@@ -1,0 +1,97 @@
+# RED: tests at 9c2f9928, the three app files reverted to 3092880b (git show 3092880b:<path> > <path>)
+ M app/Domain/Memberships/Billing/BillingLedger.php
+ M app/Domain/Memberships/Billing/BillingReconciliation.php
+ M app/Domain/Memberships/Billing/BillingWebhookIntake.php
+## BillingObservationLedgerTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+...FFF.....                                                       11 / 11 (100%)
+
+Time: 00:37.792, Memory: 91.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@subscription with data (['sub_WRONGSYNTHETIC'], [], 'subscription')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@customer with data ([], [['cus_FOREIGNSYNTHETIC']], 'customer')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_wrong_binding_retrieved_first_claims_no_invoice_identity_and_the_right_binding_still_succeeds@account with data ([], ['acct_FOREIGNSYNTHETIC'], 'account')
+A retrieval that contradicts its binding is refused, not recorded under that binding.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 26, Failures: 3.
+rc=1
+## BillingWebhookRedeliveryTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+.FFFF.                                                              6 / 6 (100%)
+
+Time: 00:20.405, Memory: 89.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => 'd6f6b75b-978a-4788-85ac-23972db80a2d',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_two_duplicates_after_a_lost_dispatch_still_result_in_one_observation
+Failed asserting that null is not null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:87
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_an_observation_older_than_the_hint_does_not_cover_it
+Failed asserting that null is not null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:105
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations
+The expected [App\Jobs\RetrieveMembershipInvoice] job was pushed 0 times instead of 2 times.
+Failed asserting that 0 is identical to 2.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:172
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:152
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:118
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 21, Failures: 4.
+rc=1
+## BillingWebhookIntakeTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+.....                                                               5 / 5 (100%)
+
+Time: 00:15.394, Memory: 89.00 MB
+
+OK (5 tests, 38 assertions)
+rc=0
+# restored: git checkout -- app
+status-lines=0

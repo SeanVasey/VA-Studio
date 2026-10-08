@@ -1,0 +1,13 @@
+head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/phpunit.xml
+
+...............................................................  63 / 115 ( 54%)
+....................................................            115 / 115 (100%)
+
+Time: 02:45.075, Memory: 111.00 MB
+
+OK (115 tests, 520 assertions)
+rc=0

@@ -1,0 +1,13 @@
+# Addendum 1 surface checks at 9c2f99289da36a17f405e68ab7396fa2d7d6a9d9
+$ git diff --stat 3092880b 9c2f9928 -- app database config routes
+ app/Domain/Memberships/Billing/BillingLedger.php   |  9 +++++
+ .../Memberships/Billing/BillingReconciliation.php  | 15 +++++++-
+ .../Memberships/Billing/BillingWebhookIntake.php   | 45 +++++++++++++++++++++-
+ 3 files changed, 67 insertions(+), 2 deletions(-)
+rc=0
+$ git diff --stat 3092880b 9c2f9928 -- routes bootstrap app/Providers config database composer.json composer.lock package.json package-lock.json .github
+rc=0 (empty output = no change)
+$ git diff 3092880b 9c2f9928 -- app | grep -nE "^\+.*(credit|award|grant|INSERT|UPDATE|DELETE|insert\(|->update|->delete)"
+rc=1 (1 = no added write/grant line)
+$ grep -rn "BillingProviderGateway|BillingWebhookIntake|RetrieveMembershipInvoice" app/Providers routes bootstrap config
+rc=1 (1 = nothing registered or bound)

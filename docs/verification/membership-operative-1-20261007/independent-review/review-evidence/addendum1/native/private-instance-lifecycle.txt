@@ -1,0 +1,12 @@
+2026-10-07T22:37:10Z reviewer (Addendum 1) private mysqld 8.4.11 --no-defaults, port 3531 (free per /proc/net/tcp; 3306 and other reviewers' 3471-3473/3493/3494/3497 untouched), datadir $scratchpad/review-member-mysql/data, socket $scratchpad/review-member-mysql/s
+2026-10-07T22:37:16Z initialize-insecure rc=0
+2026-10-07T22:37:25Z started pid 25136; ping rc=0; root password set (review-only, synthetic), database vaseyaudio_review_member created rc=0
+2026-10-07T22:52:15Z second detached worktree $scratchpad/review-member-head at 4716ae5278607b87a31317b343e4550e8403e0dc (vendor copied as symlinks); database vaseyaudio_review_member_head created on the same private instance (port 3531)
+2026-10-07T22:58:38Z dropped database vaseyaudio_review_member (aborted 9c2f9928 run); all further native runs use vaseyaudio_review_member_head only, sequentially
+2026-10-07T23:19:45Z head worktree moved to final head e26d4cb74d464943178201133612e73b16945cf1; database vaseyaudio_review_member_head dropped, vaseyaudio_review_member_final created; runner-head.sh now targets _final; all final native runs sequential on that one database
+2026-10-08T03:05:55Z completing reviewer (Addendum 1, after container restart): previous instance pid 25136 gone (/proc/25136 absent); no mysqld process used this datadir (exe scan of /proc: 0); no LISTEN on 3531; old datadir $scratchpad/review-member-mysql (229M) removed rc=0. Another lane's mysqld (scratchpad/trigscan-fix-mysql) was seen initializing and was not touched.
+2026-10-08T03:06:34Z completing reviewer: new private mysqld 8.4.11 --no-defaults, port 3531 (free per /proc/net/tcp: listeners 2024 2025 37277 41441 only; 3306 untouched), datadir $scratchpad/review-member-mysql/data, server socket $scratchpad/review-member-mysql/s, mysqlx off; clients use DB_SOCKET= empty over TCP
+2026-10-08T03:06:34Z initialize-insecure rc=0
+2026-10-08T03:07:54Z first start attempt refused (mysqld: run as root needs --user); nothing started; retried with --user=root
+2026-10-08T03:07:57Z started pid 6342; ping rc=0; root password set (review-only, synthetic), database vaseyaudio_review_member_final created rc=0
+2026-10-08T06:17:45Z completing reviewer: all native runs finished (final2-probes-native-races rc=0, final3-ProductionMembershipBilling rc=0); mysqladmin shutdown rc=0; pid 6342 exited (/proc/6342 absent); no LISTEN on 3531; no mysqld process used this datadir; datadir $scratchpad/review-member-mysql (248M) removed rc=0. Other lanes' mysqld instances (trigscan-fix, free256, supp254-a27, review-tax255) untouched.

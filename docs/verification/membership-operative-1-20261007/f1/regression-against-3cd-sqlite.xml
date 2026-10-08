@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" tests="16" assertions="26" errors="0" failures="15" skipped="0" time="13.690621">
+    <testcase name="test_captured_reader_runs_no_application_sqlite_function_during_metadata_sql" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="29" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="1.047609">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_captured_reader_runs_no_application_sqlite_function_during_metadata_sql
+SQLite must refuse to replace lower() on a captured handle.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:41
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:33
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql" tests="5" assertions="10" errors="0" failures="5" skipped="0" time="4.068381">
+      <testcase name="test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #0" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="54" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.832123">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #0
+lower must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #1" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="54" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.951647">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #1
+length must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #2" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="54" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.803522">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #2
+max must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #3" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="54" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.748376">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #3
+count must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #4" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="54" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.732713">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_function_or_aggregate_registered_before_capture_refuses_before_any_reader_sql with data set #4
+new_name must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked" tests="6" assertions="8" errors="0" failures="6" skipped="0" time="4.975229">
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #0" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.698971">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #0
+max_aggregate replacement must be refused by SQLite while captured.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #1" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.772898">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #1
+nocase replacement must be refused by SQLite while captured.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #2" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.797356">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #2
+binary replacement must be refused by SQLite while captured.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #3" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.794051">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #3
+rtrim replacement must be refused by SQLite while captured.
+Failed asserting that true is false.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #4" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="1.036175">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #4
+new_function must be refused before any reader SQL.
+Failed asserting that false is true.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:94
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #5" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="72" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.875778">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_function_or_collation_after_capture_refuses_and_builtin_replacements_are_blocked with data set #5
+new_collation must be refused before any reader SQL.
+Failed asserting that false is true.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:94
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_new_collation_registered_before_capture_refuses" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="107" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="0.937199">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_new_collation_registered_before_capture_refuses
+collation must refuse the captured reader.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:187
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_builtin_collation_replaced_before_capture_is_an_undetectable_sqlite_residual" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="119" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="2" time="1.102007"/>
+    <testcase name="test_verified_production_is_refused_on_sqlite_by_policy_and_captured_reader" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="140" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.758439">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_verified_production_is_refused_on_sqlite_by_policy_and_captured_reader
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'provenance'
++'source_capability_absent'
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:149
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_class_fetch_mode_is_refused_before_metadata_reads" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php" line="161" class="Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest" classname="Tests.Feature.ProductionMembership.MembershipRowsFunctionClosureTest" assertions="1" time="0.801757">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_class_fetch_mode_is_refused_before_metadata_reads
+Failed asserting that false is true.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:170
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:164
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

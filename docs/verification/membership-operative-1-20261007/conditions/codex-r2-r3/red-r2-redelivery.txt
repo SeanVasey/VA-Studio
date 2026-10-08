@@ -1,0 +1,45 @@
+# Red: new R-2 tests against unmodified source at 3092880bc9a216ec095975a3ae15dfa07fee68b3
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops/phpunit.xml
+
+.FFFF.                                                              6 / 6 (100%)
+
+Time: 00:08.736, Memory: 87.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => 'c68599fb-8211-4aca-b01a-d488810f4fea',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_two_duplicates_after_a_lost_dispatch_still_result_in_one_observation
+Failed asserting that null is not null.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:86
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_an_observation_older_than_the_hint_does_not_cover_it
+Failed asserting that null is not null.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations
+The expected [App\Jobs\RetrieveMembershipInvoice] job was pushed 0 times instead of 2 times.
+Failed asserting that 0 is identical to 2.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:172
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:152
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:117
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 21, Failures: 4.

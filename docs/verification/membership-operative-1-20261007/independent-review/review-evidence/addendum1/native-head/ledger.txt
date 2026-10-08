@@ -1,0 +1,22 @@
+2026-10-07T22:55:09Z start probes-native-races head 4716ae5278607b87a31317b343e4550e8403e0dc dirty=0
+2026-10-07T22:58:28Z end probes-native-races phpunit_rc=143
+2026-10-07T22:58:31Z ABORTED by reviewer: probes-native-races killed mid-run (first test errored while native-ledger ran in parallel on the same instance). Result discarded; all native runs re-done sequentially at the head.
+2026-10-07T22:58:44Z start probes-native-races head 4716ae5278607b87a31317b343e4550e8403e0dc dirty=0
+2026-10-07T23:18:10Z end probes-native-races phpunit_rc=2
+2026-10-07T23:18:10Z start native-intake head 4716ae5278607b87a31317b343e4550e8403e0dc dirty=0
+2026-10-07T23:18:51Z ABORTED by reviewer: native-intake at 4716ae52 killed (superseded by final head e26d4cb7); remaining 4716ae52 chain cancelled. Only probes-native-races at 4716ae52 completed (rc=2: 3 pass, intake-race probe harness failure, stale-race worker timeout); those two probes are fixed and re-run at e26d4cb7.
+2026-10-07T23:19:56Z start final-probes-native-races head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-07T23:39:48Z end final-probes-native-races phpunit_rc=2
+2026-10-07T23:39:48Z start final-ProductionMembershipBilling head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-08T03:08:09Z completing reviewer (after container restart): previous final-ProductionMembershipBilling run was cut off at 95/115 by the restart (no end entry); final-probes-native-races had stale-race worker SIGKILLed (memcg OOM per worker comment); both re-run as final2-* on a new private instance (port 3531, database vaseyaudio_review_member_final), sequentially, worktree /home/user/VA-Studio-review-member at e26d4cb7
+2026-10-08T03:08:14Z start final2-probes-native-races head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-08T03:08:33Z ABORTED by completing reviewer: final2-probes-native-races stopped within seconds of start (launcher relaunched detached so a 2 h tool limit cannot cut the chain); partial files discarded; chain restarted
+2026-10-08T03:08:34Z start final2-probes-native-races head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-08T03:19:26Z end final2-probes-native-races phpunit_rc=0
+2026-10-08T03:19:26Z start final2-ProductionMembershipBilling head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-08T03:31:00Z end final2-ProductionMembershipBilling phpunit_rc=143
+2026-10-08T03:31:00Z CHAIN DONE
+2026-10-08T03:31:24Z completing reviewer: final2-ProductionMembershipBilling received SIGTERM (rc 143) after 7 tests, 03:31:00Z; not sent by this reviewer (shared container, several other lanes' PHPUnit runs active; private mysqld pid 6342 still alive). Files kept as final2-ProductionMembershipBilling-sigterm.*; not cited. Database recreated; re-run as final3-ProductionMembershipBilling.
+2026-10-08T03:31:27Z start final3-ProductionMembershipBilling head e26d4cb74d464943178201133612e73b16945cf1 dirty=0
+2026-10-08T06:17:12Z end final3-ProductionMembershipBilling phpunit_rc=0
+2026-10-08T06:17:12Z CHAIN2 DONE

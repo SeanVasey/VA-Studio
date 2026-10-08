@@ -1,0 +1,38 @@
+diff --git a/app/Domain/Grants/Member/MemberGrantPolicy.php b/app/Domain/Grants/Member/MemberGrantPolicy.php
+index b475e314..4e60e103 100644
+--- a/app/Domain/Grants/Member/MemberGrantPolicy.php
++++ b/app/Domain/Grants/Member/MemberGrantPolicy.php
+@@ -91,13 +91,9 @@ final class MemberGrantPolicy
+         if ($concrete === null) {
+             return null;
+         }
+-        MemberGrantException::require($concrete instanceof Closure, 'changed_policy');
+         $function = new ReflectionFunction($concrete);
+         $variables = $function->getStaticVariables();
+-        MemberGrantException::require($function->getClosureScopeClass()?->getName() === Container::class
+-            && $function->getClosureThis() === $this->container && array_keys($variables) === ['value']
+-            && is_string($variables['value']), 'changed_policy');
+ 
+-        return $variables['value'];
++        return $variables['value'] ?? null;
+     }
+ }
+diff --git a/app/Domain/Memberships/Production/MembershipPolicy.php b/app/Domain/Memberships/Production/MembershipPolicy.php
+index 421cc074..0bdfa549 100644
+--- a/app/Domain/Memberships/Production/MembershipPolicy.php
++++ b/app/Domain/Memberships/Production/MembershipPolicy.php
+@@ -101,13 +101,9 @@ final class MembershipPolicy
+         if ($concrete === null) {
+             return null;
+         }
+-        MembershipException::require($concrete instanceof Closure, 'changed_policy');
+         $function = new ReflectionFunction($concrete);
+         $variables = $function->getStaticVariables();
+-        MembershipException::require($function->getClosureScopeClass()?->getName() === Container::class
+-            && $function->getClosureThis() === $this->container && array_keys($variables) === ['value']
+-            && is_string($variables['value']), 'changed_policy');
+ 
+-        return $variables['value'];
++        return $variables['value'] ?? null;
+     }
+ }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" tests="3" assertions="14" errors="0" failures="0" skipped="0" time="421.721201">
+    <testcase name="test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" line="37" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalSchemaPreparationTest" assertions="4" time="104.576611"/>
+    <testcase name="test_pending_original_requires_bounded_contiguous_artifacts_before_structural_activation" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" line="85" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalSchemaPreparationTest" assertions="7" time="168.757912"/>
+    <testcase name="test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php" line="118" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalSchemaPreparationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalSchemaPreparationTest" assertions="3" time="148.386677"/>
+  </testsuite>
+</testsuites>

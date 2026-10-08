@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops-native/phpunit.xml
+
+[31;1mE[0m..                                                                 3 / 3 (100%)
+
+Time: 05:22.391, Memory: 81.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'production_membership_plan_versions' referenced by a foreign key constraint 'production_membership_billing_subscriptions_f2' on table 'production_membership_billing_subscriptions'.
+
+/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:293
+/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:62
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 4[0m[37;41m, Errors: 1[0m[37;41m.[0m

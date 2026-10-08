@@ -1,0 +1,18 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+OBSERVATION race-two-bindings-mode: [w0 denied seq=- outcome=- reason=conflicting_invoice err=-] [w1 saved seq=1 outcome=refused reason=- err=-] invoices=1 observations=1
+.OBSERVATION race-two-bindings-unknown: [w0 denied seq=- outcome=- reason=provider_unavailable err=-] [w1 denied seq=- outcome=- reason=provider_unavailable err=-] invoices=0 observations=0
+.OBSERVATION race-right-vs-wrong: [w0 saved seq=1 outcome=settled reason=- err=-] [w1 denied seq=- outcome=- reason=binding_refused_subscription err=-] invoices=1 owner=right
+.OBSERVATION race-same-binding-settled: [w0 saved seq=1 outcome=settled reason=- err=-] [w1 saved seq=2 outcome=settled reason=- err=-] invoices=1 chain=1,2
+.DIAG intake-race before release: inserting=2 innodb_lock_wait=2 [{"ID":26,"COMMAND":"Execute","STATE":null,"TIME":0,"info":"INSERT INTO `production_membership_billi"},{"ID":27,"COMMAND":"Execute","STATE":null,"TIME":0,"info":"INSERT INTO `production_membership_billi"}]
+OBSERVATION intake-insert-race: lock_waiters_before_release=2 [w0 threw Illuminate\Contracts\Container\BindingResolutionException frames=receive@addendum1-intake-race-worker.php:40] [w1 threw Illuminate\Contracts\Container\BindingResolutionException frames=recoverLostDispatch@BillingWebhookIntake.php:92>receive@addendum1-intake-race-worker.php:40] events=1 loser_branch_line=92; sequential redelivery afterwards scheduled=dispatched pushed=1 observations=0
+.OBSERVATION stale-after-reversal: [stale saved seq=2 outcome=settled retrieved_at=2026-10-08 03:19:10 created_at=2026-10-08 03:19:19 err=-] [fresh saved seq=1 outcome=reversed retrieved_at=2026-10-08 03:19:13 created_at=2026-10-08 03:19:16 err=-] chain=1:reversed@retrieved 2026-10-08 03:19:13,2:settled@retrieved 2026-10-08 03:19:10 currentSettled=seq 2 settled retrieved 2026-10-08 03:19:10
+.                                                              6 / 6 (100%)
+
+Time: 10:52.389, Memory: 89.00 MB
+
+OK (6 tests, 64 assertions)
+rc=0

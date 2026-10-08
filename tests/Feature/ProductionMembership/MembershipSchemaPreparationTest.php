@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionMembership;
 
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Grants\Member\MemberGrantSchema;
+use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipRows;
@@ -289,6 +290,10 @@ class MembershipSchemaPreparationTest extends TestCase
     private function dropEmptyOwned(): void
     {
         $this->dropEmptyDependentMemberOriginals();
+        // Composed with empty Billing259, whose subscription bindings reference 257 plan versions (drift D2).
+        foreach (array_reverse(BillingSchema::TABLES) as $table) {
+            DB::connection()->getPdo()->exec('DROP TABLE IF EXISTS '.$table);
+        }
         foreach (array_reverse(MembershipSchema::TABLES) as $table) {
             DB::connection()->getPdo()->exec('DROP TABLE '.$table);
         }

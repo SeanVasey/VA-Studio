@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+OBSERVATION same-second: first scheduled=dispatched obs=1; dup@T0 scheduled=dispatched obs=2; dup@T0+1 scheduled=dispatched obs=3; dup@T0+2 scheduled=null obs=3; created_at=2026-10-07 01:00:00,2026-10-07 01:00:00,2026-10-07 01:00:01; event received_at=2026-10-07 01:00:00; chain_ok=3 credit_events=0
+.OBSERVATION stale-read: invoice read at T0 (open); hint received_at=2026-10-07 01:00:01 dispatch_lost=yes; observation outcome=not_settled reason=invoice_open retrieved_at=2026-10-07 01:00:02 created_at=2026-10-07 01:00:02; redelivery@T0+3 duplicate=true scheduled=null pushed=0
+.OBSERVATION refusal-loop: deliveries=6 retrievals=6 reasons=binding_refused_subscription|msg=Production membership billing unavailable. events=1 invoices=0 observations=0 wrong_binding=3769c8dd
+.OBSERVATION failed-job: scheduled=dispatched queued=1 worker_status=0 failed_jobs=1 first_line="App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable. in /home/user/VA-Studio-review-member/app/Domain/Memberships/Billing/BillingException.php:16" mentions_binding_refused=no mentions_line58=yes payload_has_plain_invoice_ref=yes logged=[error:Production membership billing unavailable.|ctx_reason=binding_refused_subscription] invoices=0 observations=0
+.OBSERVATION mode-first: wrong binding outcome=refused reason=mode identity_owner=wrong; right binding then=conflicting_invoice invoices=1
+.OBSERVATION unknown-first: wrong binding outcome=unknown reason=provider_unavailable; right binding then=conflicting_invoice
+.OBSERVATION storm: duplicates=25 pushed=25 (bound per invoice only by MAX_OBSERVATIONS=1000 once jobs run)
+.SSS                                                        10 / 10 (100%)
+
+Time: 00:22.128, Memory: 91.00 MB
+
+OK, but some tests were skipped!
+Tests: 10, Assertions: 17, Skipped: 3.
+rc=0
