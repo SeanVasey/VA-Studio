@@ -4,12 +4,15 @@
 # Databases must already exist on the private daemon (see mysqld-up.sh).
 set -uo pipefail
 cd "$1"
+# Every migrate:fresh status is accumulated; the script exits nonzero after the catalog dump when any one failed.
+status=0
 export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3410 DB_USERNAME=root DB_PASSWORD=
 echo "source: $(git rev-parse HEAD)  php: $(php -r 'echo PHP_VERSION;')  mysqld: $(/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql -N -uroot -h127.0.0.1 -P3410 -e 'SELECT VERSION()')"
 for db in ${DBS:-rv256_1 rv256_2 rv256_1}; do
   echo "== migrate:fresh --force on $db"
-  DB_DATABASE=$db php artisan migrate:fresh --force > /tmp/mf-$db.log 2>&1; rc=$?
+  DB_DATABASE=$db php artisan migrate:fresh --force > /tmp/mf-$db.log 2>&1; rc=$?; [ "$rc" -eq 0 ] || status=1
   grep -E "238000|FAIL|Unexpected" /tmp/mf-$db.log | head -5
   echo "exit=$rc migrations_done=$(grep -cE "^  [0-9]{4}_[0-9_]+_.* DONE" /tmp/mf-$db.log)"
 done
 /opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql -uroot -h127.0.0.1 -P3410 -e "SELECT TRIGGER_SCHEMA, COUNT(*) triggers FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA LIKE 'rv256\_%' GROUP BY TRIGGER_SCHEMA; SELECT TRIGGER_SCHEMA, TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_NAME='ptp_packet_insert';"
+exit $status
