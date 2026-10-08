@@ -36,9 +36,14 @@ async function mount(siteContent = defaultSiteContent) {
   });
 }
 
-afterEach(() => {
+afterEach(async () => {
   document.head.querySelectorAll('[data-inertia]').forEach(node => node.remove());
   window.history.replaceState({}, '', '/');
+  // Tests leave URL hashes behind (the skip link, native '/#…' clicks), and Inertia's initial page load then schedules a
+  // scrollToAnchor timer (and scroll restoration in an animation frame) that reads `document`. Let those run now, while
+  // jsdom is alive: on a slow runner they otherwise fire after the file's environment is torn down ("document is not
+  // defined", an unhandled error that fails the whole run although every test passed).
+  await new Promise(resolve => setTimeout(resolve, 25));
 });
 
 describe('read-only checkout return', () => {
