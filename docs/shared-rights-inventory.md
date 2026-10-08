@@ -12,6 +12,22 @@ This increment implements shared identity/linkage, atomic quote-bound inventory 
 
 Configuration is an explicit JSON `VASEY_TEST_INVENTORY_POLICY` with exactly `schema_version: 1`, `purpose: "test_inventory"`, integer `ttl_seconds` from 30 through 3600, and `pending: "retain_until_verified_resolution"`. Setup leaves it empty. Those bounds limit the development exercise; they do not choose U-08's production TTL. Expiry is the earlier of the requested policy interval and the quote expiry.
 
+## Operator command for test purchases
+
+Run `php artisan vasey:rights-scope list` from a trusted console on a local/testing installation. It lists scope keys and the IDs of current, active revisions on published tracks that still need linking. It never prints private evidence references. A scope link is required even for a non-exclusive test offer: without it, `PrepareOrder` refuses the selection with HTTP 409 and `INVENTORY_SCOPE_UNAVAILABLE`.
+
+For each actual rights identity, choose its scope key and a non-secret reference to its private evidence. Do not put credentials, contract text or the evidence itself in command arguments. Use the verified catalog staff account's numeric ID, then confirm that account's password at the hidden prompt:
+
+```sh
+php artisan vasey:rights-scope register --actor-id=STAFF_ID --scope=SCOPE_KEY --reference=EVIDENCE_REFERENCE
+php artisan vasey:rights-scope link --actor-id=STAFF_ID --scope=SCOPE_KEY --revision=REVISION_ID --reference=LINK_REFERENCE
+php artisan vasey:rights-scope list
+```
+
+Replace the placeholders before running. Scope keys use lowercase letters, digits and `. _ : -` (1–96 characters, starting with a letter or digit); references use letters, digits and `. _ : / -` (1–192 characters, starting with a letter or digit). Use the **revision** ID printed by `list`, not the offer ID. Link every offer revision that a buyer may select. Related variants of the same right share one scope only when the operator explicitly verifies that relationship; unrelated rights need separate scopes.
+
+Writes refuse `--no-interaction`, wrong passwords, missing/unverified staff and withdrawn catalog authority. The domain rechecks persisted authority and current publication, license, rights and media readiness inside its transaction. Identical register/link retries succeed without new rows or audits; a different scope or reference conflicts. Links are immutable, and a successor offer revision requires its own explicit link. Exit codes are 0 for success, 1 for a refused/unavailable operation and 2 for invalid input. Production remains refused. This command makes no provider call, releases no reservation and does not establish legal ownership or activate exclusive sales.
+
 ## Transactions and lifecycle
 
 Lock order is quote → all tracks sorted by ID → all offers sorted by ID → all scopes sorted by ID → reservation/claim occupancy. Scope/offer linkage takes track → offer → scope. Administrative blocking takes only the scope. A future combined checkout command must acquire pricing/campaign/use locks before inventory scopes and cannot call back into earlier locks afterward. Deadlocks retry the complete idempotent transaction at most five times; no provider call occurs inside it.
