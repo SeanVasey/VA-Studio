@@ -130,12 +130,35 @@ final class ProductionFreeGrantSpoolResidualTest extends TestCase
             $this->redeem();
             $this->fail('A symlinked sidecar must not be reclaimed');
         } catch (ProductionFreeGrantException $error) {
-            $this->assertSame('artifact_unavailable', $error->reason);
+            $this->assertSame('spool_busy', $error->reason);
         }
         $this->assertTrue(is_link($sidecar));
         $this->assertSame('outside', file_get_contents($outside));
         unlink($sidecar);
         $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($this->redeem()));
+    }
+
+    /** Review A4-2: an unreclaimable sidecar in the lowest slot must not block admission to the free slots. */
+    public function test_an_unreclaimable_sidecar_skips_its_slot_instead_of_blocking_admission(): void
+    {
+        config(['production-free-grants.spool_slots' => 3]);
+        $outside = realpath(sys_get_temp_dir()).'/va-free256-a42-'.bin2hex(random_bytes(6));
+        file_put_contents($outside, 'outside');
+        $this->beforeApplicationDestroyed(function () use ($outside): void {
+            @unlink($outside);
+        });
+        mkdir($this->spool.'/slot-0.reserve', 0700);
+        symlink($outside, $this->spool.'/slot-1.reserve');
+
+        $first = $this->redeem();
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($first));
+        $this->assertDirectoryExists($this->spool.'/slot-0.reserve');
+        $this->assertTrue(is_link($this->spool.'/slot-1.reserve'));
+        $this->assertSame('outside', file_get_contents($outside));
+        clearstatcache(true, $this->spool.'/slot-2.reserve');
+        $this->assertSame(20, filesize($this->spool.'/slot-2.reserve'));
+        rmdir($this->spool.'/slot-0.reserve');
+        unlink($this->spool.'/slot-1.reserve');
     }
 
     private function redeem(): ProductionFreeGrantTransfer

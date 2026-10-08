@@ -159,9 +159,10 @@ class ProductionFreeGrantSpool
 
     /**
      * A fixed path per locked slot keeps crash leftovers from accumulating across fresh names. Holding the slot's
-     * flock means its previous holder is gone, so a residual snapshot at exactly this slot's path is removed. Only a
-     * regular single-link file owned by this process user is removed; anything else makes the slot unusable, and it is
-     * never repaired.
+     * flock means its previous holder is gone, so a residual snapshot at exactly this slot's path is removed, and a
+     * residual reservation sidecar of the wrong size is removed for `reservation()` to recreate. Only a regular
+     * single-link file owned by this process user is removed. A slot whose snapshot or sidecar is anything else is
+     * skipped (never repaired) and the next slot is tried, so one unusable slot cannot block admission to the others.
      *
      * @return array{0:resource,1:string,2:int}
      */
@@ -177,13 +178,22 @@ class ProductionFreeGrantSpool
             $snapshot = $directory.'/slot-'.$slot.'.snapshot';
             clearstatcache(true, $snapshot);
             $residual = @lstat($snapshot);
+            $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
             if ($residual !== false) {
-                $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
                 if (($residual['mode'] & 0170000) !== 0100000 || $residual['nlink'] !== 1 || $residual['uid'] !== $owner || ! @unlink($snapshot)) {
                     fclose($candidate);
 
                     continue;
                 }
+            }
+            $sidecar = $directory.'/slot-'.$slot.'.reserve';
+            clearstatcache(true, $sidecar);
+            $reserve = @lstat($sidecar);
+            if ($reserve !== false && (($reserve['mode'] & 0170000) !== 0100000 || $reserve['nlink'] !== 1 || $reserve['uid'] !== $owner
+                || ($reserve['size'] !== 20 && ! @unlink($sidecar)))) {
+                fclose($candidate);
+
+                continue;
             }
 
             return [$candidate, $snapshot, $slot];
