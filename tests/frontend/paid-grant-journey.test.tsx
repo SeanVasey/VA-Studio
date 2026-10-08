@@ -157,4 +157,39 @@ describe('per-operation request timeouts', () => {
     expect(JSON.parse(String(replay[1]?.body))).toEqual({ requestKey: expect.stringMatching(/^[a-f0-9-]{36}$/), originHash: origin.lines[0].originHash, kind: 'master_wav', nonce: expect.stringMatching(/^[a-f0-9]{64}$/) });
     expect(screen.queryByRole('button', { name: 'Retry the exact request' })).not.toBeInTheDocument();
   });
+  it('lets a lost authorize be set aside only after a later saved read shows no live authorization of that file', async () => {
+    const statusWith = (history: unknown[]) => response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null, history }] } });
+    const lost = { id: authorizationId, kind: 'master_wav', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', attemptedAt: null };
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(statusWith([])).mockRejectedValueOnce(new Error('lost authorize answer'))
+      .mockResolvedValueOnce(statusWith([{ ...lost, status: 'unused' }])).mockResolvedValueOnce(statusWith([{ ...lost, status: 'expired' }]))
+      .mockResolvedValueOnce(response({ authorization: { ...authorization, id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' } }));
+    render(<PaidGrantJourney />); await openSaved();
+    const authorize = () => screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' });
+    const refreshStatus = async (calls: number) => { fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(calls)); await waitFor(() => expect(authorize().closest('section')).not.toHaveAttribute('aria-busy', 'true')); };
+    // A status read taken before the request says nothing about it.
+    await refreshStatus(3);
+    fireEvent.click(authorize()); expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+    const setAside = screen.getByRole('button', { name: 'Set aside and request a new authorization' });
+    expect(setAside).toBeDisabled(); expect(authorize()).toBeDisabled();
+    // The lost request may have committed a live authorization: only the exact retry may recover it.
+    await refreshStatus(5);
+    expect(screen.getByRole('button', { name: 'Retry the exact request' })).toBeEnabled(); expect(setAside).toBeDisabled(); expect(authorize()).toBeDisabled();
+    // Once a later read shows that file has no live authorization on the line, the customer may drop the old request.
+    await refreshStatus(6); expect(setAside).toBeEnabled();
+    fireEvent.click(setAside);
+    expect(screen.getByRole('alert')).toHaveTextContent('set aside');
+    expect(screen.queryByRole('button', { name: 'Retry the exact request' })).not.toBeInTheDocument(); expect(authorize()).toBeEnabled();
+    fireEvent.click(authorize()); await screen.findByRole('button', { name: 'Download authorized file' });
+    const [first, fresh] = [JSON.parse(String(fetcher.mock.calls[3][1]?.body)), JSON.parse(String(fetcher.mock.calls[6][1]?.body))];
+    expect(fetcher.mock.calls[6][0]).toBe(fetcher.mock.calls[3][0]); expect(fresh.requestKey).not.toBe(first.requestKey); expect(fresh.nonce).not.toBe(first.nonce);
+    expect(fresh).toEqual({ requestKey: expect.stringMatching(/^[a-f0-9-]{36}$/), originHash: origin.lines[0].originHash, kind: 'master_wav', nonce: expect.stringMatching(/^[a-f0-9]{64}$/) });
+  });
+  it('never offers to set aside an uncertain finalization', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('lost finalize answer'));
+    render(<PaidGrantJourney />); fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: orderId } });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare licenses for this paid order' }));
+    await screen.findByRole('button', { name: 'Retry the exact request' });
+    expect(screen.queryByRole('button', { name: 'Set aside and request a new authorization' })).not.toBeInTheDocument();
+  });
 });

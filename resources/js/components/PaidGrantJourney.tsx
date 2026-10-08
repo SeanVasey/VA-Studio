@@ -86,10 +86,10 @@ export type PaidOperation = keyof typeof paidRequestTimeouts;
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
   const [status, setStatus] = useState<Status | null>(null), [authorization, setAuthorization] = useState<Authorization | null>(null);
-  const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false);
+  const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
-  function clear() { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); setPending(null); setReviewedSaved(false); frames.current.forEach(f => f.remove()); frames.current = []; }
+  function clear() { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); setPending(null); setReviewedSaved(false); setStatusAfter(null); frames.current.forEach(f => f.remove()); frames.current = []; }
   function refuse() { clear(); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
     active.current = true;
@@ -136,7 +136,13 @@ export function PaidGrantJourney() {
   }); }
   function finalize() { if (!uuid(order) || pending) return; const p: Pending = { path: `/paid-grants/orders/${order}/finalize`, body: {}, orderId: order }; setPending(p); setReviewedSaved(false); execute(p); }
   function prepare() { if (!origin) return; const o = origin; void call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
-  function savedStatus() { if (!origin) return; const o = origin; void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setReviewedSaved(true); }); }
+  function savedStatus() { if (!origin) return; const o = origin, p = pending; void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p); setReviewedSaved(true); }); }
+  // An authorize whose answer was lost may have committed. Only a saved status read taken after that request, showing no
+  // live (unused) authorization of the same file on that line, lets the customer drop it and ask for a new one; a live one
+  // is recovered by the exact retry instead, so it never spends the per-line authorization limit twice.
+  const abandonable = !!pending && !pending.orderId && reviewedSaved && statusAfter === pending && status?.originId === pending.origin?.id
+    && status?.lines.find(s => s.id === pending.lineId)?.history.some(h => h.kind === pending.body.kind && h.status === 'unused') === false;
+  function abandon() { if (!abandonable || busy) return; setPending(null); setStatusAfter(null); setReviewedSaved(false); setMessage('The earlier authorization request was set aside. Saved status shows no live authorization for that file; you can request a new one.'); }
   function authorize(lineId: string, k: Kind) { if (!origin || pending || !origin.fulfilled) return; const line = origin.lines.find(l => l.id === lineId); if (!line) return;
     const nonce = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
     const p: Pending = { path: `/paid-grants/origins/${origin.id}/lines/${lineId}/authorize`, body: { requestKey: crypto.randomUUID(), originHash: line.originHash, kind: k, nonce }, origin, lineId };
@@ -163,7 +169,8 @@ export function PaidGrantJourney() {
     <p>Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.</p>
     {message && <div role="alert" tabIndex={-1} ref={alert} className="customer-account-message">{message}{denied && <a href="/customer/sign-in">Open a fresh sign-in page</a>}</div>}
     <button type="button" disabled={busy || denied} onClick={refresh}>{data ? 'Refresh paid licenses' : 'Open paid licenses'}</button>
-    {pending && !denied && <div><p>Review saved licenses before deliberately retrying this exact request.</p><button type="button" disabled={busy || !reviewedSaved} onClick={() => execute(pending)}>Retry the exact request</button></div>}
+    {pending && !denied && <div><p>Review saved licenses before deliberately retrying this exact request.</p><button type="button" disabled={busy || !reviewedSaved} onClick={() => execute(pending)}>Retry the exact request</button>
+      {!pending.orderId && <button type="button" disabled={busy || !abandonable} onClick={abandon}>Set aside and request a new authorization</button>}</div>}
     {!denied && <form onSubmit={e => { e.preventDefault(); finalize(); }}><label htmlFor="paid-order-reference">Saved order reference</label>
       <input id="paid-order-reference" value={order} maxLength={36} autoComplete="off" disabled={busy || !!pending} onChange={e => setOrder(e.target.value)} />
       <button type="submit" disabled={busy || !!pending || !uuid(order)}>Prepare licenses for this paid order</button></form>}
