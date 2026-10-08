@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum2\SpoolCrashProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum2/probes/SpoolCrashProbeTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="3.270212">
+    <testcase name="test_dead_holder_reservation_does_not_leak_and_live_reservation_counts" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum2/probes/SpoolCrashProbeTest.php" line="42" class="Tests\ReviewProbes\Free256\Addendum2\SpoolCrashProbeTest" classname="Tests.ReviewProbes.Free256.Addendum2.SpoolCrashProbeTest" assertions="5" time="3.270212"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+PROBE upgrade[control-unmodified]: {"rendered.library.show":"ok:complete","rendered.library.index":"ok:1","rendered.authorize.master_wav":"ok:master_wav","pending.library.show":"ok:pending","pending.library.index":"ok:1","pending.authorize.master_wav":"refused:original_pending","pending.render":"ok:complete","pending.work":"claimed"}
+.                                                                   1 / 1 (100%)
+
+Time: 00:02.770, Memory: 65.00 MB
+
+OK (1 test, 3 assertions)
+rc=0

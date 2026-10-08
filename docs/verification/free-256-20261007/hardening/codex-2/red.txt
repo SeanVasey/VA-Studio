@@ -1,0 +1,26 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 00:02.202, Memory: 81.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolReservationTest::test_two_reservations_that_fit_alone_but_not_together_are_refused_and_admitted_after_release
+Failed asserting that null is identical to 'spool_space'.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php:48
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolReservationTest::test_reservations_that_fit_together_are_admitted_and_a_failed_fill_releases_its_reservation
+Failed asserting that null is identical to 'spool_space'.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php:86
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 6[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=1

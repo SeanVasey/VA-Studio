@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ServiceProjectSchemaTest" file="/home/user/VA-Studio-review-free256-base/tests/Feature/ServiceProjectSchemaTest.php" tests="3" assertions="17" errors="0" failures="1" skipped="0" time="4.206767">
+    <testcase name="test_sql_cannot_update_delete_ignore_or_replace_original_brief_and_accepted_quote_evidence" file="/home/user/VA-Studio-review-free256-base/tests/Feature/ServiceProjectSchemaTest.php" line="36" class="Tests\Feature\ServiceProjectSchemaTest" classname="Tests.Feature.ServiceProjectSchemaTest" assertions="8" time="1.891479"/>
+    <testcase name="test_actual_rollback_failure_retains_original_rows_and_migration_bookkeeping" file="/home/user/VA-Studio-review-free256-base/tests/Feature/ServiceProjectSchemaTest.php" line="64" class="Tests\Feature\ServiceProjectSchemaTest" classname="Tests.Feature.ServiceProjectSchemaTest" assertions="1" time="1.033780">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ServiceProjectSchemaTest::test_actual_rollback_failure_retains_original_rows_and_migration_bookkeeping
+Retained service evidence must refuse rollback.
+
+/home/user/VA-Studio-review-free256-base/tests/Feature/ServiceProjectSchemaTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_failed_ddl_retains_prior_service_rows_and_retries_only_exact_owned_partial_schema" file="/home/user/VA-Studio-review-free256-base/tests/Feature/ServiceProjectSchemaTest.php" line="78" class="Tests\Feature\ServiceProjectSchemaTest" classname="Tests.Feature.ServiceProjectSchemaTest" assertions="8" time="1.281508"/>
+  </testsuite>
+</testsuites>

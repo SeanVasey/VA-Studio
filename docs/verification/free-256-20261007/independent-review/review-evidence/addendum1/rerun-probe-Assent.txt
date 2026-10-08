@@ -1,0 +1,13 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE assent.literal: 'true',1,'yes',null,false refused; missing/extra keys refused; foreign terms hash refused; origin terms_hash == definition terms_hash == configured approved hash (65a3172c197ef183be75bcb399d4c98bc4b850c651933d408cb3f3746cfefa2b); marketing_consent=unknown; origin 8f332444-ddf9-4102-bea0-ae549ab3e258
+.PROBE assent.replay: same-key replay idempotent (also after close); mismatched principal/actor refused; B replaying A's body creates B's own origin (2 origins, one per account); client-computed displayHash accepted without review(); not_open after close; stale availability refused after reopen; terms de-approval stops new assent but existing grant still delivers
+.                                                                  2 / 2 (100%)
+
+Time: 00:06.800, Memory: 89.00 MB
+
+OK (2 tests, 44 assertions)
+rc=0

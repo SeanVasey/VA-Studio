@@ -1,0 +1,15 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+PROBE auth.matrix: self_review, mfa_required, unverified, customer, demoted, unsaved, not_reviewed, stale_terms refused; author may open after independent approval
+.PROBE auth.mfa_not_required: non-MFA author+reviewer proposed/approved/opened (open=1)
+.PROBE auth.forgery: forged self-review refused by guard; forged non-MFA review admitted+read (needs APP_KEY+INSERT); forged open w/o approved terms refused at customer review (stale_terms); unkeyed seal refused (tampered); update/delete refused; DBA column edit refused (tampered)
+.PROBE auth.revocation: 4 outstanding authorizations refused (revoked), new authorizations refused, 0 redemptions; library show/index still list the origin revoked=true deliverable=false artifacts=4
+.                                                                4 / 4 (100%)
+
+Time: 00:10.582, Memory: 89.00 MB
+
+OK (4 tests, 59 assertions)
+rc=0

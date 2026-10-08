@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE race3: raw errors=0 [{"round":0,"origins":1,"outcomes":[{"ok":"c90ca4b7-a7a3-42c3-996b-da3e1a76bd44"},{"refused":"contention"}]},{"round":1,"origins":1,"outcomes":[{"ok":"63537e50-da49-478e-adf9-b93283cb06ae"},{"refused":"contention"}]},{"round":2,"origins":1,"outcomes":[{"ok":"bc3d5ee6-e5f3-4aaa-8309-21c4dbccbb6a"},{"refused":"contention"}]},{"round":3,"origins":1,"outcomes":[{"ok":"d2b3b191-423d-40ca-9687-7e0a14e250a3"},{"refused":"refused_by_guard"}]},{"round":4,"origins":1,"outcomes":[{"ok":"5d2af8e0-6e72-4215-9cd2-9b4f3e5da279"},{"refused":"contention"}]},{"round":5,"origins":1,"outcomes":[{"ok":"2a1c34b4-d812-49ce-bd1b-d388fe6473ef"},{"refused":"refused_by_guard"}]},{"round":6,"origins":1,"outcomes":[{"refused":"contention"},{"ok":"6a7f9235-b017-4763-a539-7f40a20fac89"}]},{"round":7,"origins":1,"outcomes":[{"refused":"contention"},{"ok":"76345f08-1e87-43c2-a06d-30b63c5a989a"}]}]
+.                                                                   1 / 1 (100%)
+
+Time: 02:57.480, Memory: 81.00 MB
+
+OK (1 test, 14 assertions)
+rc=0

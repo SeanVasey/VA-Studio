@@ -1,0 +1,13 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum.spool: cross-process 4th snapshot -> refused:spool_busy; residue in all 3 slots -> contract:spool_busy,master_wav:spool_busy (slots stay skipped until an operator removes residue); per-slot free-space check admitted 2 concurrent snapshots against space for 1
+.PROBE addendum.attempts: 16 failed render attempts before attempts_exhausted (32 work rows, claimed+failed per attempt); previous-key seal verifies while listed=true, after delisting=false
+.                                                                  2 / 2 (100%)
+
+Time: 00:05.903, Memory: 85.00 MB
+
+OK (2 tests, 14 assertions)
+rc=0

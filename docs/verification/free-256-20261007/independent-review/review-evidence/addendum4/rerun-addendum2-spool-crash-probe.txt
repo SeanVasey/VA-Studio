@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum2.spool:
+  after killed holder: sidecars={"slot-0.reserve":"00000000000001048576"} residue=["slot-0.snapshot"]
+  next admission with space for one: admitted; residue now=[]
+  while a live holder is mid-fill: refused:spool_space
+  residue owned by uid 65534 in all slots: refused:spool_busy, residues kept=3
+.                                                                   1 / 1 (100%)
+
+Time: 00:03.271, Memory: 59.00 MB
+
+OK (1 test, 5 assertions)
+rc=0

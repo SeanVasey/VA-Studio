@@ -1,0 +1,14 @@
+start 2026-10-08T04:27:10Z
+start instance2 port 3642 2026-10-08T04:35:40Z
+start instance3 port 3643 2026-10-08T04:35:40Z
+start instance4 port 3644 2026-10-08T04:35:40Z
+start instance5 port 3645 2026-10-08T04:50:49Z
+shutdown instance3 port 3643 pid 26283 mysqladmin rc=0 process_alive_after=yes 2026-10-08T05:28:41Z
+shutdown instance5 port 3645 pid 27595 mysqladmin rc=0 process_alive_after=yes 2026-10-08T05:28:45Z
+verify instance3: /proc/26283 absent=yes; error log ends 'Shutdown complete' 2026-10-08T05:29:00Z
+verify instance5: /proc/27595 absent=yes; error log ends 'Shutdown complete' 2026-10-08T05:29:00Z
+shutdown instance1 port 3641 pid 31315 mysqladmin rc=0 2026-10-08T05:55:44Z
+shutdown instance2 port 3642 pid 26278 mysqladmin rc=0 2026-10-08T05:55:44Z
+shutdown instance4 port 3644 pid 26284 mysqladmin rc=0 2026-10-08T05:55:44Z
+verify 2026-10-08T05:56:00Z: no LISTEN on 3641-3645; no mysqld process with a review-free256-mysql datadir (ps); other lanes' review-member-mysql and review-tax255-mysql daemons untouched
+datadirs data,data2,data3,data4,data5 deleted 2026-10-08T05:56:02Z; remaining: initialize.log initialize2.log initialize3.log initialize4.log initialize5.log lifecycle.txt mysqld.err mysqld2.err mysqld3.err mysqld4.err mysqld5.err 

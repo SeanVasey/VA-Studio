@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="14" assertions="14" errors="0" failures="0" skipped="14" time="2382.892271">
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" tests="14" assertions="14" errors="0" failures="0" skipped="14" time="2382.892271">
+      <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema" tests="14" assertions="14" errors="0" failures="0" skipped="14" time="2382.892271">
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #23" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="174.655115">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #24" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="130.138652">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #25" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="161.962426">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #26" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="212.884915">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #27" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="158.823057">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #28" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="177.182068">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #29" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="214.493570">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #30" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="86.772108">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #31" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="113.027403">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #32" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="206.460080">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #33" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="210.462346">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #34" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="210.163534">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #35" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="185.830377">
+          <skipped/>
+        </testcase>
+        <testcase name="test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema with data set #36" file="/home/user/VA-Studio-review-free256/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="41" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="1" time="140.036619">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

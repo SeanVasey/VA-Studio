@@ -1,0 +1,45 @@
+== S4 at 1860e00d3a7d3852d19126ae01ee54f50cef8660
+applied S4
+$ git diff --stat
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php
+index f9b63b01..fb6108cd 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php
+@@ -109,7 +109,7 @@ final class ProductionFreeGrantDownloads
+     {
+         ProductionFreeGrantException::require((int) $graph['origin']['account_id'] === (int) $binding['account_id']
+             && (int) $graph['origin']['user_id'] === (int) $binding['user_id'], 'not_found');
+-        ProductionFreeGrantException::require($graph['revocation'] === [], 'revoked');
++        
+         ProductionFreeGrantException::require($graph['original'] !== [], 'original_pending');
+     }
+ 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256-mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:04.948, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantDeliveryTest::test_revocation_stops_new_and_outstanding_authorizations_but_keeps_history
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'revoked'
++'refused_by_guard'
+
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php:176
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php:92
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+rc=1
+after revert: git diff --quiet -- app database resources rc=0

@@ -1,0 +1,47 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                               5 / 5 (100%)
+
+Time: 00:12.150, Memory: 89.00 MB
+
+There were 5 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolTest::test_a_fourth_concurrent_snapshot_is_refused_until_a_slot_is_released
+Must refuse spool_busy
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:190
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolTest::test_the_slot_count_comes_from_configuration
+Must refuse spool_busy
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:190
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:73
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolTest::test_low_free_space_is_refused_before_any_byte_is_written
+Failed asserting that null is identical to 16777216.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:105
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolTest::test_bytes_that_change_after_the_write_fail_the_read_back_and_release_the_slot
+Must refuse artifact_drift
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:190
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSpoolTest::test_a_prepared_snapshot_is_read_only_unlinked_and_closes_its_lease
+Failed asserting that 384 is identical to 256.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 17[0m[37;41m, Failures: 5[0m[37;41m.[0m
+rc=1
