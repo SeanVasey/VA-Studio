@@ -93,6 +93,45 @@ final class PaidGrantSpoolReservationTest extends TestCase
         $this->assertSame([], glob($this->spoolDirectory().'/slot-*.snapshot'));
     }
 
+    /**
+     * Codex P2: bytes another slot has already written are reflected by the free-space probe, so only its unwritten
+     * remainder is subtracted. `freeBytes()` is a constant here, standing for the probe after those bytes were written.
+     */
+    public function test_only_the_unwritten_part_of_another_slot_is_subtracted(): void
+    {
+        $spool = $this->spool();
+        $spool->free = (float) (self::BYTES + PaidGrantPrepareStream::RESERVE_BYTES);
+        $spool->before = self::BYTES;
+        $nested = null;
+        $spool->during = function () use ($spool, &$nested): void {
+            $spool->during = null;
+            $nested = $spool->handle($this->target());
+        };
+        // The first snapshot is fully written (not yet sealed and released): nothing of it is still pending.
+        $first = $spool->handle($this->target());
+        $this->assertNotNull($nested);
+        $nested->close();
+        $first->close();
+
+        // Half written: exactly the other half is still pending.
+        $spool->before = intdiv(self::BYTES, 2);
+        foreach ([self::BYTES / 2 - 1 => 'target_unavailable', self::BYTES / 2 => null] as $extra => $expected) {
+            $spool->free = (float) (self::BYTES + PaidGrantPrepareStream::RESERVE_BYTES + $extra);
+            $inner = 'not run';
+            $spool->during = function () use ($spool, &$inner): void {
+                $spool->during = null;
+                try {
+                    $spool->handle($this->target())->close();
+                    $inner = null;
+                } catch (DeliveryException $error) {
+                    $inner = $error->reason;
+                }
+            };
+            $spool->handle($this->target())->close();
+            $this->assertSame($expected, $inner);
+        }
+    }
+
     public function test_a_malformed_reservation_sidecar_is_never_repaired_and_its_slot_is_skipped(): void
     {
         $spool = $this->spool();
@@ -114,6 +153,9 @@ final class PaidGrantSpoolReservationTest extends TestCase
 
             public ?\Closure $during = null;
 
+            /** Bytes of the snapshot already on disk when `during` runs (0: a preparation that has not started copying). */
+            public int $before = 0;
+
             public function __construct(private readonly string $payload) {}
 
             protected function freeBytes(string $directory): float|false
@@ -123,10 +165,12 @@ final class PaidGrantSpoolReservationTest extends TestCase
 
             protected function copyTarget(array $target, $destination, int $deadline): void
             {
-                fwrite($destination, $this->payload);
+                fwrite($destination, substr($this->payload, 0, $this->before));
+                fflush($destination);
                 if ($this->during !== null) {
                     ($this->during)();
                 }
+                fwrite($destination, substr($this->payload, $this->before));
             }
         };
     }

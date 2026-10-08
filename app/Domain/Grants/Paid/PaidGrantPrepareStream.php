@@ -265,7 +265,11 @@ class PaidGrantPrepareStream
         throw new \UnexpectedValueException;
     }
 
-    /** Bytes still to be written by every other slot that is held right now. */
+    /**
+     * Bytes still to be written by every other slot that is held right now: its reservation less what its snapshot
+     * already holds, because written bytes are already reflected in the free-space probe. A snapshot that is not a
+     * regular single-link file, or is larger than its reservation, counts as nothing written (the full reservation).
+     */
     private function pending(string $spool, int $own): int
     {
         $total = 0;
@@ -283,7 +287,12 @@ class PaidGrantPrepareStream
             } finally {
                 fclose($probe);
             }
-            $total += $this->reserved($spool.'/slot-'.$slot.'.reserve');
+            $reserved = $this->reserved($spool.'/slot-'.$slot.'.reserve');
+            $snapshot = $spool.'/slot-'.$slot.'.snapshot';
+            clearstatcache(true, $snapshot);
+            $stat = @lstat($snapshot);
+            $written = is_array($stat) && ($stat['mode'] & 0170000) === 0100000 && $stat['nlink'] === 1 && $stat['size'] <= $reserved ? $stat['size'] : 0;
+            $total += $reserved - $written;
         }
 
         return $total;
