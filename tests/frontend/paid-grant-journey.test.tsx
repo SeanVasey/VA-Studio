@@ -185,6 +185,24 @@ describe('per-operation request timeouts', () => {
     expect(fetcher.mock.calls[6][0]).toBe(fetcher.mock.calls[3][0]); expect(fresh.requestKey).not.toBe(first.requestKey); expect(fresh.nonce).not.toBe(first.nonce);
     expect(fresh).toEqual({ requestKey: expect.stringMatching(/^[a-f0-9-]{36}$/), originHash: origin.lines[0].originHash, kind: 'master_wav', nonce: expect.stringMatching(/^[a-f0-9]{64}$/) });
   });
+  it('does not treat a full status window as proof that a pushed-out authorization expired', async () => {
+    const statusWith = (history: unknown[]) => response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null, history }] } });
+    // Twenty newer authorizations of another file from other tabs fill the window; none of them says anything about expiry.
+    const newer = (status: 'unused' | 'attempted' | 'expired', at = 0) => Array.from({ length: 20 }, (_, i) => ({ id: `ffffffff-ffff-4fff-8fff-${String(i).padStart(12, '0')}`, kind: 'contract',
+      issuedAt: '2026-10-07 01:09:03', expiresAt: '2026-10-07 01:19:03', status: i === at ? status : 'attempted', attemptedAt: i === at && status !== 'attempted' ? null : '2026-10-07 01:09:05' }));
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockRejectedValueOnce(new Error('lost authorize answer'))
+      .mockResolvedValueOnce(statusWith(newer('unused'))).mockResolvedValueOnce(statusWith(newer('attempted'))).mockResolvedValueOnce(statusWith(newer('expired', 19)));
+    render(<PaidGrantJourney />); await openSaved();
+    const authorize = () => screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' });
+    const refreshStatus = async (calls: number) => { fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(calls)); await waitFor(() => expect(authorize().closest('section')).not.toHaveAttribute('aria-busy', 'true')); };
+    fireEvent.click(authorize()); expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+    const setAside = screen.getByRole('button', { name: 'Set aside and request a new authorization' });
+    await refreshStatus(4); expect(setAside).toBeDisabled();
+    await refreshStatus(5); expect(setAside).toBeDisabled();
+    // The oldest entry in the full window has expired, so every older authorization on the line (the lost one included) has too.
+    await refreshStatus(6); expect(setAside).toBeEnabled();
+  });
   it('never offers to set aside an uncertain finalization', async () => {
     vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new Error('lost finalize answer'));
     render(<PaidGrantJourney />); fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: orderId } });

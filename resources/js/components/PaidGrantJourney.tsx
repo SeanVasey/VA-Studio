@@ -137,11 +137,16 @@ export function PaidGrantJourney() {
   function finalize() { if (!uuid(order) || pending) return; const p: Pending = { path: `/paid-grants/orders/${order}/finalize`, body: {}, orderId: order }; setPending(p); setReviewedSaved(false); execute(p); }
   function prepare() { if (!origin) return; const o = origin; void call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
   function savedStatus() { if (!origin) return; const o = origin, p = pending; void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p); setReviewedSaved(true); }); }
-  // An authorize whose answer was lost may have committed. Only a saved status read taken after that request, showing no
-  // live (unused) authorization of the same file on that line, lets the customer drop it and ask for a new one; a live one
-  // is recovered by the exact retry instead, so it never spends the per-line authorization limit twice.
-  const abandonable = !!pending && !pending.orderId && reviewedSaved && statusAfter === pending && status?.originId === pending.origin?.id
-    && status?.lines.find(s => s.id === pending.lineId)?.history.some(h => h.kind === pending.body.kind && h.status === 'unused') === false;
+  // An authorize whose answer was lost may have committed. Only a saved status read taken after that request may show it is
+  // not live, so the customer can drop it and ask again; a live one is recovered by the exact retry instead, so it never
+  // spends the per-line issuance limit twice. The read lists the line's newest `historyLimit` authorizations. Every
+  // authorization on a line shares the batch's fixed lifetime and is issued in id order under the batch lock, so it
+  // expires no later than any newer one: a window that is not full holds the whole line, and an expired entry in a full
+  // window proves every older authorization (one pushed out of the window included) expired too.
+  const pendingLine = pending && !pending.orderId && reviewedSaved && statusAfter === pending && status && status.originId === pending.origin?.id
+    ? status.lines.find(s => s.id === pending.lineId) : undefined;
+  const abandonable = !!pendingLine && !pendingLine.history.some(h => h.kind === pending?.body.kind && h.status === 'unused')
+    && (pendingLine.history.length < pendingLine.historyLimit || pendingLine.history.some(h => h.status === 'expired'));
   function abandon() { if (!abandonable || busy) return; setPending(null); setStatusAfter(null); setReviewedSaved(false); setMessage('The earlier authorization request was set aside. Saved status shows no live authorization for that file; you can request a new one.'); }
   function authorize(lineId: string, k: Kind) { if (!origin || pending || !origin.fulfilled) return; const line = origin.lines.find(l => l.id === lineId); if (!line) return;
     const nonce = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
