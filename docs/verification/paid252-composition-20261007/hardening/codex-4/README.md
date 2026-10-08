@@ -20,7 +20,7 @@ The gate additionally requires the window to prove the lost authorization's stat
   `unused` entry of that kind is definitive, as before.
 - **Window full:** set-aside is allowed only if some entry in it is `expired`. Every authorization on a line gets
   `created_at + delivery_policy.authorization_seconds` (`PaidGrantDownloads::authorize`). That policy is frozen in the
-  batch payload and equality-checked on every command (`PaidGrantCommands::run`). Issuance runs under the owned-graph
+  batch payload, which is sealed, hash-pinned and immutable (round 6 replaced the per-command equality check with `PaidGrantPolicy::retained`; the retained copy still decides the lifetime). Issuance runs under the owned-graph
   lock (`FOR UPDATE` on MySQL), so ids follow `created_at` on a line. An authorization pushed out of the window is older
   than every entry in it and expires no later than any of them, so one expired entry proves it expired.
 - Otherwise only the exact retry is offered.
