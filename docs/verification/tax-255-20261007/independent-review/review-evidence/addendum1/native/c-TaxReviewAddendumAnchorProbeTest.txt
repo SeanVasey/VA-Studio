@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b/phpunit.xml
+
+
+DRIVER mysql {"uuidV4":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"uuidAny":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"hex":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"timestamp":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"providerId acct_":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"providerId pi_":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"sessionId":{"valid":1,"+LF":0,"+CR":0,"+CRLF":0,"last->LF":0,"drop1+LF":0,"inner LF":0},"OLD providerId acct_ (9ec94d8c)":{"valid":1,"+LF":1,"+CR":1,"+CRLF":1,"last->LF":1,"drop1+LF":0,"inner LF":0}}
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.247, Memory: 59.00 MB
+
+OK (1 test, 8 assertions)

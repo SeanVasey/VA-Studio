@@ -1,0 +1,43 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+.............F.......                                             21 / 21 (100%)
+
+Time: 01:34.574, Memory: 114.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained@PaymentIntent amount differs from the session total with data (null, Closure Object ())
+A paid session with a mismatched money fact was retained.
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:243
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 21, Assertions: 136, Failures: 1.
+
+===== /home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php::test_q1_provider_facts exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+..F...............                                                18 / 18 (100%)
+
+Time: 01:20.443, Memory: 112.00 MB
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\TaxReviewMoneyProbeTest::test_q1_provider_facts_that_must_not_be_retained@PI amount differs from session total with data (null, Closure Object (), 'provider_uncertain/503')
+reconcile accepted
+
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php:98
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 18, Assertions: 70, Failures: 1.
+

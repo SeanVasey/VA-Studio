@@ -313,3 +313,175 @@ All 31 equal the lane's `evidence/owned-source-sha256.txt` (compared programmati
 - The auxiliary worktrees `/home/user/VA-Studio-review-tax255-{aux,main,base}` were removed with `git worktree remove --force` after confirming 0 tracked changes in each (`--force` only because of the untracked `vendor/` symlinks and `.env`). `-aux` passed `git diff --quiet -- app database` after the last mutation.
 - The review worktree `/home/user/VA-Studio-review-tax255` stays at `9ec94d8c`. `git status --short` shows only `?? docs/verification/tax-255-20261007/independent-review/`. Nothing was committed or pushed.
 - The scratchpad runner and mutation scripts remain in the session scratchpad. Copies are in `review-evidence/native/runner.sh` and `review-evidence/mutations/`.
+
+## Addendum 1: hardening `0e313aa6..f8cc0322` (head `30ec1c9a`)
+
+- Reviewed range: code `0e313aa6..f8cc0322`.
+  - `f8cc0322` fixes R-1 to R-5 and adds R-6 (Codex: the installer adopted a guard trigger without checking `DEFINER` or `SQL_MODE`).
+  - `30ec1c9a` adds only `docs/verification/tax-255-20261007/hardening/`. `git diff --name-only f8cc0322 30ec1c9a -- . ':!docs'` is empty.
+- Changed files: 10 owned PHP files plus `scripts/ci/database-sqlite-skips.json` (`addendum1/changed-files-0e313aa6-f8cc0322.txt`).
+- Untouched in this range: `bootstrap/`, `routes/web.php`, `config/app.php`, every V1 `ProductionCheckout` file and migration 246000. `git diff --quiet` over those paths exits 0.
+- I read `hardening/README.md` first.
+- Same reviewer as the decision above. It authored no lane commit, changed no app code, flag or registration, and committed and pushed nothing.
+- Date: 2026-10-08 (UTC).
+
+### Environment
+
+- Review worktree `/home/user/VA-Studio-review-tax255b` at `30ec1c9a`, made with `scripts/dev/mkworktree.sh`.
+- The previous worktree `/home/user/VA-Studio-review-tax255` was removed. Before removal I confirmed that its only uncommitted path, `independent-review/`, was byte-identical to that directory in `0e313aa6` (`diff -r` against `git archive 0e313aa6`).
+- A mutation worktree `/home/user/VA-Studio-review-tax255b-aux` at `30ec1c9a`, removed at the end.
+- Private `mysqld` 8.4.11 with `--no-defaults` on 127.0.0.1:3767:
+  - not 3306, 3711, 3721 or 3741; the listeners at start were 2024, 2025, 3711, 3741, 3751, 37277 and 41441;
+  - `--socket=` empty, `--mysqlx=OFF`, datadir in `$scratchpad/review-tax255b-mysql/`;
+  - other lanes' daemons (pids 823, 8401, 14614) were not touched.
+- Lifecycle: `addendum1/native/private-instance-lifecycle.txt`.
+- Native runs used `addendum1/native/runner.sh`, with a fresh schema per run named `rv_<stream>_*`. Since main #50 (merged here at `834a9e6d`) scopes dependency scans to the selected schema, I ran up to three streams in parallel, and every run passed. The environment is as in the main decision, with `DB_PORT=3767`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS**, again for a development merge only. R-1 to R-6 are fixed as claimed:
+
+| Finding | Fix | Evidence |
+| --- | --- | --- |
+| R-1 | Both of my original forgeries are now refused (`source_binding`, `live_unsupported`). | Probe A1; mutations A-B1 and A-B2 each turn `ProductionTaxSourceV2Test` and my probe red. |
+| R-2 | My mutations R1 to R4 now each turn exactly their own new Journey case red. | Mutations A-R1 to A-R4. |
+| R-3 | No MySQL shape guard admits a line terminator any more. | Native fragment probe. |
+| R-4 | All 11 native refusal cases and the 2 R-6 cases are now mutation-sensitive. | 10 further mutations of mine, A-N1 to A-N10, each killed natively; the lane killed 3. |
+| R-5 | Both checks are present. | Mutations A-S1 and A-S2 are each killed by Journey. |
+| R-6 | Identical to the V1 installer. | Mutations A-N9 and A-N10 are each killed natively. |
+
+The open items are below Medium. Everything the main decision does **not** approve still stands: activation, registration, a real transport, live funds, Paid252 wiring, and any policy or tax fact.
+
+### Findings (addendum 1)
+
+| ID | Severity | Finding | Recommendation |
+| --- | --- | --- | --- |
+| A1-1 | Low (forward; no consumer yet) | `accept(ProductionTaxPaidOrderSourceV2 $source, int $position, array $line, string $provenance)` proves that `$line` is exactly what **that** source mints. It does not prove that the source is the order the caller is about to grant, nor that the source is still held. **(a)** With two paid orders in one frame, `accept(A, lineB)` and `accept(B, lineA)` are refused `source_binding`, but `accept(A, lineA)` returns A's line whatever order the caller means; the adapter cannot know the intended order. **(b)** A source returned out of its `CommandTransaction` and used after commit, at transaction level 0, is still **accepted**: `line()` reads in-memory state, and `accept` calls neither `proveRetainedCurrent` nor `HeldSourceTransaction::prove`. The lane's own tests call `proveRetainedCurrent` after use; the adapter does not require it. (`addendum1/probes/binding-probe-sqlite.*`, cases A2 and A3.) | Before Paid252 wiring, either make `accept` take the caller's `CurrentRows $reader` and call `$source->proveRetainedCurrent($reader)` before (and the consumer after) the comparison, or state this as a reviewed consumer obligation with a test. The consumer must take the grant target (`order_id`, `line_id`, `origin_key`, buyer) **only** from the returned line, or pass the order id it locked so `accept` can require `$line['order_id'] === $expected`. |
+| A1-2 | Low | Judgement call 6 confirmed as a test gap. Five checks whose reviewer cases were not ported each survive the whole lane Journey class (21 tests green) and are killed only by my probe: PaymentIntent `livemode` (A-U1), PaymentIntent metadata (A-U2), `on_behalf_of` (A-U3), line currency (A-U4), and "PaymentIntent not succeeded while the session is paid" (A-U5). For A-U5 the mutated code returns `pending` and retains nothing, so it is not a money loss; the other four would let a mismatched provider fact through if the provider ever returned one. (`addendum1/mutations/A-U*.txt`.) | Before A4 binds a real transport, port those five cases from `TaxReviewMoneyProbeTest::refusedProviderFacts` into Journey. |
+| A1-I1 | Info | R-6 compares a guard's `DEFINER` and `SQL_MODE` with the **current** session's `CURRENT_USER()` and `@@SESSION.sql_mode`, exactly as V1 does. A rerun of the migration under another database user or SQL mode refuses (`guard definition`) instead of adopting. That is fail-closed, but it is an operational constraint for the deploy target (U-02). | Pin the migration user and SQL mode in the runbook when a host is chosen. |
+| A1-I2 | Info | `../README.md` still describes `accept($line, $provenance)` and says `source_hash` authenticity comes only from `lockedRead`. The hardening README flags this. | The integration owner updates those two sentences. |
+
+No new finding is Medium or above.
+
+### Rulings on the implementer's judgement calls
+
+1. **Held-source binding instead of an HMAC for R-1: accepted. `assertSelfConsistent()` may stay public, with conditions.**
+   - Binding to `$source->line($position)` is stronger than a keyed hash. It ties acceptance to the APP_KEY-sealed rows read under the held frame, and an HMAC would leave genuine old lines valid outside any frame.
+   - The binding is complete only together with A1-1: currency of the held frame, and the intended order.
+   - `assertSelfConsistent` really is non-authenticating. My probe shows it **accepts** the resealed forged line (moved order, zero tax). Today no `app/` code calls it except `accept` (grep), and its docblock says so.
+   - Conditions: keep it out of every consumer, and mark it `@internal`. The Paid252 review must confirm by grep that no `app/` caller other than `accept` uses it. If that cannot be kept, make it `private` and move the shape cases to a test-only subclass or reflection.
+2. **New reasons `live_unsupported`, `source_binding` and `session_mismatch`: accepted.**
+   - All are 409.
+   - `session_mismatch` is passed through rather than mapped to `provider_uncertain`, like `tax_ceiling` (and `retry_window` in `initiate`). The HTTP layer answers it with the sanitized 409 body.
+   - Nothing is bound, and the retained request stays, so a retry is safe: re-`create` uses the same idempotency key.
+   - The order of checks in `accept` (provenance, then shape, then binding, then self-consistency) means a genuine rehearsal line offered as `verified_production` is refused `live_unsupported` before any comparison, which is the desired default-off reading.
+   - Each reason is pinned by a test that asserts its exact string, and each dropped check is killed (A-B1, A-B2, A-S1, A-S2).
+3. **R-3 form and leaving the other `$`-anchored guards as they are: accepted, and the claim verified natively.**
+   - Method: I evaluated every generated MySQL shape fragment through a derived table aliased `NEW`, so the trigger's own expression text ran, against 7 variants of a valid value: valid, +LF, +CR, +CRLF, last character replaced by LF, first character dropped plus LF, and an inner LF.
+   - Fixed fragments: `providerId` (`acct_` and `pi_`) and `sessionId` admit only the valid value.
+   - Unchanged fragments: `uuidV4`, `uuidAny` and `hex` are bounded by an exact `CHAR_LENGTH`, so `$`-before-terminator can never leave a full match. `timestamp` is bounded by the `DATE_FORMAT(STR_TO_DATE(...))` round-trip equality. All four admit only the valid value, on MySQL and on SQLite.
+   - Control: the pre-fix `acct_` text from `9ec94d8c` admits +LF, +CR, +CRLF and last-char→LF on MySQL.
+   - Evidence: `addendum1/native/c-TaxReviewAddendumAnchorProbeTest.txt` (native, 1 test / 8 assertions, exit 0) and `addendum1/probes/anchor-probe-sqlite.txt` (1 / 7, exit 0).
+   - The unanchored negated class plus a length bound plus prefix equality is a sound, driver-symmetric form. `\z` would also work in ICU but would add escaping risk across PHP, SQL and the dictionary text, as the implementer says.
+   - The columns' own widths (`CHAR(36)`, `CHAR(64)`, `CHAR(20)`, `VARCHAR(n)`) are a further independent bound under strict mode.
+4. **Migration 255000 guard text edited in place: accepted.**
+   - `2026_10_07_255000` is not on `origin/main`: `git ls-tree origin/main database/migrations/ | grep -c 255000` gives 0 at `e94417a8`. It has never run on any production database.
+   - A database that ran the earlier text fails `assertComplete` and `up()` with `guard definition` and must be recreated, as the README says. That is fail-closed, not silent adoption.
+   - Condition: once PR #52 merges to `main`, any further change to the generated text needs a **new** migration that replaces the guards under the installer's rules, never another in-place edit.
+5. **Only 3 of 11 installer refusal cases mutation-tested: resolved by this review.**
+   - I mutated the remaining eight branches natively (A-N1 drifted guard body, A-N2 interior gap, A-N3 populated incomplete, A-N4 temporary shadow, A-N5 foreign trigger, A-N6 foreign routine, A-N7 additional owned index, A-N8 column collation drift) and the two R-6 comparisons separately (A-N9 `DEFINER`, A-N10 `SQL_MODE`).
+   - Each removal turned exactly its own case red with "Damaged installation was adopted". Each run was one test, one assertion, one failure, exit 1, filtered to that data set.
+   - Each mutation was reverted, with `git diff --quiet -- app database` exit 0 recorded.
+   - With the lane's three (foreign key consumer, additional owned guard, foreign view), all 11 refusal cases and both R-6 cases are now shown to be mutation-sensitive.
+6. **Other reviewer money cases not ported: not accepted as final.** See A1-2. Acceptable for this development merge, because nothing is bound to a real provider. Port them before A4.
+
+### Is the new `accept()` signature safe for the eventual Paid252 consumer?
+
+Yes for authenticity, but with two consumer obligations (A1-1):
+
+- **A different held source than the order being granted:** yes, a caller can pass one. The adapter binds the line to the source passed, not to the caller's intent. A consumer that locates order B, reads source A (or keeps A from an earlier iteration) and passes `(A, lineA)` gets A's genuine line back.
+  - The damage is limited if the consumer derives everything it grants from the returned line: the grant would then be A's own line, to A's buyer, at A's origin key.
+  - It becomes a mis-grant only if the consumer combines the returned line with its own separately chosen target.
+  - Required: the consumer takes the target only from the returned line, or `accept` checks an expected order id.
+- **A source used after its frame:** accepted today (probe A3). Required: `accept`, or the consumer, proves the held frame current with `proveRetainedCurrent($reader)` around the call.
+- Because `ProductionTaxPaidOrderSourceV2` has a private constructor, refuses serialization and is only minted by `lockedRead`, a caller cannot fabricate a source without reflection. Cloning is possible but yields the same immutable content.
+
+### Commands and results (addendum 1)
+
+From `/home/user/VA-Studio-review-tax255b` with `$P` as in the main decision. Every exit code is PHPUnit's own `$?`.
+
+| Selection | Engine | Exit | Result | Receipt (`addendum1/`) |
+| --- | --- | --- | --- | --- |
+| `tests/Feature/ProductionTaxCheckout` | SQLite | 0 | 142 tests, 995 assertions, 17 skipped (3 NativeSchema and 14 NativeInstaller native-only cases) | `sqlite-directory.*` |
+| `python3 -I scripts/ci/test-database-receipts.py` | n/a | 0 | 34 tests OK; the 5 distinct skipped methods all appear in the census | `census-receipts-test.*`, `census-vs-sqlite-skips.txt` |
+| `probes/TaxReviewAddendumBindingProbeTest.php` | SQLite | 0 | 3 tests, 8 assertions | `probes/binding-probe-sqlite.*` |
+| `probes/TaxReviewAddendumAnchorProbeTest.php` | SQLite | 0 | 1 test, 7 assertions | `probes/anchor-probe-sqlite.*` |
+| `ProductionTaxCheckoutGuardTest` (stream b) | MySQL 8.4.11 | 0 | 7 tests, 123 assertions, 0 skipped (includes the new trailing-terminator test) | `native/b-Guard.*` |
+| `ProductionTaxCheckoutNativeInstallerTest` (stream b) | MySQL | 0 | 14 tests, 46 assertions, 0 skipped | `native/b-NativeInstaller.*` |
+| `ProductionTaxCheckoutJourneyTest` (stream a) | MySQL | 0 | 21 tests, 139 assertions, 0 skipped (4632.6 s) | `native/a-Journey.*` |
+| `ProductionTaxSourceV2Test` (stream b) | MySQL | 0 | 5 tests, 52 assertions, 0 skipped | `native/b-SourceV2.*` |
+| `ProductionTaxPaidLineAdapterV2Test` (stream b) | MySQL | 0 | 20 tests, 26 assertions (no DB) | `native/b-PaidLineAdapterV2.*` |
+| `probes/TaxReviewAddendumAnchorProbeTest.php` (stream c) | MySQL | 0 | 1 test, 8 assertions; old text admits terminators, new text and all other fragments refuse | `native/c-TaxReviewAddendumAnchorProbeTest.*` |
+| **Native lane total** | | | **67 tests, 386 assertions, 0 failures, 0 errors, 0 skipped** | |
+
+Mutations (aux worktree at `30ec1c9a`; `mutations/mutations.py`, `mutations/run.py`, `mutations/mutation-ledger.txt`, one `.diff` and receipts per id). Each was applied by exact single-occurrence replacement and reverted with `git checkout -- app database`, and `git diff --quiet -- app database` exited 0 after every one.
+
+| ID | Mutation | Lane suite | Reviewer probe |
+| --- | --- | --- | --- |
+| A-R1 | drop `amount_received === total` | Journey red (its own new case) | red |
+| A-R2 | drop PaymentIntent `amount === total` | Journey red (its own case) | red |
+| A-R3 | drop PaymentIntent currency | Journey red (its own case) | red |
+| A-R4 | drop session currency | Journey red (its own case) | red |
+| A-B1 | drop `source_binding` in `accept` | SourceV2 red (2) | binding probe red (2) |
+| A-B2 | drop `live_unsupported` in `accept` | SourceV2 red (1) | binding probe red (1) |
+| A-S1 | drop `session_mismatch` in `initiate` | Journey red (its own case) | n/a |
+| A-S2 | drop `session_mismatch` in `reconcile` | Journey red (its own case) | n/a |
+| A-N1 to A-N8 | drop each installer refusal named in ruling 5 | NativeInstaller red, natively, exactly the targeted case | n/a |
+| A-N9, A-N10 | drop the `DEFINER` and the `SQL_MODE` comparison | NativeInstaller red, natively, exactly the targeted case | n/a |
+| A-U1 to A-U5 | drop PaymentIntent livemode, PaymentIntent metadata, `on_behalf_of`, line currency, "not succeeded while paid" | **green (gap, A1-2)** | red |
+
+Receipt note: the native mutation runs shared one runner label, so the text receipts of A-N1 to A-N3 were overwritten before I started preserving them. Their ledger lines stand. Those three were then repeated, and the repeat receipts are under `mutations/A-N{1,2,3}-*.native.*` (`mutations/receipt-copy.log`). A-N4 to A-N10 were preserved on the first run.
+
+### SHA-256 at `30ec1c9a`
+
+All 32 owned PHP files are in `addendum1/owned-source-sha256-30ec1c9a.txt`. The 10 changed in `0e313aa6..f8cc0322` are marked `*` there and listed here:
+
+| Path | SHA-256 |
+| --- | --- |
+| `app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php` | `eb10238d49f09ed0d940c09f5cd6cd9eab5d9f1f7fe0f742ed78cf75d9797264` |
+| `app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php` | `609ab675030a69b971a1e4d7e48d8ab0a26a80c88f84c0e0fea3ffc6c74a8baa` |
+| `app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php` | `a0f3a936f94f2805a3ae1588bd1488891d786e946ffc5a45d1e7198246c7b727` |
+| `app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php` | `5962c014357131c7075ae983081f1252fe933265a8a0014edb1b2edbc5b50099` |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php` | `d13500c68ecfd256cd92fa0d6c47f14a329e95e9736853aa7cb20e79fd0731dd` |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php` | `97bb264cbdf54c8ad8077ababc23010a07f830ce26872401291e41ee9aae5cd0` |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php` | `336b59f49465c3eb5c418e6ff7eeda82139cbd8d22ffbf6e409af8c3330d0082` |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php` | `5e92cd1c823e1295d15d6588711344941c9c9e2c7910ac74ca8d763ba4bc42a1` |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php` | `dd42f0c204636bd8763ff3db61a72475caf4317b81ce32edf2aa8567159071e7` |
+| `tests/Support/RecordingTaxCheckoutTransport.php` | `7d53c029d8e8ce1e4a28eb707acd690c838c20934cc0d21d1b44c8a9c2b98aac` |
+
+### Evidence index (`review-evidence/addendum1/`)
+
+- `reviewed-commit.txt`, `changed-files-0e313aa6-f8cc0322.txt`, `changed-nondoc-f8cc0322-30ec1c9a.txt` and `owned-source-sha256-30ec1c9a.txt`.
+- `sqlite-directory.*`, `census-receipts-test.*` and `census-vs-sqlite-skips.txt`.
+- `probes/`: `TaxReviewAddendumBindingProbeTest.php` and `TaxReviewAddendumAnchorProbeTest.php`, with their SQLite receipts.
+- `native/`:
+  - `runner.sh`, `run-ledger.txt` and `private-instance-lifecycle.txt`;
+  - per-run `<stream>-<class>.{txt,junit.xml,exit}`: streams `a` and `b` are the lane classes, `c` is my anchor probe, `m` is the mutation runs, whose receipts are copied under `mutations/`.
+- `mutations/`: `mutations.py`, `run.py`, `mutation-ledger.txt`, `receipt-copy.log`, `A-*.diff`, `A-*.txt`, per-class JUnit, and `A-N*.native.*`.
+
+### Untested conditions (addendum 1)
+
+- ProductionTaxCheckoutHttpBoundaryTest, PolicyTest and MigrationTest were not run natively in this addendum; the changed files they depend on are driver-independent, or are covered by Guard and NativeInstaller.
+- No MySQL concurrency or race proof.
+- No real Stripe I/O.
+- No Paid252 consumer exists, so A1-1 is shown with a probe only.
+- My binding and money probes ran on SQLite only (driver-independent PHP).
+
+### Cleanup (addendum 1)
+
+- The private `mysqld` (pid 17822, 127.0.0.1:3767) was shut down with `mysqladmin shutdown` (exit 0) at 09:02:12Z. Its `err.log` ends `MySQL Server - end`. Afterwards `/proc/17822` was absent and there were 0 LISTEN sockets on 3767.
+- The datadir `$scratchpad/review-tax255b-mysql/` (253M) was deleted, and `exists after=no` was recorded.
+- Other lanes' daemons were not touched. `pgrep -x mysqld` afterwards lists 823 and 8401. Pid 14614, another lane's, had already exited on its own.
+- `/home/user/VA-Studio-review-tax255b-aux` was removed after confirming 0 tracked changes. `/home/user/VA-Studio-review-tax255` was removed at the start, as described under "Environment".
+- The review worktree `/home/user/VA-Studio-review-tax255b` stays at `30ec1c9a`. Its only change is under `independent-review/`: `DECISION.md` (this appended section) and the new `review-evidence/addendum1/`. Nothing was committed or pushed.
+- The scratchpad scripts remain in the session scratchpad. Copies are `native/runner.sh` and `mutations/{mutations.py,run.py,rv-copy.sh,rv-tail.sh}`.

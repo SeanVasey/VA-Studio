@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php" tests="3" assertions="8" errors="0" failures="1" skipped="0" time="15.657191">
+    <testcase name="test_a1_forgeries_from_the_original_probe_are_refused_by_the_held_source_binding" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php" line="138" class="Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest" classname="Tests.ReviewProbes.TaxReviewAddendumBindingProbeTest" assertions="2" time="5.043269">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest::test_a1_forgeries_from_the_original_probe_are_refused_by_the_held_source_binding
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+     'genuine' =&gt; 'ACCEPTED',
+     'moved, zero tax, resealed' =&gt; 'source_binding/409',
+-    'live forgery as verified_production' =&gt; 'live_unsupported/409',
++    'live forgery as verified_production' =&gt; 'source_binding/409',
+     'live forgery as rehearsal' =&gt; 'source_binding/409',
+     'genuine at position 2' =&gt; 'changed/409',
+     'assertSelfConsistent(moved)' =&gt; 'ACCEPTED',
+ ]
+
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php:177
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_a1_the_adapter_binds_line_to_source_but_not_to_the_order_the_caller_intends" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php" line="182" class="Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest" classname="Tests.ReviewProbes.TaxReviewAddendumBindingProbeTest" assertions="3" time="5.670536"/>
+    <testcase name="test_a1_a_source_that_outlived_its_held_frame_is_still_accepted" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php" line="202" class="Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest" classname="Tests.ReviewProbes.TaxReviewAddendumBindingProbeTest" assertions="3" time="4.943387"/>
+  </testsuite>
+</testsuites>

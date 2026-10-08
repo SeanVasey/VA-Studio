@@ -1,0 +1,107 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+.FF..                                                               5 / 5 (100%)
+
+Time: 00:21.751, Memory: 100.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxSourceV2Test::test_a_resealed_line_moved_to_another_order_with_zero_tax_is_refused_and_the_genuine_line_is_accepted
+A resealed forged line was accepted.
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:136
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:153
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:114
+/home/user/VA-Studio-review-tax255b-aux/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-tax255b-aux/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:111
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxSourceV2Test::test_a_resealed_live_line_is_refused_until_a_reviewed_live_producer_exists
+A live line was accepted as a rehearsal.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'source_binding',
++    0 => 'changed',
+     1 => 409,
+ ]
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:138
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:175
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:114
+/home/user/VA-Studio-review-tax255b-aux/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-tax255b-aux/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:111
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:167
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 49, Failures: 2.
+
+===== /home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+
+A1 {"genuine":"ACCEPTED","moved, zero tax, resealed":"ACCEPTED","live forgery as verified_production":"live_unsupported\/409","live forgery as rehearsal":"changed\/409","genuine at position 2":"ACCEPTED","assertSelfConsistent(moved)":"ACCEPTED"}
+F
+A2 {"accept(A, lineB)":"ACCEPTED","accept(B, lineA)":"ACCEPTED","accept(A, lineA) order_id":"e8d9ade5-ee0e-4b46-b229-6222e901e6b1"}
+F
+A3 stale source accepted outside any transaction
+.                                                                 3 / 3 (100%)
+
+Time: 00:13.342, Memory: 98.00 MB
+
+There were 2 failures:
+
+1) Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest::test_a1_forgeries_from_the_original_probe_are_refused_by_the_held_source_binding
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'genuine' => 'ACCEPTED',
+-    'moved, zero tax, resealed' => 'source_binding/409',
++    'moved, zero tax, resealed' => 'ACCEPTED',
+     'live forgery as verified_production' => 'live_unsupported/409',
+-    'live forgery as rehearsal' => 'source_binding/409',
+-    'genuine at position 2' => 'changed/409',
++    'live forgery as rehearsal' => 'changed/409',
++    'genuine at position 2' => 'ACCEPTED',
+     'assertSelfConsistent(moved)' => 'ACCEPTED',
+ ]
+
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php:177
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\ReviewProbes\TaxReviewAddendumBindingProbeTest::test_a1_the_adapter_binds_line_to_source_but_not_to_the_order_the_caller_intends
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'accept(A, lineB)' => 'source_binding/409',
+-    'accept(B, lineA)' => 'source_binding/409',
++    'accept(A, lineB)' => 'ACCEPTED',
++    'accept(B, lineA)' => 'ACCEPTED',
+     'accept(A, lineA) order_id' => 'e8d9ade5-ee0e-4b46-b229-6222e901e6b1',
+ ]
+
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumBindingProbeTest.php:199
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 8, Failures: 2.
+

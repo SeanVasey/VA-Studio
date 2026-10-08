@@ -205,3 +205,22 @@ whose `DEFINER` or `SQL_MODE` differs from the installer's session, as V1 does.
 SQLite directory 142 / 995, 17 native-only skips; native MySQL 8.4.11: NativeInstaller 14/46,
 Guard 7/123, NativeSchema 3/22, Migration 10/191; Journey, SourceV2, adapter, Policy and HttpBoundary
 SQLite only. Frozen V1 files untouched.
+
+## Independent review addendum 1 (`0e313aa6..f8cc0322`)
+
+`independent-review/DECISION.md` addendum 1: **APPROVE WITH CONDITIONS** for a development merge only; R-1 to R-6
+confirmed fixed (native MySQL 8.4.11: Guard 7/123, NativeInstaller 14/46, Journey 21/139, SourceV2 5/52,
+PaidLineAdapterV2 20/26; all eight remaining installer refusal branches and both R-6 comparisons shown
+mutation-sensitive natively; R-3 shape fragments checked against seven line-terminator variants). No finding Medium or
+above. Everything the original decision excluded still stands. Conditions:
+
+1. **A1-1 Low, before any Paid252/V2 wiring:** `accept()` proves the line is exactly what the held source mints, not
+   that the source is the order being granted or that it is still held. Make `accept` take the caller's `CurrentRows`
+   reader and call `$source->proveRetainedCurrent($reader)`, and have the consumer take its grant target (order, line,
+   origin key, buyer) only from the returned line or pass an expected order id. Mark `assertSelfConsistent()`
+   `@internal` (it accepts a resealed forgery, so it is not authentication) or make it private.
+2. **A1-2 Low, before A4 binds a real transport:** port the remaining reviewer money cases (PaymentIntent `livemode`,
+   metadata, `on_behalf_of`, line currency, PaymentIntent not succeeded while the session is paid) from
+   `TaxReviewMoneyProbeTest` into the Journey test.
+3. After this PR merges, any further change to migration 255000's guards needs a new migration; pin the installer's
+   user and `sql_mode` in the runbook once a host is chosen.

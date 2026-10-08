@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b/phpunit.xml
+
+
+A1 {"genuine":"ACCEPTED","moved, zero tax, resealed":"source_binding\/409","live forgery as verified_production":"live_unsupported\/409","live forgery as rehearsal":"source_binding\/409","genuine at position 2":"changed\/409","assertSelfConsistent(moved)":"ACCEPTED"}
+.
+A2 {"accept(A, lineB)":"source_binding\/409","accept(B, lineA)":"source_binding\/409","accept(A, lineA) order_id":"75c6a40f-a526-4930-abff-46b5e940053a"}
+.
+A3 stale source accepted outside any transaction
+.                                                                 3 / 3 (100%)
+
+Time: 00:15.068, Memory: 98.00 MB
+
+OK (3 tests, 8 assertions)
