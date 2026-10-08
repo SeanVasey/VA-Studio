@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php" tests="1" assertions="54" errors="1" failures="0" skipped="0" time="414.608494">
+    <testcase name="test_native_guards_snapshot_cap_shadowing_prefix_recovery_and_parent_floor" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php" line="32" class="Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest" classname="Tests.ReviewProbes.Free256.NativeSchemaGuardProbeTest" assertions="54" time="414.608494">
+      <error type="PDOException">Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest::test_native_guards_snapshot_cap_shadowing_prefix_recovery_and_parent_floor
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'users'
+
+/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

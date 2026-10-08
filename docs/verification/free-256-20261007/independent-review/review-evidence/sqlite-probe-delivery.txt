@@ -1,0 +1,14 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+PROBE delivery.matrix: 4 roles: foreign owner/actor, wrong token, replay refused; exact bytes+hash delivered once each; TTL 300 s; expired refused; raw wrong-claim, wrong-contract-hash and post-expiry redemption refused by SQL; spool empty; transfer properties ["deadline","filename","mimeType","stream"]
+.PROBE delivery.consumer: consumer failure after redemption leaves authorization consumed (already_redeemed); 4 unlinked spool snapshots held open concurrently with no slot/disk-budget lease
+.PROBE delivery.gib: MAX+1 refused at propose (invalid_input); exactly 1073741824 bytes snapshot+streamed with sha 49bc20df15e412a64472421e13fe86ff1c5165e18b2afccf160d4dc19fe68a14 in 8.1s
+.                                                                 3 / 3 (100%)
+
+Time: 00:29.570, Memory: 89.00 MB
+
+OK (3 tests, 51 assertions)
+rc=0

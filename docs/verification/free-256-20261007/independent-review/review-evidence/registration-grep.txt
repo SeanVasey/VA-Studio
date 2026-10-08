@@ -1,0 +1,53 @@
+$ git diff --name-status fad3ab44..1860e00d
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantDocuments.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantException.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantInput.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRequestIdentity.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantSources.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantStaff.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php
+A	app/Domain/Grants/ProductionFree/ProductionFreeGrants.php
+A	config/production-free-grants.php
+A	database/migrations/2026_10_07_256000_production_free_grants.php
+A	docs/verification/free-256-20261007/README.md
+A	docs/verification/free-256-20261007/native-run1-mysql.txt
+A	docs/verification/free-256-20261007/native-run2-mysql.txt
+A	docs/verification/free-256-20261007/sqlite-production-free-grants-final.txt
+A	docs/verification/free-256-20261007/sqlite-production-free-grants.txt
+A	docs/verification/free-256-20261007/sqlite-regression-base-comparison.txt
+A	docs/verification/free-256-20261007/sqlite-regression-per-file.txt
+A	resources/contracts/production-free-v1/profile-assets.json
+A	scripts/render-production-free-grant.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantAssentTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantJourneyTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderingTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantRequestIdentityTest.php
+A	tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php
+A	tests/Support/FakeProductionFreeSources.php
+A	tests/Support/ProductionFreeGrantFixtures.php
+
+$ grep -rn "ProductionFree\|production-free-grants\|production_free_" bootstrap routes config app/Providers app/Http resources/views resources/js database/seeders
+grep_rc=1
+
+$ grep -rln "ProductionFree" app | grep -v app/Domain/Grants/ProductionFree/
+grep_rc=1
+
+$ git diff --quiet fad3ab44..1860e00d -- bootstrap routes app/Providers app/Http README.md CHANGELOG.md docs/development-order.md; echo rc
+rc=0

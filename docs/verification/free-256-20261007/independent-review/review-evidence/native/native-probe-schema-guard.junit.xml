@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php" tests="1" assertions="102" errors="0" failures="0" skipped="0" time="405.870819">
+    <testcase name="test_native_guards_snapshot_cap_shadowing_prefix_recovery_and_parent_floor" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/NativeSchemaGuardProbeTest.php" line="32" class="Tests\ReviewProbes\Free256\NativeSchemaGuardProbeTest" classname="Tests.ReviewProbes.Free256.NativeSchemaGuardProbeTest" assertions="102" time="405.870819"/>
+  </testsuite>
+</testsuites>

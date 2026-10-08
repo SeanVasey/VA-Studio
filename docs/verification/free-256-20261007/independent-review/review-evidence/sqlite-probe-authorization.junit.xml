@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\AuthorizationProbeTest" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php" tests="4" assertions="59" errors="0" failures="0" skipped="0" time="10.576472">
+    <testcase name="test_reviewer_and_actor_matrix_with_panel_mfa_required" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php" line="28" class="Tests\ReviewProbes\Free256\AuthorizationProbeTest" classname="Tests.ReviewProbes.Free256.AuthorizationProbeTest" assertions="16" time="3.448860"/>
+    <testcase name="test_panel_mfa_not_required_lets_a_non_mfa_admin_author_approve_and_open" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php" line="63" class="Tests\ReviewProbes\Free256\AuthorizationProbeTest" classname="Tests.ReviewProbes.Free256.AuthorizationProbeTest" assertions="3" time="1.531979"/>
+    <testcase name="test_forged_resealed_rows_and_tamper" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php" line="76" class="Tests\ReviewProbes\Free256\AuthorizationProbeTest" classname="Tests.ReviewProbes.Free256.AuthorizationProbeTest" assertions="19" time="1.877929"/>
+    <testcase name="test_revocation_denies_delivery_and_rendering_but_library_still_lists_the_revoked_original" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php" line="136" class="Tests\ReviewProbes\Free256\AuthorizationProbeTest" classname="Tests.ReviewProbes.Free256.AuthorizationProbeTest" assertions="21" time="3.717704"/>
+  </testsuite>
+</testsuites>

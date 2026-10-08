@@ -1,0 +1,74 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+PROBE native:
+  refused   origins: stale availability (ordinal 0 after close/reopen) [1644]
+  refused   origins: closed event as availability [1644]
+  refused   origins: staff user as customer [1644]
+  refused   origins: definition hash drift [1644]
+  refused   origins: terms hash drift [1644]
+  refused   origins: second origin same account/definition [1644]
+  refused   origins: created before availability [1644]
+  admitted  origins: positive control (B, latest open)
+  refused   work: ordinal gap first [1644]
+  refused   work: failed first [1644]
+  refused   work: created_at >= lease (CHECK) [3819]
+  admitted  work: positive control claimed
+  refused   work: second claim under live lease [1644]
+  refused   work: failure for a different claim [1644]
+  refused   work: failure with different lease [1644]
+  refused   originals: second original for an origin [1644]
+  refused   originals: after lease expiry [1644]
+  refused   originals: wrong claim [1644]
+  refused   originals: oversize bytes (CHECK) [3819]
+  refused   revocations: customer actor [1644]
+  admitted  revocations: positive control
+  refused   revocations: second revocation [1644]
+  refused   authorizations: revoked origin [1644]
+  refused   authorizations: created_at >= expires_at (CHECK) [3819]
+  refused   authorizations: foreign account for origin [1644]
+  admitted  authorizations: positive control
+  refused   redemptions: second for one authorization [1644]
+  refused   redemptions: after expiry [1644]
+  refused   redemptions: role/hash mismatch [1644]
+  admitted  redemptions: positive control
+  refused   production_free_definitions: UPDATE [1644]
+  refused   production_free_definitions: DELETE [1644]
+  refused   production_free_reviews: UPDATE [1644]
+  refused   production_free_reviews: DELETE [1644]
+  refused   production_free_availability: UPDATE [1644]
+  refused   production_free_availability: DELETE [1644]
+  refused   production_free_origins: UPDATE [1644]
+  refused   production_free_origins: DELETE [1644]
+  refused   production_free_document_work: UPDATE [1644]
+  refused   production_free_document_work: DELETE [1644]
+  refused   production_free_originals: UPDATE [1644]
+  refused   production_free_originals: DELETE [1644]
+  refused   production_free_revocations: UPDATE [1644]
+  refused   production_free_revocations: DELETE [1644]
+  refused   production_free_authorizations: UPDATE [1644]
+  refused   production_free_authorizations: DELETE [1644]
+  refused   production_free_redemptions: UPDATE [1644]
+  refused   production_free_redemptions: DELETE [1644]
+  snapshot-cap third insert error: SQLSTATE[45000]: <<Unknown error>>: 1644 Retain production free grants
+  snapshot-cap: max_origins=2, snapshot count=1, concurrent commit reached 2, snapshot session third insert admitted=false, final count=2
+  refused   reviews: customer reviewer without shadow [1644]
+  temporary users shadow: customer-as-reviewer insert admitted under shadow=true
+  domain read under temporary users shadow: parent_floor
+  domain read after shadow dropped: tampered
+  native prefix recovery: 37 of 37 prefixes resumed to the exact schema (SHOW CREATE TABLE + trigger statements)
+  refused   earlier guard hole (schema_prefix)
+  refused   temporary users shadow (installer) (parent_floor)
+  refused   temporary users shadow (domain command) (parent_floor)
+  refused   temporary customer_accounts shadow (installer) (parent_floor)
+  refused   temporary customer_accounts shadow (domain command) (parent_floor)
+  refused   customer_accounts.active drift (parent_floor)
+  refused   users.email_verified_at drift (parent_floor)
+.                                                                   1 / 1 (100%)
+
+Time: 06:45.875, Memory: 85.00 MB
+
+OK (1 test, 102 assertions)
+rc=0

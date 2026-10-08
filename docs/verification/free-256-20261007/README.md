@@ -211,12 +211,49 @@ MemberOriginalSchemaPreparation) were re-run afterwards with the file in place: 
 
 ## Untested
 
-- Native MySQL for Approval, Assent, Rendering, Library, Delivery and FrozenBytes (SQLite only); native prefix
-  recovery for all 37 prefixes, native temporary-parent shadow and native parent-column drift (SQLite only).
-- Concurrency: simultaneous assent near `max_origins` across accounts, concurrent claims/redemptions, worker races.
-  Accept and render lock the definition/origin row `FOR UPDATE` on MySQL and UNIQUE keys back the one-per-account,
-  one-original and one-use rules, but no race test exercises them.
+- Lane-authored native tests for Approval, Assent, Rendering, Library, Delivery and FrozenBytes, native prefix
+  recovery, temporary-parent shadow and parent-column drift. The independent reviewer has since run the whole
+  directory natively (93/522, 0 failures, 39 SQLite-only skips) and probed all three natively (see the review
+  section below); the lane's own suite still exercises them on SQLite only.
+- Concurrency in the lane suite. The reviewer's two-process native probe found 0 cap violations in 10 rounds,
+  one render claim and one redemption per race (`independent-review/review-evidence/native-race-log.json`); no
+  lane regression test exercises these races yet.
 - Callback/commit attacks (committing/postcommit/response/first-byte withdrawal, raw reopen, custom PDO statement
   class mid-command beyond the constructor check, config withdrawal between the two delivery transactions).
 - Large assets (>16 MiB) and the 1 GiB snapshot limit; disk-full during spool or original storage.
 - HTTP: nothing is mounted, so no request, session-marker, CSRF or response-header behaviour is tested.
+
+## Independent review (`1860e00d`)
+
+`independent-review/DECISION.md`: **APPROVE WITH CONDITIONS for a development merge
+only.** The batch is default-off, unregistered and unmounted, and adds files only. The
+reviewer ran the directory natively for the first time (93 tests, 522 assertions,
+0 failures, 39 SQLite-only skips by design; six shards exit 0), a two-process native
+concurrency probe (0 cap violations in 10 rounds; one render claim, one redemption per
+race), write-once, path-traversal, approval-forgery, revocation and default-off probes,
+and mutations S1–S6 (all caught) and U1–U3.
+
+Conditions before activation or mounting (none blocks this development merge):
+
+1. **F-1 Medium:** every read compares the sealed profile with the current renderer
+   profile, so a legitimate renderer revision makes existing grants refuse with
+   `profile_changed`. Check stored profiles against their own sealed hash; require the
+   current renderer only for render and recover; keep a registry of past profiles. Fix
+   before any operative definition exists.
+2. **F-2 Medium:** the delivery spool has no slot lease, free-space reserve, disk budget
+   or read-back. Reuse the `PrepareTestDeliveryStream` pattern before the delivery
+   endpoint is mounted.
+3. Owner-doc steps 3 (commit observer) and 5 (committed-frame delivery validation) and
+   the ff0 capsule before mounting.
+4. **F-3 Low:** require MFA enrollment for 256 staff in every environment before staff
+   actions are mounted.
+5. Root's sources adapter must refuse withdrawn or quarantined assets in `open()` and
+   serialize exclusive scope/inventory (**F-7**).
+6. Hardening before production provenance: **F-4** (session temporary-table shadow;
+   re-check the parent floor in the step 3 commit observer), **F-5** (dangling symlink
+   creates an empty file outside the root; write to a random name then `link()`),
+   **F-6** (renderer child `open_basedir` is the project root), **F-8** (`APP_KEY`
+   rotation reads every seal as tampered).
+
+The reviewer's I-10 (`CapabilityMigrationOwnership` scanning triggers across every
+schema) was fixed on `main` by PR #50 (`df8126a2`).
