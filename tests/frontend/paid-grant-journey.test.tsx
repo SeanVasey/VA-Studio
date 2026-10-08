@@ -235,6 +235,36 @@ describe('mounted original paid-purpose journey', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Retry the authorized download' }));
     expect(forms).toEqual([token, token]); expect(document.body.innerHTML).not.toContain(token);
   });
+  it('keeps the retry for an earlier refused download when a later download was submitted before the earlier frame answered', async () => {
+    const contract = { id: authorizationId, token: 'FIRST_SUBMITTED_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' };
+    const master = { id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee', token: 'SECOND_SUBMITTED_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'master_wav', filename: `paid-license-${lineId}-master_wav.wav`, mimeType: 'audio/wav' };
+    const status = response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 1, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null,
+      history: [{ id: master.id, kind: 'master_wav', issuedAt: '2026-10-07 01:02:04', expiresAt: '2026-10-07 01:03:04', status: 'attempted', attemptedAt: '2026-10-07 01:02:09' },
+        { id: authorizationId, kind: 'contract', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: 'unused', attemptedAt: null }] }] } });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ authorization: contract })).mockResolvedValueOnce(response({ authorization: master }))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(status);
+    const forms: string[] = [];
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(function (this: HTMLFormElement) { forms.push((this.querySelector('input[name="token"]') as HTMLInputElement).value); });
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    await screen.findByRole('button', { name: 'Download authorized file' });
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' }));
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'Download authorized file' })).toHaveLength(2));
+    // Both downloads are submitted before either frame answers.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Download authorized file' })[0]);
+    fireEvent.click(screen.getByRole('button', { name: 'Download authorized file' }));
+    const [first] = Array.from(document.querySelectorAll<HTMLIFrameElement>('iframe[title="Paid license attachment response"]'));
+    // The earlier (contract) submission is refused before anything is recorded.
+    Object.defineProperty(first, 'contentDocument', { value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' }, body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { first.dispatchEvent(new Event('load')); });
+    fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' }));
+    // Only the refused contract is offered; the attempted master is not.
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry the authorized download' }));
+    expect(forms).toEqual([contract.token, master.token, contract.token]); expect(document.body.innerHTML).not.toContain(contract.token);
+  });
   it('uses token-free saved lease admission before retrying a claimed original and displays consumed attempts truthfully', async () => {
     const claimed: PaidOrigin = { ...origin, lines: [{ ...origin.lines[0], documentStatus: 'claimed', attempts: 1 }] };
     const status = { schemaVersion: 1, originId: batchId, fulfilled: false, lines: [{ id: lineId, attemptCount: 1, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: true, renderRetryAfter: '2026-10-07 01:07:03',

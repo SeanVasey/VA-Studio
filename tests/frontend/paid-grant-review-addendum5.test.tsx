@@ -97,7 +97,7 @@ describe('review addendum 5: retry only after its own refusal', () => {
     expect(retry()).not.toBeInTheDocument();
   });
 
-  it('a newer submission replaces the refused mark, so an older refused authorization is no longer offered', async () => {
+  it('offers only refused submissions: an authorization whose frame has not answered is not offered even when listed unused', async () => {
     vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
     const master = { authorization: { ...auth.authorization, id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee', kind: 'master_wav', filename: `paid-license-${lineId}-master_wav.wav`, mimeType: 'audio/wav' } };
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(auth))
@@ -109,7 +109,8 @@ describe('review addendum 5: retry only after its own refusal', () => {
     // The master is refused here; the contract frame has not answered.
     await act(async () => { refuseFrame(masterFrame); });
     expect(contract.isConnected).toBe(true);
-    // The read lists the contract authorization unused, but the kept (refused) mark is the master's, which it does not list.
+    // The read lists the contract authorization unused, but only the master was refused (Codex round 17 keeps marks per
+    // authorization), and the read does not list the master.
     fireEvent.click(button('Open paid licenses'));
     fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
     await readStatus(fetcher, 7);

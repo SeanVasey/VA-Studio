@@ -90,12 +90,12 @@ export function PaidGrantJourney() {
   const [status, setStatus] = useState<Status | null>(null), [issued, setIssued] = useState<{ auth: Authorization; originId: string }[]>([]);
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
-  const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean } | null>(null), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
+  const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
-  function refuse() { clear(); kept.current = null; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
+  function refuse() { clear(); kept.current = []; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
     active.current = true;
-    const leave = () => { generation.current++; request.current?.abort(); clear(); kept.current = null; setIssued([]); inflight.current = false; setBusy(false); };
+    const leave = () => { generation.current++; request.current?.abort(); clear(); kept.current = []; setIssued([]); inflight.current = false; setBusy(false); };
     // Hiding the tab is not leaving: everything shown is cleared and an in-flight request is abandoned, but an uncertain
     // finalize or authorize keeps its exact replay (same request key and nonce, held in memory and never rendered), so a
     // committed authorization can still be recovered instead of duplicated. Hidden download frames are kept too: removing
@@ -173,9 +173,10 @@ export function PaidGrantJourney() {
   // exact authorization still unused, the customer can retry it instead of issuing another. The server refuses a spent or
   // expired token, so a retry can never redeem twice. A denial or leaving the page drops it.
 
-  function retryDownload() { if (kept.current?.refused) submit(kept.current.auth); }
+  // Kept per authorization: a second submission before the first frame answers must not orphan the first one's retry.
+  function retryDownload(a: Authorization) { if (kept.current.some(m => m.auth.id === a.id && m.refused)) submit(a); }
   function submit(a: Authorization) {
-    const token = csrf(); if (!token || denied || busy) return; setIssued(list => list.filter(i => i.auth.id !== a.id)); const mark = { auth: a, refused: false }; kept.current = mark; setStatus(null);
+    const token = csrf(); if (!token || denied || busy) return; setIssued(list => list.filter(i => i.auth.id !== a.id)); const mark = { auth: a, refused: false }; kept.current = [...kept.current.filter(m => m.auth.id !== a.id), mark]; setStatus(null);
     // Frames are never evicted to make room: removing one that has not reported back would abort a download the server may
     // still commit. They are removed on their own refusal, a denial, leaving the page and unmount.
     const frame = document.createElement('iframe'); frame.name = `paid-grant-${crypto.randomUUID()}`; frame.title = 'Paid license attachment response'; frame.hidden = true; frame.setAttribute('referrerpolicy', 'no-referrer');
@@ -197,9 +198,8 @@ export function PaidGrantJourney() {
     catch { setMessage(unknown); } finally { form.querySelectorAll('input').forEach(f => { f.value = ''; }); form.remove(); }
   }
   const shown = origin ? issued.filter(i => i.originId === origin.id).map(i => i.auth) : [];
-  const retained = kept.current?.refused ? kept.current.auth : null, keptUnused = !!retained && !denied && !!origin && status?.originId === origin.id
-    && shown.every(a => a.id !== retained.id)
-    && status.lines.some(l => l.history.some(h => h.id === retained.id && h.kind === retained.kind && h.status === 'unused'));
+  const retryable = denied || !origin || status?.originId !== origin.id ? [] : kept.current.filter(m => m.refused).map(m => m.auth)
+    .filter(r => shown.every(a => a.id !== r.id) && status.lines.some(l => l.history.some(h => h.id === r.id && h.kind === r.kind && h.status === 'unused')));
   const unfinished = origin?.lines.filter(l => l.documentStatus !== 'complete') ?? [];
   const retryAllowed = unfinished.length > 0 && unfinished.every(l => l.attempts < 5 && (l.documentStatus !== 'claimed' || status?.lines.find(s => s.id === l.id)?.renderRetryAllowed === true));
   return <section aria-label="Paid license journey" aria-busy={busy}>
@@ -226,7 +226,7 @@ export function PaidGrantJourney() {
         {l.files.map(f => <div key={f.kind}><p>{f.kind} / {f.sizeBytes} bytes / SHA256 {f.sha256}</p><button type="button" disabled={busy || !!pending} onClick={() => authorize(l.id, f.kind)}>Authorize {f.kind} for {l.title}</button></div>)}
       </article>)}
       {shown.map(a => <div key={a.id}><p>{a.filename}; expires {a.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => submit(a)}>Download authorized file</button></div>)}
-      {keptUnused && retained && <div><p>{retained.filename} is still authorized and unused; expires {retained.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={retryDownload}>Retry the authorized download</button></div>}
+      {retryable.map(r => <div key={r.id}><p>{r.filename} is still authorized and unused; expires {r.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => retryDownload(r)}>Retry the authorized download</button></div>)}
     </section>}
   </section>;
 }
