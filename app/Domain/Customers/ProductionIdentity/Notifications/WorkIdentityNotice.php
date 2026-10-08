@@ -46,7 +46,7 @@ final class WorkIdentityNotice
         }
         IdentityEvidence::verify('challenge', $selectedChallenge, 'challenge_hash');
         $payload = Crypt::decryptString($selectedChallenge['payload_ciphertext']);
-        if (! hash_equals($selectedChallenge['payload_hash'], IdentityPolicy::digest('payload', $payload))) {
+        if (! IdentityPolicy::matches('payload', $payload, $selectedChallenge['payload_hash'])) {
             throw new IdentityException;
         }
         $decoded = json_decode($payload, true, 8, JSON_THROW_ON_ERROR);
@@ -54,7 +54,7 @@ final class WorkIdentityNotice
             throw new IdentityException;
         }
         $email = IdentityPolicy::email($decoded['recipient'] ?? '');
-        if (! hash_equals($selectedChallenge['recipient_hmac'], IdentityPolicy::digest('recipient', $email))) {
+        if (! IdentityPolicy::matches('recipient', $email, $selectedChallenge['recipient_hmac'])) {
             throw new IdentityException;
         }
         $mail = new IdentityMail($selectedNotice['public_id'], $selectedChallenge['purpose'], $scope, $email, $decoded['url'] ?? '');
@@ -107,7 +107,7 @@ final class WorkIdentityNotice
             $database->same($claim['notice'], $database->rows->one('production_identity_notices', $noticeId));
             $database->same($attempt, $database->rows->one('production_identity_attempts', (int) $attempt['id']));
             if ($database->rows->rows('production_identity_outcomes', 'attempt_id = ?', [(int) $attempt['id']], 1) !== []
-                || ! hash_equals($attempt['token_hash'], IdentityPolicy::digest('lease', $token)) || $terminalNow >= $attempt['lease_expires_at']) {
+                || ! IdentityPolicy::matches('lease', $token, $attempt['token_hash']) || $terminalNow >= $attempt['lease_expires_at']) {
                 throw new IdentityException;
             }
             $database->close(false);
@@ -155,8 +155,8 @@ final class WorkIdentityNotice
                 || (string) $account['active'] !== '1' || (int) $account['user_id'] !== (int) $user['id']
                 || (int) $account['access_version'] !== (int) $selector['bound_access_version'] || (int) $origin['account_id'] !== (int) $account['id']
                 || (int) $origin['user_id'] !== (int) $user['id'] || $origin['provenance'] !== $selector['provenance']
-                || ! hash_equals($selector['bound_credential_binding'], IdentityPolicy::digest('credential', $user['password']))
-                || ! hash_equals($selector['recipient_hmac'], IdentityPolicy::digest('recipient', IdentityPolicy::email($user['email']))))) {
+                || ! IdentityPolicy::matches('credential', $user['password'], $selector['bound_credential_binding'])
+                || ! IdentityPolicy::matches('recipient', IdentityPolicy::email($user['email']), $selector['recipient_hmac']))) {
                 throw new IdentityException;
             }
             if ($origin !== []) {

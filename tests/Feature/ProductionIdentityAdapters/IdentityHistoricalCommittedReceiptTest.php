@@ -98,7 +98,7 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
 
     public static function terminalWithdrawals(): array
     {
-        return [['flag'], ['lazy_secondary'], ['statement_class'], ['database_name'], ['temporary_users']];
+        return [['flag'], ['lazy_secondary'], ['statement_class'], ['database_name'], ['temporary_users'], ['previous_keys']];
     }
 
     #[DataProvider('terminalWithdrawals')]
@@ -128,6 +128,9 @@ final class IdentityHistoricalCommittedReceiptTest extends TestCase
                 $pdo->setAttribute(PDO::ATTR_STATEMENT_CLASS, [HistoricalStatementCallback::class, []]);
             } elseif ($mode === 'database_name') {
                 DB::connection()->setDatabaseName('foreign_identity');
+            } elseif ($mode === 'previous_keys') {
+                // Stored digests verify under every configured key, so the candidate list is closed like app.key.
+                config(['app.previous_keys' => [...config('app.previous_keys', []), 'base64:'.base64_encode(str_repeat('p', 32))]]);
             } else {
                 $pdo->exec(DB::getDriverName() === 'sqlite' ? 'CREATE TEMP TABLE users AS SELECT * FROM main.users'
                     : 'CREATE TEMPORARY TABLE users AS SELECT * FROM users');

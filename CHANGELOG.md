@@ -45,6 +45,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Production customer identity survives a routine `APP_KEY` rotation. Stored identity digests (owner, credential, recipient, address, request, payload, proof, completion, lease and evidence hashes, plus consent recipient digests) verify in constant time under the current key or any `APP_PREVIOUS_KEYS` entry, and address/request lookups select under every candidate, refusing ambiguous matches. New digests use only the current key, a removed or unknown key never verifies, and nothing stored is re-keyed. Customers sign in again after a rotation because the session marker is current-key only.
 - Publication-guard tests compare complete audit contexts with strict canonical JSON while retaining typed values, and explicitly prove ordinary null-tag normalization before complete row comparisons. The separate synthetic quote publisher enrolls through the existing encrypted MFA helper when used by required-MFA inquiry fixtures; application authority and all race cases remain intact.
 
 - Private Tracks updates rejected before Livewire component boot now receive generic private errors and no-store/noindex protection when the actual server update route carries a valid signed Tracks snapshot. CSRF remains HTTP 419; forged names, signatures and client markers cannot opt unrelated requests into this scope.

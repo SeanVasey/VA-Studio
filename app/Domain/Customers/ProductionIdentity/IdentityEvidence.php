@@ -25,7 +25,21 @@ final class IdentityEvidence
     private const INTEGERS = ['address_id', 'bound_user_id', 'bound_account_id', 'bound_origin_id', 'bound_access_version',
         'account_id', 'user_id', 'initial_challenge_id', 'origin_id', 'challenge_id', 'sequence'];
 
+    /** New evidence is committed with the current key only. */
     public static function hash(string $kind, array $row): string
+    {
+        return IdentityPolicy::digest('evidence-'.$kind, self::value($kind, $row));
+    }
+
+    /** Retained evidence verifies under any configured key, so a routine key rotation does not orphan it. */
+    public static function verify(string $kind, array $row, string $column): void
+    {
+        if (! is_string($row[$column] ?? null) || ! IdentityPolicy::matches('evidence-'.$kind, self::value($kind, $row), $row[$column])) {
+            throw new IdentityException;
+        }
+    }
+
+    private static function value(string $kind, array $row): string
     {
         $fields = self::FIELDS[$kind] ?? throw new IdentityException;
         $value = ['schema_version' => 1, 'kind' => $kind, 'canonicalization_version' => CanonicalJson::VERSION];
@@ -36,13 +50,6 @@ final class IdentityEvidence
             $value[$field] = in_array($field, self::INTEGERS, true) ? (int) $row[$field] : (string) $row[$field];
         }
 
-        return IdentityPolicy::digest('evidence-'.$kind, CanonicalJson::encode($value));
-    }
-
-    public static function verify(string $kind, array $row, string $column): void
-    {
-        if (! is_string($row[$column] ?? null) || ! hash_equals($row[$column], self::hash($kind, $row))) {
-            throw new IdentityException;
-        }
+        return CanonicalJson::encode($value);
     }
 }

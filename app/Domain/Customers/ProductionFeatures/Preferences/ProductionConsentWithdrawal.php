@@ -93,7 +93,7 @@ final class ProductionConsentWithdrawal implements JsonSerializable
         }
         $context->admitConfiguration();
         $recipient = IdentityPolicy::email($context->authority()['identity']['user']['email']);
-        if ($capture['email'] !== $recipient || ! hash_equals(ProductionConsentRecords::recipientHash($binding, $recipient, $configuration), $withdrawal['recipient_hmac'])) {
+        if ($capture['email'] !== $recipient || ! ProductionConsentRecords::recipientMatches($binding, $recipient, $withdrawal['recipient_hmac'], $configuration)) {
             return null;
         }
 
