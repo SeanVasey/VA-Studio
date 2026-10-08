@@ -1,5 +1,8 @@
 # Finish-out plan and session protocol — Claude Code, from 2026-10-07
 
+> **Current priority (2026-10-08):** the Monday staging target. Its live tracker is
+> `docs/handoff/2026-10-08/MONDAY-PLAN.md`; read it first. This file remains the long plan and the merge ledger.
+
 Read this file first in every session. It is the single entry point; the six
 owner packets, `README.md`, `BRANCHES.md` and `remote-branches.json` beside it
 are reference material, not the plan. Update the **State** table at the end of
