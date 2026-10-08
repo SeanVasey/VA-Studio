@@ -222,7 +222,7 @@ class TestFulfillmentActivationTest extends TestCase
         $this->assertDatabaseCount('test_fulfillment_activations', 0);
     }
 
-    public static function deniedPolicies(): array { return [['disabled'], ['string_enabled'], ['missing_policy'], ['extra_policy'], ['live'], ['wrong_account'], ['production'], ['staging']]; }
+    public static function deniedPolicies(): array { return [['disabled'], ['string_enabled'], ['missing_policy'], ['extra_policy'], ['live'], ['wrong_account'], ['production'], ['preview'], ['staging_live']]; }
 
     #[DataProvider('deniedPolicies')]
     public function test_activation_requires_its_own_strict_policy_and_account(string $scenario): void
@@ -237,7 +237,8 @@ class TestFulfillmentActivationTest extends TestCase
                 'extra_policy' => config(['delivery.test_activation_policy' => json_encode($policy, JSON_THROW_ON_ERROR)]),
                 'live' => config(['payments.stripe.mode' => 'live']),
                 'wrong_account' => config(['payments.stripe.account_id' => 'acct_ANOTHERACCOUNT']),
-                'production', 'staging' => $this->app->detectEnvironment(fn () => $scenario),
+                'production', 'preview' => $this->app->detectEnvironment(fn () => $scenario),
+                'staging_live' => [$this->app->detectEnvironment(fn () => 'staging'), config(['payments.stripe.mode' => 'live'])],
             };
             $this->assertSame('unavailable', app(ActivateTestFulfillment::class)->handle($f['order']->id));
             $this->assertDatabaseCount('test_fulfillment_activations', 0); $this->assertSame([], $this->assets->transactionLevels);

@@ -3,13 +3,14 @@
 namespace App\Domain\Commerce\Inventory;
 
 use App\Domain\Commerce\QuoteException;
+use App\Support\Environment\TestEnvironment;
 use JsonException;
 
 final class InventoryPolicy
 {
     public static function requireTestEnvironment(): void
     {
-        if (! app()->environment('local', 'testing')) { throw new QuoteException('INVENTORY_UNAVAILABLE', 503); }
+        if (! TestEnvironment::admitsTestCommerce()) { throw new QuoteException('INVENTORY_UNAVAILABLE', 503); }
     }
 
     public function current(): array

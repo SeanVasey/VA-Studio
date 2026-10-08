@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce;
 
+use App\Support\Environment\TestEnvironment;
 use App\Support\Money\AllocateDiscount;
 use App\Support\Money\MinorUnits;
 use InvalidArgumentException;
@@ -17,7 +18,7 @@ final class PromotionPolicy
 
     public function current(string $code): array
     {
-        if (! app()->environment('local', 'testing')) {
+        if (! TestEnvironment::admitsTestCommerce()) {
             throw new QuoteException('PROMOTION_UNAVAILABLE', 503);
         }
         $selected = app(PromotionAdministration::class)->currentPolicy($code);

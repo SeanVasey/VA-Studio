@@ -3,6 +3,7 @@
 namespace App\Domain\Memberships\Production;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Support\Environment\TestEnvironment;
 use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -40,6 +41,8 @@ final class MembershipPolicy
         MembershipException::require($configuration['enabled'] === true && $configuration['version'] === self::VERSION, 'disabled');
         MembershipException::require(in_array($configuration['provenance'], [IdentityPolicy::REHEARSAL, IdentityPolicy::PRODUCTION], true)
             && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
+            // Staging is a test installation: verified production provenance is refused there.
+            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment']))
             // Only the native driver can serve verified evidence; SQLite callbacks are not fully enumerable.
             && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || $configuration['driver'] === 'mysql'), 'provenance');
         MembershipException::require(is_string($configuration['approved_policy_hash'])

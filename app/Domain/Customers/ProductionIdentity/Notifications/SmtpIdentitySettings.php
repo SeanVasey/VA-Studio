@@ -5,6 +5,7 @@ namespace App\Domain\Customers\ProductionIdentity\Notifications;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use JsonSerializable;
 use LogicException;
 use SensitiveParameter;
@@ -65,7 +66,8 @@ final readonly class SmtpIdentitySettings implements JsonSerializable
             'ca_hash' => $caFile === null ? null : hash_file('sha256', $caFile)]);
 
         $rehearsalEnvironment = app()->environment('local', 'testing');
-        $environmentAdmitted = $rehearsalEnvironment ? $provenance === IdentityPolicy::REHEARSAL : $provenance === IdentityPolicy::PRODUCTION;
+        $environmentAdmitted = $rehearsalEnvironment ? $provenance === IdentityPolicy::REHEARSAL
+            : $provenance === IdentityPolicy::PRODUCTION && ! TestEnvironment::refusesProductionOnly();
 
         return new self($provenance, $host, $port, $security, $sender, $hello, $username, $password, $capability, $caFile, $environmentAdmitted);
     }

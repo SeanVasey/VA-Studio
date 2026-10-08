@@ -132,7 +132,7 @@ class StripePaymentGatewayTest extends TestCase
 
     public static function nonDevelopmentPaymentEnvironments(): array
     {
-        return [['production'], ['staging']];
+        return [['production'], ['preview']];
     }
 
     #[DataProvider('nonDevelopmentPaymentEnvironments')]

@@ -9,6 +9,7 @@ use App\Domain\Commerce\Models\PromotionUse;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -170,7 +171,7 @@ final class PromotionAdministration
 
     private function actor(User $actor): User
     {
-        if (! app()->environment('local', 'testing')) { throw new AuthorizationException; }
+        if (! TestEnvironment::admitsTestCommerce()) { throw new AuthorizationException; }
         // A current locking read defeats a previously established MySQL consistent-read snapshot.
         $query = User::query();
         if (DB::transactionLevel() > 0) { $query->sharedLock(); }

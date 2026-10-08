@@ -2,6 +2,7 @@
 
 namespace App\Domain\Memberships;
 
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -24,7 +25,7 @@ final class MembershipPolicy
 
     public function enabled(): bool
     {
-        return app()->environment('local', 'testing') && config('memberships.test_mode_enabled') === true;
+        return TestEnvironment::admitsTestCommerce() && config('memberships.test_mode_enabled') === true;
     }
 
     public function requireEnabled(): void

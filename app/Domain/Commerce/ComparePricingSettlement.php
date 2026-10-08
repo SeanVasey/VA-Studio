@@ -4,6 +4,7 @@ namespace App\Domain\Commerce;
 
 use App\Domain\Commerce\Models\QuotePricing;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use App\Support\Money\MinorUnits;
 use Illuminate\Database\QueryException;
 use InvalidArgumentException;
@@ -48,7 +49,7 @@ final class ComparePricingSettlement
     {
         $policy = $snapshot['tax_policy'];
         $this->assertMatch($policy !== null, 'unresolved_tax');
-        $this->assertMatch(app()->environment('local', 'testing') && $policy['scope'] === 'test', 'test_scope_required');
+        $this->assertMatch(TestEnvironment::admitsTestCommerce() && $policy['scope'] === 'test', 'test_scope_required');
         PricingPolicy::keys($observed, ['schema_version', 'pricing_id', 'quote_id', 'policy_hash', 'provider', 'account', 'livemode', 'currency',
             'subtotal_minor', 'discount_minor', 'tax_minor', 'total_minor', 'tax_calculation_id', 'lines']);
         $this->identity($snapshot, $observed);

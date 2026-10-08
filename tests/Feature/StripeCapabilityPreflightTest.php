@@ -404,6 +404,7 @@ class StripeCapabilityPreflightTest extends TestCase
             'test funds on local' => ['local', 'test', 'pass'],
             'test funds in testing' => ['testing', 'test', 'pass'],
             'live funds on production' => ['production', 'live', 'pass'],
+            'live funds on staging' => ['staging', 'live', 'blocked'],
         ];
     }
 

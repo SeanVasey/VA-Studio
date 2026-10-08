@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -18,7 +19,7 @@ final class ActivationPolicy
     public function account(): string
     {
         $account = config('payments.stripe.account_id');
-        if (config('delivery.test_activation_enabled') !== true || ! app()->environment('local', 'testing')
+        if (config('delivery.test_activation_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
             || config('payments.stripe.mode') !== 'test' || ! is_string($account)
             || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account)) {
             throw new DeliveryException('unavailable');

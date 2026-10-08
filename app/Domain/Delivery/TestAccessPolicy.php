@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Throwable;
 
 /** Technical limits for internal synthetic delivery tests; never a license usage budget. */
@@ -20,7 +21,7 @@ final class TestAccessPolicy
     public function environmentAccount(): string
     {
         $account = config('payments.stripe.account_id');
-        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test'
+        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
             || ! is_string($account) || preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) !== 1) {
             throw new DeliveryException('unavailable');
         }

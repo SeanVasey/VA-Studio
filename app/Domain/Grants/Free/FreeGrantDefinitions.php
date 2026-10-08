@@ -6,6 +6,7 @@ use App\Domain\Grants\Free\Models\FreeDefinition;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -15,7 +16,7 @@ final class FreeGrantDefinitions
     {
         (new FreeGrantPolicy)->requireEnabled();
         // The operative authoring/approved-free-terms adapter is a distinct pending successor.
-        FreeGrantException::require(app()->environment('local', 'testing'), 404);
+        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
         FreeGrantInput::keys($input, ['requestKey', 'title', 'freePurpose', 'assentText', 'termsReference', 'licenseId', 'trackId', 'scopeId', 'assetIds', 'maxOrigins', 'maxDownloads', 'tokenTtlSeconds']);
         FreeGrantInput::uuid($input['requestKey']);
         foreach (['licenseId', 'trackId', 'scopeId'] as $field) {

@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1;
+use App\Support\Environment\TestEnvironment;
 
 /** Commercial target and execution funds are distinct. Rehearsal never establishes production facts. */
 final readonly class ExecutionContextV1
@@ -57,6 +58,8 @@ final readonly class ExecutionContextV1
             && $r['late_time_basis'] === 'application_verified_observation_time', 'unsupported');
         CheckoutException::require(is_int($reviewSeconds) && $reviewSeconds >= 30 && $reviewSeconds <= 3600, 'unsupported');
         CheckoutException::require($mode !== 'test' || app()->environment(['local', 'testing']), 'unsupported');
+        // Staging admits only Stripe-test commerce; live funds there are refused, never configured.
+        CheckoutException::require($mode !== 'live' || ! TestEnvironment::refusesProductionOnly(), 'unsupported');
 
         return new self($mode, $mode === 'test' ? 'synthetic_rehearsal' : 'verified_production',
             $account, $origin, $p['capture_method'], $r['reservation_seconds'], $r['provider_lifetime_seconds'], $r['retry_seconds'], $reviewSeconds);

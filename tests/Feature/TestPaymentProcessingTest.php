@@ -411,7 +411,7 @@ class TestPaymentProcessingTest extends TestCase
         $this->assertSame(3, StripeReceiptWork::sole()->attempts); $this->assertDatabaseCount('verified_payments', 1);
     }
 
-    public static function blockedEnvironments(): array { return [['disabled'], ['string_true'], ['production'], ['staging'], ['live'], ['account']]; }
+    public static function blockedEnvironments(): array { return [['disabled'], ['string_true'], ['production'], ['preview'], ['live'], ['staging_live'], ['account']]; }
 
     #[DataProvider('blockedEnvironments')]
     public function test_processing_requires_explicit_local_test_configuration_before_any_provider_request(string $scenario): void
@@ -420,7 +420,8 @@ class TestPaymentProcessingTest extends TestCase
         match ($scenario) {
             'disabled' => config(['payments.stripe.processing_enabled' => false]),
             'string_true' => config(['payments.stripe.processing_enabled' => 'true']),
-            'production', 'staging' => $this->app->instance('env', $scenario),
+            'production', 'preview' => $this->app->instance('env', $scenario),
+            'staging_live' => [$this->app->instance('env', 'staging'), config(['payments.stripe.mode' => 'live'])],
             'live' => config(['payments.stripe.mode' => 'live']),
             'account' => config(['payments.stripe.account_id' => null]),
         };
@@ -428,7 +429,7 @@ class TestPaymentProcessingTest extends TestCase
             $this->assertSame('unavailable', app(ProcessStripeReceipt::class)->handle($receipt->id));
             $this->assertSame($calls, $this->gateway->calls); $this->assertDatabaseCount('verified_payments', 0);
             $this->assertDatabaseCount('payment_observations', 0);
-        } finally { if (in_array($scenario, ['production', 'staging'], true)) { $this->app->instance('env', 'testing'); } }
+        } finally { if (in_array($scenario, ['production', 'preview', 'staging_live'], true)) { $this->app->instance('env', 'testing'); } }
     }
 
     public function test_retained_payment_evidence_whitelists_provider_fields_and_hides_private_ciphertext(): void

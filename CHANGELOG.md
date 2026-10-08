@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- A real `staging` environment. One helper, `App\Support\Environment\TestEnvironment`, admits the Stripe-test commerce chain and the synthetic test-customer and test-delivery capabilities in `local`, `testing` and `staging`. Staging requires staff MFA, refuses Stripe live mode, live or restricted keys, live production-checkout funds, production customer identity and verified-production membership provenance, and keeps development fixtures and production-lane rehearsals local/testing. `vasey:doctor` reports a `profile` and applies hosted URL, debug and cookie checks plus a test-mode-only check in staging; the private-server preflight gains `--profile=staging`.
+
 - Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
 
 - Reviewed manual track publication guards: publish/unpublish confirmations bind exact current metadata and monotonic publication revisions, use fresh persisted authority/MFA and consume stale confirmations before atomic publication/audit writes. The additive counter migration retains history and guards on rollback; scheduling remains separate.

@@ -85,7 +85,7 @@ Before sales, a code/configuration reversal can use the tested previous release 
 
 ## First sale and cutover remain separate gates
 
-Current checkout, finalization, issuance, activation and delivery policies explicitly permit test-only `local`/`testing` operation. The webhook permits test snapshots in `local`/`testing`/`staging`. Production selling requires reviewed production policies/adapters and complete customer/operations workflows; filling this template or setting `STRIPE_MODE=live` does not supply them.
+Current checkout, finalization, issuance, activation and delivery policies, and the webhook, permit test-only `local`/`testing`/`staging` operation through one environment helper (`App\Support\Environment\TestEnvironment`). Staging requires staff MFA and refuses live mode and production identity. Production selling requires reviewed production policies/adapters and complete customer/operations workflows; filling this template or setting `STRIPE_MODE=live` does not supply them.
 
 Before live sale, resolve actual seller/legal identity and license terms, prices/currency/tax/capture rules, exclusive timing, refund/dispute policy, buyer account/guest recovery, privacy/retention, support/transactional email and actual source obligations. No value or approval is invented here. Host configuration, source migration, private storage readiness, real payment-account interoperability and complete customer delivery each need their own evidence.
 

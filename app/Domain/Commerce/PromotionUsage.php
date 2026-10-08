@@ -8,6 +8,7 @@ use App\Domain\Commerce\Models\QuotePricing;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -162,7 +163,7 @@ final class PromotionUsage
         if (DB::transactionLevel() < 1) {
             throw new LogicException('Promotion usage requires the quote transaction.');
         }
-        if (! app()->environment('local', 'testing')) {
+        if (! TestEnvironment::admitsTestCommerce()) {
             throw new QuoteException('PROMOTION_UNAVAILABLE', 503);
         }
     }

@@ -18,6 +18,7 @@ use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -168,7 +169,7 @@ final class TestPaymentExceptionOperations
             throw new AuthorizationException;
         }
         $account = config('payments.stripe.account_id');
-        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test'
+        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
             || ! OrderRequest::uuid($publicId) || ! is_string($account) || preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) !== 1) {
             throw (new ModelNotFoundException)->setModel(OrderFinalization::class);
         }

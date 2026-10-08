@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Finalization;
 
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Throwable;
 
 /** An explicitly selected nonbinding test contract, never a production rights policy. */
@@ -16,7 +17,7 @@ final class FinalizationPolicy
     public function account(): string
     {
         $account = config('payments.stripe.account_id');
-        if (config('payments.stripe.finalization_enabled') !== true || ! app()->environment('local', 'testing')
+        if (config('payments.stripe.finalization_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
             || config('payments.stripe.mode') !== 'test' || ! is_string($account)
             || preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account) !== 1) {
             throw new FinalizationException('unavailable');

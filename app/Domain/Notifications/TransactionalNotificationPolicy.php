@@ -3,6 +3,7 @@
 namespace App\Domain\Notifications;
 
 use App\Domain\Customers\CustomerAccessPolicy;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 
 final class TransactionalNotificationPolicy
@@ -19,7 +20,7 @@ final class TransactionalNotificationPolicy
 
     public function requireEnabled(): void
     {
-        if (! app()->environment('local', 'testing') || ! app(CustomerAccessPolicy::class)->enabled()
+        if (! TestEnvironment::admitsTestCommerce() || ! app(CustomerAccessPolicy::class)->enabled()
             || config('transactional-notifications.test_enabled') !== true
             || config('transactional-notifications.transport') !== 'private_capture'
             || config('transactional-notifications.policy_version') !== self::VERSION) {

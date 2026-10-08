@@ -15,6 +15,7 @@ use App\Domain\Grants\Free\FreeGrantRows;
 use App\Domain\Grants\Free\FreeGrants;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Support\CommerceRequestIdentity;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -143,7 +144,7 @@ final class FreeGrantController
             return app(FreeGrantHttpIdentity::class)->forRequest($request);
         }
         // The test path verifies the original credential-stamped session marker.
-        FreeGrantException::require(app()->environment('local', 'testing'), 403);
+        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 403);
         $identity = app(CommerceRequestIdentity::class);
         $principal = $identity->principal($request);
         $actor = $identity->actor($request);

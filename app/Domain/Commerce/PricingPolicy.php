@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce;
 
+use App\Support\Environment\TestEnvironment;
 use App\Support\Money\MinorUnits;
 use Carbon\CarbonImmutable;
 use InvalidArgumentException;
@@ -17,7 +18,7 @@ final class PricingPolicy
             return null;
         }
         try {
-            if (! app()->environment('local', 'testing') || ! is_string($json) || strlen($json) > 8192) {
+            if (! TestEnvironment::admitsTestCommerce() || ! is_string($json) || strlen($json) > 8192) {
                 throw new InvalidArgumentException('Test pricing is unavailable in this environment.');
             }
             $policy = $this->validate(json_decode($json, true, 8, JSON_THROW_ON_ERROR));
