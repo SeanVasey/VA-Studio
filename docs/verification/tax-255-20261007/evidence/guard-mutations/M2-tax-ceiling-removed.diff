@@ -1,0 +1,11 @@
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 23:43:24.789204045 +0000
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 23:43:34.712338298 +0000
+@@ -152,7 +152,7 @@
+                 .' AND b.funds_mode = NEW.funds_mode AND b.created_at <= NEW.observed_at AND r.currency = NEW.currency'
+                 .' AND r.subtotal_minor = NEW.amount_subtotal_minor AND r.tax_behavior = NEW.tax_behavior'
+                 ." AND ((r.tax_behavior = 'exclusive' AND NEW.amount_total_minor = NEW.amount_subtotal_minor + NEW.amount_tax_minor"
+-                .' AND NEW.amount_tax_minor * 10000 <= NEW.amount_subtotal_minor * r.maximum_rate_bps)'
++                .')'
+                 ." OR (r.tax_behavior = 'inclusive' AND NEW.amount_total_minor = NEW.amount_subtotal_minor AND NEW.amount_tax_minor <= NEW.amount_subtotal_minor"
+                 .' AND NEW.amount_tax_minor * 10000 <= (NEW.amount_subtotal_minor - NEW.amount_tax_minor) * r.maximum_rate_bps)))'],
+         };

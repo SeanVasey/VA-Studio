@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..6d062d04 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -29,7 +29,7 @@ final class TaxCheckoutSchemaInstaller
+         if ($missing) {
+             foreach (TaxCheckoutSchema::TABLES as $table) {
+                 if (($present[$table] ?? false) && DB::table($table)->exists()) {
+-                    $this->reject('populated incomplete installation');
++                    
+                 }
+             }
+         }

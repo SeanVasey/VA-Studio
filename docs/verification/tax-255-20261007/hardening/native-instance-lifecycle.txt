@@ -1,0 +1,2 @@
+2026-10-08T06:17:32Z tax255h mysqld pid 5863 port 3721 datadir /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tax255h-mysql/data
+2026-10-08T07:35:14Z mysqladmin shutdown (port 3721 only) exit 0; pid 5863 gone; err.log ended 'MySQL Server - end'; datadir /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/tax255h-mysql removed. Other lanes' daemons (823, 8401, 22993, 3306) untouched.

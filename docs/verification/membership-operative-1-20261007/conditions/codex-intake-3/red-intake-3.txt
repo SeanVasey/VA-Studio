@@ -1,0 +1,20 @@
+# Red: new api_version test against unmodified source at af089d401376205adbe9db36234a4f1e6b5a1ec4
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops/phpunit.xml
+
+.....F                                                              6 / 6 (100%)
+
+Time: 00:12.221, Memory: 87.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookIntakeTest::test_events_from_any_api_version_other_than_the_pin_are_refused_before_a_row_or_dispatch
+An event from an unpinned API version must refuse.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMembershipBilling/BillingWebhookIntakeTest.php:148
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 43, Failures: 1.

@@ -1,0 +1,44 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:00.400, Memory: 61.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/home/user/VA-Studio-review-member/app/Domain/Memberships/Production/MembershipException.php:16
+/home/user/VA-Studio-review-member/app/Domain/Memberships/Production/MembershipPolicy.php:41
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:35
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/home/user/VA-Studio-review-member/app/Domain/Grants/Member/MemberGrantException.php:15
+/home/user/VA-Studio-review-member/app/Domain/Grants/Member/MemberGrantPolicy.php:37
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'changed_policy'
++'provenance'
+
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:61
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 1[0m[37;41m, Errors: 2[0m[37;41m, Failures: 1[0m[37;41m.[0m

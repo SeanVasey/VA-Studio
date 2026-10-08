@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingWebhookIntakeTest" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingWebhookIntakeTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="171.531891">
+    <testcase name="test_replayed_event_id_is_deduplicated_without_a_second_row_or_retrieval" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingWebhookIntakeTest.php" line="67" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookIntakeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookIntakeTest" assertions="6" time="171.531891"/>
+  </testsuite>
+</testsuites>

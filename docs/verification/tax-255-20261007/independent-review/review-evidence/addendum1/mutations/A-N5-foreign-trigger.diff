@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..55beb444 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -168,7 +168,7 @@ final class TaxCheckoutSchemaInstaller
+         }
+         foreach (DB::select('SELECT TRIGGER_NAME, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = ?', [$database]) as $guard) {
+             if (! isset($statements[$guard->TRIGGER_NAME]) && $this->referencesOwned($guard->ACTION_STATEMENT)) {
+-                $this->reject('foreign guard reference');
++                
+             }
+         }
+         foreach (DB::select('SELECT ROUTINE_NAME, ROUTINE_DEFINITION FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = ?', [$database]) as $routine) {

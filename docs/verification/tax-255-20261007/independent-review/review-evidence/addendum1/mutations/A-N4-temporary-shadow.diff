@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..0343eb86 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -141,7 +141,7 @@ final class TaxCheckoutSchemaInstaller
+         foreach ($tables as $name => $definition) {
+             try {
+                 $shown = (array) DB::selectOne('SHOW CREATE TABLE '.$name);
+-                if (str_starts_with($shown['Create Table'] ?? '', 'CREATE TEMPORARY TABLE ') || (! $present[$name] && isset($shown['Create Table']))) {
++                if ((! $present[$name] && isset($shown['Create Table']))) {
+                     $this->reject('temporary shadow');
+                 }
+             } catch (QueryException $error) {

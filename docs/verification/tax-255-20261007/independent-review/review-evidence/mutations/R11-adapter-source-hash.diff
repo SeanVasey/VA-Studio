@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+index b7e96b5e..664a6f1d 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+@@ -35,7 +35,7 @@ final class ProductionTaxPaidLineAdapterV2
+         CheckoutException::require(count($line) === count(self::KEYS) && array_diff(self::KEYS, array_keys($line)) === []);
+         $source = $line;
+         unset($source['source_hash']);
+-        CheckoutException::require(is_string($line['source_hash']) && hash_equals(CanonicalJson::hash($source), $line['source_hash']), 'source_hash');
++        
+         $rehearsal = $provenance === 'synthetic_rehearsal';
+         CheckoutException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true)
+             && $line['provenance'] === $provenance && ($line['buyer']['provenance'] ?? null) === $provenance

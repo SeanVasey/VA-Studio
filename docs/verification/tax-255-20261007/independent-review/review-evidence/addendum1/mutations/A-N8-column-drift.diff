@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..0879221a 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -195,7 +195,7 @@ final class TaxCheckoutSchemaInstaller
+                 'IS_NULLABLE' => 'NO', 'COLUMN_DEFAULT' => null, 'EXTRA' => $type === 'id' ? 'auto_increment' : '',
+                 'CHARACTER_SET_NAME' => $integer ? null : 'ascii', 'COLLATION_NAME' => $integer ? null : 'ascii_bin', 'COLUMN_COMMENT' => '', 'GENERATION_EXPRESSION' => ''];
+         }
+-        $this->same($expected, array_map(fn ($row): array => (array) $row, $columns), 'columns');
++        
+         $indexes = ['PRIMARY' => [0, ['id']]];
+         foreach ($definition['unique'] as $name => $fields) {
+             $indexes[$name] = [0, $fields];

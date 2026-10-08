@@ -1,0 +1,85 @@
+=== mutation R1-pi-amount-received (reviewer review-evidence/mutations/R1-pi-amount-received.diff) applied to app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+F...                                                                4 / 4 (100%)
+
+Time: 00:13.611, Memory: 98.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained@PaymentIntent amount_received is short of the session total with data (null, Closure Object ())
+A paid session with a mismatched money fact was retained.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:243
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 17, Failures: 1.
+rc=1
+=== mutation R2-pi-amount (reviewer review-evidence/mutations/R2-pi-amount.diff) applied to app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.F..                                                                4 / 4 (100%)
+
+Time: 00:13.697, Memory: 98.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained@PaymentIntent amount differs from the session total with data (null, Closure Object ())
+A paid session with a mismatched money fact was retained.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:243
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 17, Failures: 1.
+rc=1
+=== mutation R3-pi-currency (reviewer review-evidence/mutations/R3-pi-currency.diff) applied to app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+..F.                                                                4 / 4 (100%)
+
+Time: 00:13.802, Memory: 98.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained@PaymentIntent currency is not usd with data (null, Closure Object ())
+A paid session with a mismatched money fact was retained.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:243
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 17, Failures: 1.
+rc=1
+=== mutation R4-session-currency (reviewer review-evidence/mutations/R4-session-currency.diff) applied to app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+...F                                                                4 / 4 (100%)
+
+Time: 00:13.421, Memory: 98.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained@session currency is not usd with data (Closure Object (), null)
+A paid session with a mismatched money fact was retained.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:243
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 17, Failures: 1.
+rc=1
+=== all mutations reverted

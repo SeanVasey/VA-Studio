@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\StripeSdkBillingGatewayTest" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/StripeSdkBillingGatewayTest.php" tests="1" assertions="18" errors="0" failures="0" skipped="0" time="202.509178">
+    <testcase name="test_complete_graph_settles_through_the_sdk_with_get_requests_only" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/StripeSdkBillingGatewayTest.php" line="36" class="Tests\Feature\ProductionMembershipBilling\StripeSdkBillingGatewayTest" classname="Tests.Feature.ProductionMembershipBilling.StripeSdkBillingGatewayTest" assertions="18" time="202.509178"/>
+  </testsuite>
+</testsuites>

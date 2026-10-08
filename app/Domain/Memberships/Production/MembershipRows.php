@@ -3,6 +3,7 @@
 namespace App\Domain\Memberships\Production;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
@@ -19,6 +20,21 @@ use Throwable;
 /** One captured outer transaction per operation. A reader supplies no customer or invoice authority. */
 final class MembershipRows
 {
+    /**
+     * Functions the bundled SQLite registers as extensions (FTS3/FTS5/R-Tree), reported with builtin = 0.
+     * Owned membership SQL never calls them. Any other non-builtin function, or a non-builtin entry that
+     * shares a built-in name (an application override such as lower(), max() or count()), is refused.
+     */
+    private const SQLITE_EXTENSION_FUNCTIONS = ['bm25', 'fts3_tokenizer', 'fts5', 'fts5_source_id', 'highlight', 'match',
+        'matchinfo', 'offsets', 'optimize', 'rtreecheck', 'rtreedepth', 'rtreenode', 'snippet'];
+
+    private const SQLITE_COLLATIONS = ['BINARY', 'NOCASE', 'RTRIM'];
+
+    /** A held, table-less running statement. SQLite refuses to replace a built-in or existing function/collation while one is active. */
+    private const SQLITE_PIN = 'WITH RECURSIVE membership_pin(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM membership_pin LIMIT 2) SELECT x FROM membership_pin';
+
+    private const FETCH_MODES = [PDO::FETCH_BOTH, PDO::FETCH_ASSOC, PDO::FETCH_NUM, PDO::FETCH_OBJ];
+
     private Container $container;
 
     private DatabaseManager $manager;
@@ -39,6 +55,8 @@ final class MembershipRows
 
     private string $marker;
 
+    private ?PDOStatement $pin = null;
+
     public function __construct()
     {
         $this->container = Container::getInstance();
@@ -47,6 +65,12 @@ final class MembershipRows
         $this->connection = $this->manager->connection();
         $this->primary = $this->connection->getPdo();
         $this->nativeStatements();
+        if ($this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            // Taken before any other SQL: from here on, SQLite itself refuses a replacement of a
+            // built-in function or collation (BINARY/NOCASE/RTRIM) on this handle with SQLITE_BUSY.
+            $this->pin = $this->primary->prepare(self::SQLITE_PIN);
+            MembershipException::require($this->pin->execute() === true, 'changed_primary');
+        }
         $this->driver = $this->connection->getDriverName();
         $this->prefix = $this->connection->getTablePrefix();
         $this->connectionName = $this->connection->getName();
@@ -58,6 +82,11 @@ final class MembershipRows
         $this->marker = 'membership_'.bin2hex(random_bytes(16));
         $this->primary->exec('SAVEPOINT '.$this->marker);
         $this->assertCurrent();
+    }
+
+    public function __destruct()
+    {
+        $this->pin?->closeCursor();
     }
 
     public function identity(): PDO
@@ -140,6 +169,11 @@ final class MembershipRows
             && self::property($this->connection, Connection::class, 'transactions') === 1
             && self::property($this->connection, Connection::class, 'tablePrefix') === $this->prefix && $this->primary->inTransaction()
             && $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) === $this->driver, 'changed_connection');
+        // SQLite cannot exclude a built-in collation replaced before capture (no catalog shows it),
+        // so it serves synthetic local/testing rehearsal only, never verified production evidence.
+        $policy = $items['production-memberships'] ?? null;
+        MembershipException::require($this->driver === 'mysql'
+            || (is_array($policy) && ($policy['provenance'] ?? null) !== IdentityPolicy::PRODUCTION), 'provenance_driver');
         if ($this->driver === 'mysql') {
             MembershipException::require($this->primary->query('SELECT DATABASE()')->fetchColumn() === $this->schema, 'changed_schema');
         }
@@ -154,6 +188,49 @@ final class MembershipRows
     private function nativeStatements(): void
     {
         MembershipException::require(in_array(get_class($this->primary), [PDO::class, Sqlite::class, Mysql::class], true)
-            && $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class], 'changed_primary');
+            && $this->primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class]
+            && in_array($this->primary->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE), self::FETCH_MODES, true), 'changed_primary');
+        $this->sqliteCallbacks();
+    }
+
+    /**
+     * SQLite lets an application register PHP functions, aggregates and collations on the handle, and
+     * they run inside ordinary metadata SQL (lower(name) = lower(?)). PDO cannot enumerate them, so
+     * read SQLite's own catalogs before any other SQL. Neither catalog read has a WHERE clause, so it
+     * calls no function and compares no text; filtering happens in PHP.
+     */
+    private function sqliteCallbacks(): void
+    {
+        if ($this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite') {
+            return;
+        }
+        try {
+            $functions = $this->primary->query('SELECT name, builtin FROM pragma_function_list')->fetchAll(PDO::FETCH_NUM);
+            $collations = $this->primary->query('PRAGMA collation_list')->fetchAll(PDO::FETCH_NUM);
+        } catch (Throwable) {
+            // pragma_function_list compiled out or unreadable: no SQLite reader is admitted.
+            throw new MembershipException('sqlite_callback_catalog');
+        }
+        $builtin = [];
+        $application = [];
+        foreach ($functions as $function) {
+            MembershipException::require(is_array($function) && count($function) === 2 && is_string($function[0]), 'sqlite_callback_catalog');
+            if ((string) $function[1] === '1') {
+                $builtin[strtolower($function[0])] = true;
+            } else {
+                $application[] = strtolower($function[0]);
+            }
+        }
+        MembershipException::require($builtin !== [], 'sqlite_callback_catalog');
+        foreach ($application as $name) {
+            MembershipException::require(in_array($name, self::SQLITE_EXTENSION_FUNCTIONS, true) && ! isset($builtin[$name]), 'sqlite_application_function');
+        }
+        $names = [];
+        foreach ($collations as $collation) {
+            MembershipException::require(is_array($collation) && count($collation) === 2 && is_string($collation[1]), 'sqlite_callback_catalog');
+            $names[] = $collation[1];
+        }
+        sort($names);
+        MembershipException::require($names === self::SQLITE_COLLATIONS, 'sqlite_application_collation');
     }
 }

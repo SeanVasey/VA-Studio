@@ -1,0 +1,95 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+FF.............                                                   15 / 15 (100%)
+
+Time: 01:13.160, Memory: 106.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_unbound_provider_retains_the_exact_automatic_tax_request_and_never_touches_a_transport
+An unbound provider must fail closed.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_service_without_any_transport_retains_the_automatic_tax_request_and_fails_closed
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'provider_unbound',
++    0 => 'provider_uncertain',
+     1 => 503,
+ ]
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 15, Assertions: 86, Failures: 2.
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:16.042, Memory: 96.00 MB
+
+OK (3 tests, 42 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:01.011, Memory: 63.00 MB
+
+OK (19 tests, 24 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...........................................                       43 / 43 (100%)
+
+Time: 00:01.763, Memory: 65.00 MB
+
+OK (43 tests, 147 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+................F                                                 17 / 17 (100%)
+
+Time: 00:29.717, Memory: 102.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutHttpBoundaryTest::test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount
+Expected response status code [503] but received 200.
+Failed asserting that 200 is identical to 503.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 17, Assertions: 117, Failures: 1.
+

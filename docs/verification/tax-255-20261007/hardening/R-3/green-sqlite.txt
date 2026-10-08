@@ -1,0 +1,23 @@
+# R-3 on SQLite: Guard (incl. the new trailing-line-terminator test) and Migration classes
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:07.434, Memory: 85.00 MB
+
+OK (7 tests, 233 assertions)
+rc=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+..........                                                        10 / 10 (100%)
+
+Time: 00:10.714, Memory: 87.00 MB
+
+OK (10 tests, 240 assertions)
+rc=0

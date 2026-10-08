@@ -1,0 +1,1 @@
+Run 1 of the anchor probe errored from a reviewer probe bug (arrow fn captured the first order id, so the second valid request reused order_id 1). The duplicate-key error on ptx_r_u0 for order_id 1 itself shows the LF account_id row was stored. Fixed and rerun.

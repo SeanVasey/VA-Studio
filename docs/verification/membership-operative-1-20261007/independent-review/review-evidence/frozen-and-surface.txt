@@ -1,0 +1,45 @@
+## git diff --stat de6ae38a2064e5b06e5ed919c4d944500eab5bdb c689ffdc -- routes bootstrap app/Providers config/app.php composer.json composer.lock package.json package-lock.json .github
+(end; empty = unchanged)
+
+## grep for registrations/bindings of Billing classes outside app/Domain/Memberships/Billing and tests
+(end)
+
+## env() in new config
+(end)
+
+## writes to credit/grant tables from Billing or job
+app/Domain/Memberships/Billing/BillingWebhookIntake.php:27:        'invoice.payment_action_required', 'invoice.updated', 'invoice.voided', 'invoice.marked_uncollectible', 'invoice_payment.paid'];
+app/Domain/Memberships/Billing/BillingWebhookIntake.php:80:                $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[3])
+app/Domain/Memberships/Billing/BillingSchema.php:223:            $sql .= ', CONSTRAINT '.$quote.$name.'_f'.$index.$quote.' FOREIGN KEY ('.$column.') REFERENCES '.$quote.$this->physical($foreign[$column]).$quote.' (id) ON UPDATE RESTRICT ON DELETE RESTRICT';
+app/Domain/Memberships/Billing/BillingSchema.php:235:        $insert = 'NOT EXISTS (SELECT 1 FROM '.$table.' WHERE id = NEW.id)';
+app/Domain/Memberships/Billing/BillingSchema.php:237:            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE subscription_ref_hash = NEW.subscription_ref_hash)'
+app/Domain/Memberships/Billing/BillingSchema.php:241:            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE invoice_ref_hash = NEW.invoice_ref_hash OR source_invoice_hash = NEW.source_invoice_hash)'
+app/Domain/Memberships/Billing/BillingSchema.php:244:            $insert .= ' AND EXISTS (SELECT 1 FROM '.$invoices.' WHERE id = NEW.invoice_id)'
+app/Domain/Memberships/Billing/BillingSchema.php:250:            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)';
+app/Domain/Memberships/Billing/BillingSchema.php:253:        foreach (['insert' => $insert, 'update' => '0 = 1', 'delete' => '0 = 1'] as $event => $condition) {
+app/Domain/Memberships/Billing/BillingSchema.php:272:            foreach (['insert', 'update', 'delete'] as $event) {
+app/Domain/Memberships/Billing/BillingSchema.php:385:            $s = $pdo->prepare('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
+app/Domain/Memberships/Billing/BillingSchema.php:387:            BillingException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['UNIQUE_CONSTRAINT_SCHEMA' => $schema, 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
+app/Domain/Memberships/Billing/BillingLedger.php:71:            DB::transaction(fn () => $this->insert(BillingSchema::TABLES[1], $row));
+app/Domain/Memberships/Billing/BillingLedger.php:112:                    $this->insert(BillingSchema::TABLES[2], $row);
+app/Domain/Memberships/Billing/BillingLedger.php:193:    private function insert(string $table, array $row): void
+app/Domain/Memberships/Billing/BillingLedger.php:195:        $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table($table).' ('.implode(', ', array_keys($row))
+(end)
+
+## provider write methods in billing
+grep: invalid option -- '>'
+Usage: grep [OPTION]... PATTERNS [FILE]...
+Try 'grep --help' for more information.
+(end)
+## provider write method calls in billing (grep -e)
+(end)
+## SDK service calls
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:40:$client->accounts->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:48:$client->invoices->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:52:$client->invoices->allLines
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:66:$client->invoicePayments->all
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:78:$client->paymentIntents->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:83:$client->charges->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:88:$client->balanceTransactions->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:96:$client->subscriptions->retrieve
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:99:$client->subscriptionItems->all

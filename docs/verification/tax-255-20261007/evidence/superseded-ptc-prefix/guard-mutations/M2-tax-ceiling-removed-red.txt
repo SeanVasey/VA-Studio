@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255/phpunit.xml
+
+...F..                                                              6 / 6 (100%)
+
+Time: 00:09.254, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_reviewed_guard_refuses_inconsistent_provider_amounts_and_out_of_order_rows
+tax above approved ceiling was accepted by the reviewed guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:203
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 221, Failures: 1.

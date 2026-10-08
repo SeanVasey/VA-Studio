@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php
+index 9d05a756..0572e43a 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php
+@@ -19,7 +19,7 @@ final class TaxCheckoutPolicy
+ 
+     public static function enabled(): bool
+     {
+-        return app()->environment('local', 'testing') && config('production-tax-checkout.enabled') === true;
++        return config('production-tax-checkout.enabled') === true;
+     }
+ 
+     public static function requireEnabled(): void

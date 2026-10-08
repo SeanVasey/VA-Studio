@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255/phpunit.xml
+
+
+DRIVER mysql {"request.account_id \"acct_SYNTHETIC\\n\"":"accepted","binding.provider_session_id \"cs_test_SYNTHETICTAX\\n\"":"accepted","reviewed.provider_payment_id \"pi_SYNTHETICTAX\\n\"":"accepted"}
+.                                                                   1 / 1 (100%)
+
+Time: 03:34.193, Memory: 79.00 MB
+
+OK (1 test, 4 assertions)
