@@ -1,0 +1,36 @@
+# source: 093f9081 (product unmodified) + new tests/Feature/PaidGrantCompletionBudgetTest.php
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter PaidGrantCompletionBudgetTest tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+E.E                                                                 3 / 3 (100%)
+
+Time: 00:27.036, Memory: 195.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_two_line_order_whose_verification_outlasts_one_lease_is_fulfilled_and_still_downloads
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:121
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:106
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantCompletionBudgetTest.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_retry_after_a_slow_completion_fulfils_without_restarting_from_an_expired_budget
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:121
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:106
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantCompletionBudgetTest.php:167
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 3, Assertions: 52, Errors: 2.
+rc=2
