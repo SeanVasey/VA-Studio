@@ -218,3 +218,42 @@ Changed after `fe58fe91` (hashes at `9c1ca807`); `MembershipPolicy.php` supersed
 | `app/Domain/Memberships/Production/MembershipPolicy.php` | `9f37be772eb33737bfbf076f0005b306908e68b6fbd581fcd78d15928f485f8f` |
 | `app/Domain/Grants/Member/MemberGrantPolicy.php` | `a57bcef5d91c56f47ba498c284e8cc8eb82346dd3554e141cae3a01f0c178929` |
 | `tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php` | `8b944f62f0c0a2d5a5d71f03b9c24288761c94887867dd032f8ee20381c1358f` |
+
+## Independent review addendum 1 (`3092880b..e26d4cb7`)
+
+`independent-review/DECISION.md` addendum 1: **APPROVE WITH CONDITIONS** for a development
+merge only (default-off, unregistered), on the original decision's terms. Every invariant
+verified at `c689ffdc` still holds (no award, grant, reversal or subscription state from a
+signature or provider response; integer minor units; durable deduplication; GET-only pinned
+provider I/O; no route, binding or config change; no `currentSettled()` consumer).
+
+Runs at `e26d4cb7`: native MySQL 8.4.11 `tests/Feature/ProductionMembershipBilling` 115 / 529,
+0 failures, errors or skips (9,944.9 s); six native race probes 6 / 64; SQLite directory
+115 / 520; reviewer SQLite probes 15 / 18 (6 native-only skipped); red/green reproduced for
+every round; Pint passed on the 8 changed files.
+
+- R-2 partially closed: a dispatch lost after commit is recovered on redelivery (early
+  duplicate and concurrent-insert loser). Residual A1-2 below.
+- R-3 partially closed: no identity row on a first retrieval refused for account, customer or
+  subscription, or ending unknown/provider_incomplete. Residual A1-1 below.
+- Six of the seven fixed Codex threads confirmed closed; the R-3 thread is partially closed.
+
+Conditions and residuals (none blocks this development merge):
+
+1. **R-6 Medium (forward):** `currentSettled()` takes the last row by sequence; overlapping
+   retrievals can append an older `settled` snapshot after a newer `reversed` one (reproduced
+   natively). Before any consumer: serialize retrievals per invoice or add an append-time rule
+   keyed on `(invoice_id, retrieval_started_at)`, with a native two-process regression.
+2. **A1-1 Low:** a first retrieval refused for `mode` or `invoice_identity` still claims the
+   invoice identity for an unvalidated binding (checks run before customer/subscription).
+3. **A1-2 Low (liveness):** with an async queue, a job that fails after the webhook was
+   acknowledged is never retried (`$tries = 1`, no sweep); an `invoice_payment.*` hint for an
+   invoice with no identity row is never dispatched. Before root mounts intake: bounded retries
+   with backoff for unknown outcomes plus a sweep or operator command over uncovered hints.
+4. **A1-3 Low (liveness):** coverage compares the observation's append time with the hint's
+   `received_at`, so a retrieval whose reads began before the hint can cover it.
+5. **A1-4 Low (evidence):** a first-retrieval refusal leaves no ledger row; the reason code is
+   only in the log context, and the `failed_jobs` payload stores the invoice ref in plaintext.
+
+Codex design threads: same-second `created_at == received_at` not covering is accepted (safe
+direction); ledger ordering is R-6; `$tries = 1` is A1-2.

@@ -297,3 +297,191 @@ The completing reviewer made these corrections to the first reviewer's draft. No
 - **Lifecycle**: the file had no shutdown entry. Entries now record that the process was gone (`/proc/10138` absent, no process with a mysqld executable, `pgrep -x mysqld` exit 1, no LISTEN on 3306 or 3461) and that `$scratchpad/my` (218M) was removed.
 - **Evidence index**: the native probe run is under `native/`, not `probes/`. `runner.sh`, `mutate.py`, `dump-guards.php` and the `.err` files are now listed. SQLite probe run 2, which most findings cite, is now described alongside runs 1 and 3.
 - **O3 revert hashes**: the `o3-mutations/` files contain no hash, so the statement now points to `sha256-reviewed-files.txt` and the clean worktree, which the completing reviewer re-checked.
+
+
+---
+
+# Addendum 1: re-review of the R-2/R-3 delta (`3092880b..e26d4cb7`)
+
+- Reviewed SHA: `e26d4cb74d464943178201133612e73b16945cf1` (`harness/membership-operative-1`, PR #51).
+- Delta base: `3092880bc9a216ec095975a3ae15dfa07fee68b3`. Everything above this line (decision at `c689ffdc`, findings R-1 to R-5, I-1 to I-6) is unchanged.
+- Reviewers: independent reviewer agents that authored no lane commit and changed no app code, flag or registration. The first Addendum 1 reviewer gathered the SQLite, red/green and most native evidence, then stopped (rate limit) before writing this addendum; the container then restarted, killing its private `mysqld` and its last native run. A completing reviewer, which also authored no lane commit, checked that evidence, re-ran the two incomplete native selections at `e26d4cb7` on a new private instance, reproduced red/green for the three later rounds, and wrote this addendum. Nothing was committed by either reviewer.
+- Date: 2026-10-07 to 2026-10-08 (UTC).
+
+## Scope (the delta, by commit)
+
+Code changed only in `app/Domain/Memberships/Billing/{BillingLedger,BillingReconciliation,BillingWebhookIntake}.php`; tests changed in five `tests/Feature/ProductionMembershipBilling` classes; the rest is lane evidence and README.
+
+| Commit | Change | Lane evidence |
+| --- | --- | --- |
+| `9c2f9928` | R-3: `BillingLedger::existingInvoice()` reads without inserting; `retrieve()` claims the identity row only after the verdict, and a first retrieval whose verdict is `refused` for `account`, `customer` or `subscription` throws `binding_refused_<reason>` with no row. R-2: a duplicate `retrieval_hint` delivery runs `recoverLostDispatch()`, which re-dispatches unless an observation newer than the hint exists. | `conditions/codex-r2-r3/` |
+| `af089d40` | `invoice_payment.*` hints resolve the binding through the invoice's existing identity row (none: hint retained, no dispatch). The concurrent-insert loser runs the same recovery. | `conditions/codex-intake-2/` |
+| `4716ae52` | Intake refuses `event.api_version` other than `BillingProviderPin::API_VERSION` before any row or dispatch. | `conditions/codex-intake-3/` |
+| `e26d4cb7` | A first retrieval ending `unknown` (`provider_unavailable`, `provider_inconsistent`) or `refused/provider_incomplete` throws and writes nothing. Only a definitive observation (not `unknown`, not `refused/provider_incomplete`) created strictly after the hint covers it. | `conditions/codex-unknown-outcomes/` |
+
+Unchanged in the delta (checked): `RetrieveMembershipInvoice.php` (`b2f0078b…`, `$tries = 1`), `BillingSettlement.php` (`bf348785…`), routes, bootstrap, providers, config, database, Composer and npm manifests and lockfiles, `.github` (`git diff --stat 3092880b e26d4cb7 -- routes bootstrap app/Providers config database composer.json composer.lock package.json package-lock.json .github` is empty). No added line in `app/` writes a credit, award or grant, or issues UPDATE/DELETE (the only grep hit is a docblock line). Nothing in `app/Providers`, `routes`, `bootstrap` or `config` binds or registers the gateway, intake, reconciliation or job (grep exit 1). No code reads `currentSettled()` outside `BillingLedger`.
+
+## Environment
+
+- Review worktree `/home/user/VA-Studio-review-member`: moved `c689ffdc` → `9c2f9928` (22:34Z) → `e26d4cb7` (23:40Z, reflog). Scratch worktrees in the session scratchpad: `review-member-head` (`4716ae52` from 22:52Z, `e26d4cb7` from 23:19Z) and `review-member-redgreen` (red/green). All have the main checkout's locked `vendor/` symlinked and their own Composer autoload.
+- PHP 8.4.26, PHPUnit 12.5.34, SQLite `:memory:`, synthetic `APP_KEY` from the lane README; every value synthetic.
+- Native: private `mysqld` 8.4.11, `--no-defaults`, 127.0.0.1:3531, datadir and server socket under `$scratchpad/review-member-mysql/`, X Protocol off; clients over TCP with `DB_SOCKET=` empty. The shared :3306 server and other lanes' instances were not touched. Two instance lifetimes, both recorded in `review-evidence/addendum1/native/private-instance-lifecycle.txt`: the first (pid 25136, 22:37Z) died with the container restart; the completing reviewer confirmed it gone, removed its datadir (229M), and started a second (pid 6342, 03:07Z) for the re-runs.
+- Native runner: `review-evidence/addendum1/native-head/runner-head.sh` (unchanged), which records PHPUnit's own exit status: `rc=$?` on its own line straight after `php` returns, in both the run's text file and `ledger.txt` (`phpunit_rc=`). The exit-code capture defect of the original review's `review-evidence/native/runner.sh` (its ledger `exit` field held `date`'s status, not PHPUnit's) is documented above under the native table and in "Completion notes"; it does not affect any Addendum 1 run, and every exit code cited in this addendum is PHPUnit's own.
+
+## Commands and results
+
+`$P` = `php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' --`. Counts are from each run's JUnit XML; the text summaries agree.
+
+### SQLite
+
+| Evidence | SHA | Selection | Result | Exit |
+| --- | --- | --- | --- | --- |
+| `sqlite/ProductionMembershipBilling.*` | `9c2f9928` | `tests/Feature/ProductionMembershipBilling` | OK, 99 tests, 429 assertions, 0 skipped | 0 |
+| `probes/probes-sqlite.*` | `9c2f9928` | reviewer `Addendum1ProbeTest` (earlier revision) | OK, 10 tests, 17 assertions, 3 skipped (native-only) | 0 |
+| `sqlite/head-ProductionMembershipBilling.*` | `4716ae52` | lane directory | OK, 105 tests, 461 assertions | 0 |
+| `sqlite/head-probes-sqlite.*` | `4716ae52` | reviewer probes | OK, 12 tests, 17 assertions, 5 skipped (native-only) | 0 |
+| `sqlite/final-ProductionMembershipBilling.*` | **`e26d4cb7`** | lane directory | **OK, 115 tests, 520 assertions, 0 skipped** | **0** |
+| `sqlite/final-probes-sqlite.*` | **`e26d4cb7`** | reviewer probes (current revision) | OK, 15 tests, 18 assertions, 6 skipped (the six native-only race probes) | 0 |
+| `pint-e26d4cb7.txt` | `e26d4cb7` | `vendor/bin/pint --test` on the 3 app and 5 test files | `passed` | 0 |
+
+SHA attribution: the `final-*` and `head-*` text files print `head <sha>` themselves; the two undated `9c2f9928` runs (22:38Z and 22:40Z) precede the worktree's next checkout (23:40Z) and the `af089d40` commit time (22:41:35Z).
+
+Red/green (SQLite; tests at the round's head, the round's app files reverted to its base, then restored; `git status` clean after each restore):
+
+| Round | Evidence | Red | Green |
+| --- | --- | --- | --- |
+| `9c2f9928` (R-2/R-3), first reviewer | `red-green/red.txt`, `green.txt` | `BillingObservationLedgerTest` 3 F of 11; `BillingWebhookRedeliveryTest` 4 F of 6; `BillingWebhookIntakeTest` 0 F of 5 (unchanged behaviour) | 11/38, 6/34, 5/38; all exit 0 |
+| `af089d40`, completing reviewer | `red-green/rounds/round2-af089d40*` | `BillingWebhookRedeliveryTest` 3 F of 11, exit 1 | 11 tests, 56 assertions, exit 0 |
+| `4716ae52`, completing reviewer | `red-green/rounds/round3-4716ae52*` | `BillingWebhookIntakeTest` 1 F of 6, exit 1 | 6 tests, 48 assertions, exit 0 |
+| `e26d4cb7`, completing reviewer | `red-green/rounds/round4-e26d4cb7*` | `BillingUnknownOutcomeTest` 9 F of 11, `BillingWebhookRedeliveryTest` 4 F of 19, `StripeSdkBillingGatewayTest` 1 F of 6; each exit 1 | 11/90, 19/81, 6/40; each exit 0 |
+
+Each reproduces the lane's recorded red count (3 + 4; 3; 1; 14 of 36). The script is `red-green/rounds/redgreen-rounds.sh`. The rewritten assertions in `BillingUnknownOutcomeTest` and `StripeSdkBillingGatewayTest` keep the old coverage under an owned identity (unknown still appended, chained and not settled) and add the no-row first-retrieval cases; no assertion was weakened.
+
+### Native MySQL 8.4.11 (private instance, port 3531)
+
+| Evidence (`native-head/`) | SHA | Selection | Result | PHPUnit exit | Status |
+| --- | --- | --- | --- | --- | --- |
+| `native/native-ledger.txt` | `9c2f9928` | lane directory | killed (rc 143) after a parallel run errored tests 6-8 | 143 | Discarded, not cited |
+| `ledger.txt` first `probes-native-races` | `4716ae52` | race probes | killed (rc 143), same cause | 143 | Discarded |
+| `probes-native-races-4716ae52.*` | `4716ae52` | race probes (5) | 3 pass; intake-race probe harness failure (`lock_waiters=0`); stale-race worker hit the 90 s process timeout | 2 | Superseded; both probes fixed and re-run at `e26d4cb7` |
+| `final-probes-native-races.*` (= `-run1.*`) | `e26d4cb7` | race probes (6) | 5 pass; stale-race worker SIGKILLed (signal 9; the worker's comment records a memcg OOM kill of a php process at that time) | 2 | Superseded by `final2-` |
+| `final-ProductionMembershipBilling.*` | `e26d4cb7` | lane directory | cut off at 95/115 by the container restart (no failure shown up to then; empty XML; no ledger `end`) | none | Superseded by `final2-` |
+| **`final2-probes-native-races.*`** | **`e26d4cb7`** | `$P …/addendum1/probes/Addendum1ProbeTest.php --filter test_probe_native_` | **OK, 6 tests, 64 assertions, 0 F/E/S, 652.4 s** | **0** | Cited |
+| `final2-ProductionMembershipBilling-sigterm.*` | `e26d4cb7` | `$P tests/Feature/ProductionMembershipBilling` | received SIGTERM after 7 tests (03:31:00Z); not sent by the reviewer (shared container with several other lanes' runs; the private `mysqld` stayed up) | 143 | Not cited; recorded in `ledger.txt` |
+| **`final3-ProductionMembershipBilling.*`** | **`e26d4cb7`** | `$P tests/Feature/ProductionMembershipBilling` | **OK, 115 tests, 529 assertions, 0 F/E/S, 9944.9 s** (03:31:27Z to 06:17:12Z, under a load average near 8) | **0** | Cited |
+
+The cited runs were sequential on one database (`vaseyaudio_review_member_final`, dropped and recreated before each chain; scripts `chain-final2.sh`, `chain-final3.sh`, output `chain-logs.txt`) from `/home/user/VA-Studio-review-member` with the ledger recording `head e26d4cb7… dirty=0`. The native directory has 9 more assertions than SQLite (529 vs 520) because `BillingNativeDedupRaceTest` asserts 14 natively and 5 on SQLite; there are no skips on either driver. A first launch of the chain was stopped by the completing reviewer within seconds (to relaunch it detached); it is recorded as `ABORTED` in `ledger.txt` and its partial files were discarded.
+
+## Race probes (native, `e26d4cb7`, `final2-probes-native-races.txt`)
+
+Two worker processes, distinct PIDs and connection ids, both outside any transaction, released together behind a file barrier placed after both have passed `existingInvoice()` (so the identity claim itself races).
+
+| Probe | Observation | Reading |
+| --- | --- | --- |
+| Two bindings, invoice graph `livemode=true` (mode refusal for both) | one `saved refused` (reason `mode`), the other `denied conflicting_invoice`; invoices=1, observations=1 | The `mode` refusal claims the identity for whichever binding wins. Confirms A1-1 natively. |
+| Two bindings, provider unavailable for both | both `denied provider_unavailable`; invoices=0, observations=0 | A first unknown pins nothing (R-3 part closed). At `4716ae52` the same probe saved an `unknown` identity. |
+| Right binding (settled graph) vs wrong binding | right `saved settled seq=1`; wrong `denied binding_refused_subscription`; invoices=1, owner=right | R-3 closed for the binding-contradiction case under a real race. |
+| Same binding twice (both settled) | both saved, seq 1 and 2; invoices=1 | One identity, contiguous chain under contention. |
+| Two deliveries of one event id; every sync dispatch lost (no gateway bound) | before release both connections were in `INSERT` with `innodb_lock_wait=2`; w0 (winner, main path) threw `BindingResolutionException`; w1 (loser) threw the same from `recoverLostDispatch@BillingWebhookIntake.php:92`; events=1; a later sequential redelivery dispatched (pushed=1), observations=0 | The loser no longer returns a silent success when the winner's dispatch was lost: it re-attempts and fails loudly, so the provider retries. |
+| Overlapping retrievals: stale (reads settled, stalls, appends late) vs fresh (reads refunded, appends first) | chain `1: reversed (retrieved 03:19:13)`, `2: settled (retrieved 03:19:10, created 03:19:19)`; `currentSettled()` = seq 2 settled | An older settled snapshot becomes current after a newer reversal. Confirms R-6 natively. |
+
+## Findings (Addendum 1)
+
+| ID | Severity | Finding | Recommendation |
+| --- | --- | --- | --- |
+| R-6 | Medium (forward; no consumer at `e26d4cb7`) | `BillingLedger::currentSettled()` names the sequence tail. Two overlapping retrievals of one invoice append in commit order, not provider-read order, so a settled snapshot read before a refund or dispute can be appended after the `reversed` observation and become current for up to `FRESHNESS_SECONDS` (600). The append's `clock` check orders `created_at` only. Reproduced natively (table above). Nothing reads `currentSettled()` today, so there is no award impact on this commit. | Condition R-6 below. |
+| A1-1 (R-3 residual) | Low | Settlement refuses `account`, then `invoice_identity`, then `mode`, before it checks `customer` and `subscription`. `retrieve()` treats only `account`, `customer` and `subscription` refusals as binding refusals, so a first retrieval refused for `invoice_identity` or `mode` claims the immutable identity for a binding the provider graph never validated (SQLite probe `mode-first`: `identity_owner=wrong; right binding then=conflicting_invoice`; native two-bindings race). The lane's claim "claimed only after a retrieved provider graph validated the binding" therefore holds for three of the five pre-validation refusals. Practical exposure is small (a `test` key cannot read live objects, and a provider returning a different invoice id is implausible), and nothing is awarded. | Claim the identity only when the verdict passed the customer and subscription checks (for example a `bindingValidated` fact set by `BillingSettlement`), or add `invoice_identity` and `mode` to the non-claiming set. Add the wrong-binding-first `mode` regression. |
+| A1-2 (R-2 remainder) | Low (liveness) | Recovery runs only on a provider redelivery, and the provider redelivers only when the delivery itself failed. With an async queue, dispatch succeeds and the webhook is acknowledged before the job runs; if the job then fails (a first `unknown` or `provider_incomplete` now throws, `$tries = 1`, no sweep), the hint is retained but never retrieved again until some other event for that invoice arrives. `invoice_payment.*` hints for an invoice with no identity are never dispatched. Fail-closed: nothing is awarded. | Condition R-2 (remaining) below. |
+| A1-3 | Low (liveness) | Coverage compares the observation's `created_at` (append time) with the hint's `received_at`. A retrieval whose provider reads began before the hint but appended after it covers the hint (SQLite probe `stale-read`: invoice read open at T0, hint at T0+1 with dispatch lost, observation `not_settled/invoice_open` created at T0+2, redelivery at T0+3 `scheduled=null`). The paid state is then not retrieved until another event. Fail-closed. | Cover only with an observation whose retrieval started strictly after `received_at` (record the attempt start, `attemptedAt`, on the observation or compare against it). Fold into the R-2 remaining condition. |
+| A1-4 | Low (evidence) | A first-retrieval refusal (`binding_refused_*`, `unknown`, `provider_incomplete`) writes no ledger row. Its evidence is the retained hint row (durable, sealed, encrypted) plus a failed job. The failed job's exception message is the generic "Production membership billing unavailable."; the reason code is only in the log context (`ctx_reason=…`); `failed_jobs` is prunable and absent on a sync queue; and the serialized job in `failed_jobs` holds the plaintext invoice ref and binding id (probes `failed-job`, `first-unknown failed-job`). | Judgement (a) below; condition before C3/C2. |
+| A1-5 | Info | The retrieval job is not unique-guarded: two duplicates before the job runs give two dispatches and two chained observations (lane test `test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations`; probe `storm`: 25 duplicates, 25 pushes). Harmless per retrieval (GET-only, chained), but each redelivery whose retrieval ends `unknown` appends a row that never covers, and `MAX_OBSERVATIONS = 1000` then refuses every later append for that invoice (`technical_bound`). | Judgement (b) below. |
+| A1-6 | Info | Same-second coverage: an observation with `created_at == received_at` does not cover (strict `>` on second-granularity text). Probe `same-second`: two extra retrievals before the hint is covered. | Accept (position (d)-1). |
+| A1-7 | Info | (Code reading, `BillingSettlement.php` lines 165-166.) A first retrieval whose PaymentIntent names a foreign customer throws `binding_refused_customer` even though the invoice's customer and subscription matched; a mis-versioned event (`api_version`) is refused before any row, so no evidence of it is stored. Both are fail-closed and loud. | None required; note for operators. |
+
+No finding is High. R-6 is the only Medium, and it is forward: it has no effect until something consumes `currentSettled()`.
+
+## Judgements
+
+**(a) First-retrieval wrong-binding or unknown outcome is a thrown refusal with no ledger row.** This is the right trade-off for the immutable, unique identity row: a row claimed under an unvalidated binding can only be repaired by a retention migration (the original R-3). Against the invariant "durable verified payment state is required before a grant … preserve reconciliation evidence": no grant can follow from a thrown refusal, and the hint that triggered it is preserved, so the invariant is not violated. The attempt's outcome, however, is preserved only in non-durable places (A1-4), and the hint is re-tried only on a provider redelivery (A1-2). Accept for a development merge; before C3/C2 rely on Billing evidence, either add a durable, non-identity attempt record (append-only, keyed by the event or hint hash, reason code only, no invoice-identity claim) or have root and Sean accept "retained hint + failed job + log" as the evidence of record, and put the reason code in the exception message (the reason is a code, not a secret).
+
+**(b) The retrieval job is not unique-guarded.** Accept as Info. Every retrieval is read-only against the provider and appends one sealed, chained row; the native same-binding race shows one identity and a contiguous chain. The cost is duplicate rows and, under an `unknown` storm, eventual exhaustion of `MAX_OBSERVATIONS`. The fix that removes this also addresses R-6: `ShouldBeUnique` plus `WithoutOverlapping` keyed on the invoice hash (or one per-invoice serialization point), so overlapping retrievals of one invoice cannot run.
+
+**(c) Race probes.** All six pass natively at `e26d4cb7` (exit 0). The identity claim is race-safe (one row; the loser gets `conflicting_invoice` or `binding_refused_*`; a first unknown from either side pins nothing). The concurrent-insert loser recovers the winner's lost dispatch. Two findings are confirmed under a real two-process race: A1-1 (`mode` refusal claims for the winner) and R-6 (stale settled becomes current).
+
+**(d) Codex's three open design findings.**
+
+1. *Same-second `created_at == received_at` does not cover.* Position: accept as designed. Timestamps are whole seconds, and an observation stamped in the hint's second may come from a read that began before the hint. Failing toward one more read-only retrieval is the safe direction. (A1-3 is the opposite gap, where coverage is too generous, and should be fixed.)
+2. *Overlapping retrievals let an older settled snapshot become current via the sequence tail.* Position: real and confirmed natively. Recorded as **condition R-6** on any consumer of `currentSettled()` or of the observation tail. Recommendation: serialize retrievals per invoice (a job-level lock keyed on `invoice_ref_hash` that spans the provider reads and the append; a DB lock cannot span them because provider I/O is refused inside a transaction), or an append-time ordering rule with a named key: in the append transaction require the new row's provider-read start (`attemptedAt`, to be stored) to be at or after the tail's, keyed on `(invoice_id, retrieval_started_at)`, and record a late older snapshot as non-current instead of as the tail. Either way, add a native two-process regression like the reviewer's stale-race probe.
+3. *`$tries = 1` on `RetrieveMembershipInvoice`.* Position: this is the acknowledged-webhook half of R-2 and stays open (A1-2). Retrying is safe (GET-only; each attempt appends at most one chained row; a first unknown writes nothing). Recommendation: bounded retries with backoff for `provider_unavailable` and `provider_inconsistent`, plus either a sweep over `retrieval_hint` rows with no covering observation or an operator reconciliation command, before root mounts intake with an async queue.
+
+## Status of R-2 and R-3
+
+- **R-2: partially closed.** Closed: a hint whose dispatch failed after commit is recovered by a provider redelivery, on both the early-duplicate branch and the concurrent-insert-loser branch (native intake race and SQLite redelivery tests); `invoice_payment.*` hints resolve through the owned identity. Carried: the acknowledged-webhook half (A1-2, `$tries = 1`, no sweep) and the coverage time base (A1-3). The condition now reads "R-2 (remaining)" below.
+- **R-3: partially closed.** Closed: no identity row is created on a first retrieval refused for `account`, `customer` or `subscription`, or ending `unknown` or `provider_incomplete` (red/green, SQLite probes, native races). Carried: a first retrieval refused for `invoice_identity` or `mode` still claims the identity for an unvalidated binding (A1-1). The condition now reads "R-3 (remaining)" below.
+
+## The seven Codex threads addressed in the delta
+
+Taken from the lane README's four Codex rounds (`conditions/codex-*`). "Closed" means the thread's stated defect no longer reproduces at `e26d4cb7`, with red/green and the cited runs as evidence.
+
+| # | Thread (commit) | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | R-3: identity claimed before the binding is validated (`9c2f9928`) | **Partially closed**: closed for `account`, `customer`, `subscription`; residual A1-1 (`mode`, `invoice_identity`) | red/green 3 F; SQLite `mode-first`; native races |
+| 2 | R-2: duplicate delivery returns before scheduling, so a lost dispatch is permanent (`9c2f9928`) | **Closed** as raised (the duplicate branch re-dispatches); the acknowledged-webhook half is a separate remainder (A1-2) | red/green 4 F; lane redelivery tests |
+| 3 | `invoice_payment.*` hints carry no subscription, so they never dispatch (`af089d40`) | **Closed** (resolved through the owned identity; none: retained, not dispatched) | round 2 red/green 3 F of 11 |
+| 4 | Concurrent-insert loser returns success while the winner's dispatch may be lost (`af089d40`) | **Closed** | round 2 red/green; native intake race (both connections in lock wait; loser re-dispatches from line 92) |
+| 5 | Events from another API version are stored but never scheduled (`4716ae52`) | **Closed** (refused before any row or dispatch) | round 3 red/green 1 F of 6 |
+| 6 | Finding A: a first `unknown`/`provider_incomplete` retrieval pins the identity (`e26d4cb7`) | **Closed** | round 4 red/green (14 F of 36); native two-bindings-unknown race: invoices=0 |
+| 7 | Finding C: an `unknown` (or incomplete) observation covers the hint (`e26d4cb7`) | **Closed** (only definitive observations cover) | round 4 red/green; SQLite `unknown-cover` probe: redelivery dispatched |
+
+Six of the seven are closed as raised; thread 1 is partially closed (A1-1).
+
+## Decision for the delta
+
+**APPROVE WITH CONDITIONS**, development merge only, default-off and unregistered, on the same terms and exclusions as the decision above. The delta keeps every invariant verified at `c689ffdc`: no award, grant, reversal or subscription state from a signature or provider response; integer minor units; durable deduplication; GET-only pinned provider I/O; no registration. It improves R-2 and R-3 materially and introduces no regression in the lane directory on either driver.
+
+Conditions after this addendum (R-1, R-4 and R-5 are unchanged and still apply):
+
+- **R-2 (remaining), before root mounts webhook intake:** recover retrievals that fail after the webhook was acknowledged (bounded retries with backoff for unknown outcomes, and a sweep or operator command over uncovered `retrieval_hint` rows), and base coverage on the retrieval's start time (A1-3). Mount with an async queue.
+- **R-3 (remaining), before C3/C2 consumes Billing evidence:** no identity claim on a first retrieval refused before the binding checks (`invoice_identity`, `mode`), with a regression (A1-1).
+- **R-6, before any consumer of `currentSettled()` or the observation tail (paid-invoice authority, C3/C2, any award or activation writer):** per-invoice serialization of retrievals or an append-time read-order rule with a named key, plus a native two-process regression (judgement (d)-2).
+- **A1-4, before C3/C2 consumes Billing evidence:** a durable non-identity attempt record, or an explicit root/Sean acceptance of hint + failed job + log as the evidence of record; reason code in the exception message.
+
+## Not reviewed (Addendum 1)
+
+- Real Stripe I/O, queue workers other than the test `database`/`sync` drivers, and webhook HTTP mounting (no route exists).
+- Native runs of the other lane directories (`ProductionMembership`, `ProductionMemberOriginals`) at `e26d4cb7`; they are untouched by the delta.
+- Performance (R-5 unchanged; the native directory's wall time is recorded above but is not a latency measurement).
+- Full repository suite, frontend, Foundation CI.
+
+## SHA-256 at `e26d4cb74d464943178201133612e73b16945cf1`
+
+Each hash equals both `git show e26d4cb7:<path> | sha256sum` and the review worktree file.
+
+| Path | SHA-256 |
+| --- | --- |
+| `app/Domain/Memberships/Billing/BillingLedger.php` | `743ce28a527208ba57328b5e24d23055630327aa555475f42b067f03cedb8e9b` |
+| `app/Domain/Memberships/Billing/BillingReconciliation.php` | `eae8fbc3ac365abcc6a606312e0f45170774a74992e0cac3fd641f44e8990fbb` |
+| `app/Domain/Memberships/Billing/BillingWebhookIntake.php` | `fee44488c1bee38727fa2eae62b31d67529580c0a70155341483723a75238f12` |
+| `tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php` | `15ebd5a657f0699a1e10bb84752ebb06cfb90582470d39872d4ba91dfd17ab72` |
+| `tests/Feature/ProductionMembershipBilling/BillingWebhookIntakeTest.php` | `1446329b3a36ba0b915122d831b6940b05cb6a03c4876f3d4b30f230dfe6525e` |
+| `tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php` | `df0ae7056102c17227320d590e7d2e34ea4b8ef0f1e7c9afb905b1857de57365` |
+| `tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php` | `6927d50f993cd34e7fd0b5362b0770651dc90e9241110d86ae6e3b547d8fda92` |
+| `tests/Feature/ProductionMembershipBilling/StripeSdkBillingGatewayTest.php` | `770bbcf7807dc3f12920e682ae96c238d07488ba156bb2417ba92e4a297d3ce8` |
+
+Unchanged since `c689ffdc`: `app/Jobs/RetrieveMembershipInvoice.php` `b2f0078b…` and `BillingSettlement.php` `bf348785…` (same as the table above).
+
+## Evidence index (`review-evidence/addendum1/`)
+
+- `surface.txt`: frozen-surface and registration checks at `9c2f9928` (re-checked at `e26d4cb7` by the completing reviewer; results in "Scope").
+- `sqlite/`: lane directory and reviewer probe runs at `9c2f9928`, `4716ae52` (`head-*`) and `e26d4cb7` (`final-*`).
+- `probes/`: `Addendum1ProbeTest.php` and the three race workers (current revision, used for every `e26d4cb7` run), and the first SQLite probe run.
+- `red-green/`: the `9c2f9928` red/green; `rounds/` the per-round red/green for `af089d40`, `4716ae52`, `e26d4cb7` and the script.
+- `native/`: the private-instance lifecycle for both instances, the first runner and the discarded `9c2f9928` run.
+- `native-head/`: `runner-head.sh`, the ledger, the chain scripts and their logs, the superseded `4716ae52` and earlier `e26d4cb7` runs (retained, not cited), and the cited `final2-probes-native-races.*` and `final3-ProductionMembershipBilling.*`.
+- `pint-e26d4cb7.txt`.
+
+## Cleanup
+
+- Private instance: `mysqladmin shutdown` exit 0 at 06:17:41Z; pid 6342 exited; no LISTEN on 3531; no `mysqld` process referenced the datadir; `$scratchpad/review-member-mysql` (248M) removed (exit 0). The first instance's datadir (229M) had already been removed at 03:05:55Z after confirming pid 25136 was gone. Other lanes' `mysqld` instances (trigscan-fix, free256, supp254-a27, review-tax255) and the shared :3306 server were not touched. Full log: `native/private-instance-lifecycle.txt`.
+- Scratch worktrees: `review-member-redgreen` (clean, at `e26d4cb7`) removed with `git worktree remove`; `review-member-head` (at `e26d4cb7`; its only untracked content was a byte-identical copy of `addendum1/probes/` scripts) removed with `git worktree remove --force`. The review worktree `/home/user/VA-Studio-review-member` and the base worktree are kept.
+- `git status` in the review worktree shows only `independent-review/` changes (this `DECISION.md` and the untracked `review-evidence/addendum1/`). Nothing was committed or pushed.
