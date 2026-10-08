@@ -16,7 +16,9 @@ cd "${1:?usage: two-db-repro.sh <checkout dir>}" 2>/dev/null || refuse "cannot e
 # The evidence names exactly one commit: a full 40-hex SHA from a git checkout with no tracked or untracked changes.
 source_sha=$(git rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null) || refuse "no git commit in $PWD"
 [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]] || refuse "unexpected commit id: $source_sha"
-dirty=$(git status --porcelain 2>/dev/null) || refuse "cannot read working tree status in $PWD"
+# Untracked files and submodules are requested explicitly, so status.showUntrackedFiles or submodule settings in the
+# caller's Git configuration cannot hide source that is absent from the commit.
+dirty=$(git status --porcelain --untracked-files=all --ignore-submodules=none 2>/dev/null) || refuse "cannot read working tree status in $PWD"
 [ -z "$dirty" ] || refuse "working tree has changes; commit or stash them so the evidence matches $source_sha"
 
 MYSQL=/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql
