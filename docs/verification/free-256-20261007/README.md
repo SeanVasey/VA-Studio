@@ -257,3 +257,13 @@ Conditions before activation or mounting (none blocks this development merge):
 
 The reviewer's I-10 (`CapabilityMigrationOwnership` scanning triggers across every
 schema) was fixed on `main` by PR #50 (`df8126a2`).
+
+## Hardening after review (F-1, F-2, F-3, F-5, F-8)
+
+Fixed on this branch with regressions red before and green after; details, judgement calls and
+evidence in `hardening/README.md`. SQLite directory 113 / 747, 2 native-only skips; Pint passed.
+Still open: F-4 (session temporary-table shadow, for the step 3 commit observer), F-6 (renderer
+child `open_basedir`), F-7 (root's sources adapter must refuse withdrawn assets). The F-8 fix covers
+Free256 seals only: main-resident identity classes (`ProductionCustomerAccess`, `IdentityPolicy`,
+`CustomerAccess`) still derive from the current `app.key` alone, so customer-facing commands refuse
+after a key rotation until the identity owner adds previous-key handling.

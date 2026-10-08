@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+.[41;37mF[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:02.787, Memory: 85.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest::test_staff_without_enrolled_mfa_is_refused_for_every_staff_action
+Must refuse mfa_required
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php:88
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php:45
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest::test_enrollment_removed_after_the_actor_was_loaded_is_refused
+Must refuse mfa_required
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php:88
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php:80
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 7[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=1

@@ -1,0 +1,38 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[31;1mE[0m.[31;1mE[0m                                                                 3 / 3 (100%)
+
+Time: 00:06.399, Memory: 85.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantKeyRotationTest::test_rows_written_under_the_old_key_stay_readable_when_it_is_a_previous_key
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantException.php:16
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:50
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:59
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:47
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:104
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:97
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:182
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:177
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:97
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantKeyRotationTest.php:62
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantKeyRotationTest::test_only_well_formed_distinct_keys_are_candidates_and_the_current_key_is_first
+Error: Call to undefined method App\Domain\Grants\ProductionFree\ProductionFreeGrantRecords::keys()
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantKeyRotationTest.php:103
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 17[0m[37;41m, Errors: 2[0m[37;41m.[0m
+rc=2

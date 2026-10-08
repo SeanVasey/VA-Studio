@@ -1,0 +1,87 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[41;37mF[0m[31;1mE[0m                                                              6 / 6 (100%)
+
+Time: 00:08.849, Memory: 89.00 MB
+
+There were 5 errors:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_an_existing_rendered_origin_stays_readable_and_deliverable_after_a_profile_revision
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:116
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:129
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:22
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:22
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:213
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:205
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:17
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:59
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_render_and_recover_need_the_current_profile_and_burn_no_claim_when_refused
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:116
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:129
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDocuments.php:113
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDocuments.php:25
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDocuments.php:22
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_new_assent_and_reopening_need_the_current_profile_but_closing_does_not
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:116
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:196
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:179
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:174
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:195
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:89
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:111
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_a_tampered_or_unregistered_stored_profile_is_still_refused
+Error: Call to undefined method App\Domain\Grants\ProductionFree\ProductionFreeGrantRenderProfile::validateStored()
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:121
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_every_current_profile_is_in_the_release_registry
+Error: Undefined constant App\Domain\Grants\ProductionFree\ProductionFreeGrantRenderProfile::RELEASED
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:175
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantProfileRevisionTest::test_a_properly_sealed_row_carrying_an_unregistered_or_mismatched_profile_is_refused_on_read
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'profile_unregistered'
++'profile_changed'
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:224
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantProfileRevisionTest.php:166
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 6[0m[37;41m, Assertions: 24[0m[37;41m, Errors: 5[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=2
