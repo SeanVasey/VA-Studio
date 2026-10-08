@@ -657,6 +657,26 @@
     [
       "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
       "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+      "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_changed_enum_check_is_not_normalized_into_owned_provenance"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
+      "test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"
     ]
   ]
 }

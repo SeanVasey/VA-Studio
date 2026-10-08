@@ -89,19 +89,35 @@ final class BillingLedger
         return $this->invoiceIdentity($refHash, $binding) ?? throw new BillingException('invoice_identity');
     }
 
-    /** Append one observation after the current tail. A concurrent append retries on the new tail. */
-    public function append(array $invoice, BillingVerdict $verdict, int $retrievedAt, string $provenance): array
+    /**
+     * Append one observation after the current tail. A concurrent append retries on the new tail.
+     *
+     * `$startedAt` is when the retrieval's provider reads began. Overlapping retrievals of one invoice append in commit order, not in
+     * provider-read order, so an older snapshot could land after a newer one and become the tail (review R-6). Under a row lock on the
+     * invoice identity (MySQL; the lock covers only this short append, never provider I/O) the append refuses a retrieval that began
+     * before the one that produced the tail, with `superseded_retrieval`. It is refused rather than appended as a "superseded" row
+     * so that the outcome vocabulary, the CHECKs and every reader of the tail stay unchanged: no consumer has to learn to skip a
+     * row type, and a stale snapshot has no row to be mistaken for current evidence. The refusal writes nothing, and the newer
+     * retrieval's row already records the invoice's later state. Starts that are equal to the microsecond are admitted (they cannot
+     * be ordered), so the rule is as strong as the workers' clocks.
+     */
+    public function append(array $invoice, BillingVerdict $verdict, int $retrievedAt, string $provenance, CarbonImmutable $startedAt): array
     {
         BillingException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true), 'invalid_value');
         foreach (DB::getConnections() as $connection) {
             BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
         }
+        $started = BillingValues::utcMicro($startedAt);
         for ($attempt = 0; $attempt < 3; $attempt++) {
             try {
-                return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance): array {
+                return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance, $started): array {
+                    if (DB::getDriverName() === 'mysql') {
+                        $this->lockIdentity($invoice['id']);
+                    }
                     $chain = $this->observations($invoice['id']);
                     $last = $chain === [] ? null : $chain[array_key_last($chain)];
                     BillingException::require(count($chain) < self::MAX_OBSERVATIONS, 'technical_bound');
+                    BillingException::require($last === null || $last['retrieval_started_at'] <= $started, 'superseded_retrieval');
                     $now = CarbonImmutable::now('UTC')->timestamp;
                     $createdAt = BillingValues::utc($now);
                     BillingException::require($last === null || $last['created_at'] <= $createdAt, 'clock');
@@ -111,7 +127,7 @@ final class BillingLedger
                         'line_period_start' => $verdict->facts['line_period_start'] ?? null, 'line_period_end' => $verdict->facts['line_period_end'] ?? null,
                         'amount_minor' => $verdict->outcome === 'settled' ? $verdict->facts['amount_minor'] : null,
                         'currency' => $verdict->outcome === 'settled' ? $verdict->facts['currency'] : null,
-                        'retrieved_at' => BillingValues::utc($retrievedAt), 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
+                        'retrieved_at' => BillingValues::utc($retrievedAt), 'retrieval_started_at' => $started, 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
                         'api_version' => BillingProviderPin::API_VERSION, 'sdk_reference' => BillingProviderPin::SDK_REFERENCE,
                         'prior_seal' => $last['seal'] ?? self::ZERO,
                         'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_observation',
@@ -159,6 +175,14 @@ final class BillingLedger
         $latest = $rows === [] ? null : $rows[array_key_last($rows)];
 
         return $latest !== null && $latest['outcome'] === 'settled' && BillingValues::utc($now) < $latest['freshness_deadline'] ? $latest : null;
+    }
+
+    /** Serializes appends to one invoice's chain. Held only for the append transaction. */
+    private function lockIdentity(string $invoiceId): void
+    {
+        $statement = DB::connection()->getPdo()->prepare('SELECT id FROM '.(new BillingSchema)->table(BillingSchema::TABLES[1]).' WHERE id = ? FOR UPDATE');
+        $statement->execute([$invoiceId]);
+        BillingException::require(count($statement->fetchAll(PDO::FETCH_COLUMN)) === 1, 'invoice_identity');
     }
 
     private function invoiceIdentity(string $refHash, array $binding): ?array

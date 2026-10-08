@@ -1,0 +1,2 @@
+{"tool":"pint","result":"passed"}
+rc=0

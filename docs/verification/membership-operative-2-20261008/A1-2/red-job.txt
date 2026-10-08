@@ -1,0 +1,44 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+FFF.F.....                                                        10 / 10 (100%)
+
+Time: 00:13.603, Memory: 93.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_the_job_makes_at_most_three_attempts_with_a_bounded_backoff
+Failed asserting that 1 is identical to 3.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:48
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@first attempt with data (1, 60)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@second attempt with data (2, 600)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_provider_incomplete_outcome_under_an_owned_identity_is_appended_then_released
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:85
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 10, Assertions: 22, Failures: 4.
+rc=1

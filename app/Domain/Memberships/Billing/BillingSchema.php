@@ -200,11 +200,12 @@ final class BillingSchema
         } elseif ($logical === self::TABLES[2]) {
             $columns += ['invoice_id' => $id, 'sequence' => 'INTEGER NOT NULL', 'outcome' => 'VARCHAR(16)'.$ascii.' NOT NULL', 'facts_hash' => $hash,
                 'line_period_start' => 'VARCHAR(19)'.$ascii.' NULL', 'line_period_end' => 'VARCHAR(19)'.$ascii.' NULL',
-                'amount_minor' => 'INTEGER NULL', 'currency' => 'VARCHAR(3)'.$ascii.' NULL', 'retrieved_at' => $utc, 'freshness_deadline' => $utc,
+                'amount_minor' => 'INTEGER NULL', 'currency' => 'VARCHAR(3)'.$ascii.' NULL', 'retrieved_at' => $utc,
+                'retrieval_started_at' => 'VARCHAR(26)'.$ascii.' NOT NULL', 'freshness_deadline' => $utc,
                 'api_version' => 'VARCHAR(32)'.$ascii.' NOT NULL', 'sdk_reference' => 'VARCHAR(40)'.$ascii.' NOT NULL', 'prior_seal' => $hash];
             $unique = [['invoice_id', 'sequence']];
             $foreign = ['invoice_id' => self::TABLES[1]];
-            $check .= " AND sequence BETWEEN 1 AND 10000 AND outcome IN ('settled','not_settled','unknown','refused','reversed') AND length(facts_hash) = 64 AND length(prior_seal) = 64 AND retrieved_at < freshness_deadline AND length(api_version) BETWEEN 1 AND 32 AND length(sdk_reference) = 40 AND (outcome <> 'settled' OR (line_period_start IS NOT NULL AND line_period_end IS NOT NULL AND line_period_start < line_period_end AND amount_minor IS NOT NULL AND amount_minor > 0 AND currency IS NOT NULL AND length(currency) = 3))";
+            $check .= " AND sequence BETWEEN 1 AND 10000 AND outcome IN ('settled','not_settled','unknown','refused','reversed') AND length(facts_hash) = 64 AND length(prior_seal) = 64 AND retrieved_at < freshness_deadline AND length(retrieval_started_at) = 26 AND length(api_version) BETWEEN 1 AND 32 AND length(sdk_reference) = 40 AND (outcome <> 'settled' OR (line_period_start IS NOT NULL AND line_period_end IS NOT NULL AND line_period_start < line_period_end AND amount_minor IS NOT NULL AND amount_minor > 0 AND currency IS NOT NULL AND length(currency) = 3))";
         } else {
             $columns += ['provider_event_ref_hash' => $hash, 'type' => 'VARCHAR(64)'.$ascii.' NOT NULL', 'mode' => $mode,
                 'provider_account_hash' => $hash, 'invoice_ref_hash' => 'VARCHAR(64)'.$ascii.' NULL', 'received_at' => $utc,
@@ -245,7 +246,9 @@ final class BillingSchema
                 .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE invoice_id = NEW.invoice_id AND sequence = NEW.sequence)'
                 .' AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM '.$observations.' WHERE invoice_id = NEW.invoice_id), 0) + 1'
                 ." AND ((NEW.sequence = 1 AND NEW.prior_seal = '".str_repeat('0', 64)."')"
-                .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND o.created_at <= NEW.created_at))';
+                .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND o.created_at <= NEW.created_at'
+                // A retrieval that began before the one that produced the tail is stale evidence and never becomes the tail (review R-6).
+                .' AND o.retrieval_started_at <= NEW.retrieval_started_at))';
         } else {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)';
         }

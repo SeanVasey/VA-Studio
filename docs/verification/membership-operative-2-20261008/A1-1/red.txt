@@ -1,0 +1,26 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+......FF......                                                    14 / 14 (100%)
+
+Time: 00:19.492, Memory: 97.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_a_first_retrieval_refused_before_binding_validation_claims_no_identity_for_any_binding@mode with data ('mode')
+A refusal that never reached the binding checks must not pin the invoice to the binding that happened to ask first.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:145
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_a_first_retrieval_refused_before_binding_validation_claims_no_identity_for_any_binding@invoice_identity with data ('invoice_identity')
+A refusal that never reached the binding checks must not pin the invoice to the binding that happened to ask first.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:145
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 14, Assertions: 42, Failures: 2.
+rc=1

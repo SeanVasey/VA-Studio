@@ -53,6 +53,37 @@ class BillingSchemaPreparationTest extends TestCase
         $this->assertSame(1, (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_subscriptions')->fetchColumn());
     }
 
+    /**
+     * Review R-6: the append refuses an observation whose retrieval began before the one that produced the tail, and the guard
+     * trigger enforces the same rule below the application. An equal start is admitted (microsecond ties cannot be ordered).
+     */
+    public function test_an_observation_that_began_before_the_tail_is_refused_by_the_guard_and_an_equal_or_later_start_is_admitted(): void
+    {
+        F::configure();
+        $binding = F::binding();
+        $invoice = $this->invoice($binding);
+        $first = [...$this->observation($invoice, 1, str_repeat('0', 64), 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:05.250000'];
+        $this->insert(BillingSchema::TABLES[2], $first);
+        $older = [...$this->observation($invoice, 2, $first['seal'], 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:05.249999'];
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $older));
+        $equal = [...$older, 'retrieval_started_at' => '2026-10-07 00:00:05.250000'];
+        $this->insert(BillingSchema::TABLES[2], $equal);
+        $later = [...$this->observation($invoice, 3, $equal['seal'], 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:06.000000'];
+        $this->insert(BillingSchema::TABLES[2], $later);
+        $this->assertSame(3, (int) DB::connection()->getPdo()->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn());
+    }
+
+    public function test_the_retrieval_start_must_be_a_microsecond_timestamp(): void
+    {
+        F::configure();
+        $binding = F::binding();
+        $invoice = $this->invoice($binding);
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2],
+            [...$this->observation($invoice, 1, str_repeat('0', 64), 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:01']));
+        $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown'));
+        $this->assertSame(1, (int) DB::connection()->getPdo()->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn());
+    }
+
     public function test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner(): void
     {
         F::configure();
@@ -163,7 +194,7 @@ class BillingSchemaPreparationTest extends TestCase
 
         return ['id' => $id, 'invoice_id' => $invoice['id'], 'sequence' => $sequence, 'outcome' => $outcome, 'facts_hash' => hash('sha256', 'facts'.$id),
             'line_period_start' => null, 'line_period_end' => null, 'amount_minor' => null, 'currency' => null,
-            'retrieved_at' => '2026-10-07 00:00:01', 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
+            'retrieved_at' => '2026-10-07 00:00:01', 'retrieval_started_at' => '2026-10-07 00:00:00.500000', 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
             'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525', 'prior_seal' => $prior, 'payload_ciphertext' => 'synthetic placeholder',
             'seal' => hash('sha256', 'seal'.$id), 'created_at' => '2026-10-07 00:00:02'];
     }

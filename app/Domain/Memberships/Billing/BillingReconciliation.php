@@ -35,10 +35,15 @@ final class BillingReconciliation
         $binding = $this->ledger->binding($bindingId, $configuration);
         // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
         $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
-        $attemptedAt = CarbonImmutable::now('UTC')->timestamp;
+        // When the provider reads began. The append orders overlapping retrievals of one invoice by this, and webhook hints are
+        // covered only by a retrieval that began after them; the append time says neither.
+        $startedAt = CarbonImmutable::now('UTC');
+        $attemptedAt = $startedAt->timestamp;
+        $validated = false;
         try {
             $snapshots = $this->snapshots($invoiceRef, $provenance);
             $verdict = BillingSettlement::evaluate($snapshots, $binding['expectation']);
+            $validated = BillingSettlement::bindingValidated($snapshots, $binding['expectation']);
             $retrievedAt = $snapshots->retrievedAt;
         } catch (BillingException $error) {
             if ($error->reason === 'provider_incomplete') {
@@ -63,12 +68,30 @@ final class BillingReconciliation
         if ($invoice === null) {
             BillingException::require($verdict->outcome !== 'unknown', (string) $verdict->reason);
             BillingException::require(! ($verdict->outcome === 'refused' && $verdict->reason === 'provider_incomplete'), 'provider_incomplete');
-            BillingException::require(! ($verdict->outcome === 'refused' && in_array($verdict->reason, self::BINDING_REFUSALS, true)),
+            // Settlement refuses account, invoice identity and mode before it looks at the customer and subscription, so those refusals
+            // can precede validation. Whatever refusal comes first, a first retrieval claims the identity only once the retrieved
+            // account, invoice, customer and parent subscription all match the binding (Addendum 1, A1-1). A refusal for a
+            // reason after that point (currency, amount, shape, ...) is about an invoice this binding owns and is recorded.
+            BillingException::require(! ($verdict->outcome === 'refused' && (in_array($verdict->reason, self::BINDING_REFUSALS, true) || ! $validated)),
                 'binding_refused_'.$verdict->reason);
             $invoice = $this->ledger->invoice($binding, $invoiceRef);
         }
 
-        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance);
+        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $startedAt);
+    }
+
+    /**
+     * Whether a stored observation read a usable provider state. `unknown` (a timeout or ambiguous response) and a `provider_incomplete`
+     * refusal (an unbounded list, so nothing was read) did not, and a job retries them.
+     */
+    public static function isInconclusive(array $observation): bool
+    {
+        if ($observation['outcome'] === 'unknown') {
+            return true;
+        }
+
+        return $observation['outcome'] === 'refused'
+            && (BillingValues::decrypt($observation['payload_ciphertext'])['reason'] ?? null) === 'provider_incomplete';
     }
 
     private function snapshots(string $invoiceRef, string $provenance): BillingSnapshots

@@ -1,0 +1,30 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/member2-redcopy/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 01:52.966, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal
+{"stale":{"role":"stale","result":"saved","sequence":3,"outcome":"settled","started_at":null,"reason":null,"error_class":null,"error_message":null,"connection_id":13,"pid":18086,"transaction_level":0},"fresh":{"role":"fresh","result":"saved","sequence":2,"outcome":"reversed","started_at":null,"reason":null,"error_class":null,"error_message":null,"connection_id":14,"pid":18087,"transaction_level":0}}
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'denied',
+-    1 => 'superseded_retrieval',
++    0 => 'saved',
++    1 => null,
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/member2-redcopy/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php:40
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 8, Failures: 1.
+rc=1

@@ -15,7 +15,8 @@ use Tests\Support\RehearsalBillingGateway;
 use Tests\TestCase;
 
 /**
- * Two retrievals of the same invoice give one invoice identity and at most two ordered observations.
+ * Two retrievals of the same invoice give one invoice identity and at most two ordered observations (the one that began first is
+ * refused if it appends second).
  * Native MySQL uses two independent processes released by one barrier. SQLite (single process, one
  * in-memory database) runs the same two retrievals sequentially; it does not prove concurrency.
  */
@@ -27,11 +28,20 @@ class BillingNativeDedupRaceTest extends TestCase
     {
         F::configure();
         $binding = F::binding();
+        $expected = 2;
         if (DB::getDriverName() === 'mysql') {
             $results = $this->race($binding['id']);
-            $this->assertSame(['saved', 'saved'], array_column($results, 'result'), json_encode($results));
-            $this->assertSame([1, 2], array_column($results, 'sequence'));
-            $this->assertSame($results[0]['invoice_id'], $results[1]['invoice_id']);
+            // Both workers begin together, so either may begin first. If the one that began first appends second, its snapshot is
+            // older than the tail's and the append refuses it (review R-6, BillingLedger::append); that is a normal end, not a
+            // lost retrieval, so the invariants are one identity and one contiguous chain holding exactly the saved observations.
+            foreach ($results as $result) {
+                $this->assertTrue($result['result'] === 'saved' || ($result['result'] === 'denied' && $result['reason'] === 'superseded_retrieval'), json_encode($results));
+            }
+            $saved = array_values(array_filter($results, fn (array $result): bool => $result['result'] === 'saved'));
+            $this->assertNotEmpty($saved, json_encode($results));
+            $expected = count($saved);
+            $this->assertSame(range(1, $expected), array_column($saved, 'sequence'));
+            $this->assertCount(1, array_unique(array_column($saved, 'invoice_id')));
             $this->assertSame([0, 0], array_column($results, 'transaction_level'));
         } else {
             CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(F::PERIOD_START + 3600));
@@ -46,9 +56,11 @@ class BillingNativeDedupRaceTest extends TestCase
         $invoices = DB::table('production_membership_billing_invoices')->get();
         $this->assertCount(1, $invoices);
         $chain = (new BillingLedger)->observations($invoices[0]->id);
-        $this->assertSame([1, 2], array_column($chain, 'sequence'));
-        $this->assertSame($chain[0]['seal'], $chain[1]['prior_seal']);
-        $this->assertSame(['settled', 'settled'], array_column($chain, 'outcome'));
+        $this->assertSame(range(1, $expected), array_column($chain, 'sequence'));
+        $this->assertSame(array_fill(0, $expected, 'settled'), array_column($chain, 'outcome'));
+        for ($index = 1; $index < $expected; $index++) {
+            $this->assertSame($chain[$index - 1]['seal'], $chain[$index]['prior_seal']);
+        }
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
