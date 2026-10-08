@@ -677,6 +677,10 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
       "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
+      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
     ]
   ]
 }
