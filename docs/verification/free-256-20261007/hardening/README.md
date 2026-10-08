@@ -324,3 +324,18 @@ re-checks of the stored definition, and for the buyer's declared name at review 
 Pre-activation consideration (A3-2): definitions and origins sealed before this check could hold text that cannot render. No
 sealed production origin exists, so no operator recovery path is added; before any activation, confirm that no earlier
 rehearsal definition or origin holds unrenderable text, because a sealed origin is immutable and can only stay `failed`.
+
+## Codex review round 8: partial reservation sidecars (`codex-8/`)
+
+Codex P2 on `792af167`: a worker that died while creating `slot-N.reserve` left a short file at the fixed path; every
+later admission picked that slot and refused on the size check, so one crash blocked all delivery. `reservation()`
+runs under both the slot lock and the admission lock, so no live holder is writing the sidecar. It now reclaims a
+wrong-size residual under the same rule as a residual snapshot (regular, single-link, owned by this process user)
+and recreates it, and it always creates a sidecar under a fresh random name that is renamed into place, so a crash
+can no longer leave a partial file at the fixed path. A sidecar that is not an own regular file (for example a
+symlink) is never reclaimed and keeps refusing (`artifact_unavailable`), with the outside target untouched.
+
+Regressions in `ProductionFreeGrantSpoolResidualTest`: empty and 7-byte sidecars in both slots are reclaimed, both
+downloads succeed and no temp names remain; a symlinked sidecar is refused and left alone, and the slot works once it
+is removed. Red before the fix: 1 error (`red.txt`); green after: 4 tests, 30 assertions (`green.txt`). Directory
+SQLite 141 / 1029, 2 native-only skips (`sqlite-directory.txt`); Pint passed (`pint.txt`); census self-test OK.
