@@ -82,8 +82,8 @@ sensitive, flags still default-off unless Sean activates.
 | Step | Deliverable | Status |
 | --- | --- | --- |
 | C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | **merged** PR #42 → `3716324a`; findings F1/F2 → C1b |
-| C1b | F1, F2 and Billing259 read-only evidence adapter | **merged** PR #51 → `e94417a8` (membership lane 1; see its ledger row for the design threads still open for Sean) |
-| C2 | Operative 257 writer: reserve/lock/proveCurrent, one period per invoice, award/reserve/consume/release/expire, duplicate-invoice + last-credit independent-process MySQL races | lane 1 **merged** PR #51 → `e94417a8`; lane 2 (membership billing) **merged** PR #54 → `89e3e61f` (default-off, unregistered; independent APPROVE WITH CONDITIONS); conditions still open per the 2026-10-08 ledger rows |
+| C1b | F1, F2 and Billing259 read-only evidence adapter | **merged** PR #51 → `e94417a8` (membership lane 1; see its ledger row for the design threads still open for Sean); Billing259 retrieval and reconciliation hardening **merged** PR #54 → `89e3e61f` (membership lane 2; default-off, unregistered; independent APPROVE WITH CONDITIONS) |
+| C2 | Operative 257 writer: reserve/lock/proveCurrent, one period per invoice, award/reserve/consume/release/expire, duplicate-invoice + last-credit independent-process MySQL races | not started: no award, reserve, consume or activation writer exists yet (PR #51's independent decision excludes them, and PR #54 is Billing259 evidence only, under C1b); blocks C4 |
 | C3 | Billing259: Stripe subscription/invoice/payment/charge/balance-transaction evidence adapter, default-off, pinned SDK 21.3.2 / API 2026-08-26.dahlia | after C2 |
 | C4 | 258 member-original renderer/storage/readiness; activation + credit consumption in one owned transaction; HTTP | after C2 |
 | C5 | Renewal/cancellation/dunning/legacy continuity (T31) | after C3 |

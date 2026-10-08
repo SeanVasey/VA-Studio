@@ -79,7 +79,7 @@ The lanes are separate worktrees with no overlapping files. "Review" means an in
 | M-15 | Staging commit gate: affected checks and preflight on each deployed commit | integrator | S | each deploy | — | ongoing |
 | M-16 | FPM render risk: renderers spawn `PHP_BINARY` inside web requests, which may be the FPM binary under FPM. Lane A reports the exact fix, then a separate fix and review. | A then fix lane | S | — | licensing | investigating |
 | M-17 | Census normalization (SQLite skip list) | integrator | S | census run | — | PR #60: 33 native-only pairs added (183 → 216); merges after #56. Order-dependent `PublicTrackEmbedTest` failure under investigation |
-| M-18 | Doc reconciliation: CLAUDE-PLAN status column, Free256 README status, Project Notes contradictions (MySQL version, shard count) | D | S | — | — | done in the follow-up tracker PR (CLAUDE.md shard count, CLAUDE-PLAN C1b/C2/D1/A2 cells, Free256 status line) |
+| M-18 | Doc reconciliation: CLAUDE-PLAN status column, Free256 README status, Project Notes contradictions (MySQL version, shard count) | D | S | — | — | done in the follow-up tracker PR (CLAUDE.md shard count, CLAUDE-PLAN C1b/D1/A2 cells; C2 kept outstanding, Free256 status line) |
 
 **Critical path, after Sean grants host access (H0):**
 
