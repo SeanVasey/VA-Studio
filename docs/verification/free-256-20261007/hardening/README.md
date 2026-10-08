@@ -339,3 +339,17 @@ Regressions in `ProductionFreeGrantSpoolResidualTest`: empty and 7-byte sidecars
 downloads succeed and no temp names remain; a symlinked sidecar is refused and left alone, and the slot works once it
 is removed. Red before the fix: 1 error (`red.txt`); green after: 4 tests, 30 assertions (`green.txt`). Directory
 SQLite 141 / 1029, 2 native-only skips (`sqlite-directory.txt`); Pint passed (`pint.txt`); census self-test OK.
+
+## Codex review round 9: render lease versus renderer timeout (`codex-9/`)
+
+Codex P2 on `817dd34c`: the policy accepted any `render_lease_seconds` from 30, below the pinned renderer child's
+60-second timeout, so a slow but successful render could store an immutable original whose publication is refused
+`lease_expired`, and repeated claims would exhaust the origin. `ProductionFreeGrantPolicy` now requires the lease to be
+at least `RENDERER_TIMEOUT_SECONDS` (60) plus `RENDER_LEASE_MARGIN_SECONDS` (60) for storing and publishing; the default
+300 is unchanged. The renderer process file is hash-pinned in the render profile, so it is not edited: the timeout is
+mirrored as a constant, and the regression asserts the pinned file still says `max_execution_time=60` and
+`setTimeout(60)`, so the two cannot drift silently. Regression
+`ProductionFreeGrantApprovalTest::test_render_lease_must_outlive_the_renderer_timeout_plus_margin`: leases 30, 60 and
+119 refused `changed_policy` with nothing written; 120 accepted. Red (the old `>= 30` bound applied to this code): 1
+failure; green: 1 test, 10 assertions. Directory SQLite 142 / 1039, 2 native-only skips; Pint passed; pinned renderer
+files untouched.
