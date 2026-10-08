@@ -1,0 +1,22 @@
+### vendor/bin/pint --test <files below>
+{"tool":"pint","result":"passed"}
+exit=0
+files:
+app/Domain/Customers/CustomerIdentityChallenges.php
+app/Domain/Customers/ProductionCustomerAccess.php
+app/Domain/Customers/ProductionCustomerPrincipal.php
+app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php
+app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentRecords.php
+app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php
+app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRecords.php
+app/Domain/Customers/ProductionIdentity/CompleteIdentity.php
+app/Domain/Customers/ProductionIdentity/IdentityEvidence.php
+app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php
+app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php
+app/Domain/Customers/ProductionIdentity/IdentityPolicy.php
+app/Domain/Customers/ProductionIdentity/IdentityRequests.php
+app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php
+tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php
+tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php
+tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php
+tests/Feature/CustomerIdentityKeyRotationTest.php

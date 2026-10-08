@@ -182,7 +182,7 @@ final class ProductionConsentPreferences
                 }
             }
             $status = $events[0]['status'] ?? 'unknown';
-            if ($events !== [] && ! hash_equals($events[0]['recipient_hmac'], $recipientHash)) {
+            if ($events !== [] && ! ProductionConsentRecords::recipientMatches($binding, $recipient, $events[0]['recipient_hmac'], $context->configuration())) {
                 $status = 'unknown';
             }
             if ($status === 'granted' && ($configured === null || $collision || ! $purpose['grantsEnabled']
@@ -192,7 +192,7 @@ final class ProductionConsentPreferences
             $projection = ['schema' => 1, 'purposes' => [['purpose' => ConsentPolicy::PURPOSE, 'version' => $revision, 'status' => $status,
                 'notice' => $configured ? ['version' => $configured['version'], 'hash' => $configured['notice_hash'], 'text' => $configured['notice']] : null,
                 'canGrant' => $purpose['grantsEnabled'] && $configured !== null && ! $collision,
-                'suppression' => ['status' => $withdrawal !== null && hash_equals($withdrawal['recipient_hmac'], $recipientHash) ? 'pending' : 'not_requested']]]];
+                'suppression' => ['status' => $withdrawal !== null && ProductionConsentRecords::recipientMatches($binding, $recipient, $withdrawal['recipient_hmac'], $context->configuration()) ? 'pending' : 'not_requested']]]];
 
             return ['initialized' => true, 'preferences' => $projection];
         });
