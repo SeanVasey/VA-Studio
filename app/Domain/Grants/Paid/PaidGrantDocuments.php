@@ -21,8 +21,14 @@ final class PaidGrantDocuments
 
     public const LEASE_SECONDS = 300;
 
-    /** The buyer's heavy-work lock outlives one step (claim frame, a line's 300 s budget and its record frame) by a margin. */
-    public const HEAVY_LOCK_SECONDS = self::LEASE_SECONDS + 60;
+    /**
+     * The buyer's heavy-work lock must outlive the longest step it covers (Codex 4223825205). In prepare() it is taken
+     * before the claim frame, which runs on the call budget (up to LEASE_SECONDS left), and the claimed line then runs its
+     * own LEASE_SECONDS budget for render, asset hash and record or failure frame: at most 2 x LEASE_SECONDS, plus the
+     * frames' post-commit tails. complete() holds it for one line's re-verification (LEASE_SECONDS budget) only. 60 s of
+     * margin covers the tails; a crashed worker's lock still frees itself within this TTL.
+     */
+    public const HEAVY_LOCK_SECONDS = 2 * self::LEASE_SECONDS + 60;
 
     /**
      * Prepares as many lines as this request's budget allows, then completes the order. The request ends with the current
@@ -86,7 +92,10 @@ final class PaidGrantDocuments
                 if ($line['work']['state'] === 'complete') {
                     continue;
                 }
-                $at = CarbonImmutable::now('UTC')->startOfSecond();
+                // The lease's own instant on both clocks: the line's budget below ends with this lease, never after it.
+                $now = CarbonImmutable::now('UTC');
+                $tick = hrtime(true);
+                $at = $now->startOfSecond();
                 if ($line['work']['state'] === 'claimed' && $at->lessThan($line['work']['expires_at'])) {
                     return ['busy' => true, 'projection' => (new PaidGrants)->project($graph)];
                 }
@@ -97,7 +106,9 @@ final class PaidGrantDocuments
                     [$claimId, $lease, $line['work']['id']]);
 
                 return ['origin' => $line['origin']['public_id'], 'origin_hash' => $line['origin']['payload_hash'], 'claim_id' => $claimId,
-                    'body' => $line['body'], 'expires_at' => $lease];
+                    'body' => $line['body'], 'expires_at' => $lease,
+                    // Monotonic end of the lease: the claim instant less the second's fraction the lease truncated away.
+                    'lease_ends_ns' => $tick - $now->micro * 1000 + self::LEASE_SECONDS * 1_000_000_000];
             }
 
             return ['done' => true];
@@ -110,10 +121,13 @@ final class PaidGrantDocuments
             return 'done';
         }
         // The call-wide budget only gates new claims (the loop top and the claim frame). A claimed line gets its own
-        // budget, started now to match its database lease, for its render, asset verification, record frame and
-        // failure frame, so a line claimed late in the call is not cut off with most of its lease left and its attempt
-        // spent. The record frame still refuses once the lease itself has ended.
+        // budget for its render, asset verification, record frame and failure frame, so a line claimed late in the call
+        // is not cut off with most of its lease left and its attempt spent. The budget ends with the claim's database
+        // lease, never after it (independent review A11-I1): the lease began inside the claim frame, before its commit and
+        // post-commit proofs, so a budget started only now would outlive it and run work the record frame then refuses.
+        // The record frame still refuses once the lease itself has ended.
         $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+        $budget->shortenTo($claim['lease_ends_ns']);
         try {
             $budget->proveCurrent();
             $input = PaidGrantRenderInput::fromOrigin($claim['body']);

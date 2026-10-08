@@ -145,7 +145,8 @@ final class PaidGrantPolicyRevisionTest extends TestCase
         $this->assertSame(3, $status['lines'][0]['maxDownloads']);
         $auth = $this->authorize($f);
         $row = DB::table('paid_authorizations')->where('public_id', $auth['id'])->first();
-        $this->assertSame(60, (int) CarbonImmutable::parse($row->created_at, 'UTC')->diffInSeconds(CarbonImmutable::parse($row->expires_at, 'UTC')));
+        // The retained 60 s lifetime (not the revised 300 s), counted from the end of the authorize budget (Codex 4223825193).
+        $this->assertSame(60 + PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS, (int) CarbonImmutable::parse($row->created_at, 'UTC')->diffInSeconds(CarbonImmutable::parse($row->expires_at, 'UTC')));
         $this->assertSame($this->masterBytes($f), $this->stream($f, $auth));
         $this->assertDatabaseCount('paid_redemptions', 1);
     }

@@ -48,18 +48,20 @@ async function openOrder(start: PaidOrigin, routes: Record<string, (() => Promis
   fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
   fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` }));
   await screen.findByLabelText('Retained paid order');
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+  // Round 20: the page measures its intervals with performance.now(), so the probe fakes it too.
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date', 'performance'] });
   return s;
 }
 
 describe('review addendum 11: continuation edges', () => {
-  // A11-I5: the progress live region sits inside the section that carries aria-busy="true" for the whole continuation.
-  it('keeps the progress live region inside an aria-busy="true" ancestor while continuing', async () => {
+  // A11-I5: the progress live region sat inside the section that carries aria-busy="true" for the whole continuation.
+  // Fixed in round 20 (codex-20): the region and its Stop control now sit outside the busy subtree.
+  it('keeps the progress live region outside any aria-busy="true" ancestor while continuing (fixed in round 20)', async () => {
     await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [never] });
     fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
     await advance(1_000);
     expect(live()).toHaveTextContent('Preparing your files: 0 of 3 lines ready.');
-    expect(live().closest('[aria-busy="true"]')).not.toBeNull();
+    expect(live().closest('[aria-busy="true"]')).toBeNull();
   });
 
   // A11-I4: a completion pass that outlasts the client timeout plus the waiting window is not seen through by the page.
@@ -82,8 +84,9 @@ describe('review addendum 11: continuation edges', () => {
     expect(reads).toBeLessThanOrEqual(Math.ceil(400_000 / 15_000));
   });
 
-  // A11-I6: spacing is measured on the wall clock; a backward step stalls the next request for the size of the step.
-  it('stalls the next document request after a backward wall-clock step', async () => {
+  // A11-I6: spacing was measured on the wall clock, so a backward step stalled the next request for the size of the step.
+  // Fixed in round 20 (codex-20): spacing uses performance.now(), so the next request goes after the normal 10 s.
+  it('no longer stalls the next document request after a backward wall-clock step (fixed in round 20)', async () => {
     let release: (r: Response) => void = () => {};
     const held = () => new Promise<Response>(resolve => { release = resolve; });
     const s = await openOrder(originOf(['pending', 'pending', 'pending']), {
@@ -94,11 +97,7 @@ describe('review addendum 11: continuation edges', () => {
     // The wall clock steps back one hour while the first request is in flight; its progress answer then arrives.
     vi.setSystemTime(Date.now() - 3_600_000);
     await act(async () => { release(json({ origin: originOf(['complete', 'pending', 'pending']), busy: false })); });
-    await advance(120_000);
-    expect(s.posts()).toHaveLength(1);
-    expect(screen.getByRole('button', { name: 'Refresh preparation and download status' })).toBeDisabled();
-    // Only after the step has been waited out does the next request go.
-    await advance(3_600_000);
-    expect(s.posts().length).toBeGreaterThanOrEqual(2);
+    await advance(9_000);
+    expect(s.posts()).toHaveLength(2);
   });
 });

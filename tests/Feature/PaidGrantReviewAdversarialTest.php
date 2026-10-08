@@ -186,7 +186,8 @@ final class PaidGrantReviewAdversarialTest extends TestCase
         $downloads = new PaidGrantDownloads;
         $expired = $this->authorize($f, 'master_wav');
         $lifetime = config('paid-grants.delivery_policy.authorization_seconds');
-        $this->travelTo(CarbonImmutable::now('UTC')->addSeconds($lifetime + 2));
+        // The lifetime counts from the end of the authorize budget (Codex 4223825193).
+        $this->travelTo(CarbonImmutable::now('UTC')->addSeconds($lifetime + PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS + 2));
         // Unspent but expired: 410, nothing consumed, and the idempotent authorize replay is also refused.
         $this->refused(fn () => $downloads->redeem($expired['id'], $expired['token'], $f['buyer']['principal'], $f['buyer']['user']), 410);
         $this->assertDatabaseCount('paid_redemptions', 0);

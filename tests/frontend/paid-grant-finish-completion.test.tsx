@@ -47,7 +47,7 @@ describe('finishing a prepared but unfulfilled paid order', () => {
       .mockRejectedValueOnce(new Error('SYNTHETIC CLIENT TIMEOUT')).mockResolvedValueOnce(response(status)).mockResolvedValueOnce(response({ origin: fulfilled, busy: false }));
     render(<PaidGrantJourney />);
     await openOrder();
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date', 'performance'] });
     fireEvent.click(screen.getByRole('button', { name: finish }));
     await act(() => vi.advanceTimersByTimeAsync(0));
     expect(screen.getByRole('alert')).toHaveTextContent('could not be confirmed');

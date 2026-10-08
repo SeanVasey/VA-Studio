@@ -27,7 +27,7 @@ const documentPath = `/paid-grants/origins/${batchId}/document`, statusPath = `/
 function server(routes: Record<string, (() => Promise<Response>)[]>) {
   const calls: { path: string; at: number }[] = [];
   const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation((input: RequestInfo | URL) => {
-    const path = String(input); calls.push({ path, at: Date.now() });
+    const path = String(input); calls.push({ path, at: performance.now() });
     const queue = routes[path]; if (!queue?.length) throw new Error(`unexpected ${path}`);
     return (queue.length > 1 ? queue.shift()! : queue[0])();
   });
@@ -47,7 +47,7 @@ async function openOrder(start: PaidOrigin, routes: Record<string, (() => Promis
   fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
   fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` }));
   await screen.findByLabelText('Retained paid order');
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date', 'performance'] });
   return s;
 }
 
@@ -142,6 +142,67 @@ describe('continuing paid preparation after one click', () => {
     expect(live()).toHaveTextContent('Paused after 20 requests');
     const at = s.posts().map(p => p.at);
     expect(at.slice(1).map((t, i) => t - at[i]).every(gap => gap >= 10_000)).toBe(true);
+  });
+
+  it('keeps the progress region outside the busy subtree and offers a Stop control that ends the continuation (A11-I5)', async () => {
+    const s = await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [
+      answer({ origin: originOf(['complete', 'pending', 'pending']), busy: false }), answer({ origin: originOf(['complete', 'complete', 'pending']), busy: false })] });
+    expect(screen.queryByRole('button', { name: 'Stop preparing' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await advance(0);
+    expect(live().closest('[aria-busy="true"]')).toBeNull();
+    expect(screen.getByLabelText('Paid license journey')).toHaveAttribute('aria-busy', 'true');
+    const stop = screen.getByRole('button', { name: 'Stop preparing' });
+    expect(stop).toBeEnabled();
+    fireEvent.click(stop);
+    expect(live()).toHaveTextContent('1 of 3 lines ready');
+    expect(live()).toHaveTextContent('stopped');
+    await advance(120_000);
+    expect(s.posts()).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: 'Stop preparing' })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Retained paid order')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Prepare original licenses and files' })).toBeEnabled();
+  });
+
+  it('stops a request in flight when Stop is chosen and sends nothing more', async () => {
+    const signals: AbortSignal[] = [];
+    const s = await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [() => new Promise<Response>(() => {})] });
+    s.fetcher.mockImplementation((input: RequestInfo | URL, init?: RequestInit) => { s.calls.push({ path: String(input), at: performance.now() }); signals.push(init!.signal!); return new Promise<Response>(() => {}); });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await advance(1_000);
+    fireEvent.click(screen.getByRole('button', { name: 'Stop preparing' }));
+    expect(signals[0].aborted).toBe(true);
+    await advance(400_000);
+    expect(s.posts()).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Refresh preparation and download status' })).toBeEnabled();
+  });
+
+  it('measures POST spacing on the monotonic clock, so a backward wall-clock step does not stall the next request (A11-I6)', async () => {
+    let release: (r: Response) => void = () => {};
+    const held = () => new Promise<Response>(resolve => { release = resolve; });
+    const s = await openOrder(originOf(['pending', 'pending', 'pending']), {
+      [documentPath]: [held, answer({ origin: originOf(['complete', 'complete', 'pending']), busy: false })] });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await advance(1_000);
+    vi.setSystemTime(Date.now() - 3_600_000);
+    await act(async () => { release(json({ origin: originOf(['complete', 'pending', 'pending']), busy: false })); });
+    await advance(9_000);
+    expect(s.posts()).toHaveLength(2);
+  });
+
+  it('keeps polling while another holder may still legitimately hold the buyer lock (up to 660 s), then stops', async () => {
+    const s = await openOrder(originOf(['pending', 'pending', 'pending']), {
+      [documentPath]: [answer({ origin: originOf(['complete', 'claimed', 'pending']), busy: true })], [statusPath]: [answer(statusOf(2))] });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await advance(0);
+    await advance(600_000);
+    const reads = s.calls.filter(c => c.path === statusPath).length;
+    expect(reads).toBe(40);
+    expect(live()).toHaveTextContent('checking again shortly');
+    await advance(120_000);
+    expect(live()).toHaveTextContent('Still waiting for other work');
+    expect(s.calls.filter(c => c.path === statusPath).length).toBeLessThanOrEqual(Math.ceil(660_000 / 15_000));
+    expect(s.posts()).toHaveLength(1);
   });
 
   it('stops when the tab is hidden and does not resume on return', async () => {

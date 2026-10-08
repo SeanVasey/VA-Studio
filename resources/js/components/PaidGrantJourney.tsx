@@ -90,10 +90,12 @@ export type PaidOperation = keyof typeof paidRequestTimeouts;
  * Continuing a preparation after one click (condition C13). The server answers each document request with what it achieved
  * (its call budget spent, or other work holding the buyer's preparation), so the page sends another request while each one
  * makes progress, at most `posts` per click and never two within `spacing` (the route allows 6 a minute). While another
- * request holds the work it polls saved status every `poll`, for at most `wait` without progress: a render lease (300 s)
- * plus a margin.
+ * request holds the work it polls saved status every `poll`, for at most `wait` without progress: the server's buyer lock
+ * TTL (`PaidGrantDocuments::HEAVY_LOCK_SECONDS`, 2 x 300 s + 60 s), the longest a live holder can legitimately keep it.
+ * A crashed holder can also block this buyer's preparation for up to that 11 minutes; after `wait` the page stops and a
+ * later click continues. Intervals use the monotonic `performance.now()`, so a wall-clock step cannot stall or rush them.
  */
-export const paidContinuation = { posts: 20, spacing: 10_000, poll: 15_000, wait: 360_000 } as const;
+export const paidContinuation = { posts: 20, spacing: 10_000, poll: 15_000, wait: 660_000 } as const;
 type Outcome = 'ok' | 'lost' | 'refused' | 'denied' | 'invalid' | 'skipped';
 const ready = (o: PaidOrigin) => o.lines.filter(l => l.documentStatus === 'complete').length;
 const readyText = (o: PaidOrigin) => o.fulfilled ? 'Your files are ready.' : `Preparing your files: ${ready(o)} of ${o.lines.length} lines ready.`;
@@ -109,8 +111,16 @@ export function PaidGrantJourney() {
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState(''), [progress, setProgress] = useState('');
   // A continuing preparation: its run number (bumped to stop it), whether it is running, and the last document POST time.
-  const runs = useRef(0), auto = useRef(false), lastDocument = useRef(Number.NEGATIVE_INFINITY);
-  function stopContinuing() { runs.current++; auto.current = false; }
+  const runs = useRef(0), auto = useRef(false), lastDocument = useRef(Number.NEGATIVE_INFINITY), timers = useRef(new Set<number>());
+  const [continuing, setContinuing] = useState(false);
+  function stopContinuing() { runs.current++; auto.current = false; setContinuing(false); timers.current.forEach(t => window.clearTimeout(t)); timers.current.clear(); }
+  // Ends a continuation the way a hidden tab does (its run, timers and in-flight request), but keeps the page shown. A request
+  // already sent may still finish on the server; the next click continues from what it achieved.
+  function stopPreparing() {
+    if (!auto.current) return;
+    stopContinuing(); generation.current++; request.current?.abort(); request.current = null; inflight.current = false; setBusy(false);
+    setProgress(origin ? `${readyText(origin)} Preparation stopped; a request already sent may still finish. Choose prepare to continue.` : '');
+  }
   const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setProgress(''); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
   function refuse() { stopContinuing(); clear(); kept.current = []; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
@@ -176,17 +186,17 @@ export function PaidGrantJourney() {
    */
   async function continuePreparing(start: PaidOrigin) {
     if (auto.current || inflight.current || denied) return;
-    const run = ++runs.current; auto.current = true; setBusy(true);
+    const run = ++runs.current; auto.current = true; setBusy(true); setContinuing(true);
     const current = () => active.current && run === runs.current;
-    const pause = (ms: number) => new Promise<void>(resolve => { window.setTimeout(resolve, ms); });
+    const pause = (ms: number) => new Promise<void>(resolve => { const t = window.setTimeout(() => { timers.current.delete(t); resolve(); }, ms); timers.current.add(t); });
     let o = start, posts = 0, waitingSince: number | null = null;
     setProgress(readyText(o));
     try {
       while (current()) {
         if (posts >= paidContinuation.posts) { setProgress(`${readyText(o)} Paused after ${posts} requests; choose prepare to continue.`); return; }
-        const delay = lastDocument.current + paidContinuation.spacing - Date.now();
+        const delay = lastDocument.current + paidContinuation.spacing - performance.now();
         if (delay > 0) { await pause(delay); if (!current()) return; }
-        lastDocument.current = Date.now(); posts++;
+        lastDocument.current = performance.now(); posts++;
         let answer: { origin: PaidOrigin; busy: boolean } | null = null;
         const before = o;
         const outcome = await call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { answer = documentAnswer(x, before); if (!answer) throw new Error(); });
@@ -200,10 +210,10 @@ export function PaidGrantJourney() {
           }
         } else if (outcome !== 'lost') return;
         // Other work holds the order, or the answer was lost while the server may still be working: poll saved status.
-        waitingSince ??= Date.now();
+        waitingSince ??= performance.now();
         let proceed = false;
         while (current() && !proceed) {
-          if (Date.now() - waitingSince >= paidContinuation.wait) { setProgress(`${readyText(o)} Still waiting for other work; refresh later.`); return; }
+          if (performance.now() - waitingSince >= paidContinuation.wait) { setProgress(`${readyText(o)} Still waiting for other work; refresh later.`); return; }
           setProgress(`${readyText(o)} Another request is still working on this order; checking again shortly.`);
           await pause(paidContinuation.poll); if (!current()) return;
           let saved: Status | null = null;
@@ -222,7 +232,7 @@ export function PaidGrantJourney() {
           if (!proceed) setStatus(s);
         }
       }
-    } finally { if (run === runs.current) { auto.current = false; if (!inflight.current) setBusy(false); } }
+    } finally { if (run === runs.current) { auto.current = false; setContinuing(false); if (!inflight.current) setBusy(false); } }
   }
   function savedStatus() { if (!origin) return; const o = origin, p = pending, issuedAt = performance.now(); void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p ? { pending: p, issuedAt } : null); setReviewedSaved(true); }); }
   // An authorize whose answer was lost may have committed. Only a saved status read taken after that request may show it is
@@ -283,7 +293,12 @@ export function PaidGrantJourney() {
   // Every line is prepared but completion was refused or its answer was lost (it can outlast the client timeout): the same
   // document request finishes the order. Completion claims nothing and spends no preparation attempt.
   const finishable = !!origin && !origin.fulfilled && unfinished.length === 0;
-  return <section aria-label="Paid license journey" aria-busy={busy}>
+  // The progress line and its Stop control sit outside the busy subtree, so assistive technology is not asked to hold the
+  // announcements while a continuation keeps the controls busy (independent review A11-I5).
+  return <div className="paid-grant-journey">
+    <div className="paid-preparation-status"><p role="status" aria-live="polite" className="paid-preparation-progress">{progress}</p>
+      {continuing && <button type="button" onClick={stopPreparing}>Stop preparing</button>}</div>
+    <section aria-label="Paid license journey" aria-busy={busy}>
     <p>Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.</p>
     {message && <div role="alert" tabIndex={-1} ref={alert} className="customer-account-message">{message}{denied && <a href="/customer/sign-in">Open a fresh sign-in page</a>}</div>}
     <button type="button" disabled={busy || denied} onClick={refresh}>{data ? 'Refresh paid licenses' : 'Open paid licenses'}</button>
@@ -297,7 +312,6 @@ export function PaidGrantJourney() {
     {origin && <section aria-label="Retained paid order"><p className="paid-license-reference">Order {origin.orderId}</p>
       {origin.provenance === 'synthetic_rehearsal' && <p>Rehearsal original. No real payment or production legal facts are certified.</p>}
       <p>{origin.fulfilled ? 'Complete-order preparation is recorded. Exact files are checked again for each download.' : 'This order is waiting for complete preparation. No line can download yet.'}</p>
-      <p role="status" aria-live="polite" className="paid-preparation-progress">{progress}</p>
       {unfinished.length > 0 && <button type="button" disabled={busy || !retryAllowed} onClick={prepare}>Prepare original licenses and files</button>}
       {finishable && <button type="button" disabled={busy} onClick={prepare}>Finish preparing this order</button>}
       <button type="button" disabled={busy} onClick={savedStatus}>Refresh preparation and download status</button>
@@ -311,5 +325,6 @@ export function PaidGrantJourney() {
       {shown.map(a => <div key={a.id}><p>{a.filename}; expires {a.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => submit(a)}>Download authorized file</button></div>)}
       {retryable.map(r => <div key={r.id}><p>{r.filename} is still authorized and unused; expires {r.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => retryDownload(r)}>Retry the authorized download</button></div>)}
     </section>}
-  </section>;
+    </section>
+  </div>;
 }

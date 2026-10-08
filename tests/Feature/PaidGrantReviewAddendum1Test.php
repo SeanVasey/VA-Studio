@@ -250,7 +250,8 @@ final class PaidGrantReviewAddendum1Test extends TestCase
         $this->assertSame($first, $this->authorize($f, $input));
         $this->assertDatabaseCount('paid_authorizations', 1);
         $row = DB::table('paid_authorizations')->where('public_id', $first['id'])->first();
-        $this->assertSame(60, (int) CarbonImmutable::parse($row->created_at, 'UTC')->diffInSeconds(CarbonImmutable::parse($row->expires_at, 'UTC')));
+        // Retained 60 s, counted from the end of the authorize budget (Codex 4223825193).
+        $this->assertSame(60 + PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS, (int) CarbonImmutable::parse($row->created_at, 'UTC')->diffInSeconds(CarbonImmutable::parse($row->expires_at, 'UTC')));
         $master = file_get_contents(Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path));
         $this->assertSame($master, $this->stream($f, $first));
         // The retained limit (3) still governs, not the revised one (1); the fourth issuance is refused by the retained limit.

@@ -23,8 +23,11 @@ use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
 use Carbon\CarbonImmutable;
 use Closure;
+use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -220,6 +223,67 @@ final class PaidGrantHeavyWorkTest extends TestCase
         $this->assertSame([1], $this->attempts());
     }
 
+    public function test_the_lock_outlasts_a_slow_claim_frame_followed_by_a_long_line(): void
+    {
+        // Codex P2 4223825205: the lock is taken before the claim frame (call budget, up to 300 s) and the line then runs
+        // its own 300 s budget. Here the claim frame spends 280 s before it claims, and the line's render 290 s: 570 s
+        // after the lock was taken, past the former 360 s TTL. Time moves on both clocks (the lock and the lease read the
+        // wall clock, the budgets the paid monotonic clock).
+        $f = $this->order(1);
+        $key = $this->lockKey($f);
+        $frames = 0;
+        $held = [];
+        Event::listen(TransactionBeginning::class, function () use (&$frames): void {
+            if (DB::transactionLevel() !== 1 || ! $this->ownedFrame()) {
+                return;
+            }
+            if (++$frames === 1) {
+                $this->spend(280);
+            }
+        });
+        $commits = 0;
+        Event::listen(TransactionCommitted::class, function () use (&$held, &$commits, $key): void {
+            // Owned commit 2 is the line's record frame, at the end of the line and still inside the heavy step.
+            if (DB::transactionLevel() === 0 && $this->ownedFrame() && ++$commits === 2) {
+                $held[] = $this->lockIsHeld($key);
+            }
+        });
+        $this->slowRenderer(0, during: function () use (&$held, $key): void {
+            $this->spend(290);
+            // What a concurrent prepare() of this buyer would try first: the same non-blocking acquisition.
+            $held[] = $this->lockIsHeld($key);
+        });
+
+        $projection = $this->prepare($f, $busy);
+        $this->assertSame([true, true], $held, 'The buyer lock must still be held at the end of the render and at the line\'s record frame.');
+        $this->assertSame(['complete'], array_column($projection['lines'], 'documentStatus'));
+        $this->assertFalse($this->lockIsHeld($key), 'Released after the step.');
+        $this->assertSame(660, PaidGrantDocuments::HEAVY_LOCK_SECONDS);
+    }
+
+    public function test_the_line_budget_ends_with_the_database_lease_not_after_the_claim_frame_tail(): void
+    {
+        // Independent review A11-I1: the lease starts inside the claim frame; its commit and post-commit proofs then take
+        // 30 s here. The line's render takes 275 s, so the line reaches 305 s after its lease began. The line budget must
+        // end with the lease: refused before any asset is hashed, never a record frame that the lease check refuses (409).
+        $f = $this->order(1);
+        $commits = 0;
+        Event::listen(TransactionCommitted::class, function () use (&$commits): void {
+            if (DB::transactionLevel() === 0 && $this->ownedFrame() && ++$commits === 1) {
+                $this->spend(30);
+            }
+        });
+        $this->slowRenderer(0, during: function (): void {
+            $this->spend(275);
+        });
+
+        $this->assertSame(410, $this->refusedStatus(fn () => $this->prepare($f)));
+        $this->assertSame(0, $this->assets->verified, 'No asset is hashed past the line\'s lease.');
+        $this->assertDatabaseCount('paid_originals', 0);
+        $this->assertSame([1], $this->attempts());
+        $this->assertFalse($this->lockIsHeld($this->lockKey($f)));
+    }
+
     public function test_a_live_claim_by_another_request_is_reported_busy_and_unchanged(): void
     {
         $f = $this->order(1);
@@ -308,6 +372,21 @@ final class PaidGrantHeavyWorkTest extends TestCase
     private function lockKey(array $f): string
     {
         return 'paid-grant-heavy:'.hash('sha256', 'paid-heavy-v1:'.$f['buyer']['principal']->accountId);
+    }
+
+    private function spend(int $seconds): void
+    {
+        PaidGrantMonotonicClock::advance($seconds);
+        $this->travel($seconds)->seconds();
+    }
+
+    /** An outermost paid frame (PaidGrantCommands::run), not the customer-access transaction it opens first. */
+    private function ownedFrame(): bool
+    {
+        $frames = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+        return array_filter($frames, fn (array $frame): bool => ($frame['class'] ?? null) === PaidGrantCommands::class && $frame['function'] === 'run') !== []
+            && array_filter($frames, fn (array $frame): bool => ($frame['class'] ?? null) === ProductionCustomerAccess::class) === [];
     }
 
     private function lockIsHeld(string $key): bool
