@@ -5,10 +5,13 @@ namespace Tests\Feature\ProductionFreeGrants;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDownloads;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantInput;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantLibrary;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\Support\ProductionFreeGrantFixtures;
 use Tests\TestCase;
 
@@ -96,6 +99,45 @@ final class ProductionFreeGrantTransferDeadlineTest extends TestCase
         CarbonImmutable::setTestNow(CarbonImmutable::now('UTC')->addSeconds(301));
         $this->refuses(fn () => $this->downloads()->redeem($authorization['id'], $authorization['token'], $this->owner['principal'], $this->owner['user']), 'expired');
         $this->assertSame(0, DB::table('production_free_redemptions')->count());
+    }
+
+    public function test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry(): void
+    {
+        $authorization = $this->authorize();
+        $started = CarbonImmutable::now('UTC')->startOfSecond();
+        // The snapshot opens the source 301 s later, past the 300 s authorization; the redemption began inside it.
+        $this->sources->opening = fn () => CarbonImmutable::setTestNow($started->addSeconds(301));
+
+        $transfer = $this->downloads()->redeem($authorization['id'], $authorization['token'], $this->owner['principal'], $this->owner['user']);
+        $received = 0;
+        $transfer->writeTo(function (string $chunk) use (&$received): void {
+            $received += strlen($chunk);
+        });
+
+        $this->assertSame(8 * self::MIB, $received);
+        $row = DB::table('production_free_redemptions')->where('authorization_id', $authorization['id'])->first();
+        $this->assertNotNull($row);
+        $this->assertSame($started->getTimestamp(), CarbonImmutable::parse($row->created_at, 'UTC')->getTimestamp(), 'The guarded time is the request start.');
+        $expires = DB::table('production_free_authorizations')->where('id', $authorization['id'])->value('expires_at');
+        $this->assertTrue(CarbonImmutable::parse($row->created_at, 'UTC')->lessThan(CarbonImmutable::parse($expires, 'UTC')));
+    }
+
+    public function test_the_redemption_guard_still_refuses_a_start_time_at_or_after_expiry(): void
+    {
+        $authorization = $this->authorize();
+        $auth = DB::table('production_free_authorizations')->where('id', $authorization['id'])->first();
+        $row = fn (string $at): array => ['id' => (string) Str::uuid(), 'authorization_id' => $auth->id, 'origin_id' => $auth->origin_id,
+            'account_id' => $auth->account_id, 'user_id' => $auth->user_id, 'role' => $auth->role, 'artifact_sha256' => $auth->artifact_sha256,
+            'bytes' => 1, 'created_at' => $at, 'payload_ciphertext' => 'x', 'seal' => str_repeat('0', 64)];
+        $expires = CarbonImmutable::parse($auth->expires_at, 'UTC');
+        try {
+            DB::table('production_free_redemptions')->insert($row(ProductionFreeGrantInput::stored($expires)));
+            $this->fail('A start time at the expiry must be refused by the guard.');
+        } catch (QueryException $error) {
+            $this->assertStringContainsString('Retain production free grants', $error->getMessage());
+        }
+        DB::table('production_free_redemptions')->insert($row(ProductionFreeGrantInput::stored($expires->subSecond())));
+        $this->assertSame(1, DB::table('production_free_redemptions')->count(), 'One second earlier the same row is admitted.');
     }
 
     public function test_shipped_defaults_and_policy_bounds(): void

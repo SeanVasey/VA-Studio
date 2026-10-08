@@ -13,6 +13,9 @@ final class FakeProductionFreeSources implements ProductionFreeGrantSources
 
     public int $proofs = 0;
 
+    /** Runs as each source opens, so a test can move the clock while a snapshot is in progress. */
+    public ?\Closure $opening = null;
+
     public function __construct()
     {
         $this->bytes = ['synthetic-master_wav' => "RIFF\x24\x00\x00\x00WAVEsynthetic rehearsal master, not audio",
@@ -32,6 +35,9 @@ final class FakeProductionFreeSources implements ProductionFreeGrantSources
 
     public function open(array $asset)
     {
+        if ($this->opening !== null) {
+            ($this->opening)($asset);
+        }
         $stream = fopen('php://temp', 'w+b');
         fwrite($stream, $this->bytes[$asset['source_id']] ?? '');
         rewind($stream);

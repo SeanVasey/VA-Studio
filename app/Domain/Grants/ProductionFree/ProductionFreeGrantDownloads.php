@@ -90,15 +90,18 @@ final class ProductionFreeGrantDownloads
         $snapshotDeadline = hrtime(true) + $before['policy']['snapshot_seconds'] * 1000000000;
         $prepared = $this->snapshot($before, $snapshotDeadline);
         try {
-            $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($inspect, $before): array {
+            $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($inspect, $before, $requested): array {
                 $current = $inspect($policy, $rows, $binding);
                 ProductionFreeGrantException::require(CanonicalJson::encode($current) === CanonicalJson::encode($before), 'entitlement_changed');
                 $at = ProductionFreeGrantInput::now();
                 $id = (string) Str::uuid();
+                // The guarded timestamp is the moment the redemption began, the same instant both inspections compared with
+                // the authorization expiry, so the database guard applies the same valid-to-start rule. The sealed payload
+                // keeps the completion time.
                 $rows->insert('production_free_redemptions', ['id' => $id, 'authorization_id' => $before['auth']['id'],
                     'origin_id' => $before['auth']['origin_id'], 'account_id' => (int) $binding['account_id'], 'user_id' => (int) $binding['user_id'],
                     'role' => $before['auth']['role'], 'artifact_sha256' => $before['target']['sha256'], 'bytes' => $before['target']['bytes'],
-                    'created_at' => ProductionFreeGrantInput::stored($at)],
+                    'created_at' => ProductionFreeGrantInput::stored($requested)],
                     ['schema_version' => 'production-free-redemption-v1', 'redemption_id' => $id, 'authorization_id' => $before['auth']['id'],
                         'origin_seal' => $before['graph']['origin']['seal'], 'role' => $before['auth']['role'], 'at' => ProductionFreeGrantInput::iso($at)]);
 
