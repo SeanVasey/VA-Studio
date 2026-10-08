@@ -1,0 +1,40 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 00:06.996, Memory: 85.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAttemptLimitTest::test_thirty_one_failed_attempts_still_allow_a_thirty_second_claim
+attempt 17
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'render_failed'
++'attempts_exhausted'
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php:85
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php:30
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAttemptLimitTest::test_the_thirty_third_attempt_is_refused_and_all_sixty_four_work_rows_are_readable
+attempt 17
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'render_failed'
++'attempts_exhausted'
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php:85
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php:49
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 38[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=1

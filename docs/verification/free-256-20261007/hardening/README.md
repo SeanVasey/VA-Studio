@@ -143,3 +143,49 @@ manifest, `MANIFEST_HASH` and every main-resident file are untouched, so the sea
 F-4 (MySQL TEMPORARY-table parent shadow), F-6 (renderer child sandbox width), F-7 (delivery does not re-prove current
 source readiness) stay open and untouched. Native MySQL was not run for this lane's changes; the shipped native runs
 are the reviewer's.
+
+## Codex review round (four P2 findings on PR #53)
+
+Evidence under `codex-1/` to `codex-4/` (`red.txt`, `green.txt`), plus `codex-sqlite-directory.txt`,
+`codex-database-receipts.txt` and `codex-pint.txt`. Each item was reproduced red first. The directory run on SQLite is
+**120 tests, 857 assertions, 2 skipped (the same two native-only schema cases), rc=0**; `test-database-receipts.py` OK
+(34 tests); Pint passes on every changed or new PHP file. No new test skips on SQLite.
+
+| Item | Test file | Red | Green |
+| --- | --- | --- | --- |
+| 1 abandoned spool snapshots | `ProductionFreeGrantSpoolResidualTest` | 2 tests: 1 error (`spool_busy`), the non-regular-file control passes (rc=2) | OK 2 tests, 17 assertions |
+| 2 aggregate disk reservation | `ProductionFreeGrantSpoolReservationTest` | 2 tests: 2 failures, the second concurrent snapshot was admitted (rc=1) | OK 2 tests, 10 assertions |
+| 3 render attempt count | `ProductionFreeGrantAttemptLimitTest` | 2 tests: 2 failures, attempt 17 got `attempts_exhausted` (rc=1) | OK 2 tests, 77 assertions |
+| 4 library newest rows | `ProductionFreeGrantLibraryWindowTest` | 1 test: 1 error, the page held filler rows (rc=2) | OK 1 test, 6 assertions |
+
+1. **Residual snapshots.** When a slot's flock is acquired its previous holder is gone, so `ProductionFreeGrantSpool::slot`
+   unlinks a residual at exactly `slot-N.snapshot` for that slot, and only if it is a regular, single-link file owned
+   by the process user. A directory, symlink or hard-linked file leaves the slot skipped (never repaired), as before.
+   Regression: residuals in all three slots, three concurrent downloads succeed and every residual is gone; the
+   directory, symlink (target untouched) and hard-link cases are refused `spool_busy` and left in place.
+2. **Aggregate reservation.** Admission (slot choice, free-space probe, reservation) now runs under a short blocking
+   `flock` on `admission.lock`. Each slot has a fixed 20-digit sidecar `slot-N.reserve`, written only while its slot
+   lock is held. Admission requires `free - sum(reservations of other held slots) - size >= reserve`. A reservation is
+   set to zero when the snapshot is complete (the disk then reports those bytes itself, so they are not counted twice)
+   and also when the fill or any later step fails. Slots are found by globbing `slot-*.lock`, so lowering `spool_slots`
+   later does not hide an active higher slot. Regression drives `ProductionFreeGrantSpool::prepare` directly with a
+   simulated free-space value: a nested second reservation that fits alone but not together is `spool_space`, then
+   succeeds after the first completes; the exact-fit boundary admits both; a failed fill releases its reservation.
+   The cross-process `flock` behavior is exercised only in one process here.
+3. **Attempt count.** The allowance counts `claimed` rows (`< 32`). The work-ordinal CHECK is now `0..63`, and
+   `originGraph` reads up to 64 work rows (it read 32, which would have truncated a full chain by `id`). Migration
+   `2026_10_07_256000` has never been applied anywhere, so its guard bound was changed in place and no new migration
+   was added. The CHECK text is shared by both drivers, and the SQLite schema tests pass; the native MySQL schema cases
+   were not run here, and no test pins this literal text.
+4. **Library window.** New `ProductionFreeGrantRows::newest()` selects the ids ordered by `created_at DESC, id DESC`
+   with `LIMIT` in SQL (MySQL `FOR UPDATE` like the reader); the rows are then fetched by `id IN (...)`, so `total`
+   stays the exact count. `ProductionFreeGrantLibrary` takes an optional page size (default 50, 1 to 1000). The
+   regression holds 1,001 older filler origins that sort below every real UUID, so the old "first 1,000 by id" window
+   contained only fillers; with a page size of 3 the three real origins are returned newest first and `total` is 1004.
+   The fillers need the append-only guards removed and restored in the test (SQLite triggers re-created from
+   `sqlite_master`, foreign keys toggled off and on); that is test-only and reads of the fillers never happen.
+   `created_at` has one-second resolution, so ties fall back to `id`, as before.
+
+Judgement calls: the optional library page size exists so the cap can be exercised without 50 real origins; it is not
+a customer-facing input. Reservation accounting counts only not-yet-written bytes (released at completion) rather than
+holding the full size for the stream's lifetime, because the finished unlinked snapshot already reduces free space.
