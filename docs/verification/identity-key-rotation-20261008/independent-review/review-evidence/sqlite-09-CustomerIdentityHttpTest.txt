@@ -1,0 +1,16 @@
+# source HEAD: f59f9b827ef21832e00e627c55c739ee37710719
+# worktree diff (app tests) sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+# untracked tests: 
+# date: 2026-10-08T13:19:32Z  uptime:  13:19:32 up  2:27,  0 user,  load average: 6.15, 5.76, 5.74
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- tests/Feature/CustomerIdentityHttpTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-idkeys/phpunit.xml
+
+..........                                                        10 / 10 (100%)
+
+Time: 00:16.038, Memory: 99.00 MB
+
+[30;42mOK (10 tests, 109 assertions)[0m
+rc=0

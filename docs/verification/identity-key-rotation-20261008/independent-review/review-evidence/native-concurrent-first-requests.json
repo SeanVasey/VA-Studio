@@ -1,0 +1,10 @@
+{
+    "single-key": {
+        "rounds": 4,
+        "deadlock_delta": 0
+    },
+    "two-candidate": {
+        "rounds": 4,
+        "deadlock_delta": 0
+    }
+}

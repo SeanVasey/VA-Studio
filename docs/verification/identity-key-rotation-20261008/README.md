@@ -1,6 +1,8 @@
 # Production identity APP_KEY rotation — focused evidence (2026-10-08)
 
-**Status:** focused development evidence only. Not Foundation CI, not final acceptance, not reviewed.
+**Status:** focused development evidence only. Not Foundation CI, not final acceptance. Independent review: APPROVE WITH
+CONDITIONS for a development merge (`independent-review/DECISION.md`); conditions C1 (Free256 pins) and C2 (open
+production conditions below) are applied in `pin-move/`.
 
 ## What changed and why
 
@@ -96,6 +98,17 @@ Tested-source fingerprint: `git diff HEAD -- app tests CHANGELOG.md | sha256sum`
 `1f130cf7…` (CustomerIdentityKeyRotationTest).
 
 ## Untested or open conditions
+
+- **Open production condition (review F1, medium): mixed-key fences.** During a rolling deploy or rollback, a process
+  with only the old key and one with the new key (old key listed) can each create an address fence for an address
+  neither has seen; every later enroll or recovery for that address is then refused with the generic 422
+  (`IdentityRequests`), and the legacy `CustomerIdentityChallenges` silently issues no challenge. Anyone who knows the
+  address can trigger it inside that window; it grants no access but blocks recovery with no self-service repair.
+  Before production this needs a rotation runbook that drains every old-configuration process (a rollback must keep the
+  new key in `APP_PREVIOUS_KEYS`) or a deterministic resolution plus a repair command. Sean's decision.
+- **Open production condition (review F3, low): suppression after rotation** is the item below; the review confirmed
+  two targets and two provider calls for one address, never an unhonoured withdrawal, and that the 8-target binding
+  limit can eventually refuse recording a new suppression while consent stays withdrawn.
 
 - No Foundation CI, browser or HTTP-level rotation test; no independent review yet (required: authorization change).
 - Rotation is simulated in-process (`config()` + encrypter reset); a real deploy with `APP_PREVIOUS_KEYS` and queue

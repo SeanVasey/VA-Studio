@@ -1,0 +1,84 @@
+# SQL shape with zero previous keys: base 705a712e vs head f59f9b82 (MySQL general log)
+# private mysqld 8.4.11 127.0.0.1:42611; source HEAD f59f9b827ef21832e00e627c55c739ee37710719
+# method: scratch test ReviewSqlShapeCaptureTest (source below) run twice on the same head worktree; for 'base' the two files
+#   app/Domain/Customers/ProductionIdentity/IdentityRequests.php and app/Domain/Customers/CustomerIdentityChallenges.php
+#   were replaced by their 705a712e bytes, then restored with git checkout (git diff HEAD -- app afterwards: 0 lines).
+# scenario: enroll request, exact replay, completion, recover request, second-address enroll, legacy CustomerIdentityChallenges::request
+# normalization: thread id/time prefix, UUIDs, timestamps, bcrypt, 'eyJ..' ciphertext
+phpunit head: OK (1 test, 2 assertions)
+phpunit base: OK (1 test, 2 assertions)
+statements captured (normalized lines): base 6932, head 6932
+strict diff hunks (all remaining differences are random-valued INSERT literals - proof/payload hashes, owner_key, ciphertext -
+  and the legacy lookup whose request key is a random UUID; no production identity SELECT ... FOR UPDATE line differs):
+      3 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_notices` (`public_id`,`provenance`,`iden
+      3 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_challenges` (`public_id`,`provenance`,`i
+      3 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_notices` (`public_id`,`provenance`,`iden
+      3 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_challenges` (`public_id`,`provenance`,`i
+      1 > Execute	select * from `customer_identity_challenges` where `request_hash` = 'a7dfbd7931775df52731692c3793ebc
+      1 > Execute	insert into `customer_identity_challenges` (`public_id`, `address_key`, `request_hash`, `purpose`, `
+      1 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`quote_owners` (`owner_key`) VALUES ('fdd9747b08a392bb6a48234
+      1 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_verifications` (`public_id`,`provenance`
+      1 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_origins` (`public_id`,`provenance`,`iden
+      1 > Execute	INSERT INTO `vaseyaudio_review_idkeys`.`customer_accounts` (`public_id`,`user_id`,`owner_key`,`activ
+      1 < Execute	select * from `customer_identity_challenges` where `request_hash` = '92ad365ebc05636d2036181eda40a2c
+      1 < Execute	insert into `customer_identity_challenges` (`public_id`, `address_key`, `request_hash`, `purpose`, `
+      1 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`quote_owners` (`owner_key`) VALUES ('811c00a342b587c3d95a00a
+      1 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_verifications` (`public_id`,`provenance`
+      1 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`production_identity_origins` (`public_id`,`provenance`,`iden
+      1 < Execute	INSERT INTO `vaseyaudio_review_idkeys`.`customer_accounts` (`public_id`,`user_id`,`owner_key`,`activ
+production identity lookup lines differing: 0
+diff after masking 64-hex and long base64 literals: 0 lines (byte-identical statement text)
+sample head lookups:
+Prepare	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_addresses` WHERE address_hash = ? ORDER BY id LIMIT 1 FOR UPDATE
+Execute	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_addresses` WHERE address_hash = 'ebc0b3cc7b03b9129e7d802f2cfd38de1cbca67bc31e391a4c761b3886c2f128' ORDER BY id LIMIT 1 FOR UPDATE
+Prepare	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_addresses` WHERE address_hash = ? ORDER BY id LIMIT 1 FOR UPDATE
+Execute	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_addresses` WHERE address_hash = 'ebc0b3cc7b03b9129e7d802f2cfd38de1cbca67bc31e391a4c761b3886c2f128' ORDER BY id LIMIT 1 FOR UPDATE
+Prepare	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_challenges` WHERE request_hash = ? ORDER BY id LIMIT 1 FOR UPDATE
+Execute	SELECT * FROM `vaseyaudio_review_idkeys`.`production_identity_challenges` WHERE request_hash = 'ded68228d4982c6d50598b0eeb0b9330b4ecbdf7c05b2b4ba78c2faeaf2b5f64' ORDER BY id LIMIT 1 FOR UPDATE
+----- capture test source -----
+<?php
+
+namespace Tests\Feature\ProductionIdentity;
+
+use App\Domain\Customers\CustomerIdentityChallenges;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Support\CustomerIdentityFixtures;
+use Tests\Support\ProductionIdentityFixture;
+use Tests\TestCase;
+
+/** Review tool (not a product test): captures the MySQL general log for the identity request paths with one key. */
+class ReviewSqlShapeCaptureTest extends TestCase
+{
+    use ProductionIdentityFixture;
+
+    public function test_capture_identity_request_sql_with_a_single_key(): void
+    {
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('1', 32)), 'app.previous_keys' => []]);
+        app()->forgetInstance('encrypter');
+        Crypt::clearResolvedInstance('encrypter');
+        $this->identitySetup();
+        $this->travelTo(now()->startOfSecond());
+        $file = getenv('REVIEW_GENERAL_LOG');
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec("SET GLOBAL general_log_file='".$file."'");
+        $pdo->exec('SET GLOBAL general_log=ON');
+        try {
+            $pdo->query("SELECT 'REVIEW-MARK-START'")->fetchAll();
+            $enroll = $this->requestIdentity('enroll', 'buyer@example.test', str_repeat('e', 64));
+            $this->requestIdentity('enroll', 'buyer@example.test', str_repeat('e', 64)); // exact replay
+            $this->completeIdentity($enroll);
+            $this->requestIdentity('recover', 'buyer@example.test', str_repeat('c', 64));
+            $this->requestIdentity('enroll', 'other@example.test', str_repeat('d', 64));
+            $pdo->query("SELECT 'REVIEW-MARK-LEGACY'")->fetchAll();
+            CustomerIdentityFixtures::configure();
+            app(CustomerIdentityChallenges::class)->request('enroll', 'legacy@example.test', (string) Str::uuid(), CustomerIdentityFixtures::OWNER);
+            $pdo->query("SELECT 'REVIEW-MARK-END'")->fetchAll();
+        } finally {
+            $pdo->exec('SET GLOBAL general_log=OFF');
+        }
+        $this->assertSame(1, DB::table('production_identity_origins')->count());
+    }
+}
+rc=0
