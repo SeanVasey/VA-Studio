@@ -1,0 +1,6 @@
+GROUP_CONCAT(SCHEMA_NAME ORDER BY SCHEMA_NAME)
+information_schema,mysql,performance_schema,sys,vaseyaudio_review_trigscan
+routines_outside_sys
+0
+triggers
+0

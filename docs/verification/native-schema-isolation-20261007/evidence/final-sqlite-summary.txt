@@ -1,0 +1,11 @@
+Feature-NativeSchemaIsolationTest exit=0 1s Tests: 25, Assertions: 0, Skipped: 25.
+Feature-ProductionIdentity exit=0 49s Tests: 56, Assertions: 257, Skipped: 8.
+Feature-ProductionIdentityAdapters exit=0 73s Tests: 53, Assertions: 316, Skipped: 2.
+Feature-ProductionFeatures exit=0 124s Tests: 82, Assertions: 745, Skipped: 3.
+Unit-ProductionFeatures exit=0 0s OK (4 tests, 21 assertions)
+Feature-ProductionAccountFeatures exit=0 4s OK (3 tests, 65 assertions)
+Feature-ProductionTrackPreparationPacketMigrationTest exit=0 18s OK (23 tests, 326 assertions)
+Feature-ProductionBuyerAssentObservationMigrationTest exit=0 6s OK (4 tests, 24 assertions)
+Feature-ProductionBuyerAssentObservationsTest exit=0 39s OK (22 tests, 82 assertions)
+Feature-InquiryNotificationMigrationTest exit=0 31s Tests: 37, Assertions: 546, Skipped: 4.
+Feature-ProductionTrackCapabilitiesMigrationOwnershipTest exit=2 19s Tests: 23, Assertions: 126, Errors: 6.

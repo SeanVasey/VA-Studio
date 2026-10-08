@@ -1,0 +1,498 @@
+pattern lines found: 3, distinct: 1
+preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
+ok  db=vaseyaudio_review_trigscan   capability backtick                                                           expected=1      got=1      4.2ms
+ok  db=vaseyaudio_review_trigscan   capability bare                                                               expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vaseyaudio_review_trigscan   capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va+sey(1)                    capability backtick                                                           expected=1      got=1      6.1ms
+ok  db=va+sey(1)                    capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va+sey(1)                    capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va+sey(1)                    capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va+sey(1)                    capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va*sey?                      capability backtick                                                           expected=1      got=1      7.0ms
+ok  db=va*sey?                      capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va*sey?                      capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va*sey?                      capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va*sey?                      identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va*sey?                      inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va*sey?                      capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      1.1ms
+ok  db=va*sey?                      identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va*sey?                      inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va*sey?                      capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va$sey                       capability backtick                                                           expected=1      got=1      4.5ms
+ok  db=va$sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va$sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va$sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va$sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va$sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va$sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va$sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va$sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va$sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va$sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va$sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va$sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va$sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va$sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va$sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va$sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va$sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va$sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va$sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va$sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va$sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va$sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va$sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va$sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va$sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va$sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va$sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va$sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va$sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va$sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va$sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va$sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va#sey                       capability backtick                                                           expected=1      got=1      7.6ms
+ok  db=va#sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va#sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va#sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va#sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va#sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va#sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va#sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va#sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va#sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va#sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va#sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va#sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va#sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va#sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va#sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va#sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va#sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va#sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va#sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va#sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va#sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va#sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va#sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va#sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va#sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va#sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va#sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va#sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va#sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va#sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va#sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va#sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va/sey                       capability backtick                                                           expected=1      got=1      5.6ms
+ok  db=va/sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va/sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va/sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va/sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va/sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va/sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va/sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va/sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va/sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va/sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va/sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va/sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va/sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va/sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va/sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va/sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va/sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va/sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va/sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va/sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va/sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va/sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va/sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va/sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va/sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va/sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va/sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va/sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va/sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va/sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va/sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va/sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va|sey                       capability backtick                                                           expected=1      got=1      5.7ms
+ok  db=va|sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va|sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va|sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va|sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va|sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va|sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va|sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va|sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va|sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va|sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va|sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va|sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va|sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va|sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va|sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va|sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va|sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va|sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va|sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va|sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va|sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va|sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va|sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va|sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va|sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va|sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va|sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va|sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va|sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va|sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va|sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va|sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va-sey                       capability backtick                                                           expected=1      got=1      10.7ms
+ok  db=va-sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va-sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va-sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va-sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va-sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va-sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va-sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va-sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va-sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va-sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va-sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va-sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va-sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va-sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va-sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va-sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va-sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va-sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va-sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va-sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va-sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va-sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va-sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va-sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va-sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va-sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va-sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va-sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va-sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va-sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va-sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va-sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va.sey                       capability backtick                                                           expected=1      got=1      5.9ms
+ok  db=va.sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va.sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va.sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va.sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va.sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va.sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va.sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va.sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va.sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va.sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va.sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va.sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va.sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va.sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va.sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va.sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va.sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va.sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va.sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va.sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va.sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va.sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va.sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va.sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va.sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va.sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=refuse 7.2ms
+ok  db=va.sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=refuse 8.9ms
+ok  db=va.sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=refuse 7.9ms
+ok  db=va.sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=refuse 6.3ms
+ok  db=va.sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=refuse 4.6ms
+ok  db=va.sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=refuse 5.0ms
+ok  db=va.sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=vasé                        capability backtick                                                           expected=1      got=1      3.8ms
+ok  db=vasé                        capability bare                                                               expected=1      got=1      0.0ms
+ok  db=vasé                        capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=vasé                        capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=vasé                        capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=vasé                        capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=vasé                        capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=vasé                        capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=vasé                        capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=vasé                        capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=vasé                        capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=vasé                        capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=vasé                        capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=vasé                        capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=vasé                        capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=vasé                        capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=vasé                        capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=vasé                        capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=vasé                        capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=vasé                        capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=vasé                        capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=vasé                        capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=vasé                        capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=vasé                        capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=vasé                        capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=vasé                        capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=vasé                        capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vasé                        identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vasé                        inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=vasé                        capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vasé                        identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vasé                        inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=vasé                        capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va[s]ey                      capability backtick                                                           expected=1      got=1      3.8ms
+ok  db=va[s]ey                      capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va[s]ey                      capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va[s]ey                      capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va[s]ey                      identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va[s]ey                      inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va[s]ey                      capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va[s]ey                      identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va[s]ey                      inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va[s]ey                      capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va\sey                       capability backtick                                                           expected=1      got=1      4.2ms
+ok  db=va\sey                       capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va\sey                       capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va\sey                       capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va\sey                       capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va\sey                       capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va\sey                       capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va\sey                       capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va\sey                       capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va\sey                       capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va\sey                       capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va\sey                       capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va\sey                       capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va\sey                       capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va\sey                       capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va\sey                       capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va\sey                       capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va\sey                       capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va\sey                       capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va\sey                       capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va\sey                       capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va\sey                       capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va\sey                       capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va\sey                       capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va\sey                       capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va\sey                       capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va\sey                       capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va\sey                       identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va\sey                       inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va\sey                       capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va\sey                       identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va\sey                       inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va\sey                       capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+ok  db=va^sey{2}                    capability backtick                                                           expected=1      got=1      4.1ms
+ok  db=va^sey{2}                    capability bare                                                               expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability spaces around dot                                                  expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability tabs/newlines around dot                                           expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability block comment before dot                                           expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability multi-line block comment before dot                                expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability -- comment before dot                                              expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability # comment before dot                                               expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability ANSI double quotes                                                 expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability double-quoted qualifier (ANSI_QUOTES off: a string)                expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability upper case                                                         expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability upper case bare                                                    expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability inside a string literal                                            expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability no dot                                                             expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability dot only inside a comment                                          expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability dot inside a versioned comment (raw text; MySQL stores it expanded) expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability -- without space is not a comment                                  expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix -2 quoted                                                   expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix $x quoted                                                   expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix $x bare                                                     expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix é quoted                                                   expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability suffix _x                                                          expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability prefix x quoted                                                    expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability prefix x bare                                                      expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability prefix $ bare                                                      expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability prefix é bare                                                     expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability prefix - quoted                                                    expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability backtick-escaped dot (identifier "<db>`.t")                        expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability qualifier inside another quoted identifier                         expected=0      got=0      0.0ms
+ok  db=va^sey{2}                    capability table named like the db, after another schema                      expected=1      got=1      0.0ms
+ok  db=va^sey{2}                    capability ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    identity   ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    inquiry    ReDoS attempt: name then 40 # and no dot/newline                   expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    capability ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    identity   ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    inquiry    ReDoS attempt: name then 2000 "# \n" lines and no dot              expected=any    got=0      0.0ms
+ok  db=va^sey{2}                    capability invalid UTF-8 body                                                 expected=refuse got=refuse 0.0ms
+total checks=1326 mismatches=0
+exit=0

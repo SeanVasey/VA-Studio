@@ -1,0 +1,26 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> capability: refused LogicException: Unexpected production capability external view reference; rollback refused before schema changes.
+F                                                                   1 / 1 (100%)
+
+Time: 01:02.957, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p4_prefix_and_extension_named_peers
+P4 longer-underscore capability
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'admitted'
++'refused LogicException: Unexpected production capability external view reference; rollback refused before schema changes.'
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:171
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 10, Failures: 1.

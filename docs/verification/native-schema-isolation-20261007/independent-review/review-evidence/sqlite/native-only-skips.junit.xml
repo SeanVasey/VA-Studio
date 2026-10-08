@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="26" assertions="0" errors="0" failures="0" skipped="26" time="0.059035">
+    <testsuite name="Tests\Feature\NativeSchemaIsolationTest" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" tests="25" assertions="0" errors="0" failures="0" skipped="25" time="0.000000">
+      <testcase name="test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="56" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testsuite name="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused" tests="24" assertions="0" errors="0" failures="0" skipped="24" time="0.000000">
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" file="/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" tests="1" assertions="0" errors="0" failures="0" skipped="1" time="0.059035">
+      <testcase name="test_one_native_inspection_issues_a_small_fixed_number_of_statements" file="/home/user/VA-Studio-review-trigscan/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" line="22" class="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" classname="Tests.Feature.ProductionIdentity.IdentityInspectionCostTest" assertions="0" time="0.059035">
+        <skipped/>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

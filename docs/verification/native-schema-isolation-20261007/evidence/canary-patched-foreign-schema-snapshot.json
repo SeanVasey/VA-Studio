@@ -1,0 +1,331 @@
+{
+    "original_source_label": "b635e12992dc91f5131f35e5c46b8dab6ff30eee",
+    "actual_native_version": "8.4.11",
+    "database": "vaseyaudio_service_review",
+    "foreign_schema": "vaseyaudio_trigscan_canary_foreign",
+    "reference": [
+        {
+            "REFERENCED_TABLE_SCHEMA": "vaseyaudio_trigscan_canary_foreign",
+            "REFERENCED_TABLE_NAME": "users",
+            "REFERENCED_COLUMN_NAME": "id"
+        }
+    ],
+    "refused": true,
+    "reason": "Production membership preparation unavailable.",
+    "before": {
+        "tables": {
+            "production_membership_plan_versions": "CREATE TABLE `production_membership_plan_versions` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `policy_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `original_terms_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `provenance` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_plan_versions_u0` (`policy_hash`),\n  CONSTRAINT `production_membership_plan_versions_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (length(`policy_hash`) = 64) and (length(`original_terms_hash`) = 64) and (`provenance` in (_utf8mb4'synthetic_rehearsal',_utf8mb4'verified_production'))))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_paid_periods": "CREATE TABLE `production_membership_paid_periods` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `account_id` bigint unsigned NOT NULL,\n  `user_id` bigint unsigned NOT NULL,\n  `identity_origin_id` bigint unsigned NOT NULL,\n  `plan_version_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `source_invoice_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `invoice_graph_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `owner_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `allowance` int NOT NULL,\n  `period_start` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_end` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `credit_expires_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_paid_periods_u0` (`source_invoice_hash`),\n  KEY `production_membership_paid_periods_f0` (`account_id`),\n  KEY `production_membership_paid_periods_f2` (`plan_version_id`),\n  KEY `production_membership_paid_periods_f1` (`user_id`),\n  CONSTRAINT `production_membership_paid_periods_f0` FOREIGN KEY (`account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_f1` FOREIGN KEY (`user_id`) REFERENCES `vaseyaudio_trigscan_canary_foreign`.`users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_f2` FOREIGN KEY (`plan_version_id`) REFERENCES `production_membership_plan_versions` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`account_id` > 0) and (`user_id` > 0) and (`identity_origin_id` > 0) and (`allowance` between 1 and 1000000) and (`period_start` < `period_end`) and (length(`source_invoice_hash`) = 64) and (length(`invoice_graph_hash`) = 64) and (length(`owner_binding_hash`) = 64)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_redemptions": "CREATE TABLE `production_membership_redemptions` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `request_key_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `owner_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `credit_amount` int NOT NULL,\n  `selection_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `license_manifest_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `asset_manifest_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `original_terms_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `intent_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `honor_deadline` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_redemptions_u0` (`request_key_hash`),\n  KEY `production_membership_redemptions_f0` (`period_id`),\n  CONSTRAINT `production_membership_redemptions_f0` FOREIGN KEY (`period_id`) REFERENCES `production_membership_paid_periods` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_redemptions_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`credit_amount` between 1 and 1000000) and (length(`request_key_hash`) = 64) and (length(`owner_binding_hash`) = 64) and (length(`intent_hash`) = 64) and (`created_at` < `honor_deadline`)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_credit_events": "CREATE TABLE `production_membership_credit_events` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `sequence` int NOT NULL,\n  `kind` varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `amount` int NOT NULL,\n  `redemption_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `reservation_event_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_origin_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_receipt_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_purpose` varchar(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `key_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `request_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `prior_seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `actor_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `before_available` int NOT NULL,\n  `before_reserved` int NOT NULL,\n  `before_consumed` int NOT NULL,\n  `before_expired` int NOT NULL,\n  `after_available` int NOT NULL,\n  `after_reserved` int NOT NULL,\n  `after_consumed` int NOT NULL,\n  `after_expired` int NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_credit_events_u0` (`period_id`,`sequence`),\n  UNIQUE KEY `production_membership_credit_events_u1` (`period_id`,`key_hash`),\n  UNIQUE KEY `production_membership_credit_events_u2` (`reservation_event_id`),\n  UNIQUE KEY `production_membership_credit_events_u3` (`grant_origin_id`),\n  KEY `production_membership_credit_events_f1` (`redemption_id`),\n  CONSTRAINT `production_membership_credit_events_f0` FOREIGN KEY (`period_id`) REFERENCES `production_membership_paid_periods` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_f1` FOREIGN KEY (`redemption_id`) REFERENCES `production_membership_redemptions` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_f2` FOREIGN KEY (`reservation_event_id`) REFERENCES `production_membership_credit_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`before_available` between 0 and 1000000) and (`before_reserved` between 0 and 1000000) and (`before_consumed` between 0 and 1000000) and (`before_expired` between 0 and 1000000) and (`after_available` between 0 and 1000000) and (`after_reserved` between 0 and 1000000) and (`after_consumed` between 0 and 1000000) and (`after_expired` between 0 and 1000000) and (`sequence` between 1 and 10000) and (`amount` between 1 and 1000000) and (`kind` in (_utf8mb4'award',_utf8mb4'reserve',_utf8mb4'consume',_utf8mb4'release',_utf8mb4'expire')) and (length(`key_hash`) = 64) and (length(`request_hash`) = 64) and (length(`prior_seal`) = 64) and (length(`actor_binding_hash`) = 64)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin"
+        },
+        "guards": [
+            {
+                "TRIGGER_NAME": "production_membership_credit_events_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_credit_events",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE period_id = NEW.period_id AND (sequence = NEW.sequence OR key_hash = NEW.key_hash)) AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM `production_membership_credit_events` WHERE period_id = NEW.period_id),0) + 1 AND ((NEW.kind = 'award' AND NEW.sequence = 1 AND NEW.prior_seal = '0000000000000000000000000000000000000000000000000000000000000000' AND NEW.redemption_id IS NULL AND NEW.reservation_event_id IS NULL AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance = NEW.amount AND created_at = NEW.created_at) AND NEW.before_available = 0 AND NEW.after_available = NEW.amount AND NEW.before_reserved = 0 AND NEW.after_reserved = 0 AND NEW.before_consumed = 0 AND NEW.after_consumed = 0 AND NEW.before_expired = 0 AND NEW.after_expired = 0) OR (NEW.sequence > 1 AND EXISTS (SELECT 1 FROM `production_membership_credit_events` e WHERE e.period_id = NEW.period_id AND e.sequence = NEW.sequence - 1 AND e.seal = NEW.prior_seal AND e.created_at <= NEW.created_at AND e.after_available = NEW.before_available AND e.after_reserved = NEW.before_reserved AND e.after_consumed = NEW.before_consumed AND e.after_expired = NEW.before_expired) AND ((NEW.kind = 'reserve' AND NEW.reservation_event_id IS NULL AND NEW.before_available >= NEW.amount AND EXISTS (SELECT 1 FROM `production_membership_redemptions` r JOIN `production_membership_paid_periods` p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.period_id = NEW.period_id AND r.credit_amount = NEW.amount AND NEW.created_at < r.honor_deadline AND (p.credit_expires_at IS NULL OR NEW.created_at < p.credit_expires_at)) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE redemption_id = NEW.redemption_id AND kind = 'reserve') AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL) OR (NEW.kind IN ('consume','release') AND EXISTS (SELECT 1 FROM `production_membership_credit_events` r WHERE r.id = NEW.reservation_event_id AND r.kind = 'reserve' AND r.period_id = NEW.period_id AND r.redemption_id = NEW.redemption_id AND r.amount = NEW.amount) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE reservation_event_id = NEW.reservation_event_id) AND ((NEW.kind = 'release' AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL) OR (NEW.kind = 'consume' AND NEW.grant_purpose = 'production-member-license-grant-v1' AND length(NEW.grant_origin_id) = 36 AND length(NEW.grant_receipt_hash) = 64 AND EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE id = NEW.redemption_id AND NEW.created_at < honor_deadline)))) OR (NEW.kind = 'expire' AND NEW.redemption_id IS NULL AND NEW.reservation_event_id IS NULL AND NEW.amount = NEW.before_available AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at) AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL)))) AND NEW.after_available = NEW.before_available + (CASE WHEN NEW.kind = 'award' THEN NEW.amount WHEN NEW.kind IN ('reserve','expire') THEN -NEW.amount WHEN NEW.kind = 'release' AND NOT (EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at)) THEN NEW.amount ELSE 0 END) AND NEW.after_reserved = NEW.before_reserved + (CASE WHEN NEW.kind = 'reserve' THEN NEW.amount WHEN NEW.kind IN ('consume','release') THEN -NEW.amount ELSE 0 END) AND NEW.after_consumed = NEW.before_consumed + (CASE WHEN NEW.kind = 'consume' THEN NEW.amount ELSE 0 END) AND NEW.after_expired = NEW.before_expired + (CASE WHEN NEW.kind = 'expire' OR (NEW.kind = 'release' AND (EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at))) THEN NEW.amount ELSE 0 END) AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance = NEW.after_available + NEW.after_reserved + NEW.after_consumed + NEW.after_expired)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_credit_events_update",
+                "EVENT_OBJECT_TABLE": "production_membership_credit_events",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE source_invoice_hash = NEW.source_invoice_hash) AND EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE id = NEW.plan_version_id) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_update",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE policy_hash = NEW.policy_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_update",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE request_key_hash = NEW.request_key_hash) AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance >= NEW.credit_amount AND owner_binding_hash = NEW.owner_binding_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_update",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            }
+        ],
+        "rows": {
+            "production_membership_plan_versions": [
+                {
+                    "id": "11111111-2222-4333-8444-555555555555",
+                    "policy_hash": "4288afd531d53f35f9fd8018b2949e678c8dcc294a612dc4a33f7185a62c6f2e",
+                    "original_terms_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "provenance": "synthetic_rehearsal",
+                    "payload_ciphertext": "retained synthetic marker, not approved terms or encrypted policy proof",
+                    "seal": "6206eea7eccb3259f8e68953eaecd92dcdd6571d14434bece667106855aae6f7",
+                    "created_at": "2026-10-07 00:00:00"
+                }
+            ],
+            "production_membership_paid_periods": [],
+            "production_membership_redemptions": [],
+            "production_membership_credit_events": []
+        }
+    },
+    "after": {
+        "tables": {
+            "production_membership_plan_versions": "CREATE TABLE `production_membership_plan_versions` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `policy_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `original_terms_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `provenance` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_plan_versions_u0` (`policy_hash`),\n  CONSTRAINT `production_membership_plan_versions_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (length(`policy_hash`) = 64) and (length(`original_terms_hash`) = 64) and (`provenance` in (_utf8mb4'synthetic_rehearsal',_utf8mb4'verified_production'))))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_paid_periods": "CREATE TABLE `production_membership_paid_periods` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `account_id` bigint unsigned NOT NULL,\n  `user_id` bigint unsigned NOT NULL,\n  `identity_origin_id` bigint unsigned NOT NULL,\n  `plan_version_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `source_invoice_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `invoice_graph_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `owner_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `allowance` int NOT NULL,\n  `period_start` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_end` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `credit_expires_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_paid_periods_u0` (`source_invoice_hash`),\n  KEY `production_membership_paid_periods_f0` (`account_id`),\n  KEY `production_membership_paid_periods_f2` (`plan_version_id`),\n  KEY `production_membership_paid_periods_f1` (`user_id`),\n  CONSTRAINT `production_membership_paid_periods_f0` FOREIGN KEY (`account_id`) REFERENCES `customer_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_f1` FOREIGN KEY (`user_id`) REFERENCES `vaseyaudio_trigscan_canary_foreign`.`users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_f2` FOREIGN KEY (`plan_version_id`) REFERENCES `production_membership_plan_versions` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_paid_periods_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`account_id` > 0) and (`user_id` > 0) and (`identity_origin_id` > 0) and (`allowance` between 1 and 1000000) and (`period_start` < `period_end`) and (length(`source_invoice_hash`) = 64) and (length(`invoice_graph_hash`) = 64) and (length(`owner_binding_hash`) = 64)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_redemptions": "CREATE TABLE `production_membership_redemptions` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `request_key_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `owner_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `credit_amount` int NOT NULL,\n  `selection_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `license_manifest_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `asset_manifest_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `original_terms_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `intent_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `honor_deadline` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `payload_ciphertext` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_redemptions_u0` (`request_key_hash`),\n  KEY `production_membership_redemptions_f0` (`period_id`),\n  CONSTRAINT `production_membership_redemptions_f0` FOREIGN KEY (`period_id`) REFERENCES `production_membership_paid_periods` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_redemptions_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`credit_amount` between 1 and 1000000) and (length(`request_key_hash`) = 64) and (length(`owner_binding_hash`) = 64) and (length(`intent_hash`) = 64) and (`created_at` < `honor_deadline`)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin",
+            "production_membership_credit_events": "CREATE TABLE `production_membership_credit_events` (\n  `id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `period_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `sequence` int NOT NULL,\n  `kind` varchar(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `amount` int NOT NULL,\n  `redemption_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `reservation_event_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_origin_id` varchar(36) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_receipt_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `grant_purpose` varchar(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,\n  `key_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `request_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `prior_seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `actor_binding_hash` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `before_available` int NOT NULL,\n  `before_reserved` int NOT NULL,\n  `before_consumed` int NOT NULL,\n  `before_expired` int NOT NULL,\n  `after_available` int NOT NULL,\n  `after_reserved` int NOT NULL,\n  `after_consumed` int NOT NULL,\n  `after_expired` int NOT NULL,\n  `seal` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  `created_at` varchar(19) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `production_membership_credit_events_u0` (`period_id`,`sequence`),\n  UNIQUE KEY `production_membership_credit_events_u1` (`period_id`,`key_hash`),\n  UNIQUE KEY `production_membership_credit_events_u2` (`reservation_event_id`),\n  UNIQUE KEY `production_membership_credit_events_u3` (`grant_origin_id`),\n  KEY `production_membership_credit_events_f1` (`redemption_id`),\n  CONSTRAINT `production_membership_credit_events_f0` FOREIGN KEY (`period_id`) REFERENCES `production_membership_paid_periods` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_f1` FOREIGN KEY (`redemption_id`) REFERENCES `production_membership_redemptions` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_f2` FOREIGN KEY (`reservation_event_id`) REFERENCES `production_membership_credit_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,\n  CONSTRAINT `production_membership_credit_events_bounds` CHECK (((length(`id`) = 36) and (length(`seal`) = 64) and (`before_available` between 0 and 1000000) and (`before_reserved` between 0 and 1000000) and (`before_consumed` between 0 and 1000000) and (`before_expired` between 0 and 1000000) and (`after_available` between 0 and 1000000) and (`after_reserved` between 0 and 1000000) and (`after_consumed` between 0 and 1000000) and (`after_expired` between 0 and 1000000) and (`sequence` between 1 and 10000) and (`amount` between 1 and 1000000) and (`kind` in (_utf8mb4'award',_utf8mb4'reserve',_utf8mb4'consume',_utf8mb4'release',_utf8mb4'expire')) and (length(`key_hash`) = 64) and (length(`request_hash`) = 64) and (length(`prior_seal`) = 64) and (length(`actor_binding_hash`) = 64)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin"
+        },
+        "guards": [
+            {
+                "TRIGGER_NAME": "production_membership_credit_events_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_credit_events",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE period_id = NEW.period_id AND (sequence = NEW.sequence OR key_hash = NEW.key_hash)) AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM `production_membership_credit_events` WHERE period_id = NEW.period_id),0) + 1 AND ((NEW.kind = 'award' AND NEW.sequence = 1 AND NEW.prior_seal = '0000000000000000000000000000000000000000000000000000000000000000' AND NEW.redemption_id IS NULL AND NEW.reservation_event_id IS NULL AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance = NEW.amount AND created_at = NEW.created_at) AND NEW.before_available = 0 AND NEW.after_available = NEW.amount AND NEW.before_reserved = 0 AND NEW.after_reserved = 0 AND NEW.before_consumed = 0 AND NEW.after_consumed = 0 AND NEW.before_expired = 0 AND NEW.after_expired = 0) OR (NEW.sequence > 1 AND EXISTS (SELECT 1 FROM `production_membership_credit_events` e WHERE e.period_id = NEW.period_id AND e.sequence = NEW.sequence - 1 AND e.seal = NEW.prior_seal AND e.created_at <= NEW.created_at AND e.after_available = NEW.before_available AND e.after_reserved = NEW.before_reserved AND e.after_consumed = NEW.before_consumed AND e.after_expired = NEW.before_expired) AND ((NEW.kind = 'reserve' AND NEW.reservation_event_id IS NULL AND NEW.before_available >= NEW.amount AND EXISTS (SELECT 1 FROM `production_membership_redemptions` r JOIN `production_membership_paid_periods` p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.period_id = NEW.period_id AND r.credit_amount = NEW.amount AND NEW.created_at < r.honor_deadline AND (p.credit_expires_at IS NULL OR NEW.created_at < p.credit_expires_at)) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE redemption_id = NEW.redemption_id AND kind = 'reserve') AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL) OR (NEW.kind IN ('consume','release') AND EXISTS (SELECT 1 FROM `production_membership_credit_events` r WHERE r.id = NEW.reservation_event_id AND r.kind = 'reserve' AND r.period_id = NEW.period_id AND r.redemption_id = NEW.redemption_id AND r.amount = NEW.amount) AND NOT EXISTS (SELECT 1 FROM `production_membership_credit_events` WHERE reservation_event_id = NEW.reservation_event_id) AND ((NEW.kind = 'release' AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL) OR (NEW.kind = 'consume' AND NEW.grant_purpose = 'production-member-license-grant-v1' AND length(NEW.grant_origin_id) = 36 AND length(NEW.grant_receipt_hash) = 64 AND EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE id = NEW.redemption_id AND NEW.created_at < honor_deadline)))) OR (NEW.kind = 'expire' AND NEW.redemption_id IS NULL AND NEW.reservation_event_id IS NULL AND NEW.amount = NEW.before_available AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at) AND NEW.grant_origin_id IS NULL AND NEW.grant_receipt_hash IS NULL AND NEW.grant_purpose IS NULL)))) AND NEW.after_available = NEW.before_available + (CASE WHEN NEW.kind = 'award' THEN NEW.amount WHEN NEW.kind IN ('reserve','expire') THEN -NEW.amount WHEN NEW.kind = 'release' AND NOT (EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at)) THEN NEW.amount ELSE 0 END) AND NEW.after_reserved = NEW.before_reserved + (CASE WHEN NEW.kind = 'reserve' THEN NEW.amount WHEN NEW.kind IN ('consume','release') THEN -NEW.amount ELSE 0 END) AND NEW.after_consumed = NEW.before_consumed + (CASE WHEN NEW.kind = 'consume' THEN NEW.amount ELSE 0 END) AND NEW.after_expired = NEW.before_expired + (CASE WHEN NEW.kind = 'expire' OR (NEW.kind = 'release' AND (EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND credit_expires_at IS NOT NULL AND NEW.created_at >= credit_expires_at))) THEN NEW.amount ELSE 0 END) AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance = NEW.after_available + NEW.after_reserved + NEW.after_consumed + NEW.after_expired)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_credit_events_update",
+                "EVENT_OBJECT_TABLE": "production_membership_credit_events",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE source_invoice_hash = NEW.source_invoice_hash) AND EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE id = NEW.plan_version_id) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_paid_periods_update",
+                "EVENT_OBJECT_TABLE": "production_membership_paid_periods",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_plan_versions` WHERE policy_hash = NEW.policy_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_plan_versions_update",
+                "EVENT_OBJECT_TABLE": "production_membership_plan_versions",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_delete",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "DELETE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_insert",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "INSERT",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_membership_redemptions` WHERE request_key_hash = NEW.request_key_hash) AND EXISTS (SELECT 1 FROM `production_membership_paid_periods` WHERE id = NEW.period_id AND allowance >= NEW.credit_amount AND owner_binding_hash = NEW.owner_binding_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            },
+            {
+                "TRIGGER_NAME": "production_membership_redemptions_update",
+                "EVENT_OBJECT_TABLE": "production_membership_redemptions",
+                "EVENT_MANIPULATION": "UPDATE",
+                "ACTION_TIMING": "BEFORE",
+                "ACTION_STATEMENT": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production membership evidence'; END IF; END",
+                "SQL_MODE": "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+                "DEFINER": "root@127.0.0.1",
+                "CHARACTER_SET_CLIENT": "utf8mb4",
+                "COLLATION_CONNECTION": "utf8mb4_unicode_ci",
+                "DATABASE_COLLATION": "utf8mb4_unicode_ci"
+            }
+        ],
+        "rows": {
+            "production_membership_plan_versions": [
+                {
+                    "id": "11111111-2222-4333-8444-555555555555",
+                    "policy_hash": "4288afd531d53f35f9fd8018b2949e678c8dcc294a612dc4a33f7185a62c6f2e",
+                    "original_terms_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "provenance": "synthetic_rehearsal",
+                    "payload_ciphertext": "retained synthetic marker, not approved terms or encrypted policy proof",
+                    "seal": "6206eea7eccb3259f8e68953eaecd92dcdd6571d14434bece667106855aae6f7",
+                    "created_at": "2026-10-07 00:00:00"
+                }
+            ],
+            "production_membership_paid_periods": [],
+            "production_membership_redemptions": [],
+            "production_membership_credit_events": []
+        }
+    }
+}

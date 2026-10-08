@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\NativeSchemaIsolationTest" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" tests="6" assertions="43" errors="0" failures="6" skipped="0" time="60.181763">
+    <testsuite name="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused" tests="6" assertions="43" errors="0" failures="6" skipped="0" time="60.181763">
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer trigger naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="58.667656">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "capability: peer trigger naming this schema in upper case"
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Unexpected production capability external or additional table guard; rollback refused before schema changes.'
++'Buyer observation table already exists; installation refused before DDL.'
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer routine naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="7" time="0.083838">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "capability: peer routine naming this schema in upper case"
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Unexpected production capability external routine reference; rollback refused before schema changes.'
++'Buyer observation table already exists; installation refused before DDL.'
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer trigger naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="7" time="0.085532">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "inquiry: peer trigger naming this schema in upper case"
+inquiry up admitted a peer trigger naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer routine naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="7" time="0.064516">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "inquiry: peer routine naming this schema in upper case"
+inquiry up admitted a peer routine naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer trigger naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="7" time="0.609236">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "identity: peer trigger naming this schema in upper case"
+identity up admitted a peer trigger naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer routine naming this schema in upper case&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="137" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="7" time="0.670985">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused with data set "identity: peer routine naming this schema in upper case"
+identity up admitted a peer routine naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

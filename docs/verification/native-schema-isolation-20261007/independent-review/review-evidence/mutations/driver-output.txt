@@ -1,0 +1,17 @@
+M1_identity_schema_only: applied to app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+2026-10-07T23:02:57Z M1_identity_schema_only--lane-isolation exit=1 wall=252s tree=61b8ee17 dirty_app_db=1 :: Tests: 25, Assertions: 219, Failures: 4.
+2026-10-07T23:05:42Z M1_identity_schema_only--probes-p1-p3 exit=1 wall=165s tree=61b8ee17 dirty_app_db=1 :: Tests: 2, Assertions: 38, Failures: 2.
+2026-10-07T23:05:43Z M1_identity_schema_only reverted: git diff --quiet -- app database exit=0 ; status: 0 changed paths
+M2_capability_substring_qualifier: applied to app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+2026-10-07T23:10:56Z M2_capability_substring_qualifier--lane-isolation exit=2 wall=313s tree=61b8ee17 dirty_app_db=1 :: Tests: 25, Assertions: 233, Errors: 1.
+2026-10-07T23:12:00Z M2_capability_substring_qualifier--probes-p4 exit=1 wall=64s tree=61b8ee17 dirty_app_db=1 :: Tests: 1, Assertions: 10, Failures: 1.
+2026-10-07T23:12:00Z M2_capability_substring_qualifier reverted: git diff --quiet -- app database exit=0 ; status: 0 changed paths
+M3_inquiry_case_sensitive_qualifier: applied to database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+2026-10-07T23:15:40Z M3_inquiry_case_sensitive_qualifier--lane-isolation exit=0 wall=220s tree=61b8ee17 dirty_app_db=1 :: OK (25 tests, 235 assertions)
+2026-10-07T23:19:40Z M3_inquiry_case_sensitive_qualifier--probes-p3 exit=1 wall=240s tree=61b8ee17 dirty_app_db=1 :: Tests: 1, Assertions: 17, Failures: 1.
+2026-10-07T23:19:40Z M3_inquiry_case_sensitive_qualifier reverted: git diff --quiet -- app database exit=0 ; status: 0 changed paths
+M4_identity_binary_prefilter: applied to app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+2026-10-07T23:22:53Z M4_identity_binary_prefilter--probes-p7 exit=0 wall=193s tree=61b8ee17 dirty_app_db=1 :: OK (1 test, 1520 assertions)
+2026-10-07T23:24:07Z M4_identity_binary_prefilter--lane-unicode-alias exit=2 wall=74s tree=61b8ee17 dirty_app_db=1 :: Tests: 1, Assertions: 1, Errors: 1.
+2026-10-07T23:25:10Z M4_identity_binary_prefilter--lane-cost exit=0 wall=62s tree=61b8ee17 dirty_app_db=1 :: OK (1 test, 6 assertions)
+2026-10-07T23:25:10Z M4_identity_binary_prefilter reverted: git diff --quiet -- app database exit=0 ; status: 0 changed paths

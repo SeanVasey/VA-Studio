@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan-f253/phpunit.xml
+
+DIAGNOSTIC initialize 8169 ms prepare=3225 execute=3223 questions=3259
+.                                                                   1 / 1 (100%)
+
+Time: 03:22.301, Memory: 83.00 MB
+
+OK (1 test, 6 assertions)
