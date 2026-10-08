@@ -3,16 +3,18 @@
 namespace App\Domain\Grants\ProductionFree;
 
 use App\Domain\Delivery\PreparedDeliveryStream;
+use Closure;
 use LogicException;
 
 /**
  * One verified private snapshot with metadata derived from the re-proved authorization, never browser input.
- * The original authorization deadline still bounds every chunk; an expired stream stops and reports it.
+ * The transfer deadline (derived from the asset size and the policy's minimum rate, not the authorization TTL) bounds every
+ * chunk; an expired stream stops and reports it.
  */
 final class ProductionFreeGrantTransfer
 {
     public function __construct(public readonly PreparedDeliveryStream $stream, public readonly string $filename,
-        public readonly string $mimeType, private readonly int $deadline) {}
+        public readonly string $mimeType, private readonly int $deadline, private readonly ?Closure $clock = null) {}
 
     /** The consumer must accept each complete chunk or throw; the stream is closed in every outcome. */
     public function writeTo(callable $consumer): void
@@ -24,7 +26,7 @@ final class ProductionFreeGrantTransfer
             }
             $bytes = 0;
             while (! feof($input)) {
-                ProductionFreeGrantException::require(hrtime(true) < $this->deadline, 'expired');
+                ProductionFreeGrantException::require(($this->clock === null ? hrtime(true) : ($this->clock)()) < $this->deadline, 'expired');
                 $chunk = @fread($input, 1048576);
                 // The local snapshot never stalls: '' before EOF is a failure, not something to spin on until the deadline.
                 ProductionFreeGrantException::require(is_string($chunk) && ($chunk !== '' || feof($input)), 'artifact_unavailable');

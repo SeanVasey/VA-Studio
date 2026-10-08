@@ -33,6 +33,11 @@ final class ProductionFreeGrantDefinitions
         $assets = $this->assets($input['assets']);
         $source = $this->source($input['source']);
         ProductionFreeGrantRenderable::require(title: $title, termsReference: $reference, termsText: $terms, assentText: $assent);
+        // Staff authority and policy first (a refused caller costs no render), then the worst-case render outside any
+        // transaction, then the command that writes.
+        $prepared = $this->staffCommand($author, fn (array $policy): array => ['provenance' => $policy['provenance']], fn (array $result): array => $result);
+        ProductionFreeGrantRenderable::preflight(['title' => $title, 'terms_reference' => $reference, 'terms_text' => $terms, 'assent_text' => $assent,
+            'assets' => $assets], ProductionFreeGrantRenderProfile::current($prepared['provenance']));
 
         return $this->staffCommand($author, function (array $policy, ProductionFreeGrantRows $rows) use ($title, $reference, $terms, $assent, $maxOrigins, $assets, $source, $author): array {
             $proof = $this->prove($policy, $source, $assets);
@@ -81,6 +86,13 @@ final class ProductionFreeGrantDefinitions
     /** Opening needs the approved review, Sean-approved terms bytes and current source readiness. */
     public function open(string $definitionId, array $input, User $actor): array
     {
+        ProductionFreeGrantInput::uuid($definitionId);
+        ProductionFreeGrantInput::keys($input, ['definitionHash', 'expectedOrdinal']);
+        $sealed = $this->staffCommand($actor, fn (array $policy, ProductionFreeGrantRows $rows): array => ['payload' => $this->graph($definitionId, $rows)['payload']],
+            fn (array $result): array => $result);
+        ProductionFreeGrantRenderProfile::requireCurrent($sealed['payload']['profile']);
+        ProductionFreeGrantRenderable::preflight($sealed['payload'], $sealed['payload']['profile']);
+
         return $this->availability($definitionId, $input, $actor, 'open');
     }
 

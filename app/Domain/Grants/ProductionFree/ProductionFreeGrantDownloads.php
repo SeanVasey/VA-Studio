@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Delivery\PreparedDeliveryStream;
 use App\Models\User;
 use App\Support\CanonicalJson;
+use Closure;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -19,6 +20,9 @@ use Throwable;
 final class ProductionFreeGrantDownloads
 {
     public const ROLES = ['contract', 'master_wav', 'download_mp3', 'stems_zip'];
+
+    /** @param  ?Closure():int  $clock  Monotonic nanoseconds for the transfer deadline; the system clock when null. */
+    public function __construct(private readonly ?Closure $clock = null) {}
 
     /** Mint one authorization; the bearer token is returned once and only its hash is retained. */
     public function authorize(string $originId, array $input, ProductionCustomerPrincipal $principal, User $actor): array
@@ -60,12 +64,13 @@ final class ProductionFreeGrantDownloads
         ProductionFreeGrantInput::uuid($authorizationId);
         ProductionFreeGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 'token_refused');
         $grants = new ProductionFreeGrants;
-        $inspect = function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($authorizationId, $token, $grants): array {
+        $requested = ProductionFreeGrantInput::now();
+        $inspect = function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($authorizationId, $token, $grants, $requested): array {
             $auth = $rows->one('production_free_authorizations', 'id = ?', [$authorizationId]);
             ProductionFreeGrantException::require($auth !== [] && (int) $auth['account_id'] === (int) $binding['account_id']
                 && (int) $auth['user_id'] === (int) $binding['user_id'], 'not_found');
             ProductionFreeGrantException::require(hash_equals($auth['token_hash'], hash('sha256', $token)), 'token_refused');
-            ProductionFreeGrantException::require(ProductionFreeGrantInput::now()->lessThan(ProductionFreeGrantInput::parse($auth['expires_at'])), 'expired');
+            ProductionFreeGrantException::require($requested->lessThan(ProductionFreeGrantInput::parse($auth['expires_at'])), 'expired');
             ProductionFreeGrantException::require($rows->count('production_free_redemptions', 'authorization_id = ?', [$authorizationId]) === 0, 'already_redeemed');
             $graph = $grants->originGraph($auth['origin_id'], (int) $binding['account_id'], $rows);
             $this->entitled($graph, $binding);
@@ -78,9 +83,12 @@ final class ProductionFreeGrantDownloads
 
             return ['auth' => array_diff_key($auth, ['payload' => true]), 'graph' => $graph, 'target' => $target, 'policy' => $policy];
         };
+        // The authorization TTL is the valid-to-start deadline: both checks below compare it with the moment this request began, so a slow
+        // snapshot cannot turn a started redemption into an expired one. The snapshot has its own bound and the client stream a
+        // transfer deadline derived from the size (see below).
         $before = $grants->customerCommand($principal, $actor, $inspect);
-        $deadline = hrtime(true) + max(0, ProductionFreeGrantInput::parse($before['auth']['expires_at'])->getTimestamp() - time()) * 1000000000;
-        $prepared = $this->snapshot($before, $deadline);
+        $snapshotDeadline = hrtime(true) + $before['policy']['snapshot_seconds'] * 1000000000;
+        $prepared = $this->snapshot($before, $snapshotDeadline);
         try {
             $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($inspect, $before): array {
                 $current = $inspect($policy, $rows, $binding);
@@ -96,13 +104,19 @@ final class ProductionFreeGrantDownloads
 
                 return [];
             });
-            ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
+            $policy = $before['policy'];
+            $seconds = min($policy['transfer_max_seconds'], $policy['transfer_base_seconds'] + intdiv($before['target']['bytes'] + $policy['transfer_min_bytes_per_second'] - 1, $policy['transfer_min_bytes_per_second']));
 
-            return new ProductionFreeGrantTransfer($prepared, $before['target']['filename'], $before['target']['mime_type'], $deadline);
+            return new ProductionFreeGrantTransfer($prepared, $before['target']['filename'], $before['target']['mime_type'], $this->tick() + $seconds * 1000000000, $this->clock);
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;
         }
+    }
+
+    private function tick(): int
+    {
+        return $this->clock === null ? hrtime(true) : ($this->clock)();
     }
 
     /** Current entitlement: the owner, an unrevoked grant and a published original before any artifact leaves. */

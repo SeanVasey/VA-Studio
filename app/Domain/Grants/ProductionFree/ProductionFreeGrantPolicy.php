@@ -21,7 +21,7 @@ final class ProductionFreeGrantPolicy
 
     public const REHEARSAL = 'synthetic_rehearsal';
 
-    /** @return array{enabled:true,version:1,provenance:string,approved_terms_hashes:list<string>,authorization_ttl_seconds:int,render_lease_seconds:int,spool_slots:int,spool_reserve_bytes:int,storage_root:?string,environment:string} */
+    /** @return array{enabled:true,version:1,provenance:string,approved_terms_hashes:list<string>,authorization_ttl_seconds:int,render_lease_seconds:int,snapshot_seconds:int,transfer_min_bytes_per_second:int,transfer_base_seconds:int,transfer_max_seconds:int,spool_slots:int,spool_reserve_bytes:int,storage_root:?string,environment:string} */
     public function current(): array
     {
         $configuration = $this->configuration();
@@ -68,6 +68,10 @@ final class ProductionFreeGrantPolicy
             && is_array($policy['approved_terms_hashes'] ?? null) && array_is_list($policy['approved_terms_hashes'])
             && is_int($policy['authorization_ttl_seconds'] ?? null) && $policy['authorization_ttl_seconds'] >= 30 && $policy['authorization_ttl_seconds'] <= 300
             && is_int($policy['render_lease_seconds'] ?? null) && $policy['render_lease_seconds'] >= self::RENDERER_TIMEOUT_SECONDS + self::RENDER_LEASE_MARGIN_SECONDS && $policy['render_lease_seconds'] <= 900
+            && is_int($policy['snapshot_seconds'] ?? null) && $policy['snapshot_seconds'] >= 30 && $policy['snapshot_seconds'] <= 1800
+            && is_int($policy['transfer_min_bytes_per_second'] ?? null) && $policy['transfer_min_bytes_per_second'] >= 16384 && $policy['transfer_min_bytes_per_second'] <= 1073741824
+            && is_int($policy['transfer_base_seconds'] ?? null) && $policy['transfer_base_seconds'] >= 0 && $policy['transfer_base_seconds'] <= 600
+            && is_int($policy['transfer_max_seconds'] ?? null) && $policy['transfer_max_seconds'] >= 60 && $policy['transfer_max_seconds'] <= 14400
             && is_int($policy['spool_slots'] ?? null) && $policy['spool_slots'] >= 1 && $policy['spool_slots'] <= 16
             && is_int($policy['spool_reserve_bytes'] ?? null) && $policy['spool_reserve_bytes'] >= 16777216 && $policy['spool_reserve_bytes'] <= 1099511627776
             && array_key_exists('storage_root', $policy) && ($policy['storage_root'] === null || is_string($policy['storage_root']))
@@ -80,6 +84,8 @@ final class ProductionFreeGrantPolicy
             'purpose' => $policy['purpose'], 'provenance' => $policy['provenance'],
             'approved_terms_hashes' => $policy['approved_terms_hashes'],
             'authorization_ttl_seconds' => $policy['authorization_ttl_seconds'], 'render_lease_seconds' => $policy['render_lease_seconds'],
+            'snapshot_seconds' => $policy['snapshot_seconds'], 'transfer_min_bytes_per_second' => $policy['transfer_min_bytes_per_second'],
+            'transfer_base_seconds' => $policy['transfer_base_seconds'], 'transfer_max_seconds' => $policy['transfer_max_seconds'],
             'spool_slots' => $policy['spool_slots'], 'spool_reserve_bytes' => $policy['spool_reserve_bytes'],
             'storage_root' => $policy['storage_root'], 'environment' => $environment];
     }

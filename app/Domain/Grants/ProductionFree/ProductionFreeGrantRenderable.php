@@ -27,6 +27,9 @@ final class ProductionFreeGrantRenderable
      */
     public const VERIFIED_REVISION = 'r1';
 
+    /** Estimated rendered lines (newlines plus one per 60 bytes) at which the preflight render is run. */
+    private const PREFLIGHT_THRESHOLD = 1500;
+
     /** @var array<string, array{cw:array<int,mixed>,ctgu:array<int,int>,table:string}> */
     private static array $fonts = [];
 
@@ -53,6 +56,34 @@ final class ProductionFreeGrantRenderable
             if ($character !== "\n" && $character !== "\t") {
                 ProductionFreeGrantException::require(self::glyph(mb_ord($character)), 'unsupported_text');
             }
+        }
+    }
+
+    /**
+     * Worst-case render of the definition with the real pinned renderer (the container's `ProductionFreeGrantRendererProcess`,
+     * as `render()` uses) and the longest allowed declared name, so a definition whose terms exceed the renderer's page or
+     * output limits is refused before it can be approved and assented. Text far below those limits cannot reach them
+     * (about 70 lines fit a page, so the estimate below stays under a third of the 100-page limit) and skips the render.
+     * Must run outside a database transaction, like the renderer itself.
+     *
+     * @param  array{title:string,terms_reference:string,terms_text:string,assent_text:string,assets:list<array>}  $definition
+     */
+    public static function preflight(array $definition, array $profile): void
+    {
+        $text = $definition['title']."\n".$definition['terms_reference']."\n".$definition['terms_text']."\n".$definition['assent_text'];
+        if (substr_count($text, "\n") + 1 + intdiv(strlen($text), 60) < self::PREFLIGHT_THRESHOLD) {
+            return;
+        }
+        $origin = ['provenance' => $profile['provenance'], 'origin_id' => '00000000-0000-4000-8000-000000000000', 'accepted_at' => '2000-01-01T00:00:00Z',
+            'declared_name' => str_repeat('W', 120), 'definition_id' => '00000000-0000-4000-8000-000000000001', 'definition_hash' => str_repeat('a', 64),
+            'review_id' => '00000000-0000-4000-8000-000000000002', 'display_hash' => str_repeat('b', 64),
+            'buyer_binding' => ['account_public_id' => str_repeat('p', 36)], 'definition' => ['title' => $definition['title'],
+                'terms_reference' => $definition['terms_reference'], 'terms_text' => $definition['terms_text'], 'terms_hash' => hash('sha256', $definition['terms_text']),
+                'assent_text' => $definition['assent_text'], 'assets' => $definition['assets']]];
+        try {
+            app(ProductionFreeGrantRendererProcess::class)->render(ProductionFreeGrantRenderInput::fromOrigin($origin), $profile);
+        } catch (Throwable) {
+            throw new ProductionFreeGrantException('unrenderable_definition');
         }
     }
 
