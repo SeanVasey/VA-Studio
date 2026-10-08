@@ -61,10 +61,20 @@ The family is default-off and unmounted. The production host is undecided (U-02 
 
 ## For Sean (deployment condition, before mount)
 
-- Bound the PHP worker's wall clock: PHP-FPM `request_terminate_timeout` (or the host's equivalent) at
-  `transfer_max_seconds` plus a margin. Today that is 7200 s plus the snapshot budget plus a margin.
-- Keep proxy response buffering on for the download route.
-- Decide whether three slots (C8) are enough, given that slow clients can hold them up to that bound.
+This section was corrected after independent review addendum 9 (A9-I6), which recorded it as condition C11.
+
+- Bound the PHP worker's wall clock for the paid download route with PHP-FPM `request_terminate_timeout` (or the host's
+  equivalent). The bound must be at least `60 + snapshot_seconds + 60 + transfer_max_seconds` plus a margin: 7,620 s at the
+  defaults, 16,320 s at the validated maxima.
+  - Use a dedicated pool for that route. The setting is per pool, and a two-hour cap would be weak protection for the
+    other routes.
+  - A lower bound would cut legitimate slow transfers after the commit, consuming the attempt.
+- Keep proxy response buffering on for the download route, with a temp-file cap of at least the largest deliverable
+  (1 GiB; nginx's default `fastcgi_max_temp_file_size` of `1024m` is exactly that). This is the effective mitigation:
+  PHP then finishes writing at disk speed and releases the slot.
+- Keep the proxy's temp path on private, non-public storage sized for the concurrent maximum, because the temp files are
+  a second on-disk copy of private masters.
+- Decide whether three slots are enough (C8). A slot is now held during the snapshot as well, up to `snapshot_seconds`.
 
 With the kill timeout set, a stuck slot is released at that bound rather than never. This is an availability limit:
 no bytes leak and no attempt is lost because of it.

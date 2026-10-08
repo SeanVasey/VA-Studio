@@ -1,0 +1,6 @@
+cmd: copies of hardening/codex-14/evidence/flock-blocked-writer-{parent,child}.php in the scratchpad, child copied as child.php (the name the parent opens); timeout 30 php parent.php
+child locked: bool(true)
+parent while child blocked in write: false
+child state: S    poll_schedule_timeout.constprop.0
+parent after SIGKILL: true
+rc=0

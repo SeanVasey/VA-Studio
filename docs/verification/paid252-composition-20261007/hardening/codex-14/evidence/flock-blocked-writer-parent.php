@@ -1,6 +1,6 @@
 <?php
 $lock = __DIR__.'/slot.lock'; @unlink($lock);
-$proc = proc_open([PHP_BINARY, __DIR__.'/child.php', $lock], [1 => ['pipe', 'w']], $pipes);
+$proc = proc_open([PHP_BINARY, __DIR__.'/flock-blocked-writer-child.php', $lock], [1 => ['pipe', 'w']], $pipes);
 echo 'child locked: ', trim(fgets($pipes[1])), "\n";
 sleep(2);
 $h = fopen($lock, 'c+b');
