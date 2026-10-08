@@ -679,6 +679,14 @@
       "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_temporary_shadow_of_an_owned_table_is_refused"
+    ],
+    [
       "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
       "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
     ]

@@ -1,0 +1,23 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE render.identical: 3 fresh child renders == stored sha a1c416503e696b6d1142cb8a2e068606278089bfb251d2451358d95fc3b558c6; second store refused; hardlink -> original_unavailable; truncation -> recover and contract redeem refused, file left as found, 0 redemptions
+.FPROBE render.traversal: '..', nested '..', uppercase and NUL segments refused for render (invalid_input) and store (storage_failed) in origin and claim positions; traversal storage paths refused by verify; nothing created
+.PROBE render.isolation: open_basedir=/home/user/VA-Studio-review-free256b:/tmp/va-free256-6c5e7db6ae6ff48b/contracts/render-cache/7d04d1043a0189325a67d32264d7930b:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-barcode:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-color:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-file:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-encrypt:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-filter:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-font:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-graph:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-image:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-page:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-parser:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-sign:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-unicode:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-unicode-data reach={"env_count":5,"env_app_key":false,"open_basedir":"/home/user/VA-Studio-review-free256b:/tmp/va-free256-6c5e7db6ae6ff48b/contracts/render-cache/7d04d1043a0189325a67d32264d7930b:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-barcode:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-color:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-file:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-encrypt:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-filter:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-font:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-graph:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-image:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-page:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-parser:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-pdf-sign:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-unicode:/home/user/VA-Studio/vendor/tecnickcom/tc-lib-unicode-data","allow_url_fopen":"0","disable_functions":"curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open","dotenv_readable":true,"dotenv_bytes":true,"private_file_readable_if_under_root":true,"etc_passwd_readable":false,"http_fetch":false,"fsockopen_callable":false,"stream_socket_client_callable":false,"mail_callable":true,"gethostbyname_callable":true,"dns_get_record_callable":true,"curl_init_callable":false,"proc_open_callable":false,"pcntl_exec_callable":true,"putenv_callable":true,"ini_set_open_basedir_widen":false}; oversized input refused before spawn
+.                                                                4 / 4 (100%)
+
+Time: 00:09.157, Memory: 91.00 MB
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\Free256\RenderingProbeTest::test_symlinked_claim_file_and_directory_are_refused_and_outside_targets_untouched
+Failed asserting that file "/tmp/va-free256-outside-a4b40172340b/created-through-link.pdf" exists.
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/RenderingProbeTest.php:106
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 55, Failures: 1.
+rc=1

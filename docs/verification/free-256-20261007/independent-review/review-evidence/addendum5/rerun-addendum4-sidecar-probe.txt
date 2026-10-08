@@ -1,0 +1,17 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum4.sidecar:
+  own short sidecar slot 0: ok size now 20
+  foreign short sidecar slot 0 (slots 1,2 free), 3 attempts: ok,ok,ok
+  directory at slot-0.reserve: ok
+  after removal: ok
+  temporary sidecar names left: 0
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.448, Memory: 59.00 MB
+
+OK (1 test, 1 assertion)
+rc=0

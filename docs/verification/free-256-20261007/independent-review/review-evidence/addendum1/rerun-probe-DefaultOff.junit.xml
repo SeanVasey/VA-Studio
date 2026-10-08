@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\DefaultOffProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DefaultOffProbeTest.php" tests="2" assertions="83" errors="0" failures="0" skipped="0" time="3.732358">
+    <testcase name="test_migration_installs_the_owned_schema_even_while_disabled_but_writes_no_row" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DefaultOffProbeTest.php" line="22" class="Tests\ReviewProbes\Free256\DefaultOffProbeTest" classname="Tests.ReviewProbes.Free256.DefaultOffProbeTest" assertions="7" time="1.356686"/>
+    <testcase name="test_every_entry_point_refuses_each_disabling_condition" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DefaultOffProbeTest.php" line="44" class="Tests\ReviewProbes\Free256\DefaultOffProbeTest" classname="Tests.ReviewProbes.Free256.DefaultOffProbeTest" assertions="76" time="2.375672"/>
+  </testsuite>
+</testsuites>

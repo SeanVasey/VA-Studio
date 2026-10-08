@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum7\SkipBoundProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum7/probes/SkipBoundProbeTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="7.517528">
+    <testcase name="test_worst_shapes_at_the_skip_bound" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum7/probes/SkipBoundProbeTest.php" line="22" class="Tests\ReviewProbes\Free256\Addendum7\SkipBoundProbeTest" classname="Tests.ReviewProbes.Free256.Addendum7.SkipBoundProbeTest" assertions="2" time="7.517528"/>
+  </testsuite>
+</testsuites>

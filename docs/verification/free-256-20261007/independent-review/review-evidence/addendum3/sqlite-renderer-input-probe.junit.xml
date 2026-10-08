@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum3\RendererInputProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum3/probes/RendererInputProbeTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="4.167420">
+    <testcase name="test_assent_accepts_names_the_renderer_refuses" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum3/probes/RendererInputProbeTest.php" line="18" class="Tests\ReviewProbes\Free256\Addendum3\RendererInputProbeTest" classname="Tests.ReviewProbes.Free256.Addendum3.RendererInputProbeTest" assertions="5" time="4.167420"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "version": "production-free-grant-pdf-v1",
+  "files": {
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+    "scripts/render-production-free-grant.php": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199"
+  }
+}

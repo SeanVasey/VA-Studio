@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum6\PreflightEstimateProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum6/probes/PreflightEstimateProbeTest.php" tests="1" assertions="6" errors="0" failures="0" skipped="0" time="16.633894">
+    <testcase name="test_worst_shapes_under_the_skip_estimate_stay_far_below_100_pages" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum6/probes/PreflightEstimateProbeTest.php" line="19" class="Tests\ReviewProbes\Free256\Addendum6\PreflightEstimateProbeTest" classname="Tests.ReviewProbes.Free256.Addendum6.PreflightEstimateProbeTest" assertions="6" time="16.633894"/>
+  </testsuite>
+</testsuites>

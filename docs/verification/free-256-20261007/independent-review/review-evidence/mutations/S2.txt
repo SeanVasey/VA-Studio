@@ -1,0 +1,40 @@
+== S2 at 1860e00d3a7d3852d19126ae01ee54f50cef8660
+applied S2
+$ git diff --stat
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php
+index 9b07fa7a..d31ea946 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php
+@@ -356,7 +356,7 @@ final class ProductionFreeGrantSchema
+             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE definition_hash = NEW.definition_hash) AND '.$staff('author_user_id');
+         } elseif ($logical === self::TABLES[1]) {
+             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE definition_id = NEW.definition_id)'
+-                .' AND EXISTS (SELECT 1 FROM '.$definitions.' d WHERE d.id = NEW.definition_id AND d.definition_hash = NEW.definition_hash AND d.terms_hash = NEW.terms_hash AND d.provenance = NEW.provenance AND d.author_user_id <> NEW.reviewer_user_id AND d.created_at <= NEW.created_at)'
++                .' AND EXISTS (SELECT 1 FROM '.$definitions.' d WHERE d.id = NEW.definition_id AND d.definition_hash = NEW.definition_hash AND d.terms_hash = NEW.terms_hash AND d.provenance = NEW.provenance AND d.created_at <= NEW.created_at)'
+                 .' AND '.$staff('reviewer_user_id');
+         } elseif ($logical === self::TABLES[2]) {
+             $insert .= ' AND NEW.ordinal = (SELECT COUNT(*) FROM '.$table.' WHERE definition_id = NEW.definition_id)'
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256-mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:05.368, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_review_guard_refuses_self_review_and_availability_guard_refuses_a_gap
+Guard must refuse
+
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php:316
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php:184
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+rc=1
+after revert: git diff --quiet -- app database resources rc=0

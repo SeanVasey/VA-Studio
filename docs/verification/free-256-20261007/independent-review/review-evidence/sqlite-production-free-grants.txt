@@ -1,0 +1,13 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256/phpunit.xml
+
+................................................................. 65 / 93 ( 69%)
+..........................SS                                      93 / 93 (100%)
+
+Time: 03:37.760, Memory: 141.00 MB
+
+OK, but some tests were skipped!
+Tests: 93, Assertions: 559, Skipped: 2.
+rc=0

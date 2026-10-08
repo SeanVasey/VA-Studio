@@ -1,0 +1,41 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum6.shapes:
+  1 word(s) of 49 @ joined by spaces: pages=2
+  1 word(s) of 50 @ joined by spaces: pages=2
+  1 word(s) of 51 @ joined by spaces: pages=2
+  1 word(s) of 52 @ joined by spaces: pages=2
+  1 word(s) of 60 @ joined by spaces: pages=2
+  2 word(s) of 49 @ joined by spaces: pages=2
+  2 word(s) of 50 @ joined by spaces: pages=2
+  2 word(s) of 51 @ joined by spaces: pages=2
+  2 word(s) of 52 @ joined by spaces: pages=2
+  2 word(s) of 60 @ joined by spaces: pages=2
+  10 word(s) of 49 @ joined by spaces: pages=2
+  10 word(s) of 50 @ joined by spaces: pages=2
+  10 word(s) of 51 @ joined by spaces: pages=2
+  10 word(s) of 52 @ joined by spaces: pages=2
+  10 word(s) of 60 @ joined by spaces: pages=2
+  100 words of 51 @ joined by spaces: pages=3
+  100 words of 20 a joined by spaces: pages=2
+  300 words of 51 @ joined by spaces: REFUSED render_failed
+  300 words of 20 a joined by spaces: pages=4
+  600 words of 51 @ joined by spaces: REFUSED render_failed
+  600 words of 20 a joined by spaces: pages=6
+  900 words of 51 @ joined by spaces: REFUSED render_failed
+  900 words of 20 a joined by spaces: pages=8
+  1100 words of 51 @ joined by spaces: REFUSED render_failed
+  1100 words of 20 a joined by spaces: pages=9
+  2 words of 51 W: pages=2
+  2 words of 55 a: pages=2
+  1 word of 200 a then a space and b: pages=2
+  END TO END first failing shape: propose/approve/open/accept ok; render=render_failed
+.                                                                   1 / 1 (100%)
+
+Time: 00:32.229, Memory: 87.00 MB
+
+OK (1 test, 3 assertions)
+rc=0

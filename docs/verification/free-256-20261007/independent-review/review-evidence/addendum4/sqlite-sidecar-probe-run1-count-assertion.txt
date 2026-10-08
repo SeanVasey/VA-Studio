@@ -1,0 +1,26 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum4.sidecar:
+  own short sidecar slot 0: ok size now 20
+  foreign short sidecar slot 0 (slots 1,2 free), 3 attempts: refused:artifact_unavailable,refused:artifact_unavailable,refused:artifact_unavailable
+  directory at slot-0.reserve: refused:artifact_unavailable
+  after removal: ok
+  temporary sidecar names left: 0
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.440, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\Free256\Addendum4\SidecarProbeTest::test_sidecar_residue_handling
+Failed asserting that actual size 5 matches expected size 6.
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum4/probes/SidecarProbeTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1

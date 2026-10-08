@@ -1,0 +1,46 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[31;1mE[0m[41;37mF[0m[41;37mF[0m.[31;1mE[0m                                                               5 / 5 (100%)
+
+Time: 00:18.489, Memory: 97.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest::test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantException.php:16
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php:28
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php:59
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest::test_shipped_defaults_and_policy_bounds
+ErrorException: Undefined array key "snapshot_seconds"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest::test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream
+Chunk 1 ends at 300 s and chunk 2 at 600 s; the check before chunk 3 is past 542 s.
+Failed asserting that 1048576 is identical to 2097152.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php:76
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest::test_the_derived_deadline_is_capped_by_the_configured_maximum
+Failed asserting that 5242880 is identical to 1048576.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 16[0m[37;41m, Errors: 2[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=2

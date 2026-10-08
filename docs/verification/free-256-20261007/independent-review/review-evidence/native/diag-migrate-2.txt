@@ -1,0 +1,76 @@
+
+  Dropping all tables .......................................... 181.17ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table ...................................... 11.53ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table .......................... 48.67ms DONE
+  0001_01_01_000001_create_cache_table .......................... 45.04ms DONE
+  0001_01_01_000002_create_jobs_table ........................... 63.53ms DONE
+  2026_09_04_000001_create_catalog_foundation .................. 665.94ms DONE
+  2026_09_04_000002_add_admin_mfa_and_immutable_evidence ........ 93.47ms DONE
+  2026_09_04_000003_media_processing ........................... 411.92ms DONE
+  2026_09_04_000004_license_evidence ........................... 635.82ms DONE
+  2026_09_04_000005_offer_revisions ............................ 276.21ms DONE
+  2026_09_06_000006_provisional_quotes ......................... 190.07ms DONE
+  2026_09_09_000007_stripe_webhook_receipts ..................... 43.41ms DONE
+  2026_09_09_000008_track_metadata_and_public_urls ............. 119.54ms DONE
+  2026_09_09_000009_stems_recordings ........................... 270.88ms DONE
+  2026_09_10_000010_typed_license_terms .......................... 7.56ms DONE
+  2026_09_11_000011_license_scope_terms .......................... 8.98ms DONE
+  2026_09_12_000012_license_economic_terms ....................... 9.37ms DONE
+  2026_09_12_000013_quote_pricing ............................... 74.38ms DONE
+  2026_09_14_000014_promotion_usage ............................ 175.99ms DONE
+  2026_09_17_000015_shared_rights_inventory .................... 345.94ms DONE
+  2026_09_23_000016_exclusive_activations ...................... 105.40ms DONE
+  2026_09_24_000017_order_preparation .......................... 630.22ms DONE
+  2026_09_26_000018_hosted_test_checkout ....................... 259.69ms DONE
+  2026_09_26_000019_test_payment_evidence ...................... 500.56ms DONE
+  2026_09_26_000020_test_order_finalization .................... 896.17ms DONE
+  2026_09_26_000021_test_contract_issuance ..................... 372.94ms DONE
+  2026_09_26_000022_test_fulfillment_activation ................ 136.17ms DONE
+  2026_09_26_000023_test_owner_delivery ........................ 553.17ms DONE
+  2026_09_28_000024_site_content_releases ...................... 187.20ms DONE
+  2026_09_29_000025_promotion_administration ................... 119.68ms DONE
+  2026_09_29_000026_site_publication_schedules ................. 177.95ms DONE
+  2026_09_30_000027_site_images ................................ 177.93ms DONE
+  2026_09_30_000028_site_release_images ......................... 81.41ms DONE
+  2026_10_01_000029_byte_exact_hash_guards ..................... 121.63ms DONE
+  2026_10_01_000030_byte_exact_uuid_guards ..................... 130.01ms DONE
+  2026_10_01_000031_customer_inquiries ......................... 204.68ms DONE
+  2026_10_01_000032_editorial_related_tracks_images ............. 23.92ms DONE
+  2026_10_02_000033_track_metadata_presets ...................... 22.44ms DONE
+  2026_10_02_000034_track_publication_version ................... 64.60ms DONE
+  2026_10_02_000035_rights_evidence_guards ...................... 89.91ms DONE
+  2026_10_02_000036_test_payment_exception_operations .......... 141.16ms DONE
+  2026_10_06_000038_resumable_media_uploads .................... 199.28ms DONE
+  2026_10_06_000039_test_payment_financial_observations ........ 108.15ms DONE
+  2026_10_06_000040_customer_accounts .......................... 144.19ms DONE
+  2026_10_06_000041_product_draft_versions ..................... 305.89ms DONE
+  2026_10_06_000042_test_unpaid_releases ....................... 872.93ms DONE
+  2026_10_06_000043_inquiry_messages ........................... 106.27ms DONE
+  2026_10_06_000044_sound_kit_intake ........................... 311.54ms DONE
+  2026_10_06_000045_customer_identity_challenges ............... 322.58ms DONE
+  2026_10_06_000046_sound_kit_upload_sessions .................. 141.63ms DONE
+  2026_10_06_000047_test_refund_resolutions .................... 778.56ms DONE
+  2026_10_06_000048_customer_purchase_claims ................... 363.68ms DONE
+  2026_10_06_000049_inquiry_order_contexts ..................... 123.52ms DONE
+  2026_10_06_230000_membership_credit_foundation ............... 578.50ms DONE
+  2026_10_06_231000_test_transactional_notifications ........... 448.72ms DONE
+  2026_10_06_233000_production_track_policy_drafts ............. 328.40ms DONE
+  2026_10_06_234000_service_draft_versions ..................... 220.73ms DONE
+  2026_10_06_235000_merch_draft_versions ....................... 186.76ms DONE
+  2026_10_06_236000_production_track_policy_capabilities ....... 262.98ms DONE
+  2026_10_06_237000_catalog_import_progress .................... 122.03ms DONE
+  2026_10_06_238000_production_track_preparation_packets ........ 33.38ms FAIL
+
+In CapabilityMigrationOwnership.php line 273:
+                                                                               
+  Unexpected production capability external or additional table guard; rollba  
+  ck refused before schema changes.                                            
+                                                                               
+
+rc=1

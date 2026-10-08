@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\DeliveryProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php" tests="3" assertions="49" errors="1" failures="1" skipped="0" time="21.327776">
+    <testcase name="test_every_role_requires_exact_owner_short_lived_one_use_authorization" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php" line="42" class="Tests\ReviewProbes\Free256\DeliveryProbeTest" classname="Tests.ReviewProbes.Free256.DeliveryProbeTest" assertions="41" time="5.633476">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\ReviewProbes\Free256\DeliveryProbeTest::test_every_role_requires_exact_owner_short_lived_one_use_authorization
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; 'slot-0.lock',
++]
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php:81
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_a_failed_consumer_consumes_the_one_use_authorization_and_parallel_transfers_are_unbounded" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php" line="88" class="Tests\ReviewProbes\Free256\DeliveryProbeTest" classname="Tests.ReviewProbes.Free256.DeliveryProbeTest" assertions="3" time="3.434422">
+      <error type="App\Domain\Grants\ProductionFree\ProductionFreeGrantException">Tests\ReviewProbes\Free256\DeliveryProbeTest::test_a_failed_consumer_consumes_the_one_use_authorization_and_parallel_transfers_are_unbounded
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:141
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:30
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:143
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:83
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_one_gib_limit_is_honoured_end_to_end" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php" line="120" class="Tests\ReviewProbes\Free256\DeliveryProbeTest" classname="Tests.ReviewProbes.Free256.DeliveryProbeTest" assertions="5" time="12.259879"/>
+  </testsuite>
+</testsuites>

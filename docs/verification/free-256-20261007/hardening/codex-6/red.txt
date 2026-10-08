@@ -1,0 +1,43 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:06.959, Memory: 103.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_a_stalled_source_is_refused_at_once_and_releases_its_slot_and_reservation
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'artifact_unavailable'
++'artifact_drift'
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:144
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_the_deadline_is_checked_before_the_first_read
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'expired'
++'artifact_drift'
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:81
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_the_transfer_refuses_an_empty_read_before_eof_instead_of_spinning_to_the_deadline
+Failed asserting that 20001 is equal to 2 or is less than 2.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:96
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 12[0m[37;41m, Failures: 3[0m[37;41m.[0m
+rc=1

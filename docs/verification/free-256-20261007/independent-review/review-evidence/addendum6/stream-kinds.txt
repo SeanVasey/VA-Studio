@@ -1,0 +1,59 @@
+{
+    "plain file": {
+        "fstat_mode": "100644",
+        "regular": true,
+        "set_blocking": null,
+        "set_timeout": null,
+        "admitted": true
+    },
+    "php:\/\/temp": {
+        "fstat_mode": "100666",
+        "regular": true,
+        "set_blocking": null,
+        "set_timeout": null,
+        "admitted": true
+    },
+    "php:\/\/memory": {
+        "fstat_mode": "100666",
+        "regular": true,
+        "set_blocking": null,
+        "set_timeout": null,
+        "admitted": true
+    },
+    "compress.zlib:\/\/ file": {
+        "fstat_mode": null,
+        "regular": false,
+        "set_blocking": true,
+        "set_timeout": false,
+        "admitted": false
+    },
+    "tcp socket (http-like)": {
+        "fstat_mode": "140777",
+        "regular": false,
+        "set_blocking": true,
+        "set_timeout": true,
+        "admitted": true
+    },
+    "FIFO (O_NONBLOCK open, r+)": {
+        "fstat_mode": "10600",
+        "regular": false,
+        "set_blocking": true,
+        "set_timeout": false,
+        "admitted": false
+    },
+    "user stream wrapper": {
+        "fstat_mode": null,
+        "regular": false,
+        "set_blocking": false,
+        "set_timeout": false,
+        "admitted": false
+    },
+    "\/dev\/zero (char device)": {
+        "fstat_mode": "20666",
+        "regular": false,
+        "set_blocking": true,
+        "set_timeout": false,
+        "admitted": false
+    }
+}
+rc=0

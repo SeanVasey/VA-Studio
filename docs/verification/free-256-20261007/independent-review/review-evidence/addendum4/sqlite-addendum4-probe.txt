@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum4.stall:
+  gap 3 s: ok in 3.4s; slot-0.reserve='00000000000000000000' residue=0
+  gap 7 s: refused:artifact_unavailable in 5.2s; slot-0.reserve='00000000000000000000' residue=0
+  trickle 1 byte/s for 8 s: ok in 8.6s; slot-0.reserve='00000000000000000000' residue=0
+  single slot reusable afterwards: ok
+.PROBE addendum4.text:
+  review arabic: refused:unsupported_text
+  accept arabic: refused:unsupported_text
+  review decomposed: refused:unsupported_text
+  accept decomposed: refused:unsupported_text
+  review no glyph U+02EF: refused:unsupported_text
+  accept no glyph U+02EF: refused:unsupported_text
+  propose title: refused:unsupported_text
+  propose termsReference: refused:unsupported_text
+  propose assentText: refused:unsupported_text
+  propose+approve+open with 32,768-line terms: ok
+  accept: ok; render: refused:render_failed
+.                                                                  2 / 2 (100%)
+
+Time: 00:31.235, Memory: 96.00 MB
+
+OK (2 tests, 10 assertions)
+rc=0

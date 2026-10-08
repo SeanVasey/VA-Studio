@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="351.113089">
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="351.113089">
+      <testcase name="test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php" line="104" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantTransferDeadlineTest" assertions="6" time="126.461676"/>
+      <testcase name="test_the_redemption_guard_still_refuses_a_start_time_at_or_after_expiry" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php" line="125" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantTransferDeadlineTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantTransferDeadlineTest" assertions="4" time="224.651414"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

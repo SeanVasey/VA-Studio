@@ -1,0 +1,31 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.836, Memory: 85.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryWindowTest::test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantException.php:16
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:105
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:130
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:24
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:24
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:215
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:207
+/home/user/VA-Studio-free256h/app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php:19
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Errors: 1[0m[37;41m.[0m
+rc=2

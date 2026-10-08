@@ -1,0 +1,3 @@
+start port 3803 2026-10-08T11:25:14Z
+shutdown port 3803 pid 15756 mysqladmin rc=0 2026-10-08T11:33:49Z
+verify 2026-10-08T11:33:56Z: pid 15756 gone; datadir deleted; LISTEN on 3803: False

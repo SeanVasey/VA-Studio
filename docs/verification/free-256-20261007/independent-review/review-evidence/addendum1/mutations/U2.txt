@@ -1,0 +1,26 @@
+== U2 at 68c4e03c6be3ea65439ab34f1c794734a7ddd8a1
+applied U2
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php | 1 +
+ 1 file changed, 1 insertion(+)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
+index 0d18b068..1cd323e4 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
+@@ -102,3 +102,4 @@ final class ProductionFreeGrantText
+         return str_replace("\n", '<br>', htmlspecialchars(str_replace("\t", '    ', $value), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8'));
+     }
+ }
++// review probe: a later renderer revision
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b-mut/phpunit.xml
+
+PROBE upgrade[U2]: {"rendered.library.show":"ok:complete","rendered.library.index":"ok:1","rendered.authorize.master_wav":"ok:master_wav","pending.library.show":"ok:pending","pending.library.index":"ok:1","pending.authorize.master_wav":"refused:original_pending","pending.render":"refused:render_failed","pending.work":"claimed,failed"}
+.                                                                   1 / 1 (100%)
+
+Time: 00:01.359, Memory: 63.00 MB
+
+OK (1 test, 3 assertions)
+rc=0
+after revert: git diff --quiet -- app database resources rc=0
