@@ -1,0 +1,39 @@
+# R-3 red: new trailing-line-terminator Guard test on native MySQL, unfixed schema
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_r3red root=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap start 2026-10-08T06:19:57Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 01:01.930, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_provider_identifiers_with_a_trailing_line_terminator_are_refused
+These provider identifiers with a trailing line terminator were stored.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => 'request account_id, line feed',
++    1 => 'binding provider_session_id, line feed',
++    2 => 'reviewed provider_payment_id, line feed',
++    3 => 'request account_id, carriage return',
++    4 => 'binding provider_session_id, carriage return',
++    5 => 'reviewed provider_payment_id, carriage return',
++    6 => 'request account_id, CR LF',
++    7 => 'binding provider_session_id, CR LF',
++    8 => 'reviewed provider_payment_id, CR LF',
++]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:252
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1
+# end 2026-10-08T06:20:59Z

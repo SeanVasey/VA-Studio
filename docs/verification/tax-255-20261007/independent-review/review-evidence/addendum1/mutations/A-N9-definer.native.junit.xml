@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest" file="/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="144.484366">
+    <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="144.484366">
+      <testcase name="test_native_installer_refuses_before_ddl with data set &quot;guard recreated under another definer&quot;" file="/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php" line="128" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeInstallerTest" assertions="1" time="144.484366">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl with data set "guard recreated under another definer"
+Damaged installation was adopted.
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php:134
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

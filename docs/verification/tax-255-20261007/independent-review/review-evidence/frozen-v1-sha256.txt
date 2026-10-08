@@ -1,0 +1,59 @@
+# Frozen V1 bytes: composition record vs reviewed head 9ec94d8c vs origin/main fad3ab444e89ffb57dc915f61f7f788b626e330a
+# record file: docs/verification/checkout-composition-20261007/independent-review/source-sha256.txt (blob at head 4baefcd755ff06ead5c883b49da90f8b677468a4, at origin/main 4baefcd755ff06ead5c883b49da90f8b677468a4)
+path                                                                             head     main     record  
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php
+  head-blob ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983
+  worktree  ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983
+  main      ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983
+  record    ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php
+  head-blob c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11
+  worktree  c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11
+  main      c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11
+  record    c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php
+  head-blob 190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0
+  worktree  190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0
+  main      190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0
+  record    190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderConsumerCommitAdmissionV1.php
+  head-blob 0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608
+  worktree  0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608
+  main      0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608
+  record    0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/OrderEvidence.php
+  head-blob 4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0
+  worktree  4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0
+  main      4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0
+  record    4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/HostedEvidence.php
+  head-blob 13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024
+  worktree  13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024
+  main      13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024
+  record    13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php
+  head-blob f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770
+  worktree  f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770
+  main      f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770
+  record    f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770
+  EQUAL
+app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php
+  head-blob c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8
+  worktree  c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8
+  main      c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8
+  record    c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8
+  EQUAL
+database/migrations/2026_10_07_246000_production_checkout.php
+  head-blob e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615
+  worktree  e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615
+  main      e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615
+  record    e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615
+  EQUAL
+# V1 files changed between origin/main and head:
+  (end)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" tests="6" assertions="204" errors="0" failures="1" skipped="0" time="10.177362">
+    <testcase name="test_order_guard_refuses_every_malformed_field_and_accepts_the_valid_row" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="110" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="53" time="2.798468"/>
+    <testcase name="test_request_guard_refuses_malformed_and_out_of_order_rows" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="134" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="29" time="1.582348">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_request_guard_refuses_malformed_and_out_of_order_rows
+before its order was accepted by the request guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:153
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_binding_guard_refuses_malformed_and_out_of_order_rows" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="158" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="43" time="1.581683"/>
+    <testcase name="test_reviewed_guard_refuses_inconsistent_provider_amounts_and_out_of_order_rows" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="178" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="60" time="1.685043"/>
+    <testcase name="test_inclusive_reviewed_rows_keep_tax_inside_the_unchanged_total" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="215" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="7" time="1.388178"/>
+    <testcase name="test_every_table_refuses_update_and_delete" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php" line="231" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutGuardTest" assertions="12" time="1.141642"/>
+  </testsuite>
+</testsuites>

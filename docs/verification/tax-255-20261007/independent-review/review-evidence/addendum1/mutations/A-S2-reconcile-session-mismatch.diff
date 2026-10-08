@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+index 310e0b7b..8fc4d1ab 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+@@ -180,7 +180,6 @@ final class ProductionTaxCheckout
+         try {
+             $session = $transport->retrieve($context, $sessionId);
+             $safe = TaxCheckoutEvidence::session($session, $request);
+-            CheckoutException::require($safe['session_id'] === $sessionId, 'session_mismatch');
+             $payment = $safe['payment_intent_id'] === null ? null : $transport->paymentIntent($context, $safe['payment_intent_id']);
+             $financial = TaxCheckoutEvidence::financial($session, $payment, $request);
+         } catch (Throwable $error) {

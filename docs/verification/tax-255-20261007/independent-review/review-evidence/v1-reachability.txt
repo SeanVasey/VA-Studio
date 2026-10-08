@@ -1,0 +1,108 @@
+# use statements in the Tax255 runtime family (9ec94d8c)
+     11 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+      1 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+      1 use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
+      1 use App\Domain\Commerce\ProductionCheckout\CurrentSelection;
+      8 use App\Domain\Commerce\ProductionCheckout\Evidence;
+      1 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+      1 use App\Domain\Commerce\ProductionCheckout\HeldSourceTransaction;
+      2 use App\Domain\Commerce\ProductionCheckout\OwnAccountStripeGateway;
+      1 use App\Domain\Commerce\ProductionCheckout\PrimaryBoundary;
+      1 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
+      2 use App\Domain\Commerce\ProductionCheckout\Records;
+      1 use App\Domain\Commerce\ProductionPolicy\CapabilityHistory;
+      3 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+      1 use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1;
+      1 use App\Domain\Commerce\ProductionPreparation\PacketEvidence;
+      1 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
+      1 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
+      2 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutPolicy;
+      1 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;
+      1 use App\Domain\Commerce\ProductionTaxCheckout\UnboundTaxCheckoutTransport;
+      2 use App\Domain\Customers\ProductionCustomerAccess;
+      2 use App\Domain\Customers\ProductionCustomerPrincipal;
+      1 use App\Domain\Customers\ProductionIdentity\IdentityException;
+      1 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+      2 use App\Http\Responses\ProductionTaxCheckoutResponse as PrivateResponse;
+      2 use App\Models\User;
+      6 use App\Support\CanonicalJson;
+      2 use Carbon\CarbonImmutable;
+      1 use Closure;
+      1 use Illuminate\Database\QueryException;
+      3 use Illuminate\Http\Request;
+      2 use Illuminate\Support\Facades\DB;
+      1 use Illuminate\Support\ServiceProvider;
+      1 use Illuminate\Support\Str;
+      3 use Illuminate\Validation\ValidationException;
+      3 use LogicException;
+      1 use PDO;
+      2 use SensitiveParameter;
+      3 use Symfony\Component\HttpFoundation\Response;
+      1 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+      4 use Throwable;
+      1 use stdClass;
+
+# V1 static/instance calls from the V2 family
+     16 ProductionTaxCheckout.php: CheckoutException
+      6 ProductionTaxCheckout.php: CommandTransaction
+      9 ProductionTaxCheckout.php: CurrentSelection
+     34 ProductionTaxCheckout.php: Evidence
+      1 ProductionTaxCheckout.php: OwnAccountStripeGateway
+      3 ProductionTaxCheckout.php: ProductionCheckout
+      6 ProductionTaxCheckout.php: Records
+     10 ProductionTaxPaidLineAdapterV2.php: CheckoutException
+      4 ProductionTaxPaidOrderLocatorV2.php: CheckoutException
+      1 ProductionTaxPaidOrderLocatorV2.php: CheckoutSchema
+      1 ProductionTaxPaidOrderLocatorV2.php: Evidence
+      1 ProductionTaxPaidOrderLocatorV2.php: PrimaryBoundary
+      5 ProductionTaxPaidOrderSourceV2.php: CheckoutException
+      7 ProductionTaxPaidOrderSourceV2.php: Evidence
+      1 ProductionTaxPaidOrderSourceV2.php: HeldSourceTransaction
+      2 ProductionTaxPaidOrderSourceV2.php: Records
+      2 TaxCandidate.php: CheckoutException
+      3 TaxCandidate.php: Evidence
+     21 TaxCheckoutEvidence.php: CheckoutException
+      1 TaxCheckoutEvidence.php: CheckoutSchema
+     12 TaxCheckoutEvidence.php: Evidence
+      2 TaxCheckoutEvidence.php: OwnAccountStripeGateway
+      3 TaxCheckoutPolicy.php: CheckoutException
+      1 TaxCheckoutPolicy.php: ExecutionContextV1
+      8 TaxCheckoutRecords.php: CheckoutException
+      5 TaxCheckoutRecords.php: CheckoutSchema
+      1 TaxCheckoutRecords.php: CommandTransaction
+      2 TaxCheckoutRecords.php: Evidence
+      9 TaxCheckoutSchemaInstaller.php: CheckoutSchema
+      2 TaxExecutionContext.php: CheckoutException
+      1 TaxExecutionContext.php: Evidence
+      7 app/Http/Controllers/ProductionTaxCheckoutController.php: CheckoutException
+      5 app/Http/Controllers/ProductionTaxCheckoutController.php: Evidence
+
+# any reference to V1 paid source/locator/receipt/admission, HostedCheckout, OrderEvidence, HostedEvidence, ProductionCheckout tables:
+app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php:9: * `production_checkout_*` table, so the frozen V1 installer's foreign-reference refusal stays satisfied.
+
+# precise (word-bounded) V1 ProductionCheckout symbols called from the V2 family
+     78 CheckoutException::require
+      1 CheckoutSchema::TABLES
+      7 CommandTransaction::run
+      3 CurrentSelection::load
+      3 CurrentSelection::proveBytes
+      3 CurrentSelection::proveCurrent
+      2 Evidence::hash
+      1 Evidence::key
+      6 Evidence::keys
+      5 Evidence::open
+     21 Evidence::same
+      4 Evidence::seal
+      1 ExecutionContextV1::API_VERSION
+      1 HeldSourceTransaction::capture
+      3 OwnAccountStripeGateway::sessionId
+      1 PrimaryBoundary::prove
+      3 ProductionCheckout::requireOwner
+# instance calls on V1 Records/CurrentRows objects:
+      1 $reader->one
+      1 $rows->commandFrame
+      1 $rows->current
+      1 $this->current->identityDriver
+      2 $this->current->identityPrimary
+      1 $this->current->one
+      1 $this->current->rows

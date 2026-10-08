@@ -1,0 +1,14 @@
+# R-3 green: trailing-line-terminator Guard test on native MySQL, fixed schema
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_g1 root=/home/user/VA-Studio-tax255h start 2026-10-08T06:27:44Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 01:42.240, Memory: 79.00 MB
+
+OK (1 test, 5 assertions)
+rc=0
+# end 2026-10-08T06:29:27Z

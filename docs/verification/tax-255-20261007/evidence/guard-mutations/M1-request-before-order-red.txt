@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255/phpunit.xml
+
+.F....                                                              6 / 6 (100%)
+
+Time: 00:09.517, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_request_guard_refuses_malformed_and_out_of_order_rows
+before its order was accepted by the request guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:153
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 204, Failures: 1.
