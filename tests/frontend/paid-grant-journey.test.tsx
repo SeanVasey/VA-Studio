@@ -77,6 +77,32 @@ describe('mounted original paid-purpose journey', () => {
     render(<PaidGrantJourney />); await openSaved(); fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
     await waitFor(() => expect(finish).toBeDefined()); await act(async () => { window.dispatchEvent(new Event('pagehide')); finish(response({ authorization: { token: 'LATE_PRIVATE_TOKEN' } })); });
     expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument(); expect(screen.queryByRole('button', { name: 'Download authorized file' })).not.toBeInTheDocument(); expect(submit).not.toHaveBeenCalled();
+    // Departure drops the uncertain request too; nothing is left to replay.
+    expect(screen.queryByRole('button', { name: 'Retry the exact request' })).not.toBeInTheDocument();
+  });
+  it('keeps the exact authorize replay when the tab is only hidden, while clearing everything shown and ignoring the late answer', async () => {
+    let finish!: (r: Response) => void; let signal!: AbortSignal;
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockImplementationOnce((_, init) => { signal = init!.signal!; return new Promise(r => { finish = r; }); })
+      .mockResolvedValueOnce(response(listing()))
+      .mockResolvedValueOnce(response({ authorization: { id: authorizationId, token: 'RECOVERED_SYNTHETIC_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' } }));
+    const visibility = vi.spyOn(document, 'visibilityState', 'get');
+    try {
+      render(<PaidGrantJourney />); await openSaved(); fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+      await waitFor(() => expect(finish).toBeDefined());
+      visibility.mockReturnValue('hidden');
+      await act(async () => { document.dispatchEvent(new Event('visibilitychange')); finish(response({ authorization: { token: 'LATE_PRIVATE_TOKEN' } })); });
+      expect(signal.aborted).toBe(true);
+      expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument(); expect(document.body.textContent).not.toContain(complete.lines[0].license.termsText);
+      expect(screen.queryByRole('button', { name: 'Download authorized file' })).not.toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('could not be confirmed');
+      visibility.mockReturnValue('visible'); document.dispatchEvent(new Event('visibilitychange'));
+      const retry = screen.getByRole('button', { name: 'Retry the exact request' }); expect(retry).toBeDisabled();
+      fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' })); await waitFor(() => expect(retry).toBeEnabled());
+      fireEvent.click(retry); await screen.findByRole('button', { name: 'Download authorized file' });
+      // The replay is the same request: same path and byte-identical body (request key and nonce), so the server returns the same authorization.
+      expect(fetcher.mock.calls[4][0]).toBe(fetcher.mock.calls[2][0]); expect(fetcher.mock.calls[4][1]?.body).toBe(fetcher.mock.calls[2][1]?.body);
+    } finally { visibility.mockRestore(); }
   });
   it('uses token-free saved lease admission before retrying a claimed original and displays consumed attempts truthfully', async () => {
     const claimed: PaidOrigin = { ...origin, lines: [{ ...origin.lines[0], documentStatus: 'claimed', attempts: 1 }] };

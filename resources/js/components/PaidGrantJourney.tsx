@@ -89,12 +89,16 @@ export function PaidGrantJourney() {
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
   const active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
-  function clear() { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); setPending(null); setReviewedSaved(false); setStatusAfter(null); frames.current.forEach(f => f.remove()); frames.current = []; }
+  function clear(keepPending = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); frames.current.forEach(f => f.remove()); frames.current = []; }
   function refuse() { clear(); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
     active.current = true;
     const leave = () => { generation.current++; request.current?.abort(); clear(); inflight.current = false; setBusy(false); };
-    const visibility = () => { if (document.visibilityState === 'hidden') leave(); };
+    // Hiding the tab is not leaving: everything shown is cleared and an in-flight request is abandoned, but an uncertain
+    // finalize or authorize keeps its exact replay (same request key and nonce, held in memory and never rendered), so a
+    // committed authorization can still be recovered instead of duplicated. Actual departure (pagehide) clears it too.
+    const visibility = () => { if (document.visibilityState !== 'hidden') return; const interrupted = inflight.current;
+      generation.current++; request.current?.abort(); clear(true); inflight.current = false; setBusy(false); if (interrupted) setMessage(unknown); };
     window.addEventListener('pagehide', leave); document.addEventListener('visibilitychange', visibility);
     return () => { active.current = false; generation.current++; request.current?.abort(); frames.current.forEach(f => f.remove()); window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', visibility); };
   }, []);
