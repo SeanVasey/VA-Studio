@@ -1,0 +1,22 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member2/phpunit.xml
+
+OBSERVATION native-lock-race: r1[first denied superseded_retrieval seq=- start=12:50:54.306160 | second saved reversed seq=2 start=12:50:57.311194] r2[first saved settled seq=3 start=12:51:01.255349 | second saved reversed seq=4 start=12:51:03.296006] r3[first denied superseded_retrieval seq=- start=12:51:06.799394 | second saved reversed seq=5 start=12:51:10.387456] r4[first saved settled seq=6 start=12:51:14.870761 | second saved reversed seq=7 start=12:51:16.820170] r5[first saved settled seq=8 start=12:51:21.886289 | second saved reversed seq=9 start=12:51:23.553059] r6[first denied superseded_retrieval seq=- start=12:51:27.150545 | second saved reversed seq=10 start=12:51:29.814069] chain=1:settled,2:reversed,3:settled,4:reversed,5:reversed,6:settled,7:reversed,8:settled,9:reversed,10:reversed starts_monotonic=yes tail=reversed
+.OBSERVATION native-lock-readers: lock held 8.0s; duplicate-delivery 0.64s (duplicate=yes scheduled=dispatched); sweep-scan 0.61s (examined=1 pending=1); same-invoice retrieve 2.73s (saved settled seq=2); other-invoice claim+append 9.34s (saved refused seq=1)
+F                                                                  2 / 2 (100%)
+
+Time: 04:33.676, Memory: 89.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbes\Lane2ReviewProbeTest::test_native_append_lock_blocks_only_appends_of_the_same_invoice
+Failed asserting that 2.73 is greater than 3.0.
+
+/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php:256
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 52, Failures: 1.
+rc=1

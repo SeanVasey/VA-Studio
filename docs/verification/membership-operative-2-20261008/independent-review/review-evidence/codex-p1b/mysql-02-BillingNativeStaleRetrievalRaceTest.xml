@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php" tests="2" assertions="27" errors="0" failures="0" skipped="0" time="255.131697">
+    <testcase name="test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php" line="28" class="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeStaleRetrievalRaceTest" assertions="15" time="170.408832"/>
+    <testcase name="test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php" line="61" class="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeStaleRetrievalRaceTest" assertions="12" time="84.722866"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,16 @@
+diff --git a/app/Domain/Memberships/Billing/BillingHintSweep.php b/app/Domain/Memberships/Billing/BillingHintSweep.php
+index e55a21e6..24019505 100644
+--- a/app/Domain/Memberships/Billing/BillingHintSweep.php
++++ b/app/Domain/Memberships/Billing/BillingHintSweep.php
+@@ -56,10 +56,7 @@ final class BillingHintSweep
+     {
+         $seen = [];
+         foreach ($pending as $hint) {
+-            if (isset($seen[$hint['invoice_hash']])) {
+-                continue;
+-            }
+-            $seen[$hint['invoice_hash']] = true;
++            $seen[] = true;
+             $policy->proveConfiguration($configuration);
+             RetrieveMembershipInvoice::dispatch($hint['binding_id'], $hint['invoice_ref']);
+         }

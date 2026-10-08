@@ -1,0 +1,14 @@
+# green: BillingOverlappingRetrievalTest, MySQL 8.4.11 private 127.0.0.1:3917, worktree /home/user/VA-Studio-member-ops2 (3fed2392 + this change)
+2026-10-08T19:19:42Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 03:45.193, Memory: 91.00 MB
+
+OK (4 tests, 20 assertions)
+rc=0
+elapsed_seconds=225

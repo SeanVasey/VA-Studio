@@ -1,0 +1,61 @@
+# red at 3fed2392 (tests only changed): BillingSchemaPreparationTest, SQLite
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.EEEFE..E....                                                     13 / 13 (100%)
+
+Time: 00:11.025, Memory: 93.00 MB
+
+There were 5 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_and_positions_are_immutable
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_end_position
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:288
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_end_position
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:288
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_end_position
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:288
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:100
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_end_position
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:288
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:154
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_end_position
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:288
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:188
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended
+Immutable billing evidence must refuse.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:306
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:128
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 13, Assertions: 35, Errors: 5, Failures: 1.
+rc=2

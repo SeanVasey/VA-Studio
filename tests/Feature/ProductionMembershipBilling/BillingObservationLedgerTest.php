@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Billing\BillingProviderGateway;
 use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Billing\BillingVerdict;
@@ -120,6 +121,48 @@ class BillingObservationLedgerTest extends TestCase
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
+    /**
+     * Addendum 1, A1-1: settlement refuses `invoice_identity` and `mode` before it reaches the customer and subscription checks, so
+     * those refusals do not prove the binding. A first retrieval refused that way throws and writes nothing, whichever binding
+     * dispatched it; the correct binding then claims the invoice with sequence 1.
+     *
+     * @return array<string, array{0: string}> settlement refusal reason
+     */
+    public static function refusalsBeforeBindingValidation(): array
+    {
+        return ['mode' => ['mode'], 'invoice_identity' => ['invoice_identity']];
+    }
+
+    #[DataProvider('refusalsBeforeBindingValidation')]
+    public function test_a_first_retrieval_refused_before_binding_validation_claims_no_identity_for_any_binding(string $reason): void
+    {
+        $firstWrong = F::binding(['subscription_ref' => 'sub_WRONGSYNTHETIC']);
+        $secondWrong = F::binding(['subscription_ref' => 'sub_OTHERSYNTHETIC', 'customer_ref' => 'cus_OTHERSYNTHETIC']);
+        $right = F::binding();
+        foreach ([$firstWrong, $secondWrong] as $wrong) {
+            try {
+                (new BillingReconciliation($this->refusingBeforeValidation($reason)))->retrieve($wrong['id'], F::INVOICE);
+                $this->fail('A refusal that never reached the binding checks must not pin the invoice to the binding that happened to ask first.');
+            } catch (BillingException $error) {
+                $this->assertSame('binding_refused_'.$reason, $error->reason);
+            }
+            $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        }
+        $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($right['id'], F::INVOICE);
+        $this->assertSame(['settled', 1], [$settled['outcome'], $settled['sequence']]);
+        $this->assertSame([1, 1], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $this->assertSame(0, DB::table('production_membership_credit_events')->count());
+    }
+
+    /** The mirror: when the account, customer and subscription all match the binding, a `mode` refusal is evidence about this invoice and is recorded. */
+    public function test_a_mode_refusal_for_a_validated_binding_is_recorded_under_that_binding(): void
+    {
+        $binding = F::binding();
+        $refused = (new BillingReconciliation($this->refusingBeforeValidation('mode')))->retrieve($binding['id'], F::INVOICE);
+        $this->assertSame(['refused', 1], [$refused['outcome'], $refused['sequence']]);
+        $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
+    }
+
     public function test_a_binding_refusal_under_an_identity_the_binding_already_owns_is_still_appended(): void
     {
         $binding = F::binding();
@@ -144,7 +187,9 @@ class BillingObservationLedgerTest extends TestCase
         $ledger = new BillingLedger;
         $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
         // A structurally valid next row (triggers admit it) whose seal is not the canonical row hash.
-        $forged = [...$settled, 'id' => (string) Str::uuid(), 'sequence' => 2, 'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
+        $start = $ledger->startRetrieval();
+        $forged = [...$settled, 'id' => (string) Str::uuid(), 'sequence' => 2, 'retrieval_position' => $start,
+            'retrieval_end_position' => $ledger->endRetrieval($start), 'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
         DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2]).' ('.implode(',', array_keys($forged))
             .') VALUES ('.implode(',', array_fill(0, count($forged), '?')).')')->execute(array_values($forged));
         foreach ([fn () => $ledger->observations($settled['invoice_id']), fn () => $ledger->currentSettled($settled['invoice_id'], self::AT)] as $read) {
@@ -181,6 +226,61 @@ class BillingObservationLedgerTest extends TestCase
     {
         $this->expectException(BillingException::class);
         new BillingVerdict('settled', null, ['amount_minor' => F::AMOUNT]);
+    }
+
+    /** A provider that answers `mode` (live objects for a test-mode account) or `invoice_identity` (another invoice than requested). */
+    private function refusingBeforeValidation(string $reason): BillingProviderGateway
+    {
+        $inner = new RehearsalBillingGateway(F::graph($reason === 'mode' ? ['invoice' => ['livemode' => true]] : []));
+        if ($reason === 'mode') {
+            return $inner;
+        }
+
+        return new class($inner) implements BillingProviderGateway
+        {
+            public function __construct(private readonly RehearsalBillingGateway $inner) {}
+
+            public function provenance(): string
+            {
+                return $this->inner->provenance();
+            }
+
+            public function account(): array
+            {
+                return $this->inner->account();
+            }
+
+            public function retrieveInvoice(string $ref): array
+            {
+                // A gateway that returns an invoice other than the one requested; the evaluator must still refuse it.
+                return [...$this->inner->retrieveInvoice($ref), 'id' => 'in_OTHERSYNTHETIC'];
+            }
+
+            public function listInvoicePayments(string $invoiceRef): array
+            {
+                return $this->inner->listInvoicePayments($invoiceRef);
+            }
+
+            public function retrievePaymentIntent(string $ref): array
+            {
+                return $this->inner->retrievePaymentIntent($ref);
+            }
+
+            public function retrieveCharge(string $ref): array
+            {
+                return $this->inner->retrieveCharge($ref);
+            }
+
+            public function retrieveBalanceTransaction(string $ref): array
+            {
+                return $this->inner->retrieveBalanceTransaction($ref);
+            }
+
+            public function retrieveSubscription(string $ref): array
+            {
+                return $this->inner->retrieveSubscription($ref);
+            }
+        };
     }
 
     private function configuration(): array

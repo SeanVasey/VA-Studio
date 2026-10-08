@@ -74,7 +74,7 @@ class BillingWebhookRedeliveryTest extends TestCase
         $this->assertTrue($duplicate['duplicate']);
         $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $duplicate['scheduled']);
         Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
-        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef === F::INVOICE);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef() === F::INVOICE);
         $this->assertSame([$stored], array_map(fn ($row) => (array) $row, DB::table('production_membership_billing_events')->get()->all()));
         $this->assertSame(0, DB::table('production_membership_billing_observations')->count());
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
@@ -213,7 +213,7 @@ class BillingWebhookRedeliveryTest extends TestCase
         $this->assertFalse($result['duplicate']);
         $this->assertSame('retrieval_hint', $result['event']['disposition']);
         $this->assertSame(['binding_id' => $binding['id'], 'invoice_ref' => F::INVOICE], $result['scheduled']);
-        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef === F::INVOICE);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, fn ($job) => $job->bindingId === $binding['id'] && $job->invoiceRef() === F::INVOICE);
         Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
     }
 
@@ -339,7 +339,9 @@ class BillingWebhookRedeliveryTest extends TestCase
     {
         $this->at($offset);
         $identity = (array) DB::table('production_membership_billing_invoices')->first();
-        (new BillingLedger)->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL);
+        $ledger = new BillingLedger;
+        $start = $ledger->startRetrieval();
+        $ledger->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL, $start, $ledger->endRetrieval($start), CarbonImmutable::now('UTC'));
     }
 
     private function at(int $offset): void

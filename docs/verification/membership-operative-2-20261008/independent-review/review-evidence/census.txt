@@ -1,0 +1,47 @@
+diff --git a/scripts/ci/database-sqlite-skips.json b/scripts/ci/database-sqlite-skips.json
+index 01da185e..d3dc905a 100644
+--- a/scripts/ci/database-sqlite-skips.json
++++ b/scripts/ci/database-sqlite-skips.json
+@@ -658,6 +658,26 @@
+       "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
+       "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
+     ],
++    [
++      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
++      "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
++    ],
++    [
++      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
++      "test_native_installer_refuses_before_ddl"
++    ],
++    [
++      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
++      "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
++    ],
++    [
++      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
++      "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
++    ],
++    [
++      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
++      "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
++    ],
+     [
+       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+       "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
+682:      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+686:      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+690:      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+694:      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+698:      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
+$ python3 -I scripts/ci/test-database-receipts.py   (first attempt piped through tail; its rc line below is tail's, superseded by the re-run at the end)
+----------------------------------------------------------------------
+Ran 34 tests in 9.383s
+
+OK
+rc=0
+$ python3 -I scripts/ci/test-database-receipts.py   (re-run, rc on its own line)
+Ran 34 tests in 8.764s
+
+OK
+rc=0

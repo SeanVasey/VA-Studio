@@ -1,0 +1,5 @@
+BillingNativeCrossInvoiceClaimTest OK (1 test, 15 assertions) rc=0
+BillingSchemaPreparationTest OK (13 tests, 77 assertions) rc=0
+BillingNativeDedupRaceTest OK (1 test, 15 assertions) rc=0
+BillingNativeStaleRetrievalRaceTest OK (2 tests, 27 assertions) rc=0
+BillingNativeIntervalRetrievalRaceTest OK (2 tests, 28 assertions) rc=0

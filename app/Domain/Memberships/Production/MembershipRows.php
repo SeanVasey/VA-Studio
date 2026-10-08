@@ -89,6 +89,19 @@ final class MembershipRows
         $this->pin?->closeCursor();
     }
 
+    /**
+     * The pin is a statement shared by reference and closed in __destruct. A clone would share it, and destroying the clone
+     * would release the live frame's pin (review R-1: SQLite then admitted a BINARY collation replacement inside the live frame).
+     * A frame is therefore never copied. PHP still runs the destructor of the half-built copy after this throws, so the copy
+     * drops its reference first and has nothing left to close; the original keeps its own reference.
+     */
+    public function __clone(): void
+    {
+        $this->pin = null;
+
+        throw new MembershipException('clone_refused');
+    }
+
     public function identity(): PDO
     {
         return $this->primary;

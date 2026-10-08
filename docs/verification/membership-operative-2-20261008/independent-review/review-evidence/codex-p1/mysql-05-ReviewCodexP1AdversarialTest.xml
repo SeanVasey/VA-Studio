@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" tests="6" assertions="41" errors="1" failures="0" skipped="0" time="591.297520">
+    <testcase name="test_hints_tied_on_received_at_across_page_boundaries_are_each_examined_exactly_once" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="56" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="9" time="122.090833"/>
+    <testcase name="test_probe_a_hint_received_behind_a_cursor_is_missed_by_that_pass_and_found_by_a_fresh_pass" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="98" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="7" time="97.009528"/>
+    <testcase name="test_an_app_key_rotation_refuses_old_cursors_and_a_fresh_pass_still_works_with_previous_keys" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="125" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="12" time="95.969481"/>
+    <testcase name="test_explicit_non_positive_position_ids_cannot_back_evidence_or_move_the_counter" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="161" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="7" time="99.179747"/>
+    <testcase name="test_probe_after_a_counter_regression_an_in_flight_stale_retrieval_borrows_a_reissued_position" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="211" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="1" time="72.501197">
+      <error type="App\Domain\Memberships\Billing\BillingException">Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest::test_probe_after_a_counter_regression_an_in_flight_stale_retrieval_borrows_a_reissued_position
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (schema).
+
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingException.php:19
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:437
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:109
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:48
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:330
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:226
+/home/user/VA-Studio-review-m54/tests/Support/InterleavingBillingGateway.php:59
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingReconciliation.php:122
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingReconciliation.php:47
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:235
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_a_database_with_the_previous_259000_shape_is_refused_and_not_adopted" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php" line="266" class="Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest" classname="Tests.Feature.ProductionMembershipBilling.ReviewCodexP1AdversarialTest" assertions="5" time="104.546735"/>
+  </testsuite>
+</testsuites>

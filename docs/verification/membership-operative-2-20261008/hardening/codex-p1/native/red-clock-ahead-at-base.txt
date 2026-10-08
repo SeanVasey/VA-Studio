@@ -1,0 +1,31 @@
+$ (scratch worktree at 83821fc0, application code unchanged, new native test + worker copied in) php -r '...phpunit' -- --colors=never --filter test_a_stale_retrieval_whose_worker_clock_runs_ahead tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/cp1-red/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 01:57.245, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal
+{"stale":{"role":"stale","result":"saved","sequence":3,"outcome":"settled","started_at":"2026-10-08 16:15:04.472115","position":null,"clock":"2026-10-08 16:15:04.472115","reason":null,"error_class":null,"error_message":null,"connection_id":17,"pid":27915,"transaction_level":0},"fresh":{"role":"fresh","result":"saved","sequence":2,"outcome":"reversed","started_at":"2026-10-08 16:13:06.718439","position":null,"clock":"2026-10-08 16:13:07.849392","reason":null,"error_class":null,"error_message":null,"connection_id":18,"pid":27916,"transaction_level":0}}
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'denied',
+-    1 => 'superseded_retrieval',
++    0 => 'saved',
++    1 => null,
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/cp1-red/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 7, Failures: 1.
+rc=1

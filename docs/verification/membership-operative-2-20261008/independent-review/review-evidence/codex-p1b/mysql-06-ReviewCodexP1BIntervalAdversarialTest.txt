@@ -1,0 +1,38 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42  (worktree clean apart from untracked review files: 0 tracked changes)
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3794, database r54b_probe; DB_CONNECTION=mysql APP_ENV=testing
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/ReviewCodexP1BIntervalAdversarialTest.php
+# start: 2026-10-08T20:28:15Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+
+[review] driver=mysql cp1 state={"b":["settled",2,3],"chain":[["settled",2,3],["reversed",5,6]]}
+.
+[review] driver=mysql three-way A then B: {"A":"concurrent_retrieval","B":"concurrent_retrieval"} chain=[["settled",1,2],["settled",5,6]]
+.
+[review] driver=mysql three-way B then A: {"A":"concurrent_retrieval","B":"concurrent_retrieval"} chain=[["settled",1,2],["settled",5,6]]
+.
+[review] driver=mysql 62 schedules, appends by result: {"admitted":87,"superseded_retrieval":18,"concurrent_retrieval":61}
+.
+[review] driver=mysql liveness: {"n1s":3,"n1e":7,"w1s":4,"w1e":5,"w2s":6,"w2e":9,"w3s":10,"w3e":13,"r1":"concurrent_retrieval","r2":"concurrent_retrieval","r3":"concurrent_retrieval"}
+..
+[review] driver=mysql lost-append refusal: changed_policy
+.
+[review] driver=mysql cp2 state={"stale_start":4,"hint":3,"r2_start":4,"stale_row":["settled",4,5],"r2_refusal":"concurrent_retrieval","retry":["reversed",7,8]}
+..
+[review] driver=mysql 83821fc0-shape assertOwned refused: schema
+
+[review] driver=mysql 83821fc0-shape up refused: schema
+
+[review] driver=mysql 6184118d-shape assertOwned refused: schema
+
+[review] driver=mysql 6184118d-shape up refused: schema
+.                                                        10 / 10 (100%)
+
+Time: 23:41.975, Memory: 97.00 MB
+
+OK (10 tests, 357 assertions)
+rc=0
+# end: 2026-10-08T20:51:57Z

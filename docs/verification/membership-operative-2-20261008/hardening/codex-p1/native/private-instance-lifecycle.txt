@@ -1,0 +1,4 @@
+2026-10-08T16:04:52Z private mysqld 8.4.11 --no-defaults --user=root 127.0.0.1:3761 (free per /proc/net/tcp; 3306 and other lanes untouched) --socket=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/codex-p1-mysql/mysqld.sock --mysqlx=OFF datadir /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/codex-p1-mysql/data
+2026-10-08T16:05:14Z first start aborted: socket path >107 bytes; restarting with --socket=/tmp/claude-0/cp1-3761.sock (new name, own)
+2026-10-08T17:06:02Z private mysqld 8.4.11 --no-defaults --user=root 127.0.0.1:3762 --socket=/tmp/claude-0/m54.sock --mysqlx=OFF --skip-log-bin, datadir in session scratchpad (m54); earlier 3761 instance found stopped, its datadir removed
+2026-10-08T17:59:36Z private mysqld on 3762 shut down with mysqladmin; datadir (scratchpad m54) deleted

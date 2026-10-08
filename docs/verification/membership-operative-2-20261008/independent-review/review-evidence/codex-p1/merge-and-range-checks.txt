@@ -1,0 +1,8 @@
+# git diff --stat bd2fb261 0225c504 -- app/Domain/Memberships app/Console app/Jobs tests/Feature/ProductionMembershipBilling tests/Feature/ProductionMembership tests/Support/membership-billing-stale-race-worker.php
+rc=0 (empty stat = merge changed no lane file)
+# skips union check
+lane 255 main 250 merged 259 union 259 merged==union True
+# 6184118d vs 0225c504 non-doc changes:
+(empty = docs only)
+# 3fed2392 present locally?
+commit

@@ -1,0 +1,53 @@
+# red at 3fed2392 (tests only changed): BillingRetrievalJobTest, SQLite
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+..........FFFF..                                                  16 / 16 (100%)
+
+Time: 00:16.672, Memory: 101.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_overtaken_by_a_newer_one_completes_without_a_retry_and_records_nothing
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'settled',
+-    1 => 'reversed',
++    1 => 'settled',
++    2 => 'reversed',
+ ]
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:152
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@first attempt with data (1, 60)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:181
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@second attempt with data (2, 600)
+Job was expected to be released, but was not.
+Failed asserting that false is true.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Queue/InteractsWithQueue.php:227
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:181
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@last attempt fails visibly with data (3, null)
+The last attempt must fail visibly, not end normally.
+Failed asserting that null is not null.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:180
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 16, Assertions: 47, Failures: 4.
+rc=1

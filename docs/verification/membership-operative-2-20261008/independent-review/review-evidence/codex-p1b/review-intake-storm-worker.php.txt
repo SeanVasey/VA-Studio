@@ -1,0 +1,53 @@
+<?php
+
+// Reviewer native worker (CODEX-P1B addendum): concurrent webhook intakes of DISTINCT events, then concurrent first claims of
+// DISTINCT invoice identities. Every outcome is reported; evidence only, not part of the suite.
+use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Billing\BillingProviderPin;
+use App\Domain\Memberships\Billing\BillingWebhookIntake;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Stripe\Event;
+use Stripe\WebhookSignature;
+use Tests\Support\BillingStripeFixtures as F;
+
+require getcwd().'/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/lane2-worker-common.php';
+$run = function (Closure $work): string {
+    try {
+        return $work();
+    } catch (BindingResolutionException) {
+        return 'committed';                       // the hint committed; only the post-commit dispatch failed (no gateway bound)
+    } catch (BillingException $error) {
+        return 'refused '.$error->reason;
+    } catch (Throwable $error) {
+        return 'error '.$error::class.': '.substr($error->getMessage(), 0, 120);
+    }
+};
+$ready();
+$wait('start');
+$intakes = $claims = [];
+foreach (range(1, (int) $input['rounds']) as $round) {
+    $id = sprintf('evt_SYNTHETICISTORM%dX%02d', $worker, $round);
+    $invoice = [...F::graph()['invoice'], 'id' => sprintf('in_SYNTHETICISTORM%dX%02d', $worker, $round),
+        'parent' => ['type' => 'subscription_details', 'subscription_details' => ['subscription' => 'sub_SYNTHETICUNBOUND']]];
+    $payload = json_encode(F::sdk(Event::class, ['id' => $id, 'object' => 'event', 'api_version' => BillingProviderPin::API_VERSION, 'created' => F::PERIOD_START,
+        'livemode' => false, 'pending_webhooks' => 1, 'request' => ['id' => null, 'idempotency_key' => null], 'type' => 'invoice.paid',
+        'data' => ['object' => $invoice]]), JSON_THROW_ON_ERROR);
+    $intakes[] = $run(function () use ($payload): string {
+        $r = (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, 'whsec_SYNTHETICREHEARSAL'));
+
+        return $r['duplicate'] ? 'duplicate' : 'committed';
+    });
+}
+$signal('intakes-'.$worker);
+$wait('claims');
+foreach (range(1, (int) $input['rounds']) as $round) {
+    $claims[] = $run(function () use ($input, $worker, $round): string {
+        $ledger = new BillingLedger;
+        $ledger->invoice($ledger->binding($input['binding_id'], (new BillingPolicy)->current()), sprintf('in_SYNTHETICCSTORM%dX%02d', $worker, $round));
+
+        return 'claimed';
+    });
+}
+echo json_encode(['worker' => $worker, 'intakes' => $intakes, 'claims' => $claims, 'pid' => getmypid(), 'connection_id' => $connectionId], JSON_THROW_ON_ERROR);

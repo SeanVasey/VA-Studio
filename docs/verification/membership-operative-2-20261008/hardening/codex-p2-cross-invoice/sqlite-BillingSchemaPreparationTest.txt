@@ -1,0 +1,12 @@
+# green: BillingSchemaPreparationTest, SQLite, 2e08af42 + this change
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.............                                                     13 / 13 (100%)
+
+Time: 00:09.551, Memory: 93.00 MB
+
+OK (13 tests, 77 assertions)
+rc=0

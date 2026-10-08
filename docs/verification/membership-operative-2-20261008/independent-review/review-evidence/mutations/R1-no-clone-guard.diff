@@ -1,0 +1,14 @@
+diff --git a/app/Domain/Memberships/Production/MembershipRows.php b/app/Domain/Memberships/Production/MembershipRows.php
+index c159eaaf..8a4e8539 100644
+--- a/app/Domain/Memberships/Production/MembershipRows.php
++++ b/app/Domain/Memberships/Production/MembershipRows.php
+@@ -97,9 +97,7 @@ final class MembershipRows
+      */
+     public function __clone(): void
+     {
+-        $this->pin = null;
+ 
+-        throw new MembershipException('clone_refused');
+     }
+ 
+     public function identity(): PDO

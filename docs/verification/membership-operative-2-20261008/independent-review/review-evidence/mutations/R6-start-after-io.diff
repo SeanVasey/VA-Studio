@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Memberships/Billing/BillingReconciliation.php b/app/Domain/Memberships/Billing/BillingReconciliation.php
+index 57f6a7d5..49ac7667 100644
+--- a/app/Domain/Memberships/Billing/BillingReconciliation.php
++++ b/app/Domain/Memberships/Billing/BillingReconciliation.php
+@@ -42,6 +42,7 @@ final class BillingReconciliation
+         $validated = false;
+         try {
+             $snapshots = $this->snapshots($invoiceRef, $provenance);
++            $startedAt = CarbonImmutable::now('UTC');
+             $verdict = BillingSettlement::evaluate($snapshots, $binding['expectation']);
+             $validated = BillingSettlement::bindingValidated($snapshots, $binding['expectation']);
+             $retrievedAt = $snapshots->retrievedAt;

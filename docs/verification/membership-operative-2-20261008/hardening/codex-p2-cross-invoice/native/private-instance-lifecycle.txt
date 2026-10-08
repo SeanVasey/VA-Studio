@@ -1,0 +1,13 @@
+# private MySQL lifecycle (lane agent, codex-p2-cross-invoice)
+2026-10-08T20:17:59Z
+/usr/sbin/mysqld  Ver 8.4.11 for Linux on x86_64 (MySQL Community Server - GPL)
++ mysqld --no-defaults --user=root --initialize-insecure --datadir=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p2ci/data
+rc=0
++ start on 127.0.0.1:3923 socket /tmp/claude-0/p2ci.sock
+rc=0
+pid 25012
++ shutdown 2026-10-08T21:03:23Z: mysqladmin --no-defaults -uroot -h127.0.0.1 -P3923 shutdown (pid 25012; scratch databases p2ci_test and p2ci_plan)
+rc=0
++ 2026-10-08T21:03:27Z: pid 25012 exited (checked /proc and ps)
++ rm -rf /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p2ci
+rc=0

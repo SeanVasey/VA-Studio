@@ -1,0 +1,29 @@
+# red at 2e08af42 (app unchanged; only the new test, worker and census entry added), MySQL 8.4.11 private 127.0.0.1:3923
+2026-10-08T20:18:08Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+OBSERVATION cross-invoice: {"claim_seconds":4.259,"claim":"refused invoice_identity","retrieve_seconds":5.553,"retrieve":"refused invoice_identity","lock_wait_timeout":3,"connection_id":9,"pid":26558,"transaction_level":0,"done_while_locked":true,"held_seconds":9.817}
+F                                                                   1 / 1 (100%)
+
+Time: 01:37.646, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeCrossInvoiceClaimTest::test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock
+Claiming an unrelated invoice must not wait for another invoice's lock. {"claim_seconds":4.259,"claim":"refused invoice_identity","retrieve_seconds":5.553,"retrieve":"refused invoice_identity","lock_wait_timeout":3,"connection_id":9,"pid":26558,"transaction_level":0,"done_while_locked":true,"held_seconds":9.817}
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'claimed 36'
++'refused invoice_identity'
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php:51
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 8, Failures: 1.
+rc=1

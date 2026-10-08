@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingLedger.php b/app/Domain/Memberships/Billing/BillingLedger.php
+index c5352807..c1a8c027 100644
+--- a/app/Domain/Memberships/Billing/BillingLedger.php
++++ b/app/Domain/Memberships/Billing/BillingLedger.php
+@@ -112,7 +112,7 @@ final class BillingLedger
+             try {
+                 return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance, $started): array {
+                     if (DB::getDriverName() === 'mysql') {
+-                        $this->lockIdentity($invoice['id']);
++                        // lock removed
+                     }
+                     $chain = $this->observations($invoice['id']);
+                     $last = $chain === [] ? null : $chain[array_key_last($chain)];
