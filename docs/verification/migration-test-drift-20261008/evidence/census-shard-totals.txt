@@ -1,0 +1,8 @@
+shard-1: Tests: 1811, Assertions: 20564, Errors: 11, Failures: 12, Skipped: 133.
+shard-1: exit 2
+shard-2: Tests: 1810, Assertions: 18387, Failures: 1, Skipped: 136.
+shard-2: exit 1
+shard-3: Tests: 1810, Assertions: 13513, Errors: 1, Skipped: 170.
+shard-3: exit 2
+shard-4: Tests: 1810, Assertions: 16084, Errors: 6, Failures: 1, Skipped: 175.
+shard-4: exit 2
