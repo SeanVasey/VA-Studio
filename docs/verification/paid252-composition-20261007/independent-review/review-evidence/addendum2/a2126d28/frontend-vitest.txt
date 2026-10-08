@@ -1,0 +1,14 @@
+cmd: npx vitest run tests/frontend/paid-grant-journey.test.tsx tests/frontend/paid-grant-review-addendum1.test.tsx (node_modules temporarily symlinked, removed after)
+head: a2126d28966aedcf38ffb99a47825a1b3fdc3e10
+node: v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+
+ Test Files  2 passed (2)
+      Tests  23 passed (23)
+   Start at  17:34:23
+   Duration  2.67s (tests 57%, environment 29%, transform 9%, setup 3%, import 1%)
+
+rc=0
+wall_s=4

@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+........[41;37mF[0m                                                           9 / 9 (100%)
+
+Time: 00:00.389, Memory: 147.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSpoolReviewAddendum2Test::test_bytes_written_between_the_size_probe_and_the_free_space_probe_are_never_over_admitted
+Only BYTES + RESERVE + 499 was free when 500 bytes of slot 0 were unwritten.
+Failed asserting that null is identical to 'target_unavailable'.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReviewAddendum2Test.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 9[0m[37;41m, Assertions: 34[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1
