@@ -446,3 +446,18 @@ New policy keys in `config/production-free-grants.php`, all validated by `Produc
   the TTL is refused; the shipped defaults and the policy bounds are asserted. Time is a fake clock offset on `hrtime`, so no test sleeps.
 - **Not added:** range and resume delivery. A client slower than the configured minimum rate, or an interrupted download, needs a
   new authorization; range support is a future option for the delivery mount.
+
+## Codex review round 13: blocking sources that reject a read timeout (`codex-13/`)
+
+Codex P2 on `256c29c2`: the stalled-read fix called `stream_set_timeout()` but ignored its result. A FIFO or pipe
+source rejects read timeouts, so a blocking read on it could wait past every deadline while holding a spool slot.
+`Downloads::snapshot` now checks the deadline before configuring the source, accepts a regular file (`fstat` mode
+`S_IFREG`, which includes `php://temp` / `php://memory`) without a timeout because a host-local regular file cannot
+block indefinitely, and refuses any other stream (socket, pipe, FIFO, user wrapper) unless both
+`stream_set_blocking` and `stream_set_timeout` succeed. Regression
+`test_a_blocking_source_that_rejects_a_read_timeout_is_refused_before_any_read` (a FIFO opened `r+` with no writer
+data): red = the pre-fix code blocked on the read until a 60 s guard killed it (rc 124, `red.txt`); green = refused
+`artifact_unavailable` with no snapshot left (`green.txt`, StalledSource 5 tests / 33 assertions). The existing
+"deadline checked before the first read" case now passes because the deadline check runs before stream setup.
+Directory SQLite 154 / 1109, 2 native-only skips; Pint passed. NFS-backed regular files remain the reviewer's
+host-local storage condition for the sources adapter.
