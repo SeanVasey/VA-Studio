@@ -737,3 +737,81 @@ The `17ef19bc` and `06dfb531` changes are filesystem and policy only, so no nati
 - Private instance :3781 (pid 14992) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3781. Its datadir `scratchpad/review-free256d-mysql/data` was deleted.
 - The lifecycle is in `addendum4/native/private-instance-lifecycle.txt`.
 - The review worktree `/home/user/VA-Studio-review-free256b` is detached at `2f787589`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum4/`. Nothing was committed or pushed.
+
+## Addendum 5: publication on render state, sidecar slot skip, native stalled-source test, `2f787589..501b3335` (evidence head `471005ac`)
+
+- Scope:
+  - `256865f7`: Codex P2. A staff close or reopen during a render no longer supersedes the render.
+  - `501b3335`: fixes A4-2 and A4-3.
+- Before checkout, the addendum-4 files were compared byte for byte with `baf5b194`: all identical.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3791 with schema `rv256e`, shut down and its datadir deleted. Other lanes' instances (3711, 3741, 3767) and 3306 were not touched.
+- Evidence is in `review-evidence/addendum5/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `471005ac` for a development merge.**
+
+- A4-2 and A4-3 are closed.
+- The render-state comparison admits nothing it should refuse.
+- No new finding at Low or above.
+- A4-1 and A4-4 stay conditions. Codex has re-raised both, and fixes are expected in addendum 6.
+
+### (1) Publication compares `renderState()` only (`256865f7`)
+
+**Can excluding `definition` admit a render that should be refused? No.** Publication still calls `graph()`, which fully re-validates the definition, on both reads. The comparison still covers `origin`, `payload` (the origin's frozen definition copy, profile and buyer binding), `work`, `original`, `manifest` and `revocation`. Taking each definition-level change in turn:
+
+- **Definition row or payload:** append-only, sealed and guarded, so it cannot change between claim and publish. `graph()` refuses any tamper (seal, column-against-payload recomputation, terms hash, and `validateStored` of the profile with provenance equality). The `originGraph()` requirement that the origin's frozen definition, profile and `profile_hash` column equal the definition's still runs on the publish read.
+- **Review:** one per definition and append-only, and it already existed before the origin (`origin.review_id`). It cannot be added, removed or changed between claim and publish; a forged extra row reads `tampered`.
+- **Availability chain:** the only part of the definition that can legitimately change. It gates only new assent (I-4), and the origin's own availability event (append-only, `kind = open`) is still required by `originGraph()`. This is the change that was meant to stop superseding renders.
+- **Profile change:**
+  - The runtime is checked at claim (`requireCurrent`) and by the child's `verifyRuntime`.
+  - At publish, `rendered->profileHash` must equal the hash of the sealed profile.
+  - A changed registry or runtime cannot alter a sealed profile.
+- **Revocation:** compared, so it still blocks publication; the lane regression shows this on MySQL.
+- **Policy or configuration:** `policy->current()` and `prove()` run in the publish transaction. Terms de-approval does not block publication of an accepted origin, which is consistent with I-4.
+
+Native result: `ProductionFreeGrantRenderAvailabilityTest` passed on MySQL. Closing mid-render still publishes, and revoking mid-render still blocks.
+
+### (2) A4-2 and A4-3 (`501b3335`)
+
+- **A4-2, closed.**
+  - `slot()` now skips a slot whose sidecar is not a regular, single-link file owned by this user. It unlinks only a wrong-size own regular file, which `reservation()` then recreates.
+  - This runs only after the slot's own `flock` is held, so no live holder's sidecar is touched.
+  - My addendum-4 sidecar probe now gives: foreign 5-byte `slot-0.reserve` with slots 1 and 2 free → `ok,ok,ok`; a directory at `slot-0.reserve` → `ok`; an own short sidecar is reclaimed to 20 bytes; no temporary names left.
+- **A4-3, closed.** The wall-clock bound on the redeem case is gone. The read-count bound and the slot and reservation release assertions remain.
+  - **Native re-run:** `ProductionFreeGrantStalledSourceTest` and `ProductionFreeGrantRenderAvailabilityTest` on MySQL: **6 tests, 38 assertions, 0 failures, rc=0** (08:44:58Z to 09:00:15Z).
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `471005ac` | SQLite | 0 | 145 tests, 1056 assertions, 2 skipped |
+| `ProductionFreeGrantStalledSourceTest` and `ProductionFreeGrantRenderAvailabilityTest` | MySQL :3791 | 0 | 6 tests, 38 assertions, 0 skipped |
+| Addendum-4 `SidecarProbeTest` re-run | SQLite | 0 | A4-2 flip, as above |
+| Pint `--test` on the 5 changed PHP files | n/a | 0 | passed |
+
+SHA-256 of the changed files is in `addendum5/sha256-501b3335.txt`:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantDocuments.php` | `ccf185db6748b92c9c969788b4a51d055a611923fc16b6ef8f9ca8fcd89fa68c` |
+| `ProductionFreeGrantSpool.php` | `c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66` |
+
+### Conditions after Addendum 5
+
+- **Closed:** A4-2 and A4-3.
+- **Open:**
+  - A4-1 and A4-4 (fixes in progress);
+  - the source-adapter note (host-local storage or a configurable per-read cap);
+  - Renderable r2 or hash-checked font inputs;
+  - A1-1, the `contention` mount mapping, and A1-7 with the identity key-rotation handling;
+  - A2-2;
+  - conditions 3 and 5;
+  - F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3791 (pid 10637) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3791. Its datadir `scratchpad/review-free256e-mysql/data` was deleted.
+- The lifecycle is in `addendum5/native/private-instance-lifecycle.txt`.
+- The review worktree `/home/user/VA-Studio-review-free256b` is detached at `471005ac`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum5/`. Nothing was committed or pushed.

@@ -1,0 +1,3 @@
+$ vendor/bin/pint --test <PHP files changed in 2f787589..501b3335 under app/ and tests/>
+{"tool":"pint","result":"passed"}
+rc=0
