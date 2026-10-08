@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" tests="3" assertions="22" errors="0" failures="0" skipped="0" time="351.773745">
+    <testcase name="test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="26" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="13" time="91.275506"/>
+    <testcase name="test_native_timestamp_and_uuid_guards_refuse_malformed_text" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="41" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="7" time="130.045385"/>
+    <testcase name="test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl" file="/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="56" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="2" time="130.452855"/>
+  </testsuite>
+</testsuites>

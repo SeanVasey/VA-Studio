@@ -1,0 +1,209 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255/phpunit.xml
+
+.................................................S.....SS......  63 / 792 (  7%)
+.........................................SS.................... 126 / 792 ( 15%)
+............SFF.........................SSSSS.................. 189 / 792 ( 23%)
+.......S........SS.S..................S........................ 252 / 792 ( 31%)
+............................................................... 315 / 792 ( 39%)
+............................................................... 378 / 792 ( 47%)
+.....................S......................................... 441 / 792 ( 55%)
+........SSSSS.SS.....................................SSS....... 504 / 792 ( 63%)
+......S.......S.....SSS.......E.................EEEEES......... 567 / 792 ( 71%)
+..............EEEEEEEEE...................................SSSS. 630 / 792 ( 79%)
+...S........................................................... 693 / 792 ( 87%)
+............................................................... 756 / 792 ( 95%)
+....................................                            792 / 792 (100%)
+
+Time: 17:01.112, Memory: 577.00 MB
+
+There were 15 errors:
+
+1) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#17 with data ('view under absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#18 with data ('uppercase absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#19 with data ('foreign index under absent ow...x name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#20 with data ('foreign table under absent guard name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-tax255/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-tax255/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 0 with data (0)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 1 with data (1)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 2 with data (2)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 3 with data (3)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+12) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 4 with data (4)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+13) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 5 with data (5)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+14) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 6 with data (6)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+15) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 7 with data (7)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-tax255/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-tax255/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate@empty with data (false)
+Operational teardown admitted.
+
+/home/user/VA-Studio-tax255/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate@populated with data (true)
+Operational teardown admitted.
+
+/home/user/VA-Studio-tax255/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 792, Assertions: 11520, Errors: 15, Failures: 2, Skipped: 38.
