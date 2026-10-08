@@ -1,0 +1,697 @@
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentity
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+S.......................................SSSSSSS.................. 65 / 66 ( 98%)
+.                                                                 66 / 66 (100%)
+
+Time: 01:24.151, Memory: 141.00 MB
+
+OK, but some tests were skipped!
+Tests: 66, Assertions: 328, Skipped: 8.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentityAdapters
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.........................S............................S...        58 / 58 (100%)
+
+Time: 01:38.285, Memory: 135.00 MB
+
+OK, but some tests were skipped!
+Tests: 58, Assertions: 359, Skipped: 2.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionFeatures
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.............................................................SSS. 65 / 89 ( 73%)
+........................                                          89 / 89 (100%)
+
+Time: 02:47.625, Memory: 251.00 MB
+
+OK, but some tests were skipped!
+Tests: 89, Assertions: 915, Skipped: 3.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionSuppression
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+......................................SSSSSS....                  48 / 48 (100%)
+
+Time: 01:13.685, Memory: 165.00 MB
+
+OK, but some tests were skipped!
+Tests: 48, Assertions: 697, Skipped: 6.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionAccountFeatures
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:04.859, Memory: 90.00 MB
+
+OK (3 tests, 65 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionMembership
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.................................SSS.......                       43 / 43 (100%)
+
+Time: 00:37.534, Memory: 113.00 MB
+
+OK, but some tests were skipped!
+Tests: 43, Assertions: 125, Skipped: 3.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionMembershipBilling
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...............................................................  63 / 115 ( 54%)
+....................................................            115 / 115 (100%)
+
+Time: 01:26.732, Memory: 147.00 MB
+
+OK (115 tests, 520 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionMemberOriginals
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.....................S..                                          24 / 24 (100%)
+
+Time: 00:21.680, Memory: 101.00 MB
+
+OK, but some tests were skipped!
+Tests: 24, Assertions: 63, Skipped: 1.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionTaxCheckout
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.........................................................SSSSSS  63 / 142 ( 44%)
+SSSSSSSSSSS.................................................... 126 / 142 ( 88%)
+................                                                142 / 142 (100%)
+
+Time: 02:32.410, Memory: 170.00 MB
+
+OK, but some tests were skipped!
+Tests: 142, Assertions: 995, Skipped: 17.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerAccountAccessTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 00:07.288, Memory: 87.00 MB
+
+OK (6 tests, 21 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerAccountCommerceTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+........                                                            8 / 8 (100%)
+
+Time: 00:25.452, Memory: 106.00 MB
+
+OK (8 tests, 65 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerAccountConcurrencyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+SSSSSSSSS                                                           9 / 9 (100%)
+
+Time: 00:00.408, Memory: 63.00 MB
+
+OK, but some tests were skipped!
+Tests: 9, Assertions: 0, Skipped: 9.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerAccountMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:07.298, Memory: 91.00 MB
+
+OK (7 tests, 106 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerConsentAdmissionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+......................                                            22 / 22 (100%)
+
+Time: 00:22.277, Memory: 107.00 MB
+
+OK (22 tests, 48 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerConsentBoundaryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.................                                                 17 / 17 (100%)
+
+Time: 00:01.841, Memory: 85.00 MB
+
+OK (17 tests, 42 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerConsentMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+....................                                              20 / 20 (100%)
+
+Time: 00:21.015, Memory: 105.00 MB
+
+OK (20 tests, 162 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerConsentPreferencesTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.............................                                     29 / 29 (100%)
+
+Time: 00:04.008, Memory: 89.00 MB
+
+OK (29 tests, 147 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityConcurrencyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+SSSSSSSSS                                                           9 / 9 (100%)
+
+Time: 00:00.628, Memory: 63.00 MB
+
+OK, but some tests were skipped!
+Tests: 9, Assertions: 0, Skipped: 9.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityHttpTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..........                                                        10 / 10 (100%)
+
+Time: 00:16.142, Memory: 99.00 MB
+
+OK (10 tests, 109 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:03.575, Memory: 83.00 MB
+
+OK (2 tests, 14 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..............                                                    14 / 14 (100%)
+
+Time: 00:14.545, Memory: 97.00 MB
+
+OK (14 tests, 141 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.................                                                 17 / 17 (100%)
+
+Time: 00:27.369, Memory: 103.00 MB
+
+OK (17 tests, 90 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSessionHttpTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.........                                                           9 / 9 (100%)
+
+Time: 00:16.192, Memory: 99.00 MB
+
+OK (9 tests, 118 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionKeyAdmissionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..............SS...                                               19 / 19 (100%)
+
+Time: 00:20.065, Memory: 97.00 MB
+
+OK, but some tests were skipped!
+Tests: 19, Assertions: 133, Skipped: 2.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.............................                                     29 / 29 (100%)
+
+Time: 00:32.550, Memory: 119.00 MB
+
+OK (29 tests, 132 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionNativeAdmissionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+S                                                                   1 / 1 (100%)
+
+Time: 00:00.227, Memory: 59.00 MB
+
+OK, but some tests were skipped!
+Tests: 1, Assertions: 0, Skipped: 1.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionRetainedTargetTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:02.343, Memory: 83.00 MB
+
+OK (2 tests, 8 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionSourceBoundaryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:07.030, Memory: 89.00 MB
+
+OK (7 tests, 90 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerSuppressionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..................................                                34 / 34 (100%)
+
+Time: 00:35.557, Memory: 113.00 MB
+
+OK (34 tests, 298 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionAmountInputConsistencyAccessTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 00:29.984, Memory: 110.00 MB
+
+OK (15 tests, 113 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionAmountRequirementsAccessTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 00:24.726, Memory: 106.00 MB
+
+OK (12 tests, 82 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionBuyerAssentObservationMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:08.632, Memory: 98.00 MB
+
+OK (4 tests, 24 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionBuyerAssentObservationsTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+......................                                            22 / 22 (100%)
+
+Time: 00:43.557, Memory: 114.00 MB
+
+OK (22 tests, 82 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutCommittedReceiptTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 00:58.457, Memory: 108.00 MB
+
+OK (12 tests, 56 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutCommittedRowsTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......S                                                            8 / 8 (100%)
+
+Time: 00:00.580, Memory: 61.00 MB
+
+OK, but some tests were skipped!
+Tests: 8, Assertions: 20, Skipped: 1.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutExemptionAuthorityTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 00:24.056, Memory: 104.00 MB
+
+OK (11 tests, 50 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutFreshPolicyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:08.292, Memory: 91.00 MB
+
+OK (3 tests, 14 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutHttpBoundaryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+................                                                  16 / 16 (100%)
+
+Time: 00:00.655, Memory: 67.00 MB
+
+OK (16 tests, 134 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutJourneyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:32.690, Memory: 104.00 MB
+
+OK (7 tests, 81 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutMigrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+............SSSSS.                                                18 / 18 (100%)
+
+Time: 00:20.906, Memory: 103.00 MB
+
+OK, but some tests were skipped!
+Tests: 18, Assertions: 132, Skipped: 5.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutNativeRaceTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+SS                                                                  2 / 2 (100%)
+
+Time: 00:02.082, Memory: 81.00 MB
+
+OK, but some tests were skipped!
+Tests: 2, Assertions: 0, Skipped: 2.
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutObserverExclusionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:09.406, Memory: 98.00 MB
+
+OK (2 tests, 18 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:07.030, Memory: 85.00 MB
+
+OK (7 tests, 21 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutReceiptParentTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:18.469, Memory: 100.00 MB
+
+OK (4 tests, 20 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:03.588, Memory: 88.00 MB
+
+OK (1 test, 11 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutSourceTransactionTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 00:46.736, Memory: 108.00 MB
+
+OK (11 tests, 69 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..........................                                        26 / 26 (100%)
+
+Time: 01:31.504, Memory: 120.00 MB
+
+OK (26 tests, 187 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCheckoutWriteCommitTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 00:39.477, Memory: 108.00 MB
+
+OK (12 tests, 90 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionCommerceReadinessTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+................................................................. 65 / 66 ( 98%)
+.                                                                 66 / 66 (100%)
+
+Time: 00:01.666, Memory: 75.00 MB
+
+OK (66 tests, 334 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentityRegistrationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:10.015, Memory: 91.00 MB
+
+OK (7 tests, 118 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentitySmtpBindingTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..............                                                    14 / 14 (100%)
+
+Time: 00:04.483, Memory: 87.00 MB
+
+OK (14 tests, 61 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Unit/ProductionFeatures
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:00.298, Memory: 61.00 MB
+
+OK (4 tests, 21 assertions)
+exit=0
+
+DONE
