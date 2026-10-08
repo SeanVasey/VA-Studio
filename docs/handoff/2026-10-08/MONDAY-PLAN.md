@@ -104,7 +104,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 | S-4 | Stripe **test** account ID, `sk_test_` key, and the webhook secret (`whsec_`) or a Stripe CLI login on the host, through a secret channel and never in chat or the repo | M-03–M-05 | needed Friday |
 | S-5 | A second staff person or account: license approval must come from a different staff account than the contributor | M-11 | needed Saturday |
 | S-6 | Seller preview tag WAV; nothing can publish without it | M-11 | needed Saturday |
-| S-7 | 3–10 tracks: WAV masters, artwork, optional stems (200 MiB cap each), metadata and rights references | M-11 | needed Saturday |
+| S-7 | 3–10 tracks: WAV masters (up to 200 MiB each), artwork (up to **20 MiB** each), optional stems as one ZIP per track (up to 200 MiB), plus metadata and rights references. Limits from `app/Application/Media/IngestMediaUpload.php:63`. | M-11 | needed Saturday |
 | S-8 | License tiers, terms text and USD prices, plus the seller legal name and buyer assent text for the test order policy | M-03, M-11 | needed Saturday |
 | S-9 | BeatStars catalog export (whatever BeatStars provides), placed in private storage, never in the repo | M-09, M-10 | needed Saturday |
 | S-10 | Backup destination (bucket or another server) | M-13 | by Sunday |
