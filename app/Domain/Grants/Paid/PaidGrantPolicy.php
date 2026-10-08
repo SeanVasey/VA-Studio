@@ -25,8 +25,33 @@ final class PaidGrantPolicy
             && in_array($policy['provenance'], ['synthetic_rehearsal', 'verified_production'], true)
             && is_int($policy['max_downloads']) && $policy['max_downloads'] >= 1 && $policy['max_downloads'] <= 100
             && is_int($policy['authorization_seconds']) && $policy['authorization_seconds'] >= 30 && $policy['authorization_seconds'] <= 600, 503);
+        $this->transfer();
 
         return $policy;
+    }
+
+    /**
+     * Seconds an admitted transfer may stream, counted from the redemption commit and independent of the authorization
+     * lifetime: the base allowance plus the size at the minimum rate, capped.
+     */
+    public function transferSeconds(int $bytes): int
+    {
+        $transfer = $this->transfer();
+        PaidGrantException::require($bytes >= 1, 503);
+
+        return min($transfer['max'], $transfer['base'] + intdiv($bytes + $transfer['rate'] - 1, $transfer['rate']));
+    }
+
+    /** @return array{rate:int,base:int,max:int} Bounds mirror ProductionFreeGrantPolicy. */
+    private function transfer(): array
+    {
+        $rate = config('paid-grants.transfer_min_bytes_per_second');
+        $base = config('paid-grants.transfer_base_seconds');
+        $max = config('paid-grants.transfer_max_seconds');
+        PaidGrantException::require(is_int($rate) && $rate >= 16384 && $rate <= 1073741824 && is_int($base) && $base >= 0 && $base <= 600
+            && is_int($max) && $max >= 60 && $max <= 14400, 503);
+
+        return ['rate' => $rate, 'base' => $base, 'max' => $max];
     }
 
     /** Captured repository only: caller resolves all injectable services before terminal raw proof. */

@@ -74,6 +74,15 @@ async function readJson(response: Response, signal: AbortSignal): Promise<unknow
 }
 const csrf = () => document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? null;
 const unknown = 'The result could not be confirmed. Refresh saved licenses before deliberately retrying the same request.';
+/**
+ * Client abort per operation, in milliseconds. A mutating request waits past the server's own hard budget (60 s for
+ * finalize and authorize, the 300 s render lease for document) plus the 5 s session-lock wait and a 15 s margin, so the
+ * browser never discards an answer the server can still commit; a deliberate retry then cannot race the original.
+ * Reads change nothing and stay short. Measured native work: finalize 18 s, authorize 12-20 s, document 65-76 s
+ * (docs/verification/paid252-composition-20261007/hardening/codex-1/README.md).
+ */
+export const paidRequestTimeouts = { read: 30_000, finalize: 80_000, authorize: 80_000, document: 320_000 } as const;
+export type PaidOperation = keyof typeof paidRequestTimeouts;
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
   const [status, setStatus] = useState<Status | null>(null), [authorization, setAuthorization] = useState<Authorization | null>(null);
@@ -90,10 +99,10 @@ export function PaidGrantJourney() {
     return () => { active.current = false; generation.current++; request.current?.abort(); frames.current.forEach(f => f.remove()); window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', visibility); };
   }, []);
   useEffect(() => { if (message) alert.current?.focus(); }, [message]);
-  async function call(path: string, body: Record<string, unknown> | null, commit: (x: unknown) => void) {
+  async function call(operation: PaidOperation, path: string, body: Record<string, unknown> | null, commit: (x: unknown) => void) {
     if (inflight.current || denied) return; inflight.current = true; setBusy(true); setMessage(''); setAuthorization(null);
     const abort = new AbortController(), mine = ++generation.current; request.current = abort;
-    const timer = window.setTimeout(() => abort.abort(), 20_000), owns = () => active.current && mine === generation.current;
+    const timer = window.setTimeout(() => abort.abort(), paidRequestTimeouts[operation]), owns = () => active.current && mine === generation.current;
     try {
       const token = csrf(); if (body && !token) { refuse(); return; }
       const response = await Promise.race([fetch(path, { method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: abort.signal,
@@ -113,9 +122,9 @@ export function PaidGrantJourney() {
     } catch { if (owns()) { if (!body) { setData(null); setOrigin(null); setStatus(null); } setMessage(unknown); } }
     finally { window.clearTimeout(timer); if (owns()) { inflight.current = false; setBusy(false); request.current = null; } }
   }
-  function refresh() { void call('/paid-grants/index', null, x => { if (!listing(x)) throw new Error(); setData(x); setOrigin(null); setStatus(null); setReviewedSaved(true); }); }
-  function open(id: string, orderId: string) { setOrigin(null); setStatus(null); setOrder(''); void call(`/paid-grants/origins/${id}`, null, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== id || x.origin.orderId !== orderId) throw new Error(); setOrigin(x.origin); }); }
-  function execute(p: Pending) { void call(p.path, p.body, x => {
+  function refresh() { void call('read', '/paid-grants/index', null, x => { if (!listing(x)) throw new Error(); setData(x); setOrigin(null); setStatus(null); setReviewedSaved(true); }); }
+  function open(id: string, orderId: string) { setOrigin(null); setStatus(null); setOrder(''); void call('read', `/paid-grants/origins/${id}`, null, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== id || x.origin.orderId !== orderId) throw new Error(); setOrigin(x.origin); }); }
+  function execute(p: Pending) { void call(p.orderId ? 'finalize' : 'authorize', p.path, p.body, x => {
     if (p.orderId) { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.orderId !== p.orderId) throw new Error(); setOrigin(x.origin); setOrder(''); setStatus(null); }
     else { const a = obj(x) && exact(x, ['authorization']) ? x.authorization : null, line = p.origin?.lines.find(l => l.id === p.lineId);
       if (!obj(a) || !exact(a, ['id', 'token', 'expiresAt', 'kind', 'filename', 'mimeType']) || !uuid(a.id) || typeof a.token !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(a.token)
@@ -126,8 +135,8 @@ export function PaidGrantJourney() {
     setPending(null); setReviewedSaved(false);
   }); }
   function finalize() { if (!uuid(order) || pending) return; const p: Pending = { path: `/paid-grants/orders/${order}/finalize`, body: {}, orderId: order }; setPending(p); setReviewedSaved(false); execute(p); }
-  function prepare() { if (!origin) return; const o = origin; void call(`/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
-  function savedStatus() { if (!origin) return; const o = origin; void call(`/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setReviewedSaved(true); }); }
+  function prepare() { if (!origin) return; const o = origin; void call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
+  function savedStatus() { if (!origin) return; const o = origin; void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setReviewedSaved(true); }); }
   function authorize(lineId: string, k: Kind) { if (!origin || pending || !origin.fulfilled) return; const line = origin.lines.find(l => l.id === lineId); if (!line) return;
     const nonce = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
     const p: Pending = { path: `/paid-grants/origins/${origin.id}/lines/${lineId}/authorize`, body: { requestKey: crypto.randomUUID(), originHash: line.originHash, kind: k, nonce }, origin, lineId };

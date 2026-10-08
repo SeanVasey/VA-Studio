@@ -8,6 +8,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
@@ -16,6 +17,9 @@ use Throwable;
 final class PaidGrantDownloads
 {
     private const KINDS = ['contract', 'master_wav', 'download_mp3', 'stems_zip'];
+
+    /** @param  ?Closure():int  $clock  Monotonic nanoseconds for the transfer deadline; the system clock when null. */
+    public function __construct(private readonly ?Closure $clock = null) {}
 
     /** No token or path is returned, and DB preparation status never claims continuing physical availability. */
     public function status(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
@@ -107,13 +111,19 @@ final class PaidGrantDownloads
         PaidGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 403);
         $deadline = PaidGrantDeadline::start();
         $locator = $this->locate($id, $principal, $actor);
-        $inspect = function (array $graph, PaidGrantRows $rows) use ($locator, $id, $token): array {
+        // The authorization lifetime is the valid-to-start deadline: the first frame compares it with its own current time,
+        // and the second frame re-checks that same admitted instant, so a slow snapshot cannot turn a redemption that
+        // started in time into an expired one. The original observation budget still bounds both frames and the snapshot;
+        // the stream then gets a transfer deadline derived from the snapshot size (see below).
+        $admitted = null;
+        $inspect = function (array $graph, PaidGrantRows $rows) use ($locator, $id, $token, &$admitted): array {
             $matches = array_values(array_filter($graph['lines'], fn (array $line): bool => (int) $line['origin']['id'] === (int) $locator['origin_id']));
             PaidGrantException::require(count($matches) === 1 && $graph['complete'] !== null, 404);
             $line = $matches[0];
             $auth = $rows->one('paid_authorizations', 'public_id = ? AND account_id = ?', [$id, $graph['batch']['account_id']]);
             PaidGrantException::require($auth === $locator['auth'] && hash_equals($auth['token_hash'], hash('sha256', $token)), 403);
-            $this->live($auth, $rows);
+            $admitted ??= CarbonImmutable::now('UTC');
+            $this->live($auth, $rows, $admitted);
             $payload = PaidGrantRecords::decode($auth);
             PaidGrantException::require($payload['schema_version'] === 'paid-authorization-v1' && $payload['batch_hash'] === $graph['batch']['payload_hash']
                 && $payload['origin_hash'] === $line['origin']['payload_hash'] && $payload['fulfillment_hash'] === $graph['fulfillment']['payload_hash']
@@ -125,10 +135,14 @@ final class PaidGrantDownloads
         $commands = new PaidGrantCommands;
         $before = $commands->run($locator['batch_id'], $principal, $actor, $inspect, $deadline,
             additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($locator['auth'], $rows));
-        $deadline->shortenTo($this->deadline($before['auth']));
+        // Kept from the original flow: the lifetime must still remain (and stay within the policy maximum) when the first
+        // frame closes. It no longer shortens the snapshot, the commit frame or the transfer.
+        $this->deadline($before['auth']);
         $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $deadline->value());
         $projectionRead = PaidGrantProjectionRead::begin();
         try {
+            // Derived and validated before the attempt is consumed, so a refused transfer policy records nothing.
+            $seconds = app(PaidGrantPolicy::class)->transferSeconds($prepared->sizeBytes);
             $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before): array {
                 $current = $inspect($graph, $rows);
                 PaidGrantException::require($current === $before, 409);
@@ -139,8 +153,9 @@ final class PaidGrantDownloads
             }, $deadline, additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($before['auth'], $rows),
                 projectionRead: $projectionRead);
 
+            // Counted from the redemption commit; the first byte still needs the original observation budget (proveBeforeBytes).
             return new PaidGrantTransfer($prepared, $this->filename($before['line']['origin']['public_id'], $before['auth']['target']), $this->mime($before['auth']['target']),
-                $projectionRead, $deadline->value());
+                $projectionRead, $this->tick() + $seconds * 1_000_000_000, $this->clock);
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;
@@ -217,9 +232,14 @@ final class PaidGrantDownloads
         return [['paid_authorizations', 'id = ?', [$auth['id']], 2, [$auth]], $this->attemptSnapshot((int) $auth['origin_id'], $rows, $attempts)];
     }
 
-    private function live(array $auth, PaidGrantRows $rows): void
+    private function tick(): int
     {
-        PaidGrantException::require(CarbonImmutable::now('UTC')->lessThan($auth['expires_at']), 410);
+        return $this->clock === null ? hrtime(true) : ($this->clock)();
+    }
+
+    private function live(array $auth, PaidGrantRows $rows, ?CarbonImmutable $at = null): void
+    {
+        PaidGrantException::require(($at ?? CarbonImmutable::now('UTC'))->lessThan($auth['expires_at']), 410);
         PaidGrantException::require($rows->one('paid_redemptions', 'authorization_id = ?', [$auth['id']]) === [], 409);
     }
 

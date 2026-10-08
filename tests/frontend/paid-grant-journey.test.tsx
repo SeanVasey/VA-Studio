@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PaidGrantJourney, validPaidOrigin, type PaidOrigin } from '../../resources/js/components/PaidGrantJourney';
+import { PaidGrantJourney, paidRequestTimeouts, validPaidOrigin, type PaidOrigin } from '../../resources/js/components/PaidGrantJourney';
 
 const batchId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', orderId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', lineId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', authorizationId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
 const origin: PaidOrigin = { id: batchId, orderId, purpose: 'paid-license-grant', provenance: 'synthetic_rehearsal', fulfilled: false, lines: [{ id: lineId, originHash: 'a'.repeat(64), position: 1,
@@ -94,5 +94,65 @@ describe('mounted original paid-purpose journey', () => {
     expect(validPaidOrigin({ ...complete, ownerKey: 'PRIVATE' })).toBe(false); expect(validPaidOrigin({ ...complete, purpose: 'free-license-grant' })).toBe(false);
     expect(validPaidOrigin({ ...complete, fulfilled: false })).toBe(false); expect(validPaidOrigin({ ...complete, lines: [complete.lines[0], complete.lines[0]] })).toBe(false);
     expect(validPaidOrigin({ ...complete, lines: [{ ...complete.lines[0], files: [{ ...complete.lines[0].files[0], storagePath: 'PRIVATE' }] }] })).toBe(false);
+  });
+});
+
+describe('per-operation request timeouts', () => {
+  const authorization = { id: authorizationId, token: 'REPLAYED_SYNTHETIC_PAID_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'master_wav', filename: `paid-license-${lineId}-master_wav.wav`, mimeType: 'audio/wav' };
+  const pendingFetch = (signals: AbortSignal[]) => (_: unknown, init?: RequestInit) => { signals.push(init!.signal!); return new Promise<Response>(() => {}); };
+  it('sizes each abort from the measured server work instead of one 20 s limit', async () => {
+    expect(paidRequestTimeouts).toEqual({ read: 30_000, finalize: 80_000, authorize: 80_000, document: 320_000 });
+    const timers = vi.spyOn(window, 'setTimeout');
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin })).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null, history: [] }] } }))
+      .mockResolvedValueOnce(response({ authorization })).mockResolvedValueOnce(response({ origin: complete }));
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await screen.findByRole('button', { name: 'Authorize master_wav for Original synthetic recording' });
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await screen.findByLabelText('Download status for Original synthetic recording');
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' })); await screen.findByRole('button', { name: 'Download authorized file' });
+    fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: orderId } });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare licenses for this paid order' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(6));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Prepare licenses for this paid order' })).toBeDisabled());
+    // Only the component's request aborts are longer than the testing library's own 1 s polling bound.
+    const aborts = timers.mock.calls.map(([, delay]) => delay ?? 0).filter(delay => delay > 1_000);
+    expect(fetcher.mock.calls.map(([path]) => String(path))).toEqual(['/paid-grants/index', `/paid-grants/origins/${batchId}`, `/paid-grants/origins/${batchId}/document`,
+      `/paid-grants/origins/${batchId}/downloads`, `/paid-grants/origins/${batchId}/lines/${lineId}/authorize`, `/paid-grants/orders/${orderId}/finalize`]);
+    expect(aborts).toEqual([30_000, 30_000, 320_000, 30_000, 80_000, 80_000]);
+  });
+  it('keeps a measured-length document preparation open and still aborts it at its own bound', async () => {
+    const signals: AbortSignal[] = [];
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin })).mockImplementationOnce(pendingFetch(signals));
+    render(<PaidGrantJourney />); await openSaved();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await act(() => vi.advanceTimersByTimeAsync(100_000)); expect(signals[0].aborted).toBe(false);
+    await act(() => vi.advanceTimersByTimeAsync(219_999)); expect(signals[0].aborted).toBe(false);
+    await act(() => vi.advanceTimersByTimeAsync(1)); expect(signals[0].aborted).toBe(true);
+    vi.useRealTimers();
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+  });
+  it('recovers the same server authorization when a timed-out authorize is deliberately replayed', async () => {
+    const signals: AbortSignal[] = [];
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockImplementationOnce(pendingFetch(signals))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ authorization }));
+    render(<PaidGrantJourney />); await openSaved();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' }));
+    // The measured native authorize took 12-20 s; the old unconditional 20 s abort discarded the only token here.
+    await act(() => vi.advanceTimersByTimeAsync(79_999)); expect(signals[0].aborted).toBe(false);
+    await act(() => vi.advanceTimersByTimeAsync(1)); expect(signals[0].aborted).toBe(true);
+    vi.useRealTimers();
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+    const retry = screen.getByRole('button', { name: 'Retry the exact request' }); expect(retry).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh paid licenses' })); await waitFor(() => expect(retry).toBeEnabled());
+    fireEvent.click(retry); await screen.findByRole('button', { name: 'Download authorized file' });
+    expect(screen.getByText(`${authorization.filename}; expires ${authorization.expiresAt} UTC.`)).toBeInTheDocument();
+    const [first, replay] = [fetcher.mock.calls[2], fetcher.mock.calls[4]];
+    // Same path and byte-identical body: the server's (account, requestKey) replay returns the same row and token, never a second one.
+    expect(replay[0]).toBe(first[0]); expect(replay[1]?.body).toBe(first[1]?.body);
+    expect(JSON.parse(String(replay[1]?.body))).toEqual({ requestKey: expect.stringMatching(/^[a-f0-9-]{36}$/), originHash: origin.lines[0].originHash, kind: 'master_wav', nonce: expect.stringMatching(/^[a-f0-9]{64}$/) });
+    expect(screen.queryByRole('button', { name: 'Retry the exact request' })).not.toBeInTheDocument();
   });
 });
