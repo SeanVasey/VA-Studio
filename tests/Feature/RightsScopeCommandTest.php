@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\ManageRightsScopes;
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\Quote;
@@ -9,10 +10,16 @@ use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\QuoteException;
 use App\Models\User;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Testing\PendingCommand;
+use Mockery;
+use RuntimeException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Question\Question;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\OrderFixtures;
@@ -210,6 +217,31 @@ class RightsScopeCommandTest extends TestCase
             $this->artisan('vasey:rights-scope', $arguments)->expectsOutputToContain('Invalid input')->assertExitCode(2);
         }
         $this->assertSame($before, $this->evidence());
+    }
+
+    public function test_staff_password_prompt_disables_visible_fallback_and_refuses_when_hiding_fails(): void
+    {
+        $command = app(ManageRightsScopes::class);
+        $command->setLaravel($this->app);
+        $input = new ArrayInput(['action' => 'register', '--actor-id' => '1',
+            '--scope' => 'synthetic-review-scope', '--reference' => 'SYNTHETIC-NONSECRET-REFERENCE'], $command->getDefinition());
+        $input->setInteractive(true);
+        $buffer = new BufferedOutput;
+        $output = Mockery::mock(OutputStyle::class.'[askQuestion]', [$input, $buffer]);
+        $observed = null;
+        $output->shouldReceive('askQuestion')->once()->andReturnUsing(function (Question $question) use (&$observed): void {
+            $observed = ['hidden' => $question->isHidden(), 'fallback' => $question->isHiddenFallback()];
+            throw new RuntimeException('Unable to hide response.');
+        });
+        $before = $this->evidence();
+
+        $this->assertSame(1, $command->run($input, $output));
+        $this->assertSame(['hidden' => true, 'fallback' => false], $observed,
+            'Unsupported hidden input must never fall back to visible password entry.');
+        $this->assertSame($before, $this->evidence());
+        $text = $buffer->fetch();
+        $this->assertStringContainsString('Rights scope management is unavailable. No changes were made.', $text);
+        $this->assertStringNotContainsString('Unable to hide response.', $text);
     }
 
     public function test_domain_rejected_formats_and_unknown_records_fail_clearly_after_authentication(): void

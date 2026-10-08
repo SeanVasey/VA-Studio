@@ -95,7 +95,7 @@ final class ManageRightsScopes extends Command
     /** Current persisted credentials; authority itself is re-read by the domain inside its transaction. */
     private function authenticate(): ?User
     {
-        $password = $this->secret('Staff password (hidden)');
+        $password = $this->secret('Staff password (hidden)', false);
         $actor = User::query()->find((int) $this->option('actor-id'));
         $valid = $actor !== null && is_string($password) && $password !== '' && Hash::check($password, $actor->getAuthPassword());
         unset($password);
