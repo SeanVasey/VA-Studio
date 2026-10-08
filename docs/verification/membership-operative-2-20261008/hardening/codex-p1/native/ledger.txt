@@ -1,0 +1,13 @@
+2026-10-08T16:05:29Z start BillingNativeStaleRetrievalRaceTest base 83821fc0423d4eadd0715c7077c7ed64caba158d dirty=17
+2026-10-08T16:10:45Z end BillingNativeStaleRetrievalRaceTest phpunit_rc=0
+2026-10-08T16:11:13Z start red-clock-ahead-at-base (scratch worktree at 83821fc0423d4eadd0715c7077c7ed64caba158d, only the new test and worker copied in; db vaseyaudio_codex_p1_red)
+2026-10-08T16:13:10Z end red-clock-ahead-at-base phpunit_rc=rc=1
+2026-10-08T17:06:02Z start mysql-ProductionMembershipBilling base 83821fc0423d4eadd0715c7077c7ed64caba158d dirty=17
+2026-10-08T17:32:32Z end mysql-ProductionMembershipBilling phpunit_rc=143
+2026-10-08T17:32:40Z mysql-ProductionMembershipBilling stopped by the integration owner after 24 of 161 tests (about 1 min per test on MySQL); replaced by the focused native set below
+2026-10-08T17:32:47Z start mysql-BillingSchemaPreparationTest base 83821fc0423d4eadd0715c7077c7ed64caba158d dirty=17
+2026-10-08T17:44:07Z end mysql-BillingSchemaPreparationTest phpunit_rc=0
+2026-10-08T17:44:07Z start mysql-BillingClockSkewOrderingTest base 83821fc0423d4eadd0715c7077c7ed64caba158d dirty=17
+2026-10-08T17:51:26Z end mysql-BillingClockSkewOrderingTest phpunit_rc=0
+2026-10-08T17:51:26Z start mysql-BillingSweepHintsCursorTest base 83821fc0423d4eadd0715c7077c7ed64caba158d dirty=17
+2026-10-08T17:58:50Z end mysql-BillingSweepHintsCursorTest phpunit_rc=0

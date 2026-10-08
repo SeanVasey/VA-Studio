@@ -1,0 +1,130 @@
+$ git rev-parse HEAD: 83821fc0423d4eadd0715c7077c7ed64caba158d (application code unchanged; new tests only)
+$ php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+FFEFFFFE                                                            8 / 8 (100%)
+
+Time: 00:16.787, Memory: 93.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_a_newer_retrieval_on_a_clock_behind_worker_is_admitted_after_an_older_one
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (superseded_retrieval).
+
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingException.php:19
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingLedger.php:120
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingLedger.php:113
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingReconciliation.php:80
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:88
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_the_position_is_committed_before_any_provider_read_and_no_transaction_is_open_during_provider_io
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: production_membership_billing_positions (Connection: sqlite, Database: :memory:, SQL: select count(*) as "aggregate" from "production_membership_billing_positions" where "kind" = retrieval)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4136
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4064
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:173
+/home/user/VA-Studio-member-ops2/tests/Support/InterleavingBillingGateway.php:59
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingReconciliation.php:119
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingReconciliation.php:44
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:176
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: production_membership_billing_positions
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:435
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3636
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3620
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4136
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4064
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:173
+/home/user/VA-Studio-member-ops2/tests/Support/InterleavingBillingGateway.php:59
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingReconciliation.php:119
+/home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingReconciliation.php:44
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:176
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 6 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_an_older_retrieval_on_a_clock_ahead_worker_is_refused_as_superseded_and_the_newer_reversal_stays_the_tail
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'appended'
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:60
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_an_older_first_retrieval_on_a_clock_ahead_worker_cannot_claim_the_tail_after_a_newer_one_created_the_identity
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'appended'
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:73
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_overlapping_retrievals_with_identical_clock_readings_are_still_ordered_and_the_stale_one_is_refused
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'appended'
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_a_retrieval_that_began_before_a_hint_does_not_cover_it_even_when_the_worker_clock_is_ahead_of_the_intake_clock
+A retrieval that began before the hint must not cover it.
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => '8d44931c-ebcd-4ae5-8276-139397f42beb',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:130
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_a_retrieval_that_began_after_a_hint_covers_it_even_when_the_worker_clock_is_behind_the_intake_clock
+A retrieval that began after the hint covers it, whatever the clocks read.
+Failed asserting that Array &0 [
+    'binding_id' => '47eb912f-7ca1-435b-b2fe-b32afda5b090',
+    'invoice_ref' => 'in_SYNTHETIC',
+] is null.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:149
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_a_retrieval_that_began_after_a_hint_in_the_same_clock_instant_covers_it
+Failed asserting that Array &0 [
+    'binding_id' => 'aa6a16db-c388-4719-8d4b-7c3583b334d7',
+    'invoice_ref' => 'in_SYNTHETIC',
+] is null.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php:164
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 8, Assertions: 10, Errors: 2, Failures: 6.
+rc=2
