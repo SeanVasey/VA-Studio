@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member257/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.693, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\MembershipReview\MembershipRowsSqliteFunctionCallbackReviewTest::test_captured_reader_runs_no_application_sqlite_function_during_metadata_sql
+An application SQLite function ran inside captured reader metadata SQL: {"refused":false,"calls":30912,"policy_enabled_after":false}
+Failed asserting that 30912 is identical to 0.
+
+/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MembershipRowsSqliteFunctionCallbackReviewTest.php:49
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member257/docs/verification/membership-257-258-composition-20261007/adversarial/MembershipRowsSqliteFunctionCallbackReviewTest.php:30
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 2[0m[37;41m, Failures: 1[0m[37;41m.[0m

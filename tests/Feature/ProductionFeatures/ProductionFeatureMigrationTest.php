@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionFeatures;
 use App\Domain\Customers\Listening\ListeningLibrary;
 use App\Domain\Customers\Preferences\CustomerConsentPreferences;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureSchema;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionSchema;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -180,6 +181,14 @@ class ProductionFeatureMigrationTest extends TestCase
 
     private function resetProduction(): void
     {
+        // The dependent 254 family references these tables; native MySQL refuses to drop a referenced parent.
+        foreach (array_reverse(ProductionSuppressionSchema::TABLES) as $table) {
+            if (DB::getSchemaBuilder()->hasTable($table)) {
+                $this->assertSame(0, DB::table($table)->count());
+                DB::unprepared('DROP TABLE `'.$table.'`');
+            }
+        }
+        DB::table('migrations')->where('migration', ProductionSuppressionSchema::MIGRATION)->delete();
         foreach (array_reverse(ProductionFeatureSchema::TABLES) as $table) {
             $this->assertSame(0, DB::table($table)->count());
             DB::unprepared('DROP TABLE `'.$table.'`');

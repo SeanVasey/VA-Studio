@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionIntentGuardTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionIntentGuardTest.php" tests="1" assertions="13" errors="0" failures="0" skipped="0" time="2.581427">
+    <testcase name="test_intent_is_refused_before_its_withdrawal_event_and_accepted_at_the_same_instant" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionIntentGuardTest.php" line="25" class="Tests\Feature\ProductionSuppression\ProductionSuppressionIntentGuardTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionIntentGuardTest" assertions="13" time="2.581427"/>
+  </testsuite>
+</testsuites>

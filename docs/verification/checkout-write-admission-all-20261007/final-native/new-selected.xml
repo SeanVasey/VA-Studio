@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" tests="2" assertions="17" errors="0" failures="0" skipped="0" time="348.490582">
+    <testcase name="test_committing_offer_withdrawal_refuses_new_intent_rolls_back_and_restores_dispatcher" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="45" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="9" time="173.813997"/>
+    <testcase name="test_staff_replays_install_no_observer_and_positive_caller_write_survives" file="/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="189" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="8" time="174.676584"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission2/phpunit.xml
+
+..........F......                                                 17 / 17 (100%)
+
+Time: 00:43.060, Memory: 102.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'authority',
+-    1 => 'authority',
++    0 => 'admitted',
++    1 => 'admitted',
+ ]
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:219
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 17, Assertions: 95, Failures: 1.

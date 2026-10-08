@@ -59,7 +59,8 @@ sensitive, flags still default-off unless Sean activates.
 ### Phase A — Commerce core (T22, WP06/07/08)
 | Step | Deliverable | Status |
 | --- | --- | --- |
-| A1 | Checkout physical-write c6 + receipt 2ec composed, symmetric observer guard, canaries green | PR #41 draft; reviewer running |
+| A1 | Checkout physical-write c6 + receipt 2ec composed, observer guard, refused-frame record fix, config int fix | **merged** PR #41 → `37653bf1`; release blocker A1b below |
+| A1b | Frame admission for intent/basis/authority writes + initiate() re-proof (Codex P1/P2 ×2) | lane `harness/checkout-write-admission-all` running; RELEASE BLOCKER |
 | A2 | Paid252 consumer on composed producer; native 409 root cause; whole-order delivery; root route mount | lane `harness/paid252-composition` running |
 | A3 | Tax255: `ProductionTaxCheckout`, Stripe Checkout `automatic_tax`, SourceV2 + V2 consumer adapter, migration 255000, default off | queued after A1 |
 | A4 | Live-payment preparation packet: SDK/API/mode preflight, webhook signature+dedup checks, unknown-outcome reconciliation, dry-run commands, activation checklist with Sean's inputs | queued after A3 |
@@ -69,7 +70,7 @@ sensitive, flags still default-off unless Sean activates.
 | Step | Deliverable | Status |
 | --- | --- | --- |
 | B1 | Account features 253 reviewed + composed + canonical default-off `production-account-features` config | lane `harness/account-features-253` running |
-| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | lane `harness/pr39-late-findings` running |
+| B2 | PR39 late P2 findings: SuppressionDelivery old-recipient target; IdentityCommittedFrame single-close restoration | fixed on `harness/pr39-late-findings` (pushed); independent review running |
 | B3 | Suppression254 (distinct family from 251; built on 253 withdrawal reader; provider contract default-off) | after B1 |
 | B4 | Root HTTP mount for 253 (session-bound routes, privacy middleware, body caps) + frontend | after B1 |
 | B5 | Email operations preflight: sender/origin/TLS/provider scope, queue/scheduler/retention facts | after B3 |
@@ -77,7 +78,8 @@ sensitive, flags still default-off unless Sean activates.
 ### Phase C — Memberships and member originals (T30/T31, WP11)
 | Step | Deliverable | Status |
 | --- | --- | --- |
-| C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | lane `harness/membership-257-258` running |
+| C1 | 257 (incl. 3cd Rows guard) + 258 preparation reviewed and composed; implementation plan file | reviewed; PR #42 draft; findings F1/F2 → C1b |
+| C1b | F1 (SQLite app-function bypass of Rows guard) and F2 (activation without credit events) | lane `harness/membership-operative-1` running |
 | C2 | Operative 257 writer: reserve/lock/proveCurrent, one period per invoice, award/reserve/consume/release/expire, duplicate-invoice + last-credit independent-process MySQL races | after C1 |
 | C3 | Billing259: Stripe subscription/invoice/payment/charge/balance-transaction evidence adapter, default-off, pinned SDK 21.3.2 / API 2026-08-26.dahlia | after C2 |
 | C4 | 258 member-original renderer/storage/readiness; activation + credit consumption in one owned transaction; HTTP | after C2 |
@@ -118,3 +120,5 @@ geometry (not to be recreated). Each is listed again in the activation packets
 | Date (UTC) | Batch | SHA / PR | Evidence | Decision |
 | --- | --- | --- | --- | --- |
 | 2026-10-07 | A1 compose c6+2ec+guard | `d20d4394`, PR #41 draft | `docs/verification/checkout-composition-20261007/` — SQLite 170/162/8 native-only skips (pre-guard), red regression retained, canaries 5/5, affected 38/37/1 skip, native 8.4.11: exclusion 2/2, rows native 1/1, reviewer receipt pair 2/2, c6 physical canary 1/1 (0 fail/err/skip) | independent review pending; preflight run on d20d4394 was cancelled by the concurrency group (superseded push), live run on aa514349 pending |
+| 2026-10-07 | A1 fix: refused-frame transaction record (reviewer Medium) | `e86381bf`, PR #41 | regression red on 4a8cec40 retained; affected SQLite 37/37; canaries 1/1; native 8.4 regression 1/1; preflight run 42 success on 9d70b4ac | independent APPROVE for e86381bf (addendum in `independent-review/DECISION.md`); carried forward: consumers wrapping a receipt in their own transaction must clear the manager record after abort with a probe-B regression on both drivers |
+| 2026-10-07 | A1 merged | PR #41 merged at `37653bf1` (head `ece5a9ee`, code head `a97937ad`) | preflight run 47 success; Codex security review no findings; Codex code review P1 r4208264406 + P2 r4208264416 + P2 r4208109348 answered and deferred with reviewer agreement | independent APPROVE (addenda 1–3); open RELEASE BLOCKERS: frame admission for intent/basis/authority writes on `harness/checkout-write-admission-all`; conditions: no route/provider registration, no provider_io_enabled until closed |

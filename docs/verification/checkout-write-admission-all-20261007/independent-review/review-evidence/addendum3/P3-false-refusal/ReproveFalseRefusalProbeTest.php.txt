@@ -1,0 +1,155 @@
+<?php
+
+namespace Tests\ReviewProbe;
+
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
+use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
+use App\Domain\Commerce\ProductionPolicy\ProductionTrackCapabilities;
+use App\Domain\Catalog\Models\Track;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ProductionCheckoutGatewayFixture;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+
+/**
+ * Review probe (not part of the repo): benign or planned-set writes either in the window between
+ * prepare()'s commit and proveCreatable(), or inside proveCreatable()'s own commit, on a first
+ * initiate and on a retry after an uncertain create. Records the outcome; asserts nothing about it.
+ */
+final class ReproveFalseRefusalProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use ProductionCheckoutJourneyFixture;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('j', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true]);
+        Queue::fake();
+    }
+
+    public static function scenarios(): array
+    {
+        $out = [];
+        foreach (['window', 'commit'] as $where) {
+            foreach (['unrelated_audit', 'capability_audit', 'track_audit', 'unrelated_user'] as $what) {
+                foreach ([false, true] as $retry) {
+                    $out["$where/$what/".($retry ? 'retry' : 'first')] = [$where, $what, $retry];
+                }
+            }
+        }
+
+        return $out;
+    }
+
+    #[DataProvider('scenarios')]
+    public function test_probe(string $where, string $what, bool $retry): void
+    {
+        $f = $this->payable();
+        $before = 0;
+        if ($retry) {
+            $f['gateway']->loseFirstResponse = true;
+            try {
+                $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (CheckoutException) {
+            }
+            $before = count($f['gateway']->creates);
+        }
+        $draftId = $f['catalog']['candidate']->production_track_policy_draft_id;
+        $trackId = $f['catalog']['items'][0]['trackId'];
+        $actorId = $f['catalog']['actor']->id;
+        $write = function () use ($what, $draftId, $trackId, $actorId): void {
+            [$type, $id] = match ($what) {
+                'unrelated_audit' => ['Review\\Probe\\Unrelated', 424242],
+                'capability_audit' => [ProductionTrackCapabilities::class, $draftId],
+                'track_audit' => [Track::class, $trackId],
+                'unrelated_user' => [null, null],
+            };
+            if ($type === null) {
+                DB::table('users')->insert(['name' => 'probe', 'email' => 'probe-'.bin2hex(random_bytes(4)).'@example.test', 'password' => 'x',
+                    'created_at' => now(), 'updated_at' => now()]);
+
+                return;
+            }
+            DB::table('audit_events')->insert(['actor_id' => $actorId, 'action' => 'review.probe', 'subject_type' => $type, 'subject_id' => $id,
+                'context' => json_encode(['probe' => true]), 'created_at' => now()]);
+        };
+        $armed = false;
+        $acted = 0;
+        app('events')->listen(TransactionCommitting::class, function () use (&$armed, &$acted, $where, $write): void {
+            if ($where === 'commit' && $armed && $acted === 0) {
+                $acted++;
+                $write();
+            }
+        });
+        $f['hosted'] = new HostedCheckout($f['access'], new ProbeGateway($f['gateway'], function () use (&$armed, &$acted, $where, $write): void {
+            if ($where === 'window') {
+                $acted++;
+                $write();
+            }
+            $armed = true;
+        }));
+        $outcome = 'ok';
+        try {
+            $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        } catch (\Throwable $e) {
+            $outcome = $e instanceof CheckoutException ? 'refused:'.$e->reason : get_class($e);
+        }
+        $row = ['scenario' => "$where/$what/".($retry ? 'retry' : 'first'), 'acted' => $acted, 'outcome' => $outcome,
+            'new_creates' => count($f['gateway']->creates) - $before, 'sessions' => DB::table(CheckoutSchema::TABLES['session'])->count(),
+            'observations' => DB::table(CheckoutSchema::TABLES['observation'])->count()];
+        file_put_contents(getenv('PROBE_OUT'), json_encode($row)."\n", FILE_APPEND);
+        $this->assertSame(1, $acted);
+    }
+}
+
+final class ProbeGateway implements ProviderGateway
+{
+    private bool $done = false;
+
+    public function __construct(private readonly ProductionCheckoutGatewayFixture $inner, private readonly \Closure $hook) {}
+
+    public function provenance(ExecutionContextV1 $context): string
+    {
+        if (! $this->done) {
+            $this->done = true;
+            ($this->hook)();
+        }
+
+        return $this->inner->provenance($context);
+    }
+
+    public function account(ExecutionContextV1 $context): array
+    {
+        return $this->inner->account($context);
+    }
+
+    public function create(ExecutionContextV1 $context, array $params, string $key): array
+    {
+        return $this->inner->create($context, $params, $key);
+    }
+
+    public function retrieve(ExecutionContextV1 $context, string $sessionId): array
+    {
+        return $this->inner->retrieve($context, $sessionId);
+    }
+
+    public function paymentIntent(ExecutionContextV1 $context, string $paymentId): array
+    {
+        return $this->inner->paymentIntent($context, $paymentId);
+    }
+}

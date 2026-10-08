@@ -1,0 +1,130 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254-rg/phpunit.xml
+
+.
+[review] fiber-suspended context use from outside callback frame: released-while-suspended
+...[41;37mF[0m[41;37mF[0m[41;37mF[0m...                                                        10 / 10 (100%)
+
+Time: 00:21.885, Memory: 99.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ReviewSupp254\C2C3OnlyReviewTest::test_c3_other_renderers_and_constructorless_instances_never_expose_recipient
+symfony
+Failed asserting that 'App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal {#7114\n
+  -snapshot: array:11 [\n
+    "bindingId" => 1\n
+    "bindingPublicId" => "846849ec-5a6e-47cf-b7a5-ac85cb4c7be0"\n
+    "originalFeatureBinding" => array:4 [\n
+      "buyer_binding" => array:10 [\n
+        "account_id" => 1\n
+        "account_public_id" => "ddd53b88-a9db-46c5-b180-fd0ff1e68653"\n
+        "identity_policy_hash" => "eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c"\n
+        "identity_policy_version" => "personal-store-customer-identity-v1"\n
+        "origin_id" => "493d5389-fc13-4234-82c6-21bec5d0c5e8"\n
+        "provenance" => "synthetic_rehearsal"\n
+        "schema_version" => 1\n
+        "user_id" => 1\n
+        "verification_observation_hash" => "fa0679ef1471bc3f25648a7364242de5b8ddc42a56c9336c4f8e10d3caffb23c"\n
+        "verification_observation_id" => "1d77f831-5874-4dd7-8650-af93e5fb43da"\n
+      ]\n
+      "feature" => "consent_preferences"\n
+      "feature_policy_version" => "production-consent-preferences-identity-v1"\n
+      "feature_schema_version" => 1\n
+    ]\n
+    "originalBindingHash" => "bb8040819e627c1b491777b6e60d30ed42acb40c188721d0cc9f5064335d1b37"\n
+    "withdrawalEventId" => 1\n
+    "withdrawalPublicId" => "db59c5cc-a4f4-4e93-9ca6-9ff791abb4de"\n
+    "withdrawalRevision" => 1\n
+    "consentVersion" => 1\n
+    "recipient" => "<REDACTED-RECIPIENT>"\n
+    "recipientHmac" => "6201888eda79079a2d4ebc99351cf68b73659896822b8e023beefd1efe97f80a"\n
+    "capturedAt" => "2026-10-07 16:32:11"\n
+  ]\n
+  purpose: "email_marketing"\n
+  version: 1\n
+}\n
+' [ASCII](length: 1546) does not contain "review-254-owner" [ASCII](length: 16).
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:168
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ReviewSupp254\ProductionConsentWithdrawalSealTest::test_dump_cast_export_json_and_serialize_never_contain_the_recipient
+var_export
+Failed asserting that '\App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal::__set_state(array(\n
+   'snapshot' => \n
+  array (\n
+    'bindingId' => 1,\n
+    'bindingPublicId' => '3951362c-4977-4044-9063-cf7e98e57b75',\n
+    'originalFeatureBinding' => \n
+    array (\n
+      'buyer_binding' => \n
+      array (\n
+        'account_id' => 1,\n
+        'account_public_id' => '56a61dd6-36a2-4dde-914e-f483f48d6977',\n
+        'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',\n
+        'identity_policy_version' => 'personal-store-customer-identity-v1',\n
+        'origin_id' => '79a5dd53-3167-4b74-b435-34b744926401',\n
+        'provenance' => 'synthetic_rehearsal',\n
+        'schema_version' => 1,\n
+        'user_id' => 1,\n
+        'verification_observation_hash' => '273d278094f14d39409af927ab19ec2becd68bfcf56fdd6d27bc433b5536f44f',\n
+        'verification_observation_id' => '45d11c11-36ff-4596-b6aa-768ce3e3d500',\n
+      ),\n
+      'feature' => 'consent_preferences',\n
+      'feature_policy_version' => 'production-consent-preferences-identity-v1',\n
+      'feature_schema_version' => 1,\n
+    ),\n
+    'originalBindingHash' => 'ded3709637877c3065d1ebbde1faa556961461412c262e19e50b75c691e0a152',\n
+    'withdrawalEventId' => 1,\n
+    'withdrawalPublicId' => 'f14db32b-0c53-4cf4-9c77-a0329c0d841e',\n
+    'withdrawalRevision' => 1,\n
+    'consentVersion' => 1,\n
+    'recipient' => '<REDACTED-RECIPIENT>',\n
+    'recipientHmac' => '11505c47ab5b5e5fa7deaa8607d6a7e56aa6c94528ba2d22bcc17dac847e2238',\n
+    'capturedAt' => '2026-10-07 16:32:13',\n
+  ),\n
+))' [ASCII](length: 1556) does not contain "<REDACTED-RECIPIENT>" [ASCII](length: 30).
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionConsentWithdrawalSealTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ReviewSupp254\ProductionConsentWithdrawalSealTest::test_clones_and_crafted_unserialized_instances_carry_no_capture
+Only the sealed original instance exposes its server snapshot.
+Failed asserting that Array &0 [
+    'bindingId' => 1,
+    'bindingPublicId' => '6b760924-d2c0-4e27-a601-945629590ee4',
+    'originalFeatureBinding' => Array &1 [
+        'buyer_binding' => Array &2 [
+            'account_id' => 1,
+            'account_public_id' => 'bedf34e3-54c2-41e0-82ea-bbc55a1be09e',
+            'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
+            'identity_policy_version' => 'personal-store-customer-identity-v1',
+            'origin_id' => 'c269c6e9-aecc-4596-93b5-4d48d4e5068b',
+            'provenance' => 'synthetic_rehearsal',
+            'schema_version' => 1,
+            'user_id' => 1,
+            'verification_observation_hash' => '4d223dac3e5f825eed0768aeb42fe6d655f8886eba25afbd7c9ceb0972f49631',
+            'verification_observation_id' => '932ff2e6-26e2-4c97-9e07-b973ce04b569',
+        ],
+        'feature' => 'consent_preferences',
+        'feature_policy_version' => 'production-consent-preferences-identity-v1',
+        'feature_schema_version' => 1,
+    ],
+    'originalBindingHash' => '0edd4b4b8304cab0ae64109b7adbb62a6aac143cfaae3781156c3b29a68defeb',
+    'withdrawalEventId' => 1,
+    'withdrawalPublicId' => 'c1fdda16-a42b-468f-92eb-c936ec15b08c',
+    'withdrawalRevision' => 1,
+    'consentVersion' => 1,
+    'recipient' => '<REDACTED-RECIPIENT>',
+    'recipientHmac' => '9199a4425c1c2a0f19a048e40543679fce0b05eac946a29229400158f9b8c019',
+    'capturedAt' => '2026-10-07 16:32:16',
+] is null.
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionConsentWithdrawalSealTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 10[0m[37;41m, Assertions: 44[0m[37;41m, Failures: 3[0m[37;41m.[0m

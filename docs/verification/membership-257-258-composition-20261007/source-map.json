@@ -1,0 +1,364 @@
+{
+  "composition": "membership 257 + member-original 258 preparation onto integrated identity/checkout",
+  "base_integrated_commit": "d20d4394edcc84bf3c5a193f598d9b044b0753aa",
+  "sources": {
+    "257": {
+      "branch": "origin/codex/production-membership-preparation-20261007",
+      "frozen_head": "7fa3c62e61fae6e98e61e75eb0451edd588683d0",
+      "runtime": "3cd105667a76bb15443a9fd0119065effda8bb34",
+      "independently_approved_predecessor": "16e084b924fb9132b76095f26a35f28dc5f1feaf (approval 8fdacaf255caf50f1433eb21f88d1d0aa0d8df3f)"
+    },
+    "258": {
+      "branch": "origin/codex/production-member-original-preparation-20261007",
+      "frozen_head": "fb573a410cda76dd97884e81bc8e15437831a9ae",
+      "runtime": "c4cd6d9355257a39d2740b0a4fe55c3e376ef5b3"
+    }
+  },
+  "commands": [
+    "git checkout 3cd105667a76bb15443a9fd0119065effda8bb34 -- app/Domain/Memberships/Production config/production-memberships.php database/migrations/2026_10_07_257000_production_membership_periods.php tests/Feature/ProductionMembership",
+    "git checkout c4cd6d9355257a39d2740b0a4fe55c3e376ef5b3 -- app/Domain/Grants/Member config/member-grants.php database/migrations/2026_10_07_258000_create_production_member_originals.php tests/Feature/ProductionMemberOriginals app/Domain/Memberships/Production/MemberGrantIntent.php app/Domain/Memberships/Production/MembershipReservationAuthority.php"
+  ],
+  "not_taken": [
+    "Any non-owned path on either branch (older borrowed identity/checkout/support/discovery snapshots); the integrated base already carries canonical identity/checkout.",
+    "tests/Support/MembershipFixtures.php, membership-credit-worker.php, product-member-refresh-worker.php: byte-identical to base on both sources; nothing to take.",
+    "Branch docs/verification receipts: remain on their frozen branches; only the frozen canary MembershipForeignSchemaCanaryTest.php (blob 4e550f3c, sha256 72648803...) is copied byte-exact into this evidence directory."
+  ],
+  "shared_file_resolution": {
+    "app/Domain/Memberships/Production/MembershipRows.php": "Taken from 257@3cd (finite internal PDO/Pdo\\Sqlite/Pdo\\Mysql + default PDOStatement guard, the newer successor). 258@c4cd carries the older 16e-era Rows without nativeStatements(); its 258 tests do not depend on the absence of the guard.",
+    "app/Domain/Memberships/Production/MemberGrantIntent.php": "Taken from 258@c4cd: the single root-approved alignment FAMILY production-member-grant-v1 -> production-member-origin-v1. All other bytes identical to 257@3cd.",
+    "app/Domain/Memberships/Production/MembershipReservationAuthority.php": "Present only on 258@c4cd (interface authored in 3c8098e7); added unchanged."
+  },
+  "files": [
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantException.php",
+      "git_blob": "7620cea5787392bf06f51f3928fe6fcb49d8b4f7",
+      "sha256": "9e816278b19b1291a1768b924c8bcb421020e715292e2feec7a3c5a1a3eccee1",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "7620cea5787392bf06f51f3928fe6fcb49d8b4f7"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantFactsAuthority.php",
+      "git_blob": "e786f5168e2857fc52b2af067fa9b7bc4ee949ee",
+      "sha256": "1a93286e5559004b371a95f1f11cec906efa8fde1fe3dd612335700e6f89ef96",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "e786f5168e2857fc52b2af067fa9b7bc4ee949ee"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantFactsBinding.php",
+      "git_blob": "174dc16630f19fd90110edbc23fb437f218ece2a",
+      "sha256": "84b1a5035a402d29cb2eb1c0f65f693504b71254558e17b3bf2d8e5e0dcf3425",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "174dc16630f19fd90110edbc23fb437f218ece2a"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantFactsProof.php",
+      "git_blob": "c8726a05db92c2059b569c11302f72d981526e73",
+      "sha256": "354bd53d37e579303c21350b4053dd36cfef89159d7cb4eba4fa19e41cd5b3fa",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "c8726a05db92c2059b569c11302f72d981526e73"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantPolicy.php",
+      "git_blob": "0344a6096b3b2eb29b8c14cd92faf16cc5f81b4a",
+      "sha256": "42d98afbc87e2d97d9ee19aa17f7ebd1a9948db0ca19f6f6b8f4afbe36112cf8",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "0344a6096b3b2eb29b8c14cd92faf16cc5f81b4a"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantProfileBinding.php",
+      "git_blob": "2454a1eaf626643a5158349d695a2f6ae7fbb9e1",
+      "sha256": "3a4fc9d5357c6395fa80ae03d302b8e88d042a8266c6a3c6ece494781d051bac",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "2454a1eaf626643a5158349d695a2f6ae7fbb9e1"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantSchema.php",
+      "git_blob": "3aca225ff09eade83cd158b941575b358832cf0d",
+      "sha256": "064af8e1b0c775475a28fab7300a0d5473b58da11836fb6eddf47de24b04aed7",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "3aca225ff09eade83cd158b941575b358832cf0d"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberOriginalArtifactAuthority.php",
+      "git_blob": "e7e11d3c6e6841d39f9c02be542d9dc11a8defec",
+      "sha256": "259d236aa11cf1833256e8ae3f2b5f7d4fab64edfe4ae6e0e85e93ea62126605",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "e7e11d3c6e6841d39f9c02be542d9dc11a8defec"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberOriginalArtifactManifest.php",
+      "git_blob": "0bb7d7b558202b950d91f737cb795b84db49ec14",
+      "sha256": "796fb3bd257c84a857821209a6714f7fe2b6fddb05ae1930f117d6fc4526ef60",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "0bb7d7b558202b950d91f737cb795b84db49ec14"
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberOriginalArtifactReceipt.php",
+      "git_blob": "c80277a5c9c91b66481d5824f907d16d50d25b40",
+      "sha256": "f74f8c2a9b1c3f0860bffbceaf45a272e4bfcd5956df742148c561a9546c0b1b",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "c80277a5c9c91b66481d5824f907d16d50d25b40"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantAuthority.php",
+      "git_blob": "0fea34c57468045f814733d97c64821c9e29a77a",
+      "sha256": "02b32f1aa885dc9b6272d7b6643493131bc447c7a7d6ba7d77b45965abb4177e",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "0fea34c57468045f814733d97c64821c9e29a77a",
+      "blob_258_c4cd": "0fea34c57468045f814733d97c64821c9e29a77a"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantBinding.php",
+      "git_blob": "ccd8ab83550b7aef0f3ece48b01a8098a1f69508",
+      "sha256": "e8ec6951a419ed46ecffb537aca2ac323367b2b346efe1ca939c8585a0a3bc61",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "ccd8ab83550b7aef0f3ece48b01a8098a1f69508",
+      "blob_258_c4cd": "ccd8ab83550b7aef0f3ece48b01a8098a1f69508"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantIntent.php",
+      "git_blob": "ec4898d12d8d7d39fdde4e43fcb96fe92354d216",
+      "sha256": "7bd43b0410567621d264b8fa92a1b7d1e959d631563cab6c0fa6109b9ec9459c",
+      "source": "258@c4cd",
+      "blob_257_3cd": "6fc6964a130c41b730a7d52b2a0fc92f7f2ecb0e",
+      "blob_258_c4cd": "ec4898d12d8d7d39fdde4e43fcb96fe92354d216",
+      "resolution": "Taken from 258@c4cd: the single root-approved alignment FAMILY production-member-grant-v1 -> production-member-origin-v1. All other bytes identical to 257@3cd."
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MemberGrantReceipt.php",
+      "git_blob": "7842b0e8a2b417908d89edf73d6470a990682f81",
+      "sha256": "ee87a595896faba469ef06f563e39c79f68248bbbb7c53c64aa6c684baa37926",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "7842b0e8a2b417908d89edf73d6470a990682f81",
+      "blob_258_c4cd": "7842b0e8a2b417908d89edf73d6470a990682f81"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipEligibleLicenseAuthority.php",
+      "git_blob": "6328c756341d9af490bc0d63eae0e4d591c24395",
+      "sha256": "601c8df8a23eadb2c902c459e18a61f10ead9ddfc4527a59d6a73b848ebbcce6",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "6328c756341d9af490bc0d63eae0e4d591c24395",
+      "blob_258_c4cd": "6328c756341d9af490bc0d63eae0e4d591c24395"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipEligibleLicenseProof.php",
+      "git_blob": "c562602e43f151bc1801684886a9a00b68e285f5",
+      "sha256": "9475b15707b6a66d9a9e8e6847d2c29504cb8baa0b16bb46cef8dd3582a72f8b",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "c562602e43f151bc1801684886a9a00b68e285f5",
+      "blob_258_c4cd": "c562602e43f151bc1801684886a9a00b68e285f5"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipException.php",
+      "git_blob": "00c62223dab3241c8ea96af7867ca0065da82798",
+      "sha256": "c04533684f2981ecfb21423a7987f4c4ee5d59e146325fad37a3fa68f1fb2070",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "00c62223dab3241c8ea96af7867ca0065da82798",
+      "blob_258_c4cd": "00c62223dab3241c8ea96af7867ca0065da82798"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipInvoiceBinding.php",
+      "git_blob": "e6ebb020f4a6d30484c11424e81bf5a3063531a7",
+      "sha256": "2da632846a139b2b4ea75d991daa234659d1c013c5c121489cf1486bd26bff95",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "e6ebb020f4a6d30484c11424e81bf5a3063531a7",
+      "blob_258_c4cd": "e6ebb020f4a6d30484c11424e81bf5a3063531a7"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipLicenseBinding.php",
+      "git_blob": "8bd242acaa16900ad48e427e80942baf4fe3a0f0",
+      "sha256": "367efc2212c55fd2164f64eb89d69b3b636d242bd26d310d463d55a51397bc54",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "8bd242acaa16900ad48e427e80942baf4fe3a0f0",
+      "blob_258_c4cd": "8bd242acaa16900ad48e427e80942baf4fe3a0f0"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+      "git_blob": "f0b867ec64fb5a728fb64941a4ceb301482dd62b",
+      "sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "f0b867ec64fb5a728fb64941a4ceb301482dd62b",
+      "blob_258_c4cd": "f0b867ec64fb5a728fb64941a4ceb301482dd62b"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceProof.php",
+      "git_blob": "51315048bdaac4a6c0fc0605741720254bfdc305",
+      "sha256": "e471af3bcbff4bf6855a0a0eafa4459222fd8f69d8deacd79af493171ef818cc",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "51315048bdaac4a6c0fc0605741720254bfdc305",
+      "blob_258_c4cd": "51315048bdaac4a6c0fc0605741720254bfdc305"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicy.php",
+      "git_blob": "f145cffb89b36722ff32dd863a01c0ce0778e3ea",
+      "sha256": "816f79d6487343a5bd7f3d2bdc25c28f57a4becccf6debfafd0c6b88c503af16",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "f145cffb89b36722ff32dd863a01c0ce0778e3ea",
+      "blob_258_c4cd": "f145cffb89b36722ff32dd863a01c0ce0778e3ea"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyBinding.php",
+      "git_blob": "ddb6cdc387be16d87405f73018c25cd8cf8230bd",
+      "sha256": "492ed8b1c017c2ed6c8b785fb66de3bf0348fd28b8af8f244a8da6678f800b48",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "ddb6cdc387be16d87405f73018c25cd8cf8230bd",
+      "blob_258_c4cd": "ddb6cdc387be16d87405f73018c25cd8cf8230bd"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyFactsAuthority.php",
+      "git_blob": "c8b492b8259e4a2cf3b3d4ce533c628a75b5c508",
+      "sha256": "918cc499531858932dd3a91c54910f41640ff5fde7f0b9dfaa40fd3cd5b466a3",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "c8b492b8259e4a2cf3b3d4ce533c628a75b5c508",
+      "blob_258_c4cd": "c8b492b8259e4a2cf3b3d4ce533c628a75b5c508"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipPolicyFactsProof.php",
+      "git_blob": "af7c9caf1b81932b87c0a268ce64defb8aceb1ef",
+      "sha256": "0485a7c18f1bc1aa53d9396119ef05fc557bfc45a646c245048cc4e12e32847b",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "af7c9caf1b81932b87c0a268ce64defb8aceb1ef",
+      "blob_258_c4cd": "af7c9caf1b81932b87c0a268ce64defb8aceb1ef"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipReservationAuthority.php",
+      "git_blob": "02ab355b9a987b93cfa23a8b525d3403cf4cf2fd",
+      "sha256": "0d0a50e0a52570087d47ab9482d8b883cbda17063187fb531f124beaecfa9771",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "02ab355b9a987b93cfa23a8b525d3403cf4cf2fd",
+      "resolution": "Present only on 258@c4cd (interface authored in 3c8098e7); added unchanged."
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipReservationBinding.php",
+      "git_blob": "f8ed267ea781a93e6d57e2625696956a323bb3a2",
+      "sha256": "b4ac92ebe404ba4974c00ac06485d3a30a5cbf7e6dd5e9e50110d68fd9bd1268",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "f8ed267ea781a93e6d57e2625696956a323bb3a2",
+      "blob_258_c4cd": "f8ed267ea781a93e6d57e2625696956a323bb3a2"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipReservationProof.php",
+      "git_blob": "ba45d4bce9b6c24a80b622eeaf181cb43641dac0",
+      "sha256": "71068504f41cf95cb11d9e9f5d9be93082a72ae9b6c71c446cee3fbc47b2c540",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "ba45d4bce9b6c24a80b622eeaf181cb43641dac0",
+      "blob_258_c4cd": "ba45d4bce9b6c24a80b622eeaf181cb43641dac0"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipRows.php",
+      "git_blob": "b4080044b4962cc950cc497fb1e0952c13189399",
+      "sha256": "154b0296b74d37bd4b376861e20482ba7fff99bc54d722781566b41965ace8aa",
+      "source": "257@3cd",
+      "blob_257_3cd": "b4080044b4962cc950cc497fb1e0952c13189399",
+      "blob_258_c4cd": "f5341aa8423acaa8783c80356719fe468c98e4cb",
+      "resolution": "Taken from 257@3cd (finite internal PDO/Pdo\\Sqlite/Pdo\\Mysql + default PDOStatement guard, the newer successor). 258@c4cd carries the older 16e-era Rows without nativeStatements(); its 258 tests do not depend on the absence of the guard."
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipSchema.php",
+      "git_blob": "e34204464823eddee80a88e3745c9ca06e67c79c",
+      "sha256": "93898457684c9005853e539d344142b1c8bc1141a0554e1e76466bc378ced799",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "e34204464823eddee80a88e3745c9ca06e67c79c",
+      "blob_258_c4cd": "e34204464823eddee80a88e3745c9ca06e67c79c"
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipValues.php",
+      "git_blob": "5550908539752412663e7166ec43f68838aa95a3",
+      "sha256": "0a6f2279012adbfbe11cfa3bfb4e55b13bd17715b270bb7aeef5310656d2fe65",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "5550908539752412663e7166ec43f68838aa95a3",
+      "blob_258_c4cd": "5550908539752412663e7166ec43f68838aa95a3"
+    },
+    {
+      "path": "config/member-grants.php",
+      "git_blob": "ce8a8c8ccb65563659c21073377e7299901f112c",
+      "sha256": "06a26f7ea96868f7d45555b65fb8aa32e7e31412eaa2292d8c5cd5a02f8ffa3f",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "ce8a8c8ccb65563659c21073377e7299901f112c"
+    },
+    {
+      "path": "config/production-memberships.php",
+      "git_blob": "8d895285d5eb335177997a9e4953788560513b74",
+      "sha256": "7c76febcb5b56c82e56f7c069e48b6417b2ee1316f4a8dfb1dd982519ece2d96",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "8d895285d5eb335177997a9e4953788560513b74",
+      "blob_258_c4cd": "8d895285d5eb335177997a9e4953788560513b74"
+    },
+    {
+      "path": "database/migrations/2026_10_07_257000_production_membership_periods.php",
+      "git_blob": "37a311acb28f0ea13b93934f807b69a9b64ad982",
+      "sha256": "d30af452a097a647cd67f49e2e8cdac7b25e3e98f710529dab0a1c360a28549e",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "37a311acb28f0ea13b93934f807b69a9b64ad982",
+      "blob_258_c4cd": "37a311acb28f0ea13b93934f807b69a9b64ad982"
+    },
+    {
+      "path": "database/migrations/2026_10_07_258000_create_production_member_originals.php",
+      "git_blob": "4e6fa913748c7f7b81759b0495b0928243743085",
+      "sha256": "4a20e69a6a71290a9bd5186632b6d663e7268986282398875308f6c85499bd6e",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "4e6fa913748c7f7b81759b0495b0928243743085"
+    },
+    {
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+      "git_blob": "2cdc14b733fa27dc080a40cd3e0075920154e8fa",
+      "sha256": "397f26f54104e00fcd90d67985e10d998478645d2dd26e95e9f4f15915444932",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "2cdc14b733fa27dc080a40cd3e0075920154e8fa"
+    },
+    {
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php",
+      "git_blob": "ce8bb95e2e22032d8ce1f60aa441e9ebfe2d89b0",
+      "sha256": "57ade7ec10e76608550672ef2e308303e408c7b3a037e2c2b14186304b440347",
+      "source": "258@c4cd",
+      "blob_257_3cd": null,
+      "blob_258_c4cd": "ce8bb95e2e22032d8ce1f60aa441e9ebfe2d89b0"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipNativeStatementClosureTest.php",
+      "git_blob": "88dcc27870955a315e74256cc0880bc36abf1cf7",
+      "sha256": "1b1bd944129a527e16cb11962a24f7acc4d40a2244b7216580dfad20a2c7965e",
+      "source": "257@3cd",
+      "blob_257_3cd": "88dcc27870955a315e74256cc0880bc36abf1cf7",
+      "blob_258_c4cd": null
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+      "git_blob": "87720bd4259cd49bbd3becd6abdb34686174c3b9",
+      "sha256": "5ec07be316eb1bdfc0a5110d2a62717a098887cbbfbfb557097d3427fcee77b4",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "87720bd4259cd49bbd3becd6abdb34686174c3b9",
+      "blob_258_c4cd": "87720bd4259cd49bbd3becd6abdb34686174c3b9"
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php",
+      "git_blob": "981b26bf2c7548073cf0c0558e029f03ecc840a5",
+      "sha256": "42c9a1fe718de819a5d17fd38cb4d09f04e5519f8d3c731be437b3c91fd722b0",
+      "source": "257@3cd",
+      "blob_257_3cd": "981b26bf2c7548073cf0c0558e029f03ecc840a5",
+      "blob_258_c4cd": null
+    },
+    {
+      "path": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "git_blob": "6bb25a8bdb22e06f2db33448e044cc54c984810f",
+      "sha256": "fb0e0f8197b7e28993cccc96be89435c5a6fd213ef64930b4e280e62738ba39b",
+      "source": "both (byte-identical in 257@3cd and 258@c4cd)",
+      "blob_257_3cd": "6bb25a8bdb22e06f2db33448e044cc54c984810f",
+      "blob_258_c4cd": "6bb25a8bdb22e06f2db33448e044cc54c984810f"
+    }
+  ]
+}

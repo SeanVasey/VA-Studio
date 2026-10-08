@@ -1,0 +1,62 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-p2/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 00:04.619, Memory: 83.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\CustomerSuppressionTest::test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once@positive with data ('positive')
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'status' => 'confirmed',
++    'status' => 'not_requested',
+ ]
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php:299
+
+2) Tests\Feature\CustomerSuppressionTest::test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once@null receipt with data ('null')
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'status' => 'unknown',
++    'status' => 'not_requested',
+ ]
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php:299
+
+3) Tests\Feature\CustomerSuppressionTest::test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once@transport throws with data ('throw')
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'status' => 'unknown',
++    'status' => 'not_requested',
+ ]
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php:299
+
+4) Tests\Feature\CustomerSuppressionTest::test_retained_and_current_pending_targets_are_each_sent_once_oldest_first
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'dickens.judy@example.com',
+-    1 => 'synthetic-changed@example.test',
++    0 => 'synthetic-changed@example.test',
+ ]
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php:340
+
+FAILURES!
+Tests: 4, Assertions: 11, Failures: 4.

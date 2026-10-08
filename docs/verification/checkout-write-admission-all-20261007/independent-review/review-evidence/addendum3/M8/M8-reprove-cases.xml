@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" tests="5" assertions="15" errors="2" failures="3" skipped="0" time="16.514989">
+    <testcase name="test_only_new_intent_and_pre_create_frames_hold_the_observer_and_record_status_reconcile_hold_none" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="76" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="3.557937">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_only_new_intent_and_pre_create_frames_hold_the_observer_and_record_status_reconcile_hold_none
+Failed asserting that 1 is identical to 2.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:88
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create" tests="4" assertions="10" errors="2" failures="2" skipped="0" time="12.957051">
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;offer, first initiate&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="111" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="2" time="3.266492">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "offer, first initiate"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:424
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;capability, first initiate&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="111" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="1" time="2.949195">
+        <error type="Illuminate\Validation\ValidationException">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "capability, first initiate"
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:237
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:235
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:45
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:423
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;offer, retry&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="111" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="3.491032">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "offer, retry"
+A withdrawn NEW checkout write was admitted.
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:424
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set &quot;capability, retry&quot;" file="/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="111" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="3" time="3.250333">
+        <error type="Illuminate\Validation\ValidationException">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create with data set "capability, retry"
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:237
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:235
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:45
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:423
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

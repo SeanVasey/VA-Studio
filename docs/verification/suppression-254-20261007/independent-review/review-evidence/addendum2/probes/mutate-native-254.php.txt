@@ -1,0 +1,106 @@
+<?php
+// Independent reviewer throwaway (addendum 2): native trigger mutations on the private probe database :3494 only.
+// Each mutation drops and recreates ONE installed trigger with mutated text, runs the probes in rolled-back transactions,
+// then restores the exact original text and proves information_schema.TRIGGERS.ACTION_STATEMENT equals the installer's body.
+require getcwd().'/vendor/autoload.php';
+
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionSchema;
+use Illuminate\Support\Str;
+
+$p = json_decode(file_get_contents($argv[1]), true);
+const STRICT = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+function conn(string $mode): PDO
+{
+    $pdo = new PDO('mysql:host=127.0.0.1;port=3494;dbname=vaseyaudio_review_supp254d_probe;charset=utf8mb4', 'root', 'review-supp254d-only', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $pdo->exec('SET SESSION sql_mode='.$pdo->quote($mode));
+    $pdo->exec("SET SESSION time_zone='+00:00'");
+
+    return $pdo;
+}
+$triggers = (new ReflectionMethod(ProductionSuppressionSchema::class, 'triggers'))->invoke(new ProductionSuppressionSchema, 'mysql');
+$admin = conn(STRICT);
+// argv[2]: sql_mode of the session that CREATEs each mutated trigger (a trigger body runs under its creation sql_mode). Restores always use STRICT, the installer's mode.
+$installMode = $argv[2] ?? STRICT;
+$mutAdmin = conn($installMode);
+printf("mutated triggers are created under sql_mode=%s\n", json_encode($installMode));
+$ids = ['target' => (int) $admin->query('SELECT id FROM production_suppression_targets')->fetchColumn(), 'intent' => (int) $admin->query('SELECT id FROM production_suppression_intents')->fetchColumn(),
+    'attempt' => (int) $admin->query('SELECT id FROM production_suppression_attempts')->fetchColumn()];
+$h = fn ($s) => hash('sha256', $s);
+
+function attempt(string $mode, string $table, array $row): string
+{
+    $pdo = conn($mode);
+    $pdo->beginTransaction();
+    try {
+        $cols = array_keys($row);
+        $pdo->prepare("INSERT INTO `$table` (`".implode('`,`', $cols).'`) VALUES ('.implode(',', array_fill(0, count($cols), '?')).')')->execute(array_values($row));
+        $v = $pdo->query("SELECT created_at FROM `$table` WHERE id=".(int) $pdo->lastInsertId())->fetchColumn();
+        $out = 'ACCEPTED (stored created_at='.$v.')';
+    } catch (PDOException $e) {
+        $msg = (string) ($e->errorInfo[2] ?? '');
+        $out = str_contains($msg, 'Retained production suppression refused') ? 'refused by GUARD' : 'refused by COLUMN ('.($e->errorInfo[1] ?? '').')';
+    }
+    $pdo->rollBack();
+
+    return $out;
+}
+function install(PDO $admin, string $name, string $sql): void
+{
+    $admin->exec("DROP TRIGGER `$name`");
+    $admin->exec($sql);
+}
+function actionStatement(PDO $admin, string $name): string
+{
+    $st = $admin->prepare('SELECT ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?');
+    $st->execute([$name]);
+
+    return (string) $st->fetchColumn();
+}
+
+$zeroTarget = fn (array $o = []) => ['public_id' => (string) Str::uuid(), 'binding_id' => $p['zero_binding'], 'purpose' => 'email_marketing', 'recipient_hmac' => $p['zero_hmac'],
+    'recipient_ciphertext' => 'synthetic', 'withdrawal_event_id' => $p['zero_event'], 'created_at' => 'zzzz', ...$o];
+$normalTargetZero = ['public_id' => (string) Str::uuid(), 'binding_id' => $p['binding'], 'purpose' => 'email_marketing', 'recipient_hmac' => $h('another-recipient'),
+    'recipient_ciphertext' => 'synthetic', 'withdrawal_event_id' => $p['e1'], 'created_at' => 'zzzz'];
+$confirmation = fn (string $at) => ['attempt_id' => $ids['attempt'], 'request_hash' => $h('request'), 'receipt_hash' => $h('receipt'), 'receipt_ciphertext' => 'synthetic', 'created_at' => $at];
+$intentE2 = fn (string $at) => ['public_id' => (string) Str::uuid(), 'target_id' => $ids['target'], 'withdrawal_event_id' => $p['e2'], 'created_at' => $at];
+
+$cases = [
+    'probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event' => fn () => attempt('', 'production_suppression_targets', $zeroTarget()),
+    'probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event' => fn () => attempt('', 'production_suppression_targets', $zeroTarget(['created_at' => '0000-00-00 00:00:00'])),
+    'probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)' => fn () => attempt('', 'production_suppression_targets', $normalTargetZero),
+    'probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)' => fn () => attempt('', 'production_suppression_confirmations', $confirmation('zzzz')),
+    'probe D1: intent -> e2, created_at 1 s before e2' => fn () => attempt(STRICT, 'production_suppression_intents', $intentE2('2026-01-01 00:00:09')),
+    'probe D2: intent -> e2, same instant (control)' => fn () => attempt(STRICT, 'production_suppression_intents', $intentE2('2026-01-01 00:00:10')),
+];
+$stampMysql = "CAST(NEW.created_at AS CHAR) REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\$' AND YEAR(NEW.created_at)>0 AND NEW.created_at=STR_TO_DATE(CAST(NEW.created_at AS CHAR), '%Y-%m-%d %H:%i:%s')";
+$mutations = [
+    'none (installed text)' => [],
+    'M-none-recreated: the unmutated text recreated under the chosen creation sql_mode (targets, confirmations)' => ['production_suppression_targets_retain_insert' => [' AND ', ' AND '], 'production_suppression_confirmations_retain_insert' => [' AND ', ' AND ']],
+    'M-year: drop YEAR(NEW.created_at)>0 (targets, confirmations)' => ['production_suppression_targets_retain_insert' => [' AND YEAR(NEW.created_at)>0', ''], 'production_suppression_confirmations_retain_insert' => [' AND YEAR(NEW.created_at)>0', '']],
+    'M-shape-only-year: drop the CHAR REGEXP and STR_TO_DATE round trip, keep YEAR()>0 (targets, confirmations)' => ['production_suppression_targets_retain_insert' => [$stampMysql, 'YEAR(NEW.created_at)>0'], 'production_suppression_confirmations_retain_insert' => [$stampMysql, 'YEAR(NEW.created_at)>0']],
+    'M-intent-time: drop e.created_at<=NEW.created_at (intents)' => ['production_suppression_intents_retain_insert' => [' AND e.created_at<=NEW.created_at)', ')']],
+];
+foreach ($mutations as $label => $edits) {
+    foreach ($edits as $name => [$from, $to]) {
+        $sql = $triggers[$name]['sql'];
+        if ($from !== ' AND ' && substr_count($sql, $from) !== 1) {
+            throw new RuntimeException("mutation anchor not unique in $name");
+        }
+        install($mutAdmin, $name, str_replace($from, $to, $sql));
+        printf("installed mutated %s (ACTION_STATEMENT differs from installer: %s)\n", $name, json_encode(actionStatement($admin, $name) !== $triggers[$name]['body']));
+    }
+    echo "== $label\n";
+    foreach ($cases as $case => $run) {
+        printf("  %-95s => %s\n", $case, $run());
+    }
+    foreach ($edits as $name => $_) {
+        install($admin, $name, $triggers[$name]['sql']);
+        printf("restored %s (ACTION_STATEMENT equals installer body: %s)\n", $name, json_encode(actionStatement($admin, $name) === $triggers[$name]['body']));
+    }
+}
+$all = true;
+foreach ($triggers as $name => $t) {
+    $mode = $admin->query("SELECT SQL_MODE FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME='$name'")->fetchColumn();
+    $all = $all && actionStatement($admin, $name) === $t['body'] && $mode === STRICT;
+}
+printf("final: all %d installed 254 triggers equal the installer text and carry the installer's strict SQL_MODE: %s\n", count($triggers), json_encode($all));

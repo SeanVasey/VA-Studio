@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" file="/home/user/VA-Studio-review-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" tests="2" assertions="6" errors="0" failures="2" skipped="0" time="38.635418">
+    <testcase name="test_committing_qualifier_role_withdrawal_refuses_new_basis" file="/home/user/VA-Studio-review-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" line="42" class="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionBasisCommitAdmissionCanaryTest" assertions="3" time="27.288059">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest::test_committing_qualifier_role_withdrawal_refuses_new_basis
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_committing_qualifier_mfa_withdrawal_refuses_new_basis" file="/home/user/VA-Studio-review-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php" line="51" class="Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest" classname="Tests.Canary.ExemptionBasisCommitAdmissionCanaryTest" assertions="3" time="11.347359">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ExemptionBasisCommitAdmissionCanaryTest::test_committing_qualifier_mfa_withdrawal_refuses_new_basis
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-admission-red/docs/verification/checkout-write-admission-all-20261007/canaries/ExemptionBasisCommitAdmissionCanaryTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

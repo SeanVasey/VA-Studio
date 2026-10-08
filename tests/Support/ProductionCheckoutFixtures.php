@@ -10,10 +10,10 @@ use Carbon\CarbonImmutable;
 /** Actual catalog/source lifecycle with new synthetic checkout choices, never a legal/account approval. */
 final class ProductionCheckoutFixtures
 {
-    public static function catalog(): array
+    public static function catalog(?string $licenseUntil = null): array
     {
         ProductionCheckoutProviderFixtures::configure();
-        $fixture = ProductionTrackPreparationFixtures::prepared();
+        $fixture = ProductionTrackPreparationFixtures::prepared(licenseUntil: $licenseUntil);
         $machine = ProductionCheckoutProviderFixtures::machine();
         $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
             app(PrepareProductionTrackCapabilities::class)->review($fixture['candidate'], $fixture['source'], $machine, $fixture['actor']), $fixture['actor']);

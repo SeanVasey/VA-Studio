@@ -1,0 +1,30 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:00.222, Memory: 59.00 MB
+
+There were 2 failures:
+
+1) Tests\Unit\MysqlConnectionTimezoneTest::test_mysql_connection_pins_the_session_to_utc
+Failed asserting that null is identical to '+00:00'.
+
+/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php:16
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Unit\MysqlConnectionTimezoneTest::test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'+00:00'
++'Europe/London'
+
+/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php:26
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 2, Failures: 2.

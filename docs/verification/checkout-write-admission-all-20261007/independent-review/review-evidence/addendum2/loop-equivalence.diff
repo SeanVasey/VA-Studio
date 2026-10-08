@@ -1,0 +1,2 @@
+# diff of the active-offer license loop (foreach ($selection ...) and one() between CheckoutIntentAdmission.php and CheckoutStaffWriteAdmission.php at 0cb13ca5
+# both diff commands exited 0: the extracted text is byte-identical (no diff lines follow)

@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+.........[41;37mF[0m.....                                                   15 / 15 (100%)
+
+Time: 00:46.739, Memory: 100.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'write_source_changed'
++'changed'
+
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:318
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:201
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 15[0m[37;41m, Assertions: 83[0m[37;41m, Failures: 1[0m[37;41m.[0m

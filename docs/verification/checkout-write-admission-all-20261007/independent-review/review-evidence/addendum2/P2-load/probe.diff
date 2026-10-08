@@ -1,0 +1,24 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php b/app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php
+index ad3db5b1..9669105a 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutCommandCommitDispatcher.php
+@@ -34,6 +34,7 @@ final class CheckoutCommandCommitDispatcher implements Dispatcher
+         if ($owned && ($event instanceof TransactionBeginning || $event instanceof TransactionRolledBack)) {
+             $this->phase = 'invalid';
+         }
++        if ($owned && $event instanceof TransactionCommitting && isset($GLOBALS['__probe_open_ns'])) { file_put_contents((string) getenv('PROBE_OUT'), sprintf("%.3f\n", (hrtime(true) - $GLOBALS['__probe_open_ns']) / 1e6), FILE_APPEND); }
+         $response = $this->delegate->dispatch($event, $payload, $halt);
+         if ($owned && $event instanceof TransactionCommitting) {
+             CheckoutException::require($this->phase === 'held', 'write_frame');
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index 4ea5c81a..dfef8329 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -121,6 +121,7 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+         $remaining = $expires - (float) CarbonImmutable::now('UTC')->format('U.u');
+         CheckoutException::require($remaining > 0, 'expired');
+         $frame->capDeadline(hrtime(true) + (int) floor($remaining * 1_000_000_000));
++        $GLOBALS['__probe_open_ns'] = hrtime(true);
+         $plans = new CheckoutRawPlans($frame);
+         $plans->actor($actor);
+         $plans->staff($actor->id, $staff);

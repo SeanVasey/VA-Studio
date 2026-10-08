@@ -1,0 +1,69 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-admission/phpunit.xml
+
+[41;37mF[0m[31;1mE[0m[41;37mF[0m[31;1mE[0m                                                                4 / 4 (100%)
+
+Time: 00:16.755, Memory: 98.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@capability, first initiate with data ('capability', false)
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:239
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:237
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:45
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:190
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@capability, retry with data ('capability', true)
+Illuminate\Validation\ValidationException: Review the current source and supply every supported production machine-policy choice.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php:153
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/SourceCommitment.php:93
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php:56
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php:39
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/OrderEvidence.php:67
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:239
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:237
+/home/user/VA-Studio-admission/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:45
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:190
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@offer, first initiate with data ('offer', false)
+A framework transaction committed between the admitted re-proof and create.
+Failed asserting that 1 is identical to 0.
+
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:193
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_admitted_reproof_is_the_terminal_commit_before_provider_create@offer, retry with data ('offer', true)
+A framework transaction committed between the admitted re-proof and create.
+Failed asserting that 1 is identical to 0.
+
+/home/user/VA-Studio-admission/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:193
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 4[0m[37;41m, Assertions: 14[0m[37;41m, Errors: 2[0m[37;41m, Failures: 2[0m[37;41m.[0m

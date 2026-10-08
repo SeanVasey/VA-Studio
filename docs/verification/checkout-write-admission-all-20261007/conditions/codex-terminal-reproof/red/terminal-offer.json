@@ -1,0 +1,11 @@
+{
+    "armed": true,
+    "observed": false,
+    "admitted": true,
+    "after": 1,
+    "acted": 1,
+    "at_create": 0,
+    "driver": "sqlite",
+    "error": null,
+    "provider_creates": 1
+}

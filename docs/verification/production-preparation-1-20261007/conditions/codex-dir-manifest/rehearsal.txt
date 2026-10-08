@@ -1,0 +1,7 @@
+intact: PASS (expected)
+2a3
+> ./a/empty-dir
+empty-dir removed: REFUSED (expected)
+5d4
+< ./extra
+extra dir: REFUSED (expected)

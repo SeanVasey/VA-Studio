@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\ProductionCheckoutConfigTest" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" tests="5" assertions="5" errors="0" failures="0" skipped="0" time="0.744309">
+    <testsuite name="Tests\Unit\ProductionCheckoutConfigTest::test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer" tests="5" assertions="5" errors="0" failures="0" skipped="0" time="0.744309">
+      <testcase name="test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer with data set &quot;unset stays null&quot;" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" line="21" class="Tests\Unit\ProductionCheckoutConfigTest" classname="Tests.Unit.ProductionCheckoutConfigTest" assertions="1" time="0.521766"/>
+      <testcase name="test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer with data set &quot;numeric string becomes int&quot;" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" line="21" class="Tests\Unit\ProductionCheckoutConfigTest" classname="Tests.Unit.ProductionCheckoutConfigTest" assertions="1" time="0.049309"/>
+      <testcase name="test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer with data set &quot;float string is not coerced&quot;" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" line="21" class="Tests\Unit\ProductionCheckoutConfigTest" classname="Tests.Unit.ProductionCheckoutConfigTest" assertions="1" time="0.047852"/>
+      <testcase name="test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer with data set &quot;text is not coerced&quot;" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" line="21" class="Tests\Unit\ProductionCheckoutConfigTest" classname="Tests.Unit.ProductionCheckoutConfigTest" assertions="1" time="0.062432"/>
+      <testcase name="test_review_lifetime_from_environment_is_admitted_only_as_an_exact_integer with data set &quot;leading plus is not coerced&quot;" file="/home/user/VA-Studio-admission/tests/Unit/ProductionCheckoutConfigTest.php" line="21" class="Tests\Unit\ProductionCheckoutConfigTest" classname="Tests.Unit.ProductionCheckoutConfigTest" assertions="1" time="0.062951"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
