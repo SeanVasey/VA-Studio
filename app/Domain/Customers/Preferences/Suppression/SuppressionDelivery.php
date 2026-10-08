@@ -79,7 +79,7 @@ final class SuppressionDelivery
     private function receipt(CustomerPrincipal $principal, User $actor, int $version, ?array $claim, bool $inspect): array
     {
         return $this->transaction(function () use ($principal, $actor, $version, $claim, $inspect): array {
-            $context = $this->context($principal, $actor, $version);
+            $context = $this->context($principal, $actor, $version, $claim['target'] ?? null, $inspect);
             $graph = $context['graph'];
             if ($claim !== null && ($graph['target'] === null || $graph['attempt'] === null
                 || $graph['target']['public_id'] !== $claim['target'] || $graph['attempt']['public_id'] !== $claim['operation']
@@ -120,7 +120,7 @@ final class SuppressionDelivery
         });
     }
 
-    private function context(CustomerPrincipal $principal, User $actor, int $version): array
+    private function context(CustomerPrincipal $principal, User $actor, int $version, ?string $claimed = null, bool $inspect = false): array
     {
         $consentProof = new ConsentEvidence;
         $preferences = $this->preferences->read($principal, $actor);
@@ -149,7 +149,15 @@ final class SuppressionDelivery
         $binding = $this->binding();
         $policy = SuppressionPolicy::capture();
         $outboxProof = new SuppressionEvidence;
+        // A retained target keeps the recipient captured at withdrawal. A later account email
+        // change selects nothing new; the current address applies only when no target needs work.
+        $retained = (new SuppressionOutbox)->retained($principal, $outboxProof, $policy, $claimed, $inspect);
+        $recipient = $retained['email'] ?? $recipient;
         $graph = (new SuppressionOutbox)->graph($principal, $recipient, $outboxProof, $policy);
+        // A selected row that its own recipient does not resolve to is unauthentic: refuse, never skip.
+        if ($retained !== null && (string) ($graph['target']['id'] ?? '') !== $retained['id']) {
+            throw new ConsentException(503);
+        }
         $bound = $policy['hash'] !== null && is_string($binding) && hash_equals($policy['hash'], $binding);
         $configuration = config('customer-preferences');
 

@@ -1,0 +1,12 @@
+tree c7f9987be14daed388cdc5836b35b58deb7157fd dirty=0 start=2026-10-07T17:22:47Z
+NativeSchemaIsolationTest exit=0 123s OK (25 tests, 235 assertions)
+IdentityInspectionCostTest exit=0 94s OK (1 test, 6 assertions)
+ProductionIdentityMigrationTest exit=0 299s OK (5 tests, 19 assertions)
+ProductionIdentityDependencyAdmissionTest exit=0 548s OK (9 tests, 48 assertions)
+ProductionIdentityRuntimeTest exit=0 843s OK (11 tests, 35 assertions)
+ProductionIdentityCommittedFrameTest exit=0 1281s OK (14 tests, 81 assertions)
+IdentityHistoricalCommittedReceiptTest exit=0 1262s OK (17 tests, 80 assertions)
+ProductionBuyerAssentObservationMigrationTest exit=0 233s OK (4 tests, 24 assertions)
+ProductionFeatureNativeAdmissionTest exit=0 156s OK (3 tests, 65 assertions)
+InquiryNotificationMigrationTest-selected exit=0 515s OK (9 tests, 137 assertions)
+done 2026-10-07T18:52:01Z

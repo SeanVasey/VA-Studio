@@ -1,0 +1,34 @@
+## HEAD
+43ae65e6daa668101cd9bd72a5b9464147de6106
+43ae65e6 docs(checkout): review addendum 2 — license-expiry cap carries at 0cb13ca5
+019bc37d fix(checkout): admit the final pre-create re-proof's own commit
+0cb13ca5 fix(checkout): cap NEW-basis admission at the selected license expiry
+## sha256 frozen at 43ae65e6 worktree
+fd8fccde5538dd316bb1d799e91e0a718fd6289cf7a793fc898e6eaaba394be8  app/Domain/Commerce/ProductionCheckout/CommandTransaction.php
+ed529e8f69b2ae6733d767aeae6bebd693faa114c55cd1c5c3a3a5824ddcd372  app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php
+## diff --quiet frozen ece5a9ee..43ae65e6 and 0cb13ca5..43ae65e6
+CommandTransaction ece5a9ee..43ae65e6 identical
+CommandTransaction 0cb13ca5..43ae65e6 identical
+OriginalCommitDispatcher ece5a9ee..43ae65e6 identical
+OriginalCommitDispatcher 0cb13ca5..43ae65e6 identical
+## named files 0cb13ca5..43ae65e6
+CheckoutWriteAdmission identical
+CheckoutStaffWriteAdmission identical
+CheckoutCommandFrame identical
+CheckoutCommandCommitDispatcher identical
+CheckoutRawPlans identical
+CheckoutCommitAdmission identical
+FreshCheckoutPolicy identical
+Records identical
+TaxExemptions identical
+ApproveExemptionAuthority identical
+## routes/bootstrap/config/database/.github/providers/manifests/phpunit 0cb13ca5..43ae65e6
+(empty above = unchanged)
+## executable stat 0cb13ca5..43ae65e6 (app tests config routes bootstrap database)
+ .../ProductionCheckout/CheckoutIntentAdmission.php | 23 ++++++++-
+ .../Commerce/ProductionCheckout/HostedCheckout.php | 12 ++++-
+ .../ProductionCheckoutWriteAdmissionAllTest.php    | 57 ++++++++++++++++++++--
+ 3 files changed, 85 insertions(+), 7 deletions(-)
+## 019bc37d..43ae65e6 non-docs paths
+(none)
+## c6 canary hash

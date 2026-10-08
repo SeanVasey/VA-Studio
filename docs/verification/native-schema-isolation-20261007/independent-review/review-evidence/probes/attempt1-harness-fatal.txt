@@ -1,0 +1,1 @@
+PHP Fatal error:  Cannot override final method PHPUnit\Framework\TestCase::count() in /home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php on line 337

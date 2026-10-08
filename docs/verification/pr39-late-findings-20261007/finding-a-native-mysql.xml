@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\CustomerSuppressionTest" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" tests="7" assertions="92" errors="0" failures="0" skipped="0" time="800.597032">
+    <testcase name="test_single_positive_attempt_is_committed_before_adapter_and_is_never_sent_again" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="67" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="12" time="106.149873"/>
+    <testcase name="test_changed_provider_binding_never_resends_old_unknown_or_projects_old_confirmation" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="233" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="7" time="130.593388"/>
+    <testcase name="test_grant_does_not_unsuppress_and_changed_recipient_never_reuses_other_target" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="248" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="7" time="92.817754"/>
+    <testsuite name="Tests\Feature\CustomerSuppressionTest::test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once" tests="3" assertions="58" errors="0" failures="0" skipped="0" time="313.464768">
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;positive&quot;" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="16" time="95.098636"/>
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;null receipt&quot;" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="21" time="119.165134"/>
+      <testcase name="test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once with data set &quot;transport throws&quot;" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="274" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="21" time="99.200999"/>
+    </testsuite>
+    <testcase name="test_retained_and_current_pending_targets_are_each_sent_once_oldest_first" file="/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionTest.php" line="323" class="Tests\Feature\CustomerSuppressionTest" classname="Tests.Feature.CustomerSuppressionTest" assertions="8" time="157.571249"/>
+  </testsuite>
+</testsuites>

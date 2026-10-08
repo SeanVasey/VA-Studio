@@ -14,9 +14,9 @@ final class CheckoutCommandCommitDispatcher implements Dispatcher
     private string $phase = 'held';
 
     private function __construct(private readonly Dispatcher $delegate, private readonly CheckoutCommandFrame $frame,
-        private readonly CheckoutWriteAdmission $admission) {}
+        private readonly CheckoutCommitAdmission $admission) {}
 
-    public static function capture(CheckoutCommandFrame $frame, CheckoutWriteAdmission $admission): self
+    public static function capture(CheckoutCommandFrame $frame, CheckoutCommitAdmission $admission): self
     {
         $frame->prove(1);
         $delegate = $frame->connection()->getEventDispatcher();

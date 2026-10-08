@@ -1,0 +1,77 @@
+
+   INFO  Preparing database.  
+
+  Creating migration table ...................................... 65.66ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table .......................... 58.40ms DONE
+  0001_01_01_000001_create_cache_table .......................... 35.73ms DONE
+  0001_01_01_000002_create_jobs_table ........................... 58.30ms DONE
+  2026_09_04_000001_create_catalog_foundation .................. 684.05ms DONE
+  2026_09_04_000002_add_admin_mfa_and_immutable_evidence ....... 136.64ms DONE
+  2026_09_04_000003_media_processing ........................... 456.62ms DONE
+  2026_09_04_000004_license_evidence ................................. 1s DONE
+  2026_09_04_000005_offer_revisions ............................ 524.48ms DONE
+  2026_09_06_000006_provisional_quotes ......................... 399.15ms DONE
+  2026_09_09_000007_stripe_webhook_receipts ..................... 56.83ms DONE
+  2026_09_09_000008_track_metadata_and_public_urls ............. 144.47ms DONE
+  2026_09_09_000009_stems_recordings ........................... 461.51ms DONE
+  2026_09_10_000010_typed_license_terms ......................... 27.38ms DONE
+  2026_09_11_000011_license_scope_terms ......................... 42.53ms DONE
+  2026_09_12_000012_license_economic_terms ...................... 31.45ms DONE
+  2026_09_12_000013_quote_pricing ............................... 68.60ms DONE
+  2026_09_14_000014_promotion_usage ............................ 265.60ms DONE
+  2026_09_17_000015_shared_rights_inventory .................... 593.85ms DONE
+  2026_09_23_000016_exclusive_activations ...................... 192.24ms DONE
+  2026_09_24_000017_order_preparation .......................... 975.31ms DONE
+  2026_09_26_000018_hosted_test_checkout ....................... 488.00ms DONE
+  2026_09_26_000019_test_payment_evidence ...................... 687.15ms DONE
+  2026_09_26_000020_test_order_finalization .......................... 1s DONE
+  2026_09_26_000021_test_contract_issuance ..................... 680.53ms DONE
+  2026_09_26_000022_test_fulfillment_activation ................ 173.46ms DONE
+  2026_09_26_000023_test_owner_delivery ........................ 760.47ms DONE
+  2026_09_28_000024_site_content_releases ...................... 341.88ms DONE
+  2026_09_29_000025_promotion_administration ................... 240.96ms DONE
+  2026_09_29_000026_site_publication_schedules ................. 212.75ms DONE
+  2026_09_30_000027_site_images ................................ 252.96ms DONE
+  2026_09_30_000028_site_release_images ........................ 138.45ms DONE
+  2026_10_01_000029_byte_exact_hash_guards ..................... 124.91ms DONE
+  2026_10_01_000030_byte_exact_uuid_guards ..................... 145.79ms DONE
+  2026_10_01_000031_customer_inquiries ......................... 230.88ms DONE
+  2026_10_01_000032_editorial_related_tracks_images ............. 19.67ms DONE
+  2026_10_02_000033_track_metadata_presets ...................... 21.04ms DONE
+  2026_10_02_000034_track_publication_version ................... 43.48ms DONE
+  2026_10_02_000035_rights_evidence_guards ..................... 156.35ms DONE
+  2026_10_02_000036_test_payment_exception_operations .......... 284.08ms DONE
+  2026_10_06_000038_resumable_media_uploads .................... 239.73ms DONE
+  2026_10_06_000039_test_payment_financial_observations ......... 86.04ms DONE
+  2026_10_06_000040_customer_accounts .......................... 219.03ms DONE
+  2026_10_06_000041_product_draft_versions ..................... 535.28ms DONE
+  2026_10_06_000042_test_unpaid_releases ............................. 1s DONE
+  2026_10_06_000043_inquiry_messages ........................... 214.16ms DONE
+  2026_10_06_000044_sound_kit_intake ........................... 382.14ms DONE
+  2026_10_06_000045_customer_identity_challenges ............... 542.82ms DONE
+  2026_10_06_000046_sound_kit_upload_sessions .................. 272.76ms DONE
+  2026_10_06_000047_test_refund_resolutions .......................... 1s DONE
+  2026_10_06_000048_customer_purchase_claims ................... 592.27ms DONE
+  2026_10_06_000049_inquiry_order_contexts ..................... 153.35ms DONE
+  2026_10_06_230000_membership_credit_foundation ............... 806.69ms DONE
+  2026_10_06_231000_test_transactional_notifications ........... 674.13ms DONE
+  2026_10_06_233000_production_track_policy_drafts ............. 544.02ms DONE
+  2026_10_06_234000_service_draft_versions ..................... 431.49ms DONE
+  2026_10_06_235000_merch_draft_versions ....................... 227.89ms DONE
+  2026_10_06_236000_production_track_policy_capabilities ....... 713.70ms DONE
+  2026_10_06_237000_catalog_import_progress .................... 487.40ms DONE
+  2026_10_06_238000_production_track_preparation_packets ....... 977.58ms DONE
+  2026_10_07_239000_production_buyer_assent_observations ....... 205.36ms DONE
+  2026_10_07_240000_catalog_discovery_epoch .................... 539.59ms DONE
+  2026_10_07_242000_customer_saved_tracks ....................... 47.64ms DONE
+  2026_10_07_243000_inquiry_notification_intents ................ 45.76ms FAIL
+
+In 2026_10_07_243000_inquiry_notification_intents.php line 394:
+                                                                               
+  Unexpected inquiry notification external routine reference; existing schema  
+  , guards and evidence are unchanged. Investigate before retrying.            
+                                                                               
+

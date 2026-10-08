@@ -1,0 +1,14 @@
+--- DB_DATABASE=rv`bt
+config="rv`bt" refused: Illuminate\Database\QueryException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'bt`' at line 1 (Connection: m
+--- DB_DATABASE=rv``bt
+config="rv``bt" refused: Illuminate\Database\QueryException: SQLSTATE[HY000] [1049] Unknown database 'rv``bt' (Connection: mysql, Host: 127.0.0.1, Port: 3709, Database: rv``bt, SQL: SELECT DATABASE() d)
+--- DB_DATABASE=rv"q
+config="rv\"q" DATABASE()="rv\"q"
+--- DB_DATABASE=rv.dot
+config="rv.dot" DATABASE()="rv.dot"
+--- DB_DATABASE=rv#c
+config="rv#c" DATABASE()="rv#c"
+--- DB_DATABASE=rv sp
+config="rv sp" DATABASE()="rv sp"
+--- DB_DATABASE=a`b
+config="a`b" refused: Illuminate\Database\QueryException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'b`' at line 1 (Connection: my

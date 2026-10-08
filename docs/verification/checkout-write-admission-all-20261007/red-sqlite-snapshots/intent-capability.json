@@ -1,0 +1,13 @@
+{
+    "case": "capability",
+    "driver": "sqlite",
+    "callbacks": 2,
+    "refused": "Illuminate\\Validation\\ValidationException",
+    "provider_creates": 1,
+    "counts": {
+        "intent": 1,
+        "session": 0,
+        "observation": 0,
+        "payment": 0
+    }
+}

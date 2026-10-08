@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="29" errors="0" failures="0" skipped="0" time="22.962146">
+    <testsuite name="Tests\Feature\ProductionCheckoutRefusedFrameCallbackTest" file="/home/user/VA-Studio-review/tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php" tests="1" assertions="11" errors="0" failures="0" skipped="0" time="9.202051">
+      <testcase name="test_refused_new_order_frame_does_not_leak_after_commit_callbacks_into_next_commit" file="/home/user/VA-Studio-review/tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php" line="39" class="Tests\Feature\ProductionCheckoutRefusedFrameCallbackTest" classname="Tests.Feature.ProductionCheckoutRefusedFrameCallbackTest" assertions="11" time="9.202051"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionCheckoutObserverExclusionTest" file="/home/user/VA-Studio-review/tests/Feature/ProductionCheckoutObserverExclusionTest.php" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="13.760095">
+      <testcase name="test_receipt_observer_refuses_frame_already_holding_new_write_observer" file="/home/user/VA-Studio-review/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="47" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="9" time="7.348713"/>
+      <testcase name="test_new_write_observer_refuses_frame_already_holding_receipt_observer" file="/home/user/VA-Studio-review/tests/Feature/ProductionCheckoutObserverExclusionTest.php" line="69" class="Tests\Feature\ProductionCheckoutObserverExclusionTest" classname="Tests.Feature.ProductionCheckoutObserverExclusionTest" assertions="9" time="6.411382"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

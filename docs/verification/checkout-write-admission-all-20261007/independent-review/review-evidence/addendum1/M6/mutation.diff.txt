@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/TaxExemptions.php b/app/Domain/Commerce/ProductionCheckout/TaxExemptions.php
+index 7e260343..94bdfc0f 100644
+--- a/app/Domain/Commerce/ProductionCheckout/TaxExemptions.php
++++ b/app/Domain/Commerce/ProductionCheckout/TaxExemptions.php
+@@ -74,7 +74,7 @@ final class TaxExemptions
+             CurrentPolicy::proveCurrent($rows->current, $current);
+             StaffProof::proveCurrent($qualifier, $rows->current, $staff);
+             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+-            if ($inserted === true) {
++            if ($inserted === "M6-never") { // MUTATION M6: basis observer never installed
+                 // Only a NEW basis installs the one commit observer; an exact replay writes nothing.
+                 CheckoutStaffWriteAdmission::basis($rows, $qualifier, $staff, $buyer, $access, $current, $selection,
+                     $authority, $policy, $attestation, $record, $digest);

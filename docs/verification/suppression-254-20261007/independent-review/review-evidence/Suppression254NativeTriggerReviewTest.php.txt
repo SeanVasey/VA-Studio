@@ -1,0 +1,90 @@
+<?php
+
+namespace Tests\Feature\ReviewSupp254;
+
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionSchema;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Support\CustomerFixtures;
+use Tests\TestCase;
+
+/** Independent reviewer throwaway: native (and SQLite) BEFORE INSERT/UPDATE/DELETE guards with raw rows. */
+class Suppression254NativeTriggerReviewTest extends TestCase
+{
+    private function hex(string $seed): string
+    {
+        return hash('sha256', $seed);
+    }
+
+    private function refused(callable $write, string $label): void
+    {
+        try {
+            $write();
+            $this->fail($label.' was accepted');
+        } catch (QueryException $error) {
+            $this->assertStringContainsString('Retained production suppression refused', $error->getMessage(), $label);
+        }
+    }
+
+    public function test_raw_insert_guards_and_append_only_retention(): void
+    {
+        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+        $now = now()->utc()->format('Y-m-d H:i:s');
+        $bindings = [];
+        foreach (['a', 'b'] as $k) {
+            $account = CustomerFixtures::account(['email' => "review-native-$k@example.test"])['account'];
+            $bindings[$k] = DB::table('production_account_feature_bindings')->insertGetId(['public_id' => (string) Str::uuid(), 'account_id' => $account->id,
+                'origin_public_id' => (string) Str::uuid(), 'feature' => 'consent_preferences', 'feature_schema_version' => 1,
+                'feature_policy_version' => 'production-consent-preferences-identity-v1', 'binding_hash' => $this->hex("binding-$k"),
+                'binding_ciphertext' => 'synthetic', 'created_at' => $now]);
+        }
+        $policy = DB::table('production_consent_policies')->insertGetId(['purpose' => 'email_marketing', 'version' => 'review-v1', 'notice' => 'Synthetic notice',
+            'review_reference' => 'SYNTHETIC review', 'notice_hash' => $this->hex('notice'), 'policy_hash' => $this->hex('policy'), 'created_at' => $now]);
+        $withdrawn = DB::table('production_consent_events')->insertGetId(['public_id' => (string) Str::uuid(), 'binding_id' => $bindings['a'], 'purpose' => 'email_marketing',
+            'revision' => 1, 'status' => 'withdrawn', 'policy_id' => null, 'source' => 'first_party_customer', 'affirmative' => 0,
+            'recipient_hmac' => $this->hex('recipient-a'), 'recipient_ciphertext' => 'synthetic', 'created_at' => $now]);
+        $granted = DB::table('production_consent_events')->insertGetId(['public_id' => (string) Str::uuid(), 'binding_id' => $bindings['b'], 'purpose' => 'email_marketing',
+            'revision' => 1, 'status' => 'granted', 'policy_id' => $policy, 'source' => 'first_party_customer', 'affirmative' => 1,
+            'recipient_hmac' => $this->hex('recipient-b'), 'recipient_ciphertext' => 'synthetic', 'created_at' => $now]);
+        $target = fn (array $o = []) => DB::table('production_suppression_targets')->insertGetId([...['public_id' => (string) Str::uuid(), 'binding_id' => $bindings['a'],
+            'purpose' => 'email_marketing', 'recipient_hmac' => $this->hex('recipient-a'), 'recipient_ciphertext' => 'synthetic', 'withdrawal_event_id' => $withdrawn,
+            'created_at' => $now], ...$o]);
+        $this->refused(fn () => $target(['binding_id' => $bindings['b'], 'recipient_hmac' => $this->hex('recipient-b'), 'withdrawal_event_id' => $granted]), 'target from granted event');
+        $this->refused(fn () => $target(['recipient_hmac' => $this->hex('someone-else')]), 'target recipient differs from withdrawal');
+        $this->refused(fn () => $target(['binding_id' => $bindings['b']]), 'target binding differs from withdrawal');
+        $this->refused(fn () => $target(['created_at' => '2000-01-01 00:00:00']), 'target before withdrawal');
+        $targetId = $target();
+        $this->refused(fn () => $target(), 'second target same recipient');
+        $intent = fn (array $o = []) => DB::table('production_suppression_intents')->insertGetId([...['public_id' => (string) Str::uuid(), 'target_id' => $targetId,
+            'withdrawal_event_id' => $withdrawn, 'created_at' => $now], ...$o]);
+        $this->refused(fn () => $intent(['withdrawal_event_id' => $granted]), 'intent from granted event');
+        $intentId = $intent();
+        $this->refused(fn () => $intent(), 'second intent for one withdrawal');
+        $attempt = fn (array $o = []) => DB::table('production_suppression_attempts')->insertGetId([...['public_id' => (string) Str::uuid(), 'target_id' => $targetId,
+            'intent_id' => $intentId, 'provider_hash' => $this->hex('provider'), 'provider_ciphertext' => 'synthetic', 'request_hash' => $this->hex('request'), 'created_at' => $now], ...$o]);
+        $attemptId = $attempt();
+        $this->refused(fn () => $attempt(), 'second attempt for one target');
+        $confirm = fn (array $o = []) => DB::table('production_suppression_confirmations')->insertGetId([...['attempt_id' => $attemptId, 'request_hash' => $this->hex('request'),
+            'receipt_hash' => $this->hex('receipt'), 'receipt_ciphertext' => 'synthetic', 'created_at' => $now], ...$o]);
+        $this->refused(fn () => $confirm(['request_hash' => $this->hex('other-request')]), 'confirmation for another request');
+        $confirm();
+        $this->refused(fn () => $confirm(), 'second confirmation');
+        foreach (ProductionSuppressionSchema::TABLES as $table) {
+            $this->assertSame(1, DB::table($table)->count(), $table);
+            $this->refused(fn () => DB::statement("UPDATE $table SET created_at=created_at"), "$table update");
+            $this->refused(fn () => DB::statement("DELETE FROM $table"), "$table delete");
+            $this->assertSame(1, DB::table($table)->count(), $table);
+        }
+        try {
+            $this->artisan('migrate:rollback', ['--force' => true]);
+        } catch (\Throwable $e) {
+            fwrite(STDERR, "\n[review] migrate:rollback: ".$e::class.': '.$e->getMessage()."\n");
+        }
+        foreach (ProductionSuppressionSchema::TABLES as $table) {
+            $this->assertSame(1, DB::table($table)->count(), $table.' after rollback attempt');
+        }
+        $this->assertSame(1, DB::table('migrations')->where('migration', ProductionSuppressionSchema::MIGRATION)->count());
+        fwrite(STDERR, "\n[review] driver=".DB::getDriverName()." raw guard probe complete\n");
+    }
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" tests="1" assertions="17" errors="0" failures="1" skipped="0" time="239.378694">
+    <testcase name="test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="113" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="17" time="239.378694">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused
+P3 inquiry upper-case-qualifier
+Failed asserting that two strings are not identical.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

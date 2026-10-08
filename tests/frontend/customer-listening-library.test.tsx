@@ -101,7 +101,9 @@ describe('saved tracks and named playlists', () => {
     fetcher.mockResolvedValueOnce(libraryResponse({ ...empty(1), playlists: [{ id: playlistId, name: 'Actually committed', tracks: [] }] }));
     render(<CustomerListeningLibrary />); await open();
     fireEvent.change(screen.getByLabelText('New playlist name'), { target: { value: 'Uncertain save' } }); fireEvent.click(screen.getByRole('button', { name: 'Create playlist' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('The change could not be confirmed'); expect(screen.getByRole('alert')).toHaveFocus();
+    expect(await screen.findByRole('alert')).toHaveTextContent('The change could not be confirmed');
+    // Focus moves in a useEffect after the alert renders; wait for that commit instead of asserting synchronously.
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
     expect(screen.queryByLabelText('New playlist name')).not.toBeInTheDocument(); expect(screen.queryByText(/PRIVATE/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Open saved tracks' })); await screen.findByRole('button', { name: 'Open playlist Actually committed' });
     expect(fetcher.mock.calls.map(([, options]) => options?.method)).toEqual(['GET', 'POST', 'GET']);

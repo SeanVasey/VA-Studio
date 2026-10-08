@@ -1,0 +1,67 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 02:49.329, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\Canary\TerminalReproofCanaryTest::test_no_unadmitted_commit_between_the_admitted_reproof_and_provider_create
+LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+
+/home/user/VA-Studio-review-admission4/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:513
+/home/user/VA-Studio-review-admission4/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:185
+/home/user/VA-Studio-review-admission4/database/migrations/2026_10_07_247000_production_customer_identity.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithConsole.php:85
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/DatabaseMigrations.php:37
+/home/user/VA-Studio-review-admission4/tests/Support/FinalizationDatabaseMigrations.php:22
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:239
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:106
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-terminal-reproof/canary/TerminalReproofCanaryTest.php:34
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 0, Errors: 1.

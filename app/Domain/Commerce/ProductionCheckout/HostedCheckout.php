@@ -22,6 +22,11 @@ final class HostedCheckout
         CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
         $context = $prepared['order']['context'];
         $origin = HostedEvidence::requireGateway($this->gateway, $context);
+        if ($prepared['intent']['session'] === null) {
+            // Final read-only re-proof immediately before the first provider create. Any change after
+            // this point crosses the external call and belongs to reconciliation/refund handling.
+            $this->proveCreatable($principal, $buyer, $prepared);
+        }
         try {
             $sessionId = $prepared['intent']['session']['provider_session_id'] ?? null;
             if ($sessionId === null) {
@@ -88,8 +93,11 @@ final class HostedCheckout
             $current = null;
             $selection = null;
             $basis = null;
+            $fresh = null;
+            $inserted = false;
             if ($create) {
                 CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+                $fresh = FreshCheckoutPolicy::capture();
                 $current = CurrentPolicy::load($rows->current, $order['review']['row']['candidate_id']);
                 Evidence::same($current['binding'], $order['review']['body']['candidate']);
                 Evidence::same($current['context']->binding(), $order['context']->binding());
@@ -111,6 +119,7 @@ final class HostedCheckout
                     'order_id' => $order['row']['id'], 'attempt_id' => $order['attempt']['id'], 'account_id' => $context->accountId, 'funds_mode' => $context->fundsMode,
                     'idempotency_key' => $request['idempotency_key'], 'retry_before' => $at->addSeconds($context->retrySeconds)->format('Y-m-d\TH:i:s\Z'),
                     'provider_expires_at' => $at->addSeconds($context->providerLifetimeSeconds)->format('Y-m-d\TH:i:s\Z')]);
+                $inserted = true;
             } else {
                 $record = $intents[0];
             }
@@ -130,8 +139,46 @@ final class HostedCheckout
             OrderEvidence::proveRetained($rows, $order['raw']);
             HostedEvidence::proveRetained($rows, $intent['raw']);
             $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+            if ($inserted === true) {
+                $fresh->prove();
+                // Only a NEW intent installs the one commit observer; retries, reads and reconciliation do not.
+                CheckoutIntentAdmission::capture($rows, $access, $buyer, $fresh, $order, $intent, $current, $selection, $basis);
+            }
 
-            return compact('order', 'intent');
+            return compact('order', 'intent', 'current', 'selection', 'basis');
+        });
+    }
+
+    /**
+     * Read-only raw re-proof of the retained policy, selection, basis and request before the first create.
+     *
+     * This is the one read frame that carries the commit observer: it is the last proof before the
+     * provider boundary, so a committing listener on this frame must not be able to withdraw the offer
+     * or close the capability after the proofs ran (Codex P1 r4210033214).
+     *
+     * The admitted frame is the TERMINAL step before gateway->create() (Codex P1 r4210180698): the
+     * current-credential check runs before it, never after, because its own ordinary framework
+     * transaction would otherwise commit unobserved between the admitted re-proof and the provider
+     * call. The frame then re-locks and re-proves the same credential rows and admits them at commit.
+     */
+    private function proveCreatable(ProductionCustomerPrincipal $principal, User $buyer, array $prepared): void
+    {
+        CheckoutException::require($prepared['current'] !== null && $prepared['selection'] !== null && $prepared['basis'] !== null);
+        $this->access->current($principal, $buyer);
+        CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $prepared): void {
+            $access = $this->access->lock($principal, $buyer, $rows->current);
+            CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+            $fresh = FreshCheckoutPolicy::capture();
+            OrderEvidence::proveRetained($rows, $prepared['order']['raw']);
+            HostedEvidence::proveRetained($rows, $prepared['intent']['raw']);
+            TaxExemptions::proveRetained($rows, $prepared['basis']);
+            CurrentSelection::proveCurrent($rows->current, $prepared['selection'], CarbonImmutable::now('UTC'));
+            CurrentPolicy::proveCurrent($rows->current, $prepared['current']);
+            $this->access->proveCurrent($principal, $buyer, $rows->current, $access);
+            CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
+            $fresh->prove();
+            CheckoutIntentAdmission::reprove($rows, $access, $buyer, $fresh, $prepared['order'], $prepared['intent'],
+                $prepared['current'], $prepared['selection'], $prepared['basis']);
         });
     }
 

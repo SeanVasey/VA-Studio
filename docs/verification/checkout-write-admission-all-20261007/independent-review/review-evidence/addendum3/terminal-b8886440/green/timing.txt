@@ -1,0 +1,6 @@
+t-c6-physical exit=0 wall=16.877707799s
+t-terminal-canary exit=0 wall=17.932749316s
+t-4d-canary exit=1 wall=18.067657039s
+t-ExemptionAuthority exit=0 wall=33.206898603s
+t-Journey exit=0 wall=41.583925177s
+t-WriteAdmissionAll exit=0 wall=89.591250076s

@@ -1,0 +1,3 @@
+red-ExemptionAuthority 1
+red-ExemptionBasis 1
+red-HostedIntent 1

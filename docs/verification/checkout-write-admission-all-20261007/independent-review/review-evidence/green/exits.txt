@@ -1,0 +1,3 @@
+green-ExemptionAuthority 0
+green-ExemptionBasis 0
+green-HostedIntent 0

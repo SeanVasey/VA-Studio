@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index f73ebfe2..3958d598 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -90,7 +90,6 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+         $frame->capDeadline(hrtime(true) + (int) floor($remaining * 1_000_000_000));
+         $plans = new CheckoutRawPlans($frame);
+         $plans->actor($actor);
+-        $plans->staff($actor->id, $staff);
+ 
+         return [$frame, $plans];
+     }

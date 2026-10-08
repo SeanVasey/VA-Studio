@@ -1,0 +1,7 @@
+# SHA-256 at 61b8ee17: git show <sha>:<path> | sha256sum, and worktree file
+b0002097caa3575d7e76d48a8fd4d39134cfe0bf5c90f38c33374d4c7ab02040  app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php  (worktree same; 489369c7 same)
+1715515c80d8333dd930eb0053005779a5fa19d55315a69b2d8b72192198531b  app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php  (worktree same; 489369c7 same)
+ee11f3595d0f9535f59f0e06bf1450f685150b07db015ae360e7eaf597db1387  database/migrations/2026_10_07_243000_inquiry_notification_intents.php  (worktree same; 489369c7 same)
+d0d2a8af0904dda719d9b2272d1cfb1b6cac9d043a223776d4b0766dec38da2d  tests/Feature/NativeSchemaIsolationTest.php  (worktree same; 489369c7 same)
+d745a4066d120342b2821995f8f61e6708bd8033091550a54d23a3cbdeba47d3  tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php  (worktree same; 489369c7 same)
+94f0666a4226e2a8988f30028f51453f24e5c4a20ec0b6fa09ba13b6aa09a933  scripts/ci/database-sqlite-skips.json  (worktree same; 489369c7 same)

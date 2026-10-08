@@ -1,0 +1,108 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index f73ebfe2..4ea5c81a 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -42,7 +42,8 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+     public static function basis(Records $rows, User $qualifier, array $staff, User $buyer, array $identity, array $current,
+         array $selection, array $authority, array $policy, array $attestation, array $record, string $requestKey): self
+     {
+-        [$frame, $plans] = self::open($rows, $qualifier, $staff, [$policy['effective_until'], $attestation['effective_until']]);
++        $until = [$policy['effective_until'], $attestation['effective_until'], ...self::licenseUntil($selection)];
++        [$frame, $plans] = self::open($rows, $qualifier, $staff, $until);
+         $plans->actor($buyer);
+         $plans->identity($identity);
+         $plans->selection($selection);
+@@ -78,6 +79,38 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+             && ($policy['exemption_authoring_enabled'] ?? null) === true && in_array($this->ownerId, $owners, true), 'authority', 403);
+     }
+ 
++    /**
++     * Non-null effective_until of every active selected offer's current license, built exactly as
++     * CheckoutIntentAdmission does: an expiring license leaves its rows byte-identical, so only the
++     * original deadline cap can refuse a commit after the selection stopped being effective.
++     */
++    private static function licenseUntil(array $selection): array
++    {
++        $until = [];
++        foreach ($selection['graph']['offers'] as $offer) {
++            if ((string) $offer['is_active'] !== '1') {
++                continue;
++            }
++            $revision = self::one($selection['graph']['revisions'], $offer['current_revision_id']);
++            $license = self::one($selection['graph']['licenses'], $revision['license_version_id']);
++            if ($license['effective_until'] !== null) {
++                $until[] = $license['effective_until'];
++            }
++        }
++
++        return $until;
++    }
++
++    private static function one(array $rows, int $id): array
++    {
++        foreach ($rows as $row) {
++            if ($row['id'] === $id) {
++                return $row;
++            }
++        }
++        CheckoutException::require(false);
++    }
++
+     /** @return array{0: CheckoutCommandFrame, 1: CheckoutRawPlans} */
+     private static function open(Records $rows, User $actor, array $staff, array $until): array
+     {
+diff --git a/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php b/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+index 02e41fbf..e3e099de 100644
+--- a/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
++++ b/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
+@@ -270,6 +270,33 @@ class ProductionCheckoutWriteAdmissionAllTest extends TestCase
+         $this->assertStaffRestored($catalog['actor']->id, $column, $original);
+     }
+ 
++    public function test_new_basis_admission_is_capped_at_the_selected_license_expiry(): void
++    {
++        // The only selected license expires shortly after qualify() seals its admission. Its rows stay
++        // byte-identical, so only the original deadline cap can refuse the commit once it has expired.
++        $until = CarbonImmutable::now('UTC')->addMinutes(10)->startOfSecond();
++        $catalog = F::catalog($until->format('Y-m-d\TH:i:s\Z'));
++        $buyer = $this->enrollThroughLocalSmtp();
++        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, F::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
++        $slept = false;
++        app('events')->listen(TransactionCommitting::class, function () use (&$slept): void {
++            if (! $slept && DB::connection()->getEventDispatcher() instanceof CheckoutCommandCommitDispatcher) {
++                $slept = true;
++                // Real monotonic time passes the license expiry inside the same physical commit.
++                usleep(2_500_000);
++            }
++        });
++        CarbonImmutable::setTestNow($until->subMilliseconds(1500));
++        try {
++            $this->assertRefused('write_frame', fn () => $this->qualify($catalog, $buyer, $authority, 'synthetic-qualified-buyer'));
++        } finally {
++            CarbonImmutable::setTestNow();
++        }
++        $this->assertTrue($slept);
++        $this->assertDatabaseCount(CheckoutSchema::TABLES['basis'], 0);
++        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
++    }
++
+     public function test_staff_replays_install_no_observer_and_positive_caller_write_survives(): void
+     {
+         $catalog = F::catalog();
+diff --git a/tests/Support/ProductionCheckoutFixtures.php b/tests/Support/ProductionCheckoutFixtures.php
+index 7a2294b0..eeb93c55 100644
+--- a/tests/Support/ProductionCheckoutFixtures.php
++++ b/tests/Support/ProductionCheckoutFixtures.php
+@@ -10,10 +10,10 @@ use Carbon\CarbonImmutable;
+ /** Actual catalog/source lifecycle with new synthetic checkout choices, never a legal/account approval. */
+ final class ProductionCheckoutFixtures
+ {
+-    public static function catalog(): array
++    public static function catalog(?string $licenseUntil = null): array
+     {
+         ProductionCheckoutProviderFixtures::configure();
+-        $fixture = ProductionTrackPreparationFixtures::prepared();
++        $fixture = ProductionTrackPreparationFixtures::prepared(licenseUntil: $licenseUntil);
+         $machine = ProductionCheckoutProviderFixtures::machine();
+         $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
+             app(PrepareProductionTrackCapabilities::class)->review($fixture['candidate'], $fixture['source'], $machine, $fixture['actor']), $fixture['actor']);

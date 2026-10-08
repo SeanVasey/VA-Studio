@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index f73ebfe2..0498a0cf 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -75,7 +75,7 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+         CheckoutException::require(is_array($instances) && is_array($items) && is_array($policy) && is_array($owners)
+             && Container::getInstance() === $this->container
+             && ($instances['config'] ?? null) === $this->configuration && $aliases === $this->aliases
+-            && ($policy['exemption_authoring_enabled'] ?? null) === true && in_array($this->ownerId, $owners, true), 'authority', 403);
++            /* MUTATION M5: authoring flag and owner delegation checks removed */, 'authority', 403);
+     }
+ 
+     /** @return array{0: CheckoutCommandFrame, 1: CheckoutRawPlans} */

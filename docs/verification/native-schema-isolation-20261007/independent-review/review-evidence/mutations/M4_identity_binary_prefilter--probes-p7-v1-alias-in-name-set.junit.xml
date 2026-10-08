@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" tests="1" assertions="1520" errors="0" failures="0" skipped="0" time="191.976291">
+    <testcase name="test_p7_batched_lookups_equal_the_original_per_name_queries" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="220" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="1520" time="191.976291"/>
+  </testsuite>
+</testsuites>

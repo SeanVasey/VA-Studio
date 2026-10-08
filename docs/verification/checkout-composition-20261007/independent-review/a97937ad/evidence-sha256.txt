@@ -1,0 +1,4 @@
+fc0627ceed06aede85fc58b4025be3a2434fe9ca69503d5d4d6def1ff7c29eac  a97937ad/source-sha256.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  a97937ad/sqlite-config-provider.exit
+e8fd34f2b76a2896a7869b73d5bba64ba24505b9b957ee50fc6087b0ff3ff0b6  a97937ad/sqlite-config-provider.txt
+8444670671bad0a7b911cea49eadb62fc4805a1204e4392c72557b8da9d89086  a97937ad/sqlite-config-provider.xml

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="10" assertions="12" errors="10" failures="0" skipped="0" time="985.963367">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="310.982939">
+      <testcase name="test_actual_public_catalog_projection_and_all_ordinary_writes_keep_pinned_v1_readable" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="100" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="2" time="128.537563">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_actual_public_catalog_projection_and_all_ordinary_writes_keep_pinned_v1_readable
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php:106</error>
+      </testcase>
+      <testcase name="test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php" line="232" class="Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureBoundaryTest" assertions="2" time="182.445375">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureBoundaryTest::test_postcommit_public_withdrawal_cannot_release_old_public_link_and_reload_is_fresh
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php:237</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureHeldFloorTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.000000">
+      <testcase name="test_commit_event_identity_floor_withdrawal_withholds_projection_and_preserves_durable_write" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php" line="80" class="Tests\Feature\ProductionFeatures\ProductionFeatureHeldFloorTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureHeldFloorTest" assertions="0" time="0.000000">
+        <error type="LogicException">Tests\Feature\ProductionFeatures\ProductionFeatureHeldFloorTest::test_commit_event_identity_floor_withdrawal_withholds_projection_and_preserves_durable_write
+LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:166
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+/home/user/VA-Studio-features253/database/migrations/2026_10_06_238000_production_track_preparation_packets.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio-features253/tests/Support/ProductionIdentityFixture.php:27
+/home/user/VA-Studio-features253/tests/Support/ProductionFeatureFixtures.php:21
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php:24</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="0.000000">
+      <testcase name="test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php" line="151" class="Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest" classname="Tests.Feature.ProductionFeatures.ProductionFeaturePlainConfigurationTest" assertions="0" time="0.000000">
+        <error type="LogicException">Tests\Feature\ProductionFeatures\ProductionFeaturePlainConfigurationTest::test_plain_scalar_reference_cannot_mutate_the_captured_purpose_snapshot_in_place
+LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:166
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+/home/user/VA-Studio-features253/database/migrations/2026_10_06_238000_production_track_preparation_packets.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio-features253/tests/Support/ProductionIdentityFixture.php:27
+/home/user/VA-Studio-features253/tests/Support/ProductionFeatureFixtures.php:21
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php:35</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" tests="3" assertions="2" errors="3" failures="0" skipped="0" time="103.291151">
+      <testcase name="test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="33" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="0" time="0.000000">
+        <error type="LogicException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction
+LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:166
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+/home/user/VA-Studio-features253/database/migrations/2026_10_06_238000_production_track_preparation_packets.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio-features253/tests/Support/ProductionIdentityFixture.php:27
+/home/user/VA-Studio-features253/tests/Support/ProductionFeatureFixtures.php:21
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:30</error>
+      </testcase>
+      <testcase name="test_committing_listener_purpose_withdrawal_prevents_a_durable_grant" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="77" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="0" time="0.000000">
+        <error type="LogicException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_committing_listener_purpose_withdrawal_prevents_a_durable_grant
+LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:166
+/home/user/VA-Studio-features253/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+/home/user/VA-Studio-features253/database/migrations/2026_10_06_238000_production_track_preparation_packets.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/home/user/VA-Studio-features253/tests/Support/ProductionIdentityFixture.php:27
+/home/user/VA-Studio-features253/tests/Support/ProductionFeatureFixtures.php:21
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:30</error>
+      </testcase>
+      <testcase name="test_regular_begin_commit_and_aftercommit_callback_order_is_preserved" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php" line="105" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionEventsTest" assertions="2" time="103.291151">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_regular_begin_commit_and_aftercommit_callback_order_is_preserved
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:109</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="375.143150">
+      <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction" tests="2" assertions="4" errors="2" failures="0" skipped="0" time="375.143150">
+        <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="27" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="2" time="139.583816">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:31</error>
+        </testcase>
+        <testcase name="test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php" line="27" class="Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureTransactionOwnershipTest" assertions="2" time="235.559334">
+          <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionFeatureTransactionOwnershipTest::test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:338
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:236
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php:98
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:60
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php:31</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="196.546128">
+      <testcase name="test_actual_over_text_capacity_envelope_is_refused_before_update_with_row_and_revision_unchanged" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php" line="57" class="Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest" classname="Tests.Feature.ProductionFeatures.ProductionListeningNotesCapacityTest" assertions="2" time="196.546128">
+        <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionFeatures\ProductionListeningNotesCapacityTest::test_actual_over_text_capacity_envelope_is_refused_before_update_with_row_and_revision_unchanged
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:103
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:54
+/home/user/VA-Studio-features253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:29
+/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php:61</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

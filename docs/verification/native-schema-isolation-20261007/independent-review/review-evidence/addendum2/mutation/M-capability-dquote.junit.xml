@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\SchemaQualifierDelimiterTest" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" tests="5" assertions="18" errors="0" failures="2" skipped="0" time="0.596771">
+    <testsuite name="Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching" tests="4" assertions="12" errors="0" failures="2" skipped="0" time="0.555703">
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;backtick&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.446188"/>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;double quote&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="1" time="0.041333">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching with data set "double quote"
+capability admitted the delimited database name a"b
+
+/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;doubled backtick&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.032239"/>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;leading quote&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="1" time="0.035942">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching with data set "leading quote"
+capability admitted the delimited database name "a
+
+/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_each_matcher_still_decides_plain_names_on_the_stored_body" file="/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php" line="55" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="6" time="0.041069"/>
+  </testsuite>
+</testsuites>

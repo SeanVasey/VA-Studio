@@ -1,0 +1,125 @@
+# First paid authorize, identity at 58baafbb, private MySQL 8.4.11, general log 16:12:08-16:12:21 (second granularity)
+statements 6468
+417 SELECT DATABASE()
+120 SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?
+100 SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+87 WITH lookup AS (SELECT CONSTRAINT_NAME, TABLE_NAME AS identity_key FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() A
+86 SHOW CREATE TABLE `users`
+86 SHOW CREATE TABLE `customer_accounts`
+86 SHOW CREATE TABLE `quote_owners`
+56 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`audit_events`
+49 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`users`
+49 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`customer_accounts`
+44 WITH lookup AS (SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_
+44 SHOW CREATE TABLE `production_identity_challenges`
+44 SHOW CREATE TABLE `production_identity_origins`
+44 SHOW CREATE TABLE `production_identity_verifications`
+44 SHOW CREATE TABLE `production_identity_notices`
+44 SHOW CREATE TABLE `production_identity_attempts`
+44 SHOW CREATE TABLE `production_identity_outcomes`
+44 SHOW CREATE TABLE `pi_addresses_insert`
+44 SHOW CREATE TABLE `pi_addresses_update`
+44 SHOW CREATE TABLE `pi_addresses_delete`
+44 SHOW CREATE TABLE `pi_challenges_insert`
+44 SHOW CREATE TABLE `pi_challenges_update`
+44 SHOW CREATE TABLE `pi_challenges_delete`
+44 SHOW CREATE TABLE `pi_origins_insert`
+44 SHOW CREATE TABLE `pi_origins_update`
+44 SHOW CREATE TABLE `pi_origins_delete`
+44 SHOW CREATE TABLE `pi_verifications_insert`
+44 SHOW CREATE TABLE `pi_verifications_update`
+44 SHOW CREATE TABLE `pi_verifications_delete`
+44 SHOW CREATE TABLE `pi_notices_insert`
+44 SHOW CREATE TABLE `pi_notices_update`
+44 SHOW CREATE TABLE `pi_notices_delete`
+44 SHOW CREATE TABLE `pi_attempts_insert`
+44 SHOW CREATE TABLE `pi_attempts_update`
+44 SHOW CREATE TABLE `pi_attempts_delete`
+44 SHOW CREATE TABLE `pi_outcomes_insert`
+44 SHOW CREATE TABLE `pi_outcomes_update`
+44 SHOW CREATE TABLE `pi_outcomes_delete`
+44 SHOW CREATE TABLE `pia_address_unique`
+44 SHOW CREATE TABLE `pic_uuid_unique`
+44 SHOW CREATE TABLE `pic_request_unique`
+44 SHOW CREATE TABLE `pic_address_fk`
+44 SHOW CREATE TABLE `pio_uuid_unique`
+44 SHOW CREATE TABLE `pio_account_unique`
+44 SHOW CREATE TABLE `pio_user_unique`
+44 SHOW CREATE TABLE `pio_challenge_unique`
+44 SHOW CREATE TABLE `pio_account_fk`
+44 SHOW CREATE TABLE `pio_user_fk`
+44 SHOW CREATE TABLE `pio_address_fk`
+44 SHOW CREATE TABLE `pio_challenge_fk`
+44 SHOW CREATE TABLE `piv_uuid_unique`
+44 SHOW CREATE TABLE `piv_challenge_unique`
+44 SHOW CREATE TABLE `piv_sequence_unique`
+44 SHOW CREATE TABLE `piv_origin_fk`
+44 SHOW CREATE TABLE `piv_account_fk`
+44 SHOW CREATE TABLE `piv_user_fk`
+44 SHOW CREATE TABLE `piv_challenge_fk`
+44 SHOW CREATE TABLE `pin_uuid_unique`
+44 SHOW CREATE TABLE `pin_challenge_unique`
+44 SHOW CREATE TABLE `pin_challenge_fk`
+
+# Same authorize, identity at 2bbc8f8a, 15:55:20-15:55:36
+statements 8088
+419 SELECT DATABASE()
+308 SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION
+308 SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX
+308 SELECT k.*,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CON
+308 SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND CONSTRAINT_TYPE=?
+135 SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE
+135 SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM 
+135 SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_sch
+135 SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RUL
+135 SELECT COUNT(*) total FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?
+135 SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME
+125 SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?
+93 SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+89 SHOW CREATE TABLE `users`
+89 SHOW CREATE TABLE `customer_accounts`
+89 SHOW CREATE TABLE `quote_owners`
+55 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`audit_events`
+48 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`users`
+48 SHOW CREATE TABLE `vaseyaudio_trigscan_paid`.`customer_accounts`
+45 SELECT @@SESSION.foreign_key_checks
+45 WITH lookup AS (SELECT TABLE_NAME name,? type,TABLE_NAME tbl_name, TABLE_NAME AS identity_key FROM information_schema.TABLES WHERE TABLE_SCH
+45 WITH lookup AS (SELECT TRIGGER_NAME name,? type,EVENT_OBJECT_TABLE tbl_name, TRIGGER_NAME AS identity_key FROM information_schema.TRIGGERS W
+45 WITH lookup AS (SELECT ROUTINE_NAME, ROUTINE_NAME AS identity_key FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE()) SELECT /
+45 WITH lookup AS (SELECT EVENT_NAME, EVENT_NAME AS identity_key FROM information_schema.EVENTS WHERE EVENT_SCHEMA=DATABASE()) SELECT /*+ NO_ME
+45 WITH lookup AS (SELECT INDEX_NAME, INDEX_NAME AS identity_key FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE()) SELECT /*+ N
+45 WITH lookup AS (SELECT CONSTRAINT_NAME, CONSTRAINT_NAME AS identity_key FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DA
+45 SHOW CREATE TABLE `customer_accounts_insert`
+45 SHOW CREATE TABLE `customer_accounts_update`
+45 SHOW CREATE TABLE `customer_accounts_delete`
+45 SHOW CREATE TABLE `quote_owners_immutable_update`
+45 SHOW CREATE TABLE `quote_owners_immutable_delete`
+45 SHOW CREATE TABLE `cde_0_insert`
+45 SHOW CREATE TABLE `cde_0_update`
+45 SHOW CREATE TABLE `cde_0_delete`
+45 WITH lookup AS (SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT, TRIGGER_NAME AS identity_key FROM information_s
+45 WITH lookup AS (SELECT TABLE_NAME,TABLE_TYPE,ENGINE,CREATE_OPTIONS,TABLE_COMMENT,TABLE_COLLATION, TABLE_NAME AS identity_key FROM informatio
+45 WITH lookup AS (SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT, TRIGGER_NAME AS identity_key FROM 
+44 SHOW CREATE TABLE `production_identity_addresses`
+44 SHOW CREATE TABLE `production_identity_challenges`
+44 SHOW CREATE TABLE `production_identity_origins`
+44 SHOW CREATE TABLE `production_identity_verifications`
+44 SHOW CREATE TABLE `production_identity_notices`
+44 SHOW CREATE TABLE `production_identity_attempts`
+44 SHOW CREATE TABLE `production_identity_outcomes`
+44 SHOW CREATE TABLE `pi_addresses_insert`
+44 SHOW CREATE TABLE `pi_addresses_update`
+44 SHOW CREATE TABLE `pi_addresses_delete`
+44 SHOW CREATE TABLE `pi_challenges_insert`
+44 SHOW CREATE TABLE `pi_challenges_update`
+44 SHOW CREATE TABLE `pi_challenges_delete`
+44 SHOW CREATE TABLE `pi_origins_insert`
+44 SHOW CREATE TABLE `pi_origins_update`
+44 SHOW CREATE TABLE `pi_origins_delete`
+44 SHOW CREATE TABLE `pi_verifications_insert`
+44 SHOW CREATE TABLE `pi_verifications_update`
+44 SHOW CREATE TABLE `pi_verifications_delete`
+44 SHOW CREATE TABLE `pi_notices_insert`
+44 SHOW CREATE TABLE `pi_notices_update`
+44 SHOW CREATE TABLE `pi_notices_delete`
+44 SHOW CREATE TABLE `pi_attempts_insert`

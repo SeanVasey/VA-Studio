@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" tests="1" assertions="10" errors="0" failures="1" skipped="0" time="62.954898">
+    <testcase name="test_p4_prefix_and_extension_named_peers" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="152" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="10" time="62.954898">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p4_prefix_and_extension_named_peers
+P4 longer-underscore capability
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'admitted'
++'refused LogicException: Unexpected production capability external view reference; rollback refused before schema changes.'
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:171
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

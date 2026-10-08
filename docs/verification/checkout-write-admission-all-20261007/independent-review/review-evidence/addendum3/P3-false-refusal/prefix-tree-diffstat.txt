@@ -1,0 +1,3 @@
+ .../ProductionCheckout/CheckoutIntentAdmission.php | 23 ++--------------------
+ .../Commerce/ProductionCheckout/HostedCheckout.php | 12 +----------
+ 2 files changed, 3 insertions(+), 32 deletions(-)

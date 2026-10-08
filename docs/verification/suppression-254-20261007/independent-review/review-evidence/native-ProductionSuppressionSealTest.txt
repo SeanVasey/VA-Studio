@@ -1,0 +1,31 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m                                                                  2 / 2 (100%)
+
+Time: 05:44.014, Memory: 85.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionSealTest::test_context_not_minted_by_run_cannot_reach_the_reader_or_254_rows
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php:34
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionSuppression\ProductionSuppressionSealTest::test_transport_request_never_renders_its_recipient
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 4[0m[37;41m, Errors: 2[0m[37;41m.[0m

@@ -1,0 +1,8 @@
+{
+    "driver": "mysql",
+    "acted": 1,
+    "refused": "CheckoutException:changed",
+    "provider_creates": 0,
+    "sessions": 0,
+    "inactive_offers": 1
+}

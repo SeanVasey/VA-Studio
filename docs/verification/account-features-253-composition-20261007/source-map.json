@@ -1,0 +1,342 @@
+{
+  "integratedBase": "d20d4394edcc84bf3c5a193f598d9b044b0753aa",
+  "sourceBranch": "origin/customer-production-account-features-t32",
+  "sourceBranchHead": "3f32ffaeb4ea5225779d887d86c43d88d6204fc5",
+  "sourceCheckpoint": "3cecea697ccaaff74664acf9d48bcaecfa8bf288",
+  "runtimeByteExact": "9d0a5a27a20869c8a845e86461e64f34af669c6b",
+  "borrowedBase": "75626795130a4be15d6bd70f71412cbff7411597",
+  "sourceManifest": {
+    "path": "docs/verification/production-account-features-20261007/manifest.json",
+    "at": "origin/customer-production-account-features-t32",
+    "sha256": "575dc80487b3553a21a643f4cac99ba1466747cb1c27b54f292e129223133d90"
+  },
+  "method": "git checkout <sourceCheckpoint> -- <owned paths only>",
+  "ownedCount": 39,
+  "allMatch": true,
+  "owned": [
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+      "sha256": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+      "manifestSha256": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+      "match": true,
+      "sourceBlob": "0139042bcea0102dec2ab8a0f802f3373f5ba998"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningPublicEvidence.php",
+      "sha256": "3e61ae3de6ea4d4188da42d976a250277f026c2be758c5d1ac4386a08c3cb2fa",
+      "manifestSha256": "3e61ae3de6ea4d4188da42d976a250277f026c2be758c5d1ac4386a08c3cb2fa",
+      "match": true,
+      "sourceBlob": "ad0a7d60706a28bd2943939ee6a02ef70302a31e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningRollout.php",
+      "sha256": "6713d276073fd810f3bf3e7122445537d0884674c4fc6f1e6e736a3275121091",
+      "manifestSha256": "6713d276073fd810f3bf3e7122445537d0884674c4fc6f1e6e736a3275121091",
+      "match": true,
+      "sourceBlob": "d86ba9c360716c7c91b59bf11ab6f3cf509f9763"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningState.php",
+      "sha256": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+      "manifestSha256": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+      "match": true,
+      "sourceBlob": "9e27643250ef1d389275e9403c1165e58eb43bdc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentEvent.php",
+      "sha256": "4d0098581374f9911055211340d23611cfccd6def0c512ea4f83e98bdd9d05be",
+      "manifestSha256": "4d0098581374f9911055211340d23611cfccd6def0c512ea4f83e98bdd9d05be",
+      "match": true,
+      "sourceBlob": "3b6024e4ad307426718feefa03fa60812533babd"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentPolicySnapshot.php",
+      "sha256": "53ac2f046fb371f58f1cd6e51c73907a9db24b24de6879a32a4d920ec6444c07",
+      "manifestSha256": "53ac2f046fb371f58f1cd6e51c73907a9db24b24de6879a32a4d920ec6444c07",
+      "match": true,
+      "sourceBlob": "92f9860794eb09e1054f84ff75c5cde26634ecfe"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentState.php",
+      "sha256": "c1de4609ae53d40814aa914f437f2ea1cd12cbcf7cb072f9ab81b5d9e3435480",
+      "manifestSha256": "c1de4609ae53d40814aa914f437f2ea1cd12cbcf7cb072f9ab81b5d9e3435480",
+      "match": true,
+      "sourceBlob": "a8a5d2dd7cba92395397b56137a6d256b86cfd2b"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionFeatureBinding.php",
+      "sha256": "b56d04afd981af3818ab8e35061ef2fe91dbf5ee253b8ffd5660bbea905eef5c",
+      "manifestSha256": "b56d04afd981af3818ab8e35061ef2fe91dbf5ee253b8ffd5660bbea905eef5c",
+      "match": true,
+      "sourceBlob": "2de189646563047194501242efc0052605d55c86"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Models/ProductionListeningLibrary.php",
+      "sha256": "060d7134c87da475dcfcdcd729436b8d5eef454b4310fd0e8cefa40f9117b171",
+      "manifestSha256": "060d7134c87da475dcfcdcd729436b8d5eef454b4310fd0e8cefa40f9117b171",
+      "match": true,
+      "sourceBlob": "f4b94d41a777c200319b9e64142b23fc1fe3c3a4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+      "sha256": "268ab449cb3dc6927ca51bee915cfcdc7af6b82d6a6dcebcb184d9fdc1bbdbeb",
+      "manifestSha256": "268ab449cb3dc6927ca51bee915cfcdc7af6b82d6a6dcebcb184d9fdc1bbdbeb",
+      "match": true,
+      "sourceBlob": "3f32076597447717206ebe54f8522fb2d43fcb40"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPurposePolicy.php",
+      "sha256": "f1201242871add11aed82bd3b75b203def72e24dd1a1b6419d16d8aa5af9c4a9",
+      "manifestSha256": "f1201242871add11aed82bd3b75b203def72e24dd1a1b6419d16d8aa5af9c4a9",
+      "match": true,
+      "sourceBlob": "a8033390432f76d23388734d69306f92e565fb5d"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentRecords.php",
+      "sha256": "23f1f225dd5db107591653e83ddb418e7d702dafc9cc57197a1f622e34c2f4c6",
+      "manifestSha256": "23f1f225dd5db107591653e83ddb418e7d702dafc9cc57197a1f622e34c2f4c6",
+      "match": true,
+      "sourceBlob": "b97164f26cd097dfd6040e5a86d8af9fdaf0b35b"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php",
+      "sha256": "2f3b2b78fb64175fb6175a6cf8ec2e8fc9f66070c0b82603736a087382ca0006",
+      "manifestSha256": "2f3b2b78fb64175fb6175a6cf8ec2e8fc9f66070c0b82603736a087382ca0006",
+      "match": true,
+      "sourceBlob": "d122e5120c8598c246c67ff5a73a984d43216807"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php",
+      "sha256": "9156530ed4cb7f64674f36269d1a6475d2950ab8bd59e5b73fd96095be3eeb13",
+      "manifestSha256": "9156530ed4cb7f64674f36269d1a6475d2950ab8bd59e5b73fd96095be3eeb13",
+      "match": true,
+      "sourceBlob": "cae83dd6c54606c5ba618a428d0e61f733abe1d3"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php",
+      "sha256": "14aea5dc3d5220cf493fe63348e2c7f440c4accdba73838111d9f79f75daf1ce",
+      "manifestSha256": "14aea5dc3d5220cf493fe63348e2c7f440c4accdba73838111d9f79f75daf1ce",
+      "match": true,
+      "sourceBlob": "106a19040903094a64424ae55b57d1cc12bec36a"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+      "sha256": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+      "manifestSha256": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+      "match": true,
+      "sourceBlob": "625cec42751dbed3dffc73a6a3afed17033d025c"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureException.php",
+      "sha256": "a9a387a8066f575db4375d36a383d4aa6048c36845ed7de1e06fdca77c23cd59",
+      "manifestSha256": "a9a387a8066f575db4375d36a383d4aa6048c36845ed7de1e06fdca77c23cd59",
+      "match": true,
+      "sourceBlob": "a3c97768d9df71995b19cb6bed4365bb5bdbb40d"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+      "sha256": "2306cab0c9375d42a9482b4068b4052d88322ccc783544d9735af3d0cc23c74c",
+      "manifestSha256": "2306cab0c9375d42a9482b4068b4052d88322ccc783544d9735af3d0cc23c74c",
+      "match": true,
+      "sourceBlob": "1d275d906ab8071253c15726c5cec94857635da7"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php",
+      "sha256": "2aebacd13ce80b7bcc118dc21d524a7537ec1b354f5ca55ed89578ce14d481ea",
+      "manifestSha256": "2aebacd13ce80b7bcc118dc21d524a7537ec1b354f5ca55ed89578ce14d481ea",
+      "match": true,
+      "sourceBlob": "d196cb130d305f436b0424a5210a48aac19dc166"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureShape.php",
+      "sha256": "f309456d487db802ccd3f9a8f6364385efc9cefb724d9ef495b619dfe61d9c15",
+      "manifestSha256": "f309456d487db802ccd3f9a8f6364385efc9cefb724d9ef495b619dfe61d9c15",
+      "match": true,
+      "sourceBlob": "80e5c2aca8a7da78f3e5cd7b322018e94495ae2f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+      "sha256": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+      "manifestSha256": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+      "match": true,
+      "sourceBlob": "62fb1cd034bec15b87eeb911d93af7b785c35e97"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+      "sha256": "d48288131d585653614c23b6d635d169fc882e933e86d87965660fd90d196f2e",
+      "manifestSha256": "d48288131d585653614c23b6d635d169fc882e933e86d87965660fd90d196f2e",
+      "match": true,
+      "sourceBlob": "59bf26fadc0be6caaea26dcde657402648766a09"
+    },
+    {
+      "path": "config/production-customer-listening.php",
+      "sha256": "2ceb79c5f6ed3411a7eb5411680b55a6fcde98f968182138afa309089b945826",
+      "manifestSha256": "2ceb79c5f6ed3411a7eb5411680b55a6fcde98f968182138afa309089b945826",
+      "match": true,
+      "sourceBlob": "d4ba143203ad07304cf48cfef57b1825334d9abc"
+    },
+    {
+      "path": "config/production-customer-preferences.php",
+      "sha256": "ecc9017cb2265f5e7d7ddab5c8e45ca664964270f5a2c97c917628e7b143a582",
+      "manifestSha256": "ecc9017cb2265f5e7d7ddab5c8e45ca664964270f5a2c97c917628e7b143a582",
+      "match": true,
+      "sourceBlob": "0bf79137de36d7e4da6bc935e434458aa7ef31b1"
+    },
+    {
+      "path": "database/migrations/2026_10_07_253000_production_account_features.php",
+      "sha256": "6a2f3396d3f085f0f1355f409ded0df3cb6a4aad7a27c2c3bfd7fd82e1dd663a",
+      "manifestSha256": "6a2f3396d3f085f0f1355f409ded0df3cb6a4aad7a27c2c3bfd7fd82e1dd663a",
+      "match": true,
+      "sourceBlob": "0b593121f5af71b800f8e2397a8dcb085b76a829"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionConsentGraphTest.php",
+      "sha256": "affb45f9e769d638ac0d79e10b65d2b9c6863beeb4931f75267b8f757ebcaa12",
+      "manifestSha256": "affb45f9e769d638ac0d79e10b65d2b9c6863beeb4931f75267b8f757ebcaa12",
+      "match": true,
+      "sourceBlob": "aa2d4cdbf614e0dfeb96d5b2a0bc1c25c671bb69"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php",
+      "sha256": "eb3d4917b6a8c4a3dfeee631520b65d8aadf51cf391488e5135facc55cb7a493",
+      "manifestSha256": "eb3d4917b6a8c4a3dfeee631520b65d8aadf51cf391488e5135facc55cb7a493",
+      "match": true,
+      "sourceBlob": "4d00fae4ac90fdcbff67768c8a5982900e038629"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureBoundaryTest.php",
+      "sha256": "1e3d642be46a97de08e1f294094d3ecf23952f175a2d275dd1c2f38d44c02594",
+      "manifestSha256": "1e3d642be46a97de08e1f294094d3ecf23952f175a2d275dd1c2f38d44c02594",
+      "match": true,
+      "sourceBlob": "139a73b690e34c621de8614d79be9896161783e9"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php",
+      "sha256": "f2da994ee393057dd3b7f431c744262b6fca8945ce760195a538e2ca4b7fa289",
+      "manifestSha256": "f2da994ee393057dd3b7f431c744262b6fca8945ce760195a538e2ca4b7fa289",
+      "match": true,
+      "sourceBlob": "3834314495bd0e3d5b562e02208806f9d48bab25"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureJourneyTest.php",
+      "sha256": "be447283abe8c84d6ab369fe880fad4d448052aa5e2197b7e78217d1492bd768",
+      "manifestSha256": "be447283abe8c84d6ab369fe880fad4d448052aa5e2197b7e78217d1492bd768",
+      "match": true,
+      "sourceBlob": "9d7e462ad527f359951a9644580913d84d8e1a3f"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php",
+      "sha256": "9379c1c1b81471db4b8bb0caf3547b39b8f6447905c7fcc978ed900778aff2b6",
+      "manifestSha256": "9379c1c1b81471db4b8bb0caf3547b39b8f6447905c7fcc978ed900778aff2b6",
+      "match": true,
+      "sourceBlob": "1abd0e4957a6d6a592a1c0d48942b58c67e9411e"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php",
+      "sha256": "2ce6fed4eddf1c0f2aed48434a5f223f9e58a9ec96c5d666d6a15f3362d75f4b",
+      "manifestSha256": "2ce6fed4eddf1c0f2aed48434a5f223f9e58a9ec96c5d666d6a15f3362d75f4b",
+      "match": true,
+      "sourceBlob": "7beedfea16bb8007ac1e10ba107384e7dd4a283a"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeaturePlainConfigurationTest.php",
+      "sha256": "058e05b2342c02460c1f48b9f39e7f1949d4e38e52b5c7829b5b60a4b118a834",
+      "manifestSha256": "058e05b2342c02460c1f48b9f39e7f1949d4e38e52b5c7829b5b60a4b118a834",
+      "match": true,
+      "sourceBlob": "88dd438850caab91924d5a3be89e6c7a2f05565d"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureSourceClosureTest.php",
+      "sha256": "fdafd98c363ba756c571ce587d908a5403a473a47b103c721528f2f43938bfea",
+      "manifestSha256": "fdafd98c363ba756c571ce587d908a5403a473a47b103c721528f2f43938bfea",
+      "match": true,
+      "sourceBlob": "87a55ce03883ac70ad2a57c7f0eaf0c416cb002d"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+      "sha256": "ef1d95d9eaf2d944dbec07d0ff6c7751a25105206938e36440da9e49bc23661a",
+      "manifestSha256": "ef1d95d9eaf2d944dbec07d0ff6c7751a25105206938e36440da9e49bc23661a",
+      "match": true,
+      "sourceBlob": "d96184d00a9294e5dd17c7810d1f06e8df13b54d"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+      "sha256": "8d96f3ca3e80e2b33fb95d41c63f86283d6d17502dc1cb412f1bf61eabd1d08a",
+      "manifestSha256": "8d96f3ca3e80e2b33fb95d41c63f86283d6d17502dc1cb412f1bf61eabd1d08a",
+      "match": true,
+      "sourceBlob": "aa1239b484f2524fb40c617802951cca1029acd2"
+    },
+    {
+      "path": "tests/Feature/ProductionFeatures/ProductionListeningNotesCapacityTest.php",
+      "sha256": "aeb341fece93e01bc3391532dc7ea5decc6a717fc6714f482678b724784f862d",
+      "manifestSha256": "aeb341fece93e01bc3391532dc7ea5decc6a717fc6714f482678b724784f862d",
+      "match": true,
+      "sourceBlob": "89345db0c7597d71d60597c93ed0add6667edcbd"
+    },
+    {
+      "path": "tests/Support/ProductionFeatureFixtures.php",
+      "sha256": "6a93e458d0a275f81043984f844552c07fcce64d0a21020b8f86967a44ffccc6",
+      "manifestSha256": "6a93e458d0a275f81043984f844552c07fcce64d0a21020b8f86967a44ffccc6",
+      "match": true,
+      "sourceBlob": "a755abdb410f5a90acf554d444acfb635f9cc13e"
+    },
+    {
+      "path": "tests/Unit/ProductionFeatures/ProductionFeatureStateTest.php",
+      "sha256": "2e2e22e04ab139fb7e986820033f04b468b5a55aa70007b3e3d02539e41ad5b1",
+      "manifestSha256": "2e2e22e04ab139fb7e986820033f04b468b5a55aa70007b3e3d02539e41ad5b1",
+      "match": true,
+      "sourceBlob": "167def3984a9a7308b0574fa6eb4ca796505278f"
+    }
+  ],
+  "borrowedComparedToIntegratedBase": [
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "borrowedBaseSha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "integratedSha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90",
+      "sameAsBorrowedBase": true,
+      "note": null
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php",
+      "borrowedBaseSha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "integratedSha256": "a2a1d7608e9c47d07c9456b8828a0c83141b4a7f078e7e3b01019598d285e0d0",
+      "sameAsBorrowedBase": true,
+      "note": null
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "borrowedBaseSha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+      "integratedSha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+      "sameAsBorrowedBase": true,
+      "note": null
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "borrowedBaseSha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b",
+      "integratedSha256": "5689637577c6ffe61cec52eb60d7445432f992a2246be133be8e0dd424b13da7",
+      "sameAsBorrowedBase": false,
+      "note": "canonical integrated identity (5053 nested-frame query_only/closed fix); not edited here"
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningLibrary.php",
+      "borrowedBaseSha256": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+      "integratedSha256": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+      "sameAsBorrowedBase": true,
+      "note": null
+    },
+    {
+      "path": "app/Domain/Customers/Listening/ListeningEvidence.php",
+      "borrowedBaseSha256": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+      "integratedSha256": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+      "sameAsBorrowedBase": true,
+      "note": null
+    },
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentEvidence.php",
+      "borrowedBaseSha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+      "integratedSha256": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+      "sameAsBorrowedBase": true,
+      "note": null
+    }
+  ]
+}

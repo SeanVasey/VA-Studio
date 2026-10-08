@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeV3Test" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php" tests="1" assertions="24" errors="0" failures="1" skipped="0" time="62.294304">
+    <testcase name="test_p4_prefix_and_extension_named_peers" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php" line="153" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeV3Test" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeV3Test" assertions="24" time="62.294304">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeV3Test::test_p4_prefix_and_extension_named_peers
+P4 hyphen-extension identity
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'admitted'
++'refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.'
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php:173
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

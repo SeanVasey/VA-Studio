@@ -162,7 +162,8 @@ final class CapabilityMigrationOwnership
             if ($guard->TRIGGER_SCHEMA === $database && isset($guards[$guard->TRIGGER_NAME])) {
                 continue;
             }
-            if (($guard->TRIGGER_SCHEMA === $database && in_array($guard->EVENT_OBJECT_TABLE, $tables, true)) || $this->references($guard->ACTION_STATEMENT, $tables)) {
+            if (($guard->TRIGGER_SCHEMA === $database && in_array($guard->EVENT_OBJECT_TABLE, $tables, true))
+                || $this->dependsOn($guard->TRIGGER_SCHEMA, $guard->ACTION_STATEMENT, $tables, $database)) {
                 $this->reject('external or additional table guard');
             }
         }
@@ -172,12 +173,12 @@ final class CapabilityMigrationOwnership
             }
         }
         foreach (DB::table('information_schema.VIEWS')->get() as $view) {
-            if ($this->references($view->VIEW_DEFINITION, $tables)) {
+            if ($this->dependsOn($view->TABLE_SCHEMA, $view->VIEW_DEFINITION, $tables, $database)) {
                 $this->reject('external view reference');
             }
         }
         foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
-            if ($this->references($routine->ROUTINE_DEFINITION, $tables)) {
+            if ($this->dependsOn($routine->ROUTINE_SCHEMA, $routine->ROUTINE_DEFINITION, $tables, $database)) {
                 $this->reject('external routine reference');
             }
         }
@@ -252,6 +253,44 @@ final class CapabilityMigrationOwnership
         if ($foreign !== [] || DB::table('information_schema.TABLE_CONSTRAINTS')->where('TABLE_SCHEMA', $database)->where('TABLE_NAME', $table)->where('CONSTRAINT_TYPE', 'CHECK')->exists()) {
             $this->reject('missing or additional table constraint');
         }
+    }
+
+    /**
+     * Unqualified names in a stored trigger, routine or view resolve to that object's
+     * own schema, so another schema reaches these tables only by naming this database
+     * or through dynamic SQL. Same-named objects in a parallel schema are not dependents.
+     */
+    private function dependsOn(mixed $schema, mixed $sql, array $tables, string $database): bool
+    {
+        return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
+            || $this->qualifies($sql, $database) || $this->references($sql, ['prepare']));
+    }
+
+    /**
+     * Whether the definition names the selected database as a complete qualifier: the whole
+     * identifier (bare, backtick or ANSI-quoted) followed, past optional whitespace and
+     * comments, by the dot. A peer schema that merely extends the selected name, such as
+     * `<db>-2`, `<db>$x` or `<db>é`, is another schema; MySQL stores its objects qualified
+     * (`` `<db>-2`.`t` ``), so a plain word-boundary search would find `<db>` inside that name
+     * and refuse the peer's own objects. The name is compared case-insensitively because a
+     * `lower_case_table_names` 1 or 2 server resolves `` `DB`.`t` `` to the same schema.
+     * A database name containing a backtick or a double quote is refused outright: MySQL stores
+     * doubled delimiters inside routine and trigger bodies mangled (`` `a``b` `` is kept as
+     * `` `aa`bb` ``), so neither the raw nor the SQL-escaped spelling is a reliable match and
+     * a dependency on such a database could be admitted. A regex failure refuses. The same expression is in `IdentityMigrationOwnership::qualifies()` and migration 243 `qualifiesDatabase()`.
+     */
+    private function qualifies(string $sql, string $database): bool
+    {
+        if (str_contains($database, '`') || str_contains($database, '"')) {
+            $this->reject('dependency definition for an identifier-delimited database name');
+        }
+        $name = preg_quote($database, '/');
+        $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
+        if ($match === false) {
+            $this->reject('unreadable dependency definition');
+        }
+
+        return $match === 1;
     }
 
     private function references(mixed $sql, array $tables): bool

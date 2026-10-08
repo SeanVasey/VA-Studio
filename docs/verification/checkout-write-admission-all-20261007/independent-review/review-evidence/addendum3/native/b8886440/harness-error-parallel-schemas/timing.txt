@@ -1,0 +1,2 @@
+native-4d-canary db=va_rev_a3_c2 exit=2 wall=40.428312165s
+native-terminal-canary db=va_rev_a3_c1 exit=2 wall=170.106412209s

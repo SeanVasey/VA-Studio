@@ -1,0 +1,13 @@
+# baseline e7593a9c (SQLite)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254d-mut/phpunit.xml
+
+......................................SSSSSS....                  48 / 48 (100%)
+
+Time: 01:44.198, Memory: 165.00 MB
+
+OK, but some tests were skipped!
+Tests: 48, Assertions: 695, Skipped: 6.
+exit=0

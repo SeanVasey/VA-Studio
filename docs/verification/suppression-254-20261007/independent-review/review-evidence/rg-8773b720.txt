@@ -1,0 +1,204 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254-rg/phpunit.xml
+
+.
+[review] fiber-suspended context use from outside callback frame: released-while-suspended
+[31;1mE[0m[31;1mE[0m[31;1mE[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m.                                                        10 / 10 (100%)
+
+Time: 00:19.656, Memory: 97.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\ReviewSupp254\C2C3OnlyReviewTest::test_c2_fiber_suspended_run_cannot_start_a_second_concurrent_run
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:152
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:77
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:100
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php:28
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php:12
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:93
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ReviewSupp254\C2C3OnlyReviewTest::test_c2_context_leaked_from_a_throwing_callback_and_a_clone_of_a_live_context_refuse
+PDOException: SQLSTATE[HY000]: General error: 1 no such savepoint: va_feature_f16394ccc4c42a357580a9fe33efce12
+
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:104
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php:28
+/home/user/VA-Studio-review-supp254-rg/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php:12
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:116
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:118
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ReviewSupp254\C2C3OnlyReviewTest::test_c2_registry_is_private_static_without_setter
+ReflectionException: Property App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation::$live does not exist
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:147
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 5 failures:
+
+1) Tests\Feature\ReviewSupp254\C2C3OnlyReviewTest::test_c3_other_renderers_and_constructorless_instances_never_expose_recipient
+symfony
+Failed asserting that 'App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal {#8322\n
+  -snapshot: array:11 [\n
+    "bindingId" => 1\n
+    "bindingPublicId" => "f4534003-191c-4731-9c17-1cef4163523c"\n
+    "originalFeatureBinding" => array:4 [\n
+      "buyer_binding" => array:10 [\n
+        "account_id" => 1\n
+        "account_public_id" => "526ab1b6-9e31-415e-be4c-aa867862294e"\n
+        "identity_policy_hash" => "eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c"\n
+        "identity_policy_version" => "personal-store-customer-identity-v1"\n
+        "origin_id" => "848773f4-b9bd-4f32-804c-26a9a27278bf"\n
+        "provenance" => "synthetic_rehearsal"\n
+        "schema_version" => 1\n
+        "user_id" => 1\n
+        "verification_observation_hash" => "401a40bb2b3dab1f64c1a67180a25f5251562b51d10a1ac1ff589381b55613a7"\n
+        "verification_observation_id" => "74d8bcc8-f427-438d-932b-486173d32de0"\n
+      ]\n
+      "feature" => "consent_preferences"\n
+      "feature_policy_version" => "production-consent-preferences-identity-v1"\n
+      "feature_schema_version" => 1\n
+    ]\n
+    "originalBindingHash" => "12ff4b7152ac4f97b7bd840c231313cad4ee23785d4bfcdcd8f97af9b9ca7148"\n
+    "withdrawalEventId" => 1\n
+    "withdrawalPublicId" => "7eda4b6f-f34c-4eba-977c-8403f2a71d81"\n
+    "withdrawalRevision" => 1\n
+    "consentVersion" => 1\n
+    "recipient" => "<REDACTED-RECIPIENT>"\n
+    "recipientHmac" => "333399dd3b4143f84ae0b3b473c987b917909373e081a4dbd03236d8058764ae"\n
+    "capturedAt" => "2026-10-07 16:31:42"\n
+  ]\n
+  purpose: "email_marketing"\n
+  version: 1\n
+}\n
+' [ASCII](length: 1546) does not contain "review-254-owner" [ASCII](length: 16).
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/C2C3OnlyReviewTest.php:168
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ReviewSupp254\ProductionConsentWithdrawalSealTest::test_dump_cast_export_json_and_serialize_never_contain_the_recipient
+var_export
+Failed asserting that '\App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal::__set_state(array(\n
+   'snapshot' => \n
+  array (\n
+    'bindingId' => 1,\n
+    'bindingPublicId' => '7e0fb4c2-c744-4a6f-a0ba-4f05e5359397',\n
+    'originalFeatureBinding' => \n
+    array (\n
+      'buyer_binding' => \n
+      array (\n
+        'account_id' => 1,\n
+        'account_public_id' => '3213b049-a693-47df-9475-1d506e74f993',\n
+        'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',\n
+        'identity_policy_version' => 'personal-store-customer-identity-v1',\n
+        'origin_id' => '737195f4-1ab4-4c4a-9d9c-ea1fcd871bf4',\n
+        'provenance' => 'synthetic_rehearsal',\n
+        'schema_version' => 1,\n
+        'user_id' => 1,\n
+        'verification_observation_hash' => '0a5dea4ea259405780bc7268d7c0e3e4763ed46be83ed96a92272d9796e37cb1',\n
+        'verification_observation_id' => 'c3ab4230-dbad-44db-97d4-dd145820526d',\n
+      ),\n
+      'feature' => 'consent_preferences',\n
+      'feature_policy_version' => 'production-consent-preferences-identity-v1',\n
+      'feature_schema_version' => 1,\n
+    ),\n
+    'originalBindingHash' => '40844bb640375f91998fecc28b99a299f5b9213e380ee7ba44050b86617582f0',\n
+    'withdrawalEventId' => 1,\n
+    'withdrawalPublicId' => '9c935a1d-1a91-4b72-86ba-e8f13deda4fe',\n
+    'withdrawalRevision' => 1,\n
+    'consentVersion' => 1,\n
+    'recipient' => '<REDACTED-RECIPIENT>',\n
+    'recipientHmac' => 'b5cc0ccaa29e63d948cc0cf1cd6395c7769ec92cda18815be50f8d8d8ca95b45',\n
+    'capturedAt' => '2026-10-07 16:31:44',\n
+  ),\n
+))' [ASCII](length: 1556) does not contain "<REDACTED-RECIPIENT>" [ASCII](length: 30).
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionConsentWithdrawalSealTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ReviewSupp254\ProductionConsentWithdrawalSealTest::test_clones_and_crafted_unserialized_instances_carry_no_capture
+Only the sealed original instance exposes its server snapshot.
+Failed asserting that Array &0 [
+    'bindingId' => 1,
+    'bindingPublicId' => 'efe9ca89-9f47-46c3-8bea-ff8c96916210',
+    'originalFeatureBinding' => Array &1 [
+        'buyer_binding' => Array &2 [
+            'account_id' => 1,
+            'account_public_id' => '07a25b34-81e2-455d-adf1-f7a79fcc9b16',
+            'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
+            'identity_policy_version' => 'personal-store-customer-identity-v1',
+            'origin_id' => 'ab1c66b9-bad8-4c38-9976-5a413bb0f8ef',
+            'provenance' => 'synthetic_rehearsal',
+            'schema_version' => 1,
+            'user_id' => 1,
+            'verification_observation_hash' => 'afba12ebe13ab98134b73de78494e6e62d56767f1058650eccbcb2b71931fcb6',
+            'verification_observation_id' => 'eb538385-779b-4ca7-a169-1d266a5c6fe2',
+        ],
+        'feature' => 'consent_preferences',
+        'feature_policy_version' => 'production-consent-preferences-identity-v1',
+        'feature_schema_version' => 1,
+    ],
+    'originalBindingHash' => '5f78ec441098838dd281e43c299c4b6ce8231a0a5cfc1551c7d9356ca564511b',
+    'withdrawalEventId' => 1,
+    'withdrawalPublicId' => '97b66a48-6437-49de-bff1-29a9ef8b45b5',
+    'withdrawalRevision' => 1,
+    'consentVersion' => 1,
+    'recipient' => '<REDACTED-RECIPIENT>',
+    'recipientHmac' => '7c46a1d12a69faa3c3929982f76f6117833e2012ab0b357d974b170b526f3b38',
+    'capturedAt' => '2026-10-07 16:31:47',
+] is null.
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionConsentWithdrawalSealTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ReviewSupp254\ProductionFeatureSealedRunTest::test_reviewer_probe_context_minted_outside_run_cannot_read_the_withdrawal
+A context outside run must not release the private withdrawal capture.
+Failed asserting that App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal Object #3316 (
+    'snapshot' => Array &0 [
+        'bindingId' => 1,
+        'bindingPublicId' => 'db40956f-6be1-48b6-8a1e-b2dfceb9061b',
+        'originalFeatureBinding' => Array &1 [
+            'buyer_binding' => Array &2 [
+                'account_id' => 1,
+                'account_public_id' => 'a70663d1-7f45-4a67-89cc-aad8f4fb0392',
+                'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
+                'identity_policy_version' => 'personal-store-customer-identity-v1',
+                'origin_id' => 'cea1202e-d2cc-4669-82bb-77a9f4829828',
+                'provenance' => 'synthetic_rehearsal',
+                'schema_version' => 1,
+                'user_id' => 1,
+                'verification_observation_hash' => 'dc1009e939bd4a9a14642ec0e250c81be5d8ab7e4d9b761a18992b8bc7051c1f',
+                'verification_observation_id' => '4b33dec3-121c-4e0b-8902-ec9b81c65ee7',
+            ],
+            'feature' => 'consent_preferences',
+            'feature_policy_version' => 'production-consent-preferences-identity-v1',
+            'feature_schema_version' => 1,
+        ],
+        'originalBindingHash' => 'c67c253cc0408dae86ea36be9748de2f6adb4404166f1b43c5f5defba918d1a4',
+        'withdrawalEventId' => 1,
+        'withdrawalPublicId' => '7e0796a6-383a-4a65-a185-11a2c78523f5',
+        'withdrawalRevision' => 1,
+        'consentVersion' => 1,
+        'recipient' => '<REDACTED-RECIPIENT>',
+        'recipientHmac' => '6fd84a5a3651de93791681b875a28923ad1e4892a6bc16fd3546331227aa120a',
+        'capturedAt' => '2026-10-07 16:31:49',
+    ],
+) is identical to 503.
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionFeatureSealedRunTest.php:55
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ReviewSupp254\ProductionFeatureSealedRunTest::test_context_leaked_from_a_completed_run_cannot_read_the_withdrawal
+Failed asserting that an instance of class App\Domain\Customers\ProductionIdentity\IdentityException is an instance of class App\Domain\Customers\ProductionFeatures\ProductionFeatureException.
+
+/home/user/VA-Studio-review-supp254-rg/tests/Feature/ReviewSupp254/ProductionFeatureSealedRunTest.php:75
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 10[0m[37;41m, Assertions: 36[0m[37;41m, Errors: 3[0m[37;41m, Failures: 5[0m[37;41m.[0m

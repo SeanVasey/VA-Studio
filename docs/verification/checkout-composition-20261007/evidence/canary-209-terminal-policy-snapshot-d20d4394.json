@@ -1,0 +1,14 @@
+{
+    "source": "b6f1dfbb7b92cee5319eac79443b88bf24178ab2",
+    "expected_initial_resolution_count": 2,
+    "actual_resolver_callbacks": 4,
+    "fresh_enabled": false,
+    "refusal": "disabled",
+    "returned_order": null,
+    "retained_counts": {
+        "order": 0,
+        "line": 0,
+        "attempt": 0
+    },
+    "review_row_unchanged": true
+}\n

@@ -1,0 +1,7 @@
+unpinned_session_zone
+Europe/London
+ERROR 1292 (22007) at line 1: Incorrect datetime value: '2026-03-29 01:30:00' for column 'stamp' at row 1
+rc=1
+cast(stamp as char)
+2026-03-29 01:30:00
+pinned rc=0
