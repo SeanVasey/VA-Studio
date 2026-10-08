@@ -179,13 +179,17 @@ export function PaidGrantJourney() {
     // Frames are never evicted to make room: removing one that has not reported back would abort a download the server may
     // still commit. They are removed on their own refusal, a denial, leaving the page and unmount.
     const frame = document.createElement('iframe'); frame.name = `paid-grant-${crypto.randomUUID()}`; frame.title = 'Paid license attachment response'; frame.hidden = true; frame.setAttribute('referrerpolicy', 'no-referrer');
+    // A frame's answer is tied to the frame, not to the API-request generation: a hidden tab or a later status read must not
+    // discard a refusal, or the kept authorization could never be retried. A frame removed by a denial, departure or unmount
+    // is ignored. Only when no later request has started does the refusal also clear the page and show its message.
     const mine = generation.current;
-    frame.addEventListener('load', () => { if (!active.current || mine !== generation.current) return; try {
+    frame.addEventListener('load', () => { if (!active.current || !frames.current.includes(frame)) return; const current = mine === generation.current; try {
       const doc = frame.contentDocument; if (!doc || doc.location.href === 'about:blank') return; const raw = doc.body?.textContent ?? ''; if (raw.length > 4096) throw new Error(); const failure = JSON.parse(raw);
       // Only this submission's frame is removed: another download still waiting for its response keeps its frame, and an
       // unrelated uncertain authorize keeps its exact replay (a refusal body cannot say whether that authorize committed).
-      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; frame.remove(); frames.current = frames.current.filter(f => f !== frame); clear(true, true); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } else throw new Error();
-    } catch { setMessage('The attachment result could not be confirmed. Check browser downloads and refresh saved status.'); } });
+      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; frame.remove(); frames.current = frames.current.filter(f => f !== frame);
+        if (current) { clear(true, true); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } } else throw new Error();
+    } catch { if (current) setMessage('The attachment result could not be confirmed. Check browser downloads and refresh saved status.'); } });
     document.body.append(frame); frames.current.push(frame);
     const form = document.createElement('form'); form.method = 'POST'; form.action = `/paid-grants/authorizations/${a.id}/redeem`; form.target = frame.name; form.enctype = 'application/x-www-form-urlencoded'; form.hidden = true;
     for (const [key, value] of Object.entries({ token: a.token, _token: token })) { const input = document.createElement('input'); input.type = 'hidden'; input.name = key; input.value = value; form.append(input); }

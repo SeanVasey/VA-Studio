@@ -208,6 +208,33 @@ describe('mounted original paid-purpose journey', () => {
     expect(screen.queryByRole('button', { name: 'Retry the authorized download' })).not.toBeInTheDocument();
     expect(document.body.innerHTML).not.toContain(token);
   });
+  it('records a download refusal that arrives while the tab is hidden, so a later saved read can still offer the exact retry', async () => {
+    const token = 'HIDDEN_REFUSAL_TOKEN'.padEnd(43, 'a');
+    const auth = { id: authorizationId, token, expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' };
+    const unused = response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20,
+      renderRetryAllowed: false, renderRetryAfter: null, history: [{ id: authorizationId, kind: 'contract', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: 'unused', attemptedAt: null }] }] } });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response({ authorization: auth }))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(unused);
+    const forms: string[] = [];
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(function (this: HTMLFormElement) { forms.push((this.querySelector('input[name="token"]') as HTMLInputElement).value); });
+    const visibility = vi.spyOn(document, 'visibilityState', 'get');
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    visibility.mockReturnValue('hidden'); act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    // The server refuses before recording anything while the tab is hidden. The refusal belongs to the frame, not to the
+    // abandoned API request generation, so it is recorded and the frame removed.
+    Object.defineProperty(frame, 'contentDocument', { value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' }, body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { frame.dispatchEvent(new Event('load')); });
+    expect(frame.isConnected).toBe(false);
+    visibility.mockReturnValue('visible');
+    fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry the authorized download' }));
+    expect(forms).toEqual([token, token]); expect(document.body.innerHTML).not.toContain(token);
+  });
   it('uses token-free saved lease admission before retrying a claimed original and displays consumed attempts truthfully', async () => {
     const claimed: PaidOrigin = { ...origin, lines: [{ ...origin.lines[0], documentStatus: 'claimed', attempts: 1 }] };
     const status = { schemaVersion: 1, originId: batchId, fulfilled: false, lines: [{ id: lineId, attemptCount: 1, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: true, renderRetryAfter: '2026-10-07 01:07:03',

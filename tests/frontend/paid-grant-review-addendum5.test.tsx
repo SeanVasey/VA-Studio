@@ -63,9 +63,10 @@ describe('review addendum 5: retry only after its own refusal', () => {
     expect(document.body.innerHTML).not.toContain(token);
   });
 
-  // (c) Conservative: the refusal is ignored once any later request has started (generation guard), so no retry is offered and
-  // the frame stays until the page is cleared. The customer authorizes again instead.
-  it('ignores a refusal that arrives after a status read started during the submission and never offers the retry', async () => {
+  // (c) Since Codex round 15 the refusal belongs to the frame, not to the API-request generation: a refusal arriving after a
+  // later status read started is recorded and its frame removed, but it no longer clears the page or shows its message.
+  // A read taken after the refusal can then offer the exact retry (A5 UX note, implemented).
+  it('records a refusal that arrives after a status read started during the submission, without touching the page', async () => {
     vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(auth))
       .mockResolvedValueOnce(unusedStatus()).mockResolvedValueOnce(unusedStatus());
@@ -73,13 +74,27 @@ describe('review addendum 5: retry only after its own refusal', () => {
     const frame = frames()[0];
     await readStatus(fetcher, 4);
     await act(async () => { refuseFrame(frame); });
-    expect(frame.isConnected).toBe(true);
-    expect(screen.queryByText(/download was refused/)).not.toBeInTheDocument();
-    await readStatus(fetcher, 5);
-    expect(retry()).not.toBeInTheDocument();
-    // Denial or departure still removes it.
-    window.dispatchEvent(new Event('pagehide'));
     expect(frame.isConnected).toBe(false);
+    expect(screen.queryByText(/download was refused/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Retained paid order')).toBeInTheDocument();
+    await readStatus(fetcher, 5);
+    expect(retry()).toBeInTheDocument();
+    expect(document.body.innerHTML).not.toContain(token);
+  });
+
+  it('ignores a frame answer after a denial or departure has removed the frame', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(auth))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(unusedStatus());
+    await downloadOnce(fetcher);
+    const frame = frames()[0];
+    act(() => { window.dispatchEvent(new Event('pagehide')); });
+    expect(frame.isConnected).toBe(false);
+    await act(async () => { refuseFrame(frame); });
+    fireEvent.click(button('Open paid licenses'));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    await readStatus(fetcher, 6);
+    expect(retry()).not.toBeInTheDocument();
   });
 
   it('a newer submission replaces the refused mark, so an older refused authorization is no longer offered', async () => {
@@ -91,8 +106,7 @@ describe('review addendum 5: retry only after its own refusal', () => {
     fireEvent.click(button('Authorize master_wav for Original synthetic recording'));
     fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
     const [contract, masterFrame] = frames();
-    // Not ignored: no request started after the master submission. The contract frame was submitted before the master
-    // authorize call, so its late refusal is ignored by the generation guard; the master is refused here instead.
+    // The master is refused here; the contract frame has not answered.
     await act(async () => { refuseFrame(masterFrame); });
     expect(contract.isConnected).toBe(true);
     // The read lists the contract authorization unused, but the kept (refused) mark is the master's, which it does not list.
