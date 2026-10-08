@@ -339,7 +339,8 @@ class BillingWebhookRedeliveryTest extends TestCase
     {
         $this->at($offset);
         $identity = (array) DB::table('production_membership_billing_invoices')->first();
-        (new BillingLedger)->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL, CarbonImmutable::now('UTC'));
+        $ledger = new BillingLedger;
+        $ledger->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL, $ledger->startRetrieval(), CarbonImmutable::now('UTC'));
     }
 
     private function at(int $offset): void

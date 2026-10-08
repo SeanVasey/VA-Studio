@@ -2,7 +2,6 @@
 
 namespace App\Domain\Memberships\Billing;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use PDO;
 
@@ -34,7 +33,7 @@ final class BillingHintRecovery
             return null;
         }
         $binding = $this->bindingForHint($event['type'], $invoiceRef, $subscriptionRef, $configuration['account_ref'], $configuration['mode']);
-        if ($binding === null || $this->observedAfter($event['invoice_ref_hash'], $event['received_at'])) {
+        if ($binding === null || $this->observedAfter($event['invoice_ref_hash'], $event['hint_position'])) {
             return null;
         }
 
@@ -64,27 +63,29 @@ final class BillingHintRecovery
     }
 
     /**
-     * Whether a definitive observation from a retrieval that began after the hint was appended. The ledger's outcomes are settled,
+     * Whether a definitive observation from a retrieval that began after the hint was received was appended. The ledger's outcomes are settled,
      * not_settled, refused and reversed (each a retrieved provider state, so each covers a hint) and unknown (a timeout or
      * ambiguous response). `unknown` never covers, and neither does a `refused` observation whose reason is `provider_incomplete`:
      * the provider's unbounded list meant no state was read. Otherwise a transient provider outage would hide the hint, leaving a
      * paid invoice unreconciled until some different event arrived. This reads the reason from the encrypted payload, so only
      * `refused` rows are decrypted.
      *
-     * Time base (Addendum 1, A1-3): the observation's `retrieval_started_at`, never its append time. A retrieval whose provider reads
-     * began before the hint may have read state older than the hint even if it was appended after it. Both sides are compared in whole
-     * seconds: the observation must have started in a later second than the hint's receipt, so a retrieval that began in the hint's own
-     * second does not cover it (A1-6: one more read-only retrieval is the safe direction).
+     * Order (Addendum 1, A1-3; Codex P1 on PR #54, review L2-3): the observation's retrieval position against the hint's position,
+     * both issued by the database from one counter, never the append time and never an application clock. A retrieval whose provider
+     * reads began before the hint may have read state older than the hint even if it was appended after it, and a worker's or intake
+     * host's skewed clock cannot make it look later. The retrieval position is committed before its first provider read and the
+     * hint's is allocated after the hint arrived, so a larger retrieval position means the provider reads followed the hint's
+     * receipt. Positions are unique, so the whole-second margin of A1-6 is no longer needed.
      */
-    private function observedAfter(string $invoiceRefHash, string $receivedAt): bool
+    private function observedAfter(string $invoiceRefHash, mixed $hintPosition): bool
     {
-        $received = CarbonImmutable::createFromFormat('!Y-m-d H:i:s', $receivedAt, 'UTC');
-        BillingException::require($received !== false, 'tampered_ledger');
+        $hintPosition = is_string($hintPosition) && preg_match('/\A[1-9][0-9]{0,18}\z/D', $hintPosition) === 1 ? (int) $hintPosition : $hintPosition;
+        BillingException::require(is_int($hintPosition) && $hintPosition > 0, 'tampered_ledger');
         $schema = new BillingSchema;
         $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
-            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.retrieval_started_at >= ? AND o.outcome <> ? '
+            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.retrieval_position > ? AND o.outcome <> ? '
             .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
-        $statement->execute([$invoiceRefHash, BillingValues::utcMicro($received->addSecond()), 'unknown']);
+        $statement->execute([$invoiceRefHash, $hintPosition, 'unknown']);
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             if ($row['outcome'] !== 'refused') {
                 return true;

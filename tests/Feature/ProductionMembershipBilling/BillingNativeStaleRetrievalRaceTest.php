@@ -50,7 +50,34 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
-    private function race(string $bindingId): array
+    /**
+     * Codex P1 on PR #54 (review L2-3): the stale worker's clock runs two minutes ahead, so by wall clock its retrieval "began"
+     * after the fresh one. The database-issued position still orders it first, and its stale snapshot is refused.
+     */
+    public function test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL only: two processes need one shared server database; SQLite is covered by BillingClockSkewOrderingTest.');
+        }
+        F::configure();
+        $binding = F::binding();
+        $seed = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
+
+        $results = $this->race($binding['id'], 120);
+
+        $this->assertSame('saved', $results['fresh']['result'], json_encode($results));
+        $this->assertSame([2, 'reversed'], [$results['fresh']['sequence'], $results['fresh']['outcome']]);
+        $this->assertSame(['denied', 'superseded_retrieval'], [$results['stale']['result'], $results['stale']['reason']], json_encode($results));
+        $this->assertNotSame($results['stale']['connection_id'], $results['fresh']['connection_id']);
+        $ledger = new BillingLedger;
+        $chain = $ledger->observations($seed['invoice_id']);
+        $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
+        $this->assertGreaterThan($chain[1]['retrieval_started_at'], $results['stale']['clock'], 'By its skewed clock the stale retrieval began after the fresh one.');
+        $this->assertNull($ledger->currentSettled($seed['invoice_id'], time()), 'The stale settled snapshot must never be current evidence.');
+        $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
+    }
+
+    private function race(string $bindingId, int $staleClockOffset = 0): array
     {
         $this->assertSame(0, DB::transactionLevel());
         $directory = storage_path('framework/testing/membership-billing-stale-race-'.Str::uuid());
@@ -60,7 +87,8 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
         try {
             foreach (['stale', 'fresh'] as $worker => $role) {
                 $process = new Process([PHP_BINARY, base_path('tests/Support/membership-billing-stale-race-worker.php')], base_path(),
-                    $this->environment($directory, $worker), json_encode(['binding_id' => $bindingId, 'role' => $role], JSON_THROW_ON_ERROR), 120);
+                    $this->environment($directory, $worker), json_encode(['binding_id' => $bindingId, 'role' => $role,
+                        'clock_offset_seconds' => $role === 'stale' ? $staleClockOffset : 0], JSON_THROW_ON_ERROR), 120);
                 $process->start();
                 $processes[$role] = $process;
             }

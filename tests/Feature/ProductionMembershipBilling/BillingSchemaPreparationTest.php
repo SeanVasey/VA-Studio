@@ -36,7 +36,7 @@ class BillingSchemaPreparationTest extends TestCase
         $this->assertStringNotContainsString('production_identity_', (string) $sql);
     }
 
-    public function test_bindings_invoices_observations_and_events_are_immutable(): void
+    public function test_bindings_invoices_observations_events_and_positions_are_immutable(): void
     {
         F::configure();
         $binding = F::binding();
@@ -44,8 +44,9 @@ class BillingSchemaPreparationTest extends TestCase
         $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown'));
         $this->insert(BillingSchema::TABLES[3], $this->event());
         $pdo = DB::connection()->getPdo();
-        foreach (BillingSchema::TABLES as $table) {
-            $this->assertSame(1, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
+        // One row each, and two positions: the observation's retrieval and the event's hint.
+        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 2]) as $table => $count) {
+            $this->assertSame($count, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
             $this->pdoRefuses(fn () => $pdo->exec('UPDATE '.$table.' SET created_at = created_at'));
             $this->pdoRefuses(fn () => $pdo->exec('DELETE FROM '.$table));
         }
@@ -54,23 +55,52 @@ class BillingSchemaPreparationTest extends TestCase
     }
 
     /**
-     * Review R-6: the append refuses an observation whose retrieval began before the one that produced the tail, and the guard
-     * trigger enforces the same rule below the application. An equal start is admitted (microsecond ties cannot be ordered).
+     * Review R-6 and Codex P1 on PR #54 (review L2-3): the guard trigger refuses an observation whose retrieval position is below the
+     * tail's, below the application. Positions are unique, so a reused one is refused too, and `retrieval_started_at` (a worker clock)
+     * orders nothing: an earlier clock reading with a later position is admitted.
      */
-    public function test_an_observation_that_began_before_the_tail_is_refused_by_the_guard_and_an_equal_or_later_start_is_admitted(): void
+    public function test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing(): void
     {
         F::configure();
         $binding = F::binding();
         $invoice = $this->invoice($binding);
+        $earlier = $this->position('retrieval');
         $first = [...$this->observation($invoice, 1, str_repeat('0', 64), 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:05.250000'];
         $this->insert(BillingSchema::TABLES[2], $first);
-        $older = [...$this->observation($invoice, 2, $first['seal'], 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:05.249999'];
+        $older = [...$this->observation($invoice, 2, $first['seal'], 'unknown', $earlier), 'retrieval_started_at' => '2026-10-07 00:00:09.000000'];
         $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $older));
-        $equal = [...$older, 'retrieval_started_at' => '2026-10-07 00:00:05.250000'];
-        $this->insert(BillingSchema::TABLES[2], $equal);
-        $later = [...$this->observation($invoice, 3, $equal['seal'], 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:06.000000'];
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], [...$older, 'retrieval_position' => $first['retrieval_position']]));
+        $clockBehind = [...$this->observation($invoice, 2, $first['seal'], 'unknown'), 'retrieval_started_at' => '2026-10-07 00:00:01.000000'];
+        $this->insert(BillingSchema::TABLES[2], $clockBehind);
+        $later = $this->observation($invoice, 3, $clockBehind['seal'], 'unknown');
         $this->insert(BillingSchema::TABLES[2], $later);
         $this->assertSame(3, (int) DB::connection()->getPdo()->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn());
+    }
+
+    public function test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind(): void
+    {
+        F::configure();
+        $binding = F::binding();
+        $invoice = $this->invoice($binding);
+        $pdo = DB::connection()->getPdo();
+        $first = $this->position('retrieval');
+        $second = $this->position('hint');
+        $this->assertGreaterThan($first, $second);
+        // An explicit id (which could back-date a position into a gap), an unknown kind and a malformed time are refused.
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[4], ['id' => $second + 100, 'kind' => 'retrieval', 'created_at' => '2026-10-07 00:00:00']));
+        $this->pdoRefuses(fn () => $pdo->exec("INSERT INTO production_membership_billing_positions (kind, created_at) VALUES ('awarded', '2026-10-07 00:00:00')"));
+        $this->pdoRefuses(fn () => $pdo->exec("INSERT INTO production_membership_billing_positions (kind, created_at) VALUES ('hint', '2026-10-07')"));
+        $this->assertSame(2, (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_positions')->fetchColumn());
+        // An observation needs an existing retrieval position; an event needs an existing hint position; neither may borrow the other's.
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown', $second)));
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown', $second + 1000)));
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[3], $this->event($first)));
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[3], $this->event($second + 1000)));
+        $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown', $first));
+        $this->insert(BillingSchema::TABLES[3], $this->event($second));
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[3], [...$this->event($second), 'provider_event_ref_hash' => hash('sha256', 'another synthetic event')]));
+        $this->assertSame([1, 1], [(int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn(),
+            (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_events')->fetchColumn()]);
     }
 
     public function test_the_retrieval_start_must_be_a_microsecond_timestamp(): void
@@ -137,9 +167,9 @@ class BillingSchemaPreparationTest extends TestCase
     public function test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted(): void
     {
         $pdo = DB::connection()->getPdo();
-        $pdo->exec('DROP TRIGGER production_membership_billing_events_delete');
+        $pdo->exec('DROP TRIGGER production_membership_billing_positions_delete');
         (new BillingSchema)->up();
-        $this->assertTrue($this->guardExists('production_membership_billing_events_delete'));
+        $this->assertTrue($this->guardExists('production_membership_billing_positions_delete'));
         F::configure();
         F::binding();
         $pdo->exec('DROP TRIGGER production_membership_billing_subscriptions_delete');
@@ -169,10 +199,11 @@ class BillingSchemaPreparationTest extends TestCase
         }
     }
 
-    private function event(): array
+    private function event(?int $position = null): array
     {
         return ['id' => (string) Str::uuid(), 'provider_event_ref_hash' => hash('sha256', 'evt'), 'type' => 'invoice.paid', 'mode' => 'test',
             'provider_account_hash' => hash('sha256', 'account'), 'invoice_ref_hash' => null, 'received_at' => '2026-10-07 00:00:00',
+            'hint_position' => $position ?? $this->position('hint'),
             'payload_hash' => hash('sha256', 'payload'), 'disposition' => 'no_invoice_hint', 'payload_ciphertext' => 'synthetic placeholder',
             'seal' => hash('sha256', 'seal'), 'created_at' => '2026-10-07 00:00:00'];
     }
@@ -188,15 +219,25 @@ class BillingSchemaPreparationTest extends TestCase
         return $row;
     }
 
-    private function observation(array $invoice, int $sequence, string $prior, string $outcome): array
+    private function observation(array $invoice, int $sequence, string $prior, string $outcome, ?int $position = null): array
     {
         $id = (string) Str::uuid();
+        $position ??= $this->position('retrieval');
 
         return ['id' => $id, 'invoice_id' => $invoice['id'], 'sequence' => $sequence, 'outcome' => $outcome, 'facts_hash' => hash('sha256', 'facts'.$id),
             'line_period_start' => null, 'line_period_end' => null, 'amount_minor' => null, 'currency' => null,
-            'retrieved_at' => '2026-10-07 00:00:01', 'retrieval_started_at' => '2026-10-07 00:00:00.500000', 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
+            'retrieved_at' => '2026-10-07 00:00:01', 'retrieval_started_at' => '2026-10-07 00:00:00.500000', 'retrieval_position' => $position, 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
             'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525', 'prior_seal' => $prior, 'payload_ciphertext' => 'synthetic placeholder',
             'seal' => hash('sha256', 'seal'.$id), 'created_at' => '2026-10-07 00:00:02'];
+    }
+
+    /** A database-allocated position, as BillingLedger::position() takes one (structural rows only). */
+    private function position(string $kind): int
+    {
+        $pdo = DB::connection()->getPdo();
+        $pdo->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[4]).' (kind, created_at) VALUES (?, ?)')->execute([$kind, '2026-10-07 00:00:00']);
+
+        return (int) $pdo->lastInsertId();
     }
 
     private function insert(string $table, array $row): void

@@ -73,16 +73,22 @@ final class BillingWebhookIntake
                 'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
                 'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null])];
         $row['created_at'] = $row['received_at'];
-        $row['seal'] = BillingValues::seal($row);
         $existing = $this->event($eventHash);
         if ($existing !== null) {
             return ['event' => $existing, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($existing, $configuration, $policy)];
         }
         try {
-            DB::transaction(function () use ($row) {
+            $row = DB::transaction(function () use ($row): array {
+                // The hint's database-issued position, allocated after the hint arrived and in the same transaction as its row, so a
+                // retrieval covers the hint only if its own position (committed before its provider reads) is larger. `received_at`
+                // is the intake host's clock and is information only (Codex P1 on PR #54, review L2-3).
+                $row['hint_position'] = (new BillingLedger)->position('hint');
+                $row['seal'] = BillingValues::seal($row);
                 $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[3])
                     .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
                 $statement->execute(array_values($row));
+
+                return $row;
             });
         } catch (PDOException) {
             // A concurrent delivery of the same event id won; this one is the replay.
@@ -131,7 +137,7 @@ final class BillingWebhookIntake
         (new BillingSchema)->assertOwned($pdo);
         $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table(BillingSchema::TABLES[3]).' WHERE provider_event_ref_hash = ? LIMIT 2');
         $statement->execute([$eventHash]);
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $rows = array_map(fn (array $row): array => BillingValues::integers($row, ['hint_position']), $statement->fetchAll(PDO::FETCH_ASSOC));
         BillingException::require(count($rows) <= 1 && ($rows === [] || hash_equals(BillingValues::seal($rows[0]), $rows[0]['seal'])), 'tampered_ledger');
 
         return $rows[0] ?? null;

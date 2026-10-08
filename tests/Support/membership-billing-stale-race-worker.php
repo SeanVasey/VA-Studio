@@ -6,11 +6,14 @@
 //                 before it appends. Its retrieval began first.
 //   role "fresh": waits for "stale-read", then reads a REFUNDED graph (so its retrieval began strictly later), appends, and signals
 //                 "fresh-done".
+// An optional "clock_offset_seconds" freezes this process's application clock that many seconds away from the real time, as a
+// worker host with a skewed clock would read it (Codex P1 on PR #54, review L2-3). Ordering must not depend on it.
 // Both run outside any transaction (the wait sits inside the provider call), on their own MySQL connections.
 
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingProviderGateway;
 use App\Domain\Memberships\Billing\BillingReconciliation;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\BillingStripeFixtures as F;
@@ -27,6 +30,13 @@ F::configure();
 $directory = getenv('VA_MEMBERSHIP_BILLING_STALE_RACE_DIRECTORY');
 $worker = getenv('VA_MEMBERSHIP_BILLING_STALE_RACE_WORKER');
 $role = $input['role'];
+$skew = $input['clock_offset_seconds'] ?? 0;
+if (! is_int($skew) || abs($skew) > 3600) {
+    throw new LogicException('Bounded integer clock offset only.');
+}
+if ($skew !== 0) {
+    CarbonImmutable::setTestNow(CarbonImmutable::now('UTC')->addSeconds($skew));
+}
 $pdo = DB::connection()->getPdo();
 $connectionId = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
 $pdo->exec('SET SESSION innodb_lock_wait_timeout=15');
@@ -120,5 +130,6 @@ try {
     }
 }
 echo json_encode(['role' => $role, 'result' => $result, 'sequence' => $observation['sequence'] ?? null, 'outcome' => $observation['outcome'] ?? null,
-    'started_at' => $observation['retrieval_started_at'] ?? null, 'reason' => $reason ?? null, 'error_class' => $errorClass ?? null,
+    'started_at' => $observation['retrieval_started_at'] ?? null, 'position' => $observation['retrieval_position'] ?? null,
+    'clock' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s.u'), 'reason' => $reason ?? null, 'error_class' => $errorClass ?? null,
     'error_message' => $errorMessage ?? null, 'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);

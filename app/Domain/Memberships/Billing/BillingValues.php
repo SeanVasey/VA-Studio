@@ -64,6 +64,21 @@ final class BillingValues
         return $utc->format('Y-m-d H:i:s.u');
     }
 
+    /**
+     * A driver may return an integer column as a digit string; the seal hashes the integer the writer stored. Only canonical
+     * positive digit strings are converted, so anything else still fails the seal.
+     */
+    public static function integers(array $row, array $columns): array
+    {
+        foreach ($columns as $column) {
+            if (isset($row[$column]) && is_string($row[$column]) && preg_match('/\A(0|[1-9][0-9]{0,18})\z/D', $row[$column]) === 1) {
+                $row[$column] = (int) $row[$column];
+            }
+        }
+
+        return $row;
+    }
+
     public static function id(): string
     {
         return (string) Str::uuid();

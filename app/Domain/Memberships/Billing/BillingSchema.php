@@ -10,14 +10,24 @@ use PDO;
 
 /**
  * Billing259 evidence tables: immutable approved subscription bindings, one row per provider invoice
- * identity, append-only hash-linked retrieval observations and deduplicated webhook hints. Same atomic
- * DDL, owned-prefix recovery and schema-global namespace algorithm as MembershipSchema. No foreign key
- * or trigger reaches into any production_identity_* child; buyer values are bound by runtime proof.
- * No row here awards, reserves or consumes a credit.
+ * identity, append-only hash-linked retrieval observations, deduplicated webhook hints and the
+ * database-issued positions that order retrievals and hints. Same atomic DDL, owned-prefix recovery and
+ * schema-global namespace algorithm as MembershipSchema. No foreign key or trigger reaches into any
+ * production_identity_* child; buyer values are bound by runtime proof. No row here awards, reserves or
+ * consumes a credit.
+ *
+ * Positions (Codex P1 on PR #54, review L2-3): one AUTO_INCREMENT (MySQL) / AUTOINCREMENT (SQLite) row is
+ * inserted when a retrieval begins, before any provider read, and one when a webhook hint is received. The
+ * database allocates the ids in strictly increasing order, so "began after" is decided by one counter on one
+ * server, never by comparing application clocks read on different hosts. The guards admit a position only
+ * as a database-allocated id and an observation or hint only with an unused position of its own kind.
  */
 final class BillingSchema
 {
-    public const TABLES = ['production_membership_billing_subscriptions', 'production_membership_billing_invoices', 'production_membership_billing_observations', 'production_membership_billing_events'];
+    public const TABLES = ['production_membership_billing_subscriptions', 'production_membership_billing_invoices', 'production_membership_billing_observations', 'production_membership_billing_events',
+        'production_membership_billing_positions'];
+
+    public const POSITION_KINDS = ['retrieval', 'hint'];
 
     public const OUTCOMES = ['settled', 'not_settled', 'unknown', 'refused', 'reversed'];
 
@@ -71,7 +81,7 @@ final class BillingSchema
                 if ($actual !== false) {
                     BillingException::require($actual['type'] === 'table' && $this->sql($actual['sql']) === $this->sql(str_replace('main.', '', $create)), 'schema');
                     $indexes = $pdo->query('PRAGMA main.index_list("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC);
-                    BillingException::require(count($indexes) === 1 + count($definition['unique']), 'schema');
+                    BillingException::require(count($indexes) === $this->autoindexes($logical, $driver), 'schema');
                 }
                 $statement = $pdo->prepare("SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND tbl_name = ?");
                 $statement->execute([$name]);
@@ -184,7 +194,15 @@ final class BillingSchema
         $foreign = [];
         $check = 'length(id) = 36 AND length(seal) = 64';
         $mode = 'VARCHAR(8)'.$ascii.' NOT NULL';
-        if ($logical === self::TABLES[0]) {
+        $position = $integer.' NOT NULL';
+        if ($logical === self::TABLES[4]) {
+            // The id is the position. SQLite admits AUTOINCREMENT only on an inline INTEGER PRIMARY KEY (a rowid alias, so no
+            // autoindex); MySQL CHECK constraints cannot name an AUTO_INCREMENT column, and UNSIGNED keeps it positive.
+            $columns = ['id' => $driver === 'mysql' ? 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT' : 'INTEGER PRIMARY KEY AUTOINCREMENT',
+                'kind' => 'VARCHAR(16)'.$ascii.' NOT NULL', 'created_at' => $utc];
+            $primary = $driver === 'mysql' ? ['id'] : [];
+            $check = "kind IN ('retrieval','hint') AND length(created_at) = 19";
+        } elseif ($logical === self::TABLES[0]) {
             $columns += ['account_id' => $integer.' NOT NULL', 'user_id' => $integer.' NOT NULL', 'identity_origin_id' => $integer.' NOT NULL',
                 'provider_account_hash' => $hash, 'mode' => $mode, 'customer_ref_hash' => $hash, 'subscription_ref_hash' => $hash,
                 'price_ref_hash' => $hash, 'plan_version_id' => $id, 'approval_binding_hash' => $hash, 'provenance' => 'VARCHAR(32)'.$ascii.' NOT NULL'];
@@ -201,22 +219,25 @@ final class BillingSchema
             $columns += ['invoice_id' => $id, 'sequence' => 'INTEGER NOT NULL', 'outcome' => 'VARCHAR(16)'.$ascii.' NOT NULL', 'facts_hash' => $hash,
                 'line_period_start' => 'VARCHAR(19)'.$ascii.' NULL', 'line_period_end' => 'VARCHAR(19)'.$ascii.' NULL',
                 'amount_minor' => 'INTEGER NULL', 'currency' => 'VARCHAR(3)'.$ascii.' NULL', 'retrieved_at' => $utc,
-                'retrieval_started_at' => 'VARCHAR(26)'.$ascii.' NOT NULL', 'freshness_deadline' => $utc,
+                'retrieval_started_at' => 'VARCHAR(26)'.$ascii.' NOT NULL', 'retrieval_position' => $position, 'freshness_deadline' => $utc,
                 'api_version' => 'VARCHAR(32)'.$ascii.' NOT NULL', 'sdk_reference' => 'VARCHAR(40)'.$ascii.' NOT NULL', 'prior_seal' => $hash];
-            $unique = [['invoice_id', 'sequence']];
+            // One retrieval appends at most one observation, so its position is never reused.
+            $unique = [['invoice_id', 'sequence'], ['retrieval_position']];
             $foreign = ['invoice_id' => self::TABLES[1]];
-            $check .= " AND sequence BETWEEN 1 AND 10000 AND outcome IN ('settled','not_settled','unknown','refused','reversed') AND length(facts_hash) = 64 AND length(prior_seal) = 64 AND retrieved_at < freshness_deadline AND length(retrieval_started_at) = 26 AND length(api_version) BETWEEN 1 AND 32 AND length(sdk_reference) = 40 AND (outcome <> 'settled' OR (line_period_start IS NOT NULL AND line_period_end IS NOT NULL AND line_period_start < line_period_end AND amount_minor IS NOT NULL AND amount_minor > 0 AND currency IS NOT NULL AND length(currency) = 3))";
+            $check .= " AND sequence BETWEEN 1 AND 10000 AND outcome IN ('settled','not_settled','unknown','refused','reversed') AND length(facts_hash) = 64 AND length(prior_seal) = 64 AND retrieved_at < freshness_deadline AND length(retrieval_started_at) = 26 AND retrieval_position > 0 AND length(api_version) BETWEEN 1 AND 32 AND length(sdk_reference) = 40 AND (outcome <> 'settled' OR (line_period_start IS NOT NULL AND line_period_end IS NOT NULL AND line_period_start < line_period_end AND amount_minor IS NOT NULL AND amount_minor > 0 AND currency IS NOT NULL AND length(currency) = 3))";
         } else {
             $columns += ['provider_event_ref_hash' => $hash, 'type' => 'VARCHAR(64)'.$ascii.' NOT NULL', 'mode' => $mode,
-                'provider_account_hash' => $hash, 'invoice_ref_hash' => 'VARCHAR(64)'.$ascii.' NULL', 'received_at' => $utc,
+                'provider_account_hash' => $hash, 'invoice_ref_hash' => 'VARCHAR(64)'.$ascii.' NULL', 'received_at' => $utc, 'hint_position' => $position,
                 'payload_hash' => $hash, 'disposition' => 'VARCHAR(32)'.$ascii.' NOT NULL'];
-            $unique = [['provider_event_ref_hash']];
-            $check .= " AND length(provider_event_ref_hash) = 64 AND length(type) BETWEEN 1 AND 64 AND mode IN ('test','live') AND length(provider_account_hash) = 64 AND (invoice_ref_hash IS NULL OR length(invoice_ref_hash) = 64) AND length(payload_hash) = 64 AND disposition IN ('retrieval_hint','no_invoice_hint','ignored_type')";
+            $unique = [['provider_event_ref_hash'], ['hint_position']];
+            $check .= " AND hint_position > 0 AND length(provider_event_ref_hash) = 64 AND length(type) BETWEEN 1 AND 64 AND mode IN ('test','live') AND length(provider_account_hash) = 64 AND (invoice_ref_hash IS NULL OR length(invoice_ref_hash) = 64) AND length(payload_hash) = 64 AND disposition IN ('retrieval_hint','no_invoice_hint','ignored_type')";
         }
-        $columns += ['payload_ciphertext' => $text.' NOT NULL', 'seal' => $hash, 'created_at' => $utc];
+        if ($logical !== self::TABLES[4]) {
+            $columns += ['payload_ciphertext' => $text.' NOT NULL', 'seal' => $hash, 'created_at' => $utc];
+        }
         $quote = $driver === 'mysql' ? '`' : '"';
         $sql = implode(', ', array_map(fn ($column, $type) => $quote.$column.$quote.' '.$type, array_keys($columns), $columns));
-        $sql .= ', PRIMARY KEY ('.implode(', ', $primary).'), CONSTRAINT '.$quote.$name.'_bounds'.$quote.' CHECK ('.$check.')';
+        $sql .= ($primary === [] ? '' : ', PRIMARY KEY ('.implode(', ', $primary).')').', CONSTRAINT '.$quote.$name.'_bounds'.$quote.' CHECK ('.$check.')';
         foreach ($unique as $index => $parts) {
             $sql .= ', CONSTRAINT '.$quote.$name.'_u'.$index.$quote.' UNIQUE ('.implode(', ', $parts).')';
         }
@@ -232,6 +253,7 @@ final class BillingSchema
         $subscriptions = $this->table(self::TABLES[0]);
         $invoices = $this->table(self::TABLES[1]);
         $observations = $this->table(self::TABLES[2]);
+        $positions = $this->table(self::TABLES[4]);
         $plans = $this->physical('production_membership_plan_versions');
         $insert = 'NOT EXISTS (SELECT 1 FROM '.$table.' WHERE id = NEW.id)';
         if ($logical === self::TABLES[0]) {
@@ -243,14 +265,23 @@ final class BillingSchema
                 .' AND EXISTS (SELECT 1 FROM '.$subscriptions.' WHERE id = NEW.subscription_binding_id AND provider_account_hash = NEW.provider_account_hash AND mode = NEW.mode)';
         } elseif ($logical === self::TABLES[2]) {
             $insert .= ' AND EXISTS (SELECT 1 FROM '.$invoices.' WHERE id = NEW.invoice_id)'
+                .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.retrieval_position AND kind = 'retrieval')"
+                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_position = NEW.retrieval_position)'
                 .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE invoice_id = NEW.invoice_id AND sequence = NEW.sequence)'
                 .' AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM '.$observations.' WHERE invoice_id = NEW.invoice_id), 0) + 1'
                 ." AND ((NEW.sequence = 1 AND NEW.prior_seal = '".str_repeat('0', 64)."')"
                 .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND o.created_at <= NEW.created_at'
                 // A retrieval that began before the one that produced the tail is stale evidence and never becomes the tail (review R-6).
-                .' AND o.retrieval_started_at <= NEW.retrieval_started_at))';
+                // "Began before" is the database-issued position, never a worker clock (Codex P1 on PR #54, review L2-3).
+                .' AND o.retrieval_position < NEW.retrieval_position))';
+        } elseif ($logical === self::TABLES[3]) {
+            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)'
+                .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.hint_position AND kind = 'hint')"
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE hint_position = NEW.hint_position)';
         } else {
-            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)';
+            // Only the database allocates a position: before the insert an unassigned AUTO_INCREMENT id reads 0 on MySQL and -1 on
+            // SQLite, while an explicit id (which could back-date a position into a gap) reads as itself and is refused.
+            $insert = 'NEW.id < 1';
         }
         $result = [];
         foreach (['insert' => $insert, 'update' => '0 = 1', 'delete' => '0 = 1'] as $event => $condition) {
@@ -283,7 +314,7 @@ final class BillingSchema
             $indexes = [];
             foreach (self::TABLES as $logical) {
                 $name = DB::connection()->getTablePrefix().$logical;
-                for ($index = 1; $index <= 1 + count($this->definition($logical, $driver)['unique']); $index++) {
+                for ($index = 1; $index <= $this->autoindexes($logical, $driver); $index++) {
                     $symbol = 'sqlite_autoindex_'.$name.'_'.$index;
                     $indexes[strtolower($symbol)] = ['name' => $symbol, 'type' => 'index', 'tbl_name' => $name, 'sql' => null];
                 }
@@ -341,6 +372,14 @@ final class BillingSchema
         }
     }
 
+    /** SQLite autoindexes of one owned table: one per UNIQUE, plus one for a non-rowid primary key. */
+    private function autoindexes(string $logical, string $driver): int
+    {
+        $definition = $this->definition($logical, $driver);
+
+        return ($definition['primary'] === [] ? 0 : 1) + count($definition['unique']);
+    }
+
     private function mysqlDefinition(PDO $pdo, string $name, array $definition): void
     {
         $s = $pdo->prepare('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION');
@@ -349,7 +388,7 @@ final class BillingSchema
         BillingException::require(array_column($columns, 'COLUMN_NAME') === array_keys($definition['columns']), 'schema');
         foreach ($columns as $column) {
             $expected = $definition['columns'][$column['COLUMN_NAME']];
-            BillingException::require($column['COLUMN_TYPE'] === (str_starts_with($expected, 'INTEGER') ? 'int' : (str_starts_with($expected, 'BIGINT UNSIGNED') ? 'bigint unsigned' : strtolower(explode(' ', $expected)[0]))) && $column['COLUMN_DEFAULT'] === null && $column['EXTRA'] === ''
+            BillingException::require($column['COLUMN_TYPE'] === (str_starts_with($expected, 'INTEGER') ? 'int' : (str_starts_with($expected, 'BIGINT UNSIGNED') ? 'bigint unsigned' : strtolower(explode(' ', $expected)[0]))) && $column['COLUMN_DEFAULT'] === null && $column['EXTRA'] === (str_contains($expected, 'AUTO_INCREMENT') ? 'auto_increment' : '')
                 && $column['IS_NULLABLE'] === (str_contains($expected, 'NOT NULL') ? 'NO' : 'YES')
                 && $column['COLLATION_NAME'] === (str_contains($expected, 'ascii_bin') ? 'ascii_bin' : (str_contains($expected, 'utf8mb4_bin') ? 'utf8mb4_bin' : null)), 'schema');
         }
@@ -408,7 +447,7 @@ final class BillingSchema
         // Native8.0 dictionaries introduce/escape these exact ASCII enum literals.
         // Admit only the owned literal spellings, never arbitrary charset or SQL rewriting.
         foreach (['synthetic_rehearsal', 'verified_production', 'test', 'live', 'settled', 'not_settled', 'unknown', 'refused', 'reversed',
-            'retrieval_hint', 'no_invoice_hint', 'ignored_type'] as $literal) {
+            'retrieval_hint', 'no_invoice_hint', 'ignored_type', 'retrieval', 'hint'] as $literal) {
             $sql = str_replace("_utf8mb4\\'".$literal."\\'", "'".$literal."'", $sql);
         }
 

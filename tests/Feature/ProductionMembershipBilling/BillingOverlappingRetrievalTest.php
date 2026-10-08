@@ -27,7 +27,8 @@ use Tests\TestCase;
  * simulated in one process by running the second retrieval between the first one's last provider read and its append, which is
  * where the real race lives. The two-process native regression is BillingNativeStaleRetrievalRaceTest.
  *
- * The same start time, not the append time, decides whether a webhook hint is covered (A1-3).
+ * The same start, not the append time, decides whether a webhook hint is covered (A1-3). "Start" is the retrieval's
+ * database-issued position, not a clock (Codex P1 on PR #54; skewed clocks are covered by BillingClockSkewOrderingTest).
  */
 class BillingOverlappingRetrievalTest extends TestCase
 {

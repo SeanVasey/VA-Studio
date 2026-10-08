@@ -35,8 +35,11 @@ final class BillingReconciliation
         $binding = $this->ledger->binding($bindingId, $configuration);
         // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
         $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
-        // When the provider reads began. The append orders overlapping retrievals of one invoice by this, and webhook hints are
-        // covered only by a retrieval that began after them; the append time says neither.
+        // The retrieval's database-issued position, committed before the first provider read. The append orders overlapping
+        // retrievals of one invoice by it, and a webhook hint is covered only by a retrieval whose position is above the hint's; the
+        // append time says neither, and no application clock is compared (Codex P1 on PR #54, review L2-3). The worker clock at the
+        // start is recorded as information only.
+        $position = $this->ledger->startRetrieval();
         $startedAt = CarbonImmutable::now('UTC');
         $attemptedAt = $startedAt->timestamp;
         $validated = false;
@@ -77,7 +80,7 @@ final class BillingReconciliation
             $invoice = $this->ledger->invoice($binding, $invoiceRef);
         }
 
-        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $startedAt);
+        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $position, $startedAt);
     }
 
     /**
