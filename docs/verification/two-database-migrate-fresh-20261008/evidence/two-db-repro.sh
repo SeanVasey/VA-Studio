@@ -2,27 +2,54 @@
 # Two complete application schemas on one private mysqld (:3410), migrated one after the other.
 # Usage: [DBS="db1 db2 db1"] two-db-repro.sh <checkout dir>
 # Databases must already exist on the private daemon (see mysqld-up.sh).
+#
+# Exit status: 0 only when every migrate:fresh and the final catalog dump succeeded; 1 when any of them failed;
+# 2 when the invocation itself is refused (no checkout, no clean commit to bind the evidence to, a runtime version that
+# cannot be read, or a database name outside identifier characters). Nothing is migrated after a refusal.
 set -uo pipefail
+refuse() { echo "refused: $*" >&2; exit 2; }
+
 # A missing or unreadable checkout stops here, so the evidence is never bound to whatever directory the caller is in.
-cd "${1:?usage: two-db-repro.sh <checkout dir>}" || { echo "cannot enter checkout: $1" >&2; exit 2; }
-# Every migrate:fresh status and the final catalog dump are accumulated; the script exits nonzero when any one failed.
-status=0
+cd "${1:?usage: two-db-repro.sh <checkout dir>}" 2>/dev/null || refuse "cannot enter checkout: $1"
+
+# The evidence names exactly one commit: a full 40-hex SHA from a git checkout with no tracked or untracked changes.
+source_sha=$(git rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null) || refuse "no git commit in $PWD"
+[[ "$source_sha" =~ ^[0-9a-f]{40}$ ]] || refuse "unexpected commit id: $source_sha"
+dirty=$(git status --porcelain 2>/dev/null) || refuse "cannot read working tree status in $PWD"
+[ -z "$dirty" ] || refuse "working tree has changes; commit or stash them so the evidence matches $source_sha"
+
 MYSQL=/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql
+php_version=$(php -r 'echo PHP_VERSION;' 2>/dev/null) && [ -n "$php_version" ] || refuse "cannot read the PHP version"
+mysqld_version=$("$MYSQL" -N -uroot -h127.0.0.1 -P3410 -e 'SELECT VERSION()' 2>/dev/null) && [ -n "$mysqld_version" ] \
+  || refuse "cannot reach the private mysqld on 127.0.0.1:3410"
+
 # The selected database names drive both catalog predicates. Names are restricted to the identifier characters the
 # predicates quote, so an override cannot widen the query or dump an unrelated schema.
 DBS=${DBS:-rv256_1 rv256_2 rv256_1}
 IN=""
 for db in $DBS; do
-  case "$db" in *[!A-Za-z0-9_]*|"") echo "refusing database name: $db" >&2; exit 2;; esac
+  case "$db" in *[!A-Za-z0-9_]*|"") refuse "database name: $db";; esac
   case ",$IN," in *",'$db',"*) ;; *) IN="${IN:+$IN,}'$db'";; esac
 done
+[ -n "$IN" ] || refuse "no database selected"
+
+# Per-run logs live in a private directory, never at a predictable shared path.
+logs=$(mktemp -d "${TMPDIR:-/tmp}/two-db-repro.XXXXXX") || refuse "cannot create a private log directory"
+echo "logs: $logs"
+
 export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3410 DB_USERNAME=root DB_PASSWORD=
-echo "source: $(git rev-parse HEAD)  php: $(php -r 'echo PHP_VERSION;')  mysqld: $("$MYSQL" -N -uroot -h127.0.0.1 -P3410 -e 'SELECT VERSION()')"
+echo "source: $source_sha  php: $php_version  mysqld: $mysqld_version"
+
+# Every migrate:fresh status and the final catalog dump are accumulated; the script exits 1 when any one failed.
+status=0
+run=0
 for db in $DBS; do
+  run=$((run + 1))
+  log="$logs/$run-$db.log"
   echo "== migrate:fresh --force on $db"
-  DB_DATABASE=$db php artisan migrate:fresh --force > /tmp/mf-$db.log 2>&1; rc=$?; [ "$rc" -eq 0 ] || status=1
-  grep -E "238000|FAIL|Unexpected" /tmp/mf-$db.log | head -5
-  echo "exit=$rc migrations_done=$(grep -cE "^  [0-9]{4}_[0-9_]+_.* DONE" /tmp/mf-$db.log)"
+  DB_DATABASE=$db php artisan migrate:fresh --force > "$log" 2>&1; rc=$?; [ "$rc" -eq 0 ] || status=1
+  grep -E "238000|FAIL|Unexpected" "$log" | head -5
+  echo "exit=$rc migrations_done=$(grep -cE "^  [0-9]{4}_[0-9_]+_.* DONE" "$log")"
 done
 "$MYSQL" -uroot -h127.0.0.1 -P3410 -e "SELECT TRIGGER_SCHEMA, COUNT(*) triggers FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA IN ($IN) GROUP BY TRIGGER_SCHEMA; SELECT TRIGGER_SCHEMA, TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA IN ($IN) AND TRIGGER_NAME='ptp_packet_insert';" || status=1
 exit $status
