@@ -31,7 +31,8 @@ final class ProductionFreeGrantDocuments
                 $now = ProductionFreeGrantInput::now();
                 ProductionFreeGrantException::require($last === null || $last['kind'] === 'failed'
                     || ProductionFreeGrantInput::parse($last['lease_expires_at'])->lessThanOrEqualTo($now), 'claim_in_progress');
-                ProductionFreeGrantException::require(count($graph['work']) < 32, 'attempts_exhausted');
+                // A failed attempt appends a `claimed` and a `failed` row, so the allowance counts claims (work ordinals 0-63).
+                ProductionFreeGrantException::require(count(array_filter($graph['work'], fn (array $w): bool => $w['kind'] === 'claimed')) < 32, 'attempts_exhausted');
                 $claimId = (string) Str::uuid();
                 $lease = $now->addSeconds($policy['render_lease_seconds']);
                 $this->work($rows, $graph, count($graph['work']), 'claimed', $claimId, $lease, $now);

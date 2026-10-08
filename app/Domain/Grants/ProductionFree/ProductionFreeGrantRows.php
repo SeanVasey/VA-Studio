@@ -63,6 +63,22 @@ final class ProductionFreeGrantRows
         return $result;
     }
 
+    /**
+     * Ids of the newest rows, chosen in SQL by creation time then id (both descending) before any limit applies, so a
+     * large result set can never hide its newest rows. MySQL locks them like the reader does.
+     *
+     * @return list<string>
+     */
+    public function newest(string $logical, string $where, array $bindings, int $limit): array
+    {
+        ProductionFreeGrantException::require($limit >= 1 && $limit <= 1000, 'schema');
+        $statement = $this->pdo->prepare('SELECT id FROM '.$this->schema->table($logical).' WHERE '.$where
+            .' ORDER BY created_at DESC, id DESC LIMIT '.$limit.($this->driver === 'mysql' ? ' FOR UPDATE' : ''));
+        $statement->execute($bindings);
+
+        return array_map('strval', $statement->fetchAll(PDO::FETCH_COLUMN));
+    }
+
     public function count(string $logical, string $where, array $bindings): int
     {
         $statement = $this->pdo->prepare('SELECT COUNT(*) FROM '.$this->schema->table($logical).' WHERE '.$where);

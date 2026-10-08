@@ -10,6 +10,11 @@ final class ProductionFreeGrantLibrary
 {
     public const LIMIT = 50;
 
+    public function __construct(private readonly int $limit = self::LIMIT)
+    {
+        ProductionFreeGrantException::require($limit >= 1 && $limit <= 1000, 'invalid_input');
+    }
+
     public function index(ProductionCustomerPrincipal $principal, User $actor): array
     {
         $grants = new ProductionFreeGrants;
@@ -17,12 +22,14 @@ final class ProductionFreeGrantLibrary
         return $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($grants): array {
             $accountId = (int) $binding['account_id'];
             $total = $rows->count('production_free_origins', 'account_id = ?', [$accountId]);
-            $origins = $rows->all('production_free_origins', 'account_id = ?', [$accountId], 1000);
+            // The page is selected in SQL (newest first) before any limit, never as "first N by id, then sort".
+            $ids = $rows->newest('production_free_origins', 'account_id = ?', [$accountId], $this->limit);
+            $origins = $ids === [] ? [] : $rows->all('production_free_origins', 'id IN ('.implode(', ', array_fill(0, count($ids), '?')).')', $ids, $this->limit);
             usort($origins, fn (array $a, array $b): int => [$b['created_at'], $b['id']] <=> [$a['created_at'], $a['id']]);
             $items = array_map(fn (array $origin): array => $grants->project($grants->originGraph($origin['id'], $accountId, $rows)),
-                array_slice($origins, 0, self::LIMIT));
+                array_slice($origins, 0, $this->limit));
 
-            return ['schemaVersion' => 1, 'total' => $total, 'limit' => self::LIMIT, 'items' => $items];
+            return ['schemaVersion' => 1, 'total' => $total, 'limit' => $this->limit, 'items' => $items];
         });
     }
 

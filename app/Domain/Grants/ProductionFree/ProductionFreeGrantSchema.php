@@ -285,7 +285,7 @@ final class ProductionFreeGrantSchema
             $foreign = ['origin_id' => $origins];
             $uuids = [...$uuids, 'origin_id', 'claim_id'];
             $times[] = 'lease_expires_at';
-            $check .= " AND ordinal BETWEEN 0 AND 31 AND kind IN ('claimed','failed') AND created_at < lease_expires_at";
+            $check .= " AND ordinal BETWEEN 0 AND 63 AND kind IN ('claimed','failed') AND created_at < lease_expires_at";
         } elseif ($logical === $originals) {
             $columns += ['origin_id' => $id, 'work_id' => $id, 'claim_id' => $id, 'sha256' => $hash, 'bytes' => 'INTEGER NOT NULL',
                 'profile_hash' => $hash, 'input_hash' => $hash, 'text_digest' => $hash];

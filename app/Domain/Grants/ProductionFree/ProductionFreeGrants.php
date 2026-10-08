@@ -148,7 +148,7 @@ final class ProductionFreeGrants
         ProductionFreeGrantException::require(count($available) === 1 && $available[0]['kind'] === 'open', 'tampered');
         $originalDisplay = $this->display(['definition' => $definition['definition'], 'payload' => $d, 'current' => $available[0]]);
         ProductionFreeGrantException::require(hash_equals($this->displayHash($originalDisplay, $p['declared_name']), $p['display_hash']), 'tampered');
-        $work = $rows->all('production_free_document_work', 'origin_id = ?', [$originId], 32);
+        $work = $rows->all('production_free_document_work', 'origin_id = ?', [$originId], 64);
         usort($work, fn (array $a, array $b): int => (int) $a['ordinal'] <=> (int) $b['ordinal']);
         foreach ($work as $ordinal => $item) {
             ProductionFreeGrantException::require((int) $item['ordinal'] === $ordinal && ($item['payload']['schema_version'] ?? null) === 'production-free-work-v1'

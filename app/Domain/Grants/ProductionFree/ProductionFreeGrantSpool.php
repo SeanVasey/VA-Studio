@@ -8,7 +8,8 @@ use Throwable;
 /**
  * Bounded POSIX spool for delivery snapshots: the 256 counterpart of the main-resident `PrepareTestDeliveryStream`.
  * A snapshot needs a held `flock` slot (so at most `slots` snapshots, named or unlinked, exist at once, bounded by
- * `slots` x `DeliveryAssetFiles::MAX_BYTES`), free space above the size plus a reserve, a read-only reopen of the
+ * `slots` x `DeliveryAssetFiles::MAX_BYTES`), free space above the size plus a reserve after subtracting what every
+ * other active slot has reserved and not yet written (admission is serialized by a short global lock), a read-only reopen of the
  * sealed file and a read-back hash taken from the spool itself, not only from the write path. The returned
  * stream keeps the slot lease until it is closed.
  *
@@ -21,15 +22,13 @@ class ProductionFreeGrantSpool
      */
     public function prepare(string $directory, int $slots, int $reserveBytes, string $sha256, int $bytes, int $deadline, callable $fill): PreparedDeliveryStream
     {
-        $lease = $output = $reader = $path = $owned = null;
+        $lease = $output = $reader = $path = $owned = $reservation = null;
         try {
             if (DIRECTORY_SEPARATOR !== '/' || $slots < 1 || $reserveBytes < 0 || $bytes < 1 || realpath($directory) !== $directory
                 || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1) {
                 throw new \UnexpectedValueException;
             }
-            [$lease, $path] = $this->slot($directory, $slots);
-            $space = $this->freeBytes($directory);
-            ProductionFreeGrantException::require(is_numeric($space) && is_finite((float) $space) && $space >= $bytes + $reserveBytes, 'spool_space');
+            [$lease, $path, $reservation] = $this->admit($directory, $slots, $reserveBytes, $bytes);
             $mask = umask(0077);
             try {
                 $output = @fopen($path, 'x+b');
@@ -66,6 +65,8 @@ class ProductionFreeGrantSpool
                 throw new \UnexpectedValueException;
             }
             $path = null;
+            // The finished snapshot is now part of what the disk reports, so its reservation is released.
+            $this->reserve($reservation, 0);
             $detached = fstat($reader);
             if ($detached['nlink'] !== 0 || $detached['size'] !== $bytes || ($detached['mode'] & 07777) !== 0400
                 || $detached['ino'] !== $sealed['ino'] || $detached['dev'] !== $sealed['dev'] || fseek($reader, 0) !== 0) {
@@ -89,7 +90,14 @@ class ProductionFreeGrantSpool
                     @unlink($path);
                 }
             }
-            foreach ([$output, $reader, $lease] as $handle) {
+            if (is_resource($reservation)) {
+                try {
+                    $this->reserve($reservation, 0);
+                } catch (Throwable) {
+                    // A reservation that cannot be cleared stays until the slot's next holder overwrites it.
+                }
+            }
+            foreach ([$output, $reader, $reservation, $lease] as $handle) {
                 if (is_resource($handle)) {
                     fclose($handle);
                 }
@@ -113,10 +121,49 @@ class ProductionFreeGrantSpool
     }
 
     /**
-     * A fixed path per locked slot keeps crash leftovers from accumulating across fresh names. A slot whose
-     * snapshot path already exists is skipped and never repaired or deleted.
+     * Slot and disk admission under one short global lock, so concurrent snapshots cannot each pass the free-space
+     * probe alone: the bytes reserved by every other active slot are subtracted before this size is admitted.
      *
-     * @return array{0:resource,1:string}
+     * @return array{0:resource,1:string,2:resource} the slot lease, its snapshot path and its reservation handle
+     */
+    private function admit(string $directory, int $slots, int $reserveBytes, int $bytes): array
+    {
+        $gate = $this->lease($directory.'/admission.lock');
+        try {
+            if (! @flock($gate, LOCK_EX)) {
+                throw new \UnexpectedValueException;
+            }
+            [$lease, $snapshot, $number] = $this->slot($directory, $slots);
+            $reservation = null;
+            try {
+                $space = $this->freeBytes($directory);
+                $pending = $this->pending($directory, $number);
+                ProductionFreeGrantException::require(is_numeric($space) && is_finite((float) $space) && $space - $pending >= $bytes + $reserveBytes, 'spool_space');
+                $reservation = $this->reservation($directory.'/slot-'.$number.'.reserve');
+                $this->reserve($reservation, $bytes);
+            } catch (Throwable $error) {
+                foreach ([$reservation, $lease] as $handle) {
+                    if (is_resource($handle)) {
+                        fclose($handle);
+                    }
+                }
+                throw $error;
+            }
+
+            return [$lease, $snapshot, $reservation];
+        } finally {
+            @flock($gate, LOCK_UN);
+            fclose($gate);
+        }
+    }
+
+    /**
+     * A fixed path per locked slot keeps crash leftovers from accumulating across fresh names. Holding the slot's
+     * flock means its previous holder is gone, so a residual snapshot at exactly this slot's path is removed. Only a
+     * regular single-link file owned by this process user is removed; anything else makes the slot unusable, and it is
+     * never repaired.
+     *
+     * @return array{0:resource,1:string,2:int}
      */
     private function slot(string $directory, int $slots): array
     {
@@ -129,16 +176,104 @@ class ProductionFreeGrantSpool
             }
             $snapshot = $directory.'/slot-'.$slot.'.snapshot';
             clearstatcache(true, $snapshot);
-            if (@lstat($snapshot) !== false) {
-                fclose($candidate);
+            $residual = @lstat($snapshot);
+            if ($residual !== false) {
+                $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
+                if (($residual['mode'] & 0170000) !== 0100000 || $residual['nlink'] !== 1 || $residual['uid'] !== $owner || ! @unlink($snapshot)) {
+                    fclose($candidate);
 
-                continue;
+                    continue;
+                }
             }
 
-            return [$candidate, $snapshot];
+            return [$candidate, $snapshot, $slot];
         }
 
         throw new ProductionFreeGrantException('spool_busy');
+    }
+
+    /** Bytes still to be written by every other slot that is held right now. */
+    private function pending(string $directory, int $own): int
+    {
+        $total = 0;
+        foreach (glob($directory.'/slot-*.lock') ?: [] as $lock) {
+            if (preg_match('~/slot-(\d{1,3})\.lock\z~D', $lock, $match) !== 1 || (int) $match[1] === $own) {
+                continue;
+            }
+            $probe = $this->lease($lock);
+            try {
+                if (@flock($probe, LOCK_EX | LOCK_NB)) {
+                    @flock($probe, LOCK_UN);
+
+                    continue;
+                }
+            } finally {
+                fclose($probe);
+            }
+            $total += $this->reserved($directory.'/slot-'.$match[1].'.reserve');
+        }
+
+        return $total;
+    }
+
+    private function reserved(string $path): int
+    {
+        clearstatcache(true, $path);
+        if (@lstat($path) === false) {
+            return 0;
+        }
+        $handle = @fopen($path, 'rb');
+        if (! is_resource($handle)) {
+            throw new \UnexpectedValueException;
+        }
+        try {
+            $this->sameFile($path, fstat($handle), 0600, 20);
+            $value = fread($handle, 20);
+            if (! is_string($value) || preg_match('/\A[0-9]{20}\z/D', $value) !== 1) {
+                throw new \UnexpectedValueException;
+            }
+
+            return (int) $value;
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    /** The slot's fixed 20-byte reservation sidecar, writable only while its slot lock is held. */
+    private function reservation(string $path)
+    {
+        clearstatcache(true, $path);
+        if (@lstat($path) === false) {
+            $mask = umask(0077);
+            try {
+                $created = @fopen($path, 'x+b');
+            } finally {
+                umask($mask);
+            }
+            if (! is_resource($created) || @fwrite($created, str_repeat('0', 20)) !== 20) {
+                throw new \UnexpectedValueException;
+            }
+            fclose($created);
+        }
+        $handle = @fopen($path, 'r+b');
+        if (! is_resource($handle)) {
+            throw new \UnexpectedValueException;
+        }
+        try {
+            $this->sameFile($path, fstat($handle), 0600, 20);
+
+            return $handle;
+        } catch (Throwable $error) {
+            fclose($handle);
+            throw $error;
+        }
+    }
+
+    private function reserve($handle, int $bytes): void
+    {
+        if (fseek($handle, 0) !== 0 || @fwrite($handle, sprintf('%020d', $bytes)) !== 20 || ! @fflush($handle)) {
+            throw new \UnexpectedValueException;
+        }
     }
 
     /** Read-only descriptor on a fixed 0400 lock file; `flock` on it is the slot lease. */
