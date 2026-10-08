@@ -7,7 +7,17 @@ use App\Domain\Contracts\ContractRenderProfile;
 use App\Domain\Contracts\ContractRenderProfileRegistry;
 use App\Support\CanonicalJson;
 
-/** Separate paid purpose/template over the retained trusted offline fonts and package identities. */
+/**
+ * Separate paid purpose/template over the retained trusted offline fonts and package identities.
+ *
+ * Release rule: there is one released paid profile, and a document is rendered only under the exact profile its order
+ * retained (`validate()` compares it with `current()`). Changing a file pinned by `resources/contracts/paid-v1/
+ * profile-assets.json`, `MANIFEST_HASH` or the retained base therefore makes every order whose document is still
+ * unfinished fail with `profile_changed` until its five attempts are spent. Before any such change ships, either
+ * drain every unfinished paid document, or add the new profile as a separate version (its own manifest directory and
+ * renderer) while keeping this one's files and an entry point that resolves the renderer by the retained version.
+ * Completed documents are delivered from their stored bytes and do not consult the current profile.
+ */
 final class PaidGrantRenderProfile
 {
     private const MANIFEST_HASH = '4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940';

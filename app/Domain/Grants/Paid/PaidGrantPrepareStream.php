@@ -8,7 +8,13 @@ use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\PreparedDeliveryStream;
 use Throwable;
 
-/** Paid-purpose POSIX snapshot adapter. Three held leases bound named plus unlinked snapshots to at most 3 GiB. */
+/**
+ * Paid-purpose POSIX snapshot adapter. Three held leases bound named plus unlinked snapshots to at most 3 GiB. Slot and
+ * disk admission run under one short global lock: free space must cover this size plus the reserve after subtracting
+ * what every other held slot has reserved and not yet written (its 20-byte `slot-N.reserve` sidecar), so concurrent
+ * snapshots cannot each pass the free-space probe alone. A slot's reservation is released once its snapshot is complete
+ * (the disk then reflects it) or when the preparation fails. Ported from the Free256 spool (`ProductionFreeGrantSpool`).
+ */
 class PaidGrantPrepareStream
 {
     public const SLOTS = 3;
@@ -24,7 +30,7 @@ class PaidGrantPrepareStream
         if (($target['provenance'] ?? null) !== $policy['provenance'] || DIRECTORY_SEPARATOR !== '/') {
             throw new DeliveryException('unavailable');
         }
-        $lease = $output = $reader = null;
+        $lease = $output = $reader = $reservation = null;
         $path = null;
         $owned = null;
         try {
@@ -34,32 +40,7 @@ class PaidGrantPrepareStream
             $root = $files->privateRoot();
             $directories = $this->directories($root, true);
             $spool = $root.'/delivery/paid-spool';
-            // A fixed path per locked slot prevents accumulating crash leftovers across fresh UUID names.
-            for ($slot = 0; $slot < self::SLOTS; $slot++) {
-                $candidate = $this->lease($spool.'/slot-'.$slot.'.lock');
-                if (! @flock($candidate, LOCK_EX | LOCK_NB)) {
-                    fclose($candidate);
-
-                    continue;
-                }
-                $snapshot = $spool.'/slot-'.$slot.'.snapshot';
-                clearstatcache(true, $snapshot);
-                if (@lstat($snapshot) !== false) {
-                    fclose($candidate);
-
-                    continue;
-                } // Never repair or delete a pre-existing crash residue.
-                $lease = $candidate;
-                $path = $snapshot;
-                break;
-            }
-            if (! is_resource($lease)) {
-                throw new \UnexpectedValueException;
-            }
-            $space = $this->freeBytes($spool);
-            if (! is_numeric($space) || ! is_finite((float) $space) || $space < $target['size_bytes'] + self::RESERVE_BYTES) {
-                throw new \UnexpectedValueException;
-            }
+            [$lease, $path, $reservation] = $this->admit($spool, $target['size_bytes']);
             $mask = umask(0077);
             try {
                 $output = @fopen($path, 'x+b');
@@ -99,6 +80,8 @@ class PaidGrantPrepareStream
                 throw new \UnexpectedValueException;
             }
             $path = null;
+            // The finished snapshot is now part of what the disk reports, so its reservation is released.
+            $this->reserve($reservation, 0);
             $detached = fstat($reader);
             if ($detached['nlink'] !== 0 || $detached['size'] !== $target['size_bytes'] || ($detached['mode'] & 07777) !== 0400
                 || $detached['ino'] !== $sealed['ino'] || $detached['dev'] !== $sealed['dev'] || fseek($reader, 0) !== 0) {
@@ -120,7 +103,14 @@ class PaidGrantPrepareStream
                     @unlink($path);
                 }
             }
-            foreach ([$output, $reader, $lease] as $handle) {
+            if (is_resource($reservation)) {
+                try {
+                    $this->reserve($reservation, 0);
+                } catch (Throwable) {
+                    // A reservation that cannot be cleared stays until the slot's next holder overwrites it.
+                }
+            }
+            foreach ([$output, $reader, $reservation, $lease] as $handle) {
                 if (is_resource($handle)) {
                     fclose($handle);
                 }
@@ -197,6 +187,174 @@ class PaidGrantPrepareStream
             hash_update($hash, $chunk);
         }
         if ($bytes !== $target['size_bytes'] || ! hash_equals($target['sha256'], hash_final($hash))) {
+            throw new \UnexpectedValueException;
+        }
+    }
+
+    /**
+     * Slot and disk admission under one short global lock, so concurrent snapshots cannot each pass the free-space
+     * probe alone: the bytes reserved by every other held slot are subtracted before this size is admitted.
+     *
+     * @return array{0:resource,1:string,2:resource} the slot lease, its snapshot path and its reservation handle
+     */
+    private function admit(string $spool, int $bytes): array
+    {
+        $gate = $this->lease($spool.'/admission.lock');
+        try {
+            if (! @flock($gate, LOCK_EX)) {
+                throw new \UnexpectedValueException;
+            }
+            [$lease, $snapshot, $number] = $this->slot($spool);
+            $reservation = null;
+            try {
+                $space = $this->freeBytes($spool);
+                $pending = $this->pending($spool, $number);
+                if (! is_numeric($space) || ! is_finite((float) $space) || $space - $pending < $bytes + self::RESERVE_BYTES) {
+                    throw new \UnexpectedValueException;
+                }
+                $reservation = $this->reservation($spool.'/slot-'.$number.'.reserve');
+                $this->reserve($reservation, $bytes);
+            } catch (Throwable $error) {
+                foreach ([$reservation, $lease] as $handle) {
+                    if (is_resource($handle)) {
+                        fclose($handle);
+                    }
+                }
+                throw $error;
+            }
+
+            return [$lease, $snapshot, $reservation];
+        } finally {
+            @flock($gate, LOCK_UN);
+            fclose($gate);
+        }
+    }
+
+    /**
+     * A fixed path per locked slot prevents accumulating crash leftovers across fresh UUID names. A slot whose snapshot
+     * exists, or whose reservation sidecar is anything but a regular single-link 0600 20-byte file owned by this process
+     * user, is skipped and never repaired or deleted.
+     *
+     * @return array{0:resource,1:string,2:int}
+     */
+    private function slot(string $spool): array
+    {
+        $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
+        for ($slot = 0; $slot < self::SLOTS; $slot++) {
+            $candidate = $this->lease($spool.'/slot-'.$slot.'.lock');
+            if (! @flock($candidate, LOCK_EX | LOCK_NB)) {
+                fclose($candidate);
+
+                continue;
+            }
+            $snapshot = $spool.'/slot-'.$slot.'.snapshot';
+            $sidecar = $spool.'/slot-'.$slot.'.reserve';
+            clearstatcache(true, $snapshot);
+            clearstatcache(true, $sidecar);
+            $reserve = @lstat($sidecar);
+            if (@lstat($snapshot) !== false || ($reserve !== false && (($reserve['mode'] & 0170000) !== 0100000 || ($reserve['mode'] & 07777) !== 0600
+                || $reserve['nlink'] !== 1 || $reserve['uid'] !== $owner || $reserve['size'] !== 20))) {
+                fclose($candidate);
+
+                continue;
+            }
+
+            return [$candidate, $snapshot, $slot];
+        }
+
+        throw new \UnexpectedValueException;
+    }
+
+    /** Bytes still to be written by every other slot that is held right now. */
+    private function pending(string $spool, int $own): int
+    {
+        $total = 0;
+        for ($slot = 0; $slot < self::SLOTS; $slot++) {
+            if ($slot === $own) {
+                continue;
+            }
+            $probe = $this->lease($spool.'/slot-'.$slot.'.lock');
+            try {
+                if (@flock($probe, LOCK_EX | LOCK_NB)) {
+                    @flock($probe, LOCK_UN);
+
+                    continue;
+                }
+            } finally {
+                fclose($probe);
+            }
+            $total += $this->reserved($spool.'/slot-'.$slot.'.reserve');
+        }
+
+        return $total;
+    }
+
+    private function reserved(string $path): int
+    {
+        clearstatcache(true, $path);
+        if (@lstat($path) === false) {
+            return 0;
+        }
+        $handle = @fopen($path, 'rb');
+        if (! is_resource($handle)) {
+            throw new \UnexpectedValueException;
+        }
+        try {
+            $this->sameFile($path, fstat($handle), 0600, 20);
+            $value = fread($handle, 20);
+            if (! is_string($value) || preg_match('/\A[0-9]{20}\z/D', $value) !== 1) {
+                throw new \UnexpectedValueException;
+            }
+
+            return (int) $value;
+        } finally {
+            fclose($handle);
+        }
+    }
+
+    /**
+     * The slot's fixed 20-byte reservation sidecar, written only under both the slot lock and the admission lock. A
+     * missing sidecar is created under a fresh name and renamed into place, so a crash never leaves a partial file at
+     * the fixed path.
+     */
+    private function reservation(string $path)
+    {
+        clearstatcache(true, $path);
+        if (@lstat($path) === false) {
+            $temporary = $path.'.'.bin2hex(random_bytes(16)).'.tmp';
+            $mask = umask(0077);
+            try {
+                $created = @fopen($temporary, 'x+b');
+            } finally {
+                umask($mask);
+            }
+            if (! is_resource($created)) {
+                throw new \UnexpectedValueException;
+            }
+            $written = @fwrite($created, str_repeat('0', 20)) === 20 && @fflush($created);
+            fclose($created);
+            if (! $written || ! @rename($temporary, $path)) {
+                @unlink($temporary);
+                throw new \UnexpectedValueException;
+            }
+        }
+        $handle = @fopen($path, 'r+b');
+        if (! is_resource($handle)) {
+            throw new \UnexpectedValueException;
+        }
+        try {
+            $this->sameFile($path, fstat($handle), 0600, 20);
+
+            return $handle;
+        } catch (Throwable $error) {
+            fclose($handle);
+            throw $error;
+        }
+    }
+
+    private function reserve($handle, int $bytes): void
+    {
+        if (fseek($handle, 0) !== 0 || @fwrite($handle, sprintf('%020d', $bytes)) !== 20 || ! @fflush($handle)) {
             throw new \UnexpectedValueException;
         }
     }
