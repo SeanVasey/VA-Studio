@@ -305,7 +305,12 @@ export function PaidGrantJourney() {
     {message && <div role="alert" tabIndex={-1} ref={alert} className="customer-account-message">{message}{denied && <a href="/customer/sign-in">Open a fresh sign-in page</a>}</div>}
     <button type="button" disabled={busy || denied} onClick={refresh}>{data ? 'Refresh paid licenses' : 'Open paid licenses'}</button>
     {pending && !denied && <div><p>Review saved licenses before deliberately retrying this exact request.</p><button type="button" disabled={busy || !reviewedSaved} onClick={() => execute(pending)}>Retry the exact request</button>
-      {!pending.orderId && <button type="button" disabled={busy || !abandonable} onClick={abandon}>Set aside and request a new authorization</button>}</div>}
+      {!pending.orderId && <button type="button" disabled={busy || !abandonable} onClick={abandon}>Set aside and request a new authorization</button>}
+      {/* The request's own order may be older than the bounded index, and the reference form is closed while a request is
+          pending: reopen it here so its saved status can be read (Codex 4224824643). A pending finalize has no order yet;
+          its exact retry is what reopens it. */}
+      {pending.origin && origin?.id !== pending.origin.id && <button type="button" disabled={busy}
+        onClick={() => { const o = pending.origin!; open(o.id, o.orderId); }}>Reopen this order</button>}</div>}
     {!denied && <form onSubmit={e => { e.preventDefault(); finalize(); }}><label htmlFor="paid-order-reference">Saved order reference</label>
       <input id="paid-order-reference" value={order} maxLength={36} autoComplete="off" disabled={busy || !!pending} onChange={e => setOrder(e.target.value)} />
       <button type="submit" disabled={busy || !!pending || !uuid(order)}>Prepare licenses for this paid order</button></form>}
