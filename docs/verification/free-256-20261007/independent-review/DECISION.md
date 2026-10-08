@@ -295,3 +295,231 @@ These were computed with `git show 1860e00d:<path> | sha256sum`. The full list o
 - The datadirs `data`, `data2`, `data3`, `data4` and `data5` were deleted from `scratchpad/review-free256-mysql/`; only the init logs, error logs and lifecycle remain there. Other lanes' daemons (`review-member-mysql`, `review-tax255-mysql`) were left running and untouched. See `native/private-instance-lifecycle.txt`.
 - The base and mutation worktrees were removed (`git worktree remove`; the mutation tree was proven clean first).
 - The review worktree is at `1860e00d`, and its only change is the untracked `docs/verification/free-256-20261007/independent-review/`.
+
+## Addendum 1: hardening delta `51c9fecf..68c4e03c` (code `f1666ae3`)
+
+- Scope: the fixes for F-1, F-2, F-3, F-5 and F-8 in `f1666ae3`, plus the lane evidence in `68c4e03c` (`hardening/README.md`). Codex also raised F-1, F-2 and F-8. `51c9fecf` itself (the main merge plus this review's evidence) is the base and was not re-reviewed.
+- Reviewer: the same independent reviewer. I authored no lane commit and made no commit or push. I changed no app code, flag or registration.
+- Worktree: `/home/user/VA-Studio-review-free256b`, a detached worktree at `68c4e03c` made with `scripts/dev/mkworktree.sh`.
+  - The mutations ran in a separate detached worktree at `68c4e03c`, `/home/user/VA-Studio-review-free256b-mut`. Every revert was proven with `git diff --quiet -- app database resources` (rc 0), and that worktree was then removed.
+  - The old worktree `/home/user/VA-Studio-review-free256` was removed only after `diff -rq` showed its `independent-review/` was identical to the copy committed in `51c9fecf`.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3731 with schema `rv256b`. It used the same `--no-defaults --socket= --mysqlx=OFF` pattern and its datadir was under `scratchpad/review-free256b-mysql/`. Other lanes' instances on 3711 and 3721, and 3306, were not touched.
+- Evidence is in `review-evidence/addendum1/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `68c4e03c` for a development merge.**
+
+| Finding | Status | How it was checked |
+| --- | --- | --- |
+| F-1 | Closed | Mutations re-run against the fixed code |
+| F-3 | Closed (domain enrollment) | Re-run probe |
+| F-5 | Closed | Re-run probe and the `link()` reproduction |
+| F-8 | Closed for 256 rows, with residual A1-7 | Code review and probe |
+| F-2 | Closed for slot bounding and read-back | Re-run probe and the cross-process probe |
+
+F-2 had two remaining gaps when reviewed at `68c4e03c`: crash residue and per-slot rather than aggregate free space (A1-2 and A1-3, which Codex also found). Addendum 2 reviews the fix for both.
+
+The same exclusions as the original decision apply: this approves no activation, mount, real sources adapter, real terms or assets, and no verified-production provenance.
+
+### Did each fix close its finding without opening a new path?
+
+- **F-1 (release registry).**
+  - Re-running U1, U2 and U3 against `68c4e03c` (`addendum1/mutations/`):
+    - **U1** (legitimate renderer revision): existing owners keep library show and index, and their `master_wav` authorization (`ok`). Render of a pending origin is refused with `profile_changed`, before any claim row is written (`work=""`). At `1860e00d` every read was refused.
+    - **U3** (manifest-only drift): reads `ok`, render `profile_changed` with no claim.
+    - **U2** (implementation drift without a manifest update): reads `ok`, render `render_failed` (`claimed,failed`), as before. The manifest is unchanged, so `requireCurrent` passes and the child's runtime check refuses.
+  - **Can `RELEASED` be bypassed?** Not without `APP_KEY`. A stored profile is reachable only through a sealed definition payload. Five checks bind it:
+    - `validateStored` admits only a hash released for the profile's own provenance;
+    - `graph()` requires profile provenance to equal the definition's;
+    - `originGraph()` requires the origin's frozen profile to equal the definition's;
+    - `originGraph()` requires the origin's `profile_hash` column to equal the hash of that profile;
+    - the row seal and insert guard (`o.profile_hash = NEW.profile_hash`) bind the rest.
+  - **Registry discipline.** A revision whose runtime profile is not appended to `RELEASED` fails closed: new proposals read `profile_unregistered`, and the lane test fails when the runtime profile is not listed.
+- **F-2 (spool).**
+  - Re-running the original probes (`rerun-probe-*.txt`) gave exactly the expected flips:
+    - a fourth concurrent snapshot is now refused with `spool_busy` (Spool line 141);
+    - the spool directory now holds `slot-0.lock`;
+    - the 1 GiB transfer still passes through the spool.
+  - Cross-process check: with three snapshots held in the parent, a forked child was refused `spool_busy` (`sqlite-addendum-probe.txt`), so the `flock` lease holds across processes.
+  - The read-only reopen and read-back from the spool are present, as in the main-resident adapter.
+  - The remaining gaps at `68c4e03c` are A1-2 and A1-3 below.
+- **F-3.** The original probe `auth.mfa_not_required` now errors with `mfa_required`, raised from `ProductionFreeGrantStaff.php:42` under the shipped non-production panel rule. The lane's `StaffMfaTest` covers every staff action. The session challenge at the mount remains condition 4.
+- **F-5.**
+  - The original probe `render.symlink` now finds **no** file at the dangling target.
+  - PHP `link()` returns false onto a dangling-symlink destination and creates nothing at the target. It also refuses an existing name (`php-link-semantics.txt`).
+  - Publication is atomic: the fully written, fsynced, 0400 inode becomes `original.pdf` in a single `link()`.
+  - Residual (Info): there is no directory fsync after `link`, which was also true before.
+  - Crash between `link` and `unlink`: the claim's original has nlink 2, so `verify` refuses it. The DB publish happens only after `store` returns, so that claim fails and a new claim path is used; the temporary name is orphaned. Info.
+- **F-8.**
+  - `verify` computes `hash_equals` for every candidate key with no short-circuit. Timing reveals only the number of keys.
+  - A key in neither list never verifies; the lane test and probe (`delisting → tampered`) confirm this. Tamper detection against unknown keys is unchanged.
+  - The `request_key_hash IN (…)` lookup equals the old `=` lookup when no previous key is configured.
+  - Residual A1-7 below.
+
+### Findings in this delta (Low or above)
+
+| ID | Severity | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- |
+| A1-1 | Low | **A renderer revision strands pending origins.** Origins that are not yet rendered stay unrenderable (`profile_changed`). Master, MP3 and stems delivery require a published original, so those owners also get no assets until the old runtime is restored. This is the intended immutability, so it is an operational gap. | Before deploying any profile revision, drain pending renders (operator runbook or command). Alternatively, keep the previous renderer runnable side by side. | `addendum1/mutations/U1.txt` (`pending.render=refused:profile_changed`, `pending.authorize.master_wav=refused:original_pending`) |
+| A1-2 | Low | Codex P2-1 confirmed: a snapshot left behind by a killed worker makes its slot permanently skipped. With residue in all 3 slots, every redemption is refused `spool_busy` until an operator removes the residue. | Fixed in `5a2fadd2`; see Addendum 2. | `sqlite-addendum-probe.txt` (`addendum.spool`) |
+| A1-3 | Low | Codex P2-2 confirmed: free-space admission is per slot. With free space fixed at size + reserve, two concurrent snapshots were both admitted although together they need 2 × size + reserve. | Fixed in `5a2fadd2`; see Addendum 2. | `sqlite-addendum-probe.txt` |
+| A1-4 | Low | Codex P2-3 confirmed, and **pre-existing at `1860e00d`** (my original review missed it): a failed render appends `claimed` and `failed`, so only **16** attempts fit before `attempts_exhausted` (32 work rows). | Fixed in `5a2fadd2`; see Addendum 2. | `sqlite-addendum-probe.txt` (`addendum.attempts`) |
+| A1-5 | Low | Codex P2-4 confirmed by code, and **pre-existing**: the library index took the first 1,000 origins by UUID (`CurrentRows` orders by `id`) before sorting by time, so an account with more than 1,000 origins could miss its newest. That needs more than 1,000 distinct definitions per account. | Fixed in `5a2fadd2`; see Addendum 2. | Code review (`ProductionFreeGrantLibrary::index` at `68c4e03c`) |
+| A1-6 | Low | **A race loser gets a raw deadlock error.** In 2 of 3 native cap-1 rounds with a held definition lock, the losing process got a raw `PDOException 1213 Deadlock found` instead of an opaque refusal. The likely cause is a gap lock from the request-key `FOR UPDATE` read meeting the definition lock. The cap still held: 0 violations, all cap-2 rounds admitted both. This is not caused by the delta: with no previous keys, the `IN` lookup is equivalent to `=`. The first review's run simply did not hit the interleaving. | Before the mount, map SQLSTATE 40001/1213 to a fixed refusal (for example `busy`), or retry the transaction a bounded number of times. Never let raw driver text reach a response. | `addendum1/native-race-log.json` (rounds 1 and 3) |
+| A1-7 | Low | **Previous keys keep forging power while listed.** A row sealed now with a listed previous key verifies (probe). Rows are append-only and cannot be resealed, so a 256 deployment must list every historical key for as long as its rows exist. A compromised old key therefore cannot be retired without stranding the rows it sealed. | Before production, use a dedicated, versioned seal key that is separate from `APP_KEY`, or add an operator re-attestation record that lets an old key be retired. | `sqlite-addendum-probe.txt` (`listed=true`, `after delisting=false`) |
+
+### Rulings on the implementer's judgement calls
+
+1. **Runtime equality also for `review`/`accept` and staff `open`: agreed.** Without it, a customer could assent to a definition this runtime cannot render, producing an origin that can never get its original (A1-1). `approve`, `close`, staff `read`, `revoke` and delivery correctly use only `validateStored`.
+2. **`graph()` requires the stored profile's provenance to equal the definition's: agreed.** It is strictly tighter, and it closes reading a released profile under the other provenance's definition. The lane test refuses that case with `profile_unregistered`.
+3. **Default root from `path.base`: agreed, Info.** In the application it equals `dirname(__DIR__, 4)`, and the bounded child has no container, so it falls back. If the two ever differed, only `current()` and `requireCurrent` would read the other tree. `RendererProcess` and the child still verify with the explicit file-relative root, so a mismatch can only refuse or strand, never admit an unverified render. Suggestion: outside `testing`, assert that `realpath(path.base)` equals the file-relative root.
+4. **`Files::store` deletes its own temporary name on failure: agreed.** The removal is identity-checked (dev, inode and a regular file), the name is a fresh 128-bit random, and published or pre-existing files are never touched. The header comment was updated accordingly.
+5. **Origin `profile_hash` column checked against its stored profile: agreed.** It duplicates the seal's binding as defense in depth, at no cost.
+6. **Spool settings in the policy array: agreed.** They are validated with bounds (1 to 16 slots, reserve at least 16 MiB), and the `changed_policy` re-proof covers a change mid-command. Info: the slot bound is enforced by `flock` on the spool directory, so keep the spool on host-local storage. `flock` is not a reliable cross-host lease on network filesystems.
+
+**The implementer's identity note: confirmed.** `grep` finds `config('app.key')` used directly in eight main-resident customer classes, including `ProductionIdentity/IdentityPolicy`, `CustomerAccess`, `CustomerIdentityChallenges`, the consent and suppression evidence classes, and `IdentitySmtpFactory`. After an `APP_KEY` rotation, customer 256 commands therefore fail with `identity_refused` before any 256 row is read, whatever 256 does. This is not a 256 defect. It makes a store-wide key rotation unsafe until the identity owner adds previous-key handling. That, plus A1-7, is a condition before production.
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `68c4e03c` | SQLite | 0 | 113 tests, 747 assertions, 2 skipped (native-only); matches the lane |
+| Original reviewer probes re-run unchanged (`rerun-probe-*.txt`) | SQLite | Assent 0, DefaultOff 0, Authorization 2, Rendering 1, Delivery 2 | The only failures are the four expected flips (F-3, F-5, F-2 ×2); everything else unchanged |
+| `addendum1/probes/AddendumProbeTest.php` | SQLite | 0 | 2 tests, 14 assertions |
+| Upgrade mutations control, U1, U2, U3 (`mutations/run-upgrade-mutations.sh`) | SQLite (file) | 0 each; revert rc 0 each | As listed above |
+| `NativeConcurrencyProbeTest` | MySQL 8.4.11 :3731 | 0 | 1 test, 30 assertions. Cap violations 0; render race: 1 original; redemption race: 1 of 1 in 3 attempts; A1-6 observed |
+| `ProductionFreeGrant{Spool,KeyRotation,ProfileRevision}Test` | MySQL 8.4.11 :3731 | 0 | 14 tests, 145 assertions, 0 skipped. The fixes are driver-sensitive here (`IN` lookup, `FOR UPDATE` reads, sealed reads) |
+| Pint `--test` on the 16 changed PHP files | n/a | 0 | passed |
+
+Native ran from 06:24:10Z to 06:52:46Z. `StaffMfaTest` and `FilesTest` were not run natively: they are filesystem- and model-level and unchanged by driver.
+
+### SHA-256 at `f1666ae3`
+
+The full list is in `addendum1/sha256-f1666ae3.txt`. Key files:
+
+| Path | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantRenderProfile.php` | `ee849cc7a6f3f07f5b3dc7a6c3a24a6a9067c32d530f27712b5bfac65ff58c92` |
+| `ProductionFreeGrantSpool.php` | `fbc293e1c79500c1574aec08d6469225a93bf3c0aef2d8610f70ce461294f734` |
+| `ProductionFreeGrantRecords.php` | `7b8d686646bd14c31757ee4c40eaf400066b604148a023c833afa0e74ac8b516` |
+| `ProductionFreeGrantFiles.php` | `833f7792fc248e3531bc9c996a9ac0ad101c707e6d6d29954396bd0065c197c1` |
+| `ProductionFreeGrantStaff.php` | `5e4175ae6c1450341ef5a430c80bb9e7b5b990b130abc13968ce62a38f675cc9` |
+| `ProductionFreeGrantDefinitions.php` | `425e4851bb7c7cf8d55c1349e6b43ce8066f43fcd9fafc64347247e8903af261` |
+| `ProductionFreeGrants.php` | `5b2e954ff8ab75c57e5034e64d940f9e714573db0b461a02e803064b16e1529b` |
+| `ProductionFreeGrantDownloads.php` | `b7dafab80efee195cee2762216f751a2df4f0787aa280f105c5d5fdf31639b82` |
+
+### Conditions after Addendum 1
+
+- **Condition 1 (F-1): satisfied.**
+- **Condition 2 (F-2):** satisfied at `68c4e03c` except for A1-2 and A1-3; see Addendum 2.
+- **Condition 4 (F-3):** satisfied for the domain. The session MFA challenge at the mount remains.
+- **Added:**
+  - A1-1: a drain runbook before the first profile revision.
+  - A1-6: map deadlocks to a refusal before the mount.
+  - A1-7 and the identity layer's key handling: before production.
+- **Unchanged:** conditions 3 and 5, and F-4 and F-6.
+
+### Evidence (`review-evidence/addendum1/`)
+
+- **Runs:** `sqlite-directory.*`, `rerun-probe-*.{txt,junit.xml}`, `probes/AddendumProbeTest.php` and `sqlite-addendum-probe.*`.
+- **Mutations:** `mutations/` holds `mutate.py`, `run-upgrade-mutations.sh`, and `prepare`, `control`, `U1`, `U2` and `U3` output with diffs and revert rc.
+- **Native:** `native/` holds the runner scripts and the JUnit, text and rc files for the two native selections; `native-race-log.json` holds the race outcomes.
+- **Other:** `php-link-semantics.txt`, `pint.txt` and `sha256-f1666ae3.txt`.
+
+## Addendum 2: Codex review round `68c4e03c..5c8696a0` (code `5a2fadd2`)
+
+- Scope: the fixes for Codex P2-1 to P2-4 (A1-2 to A1-5 above) in `5a2fadd2`, and the lane evidence in `5c8696a0`.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration. The review worktree was checked out detached at `5c8696a0`; this DECISION.md and the untracked `addendum1/` and `addendum2/` carried over unchanged.
+- Native environment: the same private instance on :3731, which was then shut down and its datadir deleted (see Cleanup below).
+- Evidence is in `review-evidence/addendum2/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `5c8696a0` for a development merge.**
+
+- All four fixes close their item. The spool fix answers the crash question: a dead holder's reservation does not leak.
+- One new Low finding, A2-1: a test errors on MySQL.
+- The availability window that Codex raised later (A2-5) is confirmed, and the implementer is fixing it.
+
+### Judgement of each fix
+
+1. **Residual snapshot reclaim (A1-2).**
+   - Rule: a residual at exactly `slot-N.snapshot` is unlinked only while that slot's `flock` is held, and only if it is a regular, single-link file owned by the effective uid. Anything else leaves the slot skipped.
+   - **Safe.** Holding the flock proves the previous holder's open file description is gone, because flock is per description and is released at process death. `unlink` removes only the directory entry. A planted symlink, directory or hard link is refused by `lstat` mode and nlink (lane test). A foreign-owned residue is kept and its slot skipped (probe 4: all 3 slots `spool_busy`, 3 residues kept).
+   - Probe 2: after a SIGKILLed holder, the next admission reclaimed the residue and succeeded.
+   - Re-running the A1 probe at this head flips as expected: residue in all slots now gives `contract:ok,master_wav:ok`.
+   - Caveat (Info): this relies on `flock` being a real lease. Keep the spool on host-local storage, as ruled in judgement call 6.
+2. **Aggregate reservation (A1-3).**
+   - Mechanism: slot choice, the free-space probe and the sidecar write are serialized by `admission.lock`. `pending()` sums `slot-N.reserve` only for slots whose lock is **currently held** (a non-blocking probe under the gate).
+   - **A crash between reserve and release does not leak.** In probe 1 a holder was SIGKILLed mid-fill. That left `slot-0.reserve = 00000000000001048576` and a residue, with its flock released. The next admission, with free space for exactly one snapshot, was **admitted**: the dead holder's reservation is ignored because its lock is free, and the next holder of that slot overwrites it.
+   - A **live** holder mid-fill is counted: probe 3 gave `refused:spool_space`.
+   - Written bytes stay reserved until completion, so they are counted twice for a moment. That over-counts, which is the safe direction (Info).
+   - Info: `admission.lock` is a blocking `flock` with no timeout, and a malformed lock or sidecar file makes every admission fail closed (`artifact_unavailable`) until an operator intervenes. Both are acceptable for a bounded critical section.
+3. **Attempt count (A1-4).**
+   - The allowance now counts `claimed` rows (`< 32`). The CHECK allows ordinals 0 to 63, and `originGraph` reads 64 rows. 32 claims, each followed by a `failed` row, is exactly 64 rows (ordinals 0–63), so the read window and the guard match.
+   - The A1 probe at this head now reports **32** attempts and 64 work rows.
+   - **Native check, done:**
+     - `AttemptLimitTest` (2 cases, including a full 64-row chain) passed on MySQL.
+     - `test_migration_installs_nine_tables_with_three_guards_each_and_retry_is_a_no_op` passed on MySQL. That test exercises the installer's exact CHECK-clause comparison with the new `63` literal.
+   - The in-place edit of migration `256000` is acceptable only because it has never been applied to a shared or production database (Info A2-2).
+4. **Library window (A1-5).**
+   - `newest()` orders by `created_at DESC, id DESC LIMIT n` in SQL, with `FOR UPDATE` on MySQL. The page is then fetched by `id IN (…)`, and `total` stays exact.
+   - **Native:** `ProductionFreeGrantLibraryTest` (3 cases) passed on MySQL, so `newest()` runs natively. The lane's own regression does not (A2-1).
+   - The optional page size (1 to 1000) is a constructor argument, not customer input. Agreed.
+
+### Findings in this delta
+
+| ID | Severity | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- |
+| A2-1 | Low | **`ProductionFreeGrantLibraryWindowTest` errors on MySQL.** It reads `sqlite_master` with no driver check (MySQL error 1064). It is not in the SQLite-only census, so the final Foundation CI MySQL shards would fail on it. | Mark it SQLite-only with a skip and add it to the native-only skip census, or make the guard drop/restore driver-portable. | `addendum2/native/native2-attempts-library-schema.txt` (4 tests, 82 assertions, 1 error, rc=2) |
+| A2-2 | Info | Migration `256000` was edited in place (CHECK `0..31` changed to `0..63`). A database that ran it before `5a2fadd2` now refuses every 256 command with `schema` (fail-closed) and will not re-run the migration. | Before merge, confirm that no shared environment applied `256000`; recreate local and review databases. | Code review (`ProductionFreeGrantSchema` definition and the `up(false)` comparison) |
+| A2-5 | Low (confirming Codex; fix pending as addendum 3) | **Availability history window.** `Definitions::graph()` reads availability with `all(…, 1000)`, which `CurrentRows` orders by `id` (UUID), while the CHECK allows ordinals 0 to 9,999. Past 1,000 events, the ordinal walk sees a UUID-chosen subset: `tampered`, or a stale `current`. | Being fixed. Also see the survey below. | Code review |
+
+**Survey of bounded-window reads at `5c8696a0`** (asked by the coordinator):
+
+- The **only** chain read whose window is smaller than its guard is availability (1000 against ordinals 0–9,999).
+- The work chain read (64) exactly matches its CHECK (0–63).
+- The library page now uses `newest()`.
+- Every `one()` call reads `LIMIT 2` on a unique key and refuses duplicates: definition, review, origin, original, revocation, authorization and the request-key lookup.
+- Counts (cap, rate limit, already-redeemed, total) are unbounded `COUNT(*)`.
+- Performance note (Info): every `originGraph()` re-reads and verifies the whole availability chain of its definition (decrypt plus HMAC per row). The library index does this once per listed item, up to 50 times. The fix for A2-5 should bound or cache this.
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `5c8696a0` | SQLite | 0 | 120 tests, 857 assertions, 2 skipped; matches the lane |
+| `addendum2/probes/SpoolCrashProbeTest.php` | SQLite (forked processes) | 0 | 1 test, 5 assertions; observations as above |
+| Addendum-1 probe re-run at `5c8696a0` | SQLite | 1 | Expected flips: residue reclaimed (`ok`); 32 attempts |
+| `AttemptLimitTest`, `LibraryWindowTest`, schema install test | MySQL :3731 | 2 | 4 tests, 82 assertions, 1 error (A2-1); the other 3 pass. 06:55:14Z to 07:02:05Z |
+| `ProductionFreeGrantLibraryTest` | MySQL :3731 | 0 | 3 tests, 31 assertions |
+| Pint `--test` on the changed PHP files | n/a | 0 | passed |
+
+SHA-256 of every changed file at `5a2fadd2` is in `addendum2/sha256-5a2fadd2.txt`:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantSpool.php` | `eacad81821edd18261f3a7a08a72a7215178acdad5e3597fdd1c37f01717337a` |
+| `ProductionFreeGrantSchema.php` | `0c6af23f5350a5187612ebcc03ac042475166339ca7d2c42246e9a65b6beac20` |
+| `ProductionFreeGrantRows.php` | `e2d9b02d8d98787c12e4efb17d587333956d6734ec529d83d3c9b4916c362f6a` |
+| `ProductionFreeGrantLibrary.php` | `e3962dd8e8a6b15368194bcf9ac05db71ecec2d0d38f3c9f3ae357961f1ec998` |
+| `ProductionFreeGrantDocuments.php` | `b07170870c7ce5568466325379a175e3596443d767137fa56d25754eef99409c` |
+| `ProductionFreeGrants.php` | `b6ca6ab1f4185e1124616f195e1ca22ab18a4a8da9a1dfc1092486b46874aeb7` |
+
+### Conditions after Addendum 2
+
+- A1-2, A1-3, A1-4 and A1-5 are closed. Condition 2 (F-2) is satisfied.
+- **Added:**
+  - A2-1 must be fixed before the final integrated Foundation CI run.
+  - A2-2 must be confirmed before merge.
+  - A2-5 is pending addendum 3.
+- Otherwise unchanged from Addendum 1: A1-1, A1-6, A1-7 and the identity key-rotation handling; conditions 3 and 5; F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3731 (pid 22993) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone, and nothing listens on 3731. Its datadir `scratchpad/review-free256b-mysql/data` was deleted.
+- Other lanes' instances on 3711, 3721 and 3741, and 3306, were not touched.
+- The lifecycle is in `addendum2/native/private-instance-lifecycle.txt`.
+- The mutation worktree `-free256b-mut` and the old review worktree `/home/user/VA-Studio-review-free256` were removed.
+- The review worktree is `/home/user/VA-Studio-review-free256b`, detached at `5c8696a0`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum1/` and `review-evidence/addendum2/`. Nothing was committed or pushed.

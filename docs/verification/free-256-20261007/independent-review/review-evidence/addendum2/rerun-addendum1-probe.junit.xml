@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" tests="2" assertions="10" errors="0" failures="1" skipped="0" time="8.053169">
+    <testcase name="test_spool_crash_residue_cross_process_leases_and_aggregate_space" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" line="39" class="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" classname="Tests.ReviewProbes.Free256.Addendum1.AddendumProbeTest" assertions="4" time="4.709310">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest::test_spool_crash_residue_cross_process_leases_and_aggregate_space
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'contract:spool_busy',
+-    1 =&gt; 'master_wav:spool_busy',
++    0 =&gt; 'contract:ok',
++    1 =&gt; 'master_wav:ok',
+ ]
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_render_attempt_budget_and_previous_key_forging_power" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php" line="100" class="Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest" classname="Tests.ReviewProbes.Free256.Addendum1.AddendumProbeTest" assertions="6" time="3.343859"/>
+  </testsuite>
+</testsuites>

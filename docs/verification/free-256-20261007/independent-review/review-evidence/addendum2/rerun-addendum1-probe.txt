@@ -1,0 +1,30 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+FPROBE addendum.attempts: 32 failed render attempts before attempts_exhausted (64 work rows, claimed+failed per attempt); previous-key seal verifies while listed=true, after delisting=false
+.                                                                  2 / 2 (100%)
+
+Time: 00:08.056, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\Free256\Addendum1\AddendumProbeTest::test_spool_crash_residue_cross_process_leases_and_aggregate_space
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'contract:spool_busy',
+-    1 => 'master_wav:spool_busy',
++    0 => 'contract:ok',
++    1 => 'master_wav:ok',
+ ]
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum1/probes/AddendumProbeTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 10, Failures: 1.
+rc=1

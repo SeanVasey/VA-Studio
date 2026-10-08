@@ -1,0 +1,33 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE auth.matrix: self_review, mfa_required, unverified, customer, demoted, unsaved, not_reviewed, stale_terms refused; author may open after independent approval
+.EPROBE auth.forgery: forged self-review refused by guard; forged non-MFA review admitted+read (needs APP_KEY+INSERT); forged open w/o approved terms refused at customer review (stale_terms); unkeyed seal refused (tampered); update/delete refused; DBA column edit refused (tampered)
+.PROBE auth.revocation: 4 outstanding authorizations refused (revoked), new authorizations refused, 0 redemptions; library show/index still list the origin revoked=true deliverable=false artifacts=4
+.                                                                4 / 4 (100%)
+
+Time: 00:07.686, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\Free256\AuthorizationProbeTest::test_panel_mfa_not_required_lets_a_non_mfa_admin_author_approve_and_open
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantException.php:16
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantStaff.php:42
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantStaff.php:26
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:181
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:177
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:37
+/home/user/VA-Studio-review-free256b/tests/Support/ProductionFreeGrantFixtures.php:85
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AuthorizationProbeTest.php:70
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 4, Assertions: 57, Errors: 1.
+rc=2

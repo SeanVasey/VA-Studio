@@ -1,0 +1,54 @@
+== U1 at 68c4e03c6be3ea65439ab34f1c794734a7ddd8a1
+applied U1
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php | 2 +-
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php          | 1 +
+ resources/contracts/production-free-v1/profile-assets.json            | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php
+index 8e5d4703..1a39d692 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderProfile.php
+@@ -35,7 +35,7 @@ final class ProductionFreeGrantRenderProfile
+         ],
+     ];
+ 
+-    private const MANIFEST_HASH = 'b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f';
++    private const MANIFEST_HASH = 'a1f649421cd5fe743b09df4ca760fc05d670683ea16739d9afb92fc07a004178';
+ 
+     public static function current(string $provenance, ?string $root = null): array
+     {
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
+index 0d18b068..1cd323e4 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php
+@@ -102,3 +102,4 @@ final class ProductionFreeGrantText
+         return str_replace("\n", '<br>', htmlspecialchars(str_replace("\t", '    ', $value), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8'));
+     }
+ }
++// review probe: a later renderer revision
+diff --git a/resources/contracts/production-free-v1/profile-assets.json b/resources/contracts/production-free-v1/profile-assets.json
+index 1092bce7..45ff50d4 100644
+--- a/resources/contracts/production-free-v1/profile-assets.json
++++ b/resources/contracts/production-free-v1/profile-assets.json
+@@ -2,7 +2,7 @@
+   "schema_version": 1,
+   "version": "production-free-grant-pdf-v1",
+   "files": {
+-    "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
++    "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php": "6aae2339e731d040b27dc635b3df33fbe5a83fb50f575004867eeb17b554fd15",
+     "app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+     "app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+     "app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b-mut/phpunit.xml
+
+PROBE upgrade[U1]: {"rendered.library.show":"ok:complete","rendered.library.index":"ok:1","rendered.authorize.master_wav":"ok:master_wav","pending.library.show":"ok:pending","pending.library.index":"ok:1","pending.authorize.master_wav":"refused:original_pending","pending.render":"refused:profile_changed","pending.work":""}
+.                                                                   1 / 1 (100%)
+
+Time: 00:01.375, Memory: 63.00 MB
+
+OK (1 test, 3 assertions)
+rc=0
+after revert: git diff --quiet -- app database resources rc=0

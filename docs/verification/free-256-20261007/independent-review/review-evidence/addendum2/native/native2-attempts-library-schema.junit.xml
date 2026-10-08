@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="82" errors="1" failures="0" skipped="0" time="411.214624">
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAttemptLimitTest" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php" tests="2" assertions="77" errors="0" failures="0" skipped="0" time="237.470879">
+      <testcase name="test_thirty_one_failed_attempts_still_allow_a_thirty_second_claim" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php" line="23" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAttemptLimitTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantAttemptLimitTest" assertions="37" time="100.632969"/>
+      <testcase name="test_the_thirty_third_attempt_is_refused_and_all_sixty_four_work_rows_are_readable" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAttemptLimitTest.php" line="42" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAttemptLimitTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantAttemptLimitTest" assertions="40" time="136.837910"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryWindowTest" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="76.981477">
+      <testcase name="test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php" line="30" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryWindowTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantLibraryWindowTest" assertions="2" time="76.981477">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryWindowTest::test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap
+Illuminate\Database\QueryException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ? ORDER BY rowid' at line 1 (Connection: mysql, Host: 127.0.0.1, Port: 3731, Database: rv256b, SQL: SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = production_free_origins ORDER BY rowid)
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:426
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:56
+/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="96.762267">
+      <testcase name="test_migration_installs_nine_tables_with_three_guards_each_and_retry_is_a_no_op" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php" line="31" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantSchemaTest" assertions="3" time="96.762267"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
