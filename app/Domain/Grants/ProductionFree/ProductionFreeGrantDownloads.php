@@ -186,9 +186,18 @@ final class ProductionFreeGrantDownloads
                             }
                             // A blocking read returns '' only at end of stream. '' without EOF is a stalled source and is refused at
                             // once; the deadline is checked before every read, not only when a chunk is written.
-                            @stream_set_blocking($input, true);
                             // A read that never returns cannot be interrupted by a deadline check, so each read is also time-boxed.
-                            @stream_set_timeout($input, max(1, min(5, intdiv($deadline - hrtime(true), 1_000_000_000))));
+                            // A regular file (including php://temp and php://memory) cannot block indefinitely on a host-local
+                            // disk and does not support read timeouts; any other stream (socket, pipe, FIFO, user wrapper) is
+                            // refused unless it accepts both blocking mode and the read timeout, so no read can outlive the deadline.
+                            ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
+                            $mode = fstat($input)['mode'] ?? null;
+                            if (! is_int($mode) || ($mode & 0170000) !== 0100000) {
+                                if (! @stream_set_blocking($input, true)
+                                    || ! @stream_set_timeout($input, max(1, min(5, intdiv($deadline - hrtime(true), 1_000_000_000))))) {
+                                    throw new \UnexpectedValueException;
+                                }
+                            }
                             while (! feof($input)) {
                                 ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
                                 $chunk = @fread($input, 1048576);

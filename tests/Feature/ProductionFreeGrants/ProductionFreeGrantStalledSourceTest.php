@@ -99,6 +99,44 @@ final class ProductionFreeGrantStalledSourceTest extends TestCase
         $this->assertSame([], glob((new ProductionFreeGrantFiles)->spoolDirectory().'/slot-*.snapshot'));
     }
 
+    /**
+     * Codex P2: a FIFO (or pipe) source rejects `stream_set_timeout`, so a read on it could block past every deadline.
+     * Such a stream is refused before any read; regular files are accepted without a timeout.
+     */
+    public function test_a_blocking_source_that_rejects_a_read_timeout_is_refused_before_any_read(): void
+    {
+        $fifo = sys_get_temp_dir().'/va-free256-fifo-'.bin2hex(random_bytes(6));
+        $this->assertTrue(posix_mkfifo($fifo, 0600));
+        $this->beforeApplicationDestroyed(function () use ($fifo): void {
+            @unlink($fifo);
+        });
+        // O_RDWR on a FIFO opens without a peer; with no writer data, a blocking read would wait forever.
+        $stream = fopen($fifo, 'r+b');
+        $this->assertIsResource($stream);
+        $real = $this->sources;
+        $this->app->instance(ProductionFreeGrantSources::class, new class($real, $stream) implements ProductionFreeGrantSources
+        {
+            public function __construct(private readonly FakeProductionFreeSources $real, private $stream) {}
+
+            public function prove(array $sourceManifest, array $assets): string
+            {
+                return $this->real->prove($sourceManifest, $assets);
+            }
+
+            public function open(array $asset)
+            {
+                return $this->stream;
+            }
+        });
+        $policy = (new ProductionFreeGrantPolicy)->current();
+        $before = ['policy' => $policy, 'target' => ['role' => 'master_wav', 'sha256' => str_repeat('a', 64), 'bytes' => 10, 'source_id' => 'synthetic-master_wav']];
+
+        $this->refuses(fn () => (new ReflectionMethod(ProductionFreeGrantDownloads::class, 'snapshot'))->invoke(new ProductionFreeGrantDownloads, $before, hrtime(true) + 30_000_000_000), 'artifact_unavailable');
+
+        $spool = (new ProductionFreeGrantFiles)->spoolDirectory();
+        $this->assertSame([], glob($spool.'/slot-*.snapshot'));
+    }
+
     public function test_the_deadline_is_checked_before_the_first_read(): void
     {
         $this->app->instance(ProductionFreeGrantSources::class, $this->stalledSources());
