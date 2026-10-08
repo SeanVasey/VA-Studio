@@ -1,0 +1,34 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> capability: admitted
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> inquiry: admitted
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> identity: admitted
+P4 shorter-prefix (vaseyaudio_review) -> capability: admitted
+P4 shorter-prefix (vaseyaudio_review) -> inquiry: admitted
+P4 shorter-prefix (vaseyaudio_review) -> identity: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> capability: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> inquiry: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> identity: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+F                                                                   1 / 1 (100%)
+
+Time: 01:02.296, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeV3Test::test_p4_prefix_and_extension_named_peers
+P4 hyphen-extension identity
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'admitted'
++'refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.'
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php:173
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 24, Failures: 1.

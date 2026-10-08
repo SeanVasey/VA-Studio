@@ -1,0 +1,21 @@
+ .../Suppression/ProductionSuppressionSchema.php    |  22 +++-
+ .../suppression-254-20261007/README.md             |   1 +
+ .../green-after-fix.junit.xml                      |   6 ++
+ .../codex-timestamp-shape/green-after-fix.txt      |  10 ++
+ .../mutation-glob-removed-still-green.txt          |  10 ++
+ .../codex-timestamp-shape/owned-sqlite.junit.xml   |  85 +++++++++++++++
+ .../codex-timestamp-shape/owned-sqlite.txt         |  11 ++
+ .../parity-fuzz-sqlite.php.txt                     |  12 +++
+ .../codex-timestamp-shape/parity-fuzz-sqlite.txt   |   1 +
+ .../conditions/codex-timestamp-shape/pint.txt      |   1 +
+ .../codex-timestamp-shape/red-before-fix.junit.xml |  13 +++
+ .../codex-timestamp-shape/red-before-fix.txt       |  20 ++++
+ .../red-mutation-attempt-only.txt                  |  20 ++++
+ .../red-mutation-confirmation-only.txt             |  20 ++++
+ .../red-mutation-glob-and-hour-only.txt            |  20 ++++
+ .../red-mutation-intent-only.txt                   |  20 ++++
+ .../red-mutation-no-glob-no-hour.txt               |  20 ++++
+ .../red-mutation-no-hour-bound.txt                 |  20 ++++
+ .../red-mutation-target-only.txt                   |  20 ++++
+ .../ProductionSuppressionTimestampGuardTest.php    | 114 +++++++++++++++++++++
+ 20 files changed, 442 insertions(+), 4 deletions(-)

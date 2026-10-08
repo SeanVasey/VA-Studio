@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan-f253/phpunit.xml
+
+DIAGNOSTIC initialize 10998 ms prepare=23150 execute=23148 questions=23176
+E                                                                   1 / 1 (100%)
+
+Time: 02:53.343, Memory: 83.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_regular_begin_commit_and_aftercommit_callback_order_is_preserved
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:338
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:236
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php:98
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:60
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:64
+/home/user/VA-Studio-trigscan-f253/app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php:34
+/home/user/VA-Studio-trigscan-f253/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:109
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 2, Errors: 1.

@@ -1,0 +1,60 @@
+# Addendum 2 scope and hashes (reviewer, 2026-10-08T05:09:55Z)
+HEAD 25a0084052edd7e7ba91bee661e92ad9482658b7
+
+## git log --oneline --first-parent b47de6b6..25a00840 (102 commits in the range including main's side of the merge)
+25a00840 fix(migrations): refuse a selected database name that carries an identifier delimiter
+855610be chore(merge): integrate main at 9593fcdf into native schema isolation
+052cef7c docs(verification): review addendum 1 — complete-identifier qualifier match approved at b47de6b6
+
+## 855610be parents
+052cef7cf641a3cdcdce7a143abe2d8af74c1729 9593fcdf12ab6ec2151311872e3592b80a82b592
+
+## git merge-tree --write-tree --name-only 052cef7c 9593fcdf (conflicted paths when re-merged)
+app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php
+app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php
+scripts/ci/database-sqlite-skips.json
+tests/Feature/ProductionFeatures/ProductionConsentWithdrawalReaderTest.php
+tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php
+tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php
+
+## git diff --name-only 9593fcdf 855610be: 183 paths = 177 under docs/verification/native-schema-isolation-20261007/ + 6 branch code/test/census paths + 0 other (expect 0)
+app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+scripts/ci/database-sqlite-skips.json
+tests/Feature/NativeSchemaIsolationTest.php
+tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php
+other: (none)
+
+## five 253 files
+git diff 9593fcdf 855610be -- five: 0 lines
+git diff fad3ab44 052cef7c -- five (branch's pre-merge copies vs main before #49): 0 lines
+git diff fad3ab44 855610be -- five (= #49's own change to them): 177 lines
+ .../Preferences/ProductionConsentWithdrawal.php    | 35 ++++++++++++++++++----
+ .../ProductionFeatureOperation.php                 | 18 ++++++++++-
+ .../ProductionConsentWithdrawalReaderTest.php      |  2 +-
+ .../ProductionFeatureMigrationTest.php             |  9 ++++++
+ .../ProductionFeatureNativeAdmissionTest.php       |  9 ++++++
+ 5 files changed, 66 insertions(+), 7 deletions(-)
+
+## reviewed code unchanged by the merge: git diff b47de6b6 855610be -- three matchers, lane tests: 0 lines
+
+## census: git diff 9593fcdf 855610be (adds this branch's 4 entries) and 052cef7c..855610be (adds #49's 1 entry)
+main->merge: +4  -0
+branch->merge: +1  -0
+
+## 25a00840 code delta
+ .../CapabilityMigrationOwnership.php               |  8 ++-
+ .../IdentityMigrationOwnership.php                 |  8 ++-
+ ...6_10_07_243000_inquiry_notification_intents.php |  8 ++-
+ .../native-schema-isolation-20261007/README.md     | 21 +++++++
+ .../codex-delimited-name/green-sqlite.txt          | 12 ++++
+ .../conditions/codex-delimited-name/red-sqlite.txt | 38 ++++++++++++
+ tests/Unit/SchemaQualifierDelimiterTest.php        | 69 ++++++++++++++++++++++
+ 7 files changed, 161 insertions(+), 3 deletions(-)
+
+## SHA-256 at 25a00840 (git blob vs worktree)
+60757cb1d9242eec6594956756a8adc4e31ca2162547fdc6e3c2360ed792c2f2  app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php  worktree=60757cb1d9242eec6594956756a8adc4e31ca2162547fdc6e3c2360ed792c2f2
+656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4  app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php  worktree=656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4
+ab74169f24b9ad7692730723045dc38db74dadf366e17f6f7d575457cf67cd0f  database/migrations/2026_10_07_243000_inquiry_notification_intents.php  worktree=ab74169f24b9ad7692730723045dc38db74dadf366e17f6f7d575457cf67cd0f
+2e5265d7cd00c47efc5c75cee0318c60714e50e1e0af863a6a7377b792b66207  tests/Unit/SchemaQualifierDelimiterTest.php  worktree=2e5265d7cd00c47efc5c75cee0318c60714e50e1e0af863a6a7377b792b66207

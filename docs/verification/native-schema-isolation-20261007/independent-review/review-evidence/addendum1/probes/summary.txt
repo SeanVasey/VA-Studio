@@ -1,0 +1,4 @@
+# 2026-10-08T04:23:23Z note: the A1-M5 mutate.py dry-run (applied and reverted within ~1 s, about 04:23Z, during the first seconds of that run) overlapped the probes-v3-b47de6b6 run; that run is superseded by probes-v3-b47de6b6-rerun, started after it on a clean tree.
+2026-10-08T04:24:02Z probes-v3-b47de6b6 exit=0 wall=62s tree=b47de6b6 dirty_app_db=0 :: OK (9 tests, 3148 assertions)
+2026-10-08T04:25:37Z probes-v2-unchanged-b47de6b6 exit=1 wall=95s tree=b47de6b6 dirty_app_db=0 :: Tests: 8, Assertions: 3065, Failures: 1.
+2026-10-08T04:27:44Z probes-v3-b47de6b6-rerun exit=0 wall=122s tree=b47de6b6 dirty_app_db=0 :: OK (9 tests, 3148 assertions)

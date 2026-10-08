@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionPublicIdGuardTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionPublicIdGuardTest.php" tests="1" assertions="14" errors="0" failures="1" skipped="0" time="2.796360">
+    <testcase name="test_every_public_id_the_runtime_validates_must_be_a_uuid_at_the_trigger" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionPublicIdGuardTest.php" line="29" class="Tests\Feature\ProductionSuppression\ProductionSuppressionPublicIdGuardTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionPublicIdGuardTest" assertions="14" time="2.796360">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionSuppression\ProductionSuppressionPublicIdGuardTest::test_every_public_id_the_runtime_validates_must_be_a_uuid_at_the_trigger
+production_suppression_targets accepted a public id with non-hex characters in the right positions.
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionPublicIdGuardTest.php:80
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionPublicIdGuardTest.php:56
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

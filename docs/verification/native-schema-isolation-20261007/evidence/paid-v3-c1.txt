@@ -1,0 +1,38 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan-paid/phpunit.xml
+
+DIAGNOSTIC run start prepare 16:04:18
+DIAGNOSTIC run end prepare 19.6 s
+DIAGNOSTIC run start prepare 16:04:39
+DIAGNOSTIC run end prepare 16.6 s
+DIAGNOSTIC run start prepare 16:04:55
+DIAGNOSTIC run end prepare 16.3 s
+DIAGNOSTIC run start complete 16:05:12
+DIAGNOSTIC run end complete 15.9 s
+DIAGNOSTIC run start complete 16:05:28
+DIAGNOSTIC run end complete 15.8 s
+DIAGNOSTIC run start authorize 16:05:44
+DIAGNOSTIC run end authorize 15.5 s
+DIAGNOSTIC run start authorize 16:06:00
+DIAGNOSTIC run end authorize 16.5 s
+DIAGNOSTIC run start redeem 16:06:22
+DIAGNOSTIC run end redeem 15.6 s
+DIAGNOSTIC run start redeem 16:06:37
+E                                                                   1 / 1 (100%)
+
+Time: 08:02.231, Memory: 95.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php:113
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-trigscan-paid/tests/Feature/PaidGrantDownloadJourneyTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 14, Errors: 1.

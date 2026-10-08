@@ -1,0 +1,52 @@
+mutated triggers are created under sql_mode=""
+== none (installed text)
+  probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event       => refused by GUARD
+  probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event     => refused by GUARD
+  probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)          => refused by GUARD
+  probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)                                  => refused by GUARD
+  probe D1: intent -> e2, created_at 1 s before e2                                                => refused by GUARD
+  probe D2: intent -> e2, same instant (control)                                                  => ACCEPTED (stored created_at=2026-01-01 00:00:10)
+installed mutated production_suppression_targets_retain_insert (ACTION_STATEMENT differs from installer: false)
+installed mutated production_suppression_confirmations_retain_insert (ACTION_STATEMENT differs from installer: false)
+== M-none-recreated: the unmutated text recreated under the chosen creation sql_mode (targets, confirmations)
+  probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event       => refused by GUARD
+  probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event     => refused by GUARD
+  probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)          => refused by GUARD
+  probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)                                  => refused by GUARD
+  probe D1: intent -> e2, created_at 1 s before e2                                                => refused by GUARD
+  probe D2: intent -> e2, same instant (control)                                                  => ACCEPTED (stored created_at=2026-01-01 00:00:10)
+restored production_suppression_targets_retain_insert (ACTION_STATEMENT equals installer body: true)
+restored production_suppression_confirmations_retain_insert (ACTION_STATEMENT equals installer body: true)
+installed mutated production_suppression_targets_retain_insert (ACTION_STATEMENT differs from installer: true)
+installed mutated production_suppression_confirmations_retain_insert (ACTION_STATEMENT differs from installer: true)
+== M-year: drop YEAR(NEW.created_at)>0 (targets, confirmations)
+  probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event       => ACCEPTED (stored created_at=0000-00-00 00:00:00)
+  probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event     => ACCEPTED (stored created_at=0000-00-00 00:00:00)
+  probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)          => refused by GUARD
+  probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)                                  => refused by GUARD
+  probe D1: intent -> e2, created_at 1 s before e2                                                => refused by GUARD
+  probe D2: intent -> e2, same instant (control)                                                  => ACCEPTED (stored created_at=2026-01-01 00:00:10)
+restored production_suppression_targets_retain_insert (ACTION_STATEMENT equals installer body: true)
+restored production_suppression_confirmations_retain_insert (ACTION_STATEMENT equals installer body: true)
+installed mutated production_suppression_targets_retain_insert (ACTION_STATEMENT differs from installer: true)
+installed mutated production_suppression_confirmations_retain_insert (ACTION_STATEMENT differs from installer: true)
+== M-shape-only-year: drop the CHAR REGEXP and STR_TO_DATE round trip, keep YEAR()>0 (targets, confirmations)
+  probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event       => refused by GUARD
+  probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event     => refused by GUARD
+  probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)          => refused by GUARD
+  probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)                                  => refused by GUARD
+  probe D1: intent -> e2, created_at 1 s before e2                                                => refused by GUARD
+  probe D2: intent -> e2, same instant (control)                                                  => ACCEPTED (stored created_at=2026-01-01 00:00:10)
+restored production_suppression_targets_retain_insert (ACTION_STATEMENT equals installer body: true)
+restored production_suppression_confirmations_retain_insert (ACTION_STATEMENT equals installer body: true)
+installed mutated production_suppression_intents_retain_insert (ACTION_STATEMENT differs from installer: true)
+== M-intent-time: drop e.created_at<=NEW.created_at (intents)
+  probe Y1: target, non-strict, created_at zzzz -> zero date, parent = zero-dated 253 event       => refused by GUARD
+  probe Y2: target, non-strict, created_at 0000-00-00 00:00:00, parent = zero-dated 253 event     => refused by GUARD
+  probe Y3: target, non-strict, zzzz, parent = normal 2026 event (ordering also refuses)          => refused by GUARD
+  probe Y4: confirmation, non-strict, zzzz (attempt parent 2026)                                  => refused by GUARD
+  probe D1: intent -> e2, created_at 1 s before e2                                                => ACCEPTED (stored created_at=2026-01-01 00:00:09)
+  probe D2: intent -> e2, same instant (control)                                                  => ACCEPTED (stored created_at=2026-01-01 00:00:10)
+restored production_suppression_intents_retain_insert (ACTION_STATEMENT equals installer body: true)
+final: all 12 installed 254 triggers equal the installer text and carry the installer's strict SQL_MODE: true
+exit=0

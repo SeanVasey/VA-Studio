@@ -1,0 +1,10 @@
+#!/bin/bash
+# Installer/admission classes on private :3447
+cd /home/user/VA-Studio-review-supp254
+E=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/ev254
+export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3447 DB_DATABASE=vaseyaudio_rev254b DB_USERNAME=root DB_PASSWORD=ci-only-password DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync
+for c in ProductionSuppressionNativeAdmissionTest ProductionSuppressionMigrationTest; do
+  echo "== $c start $(date -u +%T)"
+  php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- tests/Feature/ProductionSuppression/$c.php --log-junit $E/native-$c.junit.xml > $E/native-$c.txt 2>&1
+  echo "== $c end $(date -u +%T) rc=$?"; tail -1 $E/native-$c.txt
+done

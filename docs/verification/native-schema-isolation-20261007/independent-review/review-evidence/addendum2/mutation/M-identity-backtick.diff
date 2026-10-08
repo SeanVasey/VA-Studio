@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+index e14fdb3f..c2fe63f1 100644
+--- a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++++ b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+@@ -532,7 +532,7 @@ final class IdentityMigrationOwnership
+      */
+     private function qualifies(string $sql, string $database): bool
+     {
+-        if (str_contains($database, '`') || str_contains($database, '"')) {
++        if (str_contains($database, '"')) {
+             $this->reject();
+         }
+         $name = preg_quote($database, '/');

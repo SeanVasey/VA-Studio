@@ -1,0 +1,27 @@
+mutated app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php removed backtick check
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+F.F..                                                               5 / 5 (100%)
+
+Time: 00:00.800, Memory: 61.00 MB
+
+There were 2 failures:
+
+1) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@backtick with data ('a`b')
+identity admitted the delimited database name a`b
+
+/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@doubled backtick with data ('a``b')
+identity admitted the delimited database name a``b
+
+/home/user/VA-Studio-review-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 22, Failures: 2.
+rc=1

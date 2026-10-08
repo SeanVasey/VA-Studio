@@ -1,0 +1,52 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan-paid/phpunit.xml
+
+DIAGNOSTIC run start prepare 17:25:19
+DIAGNOSTIC run end prepare 13.6 s
+DIAGNOSTIC run start prepare 17:25:33
+DIAGNOSTIC run end prepare 14.8 s
+DIAGNOSTIC run start prepare 17:25:48
+DIAGNOSTIC run end prepare 15.8 s
+DIAGNOSTIC run start complete 17:26:04
+DIAGNOSTIC run end complete 14.5 s
+DIAGNOSTIC run start complete 17:26:19
+DIAGNOSTIC run end complete 15.0 s
+DIAGNOSTIC run start authorize 17:26:34
+DIAGNOSTIC run end authorize 15.3 s
+DIAGNOSTIC run start authorize 17:26:49
+DIAGNOSTIC run end authorize 13.8 s
+DIAGNOSTIC run start redeem 17:27:08
+DIAGNOSTIC run end redeem 12.6 s
+DIAGNOSTIC run start redeem 17:27:21
+DIAGNOSTIC run refused redeem 18.1 s
+DIAGNOSTIC identity refusal: This customer identity request could not be confirmed. at /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php:41
+#0 /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php(117): App\Domain\Customers\ProductionIdentity\IdentityHistoricalPlainRows->assertPermanent()
+#1 /home/user/VA-Studio-trigscan-paid/app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php(58): App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt->provePrefix()
+#2 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php(64): App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt->sealOriginalCommit()
+#3 /home/user/VA-Studio-trigscan-paid/app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php(130): App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1->sealOriginalCommit()
+#4 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php(1129): App\Domain\Commerce\ProductionCheckout\OriginalCommitDispatcher->dispatch()
+#5 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(53): Illuminate\Database\Connection->fireConnectionEvent()
+#6 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(502): Illuminate\Database\Connection->transaction()
+#7 /home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(364): Illuminate\Database\DatabaseManager->__call()
+#8 /home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php(57): Illuminate\Support\Facades\Facade::__callStatic()
+#9 /home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantDownloads.php(132): App\Domain\Grants\Paid\PaidGrantCommands->run()
+#10 /home/user/VA-Studio-trigscan-paid/tests/Feature/PaidGrantDownloadJourneyTest.php(146): App\Domain\Grants\Paid\PaidGrantDownloads->redeem()
+#11 /home/user/VA-Studio/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): Tests\Feature\PaidGrantDownloadJourneyTest->test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal()
+E                                                                   1 / 1 (100%)
+
+Time: 04:53.780, Memory: 97.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantCommands.php:110
+/home/user/VA-Studio-trigscan-paid/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-trigscan-paid/tests/Feature/PaidGrantDownloadJourneyTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 14, Errors: 1.

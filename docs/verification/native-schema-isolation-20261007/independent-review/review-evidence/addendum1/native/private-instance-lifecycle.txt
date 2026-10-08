@@ -1,0 +1,6 @@
+2026-10-08T04:10:34Z addendum 1: fresh private mysqld 8.4.11 --no-defaults, port 3613 (0E1D; not LISTEN in /proc/net/tcp; other lanes' 3531/3555/3567/3589 and shared 3306 untouched), --socket= (empty), datadir $scratchpad/review-trigscan-a1-mysql/data
+2026-10-08T04:10:50Z started pid 31834; root password set to the CI-only value; database vaseyaudio_review_trigscan created; lower_case_table_names=0
+2026-10-08T04:37:06Z before shutdown: schemata on 3613 = information_schema,mysql,performance_schema,sys,vaseyaudio_review_trigscan
+2026-10-08T04:37:09Z mysqladmin shutdown for pid 31834; err.log last line: 2026-10-08T04:37:08.444425Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+2026-10-08T04:37:09Z after shutdown: /proc/31834 absent; LISTEN on 3613 (0E1D) = 0; mysqld processes with port=3613: 0; other lanes' mysqld ports still running: port=3531 port=3567 port=3641 port=3642 port=3643 port=3644 
+2026-10-08T04:37:09Z removed $scratchpad/review-trigscan-a1-mysql (223M: data err.log init.log native.env start.sh ); exists after rm: no. Shared 3306 and ports 3531/3555/3567/3589 untouched.

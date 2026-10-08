@@ -1,0 +1,10 @@
+red-before-NativeSchemaIsolationTest rc=2 wall=793s tree=53f4783f dirty_app_db=0 Tests: 34, Assertions: 351, Errors: 3.
+green-NativeSchemaIsolationTest rc=0 wall=414s tree=53f4783f dirty_app_db=3 OK (34 tests, 357 assertions)
+mutation-M3-case-sensitive rc=1 wall=61s tree=53f4783f dirty_app_db=3 Tests: 6, Assertions: 43, Failures: 6.
+mutation-M2-boundary-accepts-hyphen-pre-fix-tree rc=2 wall=263s tree=53f4783f dirty_app_db=0 Tests: 3, Assertions: 30, Errors: 3.
+mutation-M2-boundary-accepts-hyphen-inquiry-file-only rc=2 wall=292s tree=53f4783f dirty_app_db=3 Tests: 3, Assertions: 30, Errors: 3.
+mutation-M2-boundary-accepts-hyphen-identity-file-only rc=143 wall=357s tree=53f4783f dirty_app_db=3 
+mutation-M2-boundary-accepts-hyphen-identity-file-only-rerun rc=2 wall=542s tree=53f4783f dirty_app_db=3 Tests: 3, Assertions: 30, Errors: 3.
+green-IdentityInspectionCostTest rc=0 wall=87s tree=53f4783f dirty_app_db=3 OK (1 test, 6 assertions)
+green-ProductionIdentityDependencyAdmissionTest rc=0 wall=1033s tree=53f4783f dirty_app_db=3 OK (9 tests, 48 assertions)
+green-ProductionIdentityMigrationTest rc=0 wall=486s tree=53f4783f dirty_app_db=3 OK (5 tests, 19 assertions)

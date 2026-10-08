@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan/phpunit.xml
+
+...F....                                                            8 / 8 (100%)
+
+Time: 01:14.807, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@capability: peer dynamic routine with data ('capability', 'peer dynamic routine')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Unexpected production capability external routine reference; rollback refused before schema changes.'
++'Buyer observation table already exists; installation refused before DDL.'
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:108
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 8, Assertions: 63, Failures: 1.

@@ -1,0 +1,9 @@
+2026-10-08T03:05:30Z datadir deleted and recreated; no private mysqld running (container restart)
+2026-10-08T03:05:39Z initialize-insecure rc=0
+2026-10-08T03:07:03Z first start attempt without --user=root exited 1 (mysqld refuses to run as root); no listener was created
+2026-10-08T03:07:03Z started pid 3875 with --no-defaults --user=root --port=3541 --bind-address=127.0.0.1 --socket= --mysqlx=OFF; MySQL 8.4.11 lower_case_table_names=0; root empty password; database vaseyaudio_trigscan_fix created (utf8mb4_unicode_ci)
+2026-10-08T04:07:29Z mysqladmin shutdown pid 3875 rc=0
+pid_alive rc=1 (1 = gone)
+pgrep_after_shutdown rc=0
+2026-10-08T04:07:34Z datadir removed: rm -rf rc=0
+note: the pgrep after shutdown (rc=0) lists four other sessions' mysqld instances (ports 3531, 3555, 3567, 3589; datadirs review-member-mysql, supp254-a27-mysql, review-tax255-mysql, free256-mysql), none mine; pid 3875 (port 3541) is gone and nothing listens on 3541. Those instances were not touched.

@@ -1,0 +1,16 @@
+# SHA-256 at b47de6b6 (git show) vs worktree vs 53f4783f
+52ddd943c7bc3527c6f5a0369dab88aa7136a3f64b03d504fa4e057cfe0fcfe7  app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php  (worktree same; vs 53f4783f changed)
+fc5e3e80cf41eb74a5f30fd51a20c00eaab7d42c4a9d15708bde671e384144a2  app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php  (worktree same; vs 53f4783f changed)
+0fa48390969ad3585b9c65374551499350f677ad342d2e3a2739a9f804d19d6b  database/migrations/2026_10_07_243000_inquiry_notification_intents.php  (worktree same; vs 53f4783f changed)
+cfcca4b9e35ba152d123e5b3a633e4da4a5bf8c06c1189baac6ba1d56aa80076  tests/Feature/NativeSchemaIsolationTest.php  (worktree same; vs 53f4783f changed)
+12f60311d58f0ca81476361f8b0f35dadaf620c33e2292ebffe9fa27cbc7b777  scripts/ci/database-sqlite-skips.json  (worktree same; vs 53f4783f changed)
+d745a4066d120342b2821995f8f61e6708bd8033091550a54d23a3cbdeba47d3  tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php  (worktree same; vs 53f4783f unchanged)
+# delta scope: git diff --stat 53f4783f b47de6b6 -- app database tests scripts config routes
+ .../CapabilityMigrationOwnership.php               | 23 ++++++++-
+ .../IdentityMigrationOwnership.php                 | 23 ++++++++-
+ ...6_10_07_243000_inquiry_notification_intents.php | 29 ++++++++---
+ scripts/ci/database-sqlite-skips.json              |  4 ++
+ tests/Feature/NativeSchemaIsolationTest.php        | 59 +++++++++++++++++++++-
+ 5 files changed, 129 insertions(+), 9 deletions(-)
+# 53f4783f vs 61b8ee17 code: git diff --stat 61b8ee17 53f4783f -- app database tests scripts config routes (empty = docs only)
+# origin/harness/native-schema-isolation = b47de6b6ce0480fdb8fa307f2add53f5fecc99ac

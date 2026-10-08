@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MysqlConnectionTimezoneTest" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="0.220780">
+    <testcase name="test_mysql_connection_pins_the_session_to_utc" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" line="14" class="Tests\Unit\MysqlConnectionTimezoneTest" classname="Tests.Unit.MysqlConnectionTimezoneTest" assertions="1" time="0.198229">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\MysqlConnectionTimezoneTest::test_mysql_connection_pins_the_session_to_utc
+Failed asserting that null is identical to '+00:00'.
+
+/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php:16
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" line="20" class="Tests\Unit\MysqlConnectionTimezoneTest" classname="Tests.Unit.MysqlConnectionTimezoneTest" assertions="1" time="0.022551">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\MysqlConnectionTimezoneTest::test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'+00:00'
++'Europe/London'
+
+/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php:26
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

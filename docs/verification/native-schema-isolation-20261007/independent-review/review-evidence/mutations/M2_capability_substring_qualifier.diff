@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php b/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+index 2d409e24..a9aa4f2d 100644
+--- a/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
++++ b/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+@@ -263,7 +263,7 @@ final class CapabilityMigrationOwnership
+     private function dependsOn(mixed $schema, mixed $sql, array $tables, string $database): bool
+     {
+         return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
+-            || $this->references($sql, [$database, 'prepare']));
++            || stripos($sql, $database) !== false || $this->references($sql, ['prepare']));
+     }
+ 
+     private function references(mixed $sql, array $tables): bool

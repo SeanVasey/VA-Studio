@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+.S                                                                  2 / 2 (100%)
+
+Time: 00:00.205, Memory: 59.00 MB
+
+There was 1 skipped test:
+
+1) Tests\Unit\MysqlConnectionTimezoneTest::test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical
+Native MySQL session time zone and TIMESTAMP conversion; SQLite stores text.
+
+OK, but some tests were skipped!
+Tests: 2, Assertions: 2, Skipped: 1.

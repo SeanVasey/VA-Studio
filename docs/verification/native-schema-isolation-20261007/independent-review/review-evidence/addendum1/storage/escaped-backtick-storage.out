@@ -1,0 +1,24 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ROUTINE_NAME	ROUTINE_DEFINITION
+e1	SELECT (SELECT COUNT(*) FROM `aa`bb`) AS x, (SELECT COUNT(*) FROM `rvsel`.`owned`) AS e1
+e2	SELECT (SELECT COUNT(*) FROM `aa`bb`) AS x, `aa`bb`.id, (SELECT COUNT(*) FROM `aa`bb`), (SELECT COUNT(*) FROM rvsel.owned) AS e2 FROM `aa`bb`
+e3	SELECT 'it's' AS s, "q"q" AS d, (SELECT COUNT(*) FROM rvsel . owned) AS e3
+e4	SELECT q.`xx`yy` AS z FROM (SELECT 1 AS `xx`yy`) q WHERE (SELECT COUNT(*) FROM `rvsel`.`owned`) > 0
+v1	SELECT COUNT(*) AS v1 FROM `rvsel` . `owned`
+v2	SELECT COUNT(*) AS v2 FROM  rvsel  . owned
+v3	SELECT COUNT(*) AS v3 FROM  owned
+TRIGGER_NAME	ACTION_STATEMENT
+t1	SET @t1 = (SELECT COUNT(*) FROM `aa`bb`) + (SELECT COUNT(*) FROM `rvsel`.`owned`)
+x	e1
+0	3
+s	d	e3
+it's	q"q	3
+v1
+3
+v2
+3
+ERROR 1146 (42S02) at line 19: Table 'rvpeer.owned' doesn't exist
+exit=1
+# cleanup after the run above stopped at the expected 1146 (v3 resolves to rvpeer.owned):
+GROUP_CONCAT(SCHEMA_NAME ORDER BY SCHEMA_NAME)
+information_schema,mysql,performance_schema,sys,vaseyaudio_review_trigscan

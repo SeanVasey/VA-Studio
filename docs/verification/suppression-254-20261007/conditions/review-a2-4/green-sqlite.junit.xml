@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MysqlConnectionTimezoneTest" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" tests="2" assertions="2" errors="0" failures="0" skipped="1" time="0.203604">
+    <testcase name="test_mysql_connection_pins_the_session_to_utc" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" line="14" class="Tests\Unit\MysqlConnectionTimezoneTest" classname="Tests.Unit.MysqlConnectionTimezoneTest" assertions="2" time="0.184551"/>
+    <testcase name="test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical" file="/home/user/VA-Studio-supp254/tests/Unit/MysqlConnectionTimezoneTest.php" line="20" class="Tests\Unit\MysqlConnectionTimezoneTest" classname="Tests.Unit.MysqlConnectionTimezoneTest" assertions="0" time="0.019054">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

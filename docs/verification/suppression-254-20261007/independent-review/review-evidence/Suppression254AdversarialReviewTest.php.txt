@@ -1,0 +1,345 @@
+<?php
+
+namespace Tests\Feature\ReviewSupp254;
+
+use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPreferences;
+use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawal;
+use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentWithdrawalReader;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureContext;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionIntents;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionProvider;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionReceipt;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionRequest;
+use App\Domain\Customers\ProductionFeatures\Suppression\ProductionSuppressionRows;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Support\CanonicalJson;
+use Fiber;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use ReflectionClass;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Tests\Support\ProductionSuppressionFixtures;
+use Tests\TestCase;
+use Throwable;
+
+/** Independent reviewer throwaway (not committed). */
+class Suppression254AdversarialReviewTest extends TestCase
+{
+    use ProductionSuppressionFixtures;
+
+    private const OWNER = 'review-254-owner@example.test';
+
+    private const OTHER = 'review-254-other@example.test';
+
+    private CountingProvider $counting;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->suppressionSetup();
+        $this->counting = new CountingProvider(CanonicalJson::hash($this->providerBinding()));
+    }
+
+    // ---------- C2 ----------
+
+    public function test_c2_nested_run_inside_a_live_callback_refuses(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $nested = 'not-called';
+        $outer = (new ProductionFeatureOperation)->run($owner, function (ProductionFeatureContext $context) use ($owner, &$nested): array {
+            try {
+                (new ProductionFeatureOperation)->run($owner, fn (ProductionFeatureContext $inner): array => ['w' => (new ProductionConsentWithdrawalReader)->read($inner, 1)]);
+                $nested = 'released';
+            } catch (ProductionFeatureException $error) {
+                $nested = $error->status;
+            }
+
+            return ['ok' => true];
+        });
+        $this->assertSame(503, $nested);
+        $this->assertSame(['ok' => true], $outer);
+    }
+
+    public function test_c2_fiber_suspended_run_cannot_start_a_second_concurrent_run(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $fiber = new Fiber(function () use ($owner): array {
+            return (new ProductionFeatureOperation)->run($owner, function (ProductionFeatureContext $context): array {
+                Fiber::suspend($context);
+
+                return ['done' => true];
+            });
+        });
+        $context = $fiber->start();
+        $this->assertInstanceOf(ProductionFeatureContext::class, $context);
+        $second = 'not-called';
+        try {
+            (new ProductionFeatureOperation)->run($owner, fn (ProductionFeatureContext $c): array => ['w' => (new ProductionConsentWithdrawalReader)->read($c, 1)]);
+            $second = 'released';
+        } catch (ProductionFeatureException $error) {
+            $second = $error->status;
+        }
+        $this->assertSame(503, $second, 'Second concurrent run must refuse.');
+        // INFO: while the fiber is suspended the first context is still "live"; code outside the callback frame can use it.
+        $outside = 'refused';
+        try {
+            $w = (new ProductionConsentWithdrawalReader)->read($context, 1);
+            $outside = $w instanceof ProductionConsentWithdrawal ? 'released-while-suspended' : 'null';
+        } catch (Throwable $e) {
+            $outside = $e::class;
+        }
+        fwrite(STDERR, "\n[review] fiber-suspended context use from outside callback frame: $outside\n");
+        $fiber->resume();
+        $this->assertSame(['done' => true], $fiber->getReturn());
+        // After the fiber completes, the context is dead.
+        DB::beginTransaction();
+        try {
+            (new ProductionConsentWithdrawalReader)->read($context, 1);
+            $this->fail('dead context released');
+        } catch (ProductionFeatureException $e) {
+            $this->assertSame(503, $e->status);
+        } finally {
+            DB::rollBack();
+        }
+    }
+
+    public function test_c2_context_leaked_from_a_throwing_callback_and_a_clone_of_a_live_context_refuse(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $leaked = null;
+        try {
+            (new ProductionFeatureOperation)->run($owner, function (ProductionFeatureContext $context) use (&$leaked): array {
+                $leaked = $context;
+                throw new \RuntimeException('callback failure');
+            });
+        } catch (ProductionFeatureException) {
+        }
+        $this->assertInstanceOf(ProductionFeatureContext::class, $leaked);
+        DB::beginTransaction();
+        try {
+            foreach ([fn () => (new ProductionConsentWithdrawalReader)->read($leaked, 1), fn () => new ProductionSuppressionRows($leaked)] as $call) {
+                try {
+                    $call();
+                    $this->fail('leaked context released');
+                } catch (ProductionFeatureException $e) {
+                    $this->assertSame(503, $e->status);
+                }
+            }
+        } finally {
+            DB::rollBack();
+        }
+        $cloneOutcome = (new ProductionFeatureOperation)->run($owner, function (ProductionFeatureContext $context): array {
+            try {
+                $copy = clone $context;
+            } catch (Throwable $e) {
+                return ['outcome' => 'clone-refused:'.$e::class];
+            }
+            try {
+                (new ProductionConsentWithdrawalReader)->read($copy, 1);
+
+                return ['outcome' => 'released'];
+            } catch (ProductionFeatureException $e) {
+                return ['outcome' => $e->status];
+            }
+        });
+        $this->assertNotSame('released', $cloneOutcome['outcome']);
+    }
+
+    public function test_c2_registry_is_private_static_without_setter(): void
+    {
+        $class = new ReflectionClass(ProductionFeatureOperation::class);
+        $this->assertTrue($class->getProperty('live')->isPrivate());
+        $this->assertTrue($class->getProperty('live')->isStatic());
+        $public = array_map(fn ($m) => $m->getName(), $class->getMethods(\ReflectionMethod::IS_PUBLIC));
+        sort($public);
+        $this->assertSame(['assertLive', 'run'], $public);
+    }
+
+    // ---------- C3 ----------
+
+    public function test_c3_other_renderers_and_constructorless_instances_never_expose_recipient(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $withdrawal = (new ProductionFeatureOperation)->run($owner, fn (ProductionFeatureContext $c): array => ['w' => (new ProductionConsentWithdrawalReader)->read($c, 1)])['w'];
+        $this->assertSame(self::OWNER, $withdrawal->serverSnapshot()['recipient']);
+        ob_start();
+        debug_zval_dump($withdrawal);
+        $zval = (string) ob_get_clean();
+        $cloner = new VarCloner;
+        $dumper = new CliDumper;
+        $symfony = (string) $dumper->dump($cloner->cloneVar($withdrawal), true);
+        foreach (['debug_zval_dump' => $zval, 'symfony' => $symfony] as $name => $text) {
+            $this->assertStringNotContainsString('review-254-owner', $text, $name);
+        }
+        foreach ([fn () => unserialize('O:'.strlen(ProductionConsentWithdrawal::class).':"'.ProductionConsentWithdrawal::class.'":1:{s:8:"snapshot";a:1:{s:9:"recipient";s:3:"x@y";}}'),
+            fn () => (new ReflectionClass(ProductionConsentWithdrawal::class))->newInstanceWithoutConstructor()->serverSnapshot()] as $craft) {
+            try {
+                $result = $craft();
+                $this->assertFalse(is_array($result) && isset($result['recipient']), 'crafted instance exposed a capture');
+            } catch (Throwable $e) {
+                $this->assertStringNotContainsString('review-254-owner', $e->getMessage());
+            }
+        }
+        // Out of model: deliberate private static access (Reflection / Closure::bind) does reach the WeakMap.
+        $map = (new ReflectionClass(ProductionConsentWithdrawal::class))->getStaticPropertyValue('sealed');
+        $viaBind = \Closure::bind(fn () => self::$sealed, null, ProductionConsentWithdrawal::class)();
+        fwrite(STDERR, "\n[review] static WeakMap reachable via Reflection: ".(isset($map[$withdrawal]) ? 'yes' : 'no').'; via Closure::bind: '.(isset($viaBind[$withdrawal]) ? 'yes' : 'no')."\n");
+    }
+
+    // ---------- 254 runtime ----------
+
+    public function test_runtime_four_more_misscoped_receipts_never_confirm_and_no_resend(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $other = $this->withdrawn(self::OTHER);
+        $intents = new ProductionSuppressionIntents($this->counting);
+        $this->assertSame(['status' => 'unknown'], $intents->request($owner, 1));
+        $this->assertSame(['status' => 'unknown'], $intents->request($other, 1));
+        $this->assertCount(2, $this->counting->suppressed);
+        $otherRequest = $this->counting->requests[1];
+        $answers = [
+            'wrong recipient hmac' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), hash('sha256', 'x'), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'wrong provider hash' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), $r->recipientHmac(), hash('sha256', 'other-provider'), 'SYNTHETIC-1', 'suppressed'),
+            'other account receipt' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($otherRequest->operationId(), $otherRequest->requestHash(), $otherRequest->recipientHmac(), $otherRequest->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'mixed op of other account' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($otherRequest->operationId(), $r->requestHash(), $r->recipientHmac(), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+            'status case' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), $r->recipientHmac(), $r->providerHash(), 'SYNTHETIC-1', 'Suppressed'),
+            'control char receipt id' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), $r->requestHash(), $r->recipientHmac(), $r->providerHash(), "SYN\u{200B}1", 'suppressed'),
+            'uppercase hex request hash' => fn (ProductionSuppressionRequest $r) => new ProductionSuppressionReceipt($r->operationId(), strtoupper($r->requestHash()), $r->recipientHmac(), $r->providerHash(), 'SYNTHETIC-1', 'suppressed'),
+        ];
+        foreach ($answers as $name => $answer) {
+            $this->counting->answer = $answer;
+            $this->assertSame(['status' => 'unknown'], $intents->reconcile($owner), $name);
+        }
+        $this->assertSame(0, DB::table('production_suppression_confirmations')->count());
+        $this->assertCount(2, $this->counting->suppressed, 'reconcile never resends');
+    }
+
+    public function test_runtime_successful_suppress_return_never_confirms(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $this->counting->throwOnSuppress = false;
+        $intents = new ProductionSuppressionIntents($this->counting);
+        $this->assertSame(['status' => 'unknown'], $intents->request($owner, 1));
+        $this->assertSame(['status' => 'unknown'], $intents->request($owner, 1));
+        $this->assertSame(['status' => 'unknown'], $intents->status($owner));
+        $this->assertCount(1, $this->counting->suppressed);
+        $this->assertSame(0, DB::table('production_suppression_confirmations')->count());
+        $this->assertSame([0, false], [$this->counting->suppressed[0]['level'], $this->counting->suppressed[0]['inTransaction']]);
+    }
+
+    public function test_runtime_refusal_paths_make_no_provider_call(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $listening = $this->featureIdentity('listening_library', 'review-254-listening@example.test');
+        $intents = new ProductionSuppressionIntents($this->counting);
+        $outcomes = [];
+        foreach (['version mismatch' => fn () => $intents->request($owner, 0), 'negative version' => fn () => $intents->request($owner, -1),
+            'wrong feature request' => fn () => $intents->request($listening, 1), 'wrong feature reconcile' => fn () => $intents->reconcile($listening),
+            'wrong feature status' => fn () => $intents->status($listening)] as $name => $call) {
+            try {
+                $call();
+                $outcomes[$name] = 'returned';
+            } catch (Throwable $e) {
+                $outcomes[$name] = $e::class.':'.($e instanceof ProductionFeatureException ? $e->status : '').':'.$e->getMessage();
+                $this->assertStringNotContainsString('review-254', $e->getMessage());
+            }
+        }
+        fwrite(STDERR, "\n[review] refusal outcomes: ".json_encode($outcomes)."\n");
+        $this->assertSame([], $this->counting->calls, 'no provider call on refusal paths');
+        foreach ([['enabled' => false, 'provider' => null], ['enabled' => false, 'provider' => $this->providerBinding()]] as $parent) {
+            config(['production-suppression' => $parent]);
+            foreach (['request' => fn () => $intents->request($owner, 1), 'reconcile' => fn () => $intents->reconcile($owner), 'status' => fn () => $intents->status($owner)] as $name => $call) {
+                try {
+                    $call();
+                    $this->fail("$name returned while disabled");
+                } catch (ProductionFeatureException $e) {
+                    $this->assertSame(503, $e->status);
+                }
+            }
+        }
+        $this->assertSame([], $this->counting->calls, 'no provider call while disabled');
+        $this->assertSame([0, 0, 0, 0], array_map('count', array_values($this->suppressionRows())));
+        // Shipped default (config file): enabled=false, provider=null.
+        $this->assertSame(['enabled' => false, 'provider' => null], require base_path('config/production-suppression.php'));
+    }
+
+    public function test_runtime_provider_null_with_enabled_true_records_pending_only(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        config(['production-suppression.provider' => null]);
+        $intents = new ProductionSuppressionIntents($this->counting);
+        $this->assertSame(['status' => 'pending'], $intents->request($owner, 1));
+        $this->assertSame(['status' => 'pending'], $intents->reconcile($owner));
+        $this->assertSame([], $this->counting->suppressed);
+        $this->assertSame([], $this->counting->inspected);
+        fwrite(STDERR, "\n[review] provider=null enabled=true: rows ".json_encode(array_map('count', array_values($this->suppressionRows()))).'; provider calls '.json_encode($this->counting->calls)."\n");
+    }
+
+    public function test_runtime_withdraw_then_regrant_then_first_request_still_suppresses(): void
+    {
+        $owner = $this->withdrawn(self::OWNER);
+        $preferences = new ProductionConsentPreferences;
+        $this->assertSame('granted', $preferences->change($owner, $this->productionGrant(1))['preferences']['purposes'][0]['status']);
+        $intents = new ProductionSuppressionIntents($this->counting);
+        $outcome = $intents->request($owner, 2);
+        fwrite(STDERR, "\n[review] request after re-grant (no earlier suppression): ".json_encode($outcome).'; suppress calls '.count($this->counting->suppressed)."\n");
+        $this->assertSame(['status' => 'unknown'], $outcome);
+        $this->assertCount(1, $this->counting->suppressed);
+    }
+
+    private function withdrawn(string $email): ProductionAccountFeatureIdentity
+    {
+        $owner = $this->featureIdentity('consent_preferences', $email);
+        $preferences = new ProductionConsentPreferences;
+        $preferences->initialize($owner);
+        $preferences->change($owner, $this->productionWithdraw());
+
+        return $owner;
+    }
+}
+
+final class CountingProvider implements ProductionSuppressionProvider
+{
+    public array $calls = [];
+
+    public array $suppressed = [];
+
+    public array $inspected = [];
+
+    public array $requests = [];
+
+    public bool $throwOnSuppress = true;
+
+    public $answer = null;
+
+    public function __construct(private ?string $binding) {}
+
+    public function boundTo(): ?string
+    {
+        $this->calls[] = 'boundTo';
+
+        return $this->binding;
+    }
+
+    public function suppress(ProductionSuppressionRequest $request): void
+    {
+        $this->calls[] = 'suppress';
+        $this->requests[] = $request;
+        $this->suppressed[] = ['level' => DB::connection()->transactionLevel(), 'inTransaction' => DB::connection()->getPdo()->inTransaction()];
+        if ($this->throwOnSuppress) {
+            throw new \RuntimeException('SYNTHETIC');
+        }
+    }
+
+    public function inspect(ProductionSuppressionRequest $request): ?ProductionSuppressionReceipt
+    {
+        $this->calls[] = 'inspect';
+        $this->inspected[] = $request->operationId();
+
+        return $this->answer === null ? null : ($this->answer)($request);
+    }
+}

@@ -1,0 +1,85 @@
+
+  Dropping all tables ................................................ 1s DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table ...................................... 50.37ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table .......................... 44.70ms DONE
+  0001_01_01_000001_create_cache_table ......................... 127.40ms DONE
+  0001_01_01_000002_create_jobs_table ........................... 53.64ms DONE
+  2026_09_04_000001_create_catalog_foundation .................. 726.01ms DONE
+  2026_09_04_000002_add_admin_mfa_and_immutable_evidence ....... 104.22ms DONE
+  2026_09_04_000003_media_processing ........................... 473.00ms DONE
+  2026_09_04_000004_license_evidence ........................... 911.56ms DONE
+  2026_09_04_000005_offer_revisions ............................ 522.40ms DONE
+  2026_09_06_000006_provisional_quotes ......................... 326.90ms DONE
+  2026_09_09_000007_stripe_webhook_receipts ..................... 85.04ms DONE
+  2026_09_09_000008_track_metadata_and_public_urls ............. 130.53ms DONE
+  2026_09_09_000009_stems_recordings ........................... 415.41ms DONE
+  2026_09_10_000010_typed_license_terms ......................... 21.05ms DONE
+  2026_09_11_000011_license_scope_terms ......................... 21.03ms DONE
+  2026_09_12_000012_license_economic_terms ...................... 18.55ms DONE
+  2026_09_12_000013_quote_pricing .............................. 108.45ms DONE
+  2026_09_14_000014_promotion_usage ............................ 211.54ms DONE
+  2026_09_17_000015_shared_rights_inventory .................... 539.86ms DONE
+  2026_09_23_000016_exclusive_activations ...................... 220.51ms DONE
+  2026_09_24_000017_order_preparation .......................... 830.82ms DONE
+  2026_09_26_000018_hosted_test_checkout ....................... 381.48ms DONE
+  2026_09_26_000019_test_payment_evidence ...................... 556.64ms DONE
+  2026_09_26_000020_test_order_finalization .......................... 1s DONE
+  2026_09_26_000021_test_contract_issuance ..................... 538.87ms DONE
+  2026_09_26_000022_test_fulfillment_activation ................ 213.52ms DONE
+  2026_09_26_000023_test_owner_delivery ........................ 790.83ms DONE
+  2026_09_28_000024_site_content_releases ...................... 514.39ms DONE
+  2026_09_29_000025_promotion_administration ................... 241.65ms DONE
+  2026_09_29_000026_site_publication_schedules ................. 220.90ms DONE
+  2026_09_30_000027_site_images ................................ 320.97ms DONE
+  2026_09_30_000028_site_release_images ........................ 187.86ms DONE
+  2026_10_01_000029_byte_exact_hash_guards ..................... 158.64ms DONE
+  2026_10_01_000030_byte_exact_uuid_guards ..................... 207.40ms DONE
+  2026_10_01_000031_customer_inquiries ......................... 259.67ms DONE
+  2026_10_01_000032_editorial_related_tracks_images ............. 78.35ms DONE
+  2026_10_02_000033_track_metadata_presets ...................... 43.24ms DONE
+  2026_10_02_000034_track_publication_version .................. 106.27ms DONE
+  2026_10_02_000035_rights_evidence_guards ..................... 102.09ms DONE
+  2026_10_02_000036_test_payment_exception_operations .......... 272.15ms DONE
+  2026_10_06_000038_resumable_media_uploads .................... 208.88ms DONE
+  2026_10_06_000039_test_payment_financial_observations ........ 118.07ms DONE
+  2026_10_06_000040_customer_accounts .......................... 200.73ms DONE
+  2026_10_06_000041_product_draft_versions ..................... 464.62ms DONE
+  2026_10_06_000042_test_unpaid_releases ............................. 1s DONE
+  2026_10_06_000043_inquiry_messages ........................... 195.07ms DONE
+  2026_10_06_000044_sound_kit_intake ........................... 327.50ms DONE
+  2026_10_06_000045_customer_identity_challenges ............... 513.31ms DONE
+  2026_10_06_000046_sound_kit_upload_sessions .................. 355.97ms DONE
+  2026_10_06_000047_test_refund_resolutions .......................... 1s DONE
+  2026_10_06_000048_customer_purchase_claims ................... 489.56ms DONE
+  2026_10_06_000049_inquiry_order_contexts ..................... 173.00ms DONE
+  2026_10_06_230000_membership_credit_foundation ............... 774.84ms DONE
+  2026_10_06_231000_test_transactional_notifications ........... 694.08ms DONE
+  2026_10_06_233000_production_track_policy_drafts ............. 431.62ms DONE
+  2026_10_06_234000_service_draft_versions ..................... 336.71ms DONE
+  2026_10_06_235000_merch_draft_versions ....................... 288.66ms DONE
+  2026_10_06_236000_production_track_policy_capabilities ....... 638.26ms DONE
+  2026_10_06_237000_catalog_import_progress .................... 288.68ms DONE
+  2026_10_06_238000_production_track_preparation_packets ....... 679.44ms DONE
+  2026_10_07_239000_production_buyer_assent_observations ....... 132.83ms DONE
+  2026_10_07_240000_catalog_discovery_epoch .................... 561.33ms DONE
+  2026_10_07_242000_customer_saved_tracks ....................... 44.99ms DONE
+  2026_10_07_243000_inquiry_notification_intents ............... 286.86ms DONE
+  2026_10_07_244000_service_projects ................................. 7s DONE
+  2026_10_07_245000_free_grant_origins .............................. 23s DONE
+  2026_10_07_246000_production_checkout ........................ 890.82ms DONE
+  2026_10_07_247000_production_customer_identity ..................... 1s DONE
+  2026_10_07_248000_create_discovery_sitemap_evidence .......... 287.63ms DONE
+  2026_10_07_249000_support_attachments ......................... 70.46ms DONE
+  2026_10_07_250000_customer_consent ................................. 1s DONE
+  2026_10_07_251000_customer_suppression ............................. 2s DONE
+  2026_10_07_253000_production_account_features ...................... 2s DONE
+  2026_10_07_254000_production_suppression ........................... 2s DONE
+  2026_10_07_257000_production_membership_periods .................... 2s DONE
+  2026_10_07_258000_create_production_member_originals ............... 2s DONE
+

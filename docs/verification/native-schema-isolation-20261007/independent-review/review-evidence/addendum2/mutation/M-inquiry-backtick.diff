@@ -1,0 +1,13 @@
+diff --git a/database/migrations/2026_10_07_243000_inquiry_notification_intents.php b/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+index 92ba7c90..3368c5d7 100644
+--- a/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
++++ b/database/migrations/2026_10_07_243000_inquiry_notification_intents.php
+@@ -480,7 +480,7 @@ return new class extends Migration
+      */
+     private function qualifiesDatabase(string $sql, string $database): bool
+     {
+-        if (str_contains($database, '`') || str_contains($database, '"')) {
++        if (str_contains($database, '"')) {
+             $this->unexpected('dependency definition for an identifier-delimited database name');
+         }
+         $name = preg_quote($database, '/');
