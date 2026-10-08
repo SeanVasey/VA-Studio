@@ -11,7 +11,10 @@
 # Scope: this is a reproduction aid for the evidence in this directory, not an acceptance gate. It binds the evidence to the
 # committed application source (tracked, untracked and ignored files under app, bootstrap, config, database, routes,
 # resources and lang). Third-party code under vendor/ is bound by the committed composer.lock and a frozen install
-# (`composer install`), which this script does not re-verify.
+# (`composer install`), which this script does not re-verify. The checks guard against accidental mis-binding (a dirty
+# or sparse tree, ignore rules, index flags, cached configuration, a redirected connection); an operator deliberately
+# subverting their own checkout is outside what a script they run can prevent, and the evidence stands on its recorded
+# outputs and an independent re-run.
 set -uo pipefail
 refuse() { echo "refused: $*" >&2; exit 2; }
 
@@ -32,6 +35,11 @@ ignored=$(git ls-files --others --ignored --exclude-standard -- app bootstrap co
   || refuse "cannot list ignored files in $PWD"
 ignored=$(printf '%s\n' "$ignored" | grep -v '^bootstrap/cache/' | grep -v '^$' || true)
 [ -z "$ignored" ] || refuse "ignored files under application source paths would run outside $source_sha: $(printf '%s' "$ignored" | head -3 | tr '\n' ' ')"
+# Index flags hide tracked files from both checks above: skip-worktree (set by sparse checkout, for example) and
+# assume-unchanged. Every tracked file under those paths must be an ordinary cached entry ("H" in `git ls-files -v`).
+flagged=$(git ls-files -v -- app bootstrap config database routes resources lang 2>/dev/null) || refuse "cannot list tracked files in $PWD"
+flagged=$(printf '%s\n' "$flagged" | grep -v '^H ' | grep -v '^$' || true)
+[ -z "$flagged" ] || refuse "tracked files with skip-worktree or assume-unchanged flags under application source paths: $(printf '%s' "$flagged" | head -3 | tr '\n' ' ')"
 
 MYSQL=/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql
 php_version=$(php -r 'echo PHP_VERSION;' 2>/dev/null) && [ -n "$php_version" ] || refuse "cannot read the PHP version"
