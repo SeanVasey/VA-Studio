@@ -7,6 +7,11 @@
 # 2 when the invocation itself is refused (no checkout, no clean commit to bind the evidence to, a runtime version that
 # cannot be read, a database name outside identifier characters, cached configuration, or a Laravel connection that is
 # not the disposable database on 127.0.0.1:3410). Nothing is migrated after a refusal.
+#
+# Scope: this is a reproduction aid for the evidence in this directory, not an acceptance gate. It binds the evidence to the
+# committed application source (tracked, untracked and ignored files under app, bootstrap, config, database, routes,
+# resources and lang). Third-party code under vendor/ is bound by the committed composer.lock and a frozen install
+# (`composer install`), which this script does not re-verify.
 set -uo pipefail
 refuse() { echo "refused: $*" >&2; exit 2; }
 
@@ -20,6 +25,13 @@ source_sha=$(git rev-parse --verify --quiet 'HEAD^{commit}' 2>/dev/null) || refu
 # caller's Git configuration cannot hide source that is absent from the commit.
 dirty=$(git status --porcelain --untracked-files=all --ignore-submodules=none 2>/dev/null) || refuse "cannot read working tree status in $PWD"
 [ -z "$dirty" ] || refuse "working tree has changes; commit or stash them so the evidence matches $source_sha"
+# Ignore rules (.gitignore, .git/info/exclude, core.excludesFile) can also hide files from that check, so any ignored file
+# under a directory Laravel loads application code or configuration from is refused too. bootstrap/cache holds generated
+# caches only (cached configuration itself is refused below).
+ignored=$(git ls-files --others --ignored --exclude-standard -- app bootstrap config database routes resources lang 2>/dev/null) \
+  || refuse "cannot list ignored files in $PWD"
+ignored=$(printf '%s\n' "$ignored" | grep -v '^bootstrap/cache/' | grep -v '^$' || true)
+[ -z "$ignored" ] || refuse "ignored files under application source paths would run outside $source_sha: $(printf '%s' "$ignored" | head -3 | tr '\n' ' ')"
 
 MYSQL=/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql
 php_version=$(php -r 'echo PHP_VERSION;' 2>/dev/null) && [ -n "$php_version" ] || refuse "cannot read the PHP version"
