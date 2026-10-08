@@ -115,14 +115,22 @@ final class PaidGrantDocuments
             return $graph;
         }, $deadline);
         foreach ($bundle['lines'] as $line) {
+            // Each line's physical re-verification gets its own non-extendable bound, the same as the per-line render
+            // lease, so a large order (up to 10 lines of 1 GiB assets) is not bounded by the one budget that prepare()
+            // started. A refused line fulfils nothing, and a retry finds every line prepared and gets fresh bounds.
+            $lineBudget = PaidGrantDeadline::start(self::LEASE_SECONDS);
             // Existing originals are exact restore-only. Missing bytes never create another render claim.
             app(PaidGrantFiles::class)->verify($line['manifest']['artifact']);
-            (new PaidGrantAssets)->verify($line['body']['assets'], $deadline->value());
-            $deadline->proveCurrent();
+            (new PaidGrantAssets)->verify($line['body']['assets'], $lineBudget->value());
+            $lineBudget->proveCurrent();
         }
 
-        return $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($bundle, $actor, $deadline): array {
-            $deadline->proveCurrent();
+        // A fresh observation budget for the fulfillment frame and its body receipt. The frame still requires the exact
+        // bundle verified above and keeps every receipt, fence and post-commit proof of PaidGrantCommands::run.
+        $commit = PaidGrantDeadline::start();
+
+        return $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($bundle, $actor, $commit): array {
+            $commit->proveCurrent();
             PaidGrantException::require($graph === $bundle, 409);
             if ($graph['complete'] === null) {
                 $at = CarbonImmutable::now('UTC')->startOfSecond();
@@ -137,7 +145,7 @@ final class PaidGrantDocuments
             }
 
             return (new PaidGrants)->project($graph);
-        }, $deadline, projectionRead: $projectionRead);
+        }, $commit, projectionRead: $projectionRead);
     }
 
     private function line(array $graph, string $id): array
