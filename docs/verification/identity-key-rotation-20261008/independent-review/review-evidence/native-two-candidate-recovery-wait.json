@@ -1,0 +1,66 @@
+{
+    "fence_id": 1,
+    "deadlock_delta": 0,
+    "worker_locks": [
+        [
+            {
+                "table": "production_identity_addresses",
+                "index": null,
+                "type": "TABLE",
+                "mode": "IX",
+                "status": "GRANTED",
+                "data": null
+            },
+            {
+                "table": "production_identity_addresses",
+                "index": "pia_address_unique",
+                "type": "RECORD",
+                "mode": "X",
+                "status": "GRANTED",
+                "data": "supremum pseudo-record"
+            },
+            {
+                "table": "production_identity_addresses",
+                "index": "pia_address_unique",
+                "type": "RECORD",
+                "mode": "X,REC_NOT_GAP",
+                "status": "GRANTED",
+                "data": "'ebc0b3cc7b03b9129e7d802f2cfd38de1cbca67bc31e391a4c761b3886c2f128', 1"
+            },
+            {
+                "table": "production_identity_addresses",
+                "index": "PRIMARY",
+                "type": "RECORD",
+                "mode": "X,REC_NOT_GAP",
+                "status": "WAITING",
+                "data": "1"
+            }
+        ],
+        [
+            {
+                "table": "production_identity_addresses",
+                "index": null,
+                "type": "TABLE",
+                "mode": "IX",
+                "status": "GRANTED",
+                "data": null
+            },
+            {
+                "table": "production_identity_addresses",
+                "index": "pia_address_unique",
+                "type": "RECORD",
+                "mode": "X",
+                "status": "GRANTED",
+                "data": "supremum pseudo-record"
+            },
+            {
+                "table": "production_identity_addresses",
+                "index": "pia_address_unique",
+                "type": "RECORD",
+                "mode": "X,REC_NOT_GAP",
+                "status": "WAITING",
+                "data": "'ebc0b3cc7b03b9129e7d802f2cfd38de1cbca67bc31e391a4c761b3886c2f128', 1"
+            }
+        ]
+    ]
+}

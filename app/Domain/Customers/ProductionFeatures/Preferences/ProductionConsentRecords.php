@@ -48,7 +48,7 @@ final class ProductionConsentRecords
                 || $capture['revision'] !== (int) $event['revision'] || $capture['eventId'] !== $event['public_id']
                 || ! is_string($capture['email']) || IdentityPolicy::email($capture['email']) !== $capture['email']
                 || $plain !== CanonicalJson::encode($capture) || strlen($event['recipient_ciphertext']) > 8192
-                || ! hash_equals(self::recipientHash($binding, $capture['email'], $configuration), $event['recipient_hmac'])
+                || ! self::recipientMatches($binding, $capture['email'], $event['recipient_hmac'], $configuration)
                 || (int) $event['binding_id'] !== (int) $binding['row']['id'] || $event['purpose'] !== ConsentPolicy::PURPOSE
                 || (int) $event['revision'] < 1 || (int) $event['revision'] > ConsentPolicy::MAX_REVISION
                 || ! Str::isUuid($event['public_id']) || ! ProductionFeatureShape::timestamp($event['created_at'])
@@ -64,10 +64,24 @@ final class ProductionConsentRecords
         }
     }
 
+    /** New consent events are written with the current key only. */
     public static function recipientHash(array $binding, string $recipient, ProductionFeatureConfiguration $configuration): string
     {
         $configuration->admit();
 
-        return IdentityPolicy::digest('production-consent-recipient-v1', CanonicalJson::encode(['bindingHash' => $binding['row']['binding_hash'], 'purpose' => ConsentPolicy::PURPOSE, 'email' => $recipient]));
+        return IdentityPolicy::digest('production-consent-recipient-v1', self::recipientValue($binding, $recipient));
+    }
+
+    /** A retained recipient digest verifies under any configured key, so a routine key rotation keeps its meaning. */
+    public static function recipientMatches(array $binding, string $recipient, string $expected, ProductionFeatureConfiguration $configuration): bool
+    {
+        $configuration->admit();
+
+        return IdentityPolicy::matches('production-consent-recipient-v1', self::recipientValue($binding, $recipient), $expected);
+    }
+
+    private static function recipientValue(array $binding, string $recipient): string
+    {
+        return CanonicalJson::encode(['bindingHash' => $binding['row']['binding_hash'], 'purpose' => ConsentPolicy::PURPOSE, 'email' => $recipient]);
     }
 }

@@ -1,0 +1,33 @@
+# source HEAD: f59f9b827ef21832e00e627c55c739ee37710719
+# worktree diff (app tests) sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+# untracked tests: 
+# date: 2026-10-08T13:14:04Z  uptime:  13:14:04 up  2:22,  0 user,  load average: 4.82, 5.31, 5.65
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- tests/Feature/ProductionFreeGrants
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-idkeys/phpunit.xml
+
+........................................[41;37mF[0m......................  63 / 158 ( 39%)
+............................................................... 126 / 158 ( 79%)
+...[36;1mS[0m[36;1mS[0m...........................                                158 / 158 (100%)
+
+Time: 05:27.296, Memory: 237.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_main_resident_dependencies_are_the_exact_reviewed_bytes
+app/Domain/Customers/ProductionCustomerAccess.php
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42'
++'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7'
+
+/home/user/VA-Studio-review-idkeys/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:40
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 158[0m[37;41m, Assertions: 1121[0m[37;41m, Failures: 1[0m[37;41m, Skipped: 2[0m[37;41m.[0m
+rc=1

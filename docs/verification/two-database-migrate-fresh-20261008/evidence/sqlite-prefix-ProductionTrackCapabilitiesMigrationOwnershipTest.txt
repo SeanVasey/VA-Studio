@@ -1,0 +1,73 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-prefix/phpunit.xml
+
+[31;1mE[0m.................[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m                                           23 / 23 (100%)
+
+Time: 00:19.169, Memory: 101.00 MB
+
+There were 6 errors:
+
+1) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#17 with data ('view under absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#18 with data ('uppercase absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#19 with data ('foreign index under absent ow...x name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#20 with data ('foreign table under absent guard name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 23[0m[37;41m, Assertions: 126[0m[37;41m, Errors: 6[0m[37;41m.[0m

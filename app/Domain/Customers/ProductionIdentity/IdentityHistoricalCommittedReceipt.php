@@ -35,6 +35,8 @@ final class IdentityHistoricalCommittedReceipt implements JsonSerializable
         $plain = IdentityHistoricalPlainRows::fromWitness($witness);
         $receipt->privateRaw = $receipt->rawPrefix($plain);
         $account = $receipt->privateRaw['account'];
+        // Current-key only by design: both sides are derived in this capture (the expected value is the current-key
+        // projection of verifyHistoricalBinding), and the witness closes app.key/app.previous_keys for the frame.
         if (! hash_equals($expectedHistoricalRaw['account']['owner_digest'], IdentityPolicy::digest('owner', $account['owner_key'] ?? ''))) {
             throw new IdentityException('historical_commit_required');
         }
