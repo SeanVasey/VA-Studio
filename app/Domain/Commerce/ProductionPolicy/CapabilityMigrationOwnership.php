@@ -263,7 +263,28 @@ final class CapabilityMigrationOwnership
     private function dependsOn(mixed $schema, mixed $sql, array $tables, string $database): bool
     {
         return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
-            || $this->references($sql, [$database, 'prepare']));
+            || $this->qualifies($sql, $database) || $this->references($sql, ['prepare']));
+    }
+
+    /**
+     * Whether the definition names the selected database as a complete qualifier: the whole
+     * identifier (bare, backtick or ANSI-quoted) followed, past optional whitespace and
+     * comments, by the dot. A peer schema that merely extends the selected name, such as
+     * `<db>-2`, `<db>$x` or `<db>é`, is another schema; MySQL stores its objects qualified
+     * (`` `<db>-2`.`t` ``), so a plain word-boundary search would find `<db>` inside that name
+     * and refuse the peer's own objects. The name is compared case-insensitively because a
+     * `lower_case_table_names` 1 or 2 server resolves `` `DB`.`t` `` to the same schema.
+     * A regex failure refuses. The same expression is in `IdentityMigrationOwnership::qualifies()` and migration 243 `qualifiesDatabase()`.
+     */
+    private function qualifies(string $sql, string $database): bool
+    {
+        $name = preg_quote($database, '/');
+        $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
+        if ($match === false) {
+            $this->reject('unreadable dependency definition');
+        }
+
+        return $match === 1;
     }
 
     private function references(mixed $sql, array $tables): bool

@@ -640,6 +640,10 @@
     ],
     [
       "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
       "test_dependencies_reaching_the_selected_schema_are_still_refused"
     ],
     [

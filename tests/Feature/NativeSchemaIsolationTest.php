@@ -83,6 +83,56 @@ class NativeSchemaIsolationTest extends TestCase
         $this->assertSame($peer, $this->catalog($this->peer));
     }
 
+    /**
+     * MySQL stores a peer's view qualified with the peer's own name. A peer whose name only extends the
+     * selected one ("-", "$" or a non-ASCII character) is another schema: its own objects name it, not
+     * the selected schema, even though their text starts with the selected name.
+     */
+    #[DataProvider('extendedPeerSuffixes')]
+    public function test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration(string $suffix): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $peer = $this->database.$suffix;
+        $this->assertLessThanOrEqual(64, mb_strlen($peer));
+        $this->assertSame(0, $this->schemaCount($peer), 'The disposable peer schema must not already exist.');
+        $this->beforeApplicationDestroyed(fn () => DB::connection()->getPdo()->exec('DROP DATABASE IF EXISTS `'.$peer.'`'));
+        $pdo->exec('CREATE DATABASE `'.$peer.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $tables = array_values(self::TABLES);
+        foreach ($tables as $table) {
+            $pdo->exec('CREATE TABLE `'.$peer.'`.`'.$table.'` LIKE `'.$table.'`');
+        }
+        // The same guards, with their unqualified bodies, as the selected schema holds on these tables.
+        $statement = $pdo->prepare('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, ACTION_TIMING, EVENT_MANIPULATION, ACTION_STATEMENT FROM information_schema.TRIGGERS '
+            .'WHERE TRIGGER_SCHEMA = DATABASE() AND EVENT_OBJECT_TABLE IN (?, ?, ?) ORDER BY EVENT_OBJECT_TABLE, ACTION_ORDER');
+        $statement->execute($tables);
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $guard) {
+            $pdo->exec('CREATE TRIGGER `'.$peer.'`.`'.$guard['TRIGGER_NAME'].'` '.$guard['ACTION_TIMING'].' '.$guard['EVENT_MANIPULATION']
+                .' ON `'.$peer.'`.`'.$guard['EVENT_OBJECT_TABLE'].'` FOR EACH ROW '.$guard['ACTION_STATEMENT']);
+        }
+        // Views are the objects MySQL always stores qualified: `<selected>-2`.`table` contains the selected name followed by "-".
+        foreach (self::TABLES as $kind => $table) {
+            $pdo->exec('CREATE VIEW `'.$peer.'`.`isolation_'.$kind.'_view` AS SELECT id FROM `'.$peer.'`.`'.$table.'`');
+            $pdo->exec('CREATE PROCEDURE `'.$peer.'`.`isolation_'.$kind.'_routine`() SELECT COUNT(*) FROM `'.$peer.'`.`'.$table.'`');
+        }
+        $definition = $pdo->prepare('SELECT VIEW_DEFINITION FROM information_schema.VIEWS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?');
+        $definition->execute([$peer, 'isolation_capability_view']);
+        $this->assertStringContainsString('`'.$peer.'`.`'.self::TABLES['capability'].'`', $definition->fetchColumn());
+        $this->assertContains('pi_origins_insert', array_column($this->catalog($peer)['triggers'], 'TRIGGER_NAME'));
+        $selected = $this->catalog($this->database);
+        $other = $this->catalog($peer);
+
+        $this->migrateFresh();
+
+        $this->assertSame($selected, $this->catalog($this->database));
+        $this->assertSame($other, $this->catalog($peer));
+    }
+
+    /** @return array<string, array{0: string}> */
+    public static function extendedPeerSuffixes(): array
+    {
+        return ['hyphen' => ['-2'], 'dollar' => ['$x'], 'non-ASCII' => ["\u{e9}"]];
+    }
+
     #[DataProvider('dependencies')]
     public function test_dependencies_reaching_the_selected_schema_are_still_refused(string $guard, string $kind): void
     {
@@ -123,7 +173,8 @@ class NativeSchemaIsolationTest extends TestCase
         $cases = [];
         foreach (array_keys(self::TABLES) as $guard) {
             foreach (['peer trigger naming this schema', 'peer routine naming this schema', 'peer view naming this schema', 'peer dynamic routine',
-                'peer foreign key', 'local trigger', 'local routine', 'local view'] as $kind) {
+                'peer foreign key', 'local trigger', 'local routine', 'local view',
+                'peer trigger naming this schema in upper case', 'peer routine naming this schema in upper case'] as $kind) {
                 $cases[$guard.': '.$kind] = [$guard, $kind];
             }
         }
@@ -136,11 +187,17 @@ class NativeSchemaIsolationTest extends TestCase
     {
         $peer = '`'.$this->peer.'`.';
         $qualified = '`'.$this->database.'`.`'.$table.'`';
+        // A lower_case_table_names 1 or 2 server resolves this spelling to the selected schema; the guards must refuse it on every server.
+        $upper = '`'.strtoupper($this->database).'`.`'.$table.'`';
+        $this->assertNotSame($this->database, strtoupper($this->database));
 
         return match ($kind) {
             'peer trigger naming this schema' => [['CREATE TABLE '.$peer.'isolation_source (id BIGINT) ENGINE=InnoDB',
                 'CREATE TRIGGER '.$peer.'isolation_dependency BEFORE INSERT ON '.$peer.'isolation_source FOR EACH ROW SET @isolation = (SELECT COUNT(*) FROM '.$qualified.')'], []],
             'peer routine naming this schema' => [['CREATE PROCEDURE '.$peer.'isolation_dependency() SELECT COUNT(*) FROM '.$qualified], []],
+            'peer trigger naming this schema in upper case' => [['CREATE TABLE '.$peer.'isolation_source (id BIGINT) ENGINE=InnoDB',
+                'CREATE TRIGGER '.$peer.'isolation_dependency BEFORE INSERT ON '.$peer.'isolation_source FOR EACH ROW SET @isolation = (SELECT COUNT(*) FROM '.$upper.')'], []],
+            'peer routine naming this schema in upper case' => [['CREATE PROCEDURE '.$peer.'isolation_dependency() SELECT COUNT(*) FROM '.$upper], []],
             'peer view naming this schema' => [['CREATE VIEW '.$peer.'isolation_dependency AS SELECT id FROM '.$qualified], []],
             'peer dynamic routine' => [['CREATE PROCEDURE '.$peer."isolation_dependency() BEGIN SET @isolation = CONCAT('SELECT COUNT(*) FROM ', '".$table
                 ."'); PREPARE isolation_statement FROM @isolation; EXECUTE isolation_statement; DEALLOCATE PREPARE isolation_statement; END"], []],

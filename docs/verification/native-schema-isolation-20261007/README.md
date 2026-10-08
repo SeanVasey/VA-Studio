@@ -95,6 +95,35 @@ still seen. Each row is now classified by its own schema:
 `dependsOn()` was added once per owner: the shared `CapabilityMigrationOwnership`,
 `IdentityMigrationOwnership` and the self-contained 243 migration.
 
+**Complete-identifier qualifier match (independent review R-1 and R-2, Codex P2).** The
+first form of the qualified-name rule searched for the selected database name with a
+`[a-z0-9_]` word boundary. A peer schema named `<db>-2`, `<db>$x` or `<db>é` stores its
+own views qualified (`` `<db>-2`.`t` ``), and the boundary treated `-`, `$` and a non-ASCII
+letter as a break, so the peer's own objects were read as references to the selected
+schema. The match is now `CapabilityMigrationOwnership::qualifies()`,
+`IdentityMigrationOwnership::qualifies()` and migration 243 `qualifiesDatabase()`, one
+identical expression: the database name as a whole identifier (backticked `` `db` ``,
+double-quoted `"db"`, or bare with no identifier character, including `$` or a non-ASCII
+character, immediately before it), followed past optional whitespace and comments by `.`.
+The name is compared case-insensitively, as a `lower_case_table_names` 1 or 2 server
+resolves `` `DB`.`t` `` to the same schema. A regex failure refuses. A name followed by
+`-`, `$`, a non-ASCII character or anything but the dot no longer counts. The
+`PREPARE` rule and the schema-equality rule are unchanged.
+
+New native cases in `NativeSchemaIsolationTest`: a peer named `<db>-2`, `<db>$x` and
+`<db>é` (`test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration`,
+3 data sets) holds the same tables, the same guards with their unqualified bodies, a
+view and a procedure per guarded table, and `migrate:fresh` must still pass for all three
+guards with both catalogs unchanged; and an upper-case spelling of the selected database
+in a peer trigger and a peer routine (`... in upper case`, 2 kinds x 3 guards) must still
+be refused with the original exact message. The existing backticked-qualifier cases
+(`peer trigger/routine/view naming this schema`) cover the quoted form. The file now has
+34 tests (357 assertions) and one more method in `scripts/ci/database-sqlite-skips.json`.
+Mutations caught by lane tests: removing the case-insensitive flag fails the six
+upper-case cases; the old word-boundary match, applied to each guard on its own, fails the
+three extended-name cases at that guard. Source-bound commands and results:
+`conditions/codex-qualifier-dot/` (`run.sh`, `summary.txt`).
+
 ### Regression test
 
 `tests/Feature/NativeSchemaIsolationTest.php` is native-only and listed in
@@ -320,7 +349,7 @@ SQLite (`phpunit.xml` defaults):
 
 | Selection | Result |
 | --- | --- |
-| `tests/Feature/NativeSchemaIsolationTest.php` | 25 skipped (native-only, census) |
+| `tests/Feature/NativeSchemaIsolationTest.php` | 34 skipped (native-only, census; 25 before the complete-identifier fix) |
 | `tests/Feature/ProductionIdentity` | 56 tests / 257 assertions, 8 skipped |
 | `tests/Feature/ProductionIdentityAdapters` | 53 / 316, 2 skipped |
 | `tests/Feature/ProductionFeatures` + `tests/Unit/ProductionFeatures` | 82 / 745, 3 skipped + 4 / 21 |

@@ -1,0 +1,8 @@
+diff_quiet_after_revert rc=0
+apply rc=0
+cmp_after_reapply rc=0
+restored inquiry cmp rc=0
+restored identity cmp rc=0
+diff_quiet_after_revert rc=0
+apply rc=0
+cmp_after_reapply rc=0
