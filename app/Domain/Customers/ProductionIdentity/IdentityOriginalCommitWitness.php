@@ -218,7 +218,9 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
             throw new IdentityException('historical_commit_required');
         }
 
-        return ['key' => $items['app']['key'], 'identity' => $identity, 'default' => $items['database']['default'] ?? null];
+        // Retained identity evidence verifies under every configured key, so the candidate list is closed with the key.
+        return ['key' => $items['app']['key'], 'previous_keys' => $items['app']['previous_keys'] ?? null,
+            'identity' => $identity, 'default' => $items['database']['default'] ?? null];
     }
 
     private function property(string $class, string $name, object $object): mixed

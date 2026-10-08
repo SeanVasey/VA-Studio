@@ -4,6 +4,8 @@ namespace App\Domain\Customers;
 
 use App\Domain\Customers\Models\CustomerAccount;
 use App\Domain\Customers\Models\CustomerIdentityChallenge;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Support\Facades\DB;
@@ -29,13 +31,22 @@ final class CustomerIdentityChallenges
             throw new CustomerAccessException;
         }
         (new Timebox)->call(function () use ($purpose, $email, $requestKey, $owner): void {
-            $address = $this->digest('address', $email);
-            $requestHash = $this->digest('request', $owner."\0".$requestKey);
-            $challenge = DB::transaction(function () use ($purpose, $email, $address, $requestHash): ?CustomerIdentityChallenge {
-                $this->address($address);
+            // Lookups select stored rows under any configured key; new rows are written with the current key ([0]).
+            $addresses = $this->digests('address', $email);
+            $requestHashes = $this->digests('request', $owner."\0".$requestKey);
+            $challenge = DB::transaction(function () use ($purpose, $email, $addresses, $requestHashes): ?CustomerIdentityChallenge {
+                $address = $this->fence($addresses);
+                if ($address === null) {
+                    return null;
+                }
                 $user = $this->emailUser($email);
                 $account = $user ? CustomerAccount::where('user_id', $user->id)->lockForUpdate()->first() : null;
-                $prior = CustomerIdentityChallenge::where('request_hash', $requestHash)->lockForUpdate()->first();
+                // One exact unique-key lookup per candidate keeps the single-key lock shape.
+                $priors = array_values(array_filter(array_map(fn (string $hash): ?CustomerIdentityChallenge => CustomerIdentityChallenge::where('request_hash', $hash)->lockForUpdate()->first(), $requestHashes)));
+                if (count($priors) > 1) {
+                    return null; // Two key candidates selecting two requests is ambiguous; never pick one.
+                }
+                $prior = $priors[0] ?? null;
                 if ($prior) {
                     // Changed request bytes never adopt another pending request or leak its identity.
                     return hash_equals($prior->address_key, $address) && $prior->purpose === $purpose && $prior->state === 'pending'
@@ -49,7 +60,7 @@ final class CustomerIdentityChallenges
                 $eligible = $purpose === 'enroll' ? $user === null && ! $this->emailExists($email) : $this->eligible($user, $account);
                 $id = (string) Str::uuid();
 
-                return CustomerIdentityChallenge::create(['public_id' => $id, 'address_key' => $address, 'request_hash' => $requestHash,
+                return CustomerIdentityChallenge::create(['public_id' => $id, 'address_key' => $address, 'request_hash' => $requestHashes[0],
                     'purpose' => $purpose, 'policy_version' => CustomerIdentityPolicy::VERSION, 'email' => $email,
                     'proof_hash' => hash('sha256', $this->proof($id)), 'user_id' => $purpose === 'recover' && $eligible ? $user->id : null,
                     'account_id' => $purpose === 'recover' && $eligible ? $account->id : null,
@@ -58,10 +69,11 @@ final class CustomerIdentityChallenges
                     'state' => $eligible ? 'pending' : 'unavailable', 'created_at' => now()->startOfSecond(),
                     'expires_at' => now()->startOfSecond()->addSeconds(CustomerIdentityPolicy::TTL_SECONDS)]);
             }, 5);
-            if ($challenge?->state === 'pending') {
+            $proof = $challenge?->state === 'pending' ? $this->issuedProof($challenge) : null;
+            if ($proof !== null) {
                 // Exact request replay can reproduce a lost capture acknowledgement without retaining a raw proof in SQL.
                 try {
-                    app(CustomerIdentityCapture::class)->store($challenge, $this->proof($challenge->public_id));
+                    app(CustomerIdentityCapture::class)->store($challenge, $proof);
                 } catch (\Throwable $error) {
                     // Transport health must not turn this generic public acknowledgement into an address oracle.
                     try {
@@ -85,13 +97,14 @@ final class CustomerIdentityChallenges
             throw new CustomerAccessException;
         }
         Validator::make(['password' => $password], ['password' => ['required', 'string', 'max:1024', Password::min(12)->letters()->numbers()]])->validate();
-        $completionHash = $this->digest('completion', json_encode([$purpose, $id, $name, $password, $requestKey], JSON_THROW_ON_ERROR));
+        $completion = json_encode([$purpose, $id, $name, $password, $requestKey], JSON_THROW_ON_ERROR);
+        $completionHash = $this->digest('completion', $completion);
         // This preliminary lookup locates the address fence; all bytes and authority are checked again under it.
         $locator = CustomerIdentityChallenge::where('public_id', $id)->first();
         if (! $locator || ! hash_equals($locator->public_id, $id) || ! hash_equals($locator->proof_hash, hash('sha256', $proof))) {
             throw new CustomerAccessException;
         }
-        DB::transaction(function () use ($locator, $purpose, $id, $proof, $name, $password, $completionHash): void {
+        DB::transaction(function () use ($locator, $purpose, $id, $proof, $name, $password, $completion, $completionHash): void {
             $this->address($locator->address_key);
             $email = $locator->email;
             $user = $this->emailUser($email);
@@ -103,7 +116,7 @@ final class CustomerIdentityChallenges
                 throw new CustomerAccessException;
             }
             if ($challenge->state === 'completed') {
-                if (! hash_equals($challenge->completion_hash, $completionHash) || ! $this->eligible($user, $account)
+                if (! $this->matches('completion', $completion, $challenge->completion_hash) || ! $this->eligible($user, $account)
                     || $challenge->result_user_id !== $user->id || $challenge->result_account_id !== $account->id
                     || $challenge->result_access_version !== $account->access_version || ! hash_equals($challenge->result_stamp, app(CustomerAccess::class)->stamp($user))) {
                     throw new CustomerAccessException;
@@ -163,6 +176,23 @@ final class CustomerIdentityChallenges
         return User::whereRaw('LOWER(email) = ?', [$email])->lockForUpdate()->get(['id'])->isNotEmpty();
     }
 
+    /** The existing fence under any configured key, else the current-key fence; null when candidates are ambiguous. */
+    private function fence(array $addresses): ?string
+    {
+        if (count($addresses) > 1) {
+            $existing = array_values(array_filter(array_map(fn (string $address): ?string => DB::table('customer_identity_addresses')->where('address_key', $address)->lockForUpdate()->value('address_key'), $addresses)));
+            if (count($existing) > 1) {
+                return null;
+            }
+            if ($existing !== []) {
+                return $existing[0];
+            }
+        }
+        $this->address($addresses[0]);
+
+        return $addresses[0];
+    }
+
     private function address(string $address): void
     {
         DB::table('customer_identity_addresses')->insertOrIgnore(['address_key' => $address]);
@@ -193,19 +223,55 @@ final class CustomerIdentityChallenges
         }
     }
 
-    private function proof(string $id): string
+    private function proof(string $id, ?string $key = null): string
     {
         // A PRF over an unpredictable UUID permits exact resend without storing the bearer secret in SQL.
-        return $this->digest('proof', $id);
+        return $this->digest('proof', $id, $key);
     }
 
-    private function digest(string $purpose, #[SensitiveParameter] string $value): string
+    /** The proof originally issued for this challenge, under whichever configured key issued it; null if none. */
+    private function issuedProof(CustomerIdentityChallenge $challenge): ?string
     {
-        $key = config('app.key');
-        if (! is_string($key) || $key === '') {
-            throw new CustomerAccessException;
+        $issued = null;
+        foreach ($this->keys() as $key) {
+            $proof = $this->proof($challenge->public_id, $key);
+            $match = hash_equals($challenge->proof_hash, hash('sha256', $proof));
+            $issued = $match && $issued === null ? $proof : $issued;
         }
 
-        return hash_hmac('sha256', "customer-local-identity-v1\0".$purpose."\0".$value, $key);
+        return $issued;
+    }
+
+    /** New values use the current key only. */
+    private function digest(string $purpose, #[SensitiveParameter] string $value, #[SensitiveParameter] ?string $key = null): string
+    {
+        return hash_hmac('sha256', "customer-local-identity-v1\0".$purpose."\0".$value, $key ?? $this->keys()[0]);
+    }
+
+    /** @return non-empty-list<string> current-key digest first */
+    private function digests(string $purpose, #[SensitiveParameter] string $value): array
+    {
+        return array_map(fn (string $key): string => $this->digest($purpose, $value, $key), $this->keys());
+    }
+
+    /** Constant-time over every configured key; no candidate short-circuits the others. */
+    private function matches(string $purpose, #[SensitiveParameter] string $value, string $expected): bool
+    {
+        $matched = false;
+        foreach ($this->keys() as $key) {
+            $matched = hash_equals($this->digest($purpose, $value, $key), $expected) || $matched;
+        }
+
+        return $matched;
+    }
+
+    /** @return non-empty-list<string> */
+    private function keys(): array
+    {
+        try {
+            return IdentityPolicy::keys();
+        } catch (IdentityException) {
+            throw new CustomerAccessException;
+        }
     }
 }

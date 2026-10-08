@@ -5,6 +5,7 @@ namespace App\Domain\Customers\ProductionIdentity;
 use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
+use SensitiveParameter;
 
 /** A new account-control policy; it never activates legacy fixture identity or legal buyer assertions. */
 final class IdentityPolicy
@@ -78,13 +79,60 @@ final class IdentityPolicy
         }
     }
 
-    public static function digest(string $purpose, string $value): string
+    /**
+     * Key candidates for verifying stored identity digests: the current `app.key` first, then each distinct
+     * `app.previous_keys` entry of at least 32 bytes. A key in neither list never verifies, so retiring a
+     * previous key refuses every digest it wrote. Stored digests are immutable evidence and are never re-keyed.
+     *
+     * @return non-empty-list<string>
+     */
+    public static function keys(): array
     {
-        $key = config('app.key');
-        if (! is_string($key) || $key === '') {
+        $current = config('app.key');
+        if (! is_string($current) || $current === '') {
             throw new IdentityException;
         }
+        $previous = config('app.previous_keys', []);
+        $keys = [$current];
+        foreach (is_array($previous) ? $previous : [] as $key) {
+            if (is_string($key) && strlen($key) >= 32 && ! in_array($key, $keys, true)) {
+                $keys[] = $key;
+            }
+        }
 
+        return $keys;
+    }
+
+    /** Every new digest is written with the current key only. */
+    public static function digest(string $purpose, #[SensitiveParameter] string $value): string
+    {
+        return self::mac($purpose, $value, self::keys()[0]);
+    }
+
+    /** Constant-time verification of a stored digest under every configured key; no candidate short-circuits the others. */
+    public static function matches(string $purpose, #[SensitiveParameter] string $value, string $expected): bool
+    {
+        $matched = false;
+        foreach (self::keys() as $key) {
+            $matched = hash_equals(self::mac($purpose, $value, $key), $expected) || $matched;
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Candidate digests, current key first, for indexed lookups of a stored digest column (one exact `= ?`
+     * lookup per candidate keeps single-key lock shapes). Callers must refuse when candidates select more than one row.
+     *
+     * @return non-empty-list<string>
+     */
+    public static function digests(string $purpose, #[SensitiveParameter] string $value): array
+    {
+        return array_map(fn (string $key): string => self::mac($purpose, $value, $key), self::keys());
+    }
+
+    private static function mac(string $purpose, #[SensitiveParameter] string $value, #[SensitiveParameter] string $key): string
+    {
         return hash_hmac('sha256', self::VERSION."\0".$purpose."\0".$value, $key);
     }
 }
