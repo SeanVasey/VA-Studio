@@ -5,7 +5,8 @@
 #
 # Exit status: 0 only when every migrate:fresh and the final catalog dump succeeded; 1 when any of them failed;
 # 2 when the invocation itself is refused (no checkout, no clean commit to bind the evidence to, a runtime version that
-# cannot be read, or a database name outside identifier characters). Nothing is migrated after a refusal.
+# cannot be read, a database name outside identifier characters, cached configuration, or a Laravel connection that is
+# not the disposable database on 127.0.0.1:3410). Nothing is migrated after a refusal.
 set -uo pipefail
 refuse() { echo "refused: $*" >&2; exit 2; }
 
@@ -37,8 +38,42 @@ done
 logs=$(mktemp -d "${TMPDIR:-/tmp}/two-db-repro.XXXXXX") || refuse "cannot create a private log directory"
 echo "logs: $logs"
 
-export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3410 DB_USERNAME=root DB_PASSWORD=
+# migrate:fresh drops every table in its target, so Laravel must be pinned to the disposable daemon. A cached
+# configuration ignores the exported values, and DB_URL or DB_SOCKET (for example from an ignored .env.testing) would
+# take precedence over host and port, so cached configuration is refused and both are cleared (an empty DB_URL is
+# ignored by Laravel's URL parser). The exported values win over .env files, which never overwrite set variables.
+[ ! -e bootstrap/cache/config.php ] || refuse "cached configuration (bootstrap/cache/config.php) would bypass the pinned connection"
+export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3410 DB_USERNAME=root DB_PASSWORD= DB_URL= DB_SOCKET=
 echo "source: $source_sha  php: $php_version  mysqld: $mysqld_version"
+
+# Before the first destructive run, boot the application once per selected database and prove its effective default
+# connection is mysql on 127.0.0.1:3410 with that database, with no URL or socket, and that the live server agrees.
+for db in $(printf '%s\n' $DBS | sort -u); do
+  DB_DATABASE=$db php -d display_errors=stderr <<'PHP' || refuse "Laravel's effective connection is not the disposable database $db on 127.0.0.1:3410"
+<?php
+try {
+    require 'vendor/autoload.php';
+    $app = require 'bootstrap/app.php';
+    $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+    $want = getenv('DB_DATABASE');
+    $name = config('database.default');
+    $c = (array) config('database.connections.'.$name);
+    $pinned = ! $app->configurationIsCached() && $name === 'mysql' && ($c['driver'] ?? null) === 'mysql'
+        && empty($c['url']) && empty($c['unix_socket']) && ($c['host'] ?? null) === '127.0.0.1'
+        && (string) ($c['port'] ?? '') === '3410' && ($c['database'] ?? null) === $want;
+    $live = $pinned ? Illuminate\Support\Facades\DB::connection($name)->selectOne('SELECT @@port AS port, DATABASE() AS db') : null;
+    if (! $pinned || (int) $live->port !== 3410 || $live->db !== $want) {
+        fwrite(STDERR, 'effective connection: '.json_encode(['default' => $name, 'url' => $c['url'] ?? null, 'socket' => $c['unix_socket'] ?? null,
+            'host' => $c['host'] ?? null, 'port' => $c['port'] ?? null, 'database' => $c['database'] ?? null, 'live' => $live])."\n");
+        exit(3);
+    }
+    echo "connection pinned: 127.0.0.1:3410/{$want}\n";
+} catch (Throwable $e) {
+    fwrite(STDERR, get_class($e).': '.$e->getMessage()."\n");
+    exit(3);
+}
+PHP
+done
 
 # Every migrate:fresh status and the final catalog dump are accumulated; the script exits 1 when any one failed.
 status=0
