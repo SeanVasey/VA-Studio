@@ -40,7 +40,7 @@ margin. The abort-on-unmount, pagehide/visibilitychange and generation logic are
 
 | Operation | Server budget | Measured native time | Client abort |
 | --- | --- | --- | --- |
-| read (index, show, download status) | 60 s | not measured directly; similar frames 12–20 s | 30 s |
+| read (index, show, download status) | 60 s | not measured directly; similar frames 12–20 s | 30 s (raised to 80 s in round 2, `../codex-2/`) |
 | finalize | 60 s | 18 s | 80 s |
 | authorize | 60 s | 11.9–20.4 s | 80 s |
 | document | 300 s render lease | 65–76 s | 320 s |
