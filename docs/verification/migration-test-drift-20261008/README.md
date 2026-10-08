@@ -1,8 +1,8 @@
 # Migration test drift on main, October 8, 2026
 
-Base: `f7224ed3` (origin/main). Worktree `/home/user/VA-Studio-migtests`, branch `harness/migration-test-drift`. This lane did not commit or push. The integration owner commits the files listed under "What changed".
+Base: `f7224ed3` (origin/main). Worktree `/home/user/VA-Studio-migtests`, branch `harness/migration-test-drift`. The lane agent did not commit; the integration owner committed the files listed under "What changed".
 
-Status: SQLite census complete. Red/green done for every fixed file (SQLite, plus MySQL 8.4.11 for the files that run natively). The final-tree neighbour run is recorded at the end.
+Status: SQLite census complete. Red/green done for every fixed file (SQLite, plus MySQL 8.4.11 for the files that run natively). Committed by the integration owner as `bc18ca66` (tests) and `ca1d1c1a` (this record), then merged with main `72045620` as `6039b246`; the final green and neighbour runs below are on that merged tree.
 
 ## Rules followed
 
@@ -176,7 +176,22 @@ These runs used a private `mysqld` 8.4.11 (`--no-defaults --user=root --socket= 
 
 ## Neighbouring tests, receipts, Pint
 
-- Final tree, SQLite: all 8 changed test files, 4 neighbours that touch the same migrations, and every `tests/Feature/**/*Migration*Test.php` (58 files). Results are below.
+- Merged tree `6039b246` (lane plus main `72045620`), SQLite, worktree runner, `public/build` absent (`evidence/green-merged/`):
+
+| Run | Result |
+|---|---|
+| ProductionTrackCapabilitiesMigrationOwnershipTest | OK 23 / 606, rc 0 |
+| ProductionTrackCapabilitiesGuardsTest | OK 28 / 126, rc 0 |
+| DiscoveryEpochMigrationTest | OK 9 / 42, rc 0 |
+| ServiceProjectSchemaTest | OK 3 / 19, rc 0 |
+| RightsEvidenceGuardMigrationTest | OK 33 / 195, rc 0 |
+| PrivateTrackReviewTest | OK 16 / 215, rc 0 |
+| Unit\BulkLicenseDraftSourceBrowserEvidenceTest | OK 4 / 119, rc 0 |
+| Unit\OfferDraftBrowserEvidenceTest | OK 2 / 82, rc 0 |
+| Every `tests/Feature/*Migration*Test.php` and `tests/Feature/**/*Migration*Test.php` (49 files, one run each) | 49 files rc 0, 0 failed (`sqlite-neighbours.txt`, file list in `neighbour-files.txt`) |
+| `python3 -I scripts/ci/test-database-receipts.py` | 34 tests OK (`database-receipts-selftest.txt`) |
+
+The 49-file count replaces the earlier 58-file estimate: it is the exact glob result on the merged tree.
 - `python3 -I scripts/ci/test-database-receipts.py`: 34 tests OK.
 - `/home/user/VA-Studio/vendor/bin/pint --test` on all 9 changed PHP files: passed. A deliberately misformatted probe file fails, which shows the check runs.
 
