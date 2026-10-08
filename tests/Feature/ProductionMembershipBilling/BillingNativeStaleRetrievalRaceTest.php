@@ -16,7 +16,9 @@ use Tests\TestCase;
 /**
  * Review R-6, native. Two independent PHP processes on two MySQL connections retrieve one invoice. The stale one reads a settled
  * graph and stalls before its append; the fresh one starts after that read, sees the refund, and appends first. Without the
- * append-time ordering rule the stale snapshot lands after the `reversed` observation and `currentSettled()` names it. SQLite runs
+ * append-time ordering rule the stale snapshot lands after the `reversed` observation and `currentSettled()` names it. The stale
+ * worker's end position is allocated after the fresh one appended, so the stale read is refused as `concurrent_retrieval` (the
+ * job retries it); the Codex stall-before-read interleaving is BillingNativeIntervalRetrievalRaceTest. SQLite runs
  * only the in-process simulation in BillingOverlappingRetrievalTest; it cannot prove two connections, so this case is native only.
  */
 class BillingNativeStaleRetrievalRaceTest extends TestCase
@@ -37,7 +39,9 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
 
         $this->assertSame('saved', $results['fresh']['result'], json_encode($results));
         $this->assertSame([2, 'reversed'], [$results['fresh']['sequence'], $results['fresh']['outcome']]);
-        $this->assertSame(['denied', 'superseded_retrieval'], [$results['stale']['result'], $results['stale']['reason']], json_encode($results));
+        // The stale worker stalls after its last provider read, before its end position is allocated, so its read overlaps the fresh
+        // one by position: refused for retry, never appended (Codex P1 on PR #54, `BillingReconciliation.php:42`).
+        $this->assertSame(['denied', 'concurrent_retrieval'], [$results['stale']['result'], $results['stale']['reason']], json_encode($results));
         $this->assertSame([0, 0], [$results['stale']['transaction_level'], $results['fresh']['transaction_level']]);
         $this->assertNotSame($results['stale']['connection_id'], $results['fresh']['connection_id']);
         $this->assertNotSame($results['stale']['pid'], $results['fresh']['pid']);
@@ -67,7 +71,9 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
 
         $this->assertSame('saved', $results['fresh']['result'], json_encode($results));
         $this->assertSame([2, 'reversed'], [$results['fresh']['sequence'], $results['fresh']['outcome']]);
-        $this->assertSame(['denied', 'superseded_retrieval'], [$results['stale']['result'], $results['stale']['reason']], json_encode($results));
+        // The stale worker stalls after its last provider read, before its end position is allocated, so its read overlaps the fresh
+        // one by position: refused for retry, never appended (Codex P1 on PR #54, `BillingReconciliation.php:42`).
+        $this->assertSame(['denied', 'concurrent_retrieval'], [$results['stale']['result'], $results['stale']['reason']], json_encode($results));
         $this->assertNotSame($results['stale']['connection_id'], $results['fresh']['connection_id']);
         $ledger = new BillingLedger;
         $chain = $ledger->observations($seed['invoice_id']);

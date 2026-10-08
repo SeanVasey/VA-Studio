@@ -187,8 +187,9 @@ class BillingObservationLedgerTest extends TestCase
         $ledger = new BillingLedger;
         $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
         // A structurally valid next row (triggers admit it) whose seal is not the canonical row hash.
-        $forged = [...$settled, 'id' => (string) Str::uuid(), 'sequence' => 2, 'retrieval_position' => $ledger->startRetrieval(),
-            'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
+        $start = $ledger->startRetrieval();
+        $forged = [...$settled, 'id' => (string) Str::uuid(), 'sequence' => 2, 'retrieval_position' => $start,
+            'retrieval_end_position' => $ledger->endRetrieval($start), 'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
         DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2]).' ('.implode(',', array_keys($forged))
             .') VALUES ('.implode(',', array_fill(0, count($forged), '?')).')')->execute(array_values($forged));
         foreach ([fn () => $ledger->observations($settled['invoice_id']), fn () => $ledger->currentSettled($settled['invoice_id'], self::AT)] as $read) {

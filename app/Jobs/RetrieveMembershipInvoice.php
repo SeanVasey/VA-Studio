@@ -17,8 +17,11 @@ use Illuminate\Queue\InteractsWithQueue;
  *
  * Up to three attempts. A first retrieval that ends unknown throws (it writes nothing), so the queue retries it with the backoff.
  * Under an identity the binding already owns, an unknown or incomplete outcome is appended first, so every attempt is visible in
- * the ledger, and the job is then released for another attempt while attempts remain. A retrieval overtaken by a newer one of the
- * same invoice (`superseded_retrieval`) is a normal end: the newer retrieval recorded the later state, so there is nothing to retry.
+ * the ledger, and the job is then released for another attempt while attempts remain. A retrieval whose provider reads wholly
+ * preceded those of the retrieval that produced the tail (`superseded_retrieval`) is a normal end: the newer retrieval recorded the
+ * later state, so there is nothing to retry. A retrieval whose reads overlapped the tail's (`concurrent_retrieval`) appended nothing
+ * because the database cannot tell which read saw the later state; it is released with the same backoff and retried with a fresh
+ * read, and the last attempt fails visibly (Codex P1 on PR #54, `BillingReconciliation.php:42`).
  *
  * The provider invoice reference is carried only as an application-key-encrypted value (the same sealing the ledger uses for its
  * payloads), never plaintext, so neither the queued payload nor `failed_jobs` holds it. The binding id is an internal row id.
@@ -60,13 +63,23 @@ final class RetrieveMembershipInvoice implements ShouldQueue
             if ($error->reason === 'superseded_retrieval') {
                 return;
             }
+            if ($error->reason === 'concurrent_retrieval' && $this->attempts() < $this->tries) {
+                $this->retryLater();
+
+                return;
+            }
 
             throw $error;
         }
-        $attempt = $this->attempts();
-        if (BillingReconciliation::isInconclusive($observation) && $attempt < $this->tries) {
-            $backoff = $this->backoff();
-            $this->release($backoff[$attempt - 1] ?? $backoff[array_key_last($backoff)]);
+        if (BillingReconciliation::isInconclusive($observation) && $this->attempts() < $this->tries) {
+            $this->retryLater();
         }
+    }
+
+    private function retryLater(): void
+    {
+        $attempt = $this->attempts();
+        $backoff = $this->backoff();
+        $this->release($backoff[$attempt - 1] ?? $backoff[array_key_last($backoff)]);
     }
 }

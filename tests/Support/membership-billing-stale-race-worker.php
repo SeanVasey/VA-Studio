@@ -131,5 +131,6 @@ try {
 }
 echo json_encode(['role' => $role, 'result' => $result, 'sequence' => $observation['sequence'] ?? null, 'outcome' => $observation['outcome'] ?? null,
     'started_at' => $observation['retrieval_started_at'] ?? null, 'position' => $observation['retrieval_position'] ?? null,
+    'end_position' => $observation['retrieval_end_position'] ?? null,
     'clock' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s.u'), 'reason' => $reason ?? null, 'error_class' => $errorClass ?? null,
     'error_message' => $errorMessage ?? null, 'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);

@@ -31,11 +31,13 @@ class BillingNativeDedupRaceTest extends TestCase
         $expected = 2;
         if (DB::getDriverName() === 'mysql') {
             $results = $this->race($binding['id']);
-            // Both workers begin together, so either may begin first. If the one that began first appends second, its snapshot is
-            // older than the tail's and the append refuses it (review R-6, BillingLedger::append); that is a normal end, not a
+            // Both workers begin together, so either may begin first. If the reads overlap (one began before the other's ended), the
+            // second append is refused as `concurrent_retrieval`, which the job retries; one whose read wholly preceded the tail's is
+            // refused as `superseded_retrieval`, a normal end (review R-6; Codex P1 on PR #54, BillingLedger::append). Neither is a
             // lost retrieval, so the invariants are one identity and one contiguous chain holding exactly the saved observations.
             foreach ($results as $result) {
-                $this->assertTrue($result['result'] === 'saved' || ($result['result'] === 'denied' && $result['reason'] === 'superseded_retrieval'), json_encode($results));
+                $this->assertTrue($result['result'] === 'saved' || ($result['result'] === 'denied'
+                    && in_array($result['reason'], ['superseded_retrieval', 'concurrent_retrieval'], true)), json_encode($results));
             }
             $saved = array_values(array_filter($results, fn (array $result): bool => $result['result'] === 'saved'));
             $this->assertNotEmpty($saved, json_encode($results));

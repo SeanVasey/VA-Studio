@@ -721,6 +721,14 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
       "test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal"
     ]
   ]
 }

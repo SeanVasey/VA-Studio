@@ -75,7 +75,9 @@ final class BillingHintRecovery
      * reads began before the hint may have read state older than the hint even if it was appended after it, and a worker's or intake
      * host's skewed clock cannot make it look later. The retrieval position is committed before its first provider read and the
      * hint's is allocated after the hint arrived, so a larger retrieval position means the provider reads followed the hint's
-     * receipt. Positions are unique, so the whole-second margin of A1-6 is no longer needed.
+     * receipt. Positions are unique, so the whole-second margin of A1-6 is no longer needed. Coverage uses the START position only:
+     * the end position (allocated after the reads) orders appends and never decides coverage, since a retrieval whose reads ended
+     * after the hint but began before it may have read state older than the hint (Codex P1 on PR #54, `BillingReconciliation.php:42`).
      */
     private function observedAfter(string $invoiceRefHash, mixed $hintPosition): bool
     {

@@ -211,6 +211,47 @@ class BillingSweepHintsCursorTest extends TestCase
         Queue::assertNothingPushed();
     }
 
+    /**
+     * Independent review CP-4: the keyset's tie-break `(received_at = ? AND id > ?)` is what continues a page that ended inside one
+     * intake second. Five uncovered hints share one `received_at`; pages of two must examine each exactly once and miss none, and a
+     * page of one per hint must reach and dispatch all five. Without the tie-break the second page finds nothing after the first.
+     */
+    public function test_hints_sharing_one_received_at_second_are_each_examined_exactly_once_across_page_boundaries(): void
+    {
+        F::binding();
+        $this->at(5);
+        $events = array_map(fn (int $n): string => 'evt_SYNTHETICSAMESECOND'.$n, range(1, 5));
+        foreach ($events as $n => $event) {
+            $this->lose($event, 'in_SYNTHETICSAMESECOND'.$n);
+        }
+        $this->assertSame(1, DB::table('production_membership_billing_events')->distinct()->count('received_at'), 'All five share one intake second.');
+        $this->at(30);
+        Queue::fake();
+
+        $seen = [];
+        $cursor = null;
+        $pages = 0;
+        do {
+            $this->assertSame(0, Artisan::call('membership-billing:sweep-hints', ['--limit' => 2] + ($cursor === null ? [] : ['--after' => $cursor])));
+            $output = Artisan::output();
+            $pages++;
+            preg_match_all('/^uncovered (event=[0-9a-f]{12}) /m', $output, $matches);
+            array_push($seen, ...$matches[1]);
+            $cursor = preg_match('/^Next cursor: (\S+)$/m', $output, $next) === 1 ? $next[1] : null;
+        } while ($cursor !== null && $pages < 10);
+
+        $expected = array_map(fn (string $event): string => $this->prefix($event), $events);
+        sort($expected);
+        sort($seen);
+        $this->assertSame($expected, $seen, 'Every hint of the shared second is examined exactly once.');
+        $this->assertSame(3, $pages);
+        Queue::assertNothingPushed();
+
+        $this->assertSame(0, Artisan::call('membership-billing:sweep-hints', ['--limit' => 1, '--all' => true, '--dispatch' => true]));
+        $this->assertStringContainsString('Scan complete: 5 hint(s) examined in 5 page(s).', Artisan::output());
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 5);
+    }
+
     /** `$covered` hints of F::INVOICE that one retrieval covers, then one newer uncovered hint of another invoice. */
     private function coveredHintsThenOneUncovered(int $covered): array
     {

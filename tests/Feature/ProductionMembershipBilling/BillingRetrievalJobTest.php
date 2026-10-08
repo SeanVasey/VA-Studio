@@ -9,7 +9,9 @@ use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingValues;
 use App\Jobs\RetrieveMembershipInvoice;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -121,21 +123,67 @@ class BillingRetrievalJobTest extends TestCase
         $job->assertNotReleased();
     }
 
-    /** Review R-6: the overtaken retrieval is a normal end, not a failure to retry. */
+    /**
+     * Review R-6: the overtaken retrieval is a normal end, not a failure to retry. "Overtaken" means its read wholly preceded the
+     * tail's: its end position committed before the newer retrieval's start (Codex P1 on PR #54, `BillingReconciliation.php:42`).
+     * The newer retrieval therefore runs right after the stale one's end-position commit, not during its provider reads.
+     */
     public function test_a_retrieval_overtaken_by_a_newer_one_completes_without_a_retry_and_records_nothing(): void
     {
         $binding = F::binding();
         $this->handle($binding['id'], new RehearsalBillingGateway(F::graph()), 1, 0);
         $this->at(10);
         $stale = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph()), function () use ($binding): void {
-            $this->handle($binding['id'], new RehearsalBillingGateway(F::graph(['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]])), 1, 20);
-            $this->at(30);
+            $armed = true;
+            Event::listen(TransactionCommitted::class, function () use (&$armed, $binding): void {
+                if ($armed) {
+                    $armed = false;
+                    $this->handle($binding['id'], new RehearsalBillingGateway(F::graph(['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]])), 1, 20);
+                    $this->at(30);
+                }
+            });
         });
         $job = (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->withFakeQueueInteractions();
         $job->handle(new BillingReconciliation($stale));
 
         $job->assertNotReleased();
         $job->assertNotFailed();
+        $chain = (new BillingLedger)->observations((string) DB::table('production_membership_billing_invoices')->value('id'));
+        $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
+    }
+
+    /** @return array<string, array{0: int, 1: ?int}> attempt number, expected release delay (null: the last attempt fails the job) */
+    public static function concurrentAttempts(): array
+    {
+        return ['first attempt' => [1, 60], 'second attempt' => [2, 600], 'last attempt fails visibly' => [3, null]];
+    }
+
+    /**
+     * Codex P1 on PR #54 (`BillingReconciliation.php:42`): a read that overlapped the tail's read (it began before the tail's read
+     * finished) is refused as `concurrent_retrieval`. The database cannot order the two reads, so it is not a normal end: the job is
+     * released with its backoff and retries with a fresh interval, and the last attempt fails visibly. Nothing is appended.
+     */
+    #[DataProvider('concurrentAttempts')]
+    public function test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing(int $attempt, ?int $delay): void
+    {
+        $binding = F::binding();
+        $this->handle($binding['id'], new RehearsalBillingGateway(F::graph()), 1, 0);
+        $this->at(10);
+        $overlapping = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph()), function () use ($binding): void {
+            $this->handle($binding['id'], new RehearsalBillingGateway(F::graph(['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]])), 1, 20);
+            $this->at(30);
+        });
+        $job = (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->withFakeQueueInteractions();
+        $job->job->attempts = $attempt;
+        try {
+            $job->handle(new BillingReconciliation($overlapping));
+            $this->assertNotNull($delay, 'The last attempt must fail visibly, not end normally.');
+            $job->assertReleased($delay);
+        } catch (BillingException $error) {
+            $this->assertNull($delay, 'An overlapping read is released while attempts remain.');
+            $this->assertSame('concurrent_retrieval', $error->reason);
+            $job->assertNotReleased();
+        }
         $chain = (new BillingLedger)->observations((string) DB::table('production_membership_billing_invoices')->value('id'));
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
     }

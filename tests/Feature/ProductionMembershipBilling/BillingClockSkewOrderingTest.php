@@ -47,7 +47,7 @@ class BillingClockSkewOrderingTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_an_older_retrieval_on_a_clock_ahead_worker_is_refused_as_superseded_and_the_newer_reversal_stays_the_tail(): void
+    public function test_an_older_retrieval_on_a_clock_ahead_worker_is_refused_and_the_newer_reversal_stays_the_tail(): void
     {
         $binding = F::binding();
         $ledger = new BillingLedger;
@@ -57,7 +57,8 @@ class BillingClockSkewOrderingTest extends TestCase
         // The stale retrieval begins first, on a worker whose clock reads 15 s ahead; the fresh one begins after its reads.
         $outcome = $this->staleAroundFresh($binding['id'], 25, 20, 30);
 
-        $this->assertSame('superseded_retrieval', $outcome);
+        // Overlapping reads by position (Codex P1 on PR #54, :42): refused for retry, whatever the clocks read.
+        $this->assertSame('concurrent_retrieval', $outcome);
         $chain = $ledger->observations($first['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
         $this->assertNull($ledger->currentSettled($first['invoice_id'], self::T0 + 31), 'A snapshot read before the refund is never current evidence.');
@@ -70,7 +71,8 @@ class BillingClockSkewOrderingTest extends TestCase
 
         $outcome = $this->staleAroundFresh($binding['id'], 25, 20, 30);
 
-        $this->assertSame('superseded_retrieval', $outcome);
+        // Overlapping reads by position (Codex P1 on PR #54, :42): refused for retry, whatever the clocks read.
+        $this->assertSame('concurrent_retrieval', $outcome);
         $invoiceId = (string) DB::table('production_membership_billing_invoices')->value('id');
         $this->assertSame(['reversed'], array_column((new BillingLedger)->observations($invoiceId), 'outcome'));
         $this->assertNull((new BillingLedger)->currentSettled($invoiceId, self::T0 + 31));
@@ -101,7 +103,8 @@ class BillingClockSkewOrderingTest extends TestCase
         // Both retrievals read the very same microsecond at their start; only the database can tell which began first.
         $outcome = $this->staleAroundFresh($binding['id'], 10, 10, 10);
 
-        $this->assertSame('superseded_retrieval', $outcome);
+        // Overlapping reads by position (Codex P1 on PR #54, :42): refused for retry, whatever the clocks read.
+        $this->assertSame('concurrent_retrieval', $outcome);
         $chain = (new BillingLedger)->observations($first['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
         $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 11));

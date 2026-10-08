@@ -90,18 +90,31 @@ final class BillingLedger
     }
 
     /**
-     * Begins one retrieval: allocates its database-issued position in its own short committed transaction, before any provider read
-     * (Codex P1 on PR #54, review L2-3). The position is what orders overlapping retrievals of one invoice and what decides whether a
-     * webhook hint is covered; no application clock is compared for either. The row records only that a retrieval began: it names
-     * no invoice, binding or provider reference, so it claims no identity (review R-3).
+     * Begins one retrieval: allocates its database-issued start position in its own short committed transaction, before any provider
+     * read (Codex P1 on PR #54, review L2-3). The start decides whether a webhook hint is covered (the read began after the hint) and,
+     * with the end position (endRetrieval()), orders overlapping retrievals of one invoice; no application clock is compared for
+     * either. The row records only that a retrieval began: it names no invoice, binding or provider reference, so it claims no
+     * identity (review R-3).
      */
     public function startRetrieval(): int
     {
-        foreach (DB::getConnections() as $connection) {
-            BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
-        }
+        return $this->committedRetrievalPosition();
+    }
 
-        return DB::transaction(fn (): int => $this->position('retrieval'));
+    /**
+     * Ends one retrieval's provider reads: allocates its database-issued end position in its own short committed transaction, after
+     * the last provider read and before the append (Codex P1 on PR #54, `BillingReconciliation.php:42`). A start position alone does
+     * not order the reads: a retrieval can take an early start, stall, and then read newer provider state than one that started
+     * later. The [start, end] interval brackets the reads, so "this read began after that read ended" is a comparison of two
+     * positions from one database counter. Like the start, the row names nothing and claims no identity.
+     */
+    public function endRetrieval(int $start): int
+    {
+        BillingException::require($start > 0, 'invalid_value');
+        $end = $this->committedRetrievalPosition();
+        BillingException::require($end > $start, 'position');
+
+        return $end;
     }
 
     /**
@@ -130,33 +143,40 @@ final class BillingLedger
     /**
      * Append one observation after the current tail. A concurrent append retries on the new tail.
      *
-     * `$position` is the retrieval's database-issued position (startRetrieval(), allocated before its provider reads began) and
-     * `$startedAt` the worker's clock at that moment, kept only as information: it never orders anything. Overlapping retrievals of
-     * one invoice append in commit order, not in provider-read order, so an older snapshot could land after a newer one and become the
-     * tail (review R-6). Under a row lock on the invoice identity (MySQL; the lock covers only this short append, never provider I/O)
-     * the append refuses a retrieval whose position is below the one that produced the tail, with `superseded_retrieval`. It is
-     * refused rather than appended as a "superseded" row so that the outcome vocabulary, the CHECKs and every reader of the tail stay
-     * unchanged: no consumer has to learn to skip a row type, and a stale snapshot has no row to be mistaken for current evidence. The
-     * refusal writes nothing, and the newer retrieval's row already records the invoice's later state. Positions are unique, so no two
-     * retrievals tie, and the order is the database's own, whatever the workers' clocks read (Codex P1 on PR #54, review L2-3).
+     * `$position` and `$endPosition` are the retrieval's database-issued start and end positions (startRetrieval(), committed before
+     * its first provider read; endRetrieval(), committed after its last), and `$startedAt` the worker's clock at the start, kept only
+     * as information: it never orders anything. Overlapping retrievals of one invoice append in commit order, not in provider-read
+     * order, so an older snapshot could land after a newer one and become the tail (review R-6). Under a row lock on the invoice
+     * identity (MySQL; the lock covers only this short append, never provider I/O) the append admits a retrieval only when its read
+     * began after the tail's read ended: its start is above the tail's end (Codex P1 on PR #54, `BillingReconciliation.php:42`).
+     * Otherwise it refuses, writing nothing:
+     *  - `superseded_retrieval` when the read wholly preceded the tail's (its end is below the tail's start): the tail already records
+     *    a strictly later read, so this is a normal end with nothing to retry;
+     *  - `concurrent_retrieval` when the two reads overlapped: the database cannot tell which read saw the later provider state, so
+     *    the job retries with a fresh interval, which converges on a read that began after the tail's ended.
+     * It is refused rather than appended as a "superseded" row so that the outcome vocabulary, the CHECKs and every reader of the tail
+     * stay unchanged: no consumer has to learn to skip a row type, and a stale snapshot has no row to be mistaken for current evidence.
+     * Positions are unique, so no two retrievals tie, and the order is the database's own, whatever the workers' clocks read.
      */
-    public function append(array $invoice, BillingVerdict $verdict, int $retrievedAt, string $provenance, int $position, CarbonImmutable $startedAt): array
+    public function append(array $invoice, BillingVerdict $verdict, int $retrievedAt, string $provenance, int $position, int $endPosition, CarbonImmutable $startedAt): array
     {
-        BillingException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true) && $position > 0, 'invalid_value');
+        BillingException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true) && $position > 0 && $endPosition > $position, 'invalid_value');
         foreach (DB::getConnections() as $connection) {
             BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
         }
         $started = BillingValues::utcMicro($startedAt);
         for ($attempt = 0; $attempt < 3; $attempt++) {
             try {
-                return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance, $position, $started): array {
+                return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance, $position, $endPosition, $started): array {
                     if (DB::getDriverName() === 'mysql') {
                         $this->lockIdentity($invoice['id']);
                     }
                     $chain = $this->observations($invoice['id']);
                     $last = $chain === [] ? null : $chain[array_key_last($chain)];
                     BillingException::require(count($chain) < self::MAX_OBSERVATIONS, 'technical_bound');
-                    BillingException::require($last === null || $last['retrieval_position'] < $position, 'superseded_retrieval');
+                    if ($last !== null && $last['retrieval_end_position'] >= $position) {
+                        throw new BillingException($endPosition < $last['retrieval_position'] ? 'superseded_retrieval' : 'concurrent_retrieval');
+                    }
                     $now = CarbonImmutable::now('UTC')->timestamp;
                     $createdAt = BillingValues::utc($now);
                     BillingException::require($last === null || $last['created_at'] <= $createdAt, 'clock');
@@ -166,7 +186,7 @@ final class BillingLedger
                         'line_period_start' => $verdict->facts['line_period_start'] ?? null, 'line_period_end' => $verdict->facts['line_period_end'] ?? null,
                         'amount_minor' => $verdict->outcome === 'settled' ? $verdict->facts['amount_minor'] : null,
                         'currency' => $verdict->outcome === 'settled' ? $verdict->facts['currency'] : null,
-                        'retrieved_at' => BillingValues::utc($retrievedAt), 'retrieval_started_at' => $started, 'retrieval_position' => $position, 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
+                        'retrieved_at' => BillingValues::utc($retrievedAt), 'retrieval_started_at' => $started, 'retrieval_position' => $position, 'retrieval_end_position' => $endPosition, 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
                         'api_version' => BillingProviderPin::API_VERSION, 'sdk_reference' => BillingProviderPin::SDK_REFERENCE,
                         'prior_seal' => $last['seal'] ?? self::ZERO,
                         'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_observation',
@@ -216,6 +236,16 @@ final class BillingLedger
         return $latest !== null && $latest['outcome'] === 'settled' && BillingValues::utc($now) < $latest['freshness_deadline'] ? $latest : null;
     }
 
+    /** One `retrieval` position committed in its own short transaction; no transaction may be open (no provider I/O inside one). */
+    private function committedRetrievalPosition(): int
+    {
+        foreach (DB::getConnections() as $connection) {
+            BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
+        }
+
+        return DB::transaction(fn (): int => $this->position('retrieval'));
+    }
+
     /** Serializes appends to one invoice's chain. Held only for the append transaction. */
     private function lockIdentity(string $invoiceId): void
     {
@@ -252,7 +282,7 @@ final class BillingLedger
         $statement->execute($bindings);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         foreach ($rows as &$row) {
-            foreach (['sequence', 'amount_minor', 'account_id', 'user_id', 'identity_origin_id', 'retrieval_position'] as $integer) {
+            foreach (['sequence', 'amount_minor', 'account_id', 'user_id', 'identity_origin_id', 'retrieval_position', 'retrieval_end_position'] as $integer) {
                 if (isset($row[$integer]) && is_string($row[$integer])) {
                     $row[$integer] = (int) $row[$integer];
                 }

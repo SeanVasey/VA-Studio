@@ -44,8 +44,8 @@ class BillingSchemaPreparationTest extends TestCase
         $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown'));
         $this->insert(BillingSchema::TABLES[3], $this->event());
         $pdo = DB::connection()->getPdo();
-        // One row each, and two positions: the observation's retrieval and the event's hint.
-        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 2]) as $table => $count) {
+        // One row each, and three positions: the observation's retrieval start and end and the event's hint.
+        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 3]) as $table => $count) {
             $this->assertSame($count, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
             $this->pdoRefuses(fn () => $pdo->exec('UPDATE '.$table.' SET created_at = created_at'));
             $this->pdoRefuses(fn () => $pdo->exec('DELETE FROM '.$table));
@@ -55,9 +55,10 @@ class BillingSchemaPreparationTest extends TestCase
     }
 
     /**
-     * Review R-6 and Codex P1 on PR #54 (review L2-3): the guard trigger refuses an observation whose retrieval position is below the
-     * tail's, below the application. Positions are unique, so a reused one is refused too, and `retrieval_started_at` (a worker clock)
-     * orders nothing: an earlier clock reading with a later position is admitted.
+     * Review R-6 and Codex P1 on PR #54 (review L2-3, then `BillingReconciliation.php:42`): the guard trigger refuses an observation
+     * whose retrieval began (start position) before the tail's read ended (end position), below the application. Positions are
+     * unique, so a reused one is refused too, and `retrieval_started_at` (a worker clock) orders nothing: an earlier clock reading
+     * with a later position is admitted.
      */
     public function test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing(): void
     {
@@ -101,6 +102,46 @@ class BillingSchemaPreparationTest extends TestCase
         $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[3], [...$this->event($second), 'provider_event_ref_hash' => hash('sha256', 'another synthetic event')]));
         $this->assertSame([1, 1], [(int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn(),
             (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_events')->fetchColumn()]);
+    }
+
+    /**
+     * Codex P1 on PR #54 (`BillingReconciliation.php:42`): each observation is bracketed by a start and an end retrieval position.
+     * The guard requires the end to exist with kind `retrieval`, to be above the start and unused as any observation's start or end,
+     * and admits an observation only when its start is above the tail's END, so a read that overlapped the tail's read is refused.
+     */
+    public function test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended(): void
+    {
+        F::configure();
+        $binding = F::binding();
+        $invoice = $this->invoice($binding);
+        $other = $this->invoice($binding);
+        $zero = str_repeat('0', 64);
+        $spare = $this->position('retrieval');
+        $start = $this->position('retrieval');
+        $mid = $this->position('retrieval');
+        $hint = $this->position('hint');
+        $end = $this->position('retrieval');
+        $row = fn (array $for, int $sequence, string $prior, int $from, mixed $to): array => [...$this->observation($for, $sequence, $prior, 'unknown', $from, 1), 'retrieval_end_position' => $to];
+
+        $missing = $row($invoice, 1, $zero, $start, $end);
+        unset($missing['retrieval_end_position']);
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $missing));
+        foreach ([null, 0, -1, $start, $spare, $hint, $end + 1000] as $invalid) {
+            // Missing, non-positive, equal to the start, below the start, a hint position, or never issued.
+            $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $row($invoice, 1, $zero, $start, $invalid)));
+        }
+        $first = $row($invoice, 1, $zero, $start, $end);
+        $this->insert(BillingSchema::TABLES[2], $first);
+
+        // Neither position may back another observation, as its start or as its end, on any invoice.
+        foreach ([[$spare, $end], [$start, $this->position('retrieval')], [$end, $this->position('retrieval')], [$spare, $start]] as [$from, $to]) {
+            $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $row($other, 1, $zero, $from, $to)));
+        }
+        // A read that began before the tail's read ended (mid < end) is refused; one that began after it is admitted.
+        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[2], $row($invoice, 2, $first['seal'], $mid, $this->position('retrieval'))));
+        $after = $this->position('retrieval');
+        $this->insert(BillingSchema::TABLES[2], $row($invoice, 2, $first['seal'], $after, $this->position('retrieval')));
+        $this->assertSame(2, (int) DB::connection()->getPdo()->query('SELECT COUNT(*) FROM production_membership_billing_observations')->fetchColumn());
     }
 
     public function test_the_retrieval_start_must_be_a_microsecond_timestamp(): void
@@ -219,14 +260,16 @@ class BillingSchemaPreparationTest extends TestCase
         return $row;
     }
 
-    private function observation(array $invoice, int $sequence, string $prior, string $outcome, ?int $position = null): array
+    private function observation(array $invoice, int $sequence, string $prior, string $outcome, ?int $position = null, ?int $end = null): array
     {
         $id = (string) Str::uuid();
         $position ??= $this->position('retrieval');
+        // The end position is allocated after the start, as BillingLedger::endRetrieval() allocates it after the provider reads.
+        $end ??= $this->position('retrieval');
 
         return ['id' => $id, 'invoice_id' => $invoice['id'], 'sequence' => $sequence, 'outcome' => $outcome, 'facts_hash' => hash('sha256', 'facts'.$id),
             'line_period_start' => null, 'line_period_end' => null, 'amount_minor' => null, 'currency' => null,
-            'retrieved_at' => '2026-10-07 00:00:01', 'retrieval_started_at' => '2026-10-07 00:00:00.500000', 'retrieval_position' => $position, 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
+            'retrieved_at' => '2026-10-07 00:00:01', 'retrieval_started_at' => '2026-10-07 00:00:00.500000', 'retrieval_position' => $position, 'retrieval_end_position' => $end, 'freshness_deadline' => '2026-10-07 00:10:01', 'api_version' => '2026-08-26.dahlia',
             'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525', 'prior_seal' => $prior, 'payload_ciphertext' => 'synthetic placeholder',
             'seal' => hash('sha256', 'seal'.$id), 'created_at' => '2026-10-07 00:00:02'];
     }

@@ -35,10 +35,10 @@ final class BillingReconciliation
         $binding = $this->ledger->binding($bindingId, $configuration);
         // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
         $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
-        // The retrieval's database-issued position, committed before the first provider read. The append orders overlapping
-        // retrievals of one invoice by it, and a webhook hint is covered only by a retrieval whose position is above the hint's; the
-        // append time says neither, and no application clock is compared (Codex P1 on PR #54, review L2-3). The worker clock at the
-        // start is recorded as information only.
+        // The retrieval's database-issued start position, committed before the first provider read. A webhook hint is covered only by
+        // a retrieval whose start is above the hint's position; the append time says nothing, and no application clock is compared
+        // (Codex P1 on PR #54, review L2-3). The start alone does not order the reads (a retrieval can stall after taking it), so the
+        // reads are bracketed by an end position too, below. The worker clock at the start is recorded as information only.
         $position = $this->ledger->startRetrieval();
         $startedAt = CarbonImmutable::now('UTC');
         $attemptedAt = $startedAt->timestamp;
@@ -58,6 +58,10 @@ final class BillingReconciliation
             }
             $retrievedAt = $attemptedAt;
         }
+        // The end position, committed after the last provider read (or the provider failure that ended the reads) and before anything
+        // is appended. The append admits this observation only if its start is above the tail's end: its reads began after the tail's
+        // reads ended. An overlapping read is refused as `concurrent_retrieval` and retried (Codex P1 on PR #54, :42).
+        $end = $this->ledger->endRetrieval($position);
         // Configuration withdrawn during provider I/O records nothing.
         $policy->proveConfiguration($configuration);
         // The invoice-identity row is immutable and its unique hash can never move to another binding, so it is claimed only
@@ -80,7 +84,7 @@ final class BillingReconciliation
             $invoice = $this->ledger->invoice($binding, $invoiceRef);
         }
 
-        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $position, $startedAt);
+        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $position, $end, $startedAt);
     }
 
     /**
