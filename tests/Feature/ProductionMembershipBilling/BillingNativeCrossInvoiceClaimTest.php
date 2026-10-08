@@ -51,7 +51,9 @@ class BillingNativeCrossInvoiceClaimTest extends TestCase
         $this->assertSame('claimed 36', $result['claim'], 'Claiming an unrelated invoice must not wait for another invoice\'s lock. '.$summary);
         $this->assertSame('saved sequence 1', $result['retrieve'], 'A first retrieval of an unrelated invoice must not wait either. '.$summary);
         $this->assertTrue($doneWhileLocked, 'Both finished while invoice A was still locked. '.$summary);
-        $this->assertLessThan(self::LOCK_WAIT_TIMEOUT, $result['claim_seconds'], $summary);
+        // No wall-clock bound (review P1B-2): under innodb_lock_wait_timeout a claim that waited for invoice A's lock is
+        // refused (`invoice_identity`), so the successful outcomes above already prove it never waited. Elapsed time also
+        // includes ownership checks and varies with load.
         $this->assertSame(0, $result['transaction_level']);
 
         $this->assertSame(3, DB::table('production_membership_billing_invoices')->count());
