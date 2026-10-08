@@ -729,6 +729,10 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
       "test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeCrossInvoiceClaimTest",
+      "test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock"
     ]
   ]
 }

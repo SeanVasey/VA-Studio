@@ -263,7 +263,11 @@ final class BillingSchema
                 .' AND EXISTS (SELECT 1 FROM '.$plans.' WHERE id = NEW.plan_version_id AND provenance = NEW.provenance)'
                 .' AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)';
         } elseif ($logical === self::TABLES[1]) {
-            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE invoice_ref_hash = NEW.invoice_ref_hash OR source_invoice_hash = NEW.source_invoice_hash)'
+            // One point lookup per unique index (Codex P2 on PR #54, `BillingLedger.php:173`). A trigger subquery inside an INSERT is
+            // a locking read on MySQL; a single `invoice_ref_hash = ? OR source_invoice_hash = ?` predicate read across the rows,
+            // including an identity row another invoice's append holds FOR UPDATE, so an unrelated first claim waited for that lock.
+            $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE invoice_ref_hash = NEW.invoice_ref_hash)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE source_invoice_hash = NEW.source_invoice_hash)'
                 .' AND EXISTS (SELECT 1 FROM '.$subscriptions.' WHERE id = NEW.subscription_binding_id AND provider_account_hash = NEW.provider_account_hash AND mode = NEW.mode)';
         } elseif ($logical === self::TABLES[2]) {
             // A retrieval is bracketed by two database-issued positions: its start, committed before the first provider read, and
@@ -273,8 +277,12 @@ final class BillingSchema
                 .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.retrieval_position AND kind = 'retrieval')"
                 .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.retrieval_end_position AND kind = 'retrieval')"
                 .' AND NEW.retrieval_end_position > NEW.retrieval_position'
-                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_position IN (NEW.retrieval_position, NEW.retrieval_end_position))'
-                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_end_position IN (NEW.retrieval_position, NEW.retrieval_end_position))'
+                // One equality per unique index and value, never an IN list or OR: each is a point lookup, so the guard's locking reads
+                // stay on the keys it checks (Codex P2 on PR #54, `BillingLedger.php:173`).
+                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_position = NEW.retrieval_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_position = NEW.retrieval_end_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_end_position = NEW.retrieval_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE retrieval_end_position = NEW.retrieval_end_position)'
                 .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE invoice_id = NEW.invoice_id AND sequence = NEW.sequence)'
                 .' AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM '.$observations.' WHERE invoice_id = NEW.invoice_id), 0) + 1'
                 ." AND ((NEW.sequence = 1 AND NEW.prior_seal = '".str_repeat('0', 64)."')"
