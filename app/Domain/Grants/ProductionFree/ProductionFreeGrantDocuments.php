@@ -57,7 +57,7 @@ final class ProductionFreeGrantDocuments
                 $policy = (new ProductionFreeGrantPolicy)->current();
                 $rows = new ProductionFreeGrantRows;
                 $current = $this->graph($originId, $rows);
-                ProductionFreeGrantException::require(CanonicalJson::encode($current) === CanonicalJson::encode($claim), 'claim_superseded');
+                ProductionFreeGrantException::require(CanonicalJson::encode(self::renderState($current)) === CanonicalJson::encode(self::renderState($claim)), 'claim_superseded');
                 $now = ProductionFreeGrantInput::now();
                 ProductionFreeGrantException::require($now->lessThan(ProductionFreeGrantInput::parse($work['lease_expires_at'])), 'lease_expired');
                 $id = (string) Str::uuid();
@@ -114,6 +114,18 @@ final class ProductionFreeGrantDocuments
         ProductionFreeGrantException::require($origin !== [], 'not_found');
 
         return (new ProductionFreeGrants)->originGraph($originId, (int) $origin['account_id'], $rows);
+    }
+
+    /**
+     * The part of an origin graph a render depends on: the origin and its sealed payload, the work chain (so a
+     * superseding claim is detected), the original and any revocation. The definition's review and availability chain
+     * are excluded: availability only gates new assent, so a staff close or reopen while an accepted origin renders
+     * must not reject the render and burn an attempt. `graph()` still validates the whole definition on both reads,
+     * so tampering anywhere is still refused.
+     */
+    private static function renderState(array $graph): array
+    {
+        return array_intersect_key($graph, array_flip(['origin', 'payload', 'work', 'original', 'manifest', 'revocation']));
     }
 
     private function work(ProductionFreeGrantRows $rows, array $graph, int $ordinal, string $kind, string $claimId, CarbonImmutable $lease, CarbonImmutable $at): void
