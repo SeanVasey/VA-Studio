@@ -142,3 +142,13 @@ Stripe account id and mode for this flow. Whether Stripe Tax is enabled, with re
 ## Private instance cleanup
 
 On 2026-10-08 the Tax255 `mysqld` (pid 14577, port 3455, socket `/tmp/claude-0/t255.sock`) was no longer running: `kill -0` reported no such process and nothing was listening on 3455. Its datadir `scratchpad/mysql-tax255/` (232 MB, schema `vaseyaudio_tax255`) and the stale socket were deleted. Two other `mysqld` processes on that host (`trigscan-fix-mysql`, port 3541, and `review-member-mysql`, port 3531) belong to other lanes and were left untouched. No database, dump or credential from these runs is committed. `ci-only-password` is a throwaway local root password for a loopback-only instance that has now been destroyed.
+
+## Integration onto current `main`
+
+`21c2d046` merges `origin/main` at `fad3ab44` (PRs #46 and #48 included) into the branch with
+no conflicts. `tests/Feature/ProductionTaxCheckout` on SQLite afterwards: 118 tests / 948
+assertions, 0 failures, 0 errors, 3 skipped (native-only), exit 0
+(`evidence/owned-sqlite-after-main-merge.*`). The nine frozen V1 files keep their SHA-256 on
+`fad3ab44`; the A1b `CheckoutCommitAdmission` interface and the now-public
+`MachinePolicyV1::origin()` are the only changes to V1 helpers Tax255 calls, and Tax255
+registers no observer.
