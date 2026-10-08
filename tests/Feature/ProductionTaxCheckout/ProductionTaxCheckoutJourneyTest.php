@@ -95,6 +95,37 @@ class ProductionTaxCheckoutJourneyTest extends TestCase
         $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['request'], 1);
     }
 
+    public function test_service_without_any_transport_retains_the_automatic_tax_request_and_fails_closed(): void
+    {
+        $f = $this->taxOrder();
+        $this->assertNull(config('production-tax-checkout.provider'));
+        // No transport object at all: the container default when the unregistered provider binds nothing.
+        $none = new ProductionTaxCheckout($f['access']);
+        foreach ([null, 'synthetic-tax-transport-v1'] as $provider) {
+            config(['production-tax-checkout.provider' => $provider]);
+            try {
+                $none->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+                $this->fail('A service without a transport must fail closed.');
+            } catch (CheckoutException $error) {
+                $this->assertSame(['provider_unbound', 503], [$error->reason, $error->status]);
+            }
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['request'], 1);
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['binding'], 0);
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 0);
+        $request = Evidence::open((array) DB::table(TaxCheckoutSchema::TABLES['request'])->sole(), 'production_tax_checkout_provider_request');
+        $this->assertSame(['enabled' => true], $request['params']['automatic_tax']);
+        $this->assertSame('exclusive', $request['params']['line_items'][0]['price_data']['tax_behavior']);
+        $this->assertArrayNotHasKey('tax', $request['params']['payment_intent_data']);
+        $this->assertSame([], $f['transport']->calls);
+        try {
+            $none->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('Reconcile without a provider binding must refuse.');
+        } catch (CheckoutException $error) {
+            $this->assertSame('session_required', $error->reason);
+        }
+    }
+
     public function test_bound_transport_retains_the_buyer_reviewed_provider_tax_exactly_once(): void
     {
         $f = $this->taxOrder();
