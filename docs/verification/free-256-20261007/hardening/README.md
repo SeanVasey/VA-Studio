@@ -189,3 +189,67 @@ Evidence under `codex-1/` to `codex-4/` (`red.txt`, `green.txt`), plus `codex-sq
 Judgement calls: the optional library page size exists so the cap can be exercised without 50 real origins; it is not
 a customer-facing input. Reservation accounting counts only not-yet-written bytes (released at completion) rather than
 holding the full size for the stream's lifetime, because the finished unlinked snapshot already reduces free space.
+
+## Bounded chain reads (Codex P2 5) and the reviewer addenda A2-1 and A1-6
+
+Evidence: `codex-5/` (`red.txt`, `green.txt`, `sqlite-directory.txt`, `database-receipts.txt`, `pint.txt`) and `review-a2/`
+(`a1-6-red.txt`, `a1-6-green.txt`, `a2-1-green.txt`). The directory run on SQLite is **129 tests, 925 assertions, 2 skipped
+(the same two native-only schema cases), rc=0**; `test-database-receipts.py` OK (34 tests); Pint passes on the changed and
+new files only. No new test skips on SQLite, so the census is unchanged. Migration `2026_10_07_256000` has never been
+applied anywhere, so the CHECK bounds below were changed in place and no migration was added. No MySQL was run; the
+native check of everything below is pending the independent reviewer.
+
+### Audit of every bounded read
+
+Root cause: a read capped at N rows but ordered by UUID `id` (the reader's fixed order), against a schema bound that did
+not equal N. Every `rows->all`/`one` call in the namespace was checked:
+
+| Read | Before | Decision |
+| --- | --- | --- |
+| Availability events (`Definitions::graph`) | window 1,000, CHECK `0..9999` | **(b) cap writes at the bound.** CHECK is now `0..999` (`ProductionFreeGrantSchema::MAX_AVAILABILITY_EVENTS = 1000`); the read is complete; the 1,001st command is refused `availability_exhausted` before the insert. Reading 10,000 sealed rows (decrypt and HMAC each) on every staff command is not worth it for a toggle that has no legitimate reason to flip a thousand times. A definition at the bound is always `closed` (ordinal 999 is odd), so it is never stuck open. |
+| Work rows (`originGraph`) | window 64, CHECK `0..63` (fixed in round 4) | **(a) read the full chain.** 64 rows is the schema's maximum, so it is complete. Bound is now the shared constant `MAX_WORK_ROWS`. |
+| Library origins | fixed in round 4 | SQL `ORDER BY created_at DESC, id DESC LIMIT n`, then fetch by id. |
+| Reviews, originals, revocations, authorizations (by id), origins (by id or request-key hash) | `one()` (limit 2) | Unique by constraint, one row; two rows read as `tampered`. No change. |
+| Authorizations and redemptions | `count()` only (rate limit, one-use check) | Counted in SQL, never windowed. No change. |
+
+New `ProductionFreeGrantRows::chain($logical, $where, $bindings, $max)` is used for both ordinal chains. It reads `max + 1`
+rows through the same id-ordered reader (so MySQL locking and committed-read behavior of `CurrentRows` are unchanged), sorts by
+ordinal, and treats a row beyond the schema bound as `tampered` instead of silently dropping it. Because the read is
+complete by construction, SQL ordering is immaterial; a schema bound and a read bound can no longer drift because both
+use the same constants. `expectedOrdinal` input is now capped at the same bound.
+
+Regression `ProductionFreeGrantAvailabilityBoundTest` (red: 1 failure, the command at ordinal 1000 committed then
+reloaded as `tampered`; green: OK 1 test, 13 assertions): 997 events are appended through the same sealed insert the
+command uses, then the events at ordinals 998 (open) and 999 (closed) are accepted and projected correctly, the next
+open is refused `availability_exhausted` with the table unchanged, and `read` still reports the closed state at ordinal
+999. A beyond-bound row cannot be forged on SQLite because the CHECK refuses it, so the `chain()` overflow branch is
+covered by that constraint rather than a separate test.
+
+### A2-1: library window test on both drivers
+
+`ProductionFreeGrantLibraryWindowTest` now has a driver-neutral test that runs everywhere (three real origins ten seconds
+apart whose UUIDs sort opposite to their age, forced with `Str::createUuidsUsing`, page size 2, plus the default page) and the
+1,001-filler case, which needs the append-only guards removed and restored through `sqlite_master`. I could not write a
+MySQL form I can run here (it would need `SHOW CREATE TRIGGER` round trips I cannot verify), and a MySQL skip would break
+the zero-skip MySQL shards, so the filler test is not skipped: on a non-SQLite driver it asserts the driver and returns, and
+the neutral test carries the regression. No `sqlite_master` read happens off SQLite. Green on SQLite: 2 tests, 15 assertions
+(`review-a2/a2-1-green.txt`). A red for the original MySQL error cannot be produced here. **The native MySQL run is
+pending the reviewer.** The SQLite census is unchanged because nothing skips.
+
+### A1-6: contention on native races
+
+Choice: map, do not retry. New `ProductionFreeGrantTransactions::run()` replaces every `DB::transaction` in the Free256
+commands (staff, customer, render, recover, failure append). SQLSTATE `40001`, MySQL 1213 and 1205 (also Laravel's
+`DeadlockException`, anywhere in the exception chain) roll the transaction back and refuse with `contention`. `Rows::insert`
+also stops labelling a deadlocked insert `refused_by_guard`. Retrying inside was rejected: the closures carry external
+effects (leased render claims, staged files, the one-use redemption row), and the customer commands are idempotent by
+request key, so the caller retrying the same command is observable and safe; a bounded in-library retry would re-run those
+closures invisibly.
+
+Regression `ProductionFreeGrantContentionTest` (red: 6 raw `PDOException` errors and 1 classification failure, rc=2;
+green: OK 7 tests, 44 assertions): the driver exception is thrown from inside the transaction, after the command has
+written its definition or origin row (the hook is the policy re-proof every command runs last). For 1213, 1205 and a bare
+`40001`, staff `propose` and customer `accept` refuse `contention`, the hook fires exactly once (no retry), no rows
+remain, and the same request key then succeeds exactly once. A classification test accepts deadlock and lock-wait
+errors, including wrapped in `QueryException` or `DeadlockException`, and rejects duplicate-key, access-denied and plain
+exceptions.
