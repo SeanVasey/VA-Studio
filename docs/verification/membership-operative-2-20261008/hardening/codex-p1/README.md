@@ -146,3 +146,10 @@ after 16:05 UTC).
   method set, which runs in Foundation CI.
 
 Not tested: the full 161-test directory on MySQL, Foundation CI, a real provider.
+
+## After merging main `72045620` (identity key rotation)
+
+`0225c504` merges `origin/main` into the branch. `scripts/ci/database-sqlite-skips.json` is the union of main and this
+lane's additions (180 methods); `python3 -I scripts/ci/test-database-receipts.py` passes. SQLite on the merged tree
+(`merged-0225c504/`): `ProductionMembershipBilling` 161 tests, 782 assertions, 2 skipped (native-only); `ProductionMembership`
+44 tests, 130 assertions, 3 skipped; `ProductionMemberOriginals` 24 tests, 63 assertions, 1 skipped; all rc 0.
