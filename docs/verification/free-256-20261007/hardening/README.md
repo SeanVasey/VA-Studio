@@ -385,3 +385,64 @@ untouched (`ProductionFreeGrantDocuments` is not in the render profile).
 
 Spool and stalled-source classes 9 tests / 64 assertions; directory SQLite 145 / 1056, 2 native-only skips; Pint
 passed.
+
+## A4-1 render preflight (`codex-11/`) and A4-4 transfer deadline (`codex-12/`)
+
+Directory SQLite: **153 tests, 1103 assertions, 2 native-only skips, rc=0** (`codex-12/sqlite-directory.txt`); census
+self-test OK; Pint passed on the changed and new files only. No MySQL was run. No hash-pinned renderer file was edited
+(the frozen-bytes and manifest tests pass; the render profile hash is unchanged).
+
+### A4-1: a definition that cannot render is refused before it is written
+
+| Test file | Red | Green |
+| --- | --- | --- |
+| `ProductionFreeGrantPreflightTest` | 3 failures (a 32,768-line terms text was accepted, the renderer was never run, open did not re-check) | OK 3 tests, 16 assertions |
+
+Choice: **preflight with the real renderer, not a line bound.** Terms of 32,767 newlines fit the 65,536-byte allowance but
+exceed the pinned 100-page limit (the renderer fails `render_failed` after about 1.2 s; 6,000 short lines still make 85
+pages). The page count depends on the pinned renderer's geometry and fonts, so any line or length bound I wrote would be a
+guess that could drift from it; running the same renderer path `render()` uses (`ProductionFreeGrantRendererProcess` resolved from
+the container) is exact, and one isolated render (about 2 to 3 s) per propose or open is acceptable for a staff action.
+`ProductionFreeGrantRenderable::preflight()` renders the definition's real title, terms, assent text and assets with the longest
+declared name (120 `W`) and the definition's own profile, and refuses `unrenderable_definition` on any failure, including an
+unavailable renderer. A cheap guard avoids the render for ordinary text: when the estimated rendered lines (newlines plus
+one per 60 bytes) are below 1,500, which is a third of what fits in the page limit at about 70 lines a page, the render
+is skipped; the test shows ordinary terms cost no render.
+
+- **Propose:** input and text checks first, then staff authority and policy (so an unauthorized caller costs no render), then
+  the preflight outside any transaction, then the write. A refused definition leaves no row.
+- **Open:** the sealed definition is read in a staff transaction, the runtime profile is required to be current, the preflight
+  runs outside the transaction, and only then does the availability command run. Approve does not render again.
+- **Cost and precedence note:** `propose` and `open` now take one extra short staff transaction each. Refusals keep their order
+  (disabled, environment, capability, staff and MFA come before the render).
+- **Not covered:** a 120-character name of the widest glyphs is the worst case I render; a definition within a page or two of
+  the 100-page limit is still refused only if it fails that worst-case render, which is the intended meaning.
+
+### A4-4: valid-to-start is separate from the transfer deadline
+
+| Test file | Red | Green |
+| --- | --- | --- |
+| `ProductionFreeGrantTransferDeadlineTest` | 2 errors and 2 failures (stream cut at the 300 s authorization TTL; no cap; no policy keys) | OK 5 tests, 31 assertions |
+
+The red state already carried the clock seam (`Downloads` and `Transfer` accept an injectable monotonic clock), which changes no behavior.
+New policy keys in `config/production-free-grants.php`, all validated by `ProductionFreeGrantPolicy` (so the existing
+`changed_policy` re-proof covers them):
+
+| Key | Default | Allowed |
+| --- | --- | --- |
+| `snapshot_seconds` | 300 | 30 to 1800 |
+| `transfer_min_bytes_per_second` | 262144 (256 KiB/s) | 16384 to 1 GiB/s |
+| `transfer_base_seconds` | 30 | 0 to 600 |
+| `transfer_max_seconds` | 7200 (2 h) | 60 to 14400 |
+
+- **Valid to start:** both entitlement inspections compare the authorization TTL with the moment the redeem request began, so a request
+  that started in time is not turned away by a slow snapshot; redeeming after the TTL is still `expired` and records nothing.
+- **Snapshot:** has its own deadline of `snapshot_seconds` from the start of the copy (real monotonic time; the spool is unchanged).
+- **Client stream:** the transfer deadline is `min(transfer_max_seconds, transfer_base_seconds + ceil(bytes / rate))` from the commit
+  of the one-use redemption row. A 1 GiB asset gets 4,126 s at the defaults (it needed about 29 Mbit/s before). `Transfer::writeTo`
+  still checks the deadline before every chunk.
+- **Tests:** an 8 MiB synthetic master at the minimum rate (542 s derived) streams past the 300 s authorization and completes; a stream
+  that overruns the derived deadline is refused mid-stream after exactly two chunks; the configured maximum caps it; redeeming after
+  the TTL is refused; the shipped defaults and the policy bounds are asserted. Time is a fake clock offset on `hrtime`, so no test sleeps.
+- **Not added:** range and resume delivery. A client slower than the configured minimum rate, or an interrupted download, needs a
+  new authorization; range support is a future option for the delivery mount.
