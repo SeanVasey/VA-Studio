@@ -1,0 +1,16 @@
+# source: 2c3f8cb8 + working tree; the eight existing paid frontend files plus the new one
+# command: npx vitest run tests/frontend/paid-grant-*.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+
+ Test Files  9 passed (9)
+      Tests  51 passed (51)
+   Start at  19:43:19
+   Duration  6.18s (tests 57%, environment 33%, transform 4%, setup 4%, import 1%)
+
+Environment  jsdom was created 9 times · 5.18s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=0

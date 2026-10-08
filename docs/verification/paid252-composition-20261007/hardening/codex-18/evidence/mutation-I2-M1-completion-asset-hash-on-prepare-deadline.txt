@@ -1,0 +1,51 @@
+# source: 2c3f8cb8 + codex-18 final working tree (product + tests) + mutation I2-M1-completion-asset-hash-on-prepare-deadline (scratch worktree)
+I2-M1-completion-asset-hash-on-prepare-deadline applied
++            $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+-                $deadline->proveCurrent();
++                $budget->proveCurrent();
+-                $deadline->proveCurrent();
+-                (new PaidGrantAssets)->verify($claim['body']['assets'], $deadline->value());
++                $budget->proveCurrent();
++                (new PaidGrantAssets)->verify($claim['body']['assets'], $budget->value());
+-                }, $deadline);
++                }, $budget);
+-                    }, $deadline);
++                    }, $budget);
+-        foreach ($bundle['lines'] as $line) {
++        foreach ($bundle['complete'] === null ? $bundle['lines'] : [] as $line) {
+-            (new PaidGrantAssets)->verify($line['body']['assets'], $lineBudget->value());
++            (new PaidGrantAssets)->verify($line['body']['assets'], $deadline->value());
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/phpunit.xml
+
+E.E........                                                       11 / 11 (100%)
+
+Time: 01:27.668, Memory: 210.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_two_line_order_whose_verification_outlasts_one_lease_is_fulfilled_and_still_downloads
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Support/PaidGrantClockedAssetFiles.php:39
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantAssets.php:145
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:134
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:113
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Feature/PaidGrantCompletionBudgetTest.php:118
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_retry_after_a_slow_completion_fulfils_without_restarting_from_an_expired_budget
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Support/PaidGrantClockedAssetFiles.php:39
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantAssets.php:145
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:134
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:113
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Feature/PaidGrantCompletionBudgetTest.php:179
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 11, Assertions: 251, Errors: 2.
+rc=2

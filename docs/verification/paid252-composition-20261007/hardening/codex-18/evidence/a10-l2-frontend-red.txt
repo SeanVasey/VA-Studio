@@ -1,0 +1,491 @@
+# source: 2c3f8cb8 + new tests/frontend/paid-grant-finish-completion.test.tsx; resources/js unmodified; node v24.21.0, node_modules symlinked from /home/user/VA-Studio
+# command: npx vitest run tests/frontend/paid-grant-finish-completion.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-finish-completion.test.tsx (3 tests | 2 failed) 339ms
+   ❯ finishing a prepared but unfulfilled paid order (3)
+     × offers to finish an order whose lines are all prepared, sends the same document request and shows the fulfilled order 214ms
+     × keeps the control after a lost answer, so the order stays recoverable 61ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-finish-completion.test.tsx > finishing a prepared but unfulfilled paid order > offers to finish an order whose lines are all prepared, sends the same document request and shows the fulfilled order
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Finish preparing this order"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Paid license journey":
+  <section
+    aria-busy="false"
+    aria-label="Paid license journey"
+  />
+
+  Name "Retained paid order":
+  <section
+    aria-label="Retained paid order"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="paid-license-reference"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  <button
+    type="button"
+  />
+
+  Name "Prepare licenses for this paid order":
+  <button
+    disabled=""
+    type="submit"
+  />
+
+  Name "Open saved order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb":
+  <button
+    type="button"
+  />
+
+  Name "Refresh preparation and download status":
+  <button
+    type="button"
+  />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  <input
+    autocomplete="off"
+    id="paid-order-reference"
+    maxlength="36"
+    value=""
+  />
+
+  --------------------------------------------------
+  article:
+
+  Name "":
+  <article
+    class="paid-license-line"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "Original synthetic recording":
+  <h2 />
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  <details />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-busy="false"
+      aria-label="Paid license journey"
+    >
+      <p>
+        Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+      </p>
+      <button
+        type="button"
+      >
+        Refresh paid licenses
+      </button>
+      <form>
+        <label
+          for="paid-order-reference"
+        >
+          Saved order reference
+        </label>
+        <input
+          autocomplete="off"
+          id="paid-order-reference"
+          maxlength="36"
+          value=""
+        />
+        <button
+          disabled=""
+          type="submit"
+        >
+          Prepare licenses for this paid order
+        </button>
+      </form>
+      <div
+        aria-label="Saved paid licenses"
+      >
+        <p>
+          Latest 
+          20
+           saved orders. An order reference can open an older original.
+        </p>
+        <button
+          type="button"
+        >
+          Open saved order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </button>
+      </div>
+      <section
+        aria-label="Retained paid order"
+      >
+        <p
+          class="paid-license-reference"
+        >
+          Order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </p>
+        <p>
+          Rehearsal original. No real payment or production legal facts are certified.
+        </p>
+        <p>
+          This order is waiting for complete preparation. No line can download yet.
+        </p>
+        <button
+          type="button"
+        >
+          Refresh preparation and download status
+        </button>
+        <article
+          class="paid-license-line"
+        >
+          <h2>
+            Original synthetic recording
+          </h2>
+          <p>
+            USD
+             
+            49.99
+             + tax 
+            0.00
+             from the original accepted order.
+          </p>
+          <p>
+            Declared name: 
+            Synthetic buyer
+          </p>
+          <p>
+            License accepted: 
+            2026-10-07T01:02:03Z
+          </p>
+          <p>
+            Original PDF: 
+            complete
+            ; preparation attempts 
+            1
+            /5.
+          </p>
+          <details>
+            <summary>
+              Explicit synthetic license
+               / retained version 
+              1
+            </summary>
+            <pre
+              class="paid-license-terms"
+            >
+              SYNTHETIC TERMS
+            </pre>
+          </details>
+        </article>
+      </section>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-finish-completion.test.tsx:33:28
+     31|     expect(screen.getByText(/waiting for complete preparation/)).toBeI…
+     32|     expect(screen.queryByRole('button', { name: prepare })).not.toBeIn…
+     33|     fireEvent.click(screen.getByRole('button', { name: finish }));
+       |                            ^
+     34|     await screen.findByRole('button', { name: 'Authorize master_wav fo…
+     35|     expect(fetcher).toHaveBeenCalledTimes(3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-finish-completion.test.tsx > finishing a prepared but unfulfilled paid order > keeps the control after a lost answer, so the order stays recoverable
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Finish preparing this order"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Paid license journey":
+  <section
+    aria-busy="false"
+    aria-label="Paid license journey"
+  />
+
+  Name "Retained paid order":
+  <section
+    aria-label="Retained paid order"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="paid-license-reference"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  <button
+    type="button"
+  />
+
+  Name "Prepare licenses for this paid order":
+  <button
+    disabled=""
+    type="submit"
+  />
+
+  Name "Open saved order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb":
+  <button
+    type="button"
+  />
+
+  Name "Refresh preparation and download status":
+  <button
+    type="button"
+  />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  <input
+    autocomplete="off"
+    id="paid-order-reference"
+    maxlength="36"
+    value=""
+  />
+
+  --------------------------------------------------
+  article:
+
+  Name "":
+  <article
+    class="paid-license-line"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "Original synthetic recording":
+  <h2 />
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  <details />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-busy="false"
+      aria-label="Paid license journey"
+    >
+      <p>
+        Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+      </p>
+      <button
+        type="button"
+      >
+        Refresh paid licenses
+      </button>
+      <form>
+        <label
+          for="paid-order-reference"
+        >
+          Saved order reference
+        </label>
+        <input
+          autocomplete="off"
+          id="paid-order-reference"
+          maxlength="36"
+          value=""
+        />
+        <button
+          disabled=""
+          type="submit"
+        >
+          Prepare licenses for this paid order
+        </button>
+      </form>
+      <div
+        aria-label="Saved paid licenses"
+      >
+        <p>
+          Latest 
+          20
+           saved orders. An order reference can open an older original.
+        </p>
+        <button
+          type="button"
+        >
+          Open saved order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </button>
+      </div>
+      <section
+        aria-label="Retained paid order"
+      >
+        <p
+          class="paid-license-reference"
+        >
+          Order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </p>
+        <p>
+          Rehearsal original. No real payment or production legal facts are certified.
+        </p>
+        <p>
+          This order is waiting for complete preparation. No line can download yet.
+        </p>
+        <button
+          type="button"
+        >
+          Refresh preparation and download status
+        </button>
+        <article
+          class="paid-license-line"
+        >
+          <h2>
+            Original synthetic recording
+          </h2>
+          <p>
+            USD
+             
+            49.99
+             + tax 
+            0.00
+             from the original accepted order.
+          </p>
+          <p>
+            Declared name: 
+            Synthetic buyer
+          </p>
+          <p>
+            License accepted: 
+            2026-10-07T01:02:03Z
+          </p>
+          <p>
+            Original PDF: 
+            complete
+            ; preparation attempts 
+            1
+            /5.
+          </p>
+          <details>
+            <summary>
+              Explicit synthetic license
+               / retained version 
+              1
+            </summary>
+            <pre
+              class="paid-license-terms"
+            >
+              SYNTHETIC TERMS
+            </pre>
+          </details>
+        </article>
+      </section>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-finish-completion.test.tsx:48:28
+     46|     render(<PaidGrantJourney />);
+     47|     await openOrder();
+     48|     fireEvent.click(screen.getByRole('button', { name: finish }));
+       |                            ^
+     49|     expect(await screen.findByRole('alert')).toHaveTextContent('could …
+     50|     await waitFor(() => expect(screen.getByRole('button', { name: fini…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  19:43:06
+   Duration  1.10s (environment 46%, tests 34%, transform 13%, setup 7%, import 1%)
+
+rc=1
