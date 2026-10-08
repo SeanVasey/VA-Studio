@@ -239,21 +239,41 @@ class ProductionFreeGrantSpool
         }
     }
 
-    /** The slot's fixed 20-byte reservation sidecar, writable only while its slot lock is held. */
+    /**
+     * The slot's fixed 20-byte reservation sidecar, writable only while its slot lock is held. Called under both the
+     * slot lock and the admission lock, so no live holder is writing it. A sidecar is created under a fresh name and
+     * renamed into place, so a crash never leaves a partial file at the fixed path; a residual of the wrong size left
+     * by an older crash is reclaimed under the same rule as a residual snapshot (regular, single-link, owned by this
+     * process user) and recreated. Anything else keeps the slot unusable.
+     */
     private function reservation(string $path)
     {
         clearstatcache(true, $path);
-        if (@lstat($path) === false) {
+        $residual = @lstat($path);
+        if ($residual !== false && $residual['size'] !== 20) {
+            $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
+            if (($residual['mode'] & 0170000) !== 0100000 || $residual['nlink'] !== 1 || $residual['uid'] !== $owner || ! @unlink($path)) {
+                throw new \UnexpectedValueException;
+            }
+            $residual = false;
+        }
+        if ($residual === false) {
+            $temporary = $path.'.'.bin2hex(random_bytes(16)).'.tmp';
             $mask = umask(0077);
             try {
-                $created = @fopen($path, 'x+b');
+                $created = @fopen($temporary, 'x+b');
             } finally {
                 umask($mask);
             }
-            if (! is_resource($created) || @fwrite($created, str_repeat('0', 20)) !== 20) {
+            if (! is_resource($created)) {
                 throw new \UnexpectedValueException;
             }
+            $written = @fwrite($created, str_repeat('0', 20)) === 20 && @fflush($created);
             fclose($created);
+            if (! $written || ! @rename($temporary, $path)) {
+                @unlink($temporary);
+                throw new \UnexpectedValueException;
+            }
         }
         $handle = @fopen($path, 'r+b');
         if (! is_resource($handle)) {

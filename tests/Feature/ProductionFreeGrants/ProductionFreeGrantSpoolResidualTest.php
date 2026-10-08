@@ -92,6 +92,52 @@ final class ProductionFreeGrantSpoolResidualTest extends TestCase
         $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($this->redeem()));
     }
 
+    /**
+     * Codex P2 (round 8): a worker that dies while creating its 20-byte reservation sidecar leaves a short file at the
+     * fixed path. The next holder of the slot reclaims it under the same rule as a residual snapshot and recreates it;
+     * a sidecar that is not a regular single-link file owned by this process user still keeps the slot unusable.
+     */
+    public function test_partial_reservation_sidecars_left_by_a_crash_are_reclaimed(): void
+    {
+        foreach (['', '0000000'] as $index => $partial) {
+            $sidecar = $this->spool.'/slot-'.$index.'.reserve';
+            file_put_contents($sidecar, $partial);
+            chmod($sidecar, 0600);
+        }
+        config(['production-free-grants.spool_slots' => 2]);
+        $first = $this->redeem();
+        $second = $this->redeem();
+        foreach ([0, 1] as $slot) {
+            clearstatcache(true, $this->spool.'/slot-'.$slot.'.reserve');
+            $this->assertSame(20, filesize($this->spool.'/slot-'.$slot.'.reserve'));
+        }
+        $this->assertSame([], glob($this->spool.'/slot-*.reserve.*.tmp'));
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($first));
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($second));
+    }
+
+    public function test_a_reservation_sidecar_that_is_not_an_own_regular_file_is_never_reclaimed(): void
+    {
+        config(['production-free-grants.spool_slots' => 1]);
+        $outside = realpath(sys_get_temp_dir()).'/va-free256-sidecar-'.bin2hex(random_bytes(6));
+        file_put_contents($outside, 'outside');
+        $this->beforeApplicationDestroyed(function () use ($outside): void {
+            @unlink($outside);
+        });
+        $sidecar = $this->spool.'/slot-0.reserve';
+        symlink($outside, $sidecar);
+        try {
+            $this->redeem();
+            $this->fail('A symlinked sidecar must not be reclaimed');
+        } catch (ProductionFreeGrantException $error) {
+            $this->assertSame('artifact_unavailable', $error->reason);
+        }
+        $this->assertTrue(is_link($sidecar));
+        $this->assertSame('outside', file_get_contents($outside));
+        unlink($sidecar);
+        $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($this->redeem()));
+    }
+
     private function redeem(): ProductionFreeGrantTransfer
     {
         $downloads = new ProductionFreeGrantDownloads;
