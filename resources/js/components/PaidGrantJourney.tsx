@@ -176,7 +176,8 @@ export function PaidGrantJourney() {
   function retryDownload() { if (kept.current?.refused) submit(kept.current.auth); }
   function submit(a: Authorization) {
     const token = csrf(); if (!token || denied || busy) return; setIssued(list => list.filter(i => i.auth.id !== a.id)); const mark = { auth: a, refused: false }; kept.current = mark; setStatus(null);
-    if (frames.current.length === 3) frames.current.shift()?.remove();
+    // Frames are never evicted to make room: removing one that has not reported back would abort a download the server may
+    // still commit. They are removed on their own refusal, a denial, leaving the page and unmount.
     const frame = document.createElement('iframe'); frame.name = `paid-grant-${crypto.randomUUID()}`; frame.title = 'Paid license attachment response'; frame.hidden = true; frame.setAttribute('referrerpolicy', 'no-referrer');
     const mine = generation.current;
     frame.addEventListener('load', () => { if (!active.current || mine !== generation.current) return; try {
