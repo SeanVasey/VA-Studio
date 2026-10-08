@@ -27,8 +27,13 @@ final class ProductionFreeGrantRenderable
      */
     public const VERIFIED_REVISION = 'r1';
 
-    /** Estimated rendered lines (newlines plus one per 60 bytes) at which the preflight render is run. */
-    private const PREFLIGHT_THRESHOLD = 1500;
+    /**
+     * Characters (newlines included) at or below which the preflight render is skipped. Wrapping never places fewer than
+     * one character on a line, so this is a worst-case bound, not an estimate: 2,000 lines plus the fixed document lines
+     * stay near a third of the 100-page limit (about 70 lines a page). A bytes-per-line estimate is not a bound; long
+     * unbreakable tokens defeated it (A6-1, `review-evidence/addendum6/`).
+     */
+    private const PREFLIGHT_SKIP_CHARACTERS = 2000;
 
     /** @var array<string, array{cw:array<int,mixed>,ctgu:array<int,int>,table:string}> */
     private static array $fonts = [];
@@ -62,8 +67,8 @@ final class ProductionFreeGrantRenderable
     /**
      * Worst-case render of the definition with the real pinned renderer (the container's `ProductionFreeGrantRendererProcess`,
      * as `render()` uses) and the longest allowed declared name, so a definition whose terms exceed the renderer's page or
-     * output limits is refused before it can be approved and assented. Text far below those limits cannot reach them
-     * (about 70 lines fit a page, so the estimate below stays under a third of the 100-page limit) and skips the render.
+     * output limits is refused before it can be approved and assented. Only text too short to reach those limits even at
+     * one character per line skips the render.
      * Must run outside a database transaction, like the renderer itself.
      *
      * @param  array{title:string,terms_reference:string,terms_text:string,assent_text:string,assets:list<array>}  $definition
@@ -71,7 +76,7 @@ final class ProductionFreeGrantRenderable
     public static function preflight(array $definition, array $profile): void
     {
         $text = $definition['title']."\n".$definition['terms_reference']."\n".$definition['terms_text']."\n".$definition['assent_text'];
-        if (substr_count($text, "\n") + 1 + intdiv(strlen($text), 60) < self::PREFLIGHT_THRESHOLD) {
+        if (mb_strlen($text) <= self::PREFLIGHT_SKIP_CHARACTERS) {
             return;
         }
         $origin = ['provenance' => $profile['provenance'], 'origin_id' => '00000000-0000-4000-8000-000000000000', 'accepted_at' => '2000-01-01T00:00:00Z',

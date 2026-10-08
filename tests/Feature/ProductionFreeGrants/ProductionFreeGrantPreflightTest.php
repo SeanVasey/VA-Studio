@@ -14,7 +14,8 @@ use Tests\TestCase;
  * A4-1: terms of ~32,768 short lines fit the 65,536-byte allowance but exceed the pinned renderer's 100-page limit, so a
  * definition could be approved and assented but never render. Propose and open now run the real pinned renderer on a
  * worst-case preflight input (the longest declared name) and refuse `unrenderable_definition` before anything is written.
- * Terms too small to approach the limits skip the render.
+ * Only text short enough to fit even at one character per line (2,000 characters) skips the render; A6-1 showed a
+ * bytes-per-line estimate admitted long unbreakable tokens that the renderer then could never lay out.
  */
 final class ProductionFreeGrantPreflightTest extends TestCase
 {
@@ -78,6 +79,31 @@ final class ProductionFreeGrantPreflightTest extends TestCase
         $this->countRenders();
         $this->assertTrue($definitions->open($proposed['id'], $input, $reviewer)['open']);
         $this->assertSame(1, $this->renders);
+    }
+
+    public function test_long_unbreakable_tokens_under_the_old_estimate_are_rendered_and_refused_at_propose(): void
+    {
+        $definitions = new ProductionFreeGrantDefinitions;
+        $terms = implode(' ', array_fill(0, 300, str_repeat('@', 51)));
+        $this->assertLessThan(1500, substr_count($terms, "\n") + 1 + intdiv(strlen($terms), 60), 'The retired estimate skipped this text.');
+
+        $this->refuses(fn () => $definitions->propose($this->definitionInput(['termsText' => $terms]), $this->staff()));
+
+        $this->assertSame(0, DB::table('production_free_definitions')->count());
+        $this->assertSame(1, $this->renders);
+    }
+
+    public function test_the_skip_bound_counts_every_character_of_the_rendered_definition_text(): void
+    {
+        $definitions = new ProductionFreeGrantDefinitions;
+        $input = $this->definitionInput();
+        $fixed = mb_strlen($input['title']."\n".$input['termsReference']."\n\n".$input['assentText']);
+
+        $definitions->propose($this->definitionInput(['termsText' => str_repeat('é', 2000 - $fixed)]), $this->staff());
+        $this->assertSame(0, $this->renders, 'Exactly 2,000 characters cannot reach the page limit and skip the render.');
+
+        $definitions->propose($this->definitionInput(['termsText' => str_repeat('é', 2001 - $fixed)]), $this->staff());
+        $this->assertSame(1, $this->renders, 'One character more is rendered.');
     }
 
     private function countRenders(): void
