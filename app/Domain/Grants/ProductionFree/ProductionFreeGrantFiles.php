@@ -9,7 +9,8 @@ use Throwable;
 
 /**
  * Write-once private originals at `contracts/production-free-v1/{originUUID}/{claimUUID}/original.pdf`.
- * The `x` open mode is the inter-worker arbitration point; nothing here overwrites, replaces or deletes a file.
+ * `link()` of a fresh random name onto `original.pdf` is the inter-worker arbitration point; nothing here overwrites,
+ * replaces or deletes a published file (only the call's own random temporary name is removed).
  * The root is the validated private local delivery root (never public, served or linked).
  */
 final class ProductionFreeGrantFiles
@@ -27,7 +28,7 @@ final class ProductionFreeGrantFiles
     public function store(string $originId, string $claimId, RenderedContract $rendered): array
     {
         ContractIo::outsideTransactions();
-        $output = null;
+        $output = $temporary = $owned = null;
         try {
             $record = ['disk' => 'local', 'storage_path' => self::path($originId, $claimId), 'pdf_hash' => $rendered->sha256,
                 'size_bytes' => $rendered->sizeBytes, 'page_count' => $rendered->pageCount, 'profile_hash' => $rendered->profileHash];
@@ -40,16 +41,21 @@ final class ProductionFreeGrantFiles
                 $this->directory($directory, true);
             }
             $path = $directory.'/original.pdf';
+            // `fopen('x')` on `original.pdf` would follow a planted dangling symlink and create its target outside the
+            // private root. Write a fresh random name instead, then `link()` it into place: `link()` never follows
+            // a destination symlink and never replaces an existing entry, so it is the write-once arbiter.
+            $temporary = $directory.'/.original-'.bin2hex(random_bytes(16)).'.tmp';
             $mask = umask(0077);
             try {
-                $output = @fopen($path, 'x+b');
+                $output = @fopen($temporary, 'x+b');
             } finally {
                 umask($mask);
             }
             if (! is_resource($output)) {
                 throw new \UnexpectedValueException;
             }
-            $this->sameFile($path, fstat($output), $root, false);
+            $owned = fstat($output);
+            $this->sameFile($temporary, $owned, $root, false);
             $offset = 0;
             while ($offset < strlen($rendered->pdfBytes)) {
                 $written = @fwrite($output, substr($rendered->pdfBytes, $offset, 1048576));
@@ -66,10 +72,14 @@ final class ProductionFreeGrantFiles
                 throw new \UnexpectedValueException;
             }
             $this->validateBytes($bytes, $record);
-            if (! @chmod($path, 0400)) {
+            if (! @chmod($temporary, 0400)) {
                 throw new \UnexpectedValueException;
             }
-            $this->sameFile($path, fstat($output), $root, true);
+            $this->sameFile($temporary, fstat($output), $root, true);
+            if (! @link($temporary, $path) || ! @unlink($temporary)) {
+                throw new \UnexpectedValueException;
+            }
+            $temporary = null;
             fclose($output);
             $output = null;
             $this->verify($record);
@@ -79,6 +89,14 @@ final class ProductionFreeGrantFiles
             // A failed claim may leave an unreferenced claim path. It is never deleted or reused.
             throw new ProductionFreeGrantException('storage_failed');
         } finally {
+            if (is_string($temporary) && is_array($owned)) {
+                clearstatcache(true, $temporary);
+                $current = @lstat($temporary);
+                // Remove only the random name this call exclusively created, never an unexpected replacement.
+                if (is_array($current) && $current['dev'] === $owned['dev'] && $current['ino'] === $owned['ino'] && ($current['mode'] & 0170000) === 0100000) {
+                    @unlink($temporary);
+                }
+            }
             if (is_resource($output)) {
                 fclose($output);
             }

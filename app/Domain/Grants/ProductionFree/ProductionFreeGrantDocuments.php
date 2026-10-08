@@ -25,6 +25,8 @@ final class ProductionFreeGrantDocuments
             $graph = $this->graph($originId, $rows);
             if ($graph['original'] === []) {
                 ProductionFreeGrantException::require($graph['revocation'] === [], 'revoked');
+                // Refuse before claiming: a profile the runtime cannot render must not burn one of the 32 attempts.
+                ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
                 $last = $graph['work'] === [] ? null : $graph['work'][array_key_last($graph['work'])];
                 $now = ProductionFreeGrantInput::now();
                 ProductionFreeGrantException::require($last === null || $last['kind'] === 'failed'
@@ -91,6 +93,7 @@ final class ProductionFreeGrantDocuments
             $rows = new ProductionFreeGrantRows;
             $graph = $this->graph($originId, $rows);
             ProductionFreeGrantException::require($graph['original'] !== [], 'original_unavailable');
+            ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
             (new ProductionFreeGrantPolicy)->prove($policy);
 
             return $graph;

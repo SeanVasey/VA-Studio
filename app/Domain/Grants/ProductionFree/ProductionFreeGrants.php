@@ -7,7 +7,6 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use App\Support\CanonicalJson;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -48,8 +47,10 @@ final class ProductionFreeGrants
         $requestHash = CanonicalJson::hash(['definition_id' => $definitionId, ...$input]);
 
         return $this->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($definitionId, $input, $requestHash): array {
-            $keyHash = $this->requestKeyHash((int) $binding['account_id'], $input['requestKey']);
-            $existing = $rows->one('production_free_origins', 'request_key_hash = ?', [$keyHash]);
+            // Replays are found under the current key or any previous key; new rows always use the current key.
+            $hashes = $this->requestKeyHashes((int) $binding['account_id'], $input['requestKey']);
+            $keyHash = $hashes[0];
+            $existing = $rows->one('production_free_origins', 'request_key_hash IN ('.implode(', ', array_fill(0, count($hashes), '?')).')', $hashes);
             if ($existing !== []) {
                 ProductionFreeGrantException::require(hash_equals($existing['payload']['request_hash'], $requestHash), 'request_key_reused');
 
@@ -137,6 +138,7 @@ final class ProductionFreeGrants
             && CanonicalJson::encode($p['definition']) === CanonicalJson::encode($frozen) && CanonicalJson::encode($p['profile']) === CanonicalJson::encode($d['profile']) && $p['provenance'] === $origin['provenance']
             && $p['buyer_binding']['account_id'] === (int) $origin['account_id'] && $p['buyer_binding']['user_id'] === (int) $origin['user_id']
             && $p['buyer_binding']['origin_id'] === $origin['identity_origin_id']
+            && hash_equals(CanonicalJson::hash($p['profile']), $origin['profile_hash'])
             && hash_equals(CanonicalJson::hash($p['buyer_binding']), $origin['owner_binding_hash'])
             && hash_equals(CanonicalJson::hash($p['assent']), $origin['assent_hash']) && $p['assent']['affirmed'] === true
             && $p['assent']['display_hash'] === $p['display_hash'] && $p['assent']['declared_name'] === $p['declared_name']
@@ -245,17 +247,18 @@ final class ProductionFreeGrants
         $graph = (new ProductionFreeGrantDefinitions)->graph($definitionId, $rows);
         ProductionFreeGrantException::require($graph['review'] !== [] && $graph['open'], 'not_open');
         ProductionFreeGrantException::require($graph['payload']['provenance'] === $policy['provenance'], 'provenance');
+        // A new origin must be renderable, so its definition's profile has to be the one this runtime renders with.
+        ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
         (new ProductionFreeGrantPolicy)->requireApprovedTerms($policy, $graph['payload']['terms_hash']);
         (new ProductionFreeGrantDefinitions)->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
 
         return $graph;
     }
 
-    private function requestKeyHash(int $accountId, string $requestKey): string
+    /** @return non-empty-list<string> the current key's hash first, then one per previous key */
+    private function requestKeyHashes(int $accountId, string $requestKey): array
     {
-        $key = (string) Config::get('app.key');
-        ProductionFreeGrantException::require(strlen($key) >= 32, 'key_absent');
-
-        return hash_hmac('sha256', "production-free-request-v1\0".$accountId."\0".$requestKey, $key);
+        return array_map(fn (string $key): string => hash_hmac('sha256', "production-free-request-v1\0".$accountId."\0".$requestKey, $key),
+            ProductionFreeGrantRecords::keys());
     }
 }

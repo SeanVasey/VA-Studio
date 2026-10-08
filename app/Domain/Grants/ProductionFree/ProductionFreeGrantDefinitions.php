@@ -110,10 +110,13 @@ final class ProductionFreeGrantDefinitions
             && $payload['definition_id'] === $definitionId && $payload['proposed_at'] === ProductionFreeGrantInput::iso(ProductionFreeGrantInput::parse($definition['created_at']))
             && ProductionFreeGrantRecords::strings($actual) === ProductionFreeGrantRecords::strings($expected)
             && hash_equals(hash('sha256', $payload['terms_text']), $payload['terms_hash']), 'tampered');
+        // The stored profile is checked against the release registry, never against the current runtime, so a later
+        // renderer revision does not strand existing grants. Render, recover and new assent check the runtime.
         try {
-            ProductionFreeGrantRenderProfile::validate($payload['profile']);
+            ProductionFreeGrantRenderProfile::validateStored($payload['profile']);
+            ProductionFreeGrantException::require($payload['profile']['provenance'] === $payload['provenance'], 'profile_unregistered');
         } catch (Throwable) {
-            throw new ProductionFreeGrantException('profile_changed');
+            throw new ProductionFreeGrantException('profile_unregistered');
         }
         $review = $rows->one('production_free_reviews', 'definition_id = ?', [$definitionId]);
         if ($review !== []) {
@@ -199,6 +202,7 @@ final class ProductionFreeGrantDefinitions
             ProductionFreeGrantException::require(count($graph['events']) === $expected, 'stale_availability');
             ProductionFreeGrantException::require($kind === 'open' ? ! $graph['open'] : $graph['open'], 'stale_availability');
             if ($kind === 'open') {
+                ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
                 (new ProductionFreeGrantPolicy)->requireApprovedTerms($policy, $graph['payload']['terms_hash']);
                 $this->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
             }

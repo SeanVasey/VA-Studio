@@ -13,7 +13,8 @@ use Throwable;
 /**
  * Short-lived, one-use owner authorization per artifact and its redemption. Bytes are copied into an unlinked
  * private snapshot and hash-verified before the first byte can leave; the authorization deadline bounds the
- * copy and the stream. No HTTP route exists here: root mounts the delivery endpoint after review.
+ * copy and the stream. Snapshots are bounded by `ProductionFreeGrantSpool` (held slots, free-space reserve,
+ * read-only reopen and read-back hash). No HTTP route exists here: root mounts the delivery endpoint after review.
  */
 final class ProductionFreeGrantDownloads
 {
@@ -128,77 +129,68 @@ final class ProductionFreeGrantDownloads
         throw new ProductionFreeGrantException('not_entitled');
     }
 
-    /** Copy while hashing into an unlinked private file; refuse unless size and SHA-256 match exactly. */
+    /**
+     * Copy while hashing into a bounded, slot-leased, read-only and unlinked private spool; refuse unless size and
+     * SHA-256 match exactly on the write path and again on read-back from the spool itself.
+     */
     private function snapshot(array $before, int $deadline): PreparedDeliveryStream
     {
         ContractIo::outsideTransactions();
         $target = $before['target'];
-        $output = $input = null;
         try {
-            $path = (new ProductionFreeGrantFiles)->spoolDirectory().'/'.Str::uuid().'.snapshot';
-            $mask = umask(0077);
-            try {
-                $output = @fopen($path, 'x+b');
-            } finally {
-                umask($mask);
-            }
-            if (! is_resource($output) || ! @unlink($path)) {
-                throw new \UnexpectedValueException;
-            }
-            $hash = hash_init('sha256');
-            $bytes = 0;
-            $write = function (string $chunk) use (&$output, &$hash, &$bytes, $target, $deadline): void {
-                if (hrtime(true) >= $deadline) {
-                    throw new ProductionFreeGrantException('expired');
-                }
-                $bytes += strlen($chunk);
-                if ($bytes > $target['bytes']) {
-                    throw new \UnexpectedValueException;
-                }
-                hash_update($hash, $chunk);
-                for ($offset = 0; $offset < strlen($chunk);) {
-                    $written = @fwrite($output, substr($chunk, $offset));
-                    if (! is_int($written) || $written < 1) {
-                        throw new \UnexpectedValueException;
-                    }
-                    $offset += $written;
-                }
-            };
-            if ($target['role'] === 'contract') {
-                $write((new ProductionFreeGrantFiles)->verify($target['artifact']));
-            } else {
-                $input = (new ProductionFreeGrantPolicy)->sources($before['policy'])->open($target);
-                if (! is_resource($input) || get_resource_type($input) !== 'stream') {
-                    throw new \UnexpectedValueException;
-                }
-                while (! feof($input)) {
-                    $chunk = @fread($input, 1048576);
-                    if (! is_string($chunk)) {
-                        throw new \UnexpectedValueException;
-                    }
-                    if ($chunk !== '') {
-                        $write($chunk);
-                    }
-                }
-            }
-            if ($bytes !== $target['bytes'] || ! hash_equals($target['sha256'], hash_final($hash)) || ! @fflush($output) || fseek($output, 0) !== 0) {
-                throw new ProductionFreeGrantException('artifact_drift');
-            }
-            $prepared = new PreparedDeliveryStream($output, $target['sha256'], $target['bytes']);
-            $output = null;
+            $directory = (new ProductionFreeGrantFiles)->spoolDirectory();
 
-            return $prepared;
+            return app(ProductionFreeGrantSpool::class)->prepare($directory, $before['policy']['spool_slots'], $before['policy']['spool_reserve_bytes'],
+                $target['sha256'], $target['bytes'], $deadline, function ($output) use ($before, $target, $deadline): void {
+                    $input = null;
+                    try {
+                        $hash = hash_init('sha256');
+                        $bytes = 0;
+                        $write = function (string $chunk) use ($output, &$hash, &$bytes, $target, $deadline): void {
+                            if (hrtime(true) >= $deadline) {
+                                throw new ProductionFreeGrantException('expired');
+                            }
+                            $bytes += strlen($chunk);
+                            if ($bytes > $target['bytes']) {
+                                throw new \UnexpectedValueException;
+                            }
+                            hash_update($hash, $chunk);
+                            for ($offset = 0; $offset < strlen($chunk);) {
+                                $written = @fwrite($output, substr($chunk, $offset));
+                                if (! is_int($written) || $written < 1) {
+                                    throw new \UnexpectedValueException;
+                                }
+                                $offset += $written;
+                            }
+                        };
+                        if ($target['role'] === 'contract') {
+                            $write((new ProductionFreeGrantFiles)->verify($target['artifact']));
+                        } else {
+                            $input = (new ProductionFreeGrantPolicy)->sources($before['policy'])->open($target);
+                            if (! is_resource($input) || get_resource_type($input) !== 'stream') {
+                                throw new \UnexpectedValueException;
+                            }
+                            while (! feof($input)) {
+                                $chunk = @fread($input, 1048576);
+                                if (! is_string($chunk)) {
+                                    throw new \UnexpectedValueException;
+                                }
+                                if ($chunk !== '') {
+                                    $write($chunk);
+                                }
+                            }
+                        }
+                        ProductionFreeGrantException::require($bytes === $target['bytes'] && hash_equals($target['sha256'], hash_final($hash)), 'artifact_drift');
+                    } finally {
+                        if (is_resource($input)) {
+                            fclose($input);
+                        }
+                    }
+                });
         } catch (ProductionFreeGrantException $error) {
             throw $error;
         } catch (Throwable) {
             throw new ProductionFreeGrantException('artifact_unavailable');
-        } finally {
-            if (is_resource($input)) {
-                fclose($input);
-            }
-            if (is_resource($output)) {
-                fclose($output);
-            }
         }
     }
 }

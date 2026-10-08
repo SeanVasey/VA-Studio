@@ -13,5 +13,9 @@ return [
     'approved_terms_hashes' => [],
     'authorization_ttl_seconds' => 300,
     'render_lease_seconds' => 300,
+    // Delivery snapshots: held flock slots (each snapshot is at most 1 GiB, so the spool holds at most
+    // slots x 1 GiB) and the free-space reserve that must remain after a snapshot, in bytes (16 MiB).
+    'spool_slots' => 3,
+    'spool_reserve_bytes' => 16777216,
     'storage_root' => null,
 ];

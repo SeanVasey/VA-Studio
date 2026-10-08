@@ -10,7 +10,7 @@ final class ProductionFreeGrantPolicy
 {
     public const REHEARSAL = 'synthetic_rehearsal';
 
-    /** @return array{enabled:true,version:1,provenance:string,approved_terms_hashes:list<string>,authorization_ttl_seconds:int,render_lease_seconds:int,storage_root:?string,environment:string} */
+    /** @return array{enabled:true,version:1,provenance:string,approved_terms_hashes:list<string>,authorization_ttl_seconds:int,render_lease_seconds:int,spool_slots:int,spool_reserve_bytes:int,storage_root:?string,environment:string} */
     public function current(): array
     {
         $configuration = $this->configuration();
@@ -57,6 +57,8 @@ final class ProductionFreeGrantPolicy
             && is_array($policy['approved_terms_hashes'] ?? null) && array_is_list($policy['approved_terms_hashes'])
             && is_int($policy['authorization_ttl_seconds'] ?? null) && $policy['authorization_ttl_seconds'] >= 30 && $policy['authorization_ttl_seconds'] <= 300
             && is_int($policy['render_lease_seconds'] ?? null) && $policy['render_lease_seconds'] >= 30 && $policy['render_lease_seconds'] <= 900
+            && is_int($policy['spool_slots'] ?? null) && $policy['spool_slots'] >= 1 && $policy['spool_slots'] <= 16
+            && is_int($policy['spool_reserve_bytes'] ?? null) && $policy['spool_reserve_bytes'] >= 16777216 && $policy['spool_reserve_bytes'] <= 1099511627776
             && array_key_exists('storage_root', $policy) && ($policy['storage_root'] === null || is_string($policy['storage_root']))
             && is_string($environment), 'changed_policy');
         foreach ($policy['approved_terms_hashes'] as $hash) {
@@ -67,6 +69,7 @@ final class ProductionFreeGrantPolicy
             'purpose' => $policy['purpose'], 'provenance' => $policy['provenance'],
             'approved_terms_hashes' => $policy['approved_terms_hashes'],
             'authorization_ttl_seconds' => $policy['authorization_ttl_seconds'], 'render_lease_seconds' => $policy['render_lease_seconds'],
+            'spool_slots' => $policy['spool_slots'], 'spool_reserve_bytes' => $policy['spool_reserve_bytes'],
             'storage_root' => $policy['storage_root'], 'environment' => $environment];
     }
 }
