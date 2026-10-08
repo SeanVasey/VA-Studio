@@ -245,3 +245,131 @@ mysqladmin --no-defaults -h127.0.0.1 -P3497 -uroot shutdown; rm -rf $scratchpad/
   - Afterwards `/proc/18644` was absent, there was no LISTEN on 3497 (`0DA9`) in `/proc/net/tcp`, and no `mysqld` process had `port=3497`.
   - `$scratchpad/review-trigscan-mysql` (223M) was removed.
   - The other agents' daemons on :3471 and :3493 and the shared :3306 were not touched.
+
+## Addendum 1: conditions 1 and 2, delta `53f4783f..b47de6b6`
+
+- **Reviewed delta.** `53f4783f..b47de6b6` on `origin/harness/native-schema-isolation`: one commit, `b47de6b6` "fix(migrations): match a schema qualifier only as a complete identifier followed by a dot". `53f4783f` is this review, committed by the integration owner; it has no code change against `61b8ee17`.
+  - The code delta touches the three matchers, `NativeSchemaIsolationTest` and the census (+1 entry). `IdentityInspectionCostTest` is unchanged. Scope and hashes are in `review-evidence/addendum1/sha256-and-scope.txt`.
+- **Method.** The review worktree was moved to `git checkout --detach b47de6b6`. The `independent-review/` directory, now tracked and byte-identical to my untracked copy (54 files, 0 differences), was kept.
+- **Database.** A fresh private `mysqld` 8.4.11 with `--no-defaults` on 127.0.0.1:3613, with `--socket=` empty and schema `vaseyaudio_review_trigscan`. The shared :3306 server and ports 3531, 3555, 3567 and 3589 were not touched.
+- **Date.** 2026-10-08 (UTC).
+
+### Decision for the delta
+
+**APPROVE.** Conditions 1 (R-2) and 2 (R-1) are **closed**. No new finding is Low or above. The remaining notes are Info only.
+
+### What changed
+
+- **Matcher.** The three matchers now share one expression, byte-identical in all three files (3 occurrences, 1 distinct):
+
+  ```
+  /(?:`NAME`|"NAME"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])NAME)(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu
+  ```
+
+  `NAME` is `preg_quote($database, '/')`. A regex failure refuses.
+- **Capability and identity guards.** Rule: `references(tables) && (same schema || qualifies || references(['prepare']))`.
+- **243.** Rule: same schema or `qualifiesDatabase`, otherwise a standalone `prepare` word check. This is equivalent to the old loop for `prepare`.
+
+### Adversarial judgement of the expression
+
+Two layers of evidence:
+
+- **Matcher matrix** (`review-evidence/addendum1/matcher/matrix.php`, output `matrix-b47de6b6.txt`). It calls the three private matchers by reflection and needs no database:
+  - 34 definitions × 13 database names × 3 implementations = **1,326 checks, 0 mismatches**, exit 0.
+  - The database names include regex metacharacters and the delimiter: `va+sey(1)`, `va*sey?`, `va$sey`, `va#sey`, `va/sey`, `va|sey`, `va-sey`, `va.sey`, `vasé`, `va[s]ey`, `va\sey`, `va^sey{2}`.
+- **Native probe P9** (`ReviewerSchemaIsolationProbeV3Test`). It creates each variant in a peer schema and records the text MySQL actually stores. It then executes the object to show which table MySQL resolves, and runs all three guards.
+
+| Case | Stored by MySQL (P9) | Resolves to | Guards | Judgement |
+| --- | --- | --- | --- | --- |
+| Qualifier split by a block, `--` or `#` comment (`db/* c */.t`, `db -- c\n . t`, `db # c\n.t`) | stored as written | selected table | refused ×3 | correct |
+| `db . table` with spaces or newlines | as written | selected | refused ×3 | correct |
+| Dot or qualifier inside a versioned comment (`` `db` /*!.*/ `t` ``, `/*!80000 db */ . t`, `/*!db.t*/`) | **expanded**: `` `db` . `t` ``, `db . t`, `db.t` (markers removed) | selected | refused ×3 | correct. On raw text the matcher would not match (matrix: `0`), but MySQL never stores the raw form. A `/*!99999 …*/` comment above the server version is dropped from the body and resolves to the peer (`storage/escaped-backtick-storage.out`). |
+| Double-quoted qualifier, ANSI_QUOTES off (`"db".t`) | not creatable: `1064` syntax error | n/a | n/a | not reachable. Under ANSI_QUOTES it is refused (P3, matrix). |
+| Name that is a regex metacharacter | n/a (matrix only) | n/a | matcher as expected for all 13 names | correct. `preg_quote` with the `/` delimiter. |
+| `` `db` `` followed by a backtick-escaped dot (`` `db``.t` ``, one identifier) | MySQL stores escaped backticks **mangled**, but locally (`` `vdb`.tt` ``). A later qualifier in the same body stays intact (`storage/`: `` `aa`bb` `` … `` `rvsel`.`owned` ``). | peer (`1146 '<peer>.db`.t'`) | admitted ×3 | correct: it is not a qualifier |
+| Name inside a string literal (`'db.t'`) | as written | not executed | refused ×3 | over-refusal (Info, safe direction) |
+| Upper-case qualifier (`` `DB`.`t` ``, bare `DB.t`) | as written | selected on lctn 1/2 | refused ×3 (P3, lane) | correct (R-2) |
+| Peer named `<db>-rv4`, `<db>$rv4`, `<db>é`, `<db>_rv4`, `x-<db>`, or shorter `vaseyaudio_review` | own objects qualified with the peer's name | peer | admitted ×3 (P4 v3) | correct (R-1) |
+| Prefix extension `x<db>.t`, `$<db>.t`, `é<db>.t`, `` `x<db>`.t `` | matrix | n/a | not a qualifier | correct |
+| Invalid UTF-8 body | matrix | n/a | matcher throws, so refused | fails closed |
+| Long runs of `#` or `"# \n"` after the name with no dot (2,000 lines) | matrix | n/a | 0 to 1.1 ms, no backtracking failure | no ReDoS observed |
+
+### Native runs at `b47de6b6` (private 8.4.11, port 3613; PHPUnit exit codes)
+
+| Selection | Exit | Tests | Assertions | Failures | Errors | Skipped | Wall (s) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `tests/Feature/NativeSchemaIsolationTest.php` (lane) | 0 | 34 | 357 | 0 | 0 | 0 | 695 |
+| Reviewer probes v3 `addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php` (P1 to P9; P4 now expects every extension admitted; rerun on a clean tree) | 0 | 9 | 3,148 | 0 | 0 | 0 | 122 |
+| Reviewer probes v2 unchanged (`probes/ReviewerSchemaIsolationProbeTest.php`) | 1 | 8 | 3,065 | 1 | 0 | 0 | 94 |
+
+- **The v2 failure is the intended one.** It is P4's over-refusal characterization of R-1: `P4 hyphen-extension (…-rv4) -> capability: admitted`. That is condition 2 observed closed.
+- **P1, P2, P3 and P5 to P8 are unchanged.** P7 again compared 608 requested and 636 superset rows with 0 mismatches. P8 again counted 104 statements with and without peers.
+- **SQLite.** `NativeSchemaIsolationTest` gives 34 skipped (census), and `pint --test` on the four changed PHP files passed.
+- **A superseded run.** The first v3 run (`probes-v3-b47de6b6.*`, also 9/3,148 OK) overlapped a one-second dry run of my mutation script. It is superseded by the rerun and recorded in `addendum1/probes/summary.txt`.
+
+### Mutation (my choice): A1-M5
+
+- **Change.** Identity `qualifies()` drops "followed by a dot" and ends the name at a narrow `(?![A-Za-z0-9_])` boundary.
+- **Lane test.** `--filter extends_the_selected_name` exits 2 with **3 errors** (hyphen `-2`, dollar `$x`, non-ASCII `é`), each `Unexpected production identity schema or retained evidence; refused before DDL.` during `migrate:fresh`.
+- **Probe.** P4 v3 exits 1 with 1 failure (`P4 hyphen-extension identity` refused).
+- **Revert.** `git checkout -- app database`; `git diff --quiet -- app database` exit 0. The identity file then hashes to `fc5e3e80…` again.
+- **Evidence.** `addendum1/mutation/A1-M5.diff`, `mutate.py` and `summary.txt`.
+
+I did not repeat the lane's M3 run. The six upper-case lane cases pass natively here, and my P3 and the matrix confirm the refusal independently.
+
+### Conditions
+
+1. **Condition 1 (R-2): closed.**
+   - The lane now has six upper-case qualified-reference cases (trigger and routine × three guards), green natively here.
+   - The lane reports that its M3 case-sensitive mutation fails 6/6.
+2. **Condition 2 (R-1): closed.**
+   - The token-aware match was implemented, and the lane added a hyphen, dollar and non-ASCII extended-peer regression, green here (3 cases).
+   - My mutation A1-M5 makes all three fail.
+   - P4 v3 admits six differently extended or prefixed peers in all three guards.
+3. **Condition 3 (I-6): unchanged.** It is carried forward.
+
+### Info notes on the delta (no finding Low or above)
+
+- **A1-I1.** The match is textual, on the stored body. MySQL expands versioned comments and mangles escaped backticks token-locally before storing. I found neither hides a qualifier.
+- **A1-I2.** Remaining over-refusals are all in the safe direction:
+  - a name inside a string literal;
+  - a case-variant peer on lctn=0 (I-1, unchanged).
+- **A1-I3.** The prefix lookbehind is not pinned by a lane test. Removing it can only over-refuse, because a qualifier still needs the dot. My matrix and P4 `hyphen-prefix` cover it.
+- **Unchanged.** I-2 (events), I-3 (literal table name), I-4 (visibility) and I-5 (exception type).
+
+### SHA-256 at `b47de6b6`
+
+Each is identical in the worktree.
+
+| Path | SHA-256 |
+| --- | --- |
+| `app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php` | `52ddd943c7bc3527c6f5a0369dab88aa7136a3f64b03d504fa4e057cfe0fcfe7` |
+| `app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php` | `fc5e3e80cf41eb74a5f30fd51a20c00eaab7d42c4a9d15708bde671e384144a2` |
+| `database/migrations/2026_10_07_243000_inquiry_notification_intents.php` | `0fa48390969ad3585b9c65374551499350f677ad342d2e3a2739a9f804d19d6b` |
+| `tests/Feature/NativeSchemaIsolationTest.php` | `cfcca4b9e35ba152d123e5b3a633e4da4a5bf8c06c1189baac6ba1d56aa80076` |
+| `scripts/ci/database-sqlite-skips.json` | `12f60311d58f0ca81476361f8b0f35dadaf620c33e2292ebffe9fa27cbc7b777` |
+| Reviewer probe v3 `addendum1/probes/ReviewerSchemaIsolationProbeV3Test.php` | `aba0dc8fbd8c935c4c4bfa684c4d9c862bb0736c589b94c877c49209cc92a817` |
+| Reviewer matrix `addendum1/matcher/matrix.php` | `e31081b104df75d9ee81d4d78d41c13482b7c90f51d50cfb8882ec52ffbe77af` |
+
+### Evidence index (`review-evidence/addendum1/`)
+
+- `sha256-and-scope.txt`.
+- `native/`: `run.sh`, the ledger, JUnit and text for the lane test, and `private-instance-lifecycle.txt`.
+- `probes/`: the v3 probe, the v3 runs (clean rerun plus the superseded first run), the unchanged v2 run, and `summary.txt`.
+- `matcher/`: `matrix.php` and its output.
+- `storage/`: the MySQL storage check for versioned comments and escaped backticks.
+  - The SQL and its output, plus the first attempt's syntax error, retained.
+  - The check ran in throwaway schemas `rvsel` and `rvpeer`, both dropped.
+- `mutation/`: `mutate.py`, `A1-M5.diff`, JUnit and text for the lane and probe runs, and `summary.txt`.
+- `pint.txt` and the SQLite `NativeSchemaIsolationTest` result.
+
+### Cleanup
+
+- **Mutation.** A1-M5 was reverted. `git diff --quiet -- app database` returned exit 0.
+- **Worktree.** It is at `b47de6b6`. `git status --short` shows only `independent-review/`: `DECISION.md` modified and `review-evidence/addendum1/` untracked.
+- **Schemas.** Before shutdown, the instance listed `information_schema, mysql, performance_schema, sys, vaseyaudio_review_trigscan`. Every peer and throwaway schema had been dropped.
+- **Private mysqld.**
+  - pid 31834 on :3613 was shut down with `mysqladmin shutdown`; `err.log` ends `MySQL Server - end.`
+  - Afterwards `/proc/31834` was absent, there was no LISTEN on 3613 (`0E1D`), and no `mysqld` process had `port=3613`.
+  - `$scratchpad/review-trigscan-a1-mysql` (223M) was removed.
+  - Other lanes' daemons were left running: 3531, 3567, and 3641 to 3644, which another agent started during this addendum.

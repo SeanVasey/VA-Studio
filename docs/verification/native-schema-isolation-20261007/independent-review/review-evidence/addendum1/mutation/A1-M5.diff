@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+index 61cece66..aa1c783f 100644
+--- a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++++ b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+@@ -530,7 +530,7 @@ final class IdentityMigrationOwnership
+     private function qualifies(string $sql, string $database): bool
+     {
+         $name = preg_quote($database, '/');
+-        $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
++        $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?![A-Za-z0-9_])/isu', $sql);
+         if ($match === false) {
+             $this->reject();
+         }

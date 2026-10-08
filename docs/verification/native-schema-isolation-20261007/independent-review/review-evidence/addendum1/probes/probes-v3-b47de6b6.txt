@@ -1,0 +1,128 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+P1 capability: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`production_buyer_assent_observations`.`id` AS `id` from `vaseyaudio_review_trigscan`.`production_buyer_assent_observations`
+P1 view on production_buyer_assent_observations -> capability: refused LogicException: Unexpected production capability external view reference; rollback refused before schema changes.
+P1 view on production_buyer_assent_observations -> inquiry: admitted
+P1 view on production_buyer_assent_observations -> identity: admitted
+P1 inquiry: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`inquiry_notification_intents`.`id` AS `id` from `vaseyaudio_review_trigscan`.`inquiry_notification_intents`
+P1 view on inquiry_notification_intents -> capability: admitted
+P1 view on inquiry_notification_intents -> inquiry: refused LogicException: Unexpected inquiry notification external view reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P1 view on inquiry_notification_intents -> identity: admitted
+P1 identity: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`production_identity_origins`.`id` AS `id` from `vaseyaudio_review_trigscan`.`production_identity_origins`
+P1 view on production_identity_origins -> capability: admitted
+P1 view on production_identity_origins -> inquiry: admitted
+P1 view on production_identity_origins -> identity: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+.P2 ROUTINE_DEFINITION=SELECT COUNT(*) FROM production_identity_origins
+P2 CALL `vaseyaudio_review_trigscan_rv2`.p2_routine() -> 1146 Table 'vaseyaudio_review_trigscan_rv2.production_identity_origins' doesn't exist
+P2 INSERT INTO `vaseyaudio_review_trigscan_rv2`.p2_source VALUES (1) -> 1146 Table 'vaseyaudio_review_trigscan_rv2.production_identity_origins' doesn't exist
+P2 -> capability: admitted
+P2 -> inquiry: admitted
+P2 -> identity: admitted
+.P3 capability backtick+comment: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability unquoted+newlines: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 capability ansi-quotes: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability upper-case-qualifier: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability line-comment-then-name: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 inquiry backtick+comment: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry unquoted+newlines: refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry ansi-quotes: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry upper-case-qualifier: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry line-comment-then-name: refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 identity backtick+comment: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P3 identity unquoted+newlines: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P3 identity ansi-quotes: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P3 identity upper-case-qualifier: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P3 identity line-comment-then-name: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+.P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> capability: admitted
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> inquiry: admitted
+P4 longer-underscore (vaseyaudio_review_trigscan_rv4) -> identity: admitted
+P4 shorter-prefix (vaseyaudio_review) -> capability: admitted
+P4 shorter-prefix (vaseyaudio_review) -> inquiry: admitted
+P4 shorter-prefix (vaseyaudio_review) -> identity: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> capability: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> inquiry: admitted
+P4 hyphen-extension (vaseyaudio_review_trigscan-rv4) -> identity: admitted
+P4 dollar-extension (vaseyaudio_review_trigscan$rv4) -> capability: admitted
+P4 dollar-extension (vaseyaudio_review_trigscan$rv4) -> inquiry: admitted
+P4 dollar-extension (vaseyaudio_review_trigscan$rv4) -> identity: admitted
+P4 non-ascii-extension (vaseyaudio_review_trigscané) -> capability: admitted
+P4 non-ascii-extension (vaseyaudio_review_trigscané) -> inquiry: admitted
+P4 non-ascii-extension (vaseyaudio_review_trigscané) -> identity: admitted
+P4 hyphen-prefix (x-vaseyaudio_review_trigscan) -> capability: admitted
+P4 hyphen-prefix (x-vaseyaudio_review_trigscan) -> inquiry: admitted
+P4 hyphen-prefix (x-vaseyaudio_review_trigscan) -> identity: admitted
+.P9 capability versioned-comment dot: stored="SELECT COUNT(*) FROM `vaseyaudio_review_trigscan` . `production_buyer_assent_observations`" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability versioned-comment qualifier: stored="SELECT COUNT(*) FROM  vaseyaudio_review_trigscan  . production_buyer_assent_observations" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability versioned-comment whole name: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan.production_buyer_assent_observations )" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P9 capability split by block comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan\/* c *\/.production_buyer_assent_observations" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability split by -- comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan -- c\n . production_buyer_assent_observations" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability split by # comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan # c\n.production_buyer_assent_observations" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability spaces around dot: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan . production_buyer_assent_observations)" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P9 capability double-quoted qualifier, ANSI_QUOTES off: not creatable: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"vaseyaudio_review_trigscan".production_buyer_assent_observations' at line 1
+P9 capability name inside a string literal: stored="SELECT 'vaseyaudio_review_trigscan.production_buyer_assent_observations' AS p9" resolves: not executed -> refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P9 capability backtick-escaped dot: stored="SELECT COUNT(*) FROM `vvaseyaudio_review_trigscan`.production_buyer_assent_observationss`" resolves: 1146 Table 'vaseyaudio_review_trigscan_rv9.vaseyaudio_review_trigscan`.production_buyer_assent_observations' doesn't exist -> admitted
+P9 inquiry versioned-comment dot: stored="SELECT COUNT(*) FROM `vaseyaudio_review_trigscan` . `inquiry_notification_intents`" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry versioned-comment qualifier: stored="SELECT COUNT(*) FROM  vaseyaudio_review_trigscan  . inquiry_notification_intents" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry versioned-comment whole name: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan.inquiry_notification_intents )" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry split by block comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan\/* c *\/.inquiry_notification_intents" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry split by -- comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan -- c\n . inquiry_notification_intents" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry split by # comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan # c\n.inquiry_notification_intents" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry spaces around dot: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan . inquiry_notification_intents)" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry double-quoted qualifier, ANSI_QUOTES off: not creatable: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"vaseyaudio_review_trigscan".inquiry_notification_intents' at line 1
+P9 inquiry name inside a string literal: stored="SELECT 'vaseyaudio_review_trigscan.inquiry_notification_intents' AS p9" resolves: not executed -> refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P9 inquiry backtick-escaped dot: stored="SELECT COUNT(*) FROM `vvaseyaudio_review_trigscan`.inquiry_notification_intentss`" resolves: 1146 Table 'vaseyaudio_review_trigscan_rv9.vaseyaudio_review_trigscan`.inquiry_notification_intents' doesn't exist -> admitted
+P9 identity versioned-comment dot: stored="SELECT COUNT(*) FROM `vaseyaudio_review_trigscan` . `production_identity_origins`" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity versioned-comment qualifier: stored="SELECT COUNT(*) FROM  vaseyaudio_review_trigscan  . production_identity_origins" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity versioned-comment whole name: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan.production_identity_origins )" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity split by block comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan\/* c *\/.production_identity_origins" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity split by -- comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan -- c\n . production_identity_origins" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity split by # comment: stored="SELECT COUNT(*) FROM vaseyaudio_review_trigscan # c\n.production_identity_origins" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity spaces around dot: stored="SET @p9 = (SELECT COUNT(*) FROM vaseyaudio_review_trigscan . production_identity_origins)" resolves: executed against the selected table (no error) -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity double-quoted qualifier, ANSI_QUOTES off: not creatable: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"vaseyaudio_review_trigscan".production_identity_origins' at line 1
+P9 identity name inside a string literal: stored="SELECT 'vaseyaudio_review_trigscan.production_identity_origins' AS p9" resolves: not executed -> refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+P9 identity backtick-escaped dot: stored="SELECT COUNT(*) FROM `vvaseyaudio_review_trigscan`.production_identity_originss`" resolves: 1146 Table 'vaseyaudio_review_trigscan_rv9.vaseyaudio_review_trigscan`.production_identity_origins' doesn't exist -> admitted
+.P5 VASEYAUDIO_REVIEW_TRIGSCAN unqualified same-named trigger -> capability: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P5 VASEYAUDIO_REVIEW_TRIGSCAN unqualified same-named trigger -> inquiry: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P5 VASEYAUDIO_REVIEW_TRIGSCAN unqualified same-named trigger -> identity: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+.P6 disabled peer EVENT deleting from vaseyaudio_review_trigscan.owned -> capability: admitted
+P6 disabled peer EVENT deleting from vaseyaudio_review_trigscan.owned -> inquiry: admitted
+P6 disabled peer EVENT deleting from vaseyaudio_review_trigscan.owned -> identity: admitted
+.P7 lookup statements found: 21
+P7 sql: SELECT TABLE_NAME,TABLE_TYPE,ENGINE,CREATE_OPTIONS,TABLE_COMMENT,TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?
+P7 sql: SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?
+P7 sql: SELECT TABLE_NAME,INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND LOWER(INDEX_NAME)=?
+P7 sql: SELECT TABLE_NAME,CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND LOWER(CONSTRAINT_NAME)=?
+P7 sql: SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?
+P7 sql: SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION
+P7 sql: SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX
+P7 sql: SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.REFERENCED_TABLE_NAME IS NOT NULL AND k.TABLE_NAME=? ORDER BY k.COLUMN_NAME
+P7 sql: SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?
+P7 sql: SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?
+P7 sql: SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME
+P7 sql: SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_COMMENT,GENERATION_EXPRESSION,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION
+P7 sql: SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SUB_PART,EXPRESSION,INDEX_TYPE,COLLATION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX
+P7 sql: SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_POSITION,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=?
+P7 sql: SELECT TABLE_NAME name,'table' type,TABLE_NAME tbl_name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?
+P7 sql: SELECT TRIGGER_NAME name,'trigger' type,EVENT_OBJECT_TABLE tbl_name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?
+P7 sql: SELECT ROUTINE_NAME FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE() AND ROUTINE_NAME=?
+P7 sql: SELECT EVENT_NAME FROM information_schema.EVENTS WHERE EVENT_SCHEMA=DATABASE() AND EVENT_NAME=?
+P7 sql: SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND INDEX_NAME=?
+P7 sql: SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_NAME=?
+P7 sql: SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='CHECK' AND TABLE_NAME=?
+P7 accent alias trigger pi_addresses_insért not creatable: SQLSTATE[HY000]: General error: 1359 Trigger already exists
+P7 created accent alias of reserved name: TRIGGER `pia_address_uniqué` BEFORE INSERT ON p7_alias_source FOR EACH ROW SET @p7 = 2
+P7 created accent alias of reserved name: INDEX `pia_address_uniqué` ON p7_alias_source (id, v)
+P7 per-name LOWER(TRIGGER_NAME)='pia_address_unique' returns: ["pia_address_uniqué"]
+P7 per-name LOWER(INDEX_NAME)='pia_address_unique' returns: ["pia_address_unique","PIA_ADDRESS_UNIQUE"]
+P7 set=requested statements=21 names=68 per-name rows compared=608 mismatches=0
+P7 set=superset statements=21 names=72 per-name rows compared=636 mismatches=0
+P7 identity inspection with aliases present: refused LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+.P8 without peers: 104 statements 209.5 ms; with 2 peers (server triggers=1421 views=200 routines=148 schemata=7): 104 statements 228.0 ms
+.                                                           9 / 9 (100%)
+
+Time: 01:01.759, Memory: 87.00 MB
+
+OK (9 tests, 3148 assertions)

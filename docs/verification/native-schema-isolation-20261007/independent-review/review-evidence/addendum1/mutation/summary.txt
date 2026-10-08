@@ -1,0 +1,4 @@
+A1-M5 applied to /home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+2026-10-08T04:35:44Z A1-M5--lane-extended-peer exit=2 wall=430s tree=b47de6b6 dirty_app_db=1 :: Tests: 3, Assertions: 30, Errors: 3.
+2026-10-08T04:36:46Z A1-M5--probes-p4 exit=1 wall=62s tree=b47de6b6 dirty_app_db=1 :: Tests: 1, Assertions: 24, Failures: 1.
+2026-10-08T04:36:46Z A1-M5 reverted: git diff --quiet -- app database exit=0 ; changed paths under app/database: 0; sha256 identity after revert: fc5e3e80cf41eb74a5f30fd51a20c00eaab7d42c4a9d15708bde671e384144a2
