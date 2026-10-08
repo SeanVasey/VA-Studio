@@ -51,3 +51,10 @@ A1-I2 is also corrected: `../codex-4/README.md` called the retained policy "equa
   mount.
 - **C1:** the transfer-deadline values are for Sean to confirm.
 - **C2, C4–C7:** open as recorded in `../../independent-review/DECISION.md`.
+
+## After merging main `72045620` (identity key rotation)
+
+`db315e12` merges `origin/main` into the branch. `CHANGELOG.md` keeps both entries. `scripts/ci/database-sqlite-skips.json`
+is the union of main and this branch's additions (175 methods); `python3 -I scripts/ci/test-database-receipts.py`
+passes 34 OK. On SQLite, `--filter PaidGrant tests/Feature` runs 90 tests (81 plus the reviewer's 9), 3,814 assertions, 1
+skipped, rc 0 (`evidence/family-merged-db315e12.txt`).
