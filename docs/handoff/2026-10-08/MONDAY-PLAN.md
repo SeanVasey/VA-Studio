@@ -75,11 +75,11 @@ The lanes are separate worktrees with no overlapping files. "Review" means an in
 | M-11 | Operator onboarding: two staff accounts, MFA, seller tag WAV and its hash, first-pack checklist, upload session support | integrator + Sean | S + Sean | M-02, S-5–S-8 | auth | waiting |
 | M-12 | Storefront and player check with real content (keyboard, desktop, mobile) | D | M | M-11 | — | waiting |
 | M-13 | Nightly backup plus one restore proof | A | S–M | M-01, S-10 | — | in kit |
-| M-14 | PR #56 paid downloads: review addendum 13, Codex, merge (default-off, unmounted) | E `VA-Studio-paid252` | M | — | **payment/licensing** | addendum 13 running |
+| M-14 | PR #56 paid downloads: review addendum 13, Codex, merge (default-off, unmounted) | E `VA-Studio-paid252` | M | — | **payment/licensing** | round 22 fixed (`400e5012`); addendum 14 APPROVE WITH CONDITIONS; Codex on `55976099` |
 | M-15 | Staging commit gate: affected checks and preflight on each deployed commit | integrator | S | each deploy | — | ongoing |
 | M-16 | FPM render risk: renderers spawn `PHP_BINARY` inside web requests, which may be the FPM binary under FPM. Lane A reports the exact fix, then a separate fix and review. | A then fix lane | S | — | licensing | investigating |
-| M-17 | Census normalization (SQLite skip list) | integrator | S | census run | — | running |
-| M-18 | Doc reconciliation: CLAUDE-PLAN status column, Free256 README status, Project Notes contradictions (MySQL version, shard count) | D | S | — | — | open |
+| M-17 | Census normalization (SQLite skip list) | integrator | S | census run | — | PR #60: 33 native-only pairs added (183 → 216); merges after #56. Order-dependent `PublicTrackEmbedTest` failure under investigation |
+| M-18 | Doc reconciliation: CLAUDE-PLAN status column, Free256 README status, Project Notes contradictions (MySQL version, shard count) | D | S | — | — | done in the follow-up tracker PR (CLAUDE.md shard count and native MySQL availability, CLAUDE-PLAN C1b/D1/A2 cells; C2 kept outstanding, Free256 status line) |
 
 **Critical path, after Sean grants host access (H0):**
 
@@ -136,5 +136,6 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | Time (UTC) | Update |
 | --- | --- |
+| 2026-10-08 23:00 | PR #44 merged (`672f5826`). PR #56 round 22 pushed, addendum 14 APPROVE WITH CONDITIONS. Census run complete: PR #60 opened. M-18 done. |
 | 2026-10-08 22:45 | Sean confirmed S-1 (interim local mode, locked down) and chose a staging subdomain for S-3. |
 | 2026-10-08 22:40 | Audits complete. Lanes A, B and B2 started. PR #56 at `94d32518` with addendum 13 running. Census run on `d3e1c39a` in progress. Inputs S-1 to S-11 listed. |
