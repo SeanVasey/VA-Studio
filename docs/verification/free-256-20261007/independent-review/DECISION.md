@@ -963,3 +963,103 @@ SHA-256 of the changed files is in `addendum6/sha256-e410c711.txt` and `addendum
 - Verified at 10:54:26Z: `/proc/6562` absent and nothing in LISTEN on 3797. The datadir `scratchpad/review-free256f-mysql/data` was then deleted.
 - The lifecycle is in `addendum6/native/private-instance-lifecycle.txt`. No other instance and not :3306 was touched.
 - The review worktree `/home/user/VA-Studio-review-free256b` is detached at `c8d88e76`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum6/`. Nothing was committed or pushed.
+
+## Addendum 7: character-bounded preflight skip and request-start redemption time, `4c659ae0..fbb4d884`
+
+- Scope:
+  - `27502fcd`: fixes A6-1. The preflight is now skipped only when `mb_strlen(title\nreference\nterms\nassent) <= 2000`.
+  - `d6a72d72`: Codex round 14. The redemption row's guarded `created_at` is now the request-start time `$requested`; the sealed payload's `at` keeps the completion time.
+  - The docs commits are `e382e195` (which carries this review's addendum 6) and `fbb4d884`.
+- Before checkout, my uncommitted addendum-6 copy was compared byte for byte with `e382e195` (`DECISION.md` and every evidence file): identical, and then discarded.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3803 with schema `rv256g`, shut down and its datadir deleted. Other lanes' instances (3711, 3751) and 3306 were not touched.
+- Evidence is in `review-evidence/addendum7/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `fbb4d884` for a development merge.**
+
+- **A6-1 is closed.** The 2,000-character skip bound is sound with a wide margin, measured with the real renderer.
+- The request-start redemption time opens no replay, ordering or late-redemption path.
+- No new finding at Low or above.
+
+### (1) Skip bound: `mb_strlen(...) <= 2000`
+
+- **Measured with the real pinned renderer** (`SkipBoundProbeTest`). Each shape uses the heaviest fixed content: a 120-character `@` declared name, three assets with 128-character source ids and 1 GiB sizes, and a 36-character account reference. For each shape I first **confirmed that `preflight()` makes 0 renderer calls**, so it really is a skipped shape.
+
+| Shape at the bound | Characters | Result |
+| --- | --- | --- |
+| `a` + 1,992 newlines + `a` | 2,000 | **3 pages**: consecutive newlines collapse |
+| Alternating `@` and newline (worst found) | 1,999 | **16 pages**, 893,100 bytes |
+| Alternating U+2031 (widest glyph) and newline | 1,999 | 16 pages |
+| Space and newline alternating | 2,000 | 3 pages |
+| Tabs between `@` (a tab becomes 4 spaces) | 2,000 | 3 pages |
+| Words of 51 `@` (the A6-1 shape) | 2,000 | 3 pages |
+| One unbroken `@` token | 2,000 | 2 pages |
+| CR LF pairs | 2,000 | 3 pages |
+
+- **Is the bound sound?** Yes.
+  - No single character took more than one line. The widest admissible glyph (U+2031, width 1735 units) is about 6 mm at 10 pt, far less than the 180 mm line.
+  - Collapsing newlines only reduces the count.
+  - The fixed document content (header, buyer binding, asset rows, the 120-character name) adds about 2 pages.
+  - The worst shape reaches 16 of 100 pages and under 0.9 MB of the 16 MiB output limit, so the margin is about 6 times.
+- **The A6-1 failure class now always renders.**
+  - It needs about 15,000 characters (300 or more line-width tokens), well above the bound.
+  - Re-running the addendum-6 end-to-end probe gives `refused at admission (unrenderable_definition)`.
+- Info (residual): I have not proved that no text under 2,000 characters triggers a renderer failure unrelated to page count. None of the 26 short shapes across addenda 6 and 7 did. Rendering always would remove even this residual at about 1–4 s per staff action. I accept the bound.
+
+### (2) Request-start redemption time (`d6a72d72`)
+
+**No guard sees an inconsistent order, and no new replay or late-redemption path opens.**
+
+- **The redemption insert guard compares:**
+  - `a.created_at <= NEW.created_at`: `$requested` is taken after the authorization exists and is truncated to the second like `created_at`. Equal is admitted.
+  - `NEW.created_at < a.expires_at`: the same valid-to-start rule both entitlement inspections apply.
+  - Revocation is `NOT EXISTS`, with **no time comparison**. A revocation committed during the snapshot is still refused by the second inspection (`entitlement_changed` or `revoked`) and by the guard.
+- **No chain or monotonic check involves redemptions.** No table references them. The authorization rate limit counts authorizations by their own `created_at`.
+- **The earlier timestamp is cosmetic.** A redemption's `created_at` can now be earlier than an authorization minted during its snapshot, but nothing compares the two.
+- **Replay is unaffected.** One use is enforced by `UNIQUE(authorization_id)` plus the guard.
+- **Late redemption is not widened.** `$requested` comes from the server clock, so a client cannot backdate it, and a redeem that starts at or after `expires_at` is still refused. A redemption committed after expiry is possible only for a request that started in time, and its snapshot stays within `snapshot_seconds`. That is the intended A4-4 semantics, and the payload `at` keeps the completion time for audit.
+- Info: if authorizations and redemptions are served by hosts with skewed clocks, `$requested` could precede the authorization's `created_at`, and the guard would refuse (fails closed).
+- **Native:** both new tests passed on MySQL: 2 tests, 10 assertions, rc 0 (11:25:27Z to 11:31:19Z).
+  - `test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry`
+  - `test_the_redemption_guard_still_refuses_a_start_time_at_or_after_expiry`
+
+### Codex round 15 (`ProductionFreeGrantTransfer.php:36`, this review's A6-2)
+
+**I agree with the coordinator's disposition: a pre-mount condition with no code change now.** Nothing mounts delivery and the family is default-off. The right fix depends on the mount's transport, for example progress enforcement against the minimum rate, per-account or per-origin caps on open transfers, the web server's send timeout, and spool sizing. The condition stays as recorded in Addendum 6.
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `fbb4d884` | SQLite | 0 | 158 tests, 1127 assertions, 2 skipped |
+| The two new `TransferDeadlineTest` cases | MySQL :3803 | 0 | 2 tests, 10 assertions |
+| `addendum7/probes/SkipBoundProbeTest.php` | SQLite | 0 | 8 shapes, all skipped by the preflight and all rendered; at most 16 pages |
+| Addendum-6 `RenderShapeProbeTest` re-run | SQLite | 0 | The A6-1 shape is now refused at admission (`unrenderable_definition`) |
+| Pint `--test` on the 5 changed PHP files | n/a | 0 | passed |
+
+SHA-256 of the changed files is in `addendum7/sha256-fbb4d884.txt`:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantRenderable.php` | `8d28eef289d2176bfaeeb3c049de57d9ca6d2f9d2f8a495be441f5f5ceccad87` |
+| `ProductionFreeGrantDownloads.php` | `57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e` |
+
+### Conditions after Addendum 7
+
+- **Closed:** A6-1 (and with it A4-1).
+- **Open:**
+  - A6-2 before the delivery mount (the Codex round-15 disposition agreed above);
+  - the source adapter must be host-local and bound its own `open()`;
+  - Renderable r2 or hash-checked font inputs;
+  - A1-1, the `contention` mount mapping, and A1-7 with the identity-lane key rotation;
+  - A2-2;
+  - conditions 3 and 5;
+  - F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3803 (pid 15756) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3803. Its datadir `scratchpad/review-free256g-mysql/data` was deleted.
+- The lifecycle is in `addendum7/native/private-instance-lifecycle.txt`.
+- The review worktree `/home/user/VA-Studio-review-free256b` is detached at `fbb4d884`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum7/`. Nothing was committed or pushed.
