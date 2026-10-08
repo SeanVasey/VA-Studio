@@ -139,12 +139,16 @@ name contains a backtick or a double quote (`CapabilityMigrationOwnership::quali
 regex runs; the refusal reaches the caller as the guard's usual exception, and plain names
 are decided exactly as before. `tests/Unit/SchemaQualifierDelimiterTest.php` invokes the
 three private matchers by reflection on any engine: four delimited names are refused by
-each guard (red before the fix: each guard admitted them, `conditions/codex-delimited-name/red-sqlite.txt`),
+each guard (red before the fix, `conditions/codex-delimited-name/red-sqlite.txt`: each guard
+admitted the two backtick names; the two double-quote names were already refused by the
+regex, and the test only noticed the missing early exception),
 and a hyphenated plain name still matches its own qualifier and not its `-2` peer
 (`green-sqlite.txt`: 36 tests / 453 assertions with `IdentityInspectionCostTest` and
 `ProductionFeatureMigrationTest`, 1 native-only skip). Such a name is unsupported for
-this store rather than matched; no native run was added, because the refusal happens
-before any dictionary read.
+this store rather than matched; the refusal happens after the dictionary rows are read and
+before the regex. The independent reviewer's addendum 2 ran the test natively, found that a
+backtick-named database cannot be selected by the app's connection at all (defence in depth),
+and that the double-quote arm is reachable.
 
 ### Regression test
 
@@ -420,3 +424,14 @@ result.
   `test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused`) are still
   not in the SQLite census. This branch adds only its three new methods.
 - Full native directories and Foundation CI were not run (cost policy).
+- A peer schema whose name contains a backtick (Codex P2 on `25a00840`, thread
+  `discussion_r4214949277`): MySQL stores the peer's own qualified reference mangled
+  (`` `aa`bb`.`owned` `` for peer `` aa`bb ``), the quoted branch of the matcher finds
+  `` `bb` `` inside it, and the peer's objects refuse `migrate:fresh` for a selected `bb`.
+  Over-refusal only (availability, no admission). Left as is for the owner: the mangled
+  form is ambiguous with an escaped `` `a``b` ``, and requiring a non-identifier
+  character before the opening backtick would admit a real dependency written as
+  `` FROM`bb`.`owned` `` (valid MySQL; routine bodies are stored as written). The lane
+  protocol names peers `vaseyaudio_<lane>`; a delimiter in a peer name is unsupported.
+  If wanted, refuse such peer names from `information_schema.SCHEMATA` rather than
+  loosening the regex.

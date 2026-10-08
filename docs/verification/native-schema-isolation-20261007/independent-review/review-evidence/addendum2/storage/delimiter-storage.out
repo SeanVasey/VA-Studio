@@ -1,0 +1,64 @@
+ERROR 1102 (42000) at line 4: Incorrect database name 'rvtrail '
+ERROR 1102 (42000) at line 5: Incorrect database name 'rvtrailtab	'
+SCHEMA_NAME	HEX(SCHEMA_NAME)
+a`b	616062
+aa`bb	6161606262
+bb	6262
+rv sp	7276207370
+rv"q	72762271
+rv#c	72762363
+rv--c	72762D2D63
+rv.dot	72762E646F74
+rv/*c	72762F2A63
+rv\\bs	72765C6273
+rv`bt	7276606274
+rvpeer	727670656572
+ROUTINE_SCHEMA	ROUTINE_NAME	ROUTINE_DEFINITION
+a`b	own	SELECT COUNT(*) AS own_a_bt_b FROM `aa`bb`.`owned`
+aa`bb	own	SELECT COUNT(*) AS own_aa_bt_bb FROM `aaa`bbb`.`owned`
+rvpeer	ansi_bb	SELECT COUNT(*) AS ansi_bb FROM"bb"."owned"
+rvpeer	ansi_dq	SELECT COUNT(*) AS ansi_dq FROM "rrv"qq"."owned"
+rvpeer	nosep	SELECT COUNT(*) AS nosep FROM`bb`.`owned`
+rvpeer	nosep2	SELECT COUNT(*) AS nosep2 FROM(SELECT id FROM`bb`.`owned`)x
+rvpeer	q_backslash	SELECT COUNT(*) AS q_backslash FROM `rv\\bs`.`owned`
+rvpeer	q_backtick	SELECT COUNT(*) AS q_backtick FROM `rrv`btt`.`owned`
+rvpeer	q_block	SELECT COUNT(*) AS q_block FROM `rv/*c`.`owned`
+rvpeer	q_dash	SELECT COUNT(*) AS q_dash FROM `rv--c`.`owned`
+rvpeer	q_dot	SELECT COUNT(*) AS q_dot FROM `rv.dot`.`owned`
+rvpeer	q_dquote	SELECT COUNT(*) AS q_dquote FROM `rv"q`.`owned`
+rvpeer	q_hash	SELECT COUNT(*) AS q_hash FROM `rv#c`.`owned`
+rvpeer	q_space	SELECT COUNT(*) AS q_space FROM `rv sp` . `owned`
+TRIGGER_SCHEMA	TRIGGER_NAME	ACTION_STATEMENT
+a`b	t_own	SET @t_own = (SELECT COUNT(*) FROM `aa`bb`.`owned`)
+rvpeer	t_nosep	SET @t_nosep = (SELECT COUNT(*) FROM`bb`.`owned`)
+own_a_bt_b
+7
+own_aa_bt_bb
+5
+nosep
+2
+nosep2
+2
+q_backtick
+1
+q_dquote
+1
+q_block
+1
+q_hash
+1
+q_dash
+1
+q_dot
+1
+q_space
+1
+ansi_dq
+1
+ansi_bb
+2
+@t_nosep
+2
+@t_own
+7
+exit=0

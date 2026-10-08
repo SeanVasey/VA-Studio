@@ -373,3 +373,186 @@ Each is identical in the worktree.
   - Afterwards `/proc/31834` was absent, there was no LISTEN on 3613 (`0E1D`), and no `mysqld` process had `port=3613`.
   - `$scratchpad/review-trigscan-a1-mysql` (223M) was removed.
   - Other lanes' daemons were left running: 3531, 3567, and 3641 to 3644, which another agent started during this addendum.
+
+## Addendum 2: merge of main and the delimiter guard, delta `b47de6b6..25a00840`
+
+- **Reviewed delta.** `b47de6b6..25a00840` on `harness/native-schema-isolation`, first parent: `052cef7c` (addendum 1, documentation only), `855610be` (merge of main at `9593fcdf`) and `25a00840` "fix(migrations): refuse a selected database name that carries an identifier delimiter". The range also contains main's own commits through `9593fcdf`; those are outside this review.
+  - `25a00840` touches the three matchers (three added lines each, plus the docblock), adds `tests/Unit/SchemaQualifierDelimiterTest.php`, and adds a README section and `conditions/codex-delimited-name/`. The regex line itself is unchanged.
+- **Also judged.** The second Codex P2 on `25a00840` (thread `discussion_r4214949277`), at the coordinator's request.
+- **Method.** The worktree was detached at `25a00840`, with the vendor tree symlinked and its own Composer autoload. `git status --short` showed nothing before this addendum.
+- **Database.** A fresh private `mysqld` 8.4.11 with `--no-defaults` on 127.0.0.1:3709, `--socket=` empty, `--mysqlx=OFF`, `lower_case_table_names=0`, default `sql_mode`, schema `vaseyaudio_review_trigscan`. Port 3306 and the other lanes' daemons were not touched.
+- **Date.** 2026-10-08 (UTC).
+
+### Decision for the delta
+
+**APPROVE.** The merge changes none of this branch's code. The delimiter guard is sound and is reached only where it matters. Each of its six arms is pinned by the new test. No finding is Low or above.
+
+The second Codex P2 is real, but it can only over-refuse; it never admits. I rate it **Info**. Leaving it open is acceptable for a development merge, with the owner deciding whether to name it explicitly (A2-I1).
+
+### 1. The merge `855610be` (question 2)
+
+All of this is in `review-evidence/addendum2/sha256-and-scope.txt`.
+
+- **Parents.** `052cef7c` (this branch) and `9593fcdf` (main).
+- **Paths that differ from main.** `git diff --name-only 9593fcdf 855610be` lists 183 paths:
+  - 177 under `docs/verification/native-schema-isolation-20261007/`;
+  - the branch's own six code, test and census paths: the three matchers, `NativeSchemaIsolationTest`, `IdentityInspectionCostTest` and `database-sqlite-skips.json`;
+  - **0 other paths.**
+- **The reviewed code is unchanged.** `git diff b47de6b6 855610be` on the three matchers and the two lane tests is empty.
+- **The five 253 files.** Re-merging (`git merge-tree 052cef7c 9593fcdf`) conflicts on these five files and on the census.
+  - `git diff 9593fcdf 855610be` on the five files is **empty**: main's #49 versions were taken.
+  - `git diff fad3ab44 052cef7c` on the five files is **empty**: the branch carried main's pre-#49 copies unchanged.
+- **Correction to the brief.** `git diff fad3ab44 855610be` on the five files is **not** empty: 177 lines across 66 insertions and 7 deletions. That diff is exactly #49's own change to these files, which the merge correctly brought in. The emptiness the brief expected holds against `9593fcdf`, not against `fad3ab44`.
+- **Census.** Compared with main, the merge adds 4 entries (this branch's four) and removes none. Compared with `052cef7c`, it adds 1 (#49's `MysqlConnectionTimezoneTest`) and removes none. That is a union.
+
+### 2. Is the fail-closed check sound and complete? (question 1)
+
+**Where `$database` comes from.**
+- Capability and 243 read `DB::getDatabaseName()`, which is the config value `DB_DATABASE` (`config/database.php`, default `laravel`). Identity reads `SELECT DATABASE()`.
+- I tested whether the store can even select such a database: `storage/laravel-connect.php` boots the application against the private instance, and the output is in `laravel-connect.out`. Laravel's `MySqlConnector` runs ``use `<name>`;`` without escaping.
+  - **A name with a backtick cannot be selected at all.** `rv`bt` and `a`b` fail with `1064` on the `use` statement. `rv``bt` fails with `1049 Unknown database` in the DSN.
+  - **Other names connect.** `rv"q`, `rv.dot`, `rv#c` and `rv sp` all connect, and config and `DATABASE()` agree.
+- So the backtick arm is defence in depth. The double-quote arm is reachable.
+
+**When the check runs.**
+- It runs inside `qualifies()`/`qualifiesDatabase()`, which are reached only for a stored object outside the selected schema whose body names a guarded table. The `references(...)` test comes first, then the same-schema comparison short-circuits.
+- So a delimited selected name refuses only when such a candidate exists. Otherwise there is nothing to decide, and migration proceeds.
+- This is correct, but it is narrower than two README phrases (A2-I3).
+
+**The same-schema branch.**
+- `strtolower($schema) === strtolower($database)` compares the dictionary's raw `*_SCHEMA` value with the name. It reads no body text, so delimiters cannot mislead it. It does not need the guard.
+- MySQL stores the schema name unmangled in the dictionary: `SCHEMATA` hex for `a`b` is `616062`.
+
+**Names containing `.`, whitespace or comment openers.**
+- I checked these on 8.4.11 (`storage/delimiter-storage.sql` and `.out`, and `matcher/stored-bodies.php`, whose output `stored-bodies-25a00840.txt` shows 22 cases and 0 mismatches).
+- **MySQL rejects a trailing space or tab.** `CREATE DATABASE `rvtrail `` and the tab form both fail with `1102 Incorrect database name`. So the `(?:\s|…)*\.` tail can never be fed from inside the name.
+- **Accepted names are stored as written and refused by all three guards.** The names `rv.dot`, `rv/*c`, `rv--c`, `rv#c`, `rv sp` (inner space, with spaces around the dot) and `rv\bs` are accepted. Each is stored as written inside a backtick-quoted body, and each `` `<name>`.`owned` `` matches in all three guards (qualifies = 1, so the dependency is refused).
+  - The name is `preg_quote`d and the flags are `isu` (no `x`), so a `.`, `#`, `/*` or space inside the name is literal.
+  - The name is consumed before the tail, so the tail cannot borrow from it.
+- **Interaction with a shorter selected name `rv`.** The only effect is over-refusal (A2-I2):
+  - A peer `rv.dot` matches through the bare arm: the opening backtick is not an identifier character, and then the dot follows.
+  - A peer `rv#c` matches because `#[^\n]*` runs up to the later dot.
+  - Peers `rv/*c` (unterminated comment), `rv--c` (no whitespace after `--`) and `rv sp` do not match.
+
+**Mangling without a delimiter.**
+- Every mangled form I have seen comes from a doubled delimiter inside its own quoting:
+  - `` `a``b` `` is stored as `` `aa`bb` ``, `` `rv``bt` `` as `` `rrv`btt` ``, and `` `aa``bb` `` as `` `aaa`bbb` ``;
+  - under `ANSI_QUOTES`, `"rv""q"` is stored as `"rrv"qq"`.
+- A backslash is stored literally (`rv\bs`).
+- MySQL identifiers are limited to the BMP, without U+0000.
+- Inside backtick quoting the only character that is escaped is the backtick. Under `ANSI_QUOTES` it is the double quote. Both are covered by the guard.
+- I found no admission path left. This is not an exhaustive character sweep. Versioned comments are expanded before storage, as addendum 1 showed.
+
+**Pre-fix behaviour, which confirms the defect was real.**
+- `matcher/pre-fix-expression.txt` applies the `855610be` expression:
+  - it returns **0, meaning admitted**, for the stored `` `rrv`btt` `` (selected `rv`bt`), for the stored ANSI form `"rrv"qq"` (selected `rv"q`), and for the unit test's backtick bodies;
+  - it returns **1, meaning refused**, for a backtick-quoted `` `rv"q` `` and for the unit test's two double-quote bodies.
+- The guard closes the backtick and ANSI cases.
+
+### 3. The second Codex P2: a peer whose name contains a backtick (coordinator's (a) and (b))
+
+**Claim verified.**
+- A peer schema `a`b` holds a routine and a trigger naming its own table `` `a``b`.`owned` ``. MySQL stores both as `` `aa`bb`.`owned` ``.
+- Executing them reads the peer's own table (7 rows), not `bb.owned` (2 rows).
+- All three guards return 1 for selected `bb`. The longer case behaves the same: `aa`bb` is stored as `` `aaa`bbb` `` and matches selected `bbb`.
+- **End to end** (`storage/codex-p2-2-end-to-end.out`, with `DB_DATABASE=bb` and `php artisan migrate:fresh --force`):
+  - With a peer routine in `a`b` naming its own `inquiry_notification_intents`, `migrate:fresh` exits 1 at `2026_10_07_243000` with `Unexpected inquiry notification external routine reference`.
+  - The control, the same routine in a peer `a`c` (stored `` `aa`cc` ``), exits 0, with all 77 migrations DONE.
+
+**Counterexample verified.**
+- MySQL accepts `` SELECT COUNT(*) FROM`bb`.`owned` `` with no separator. This holds in a procedure, inside a derived table (`` FROM(SELECT id FROM`bb`.`owned`)x ``) and in a trigger. Under `ANSI_QUOTES`, `FROM"bb"."owned"` is also accepted.
+- All four are stored as written and resolve to `bb.owned` (2 rows; trigger `@t_nosep = 2`). The current guards return 1 for all four, which is correct.
+- **The nearest regex fix fails open.** The variant puts the identifier-character lookbehind in front of the quoted arms as well. It returns **0 for all four real dependencies**, while it would remove the Codex over-refusal (`variant=0` on `` `aa`bb` ``). A regex fix in that direction would admit a real cross-schema dependency.
+
+**Severity: Info (availability only; fails closed).**
+- The precondition is a schema on the same server whose name contains a backtick and which holds a trigger, view or routine naming one of the guarded tables.
+- That schema cannot be one the store itself uses, because Laravel cannot select it (section 2). The operator's remedy is to rename or drop that schema.
+- **Leaving it open is acceptable for a development merge.** Because the stored text is ambiguous, refusing is the only sound outcome for objects in such a schema.
+- The `SCHEMATA` route the coordinator proposes would also refuse. It improves the message, not availability, and is the owner's choice. It is not a condition.
+
+### 4. Tests and mutations (question 3)
+
+**SQLite** (`sqlite-SchemaQualifierDelimiterTest.txt`, JUnit alongside): `tests/Unit/SchemaQualifierDelimiterTest.php` gives `OK (5 tests, 26 assertions)`, rc=0.
+
+**Native at `25a00840`** (private 8.4.11, port 3709, `native/run.sh`; PHPUnit exit codes):
+
+| Selection | rc | Tests | Assertions | Failures | Errors | Skipped | Wall (s) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `tests/Unit/SchemaQualifierDelimiterTest.php` | 0 | 5 | 26 | 0 | 0 | 0 | 1 |
+| `tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php` | 0 | 1 | 6 | 0 | 0 | 0 | 194 |
+| `tests/Feature/NativeSchemaIsolationTest.php` (lane) | 0 | 34 | 357 | 0 | 0 | 0 | 955 |
+
+The refusal does not reach plain-named servers: the selected name `vaseyaudio_review_trigscan` gives the same lane results as at `b47de6b6`.
+
+**Mutations (my choice: all six arms).**
+- Each run removed one `str_contains` check in one guard, using `mutation/mutate.py <guard> <backtick|dquote>`, and the unit test was run on SQLite. Results are in `mutation/summary.txt`, with the diff, text and JUnit for each mutation.
+
+| Mutation | rc | Result | Failing cases (message names the mutated guard) |
+| --- | --- | --- | --- |
+| capability, backtick removed | 1 | 5 tests, 2 failures | `backtick`, `doubled backtick`: "capability admitted …" |
+| capability, double quote removed | 1 | 5 tests, 2 failures | `double quote`, `leading quote` |
+| identity, backtick removed | 1 | 5 tests, 2 failures | `backtick`, `doubled backtick` |
+| identity, double quote removed | 1 | 5 tests, 2 failures | `double quote`, `leading quote` |
+| inquiry (243), backtick removed | 1 | 5 tests, 2 failures | `backtick`, `doubled backtick` |
+| inquiry (243), double quote removed | 1 | 5 tests, 2 failures | `double quote`, `leading quote` |
+
+- Every mutation was reverted with `git checkout -- app database`. `git diff --quiet -- app database` returned exit 0 each time, and `sha256sum -c` against the pre-mutation hashes printed OK ×3.
+- All mutation runs finished before the native runs started; the native summary records `dirty_app_db_tests=0`.
+
+### 5. Pint (question 4)
+
+`vendor/bin/pint --test` on the four changed PHP files: `{"tool":"pint","result":"passed"}`, rc=0 (`pint.txt`).
+
+### Findings on the delta (none Low or above)
+
+| ID | Severity | Area | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| A2-I1 | Info (availability; fails closed; no admission) | Second Codex P2: peer named with a backtick | A peer `a`b` naming its own guarded table is stored as `` `aa`bb`.`… ``. The quoted arm matches `` `bb` `` for selected `bb`, and `migrate:fresh` refuses (end to end, rc 1 at 243). The control `a`c` passes. The nearest regex fix (identifier lookbehind before the quoted arms) fails open on the valid ``FROM`bb`.`owned` ``, ``FROM(…FROM`bb`…)`` and `ANSI_QUOTES` ``FROM"bb"."owned"``. | Leave as is for development. The operator remedy is to rename or drop such a peer. An explicit `SCHEMATA` refusal is an optional owner choice for a clearer message. Do not adopt the lookbehind fix. | `storage/delimiter-storage.out`, `storage/codex-p2-2-end-to-end.out`, `matcher/stored-bodies-25a00840.txt` |
+| A2-I2 | Info (over-refusal, safe direction) | Peers extending the selected name with `.` or `#` | For selected `rv`, a peer named `rv.dot` or `rv#c` that names its own guarded table is refused. The bare arm accepts the opening backtick as a boundary, and `.` or `#…` then reaches a dot. This was the same at `b47de6b6`. | None required. Note it next to I-1. | `matcher/stored-bodies-25a00840.txt` |
+| A2-I3 | Info (documentation accuracy) | Lane README and unit-test wording | (1) README: "each guard admitted them" before the fix. For the two double-quote names the pre-fix expression returned 1, which is a refusal; the red failures there show only the missing early exception. The real pre-fix admissions are the backtick spellings and the stored `ANSI_QUOTES` form `"rrv"qq"`, which the unit test does not exercise. The test's "admitted" message has the same imprecision. (2) README: "the refusal happens before any dictionary read" and "such a name is unsupported". The refusal happens after the dictionary rows are read, only for a peer object naming a guarded table, and before the regex. A delimited name with no such object migrates. (3) A backtick name cannot be selected through the app's connection at all (1064 or 1049). | Optional wording fix in the README, and optionally an `ANSI_QUOTES` stored-form case. No code change. | `matcher/pre-fix-expression.txt`, `storage/laravel-connect.out`, `conditions/codex-delimited-name/red-sqlite.txt` |
+
+**Unchanged.** I-1 to I-6 and A1-I1 to A1-I3.
+
+### Conditions
+
+1. **Conditions 1 and 2:** closed in addendum 1, and they remain closed. The matcher expression is unchanged (`git diff 855610be 25a00840` adds only the guard and the docblock).
+2. **Condition 3 (I-6):** unchanged and carried forward.
+3. **No new condition.**
+
+### SHA-256 at `25a00840`
+
+The git blob and the worktree are identical for each file.
+
+| Path | SHA-256 |
+| --- | --- |
+| `app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php` | `60757cb1d9242eec6594956756a8adc4e31ca2162547fdc6e3c2360ed792c2f2` |
+| `app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php` | `656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4` |
+| `database/migrations/2026_10_07_243000_inquiry_notification_intents.php` | `ab74169f24b9ad7692730723045dc38db74dadf366e17f6f7d575457cf67cd0f` |
+| `tests/Unit/SchemaQualifierDelimiterTest.php` | `2e5265d7cd00c47efc5c75cee0318c60714e50e1e0af863a6a7377b792b66207` |
+
+### Evidence index (`review-evidence/addendum2/`)
+
+- `sha256-and-scope.txt`: the first-parent log, the merge's parents and conflicts, the path partition, the checks on the five 253 files, the census union, the `25a00840` stat, and the hashes.
+- `storage/`:
+  - `delimiter-storage.sql` and `.out`: accepted and refused names, stored bodies and resolution, the Codex P2-2 peers, the ``FROM`bb` `` counterexamples, and the `ANSI_QUOTES` forms.
+  - `laravel-connect.php` and `.out`.
+  - `codex-p2-2-end-to-end.out`, plus the two `migrate:fresh` logs.
+  - `cleanup.txt`.
+- `matcher/`:
+  - `stored-bodies.php` and its output (22 cases, 0 mismatches; also the lookbehind variant);
+  - `pre-fix-expression.php` and its output.
+- `native/`: `run.sh`, `summary.txt`, text and JUnit for each selection, and `private-instance-lifecycle.txt`.
+- `mutation/`: `mutate.py`, six diffs, text and JUnit for each mutation, `pre-mutation-sha256.txt` and `summary.txt`.
+- `sqlite-SchemaQualifierDelimiterTest.txt` and `.junit.xml`, and `pint.txt`.
+
+### Cleanup
+
+- **Mutations.** All six were reverted. `git diff --quiet -- app database` returned exit 0, and the three hashes match `pre-mutation-sha256.txt`.
+- **Worktree.** It is at `25a00840`. `git status --short` shows only `?? …/independent-review/review-evidence/addendum2/`, plus this appended section in `DECISION.md`.
+- **Throwaway schemas.** These were dropped before the native runs (`storage/cleanup.txt`): `rv.dot`, `rv/*c`, `rv--c`, `rv#c`, `rv sp`, `rv"q`, `rv`bt`, `rv\bs`, `bb`, `a`b`, `a`c`, `aa`bb` and `rvpeer`. The instance then listed only the system schemas and `vaseyaudio_review_trigscan`, with 0 non-`sys` routines and 0 triggers.
+- **Private mysqld.**
+  - pid 18910 on :3709 was shut down with `mysqladmin shutdown`. `/proc/18910` was then absent, nothing was listening on 3709 (only 16 TIME_WAIT entries), and no `mysqld` process had `--port=3709`.
+  - `$scratchpad/review-trigscan-mysql2` (231M) was removed.
+  - Other lanes' daemons were left running: 3531, 3567, 3641, 3642 and 3644.
+- **Recording error, mine.** My working lifecycle file was inside the removed directory, and it was deleted before I copied it. As a result, the pre-shutdown schema listing and the last `err.log` line were lost. `native/private-instance-lifecycle.txt` says so and records an independent post-shutdown re-check instead.
+- **Credentials.** The throwaway password does not appear in any evidence file.
