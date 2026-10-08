@@ -1,0 +1,49 @@
+# source: 9004245f + codex-13 working tree + mutation M2-commit-frame-old-budget (scratch worktree)
+M2-commit-frame-old-budget applied to app/Domain/Grants/Paid/PaidGrantDownloads.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/phpunit.xml
+
+E.EE..                                                              6 / 6 (100%)
+
+Time: 00:48.730, Memory: 206.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_started_late_in_the_observation_budget_gets_its_own_bound
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantCommands.php:31
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:157
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_commit_frame_and_first_byte_get_a_fresh_budget_after_a_long_first_frame_and_snapshot
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantCommands.php:31
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:157
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:165
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_fresh_commit_budget_is_still_bounded_before_the_first_byte
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantCommands.php:31
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:157
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 131, Errors: 3.
+rc=2
