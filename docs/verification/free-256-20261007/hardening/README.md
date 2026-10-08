@@ -353,3 +353,15 @@ mirrored as a constant, and the regression asserts the pinned file still says `m
 119 refused `changed_policy` with nothing written; 120 accepted. Red (the old `>= 30` bound applied to this code): 1
 failure; green: 1 test, 10 assertions. Directory SQLite 142 / 1039, 2 native-only skips; Pint passed; pinned renderer
 files untouched.
+
+## Codex review round 10: availability changes during a render (`codex-10/`)
+
+Codex P2 on `2f787589`: publishing a render compared the whole origin graph, including the definition's availability
+chain, so a staff close or reopen while an accepted origin rendered rejected a valid PDF as `claim_superseded` and
+consumed an attempt. Publication now compares only the render-relevant state (`renderState()`: origin, payload, work
+chain, original, manifest, revocation); `graph()` still validates the whole definition on both reads, so tampering is
+still refused, and a revocation during the render still blocks publication. Regression
+`ProductionFreeGrantRenderAvailabilityTest` (a renderer process factory closes the definition, or revokes the origin,
+mid-render, then renders for real): red 1 error (close superseded the render; the revocation control already refused),
+green 2 tests, 11 assertions. Directory SQLite 144 / 1050, 2 native-only skips; Pint passed; pinned renderer files
+untouched (`ProductionFreeGrantDocuments` is not in the render profile).
