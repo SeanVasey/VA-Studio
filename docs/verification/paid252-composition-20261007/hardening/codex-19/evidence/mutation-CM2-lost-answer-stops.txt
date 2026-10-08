@@ -1,0 +1,56 @@
+# source: a7892c9b + codex-19 working tree + client mutation CM2-lost-answer-stops (restored afterwards)
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-finish-completion.test.tsx (3 tests | 1 failed) 564ms
+   ❯ finishing a prepared but unfulfilled paid order (3)
+     × keeps the order recoverable after a lost answer by polling saved status and finishing it (C13) 71ms
+ ❯ tests/frontend/paid-grant-continuation.test.tsx (7 tests | 1 failed) 801ms
+   ❯ continuing paid preparation after one click (7)
+     × recovers from a document timeout by polling saved status instead of stopping 83ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > recovers from a document timeout by polling saved status instead of stopping
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:108:56
+    106|     expect(screen.getByRole('alert')).toHaveTextContent('could not be …
+    107|     await advance(15_000);
+    108|     expect(s.calls.filter(c => c.path === statusPath)).toHaveLength(1);
+       |                                                        ^
+    109|     await advance(15_000);
+    110|     expect(s.calls.map(c => c.path).slice(2)).toEqual([documentPath, s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-finish-completion.test.tsx > finishing a prepared but unfulfilled paid order > keeps the order recoverable after a lost answer by polling saved status and finishing it (C13)
+Error: expect(element).toHaveTextContent()
+
+Expected element to have text content:
+  checking again shortly
+Received:
+  Preparing your files: 1 of 1 lines ready.
+ ❯ tests/frontend/paid-grant-finish-completion.test.tsx:54:40
+     52|     await act(() => vi.advanceTimersByTimeAsync(0));
+     53|     expect(screen.getByRole('alert')).toHaveTextContent('could not be …
+     54|     expect(screen.getByRole('status')).toHaveTextContent('checking aga…
+       |                                        ^
+     55|     await act(() => vi.advanceTimersByTimeAsync(15_000));
+     56|     expect(fetcher.mock.calls.map(([path]) => String(path)).slice(2)).…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 8 passed (10)
+   Start at  20:21:57
+   Duration  1.66s (tests 48%, environment 40%, transform 7%, setup 5%, import 1%)
+
+rc=1
