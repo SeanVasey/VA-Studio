@@ -26,7 +26,8 @@ final class ProductionFreeGrantTransfer
             while (! feof($input)) {
                 ProductionFreeGrantException::require(hrtime(true) < $this->deadline, 'expired');
                 $chunk = @fread($input, 1048576);
-                ProductionFreeGrantException::require(is_string($chunk), 'artifact_unavailable');
+                // The local snapshot never stalls: '' before EOF is a failure, not something to spin on until the deadline.
+                ProductionFreeGrantException::require(is_string($chunk) && ($chunk !== '' || feof($input)), 'artifact_unavailable');
                 $bytes += strlen($chunk);
                 ProductionFreeGrantException::require($bytes <= $this->stream->sizeBytes, 'artifact_unavailable');
                 if ($chunk !== '') {

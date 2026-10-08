@@ -170,9 +170,15 @@ final class ProductionFreeGrantDownloads
                             if (! is_resource($input) || get_resource_type($input) !== 'stream') {
                                 throw new \UnexpectedValueException;
                             }
+                            // A blocking read returns '' only at end of stream. '' without EOF is a stalled source and is refused at
+                            // once; the deadline is checked before every read, not only when a chunk is written.
+                            @stream_set_blocking($input, true);
+                            // A read that never returns cannot be interrupted by a deadline check, so each read is also time-boxed.
+                            @stream_set_timeout($input, max(1, min(5, intdiv($deadline - hrtime(true), 1_000_000_000))));
                             while (! feof($input)) {
+                                ProductionFreeGrantException::require(hrtime(true) < $deadline, 'expired');
                                 $chunk = @fread($input, 1048576);
-                                if (! is_string($chunk)) {
+                                if (! is_string($chunk) || (stream_get_meta_data($input)['timed_out'] ?? false) === true || ($chunk === '' && ! feof($input))) {
                                     throw new \UnexpectedValueException;
                                 }
                                 if ($chunk !== '') {

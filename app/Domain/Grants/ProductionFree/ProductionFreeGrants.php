@@ -21,6 +21,7 @@ final class ProductionFreeGrants
     {
         ProductionFreeGrantInput::uuid($definitionId);
         ProductionFreeGrantInput::text($declaredName, 120);
+        ProductionFreeGrantRenderable::require(declaredName: $declaredName);
 
         return $this->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows) use ($definitionId, $declaredName): array {
             $graph = $this->admissible($definitionId, $policy, $rows);
@@ -41,6 +42,7 @@ final class ProductionFreeGrants
             ProductionFreeGrantInput::hash($input[$field]);
         }
         ProductionFreeGrantInput::text($input['declaredName'], 120);
+        ProductionFreeGrantRenderable::require(declaredName: $input['declaredName']);
         // Literal affirmative assent only: never true-ish, never defaulted, never inferred from a purchase or import.
         ProductionFreeGrantException::require($input['affirmed'] === true, 'assent_required');
         $requestHash = CanonicalJson::hash(['definition_id' => $definitionId, ...$input]);
@@ -247,6 +249,7 @@ final class ProductionFreeGrants
         ProductionFreeGrantException::require($graph['payload']['provenance'] === $policy['provenance'], 'provenance');
         // A new origin must be renderable, so its definition's profile has to be the one this runtime renders with.
         ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
+        ProductionFreeGrantRenderable::requirePayload($graph['payload']);
         (new ProductionFreeGrantPolicy)->requireApprovedTerms($policy, $graph['payload']['terms_hash']);
         (new ProductionFreeGrantDefinitions)->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
 

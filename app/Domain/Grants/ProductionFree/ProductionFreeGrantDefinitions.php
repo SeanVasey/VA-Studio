@@ -32,6 +32,7 @@ final class ProductionFreeGrantDefinitions
         $maxOrigins = ProductionFreeGrantInput::integer($input['maxOrigins'], 1, 1000000);
         $assets = $this->assets($input['assets']);
         $source = $this->source($input['source']);
+        ProductionFreeGrantRenderable::require(title: $title, termsReference: $reference, termsText: $terms, assentText: $assent);
 
         return $this->staffCommand($author, function (array $policy, ProductionFreeGrantRows $rows) use ($title, $reference, $terms, $assent, $maxOrigins, $assets, $source, $author): array {
             $proof = $this->prove($policy, $source, $assets);
@@ -62,6 +63,7 @@ final class ProductionFreeGrantDefinitions
             ProductionFreeGrantException::require(hash_equals($graph['definition']['definition_hash'], $hash), 'stale_definition');
             ProductionFreeGrantException::require($graph['review'] === [], 'already_reviewed');
             ProductionFreeGrantException::require((int) $graph['payload']['author_user_id'] !== (int) $reviewer->getKey(), 'self_review');
+            ProductionFreeGrantRenderable::requirePayload($graph['payload']);
             $proof = $this->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
             $at = ProductionFreeGrantInput::now();
             $id = (string) Str::uuid();
@@ -203,6 +205,7 @@ final class ProductionFreeGrantDefinitions
             ProductionFreeGrantException::require(count($graph['events']) < ProductionFreeGrantSchema::MAX_AVAILABILITY_EVENTS, 'availability_exhausted');
             if ($kind === 'open') {
                 ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
+                ProductionFreeGrantRenderable::requirePayload($graph['payload']);
                 (new ProductionFreeGrantPolicy)->requireApprovedTerms($policy, $graph['payload']['terms_hash']);
                 $this->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
             }
