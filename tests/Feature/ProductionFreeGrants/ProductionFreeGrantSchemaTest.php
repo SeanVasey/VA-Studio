@@ -94,7 +94,9 @@ final class ProductionFreeGrantSchemaTest extends TestCase
     public function test_an_external_dependent_on_owned_evidence_is_refused(): void
     {
         $pdo = DB::connection()->getPdo();
-        $pdo->exec('CREATE TABLE foreign_free_dependent (id INTEGER PRIMARY KEY, origin_id VARCHAR(36) REFERENCES production_free_origins (id))');
+        $pdo->exec(DB::getDriverName() === 'mysql'
+            ? 'CREATE TABLE foreign_free_dependent (id INT PRIMARY KEY, origin_id VARCHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, FOREIGN KEY (origin_id) REFERENCES production_free_origins (id)) ENGINE=InnoDB'
+            : 'CREATE TABLE foreign_free_dependent (id INTEGER PRIMARY KEY, origin_id VARCHAR(36) REFERENCES production_free_origins (id))');
         $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'external_dependent');
         $pdo->exec('DROP TABLE foreign_free_dependent');
         $pdo->exec('CREATE VIEW foreign_free_view AS SELECT id FROM production_free_originals');
