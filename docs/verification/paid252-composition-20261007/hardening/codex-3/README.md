@@ -40,6 +40,6 @@ The finalize case ("never offers to set aside an uncertain finalization") is a g
 ## Not tested
 
 - No browser run; the jsdom test drives the real component with mocked responses.
-- The server keeps only the latest 20 authorizations per line in the status history. If more than 20 newer
-  authorizations were made from other tabs inside one 60 s lifetime (the server allows 3), a live one could fall outside
-  the window; that cannot happen under the current rate limit.
+- The server keeps only the latest 20 authorizations per line in the status history. This round assumed a 60 s
+  lifetime; the policy allows up to 600 s, so a live authorization can be pushed out of the window. Fixed in round 4
+  (`../codex-4/`).
