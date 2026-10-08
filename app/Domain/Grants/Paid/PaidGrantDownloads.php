@@ -138,7 +138,10 @@ final class PaidGrantDownloads
         // Kept from the original flow: the lifetime must still remain (and stay within the policy maximum) when the first
         // frame closes. It no longer shortens the snapshot, the commit frame or the transfer.
         $this->deadline($before['auth']);
-        $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $deadline->value());
+        // One held spool slot per buyer account, so one buyer's slow transfers cannot occupy every slot (refused before any
+        // attempt is recorded). The digest only names the account inside the private spool.
+        $holder = hash('sha256', 'paid-spool-holder-v1:'.$before['graph']['batch']['account_id']);
+        $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $deadline->value(), $holder);
         $projectionRead = PaidGrantProjectionRead::begin();
         try {
             // Derived and validated before the attempt is consumed, so a refused transfer policy records nothing.

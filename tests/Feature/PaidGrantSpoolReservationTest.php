@@ -132,6 +132,42 @@ final class PaidGrantSpoolReservationTest extends TestCase
         }
     }
 
+    /**
+     * Codex P2 (PR #56): a held slot lasts for the whole transfer (up to `transfer_max_seconds`), so one buyer's slow
+     * transfers could hold every slot. A buyer now holds at most one slot at a time; another buyer is still admitted, and
+     * the buyer is admitted again once its stream is closed.
+     */
+    public function test_one_buyer_holds_at_most_one_slot_while_another_buyer_is_admitted(): void
+    {
+        $spool = $this->spool();
+        $spool->free = (float) (3 * self::BYTES + PaidGrantPrepareStream::RESERVE_BYTES);
+        [$buyer, $other] = [hash('sha256', 'buyer-a'), hash('sha256', 'buyer-b')];
+        $results = [];
+        $spool->during = function () use ($spool, $buyer, $other, &$results): void {
+            $spool->during = null;
+            foreach (['same' => $buyer, 'other' => $other, 'none' => null] as $name => $holder) {
+                try {
+                    $spool->handle($this->target(), null, $holder)->close();
+                    $results[$name] = 'admitted';
+                } catch (DeliveryException $error) {
+                    $results[$name] = $error->reason;
+                }
+            }
+        };
+        $first = $spool->handle($this->target(), null, $buyer);
+        $this->assertSame(['same' => 'target_unavailable', 'other' => 'admitted', 'none' => 'admitted'], $results);
+        $first->close();
+        // Released: the same buyer is admitted again, and a malformed holder is refused before anything is reserved.
+        $spool->handle($this->target(), null, $buyer)->close();
+        try {
+            $spool->handle($this->target(), null, 'not-a-digest');
+            $this->fail('A malformed holder must be refused.');
+        } catch (DeliveryException $error) {
+            $this->assertSame('target_unavailable', $error->reason);
+        }
+        $this->assertSame([], glob($this->spoolDirectory().'/slot-*.snapshot'));
+    }
+
     public function test_a_malformed_reservation_sidecar_is_never_repaired_and_its_slot_is_skipped(): void
     {
         $spool = $this->spool();

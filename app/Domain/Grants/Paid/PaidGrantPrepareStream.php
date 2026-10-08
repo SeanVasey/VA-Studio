@@ -23,7 +23,12 @@ class PaidGrantPrepareStream
 
     public const MAX_SECONDS = 60;
 
-    public function handle(array $target, ?int $originalDeadline = null): PreparedDeliveryStream
+    /**
+     * @param  string|null  $holder  64-hex digest naming the buyer account the snapshot is for. One buyer holds at most one
+     *                               slot at a time, so a buyer's own slow transfers cannot take every slot from other
+     *                               customers; null (tests and non-account callers) records no holder.
+     */
+    public function handle(array $target, ?int $originalDeadline = null, ?string $holder = null): PreparedDeliveryStream
     {
         ActivationPolicy::outsideTransactions();
         $policy = (new PaidGrantPolicy)->capture();
@@ -40,7 +45,10 @@ class PaidGrantPrepareStream
             $root = $files->privateRoot();
             $directories = $this->directories($root, true);
             $spool = $root.'/delivery/paid-spool';
-            [$lease, $path, $reservation] = $this->admit($spool, $target['size_bytes']);
+            if ($holder !== null && preg_match('/\A[a-f0-9]{64}\z/D', $holder) !== 1) {
+                throw new \UnexpectedValueException;
+            }
+            [$lease, $path, $reservation] = $this->admit($spool, $target['size_bytes'], $holder);
             $mask = umask(0077);
             try {
                 $output = @fopen($path, 'x+b');
@@ -197,7 +205,7 @@ class PaidGrantPrepareStream
      *
      * @return array{0:resource,1:string,2:resource} the slot lease, its snapshot path and its reservation handle
      */
-    private function admit(string $spool, int $bytes): array
+    private function admit(string $spool, int $bytes, ?string $holder): array
     {
         $gate = $this->lease($spool.'/admission.lock');
         try {
@@ -207,12 +215,22 @@ class PaidGrantPrepareStream
             [$lease, $snapshot, $number] = $this->slot($spool);
             $reservation = null;
             try {
+                // One held slot per buyer: a held slot of the same holder refuses this one before anything is reserved.
+                if ($holder !== null && in_array($holder, $this->holders($spool, $number), true)) {
+                    throw new \UnexpectedValueException;
+                }
                 // Written sizes are read before free space: a byte another holder writes in between is then still counted
                 // as pending and also missing from free space (conservative), never counted as written but still free.
                 $pending = $this->pending($spool, $number);
                 $space = $this->freeBytes($spool);
                 if (! is_numeric($space) || ! is_finite((float) $space) || $space - $pending < $bytes + self::RESERVE_BYTES) {
                     throw new \UnexpectedValueException;
+                }
+                $mark = $this->reservation($spool.'/slot-'.$number.'.holder', 64);
+                try {
+                    $this->write($mark, $holder ?? str_repeat('0', 64));
+                } finally {
+                    fclose($mark);
                 }
                 $reservation = $this->reservation($spool.'/slot-'.$number.'.reserve');
                 $this->reserve($reservation, $bytes);
@@ -234,8 +252,8 @@ class PaidGrantPrepareStream
 
     /**
      * A fixed path per locked slot prevents accumulating crash leftovers across fresh UUID names. A slot whose snapshot
-     * exists, or whose reservation sidecar is anything but a regular single-link 0600 20-byte file owned by this process
-     * user, is skipped and never repaired or deleted.
+     * exists, or whose reservation (20-byte) or holder (64-byte) sidecar is anything but a regular single-link 0600 file of
+     * that size owned by this process user, is skipped and never repaired or deleted.
      *
      * @return array{0:resource,1:string,2:int}
      */
@@ -250,12 +268,16 @@ class PaidGrantPrepareStream
                 continue;
             }
             $snapshot = $spool.'/slot-'.$slot.'.snapshot';
-            $sidecar = $spool.'/slot-'.$slot.'.reserve';
             clearstatcache(true, $snapshot);
-            clearstatcache(true, $sidecar);
-            $reserve = @lstat($sidecar);
-            if (@lstat($snapshot) !== false || ($reserve !== false && (($reserve['mode'] & 0170000) !== 0100000 || ($reserve['mode'] & 07777) !== 0600
-                || $reserve['nlink'] !== 1 || $reserve['uid'] !== $owner || $reserve['size'] !== 20))) {
+            $unusable = @lstat($snapshot) !== false;
+            foreach (['reserve' => 20, 'holder' => 64] as $suffix => $size) {
+                $sidecar = $spool.'/slot-'.$slot.'.'.$suffix;
+                clearstatcache(true, $sidecar);
+                $stat = @lstat($sidecar);
+                $unusable = $unusable || ($stat !== false && (($stat['mode'] & 0170000) !== 0100000 || ($stat['mode'] & 07777) !== 0600
+                    || $stat['nlink'] !== 1 || $stat['uid'] !== $owner || $stat['size'] !== $size));
+            }
+            if ($unusable) {
                 fclose($candidate);
 
                 continue;
@@ -323,12 +345,54 @@ class PaidGrantPrepareStream
         }
     }
 
+    /** Holders recorded by every other slot that is held right now. A held slot's unreadable holder fails closed. */
+    private function holders(string $spool, int $own): array
+    {
+        $holders = [];
+        for ($slot = 0; $slot < self::SLOTS; $slot++) {
+            if ($slot === $own) {
+                continue;
+            }
+            $probe = $this->lease($spool.'/slot-'.$slot.'.lock');
+            try {
+                if (@flock($probe, LOCK_EX | LOCK_NB)) {
+                    @flock($probe, LOCK_UN);
+
+                    continue;
+                }
+            } finally {
+                fclose($probe);
+            }
+            $path = $spool.'/slot-'.$slot.'.holder';
+            clearstatcache(true, $path);
+            if (@lstat($path) === false) {
+                continue;
+            }
+            $handle = @fopen($path, 'rb');
+            if (! is_resource($handle)) {
+                throw new \UnexpectedValueException;
+            }
+            try {
+                $this->sameFile($path, fstat($handle), 0600, 64);
+                $value = fread($handle, 64);
+                if (! is_string($value) || preg_match('/\A[a-f0-9]{64}\z/D', $value) !== 1) {
+                    throw new \UnexpectedValueException;
+                }
+                $holders[] = $value;
+            } finally {
+                fclose($handle);
+            }
+        }
+
+        return $holders;
+    }
+
     /**
-     * The slot's fixed 20-byte reservation sidecar, written only under both the slot lock and the admission lock. A
-     * missing sidecar is created under a fresh name and renamed into place, so a crash never leaves a partial file at
-     * the fixed path.
+     * A slot's fixed-size sidecar (the 20-byte reservation or the 64-byte holder), written only under both the slot lock
+     * and the admission lock. A missing sidecar is created under a fresh name and renamed into place, so a crash never
+     * leaves a partial file at the fixed path.
      */
-    private function reservation(string $path)
+    private function reservation(string $path, int $length = 20)
     {
         clearstatcache(true, $path);
         if (@lstat($path) === false) {
@@ -342,7 +406,7 @@ class PaidGrantPrepareStream
             if (! is_resource($created)) {
                 throw new \UnexpectedValueException;
             }
-            $written = @fwrite($created, str_repeat('0', 20)) === 20 && @fflush($created);
+            $written = @fwrite($created, str_repeat('0', $length)) === $length && @fflush($created);
             fclose($created);
             if (! $written || ! @rename($temporary, $path)) {
                 @unlink($temporary);
@@ -354,12 +418,19 @@ class PaidGrantPrepareStream
             throw new \UnexpectedValueException;
         }
         try {
-            $this->sameFile($path, fstat($handle), 0600, 20);
+            $this->sameFile($path, fstat($handle), 0600, $length);
 
             return $handle;
         } catch (Throwable $error) {
             fclose($handle);
             throw $error;
+        }
+    }
+
+    private function write($handle, string $value): void
+    {
+        if (fseek($handle, 0) !== 0 || @fwrite($handle, $value) !== strlen($value) || ! @fflush($handle)) {
+            throw new \UnexpectedValueException;
         }
     }
 
