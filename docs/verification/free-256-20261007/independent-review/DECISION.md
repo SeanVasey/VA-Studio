@@ -523,3 +523,82 @@ SHA-256 of every changed file at `5a2fadd2` is in `addendum2/sha256-5a2fadd2.txt
 - The lifecycle is in `addendum2/native/private-instance-lifecycle.txt`.
 - The mutation worktree `-free256b-mut` and the old review worktree `/home/user/VA-Studio-review-free256` were removed.
 - The review worktree is `/home/user/VA-Studio-review-free256b`, detached at `5c8696a0`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum1/` and `review-evidence/addendum2/`. Nothing was committed or pushed.
+
+## Addendum 3: bounded reads and contention, `5c8696a0..cbc16065` (evidence head `613bf539`)
+
+- Scope: code `cbc16065`, which fixes A2-5 (availability window), A2-1 (the library window test on MySQL) and A1-6 (raw deadlock exceptions). Lane evidence is in `613bf539`.
+- Before checkout, every file of my addenda 1 and 2 was compared byte for byte with `e9fdff7e`: 57 files plus `DECISION.md`, all identical. Nothing uncommitted was lost.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3751 with schema `rv256c`, using the usual `--no-defaults --socket=` pattern. Other lanes' instances (3711, 3721, 3741, 3767) and 3306 were not touched.
+- Evidence is in `review-evidence/addendum3/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `613bf539` for a development merge.** A2-5, A2-1 and A1-6 are closed.
+
+Codex raised two more items on `613bf539` (stalled source reads and renderer-unsupported input). I confirm both. Both were already present at `1860e00d` and my original review missed them. They are A3-1 and A3-2 below and are pending addendum 4.
+
+### Judgement of each fix
+
+- **A2-5, bounded chain reads.**
+  - `ProductionFreeGrantRows::chain()` reads `max + 1` rows and refuses with `tampered` if it gets more than `max`. It then sorts by ordinal.
+  - Availability ordinals are now capped at 0–999 by CHECK, the read, the write cap (`availability_exhausted`) and `expectedOrdinal`. The work chain is 0–63, read through `chain(…, 64)`. CHECK, `UNIQUE(definition_id|origin_id, ordinal)` and the read bound agree, so a chain is always read whole.
+  - All six transaction sites now use the wrapper. The only remaining `all()` reads are by unique id: the library page `id IN (…)` and `one()` reads with `LIMIT 2`.
+  - The availability guard alternates open and closed starting from `open` at ordinal 0, so ordinal 999 can only be `closed`. **A definition can never be left stuck open at the cap**: the last permitted event is a close.
+  - Native: `ProductionFreeGrantAvailabilityBoundTest` passed on MySQL. So did the schema install test, which compares the CHECK clause exactly, now with `999` and `63`.
+  - The migration `256000` was edited in place again. A2-2 (Info) still applies: recreate any database that ran it.
+- **A2-1, library window test.** The driver-neutral case runs on every driver: real origins with forced UUIDs that sort opposite to their age, and a page smaller than the total. It passed on MySQL.
+  - The 1,001-filler case returns early off SQLite with one assertion that the driver is not SQLite. On MySQL it is a pass that tests nothing (2 assertions, `passed`, not `skipped`).
+  - **Ruling: acceptable.** The MySQL shards require zero skips, and the native-only skip census is for the other direction. The neutral case carries the native coverage of the property under test (newest-first selection in SQL before the limit). The filler case adds only the more-than-1,000 scan, which the `ORDER BY … LIMIT` semantics guarantee by construction.
+  - Recommendation (Info): keep the test name's `_on_sqlite` suffix and docblock, so the vacuous pass is visible to readers. Do not count it as native evidence.
+- **A1-6, contention.** `ProductionFreeGrantTransactions::run()` maps SQLSTATE 40001, MySQL 1213, MySQL 1205 and Laravel's `DeadlockException` (anywhere in the exception chain) to `contention`. `Rows::insert` maps the same errors at the statement level. Every Free256 transaction now goes through the wrapper.
+  - **Native re-run of my cap-1 held-lock race (8 rounds):** every round produced exactly one origin.
+    - Losers: 6 got `contention` and 2 got `refused_by_guard`.
+    - **0 raw driver exceptions.** Before the fix, 2 of 3 held rounds produced a raw `PDOException 1213`.
+  - MySQL rolls back only the statement on a 1205 lock wait timeout (`innodb_rollback_on_timeout=OFF`). Throwing from inside `DB::transaction` makes Laravel roll back the whole transaction, so nothing partial survives. The lane test checks this with zero rows after a simulated 1205 and 1213, on MySQL as well.
+  - **Mapping without retry is correct for the domain layer.** These commands have effects outside the database: source proofs, claims, staged files and spool snapshots, all taken outside or before the transaction. A blind in-domain retry would repeat them under a new frame.
+    - The customer commands are safe for the caller to retry. `accept` is idempotent by request key; the lane test shows the same key succeeding exactly once after contention.
+    - `authorize` and `redeem` leave nothing behind when refused: the authorization or redemption row is rolled back, and the prepared stream is closed.
+    - The mount should turn `contention` into a "try again" response (for example 409 or 503 with `Retry-After`), with at most a bounded client or controller retry.
+
+### Codex P2s on `613bf539` (my view; fixes pending as addendum 4)
+
+| ID | Severity | Finding | View |
+| --- | --- | --- | --- |
+| A3-1 | Low (mount condition) | **A stalled source can hold a spool slot.** In the fill loop of `ProductionFreeGrantDownloads::snapshot` (`while (! feof($input)) { $chunk = fread(…); if ($chunk !== '') $write($chunk); }`), only `$write()` checks the deadline. A source stream that keeps returning `''` without reaching EOF spins forever and holds its spool slot. With 3 slots, three stalled sources stop all free-grant delivery. A blocking `fread` on a hung source is also unbounded. | **Confirmed by code; present since `1860e00d`.** Check the deadline on every iteration, refuse an empty non-EOF read after a bounded count or interval, and set a stream timeout (`stream_set_timeout`) or use non-blocking reads against the deadline. Audit every stream loop: the lane's `Transfer::writeTo` already checks the deadline per chunk, and the spool `readBack` calls `within()` on each iteration. |
+| A3-2 | Low | **Assent accepts text the renderer refuses.** `ProductionFreeGrantInput::text` admits visible UTF-8 that `ProductionFreeGrantText::supportedText()` rejects (scripts other than Latin, Greek or Cyrillic, and any combining mark). A customer can assent with such a declared name, which seals an origin that can never render. Its master, MP3 and stems are then never deliverable, because delivery needs the original. Staff-entered title, terms and assent text have the same gap. | **Confirmed by probe; present since `1860e00d`.** An Arabic name and a decomposed `e` + U+0301 both gave `accept=ok`, `render=render_failed`, `master=original_pending`. Validate every renderer-fed field with the renderer's own rule, including font glyph coverage, at `review`/`accept` (declared name) and at `propose` (staff text). Better still, run a render preflight on the exact sealed input before the origin is written. Origins already sealed with unsupported text cannot be fixed (append-only) and need an operator path. |
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `613bf539` | SQLite | 0 | 129 tests, 925 assertions, 2 skipped; matches the lane |
+| `LibraryWindowTest`, `AvailabilityBoundTest`, `ContentionTest` (7 data cases), schema install test | MySQL :3751 | 0 | 11 tests, 71 assertions, 0 skipped. 07:23:23Z to 07:44:25Z. The SQLite-only filler case passes vacuously (2 assertions) |
+| `addendum3/probes/NativeHeldRaceProbeTest.php` (8 cap-1 held rounds) | MySQL :3751 | 0 | 1 test, 14 assertions; 0 raw exceptions (`native-held-race-log.json`) |
+| `addendum3/probes/RendererInputProbeTest.php` | SQLite | 0 | 1 test, 5 assertions; A3-2 reproduced |
+| Pint `--test` on the 9 changed PHP files under `app/` and `tests/` | n/a | 0 | passed |
+
+SHA-256 of every changed file at `cbc16065` is in `addendum3/sha256-cbc16065.txt`. The new class:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantTransactions.php` | `5982ee4cfd2b724337391f48cd5a458c618c1be4867ec2ed21e246fc1a4c0186` |
+| `ProductionFreeGrantRows.php` | `160a225332d233c32e55c846fb609dac8962243148069147ef837a9483f6fba6` |
+
+Note on the committed reviewer probe: Pint flags `addendum1/probes/AddendumProbeTest.php`. It is review evidence and not part of the suite, so it is not in the gate set.
+
+### Conditions after Addendum 3
+
+- **Closed:** A2-5, A2-1 and A1-6.
+- **Added:** A3-1 before any delivery mount; A3-2 before activation (and the input rule before any customer-facing assent).
+- **Unchanged:**
+  - A1-1, the A1-6 mount response mapping (`contention` to a retryable response), and A1-7 with the identity key-rotation handling;
+  - A2-2 (confirm before merge);
+  - conditions 3 and 5;
+  - F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3751 (pid 14614) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3751; the only remaining entries are client sockets in TIME_WAIT. Its datadir `scratchpad/review-free256c-mysql/data` was deleted.
+- The lifecycle is in `addendum3/native/private-instance-lifecycle.txt`.
+- The review worktree `/home/user/VA-Studio-review-free256b` is detached at `613bf539`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum3/`. Nothing was committed or pushed.
