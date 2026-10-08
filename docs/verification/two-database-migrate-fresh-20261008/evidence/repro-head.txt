@@ -1,0 +1,16 @@
+source: 705a712e6a3d22ea8e4483c44d2cc47a2d9fa52b  php: 8.4.26  mysqld: 8.4.11
+== migrate:fresh --force on rv256_1
+  2026_10_06_238000_production_track_preparation_packets ....... 408.46ms DONE
+exit=0 migrations_ran=79
+== migrate:fresh --force on rv256_2
+  2026_10_06_238000_production_track_preparation_packets ....... 376.13ms DONE
+exit=0 migrations_ran=79
+== migrate:fresh --force on rv256_1
+  2026_10_06_238000_production_track_preparation_packets ....... 333.03ms DONE
+exit=0 migrations_ran=80
+TRIGGER_SCHEMA	triggers
+rv256_1	537
+rv256_2	537
+TRIGGER_SCHEMA	TRIGGER_NAME
+rv256_2	ptp_packet_insert
+rv256_1	ptp_packet_insert
