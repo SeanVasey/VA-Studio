@@ -1,0 +1,209 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (19 tests | 1 failed) 1986ms
+   ❯ mounted original paid-purpose journey (13)
+     × keeps every issued authorization with its order until it is submitted, across reads, other orders and other authorizations 111ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > mounted original paid-purpose journey > keeps every issued authorization with its order until it is submitted, across reads, other orders and other authorizations
+TestingLibraryElementError: Unable to find an element with the text: paid-license-cccccccc-cccc-4ccc-8ccc-cccccccccccc-contract.pdf; expires 2026-10-07 01:03:03 UTC.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-busy[39m=[32m"false"[39m
+      [33maria-label[39m=[32m"Paid license journey"[39m
+    [36m>[39m
+      [36m<p>[39m
+        [0mYour original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.[0m
+      [36m</p>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mRefresh paid licenses[0m
+      [36m</button>[39m
+      [36m<form>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"paid-order-reference"[39m
+        [36m>[39m
+          [0mSaved order reference[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mautocomplete[39m=[32m"off"[39m
+          [33mid[39m=[32m"paid-order-reference"[39m
+          [33mmaxlength[39m=[32m"36"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+        [36m<button[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtype[39m=[32m"submit"[39m
+        [36m>[39m
+          [0mPrepare licenses for this paid order[0m
+        [36m</button>[39m
+      [36m</form>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Saved paid licenses"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mLatest [0m
+          [0m20[0m
+          [0m saved orders. An order reference can open an older original.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mOpen saved order [0m
+          [0mbbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Retained paid order"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"paid-license-reference"[39m
+        [36m>[39m
+          [0mOrder [0m
+          [0mbbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb[0m
+        [36m</p>[39m
+        [36m<p>[39m
+          [0mRehearsal original. No real payment or production legal facts are certified.[0m
+        [36m</p>[39m
+        [36m<p>[39m
+          [0mComplete-order preparation is recorded. Exact files are checked again for each download.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRefresh preparation and download status[0m
+        [36m</button>[39m
+        [36m<article[39m
+          [33mclass[39m=[32m"paid-license-line"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mOriginal synthetic recording[0m
+          [36m</h2>[39m
+          [36m<p>[39m
+            [0mUSD[0m
+            [0m [0m
+            [0m49.99[0m
+            [0m + tax [0m
+            [0m0.00[0m
+            [0m from the original accepted order.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mDeclared name: [0m
+            [0mOriginal private buyer declaration[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mLicense accepted: [0m
+            [0m2026-10-07T01:02:03Z[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mOriginal PDF: [0m
+            [0mcomplete[0m
+            [0m; preparation attempts [0m
+            [0m1[0m
+            [0m/5.[0m
+          [36m</p>[39m
+          [36m<details>[39m
+            [36m<summary>[39m
+              [0mExplicit synthetic license[0m
+              [0m / retained version [0m
+              [0m1[0m
+            [36m</summary>[39m
+            [36m<pre[39m
+              [33mclass[39m=[32m"paid-license-terms"[39m
+            [36m>[39m
+              [0mRETAINED PRIVATE ORIGINAL TERMS &lt;script&gt;private()&lt;/script&gt;[0m
+            [36m</pre>[39m
+          [36m</details>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Download status for Original synthetic recording"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0m0[0m
+              [0m/[0m
+              [0m3[0m
+              [0m committed download attempts. This does not confirm file receipt.[0m
+            [36m</p>[39m
+            [36m<ul />[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<p>[39m
+              [0mmaster_wav[0m
+              [0m / [0m
+              [0m1024[0m
+              [0m bytes / SHA256 [0m
+              [0mbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAuthorize [0m
+              [0mmaster_wav[0m
+              [0m for [0m
+              [0mOriginal synthetic recording[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<p>[39m
+              [0mcontract[0m
+              [0m / [0m
+              [0m2048[0m
+              [0m bytes / SHA256 [0m
+              [0mcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAuthorize [0m
+              [0mcontract[0m
+              [0m for [0m
+              [0mOriginal synthetic recording[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</article>[39m
+        [36m<div>[39m
+          [36m<p>[39m
+            [0mpaid-license-cccccccc-cccc-4ccc-8ccc-cccccccccccc-master_wav.wav[0m
+            [0m; expires [0m
+            [0m2026-10-07 01:03:03[0m
+            [0m UTC.[0m
+          [36m</p>[39m
+          [36m<button[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mDownload authorized file[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-journey.test.tsx:123:19
+    121|     fireEvent.click(screen.getByRole('button', { name: 'Authorize mast…
+    122|     await screen.findByText(`${master.filename}; expires ${master.expi…
+    123|     expect(screen.getByText(`${contract.filename}; expires ${contract.…
+       |                   ^
+    124|     expect(screen.getAllByRole('button', { name: 'Download authorized …
+    125|     // Leaving the order hides them; reopening it shows them again.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 31 passed (32)
+   Start at  18:01:52
+   Duration  3.49s (tests 59%, environment 32%, setup 4%, transform 4%, import 1%)
+
+    Isolate  4 workers spawned · ~815ms startup each (spawn + environment, per file)
+             at least ~272ms faster with isolate: false — reuses workers across files instead of one per file
+
+rc=1
