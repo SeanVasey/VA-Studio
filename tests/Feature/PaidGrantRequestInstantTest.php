@@ -9,6 +9,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantRequestInstant;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Http\Middleware\PaidGrantPrivacy;
 use Carbon\CarbonImmutable;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
@@ -106,6 +109,40 @@ final class PaidGrantRequestInstantTest extends TestCase
         $this->assertDatabaseCount('paid_redemptions', 1);
     }
 
+    public function test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time(): void
+    {
+        // Codex P2 4224939409: the instant is validated once, when the controller captures it. The identity proof here
+        // takes 65 s of wall time, more than ADMISSION_MAX_AGE_SECONDS, and ends 63 s after expiry. The captured instant,
+        // 2 s before expiry, still admits the redemption: the exact bytes and one recorded attempt.
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->subSeconds(2));
+        $received = $this->now();
+        $this->slowIdentity(PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS + 5);
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $received])->assertOk();
+        $this->assertSame($this->masterBytes($f), $response->streamedContent());
+        $this->assertTrue(CarbonImmutable::now('UTC')->greaterThan($expires->addSeconds(60)));
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed(): void
+    {
+        // The same rule at the domain boundary: an instant captured while the authorization is live is used as captured,
+        // with no second age check, however long passes before redeem() runs.
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->subSeconds(2));
+        $instant = PaidGrantDownloads::receivedAt($this->now());
+        $this->travel(PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS + 5)->seconds();
+        $transfer = (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $instant);
+        $bytes = '';
+        $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+            $bytes .= $chunk;
+        });
+        $this->assertSame($this->masterBytes($f), $bytes);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
     public function test_a_request_received_after_expiry_is_still_refused_with_nothing_recorded(): void
     {
         [, $auth] = $this->authorized();
@@ -140,13 +177,31 @@ final class PaidGrantRequestInstantTest extends TestCase
         $this->travelTo(CarbonImmutable::parse('2026-10-08 12:00:00.250000', 'UTC'));
         $now = CarbonImmutable::now('UTC');
         $at = fn (float $offset): float => (float) $now->format('U.u') + $offset;
-        $this->assertEquals($now->subSeconds(5), PaidGrantDownloads::receivedAt($at(-5.0)));
-        $this->assertEquals($now->subSeconds(PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS), PaidGrantDownloads::receivedAt($at(-(float) PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS)));
+        $this->assertEquals($now->subSeconds(5), PaidGrantDownloads::receivedAt($at(-5.0))->at);
+        $this->assertEquals($now->subSeconds(PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS), PaidGrantDownloads::receivedAt($at(-(float) PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS))->at);
         // A value up to 1 s ahead (clock granularity) is clamped to now; anything else falls back to now.
-        $this->assertEquals($now, PaidGrantDownloads::receivedAt($at(0.5)));
+        $this->assertEquals($now, PaidGrantDownloads::receivedAt($at(0.5))->at);
         foreach ([$at(1.5), $at(-(float) PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS - 1), NAN, INF, -INF, null, 'abc', '1', true, [1]] as $value) {
-            $this->assertEquals($now, PaidGrantDownloads::receivedAt($value));
+            $this->assertEquals($now, PaidGrantDownloads::receivedAt($value)->at);
         }
+        $this->assertEquals(PaidGrantRequestInstant::capture($at(-5.0)), PaidGrantDownloads::receivedAt($at(-5.0)));
+    }
+
+    public function test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation(): void
+    {
+        // Codex 4224939409: redeem() trusts the instant without re-checking its age, so the type must not be constructible
+        // from an arbitrary time. Its only constructor is private; capture() is its only factory, and the value is fixed.
+        $class = new ReflectionClass(PaidGrantRequestInstant::class);
+        $this->assertTrue($class->isFinal());
+        $this->assertTrue($class->getConstructor()->isPrivate());
+        $this->assertTrue($class->getProperty('at')->isReadOnly());
+        $factories = array_values(array_map(fn (ReflectionMethod $method): string => $method->getName(),
+            array_filter($class->getMethods(ReflectionMethod::IS_PUBLIC), fn (ReflectionMethod $method): bool => $method->isStatic())));
+        $this->assertSame(['capture'], $factories);
+        $this->assertSame(PaidGrantRequestInstant::class, (string) (new ReflectionMethod(PaidGrantDownloads::class, 'redeem'))->getParameters()[4]->getType()?->getName());
+        $this->travelTo(CarbonImmutable::parse('2026-10-08 12:00:00', 'UTC'));
+        // Long before the clock: falls back to now at capture, so a backdated value cannot be smuggled through the type.
+        $this->assertEquals(CarbonImmutable::now('UTC'), PaidGrantRequestInstant::capture(0.0)->at);
     }
 
     private function now(): float

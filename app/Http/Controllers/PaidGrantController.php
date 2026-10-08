@@ -114,7 +114,8 @@ final class PaidGrantController
     {
         return $this->run(function () use ($authorization, $request): Response {
             // The server's own request-start time, taken before the identity proof: admission judges the token as it was
-            // when the request arrived (Codex 4224514947). Never a client-supplied header.
+            // when the request arrived (Codex 4224514947). Never a client-supplied header. Validated here, once, into a
+            // type only capture can create; redeem() uses it without a second age check (Codex 4224939409).
             $receivedAt = PaidGrantDownloads::receivedAt($request->server('REQUEST_TIME_FLOAT'));
             [$principal, $actor] = $this->identity($request);
             $input = $this->body($request);

@@ -6,7 +6,7 @@ requirements and reference settings. It does not configure any host. Nothing her
 a production deployment.
 
 Sources: Paid252 independent review addenda 9 and 10 (A9-I6, C11 (a)–(e)) and Codex rounds 13, 14 and 16
-(`docs/verification/paid252-composition-20261007/`).
+(`docs/verification/paid252-composition-20261007/`), plus Codex round 23 (C11 (k)).
 
 ## Why these settings matter
 
@@ -44,6 +44,14 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      defaults. After the first byte, the per-write timeout applies.
    - `document`: at least the whole-request bound plus a margin: 3,900 s.
    - nginx's 60 s default is too short for both.
+   - The `redeem` bound starts when PHP begins the controller, but the proxy's clock starts earlier. Before
+     `redeem()` runs there is the session-lock wait (up to 5 s) and the customer identity proof. The proof's locking
+     reads have no deadline of their own; each statement is bounded only by the database lock-wait timeout. Redemption
+     is judged at the request's start, so a slow proof no longer refuses a token that was live on arrival (Codex
+     round 23). But if the proof plus the first-byte path outlasts the proxy timeout, the server can record the attempt
+     while the customer gets a 504. Before mount, either set `innodb_lock_wait_timeout` low enough for the identity
+     proof to fit inside the margin above, or add an explicit identity-proof budget that refuses before anything is
+     recorded (condition C11 (k), open for Sean).
 3. **Proxy response buffering on** for `redeem`, with a temp-file cap at least the largest deliverable. With nginx that
    means `fastcgi_buffering on` and `fastcgi_max_temp_file_size 1024m` (1 GiB, `DeliveryAssetFiles::MAX_BYTES`). PHP
    then finishes writing at disk speed and releases its spool slot, while the proxy serves slow clients.
@@ -89,7 +97,7 @@ them.
 
 ```nginx
 # Long paid routes go to a dedicated FPM pool; everything else keeps the default pool and timeouts.
-location ~ ^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$ {
+location ~ "^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$" {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
     fastcgi_pass unix:/run/php/paid-delivery.sock;
@@ -98,7 +106,7 @@ location ~ ^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$ {
     fastcgi_max_temp_file_size 1024m;    # >= largest deliverable (1 GiB)
     fastcgi_temp_path /var/lib/nginx/paid-delivery-temp 1 2;   # private, 0700, never public or backed up
 }
-location ~ ^/paid-grants/origins/[0-9a-f-]{36}/document$ {
+location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
     fastcgi_pass unix:/run/php/paid-delivery.sock;
@@ -136,3 +144,5 @@ Record the results in the activation packet (`docs/ops/production-activation-pac
   the long request is the page's own, the cap can end the wait earlier, about 620 s after the click. A completion longer
   than that needs a later click, so confirm it fits (review A11-I4, A12-I3).
 - The proxy temp directory is not reachable over HTTP and holds nothing after the transfers finish.
+- The identity proof's worst case on the chosen database (lock-wait timeout times its locking statements) fits inside
+  the `redeem` proxy margin, or an explicit identity budget exists (C11 (k)).

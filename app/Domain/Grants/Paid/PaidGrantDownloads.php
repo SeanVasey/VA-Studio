@@ -29,38 +29,18 @@ final class PaidGrantDownloads
     /**
      * How long before admission the request may have started (Codex 4224514947). The server's own request-start time is
      * taken before the identity proof; between it and the controller there is only request parsing and middleware (the
-     * session lock waits at most 5 s), so one observation budget is generous. An older value is treated as broken.
+     * session lock waits at most 5 s), so one observation budget is generous. An older value is treated as broken. It
+     * is checked once, at capture; the identity proof that follows is not counted against it (Codex 4224939409).
      */
     public const ADMISSION_MAX_AGE_SECONDS = 60;
 
     /**
-     * The instant the server began this request: the SAPI's `REQUEST_TIME_FLOAT` (never a client header), else Laravel's
-     * `LARAVEL_START` (set at the top of `public/index.php`, also before any identity work), else now. A candidate must be a
-     * finite number no more than 1 s ahead of now (clock granularity; clamped to now) and no older than
-     * ADMISSION_MAX_AGE_SECONDS. Anything else falls back to now, so a broken value can only make admission stricter.
+     * The instant the server began this request, validated once, when captured (`PaidGrantRequestInstant::capture()`):
+     * the SAPI's `REQUEST_TIME_FLOAT`, else `LARAVEL_START`, else now, within ADMISSION_MAX_AGE_SECONDS of now.
      */
-    public static function receivedAt(mixed $requestTime): CarbonImmutable
+    public static function receivedAt(mixed $requestTime): PaidGrantRequestInstant
     {
-        $now = CarbonImmutable::now('UTC');
-        foreach ([$requestTime, defined('LARAVEL_START') ? constant('LARAVEL_START') : null] as $candidate) {
-            if ((is_float($candidate) || is_int($candidate)) && is_finite((float) $candidate)) {
-                $at = self::admissible(CarbonImmutable::createFromTimestamp((float) $candidate, 'UTC'), $now);
-                if ($at !== null) {
-                    return $at;
-                }
-            }
-        }
-
-        return $now;
-    }
-
-    private static function admissible(CarbonImmutable $at, CarbonImmutable $now): ?CarbonImmutable
-    {
-        if ($at->greaterThan($now->addSecond()) || $at->lessThan($now->subSeconds(self::ADMISSION_MAX_AGE_SECONDS))) {
-            return null;
-        }
-
-        return $at->lessThan($now) ? $at : $now;
+        return PaidGrantRequestInstant::capture($requestTime);
     }
 
     /** @param  ?Closure():int  $clock  Monotonic nanoseconds for the transfer deadline; the system clock when null. */
@@ -151,10 +131,11 @@ final class PaidGrantDownloads
 
     /** Exact physical snapshot between two freshly authenticated producer/owner frames; one committed attempt. */
     /**
-     * @param  CarbonImmutable|null  $receivedAt  When the server began this request (`receivedAt()`), captured before the
-     *                                            identity proof; null means now. It is re-checked here the same way.
+     * @param  PaidGrantRequestInstant|null  $receivedAt  When the server began this request, captured and validated before the
+     *                                                    identity proof (`receivedAt()`); null means now. It is not re-checked
+     *                                                    here, so a slow identity proof cannot age it out (Codex 4224939409).
      */
-    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?CarbonImmutable $receivedAt = null): PaidGrantTransfer
+    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantRequestInstant $receivedAt = null): PaidGrantTransfer
     {
         PaidGrantInput::uuid($id);
         PaidGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 403);
@@ -162,9 +143,9 @@ final class PaidGrantDownloads
         // The authorization lifetime is the valid-to-start deadline, judged at the moment the server began this request (as
         // Free256 does with its request time): before the identity proof and before locating, so a slow proof, locate or
         // first frame cannot turn a redemption that started in time into an expired one (Codex 4223825193, 4224514947).
-        // Both frames and the post-frame check compare that same admitted instant, so a slow snapshot cannot either.
-        $now = CarbonImmutable::now('UTC');
-        $admitted = $receivedAt === null ? $now : (self::admissible($receivedAt->setTimezone('UTC'), $now) ?? $now);
+        // Both frames and the post-frame check compare that same admitted instant, so a slow snapshot cannot either. The
+        // instant was validated against the clock when the controller captured it; it is used as captured (Codex 4224939409).
+        $admitted = $receivedAt?->at ?? CarbonImmutable::now('UTC');
         $locator = $this->locate($id, $principal, $actor);
         // Three budgets follow, none extendable: this 60 s observation budget bounds locating and the first frame; the
         // snapshot gets its own `snapshot_seconds` bound from when the first frame closes; the commit frame and the
