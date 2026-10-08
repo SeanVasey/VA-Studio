@@ -52,7 +52,8 @@ Merges since the handoff are reviewed development merges with activation conditi
 | --- | --- | --- |
 | 2026-10-08 | Staging host: Laravel Forge managing a VPS | Sean |
 | 2026-10-08 | Conditions C11–C13 for paid downloads: runtime requirements doc, per-buyer heavy-work lock, page-driven continuation | Claude (delegated by Sean) |
-| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admits only `local`/`testing` today. | Claude; Sean to confirm (input S-1) |
+| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admits only `local`/`testing` today. | Claude; **confirmed by Sean** (S-1) |
+| 2026-10-08 | Access: staging subdomain with TLS and basic auth (the Stripe webhook route is signature-checked and exempt from basic auth) | Sean |
 | 2026-10-08 | Environment, target: a reviewed `staging` environment that admits test commerce, requires staff MFA and refuses live mode (lane B2). Staging switches to it once merged. | Claude |
 
 ## 3. Work items
@@ -97,9 +98,9 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | ID | Input | Unblocks | Status |
 | --- | --- | --- | --- |
-| S-1 | Accept the interim `APP_ENV=local` staging (private access only) until the `staging` environment lands | M-01–M-07 | asked |
+| S-1 | Accept the interim `APP_ENV=local` staging (private access only) until the `staging` environment lands | M-01–M-07 | **done: accepted** |
 | S-2 | Forge account and VPS (Hetzner or DigitalOcean, at least 4 GB RAM), and SSH access for deploys | M-01 | needed Friday |
-| S-3 | Access path: a staging subdomain with TLS plus basic auth (needs one DNS record, which you authorize), or private access only (Tailscale/IP allowlist, with Stripe events via `stripe listen`) | M-02, M-05 | needed Friday |
+| S-3 | Access path: **chosen: a staging subdomain with TLS plus basic auth**. Still needed: the exact hostname and one DNS A record pointing at the VPS, added or authorized by Sean. | M-02, M-05 | choice done; DNS record needed Friday |
 | S-4 | Stripe **test** account ID, `sk_test_` key, and the webhook secret (`whsec_`) or a Stripe CLI login on the host, through a secret channel and never in chat or the repo | M-03–M-05 | needed Friday |
 | S-5 | A second staff person or account: license approval must come from a different staff account than the contributor | M-11 | needed Saturday |
 | S-6 | Seller preview tag WAV; nothing can publish without it | M-11 | needed Saturday |
@@ -135,4 +136,5 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | Time (UTC) | Update |
 | --- | --- |
+| 2026-10-08 22:45 | Sean confirmed S-1 (interim local mode, locked down) and chose a staging subdomain for S-3. |
 | 2026-10-08 22:40 | Audits complete. Lanes A, B and B2 started. PR #56 at `94d32518` with addendum 13 running. Census run on `d3e1c39a` in progress. Inputs S-1 to S-11 listed. |
