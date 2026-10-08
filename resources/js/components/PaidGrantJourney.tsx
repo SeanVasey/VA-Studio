@@ -112,7 +112,7 @@ export function PaidGrantJourney() {
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState(''), [progress, setProgress] = useState('');
   // A continuing preparation: its run number (bumped to stop it), whether it is running, and the last document POST time.
   const runs = useRef(0), auto = useRef(false), lastDocument = useRef(Number.NEGATIVE_INFINITY), timers = useRef(new Set<number>());
-  const [continuing, setContinuing] = useState(false);
+  const [continuing, setContinuing] = useState(false), progressLine = useRef<HTMLParagraphElement>(null);
   function stopContinuing() { runs.current++; auto.current = false; setContinuing(false); timers.current.forEach(t => window.clearTimeout(t)); timers.current.clear(); }
   // Ends a continuation the way a hidden tab does (its run, timers and in-flight request), but keeps the page shown. A request
   // already sent may still finish on the server; the next click continues from what it achieved.
@@ -120,6 +120,8 @@ export function PaidGrantJourney() {
     if (!auto.current) return;
     stopContinuing(); generation.current++; request.current?.abort(); request.current = null; inflight.current = false; setBusy(false);
     setProgress(origin ? `${readyText(origin)} Preparation stopped; a request already sent may still finish. Choose prepare to continue.` : '');
+    // Stop removes its own button; keep focus on the progress line rather than letting it fall to the page (A12-I4).
+    progressLine.current?.focus();
   }
   const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setProgress(''); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
@@ -296,7 +298,7 @@ export function PaidGrantJourney() {
   // The progress line and its Stop control sit outside the busy subtree, so assistive technology is not asked to hold the
   // announcements while a continuation keeps the controls busy (independent review A11-I5).
   return <div className="paid-grant-journey">
-    <div className="paid-preparation-status"><p role="status" aria-live="polite" className="paid-preparation-progress">{progress}</p>
+    <div className="paid-preparation-status"><p role="status" aria-live="polite" tabIndex={-1} ref={progressLine} className="paid-preparation-progress">{progress}</p>
       {continuing && <button type="button" onClick={stopPreparing}>Stop preparing</button>}</div>
     <section aria-label="Paid license journey" aria-busy={busy}>
     <p>Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.</p>

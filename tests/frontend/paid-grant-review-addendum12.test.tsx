@@ -73,8 +73,9 @@ describe('review addendum 12: continuation edges', () => {
     fwrite(stoppedAt);
   });
 
-  // A12-I4: choosing Stop removes the Stop button, which held focus; focus falls back to the document body.
-  it('leaves focus on the document body after Stop removes its own button', async () => {
+  // A12-I4: choosing Stop removes the Stop button, which held focus, and focus fell back to the document body.
+  // Fixed in round 21 (codex-21): Stop moves focus to the progress line.
+  it('moves focus to the progress line after Stop removes its own button (fixed in round 21)', async () => {
     await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [never] });
     fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
     await advance(1_000);
@@ -84,7 +85,8 @@ describe('review addendum 12: continuation edges', () => {
     fireEvent.click(stop);
     await advance(1_000);
     expect(screen.queryByRole('button', { name: 'Stop preparing' })).not.toBeInTheDocument();
-    expect(document.activeElement).toBe(document.body);
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement).toBe(screen.getByRole('status'));
     expect(live()).toHaveTextContent('Preparation stopped');
   });
 });

@@ -113,11 +113,14 @@ final class PaidGrantController
     public function redeem(string $authorization, Request $request): Response
     {
         return $this->run(function () use ($authorization, $request): Response {
+            // The server's own request-start time, taken before the identity proof: admission judges the token as it was
+            // when the request arrived (Codex 4224514947). Never a client-supplied header.
+            $receivedAt = PaidGrantDownloads::receivedAt($request->server('REQUEST_TIME_FLOAT'));
             [$principal, $actor] = $this->identity($request);
             $input = $this->body($request);
             PaidGrantInput::keys($input, ['token']);
             PaidGrantException::require(is_string($input['token']), 403);
-            $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor);
+            $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor, $receivedAt);
 
             return response()->stream(function () use ($transfer): void {
                 try {

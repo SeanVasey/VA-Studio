@@ -164,6 +164,20 @@ describe('continuing paid preparation after one click', () => {
     expect(screen.getByRole('button', { name: 'Prepare original licenses and files' })).toBeEnabled();
   });
 
+  it('moves focus to the progress line after Stop instead of leaving it on the page body (A12-I4)', async () => {
+    await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [answer({ origin: originOf(['complete', 'pending', 'pending']), busy: false })] });
+    fireEvent.click(screen.getByRole('button', { name: 'Prepare original licenses and files' }));
+    await advance(0);
+    const stop = screen.getByRole('button', { name: 'Stop preparing' });
+    stop.focus();
+    expect(document.activeElement).toBe(stop);
+    fireEvent.click(stop);
+    await advance(0);
+    expect(screen.queryByRole('button', { name: 'Stop preparing' })).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(live());
+    expect(document.activeElement).not.toBe(document.body);
+  });
+
   it('stops a request in flight when Stop is chosen and sends nothing more', async () => {
     const signals: AbortSignal[] = [];
     const s = await openOrder(originOf(['pending', 'pending', 'pending']), { [documentPath]: [() => new Promise<Response>(() => {})] });

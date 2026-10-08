@@ -6,6 +6,7 @@ use App\Domain\Delivery\ActivationPolicy;
 use App\Domain\Delivery\DeliveryAssetFiles;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\PreparedDeliveryStream;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -260,9 +261,16 @@ class PaidGrantPrepareStream
     }
 
     /**
-     * A fixed path per locked slot prevents accumulating crash leftovers across fresh UUID names. A slot whose snapshot
-     * exists, or whose reservation (20-byte) or holder (64-byte) sidecar is anything but a regular single-link 0600 file of
-     * that size owned by this process user, is skipped and never repaired or deleted.
+     * A fixed path per locked slot prevents accumulating crash leftovers across fresh UUID names. A slot whose reservation
+     * (20-byte) or holder (64-byte) sidecar is anything but a regular single-link 0600 file of that size owned by this process
+     * user is skipped and never repaired or deleted.
+     *
+     * A worker killed mid-snapshot leaves its named snapshot behind (its `finally` never runs). Holding the slot's exclusive
+     * lock proves no live process owns that slot, because a holder keeps the lock until its stream is closed and the kernel
+     * drops it when the process dies. So a leftover that is exactly what this spool writes (a regular single-link file of mode
+     * 0600, or 0400 once sealed for read-back, owned by this process user, at most DeliveryAssetFiles::MAX_BYTES) is removed, the slot's sidecars are reset to an
+     * empty reservation and holder, and the slot is reused (Codex 4224514955). Any other leftover is skipped and never
+     * touched. This runs under the admission lock, like every other sidecar write.
      *
      * @return array{0:resource,1:string,2:int}
      */
@@ -277,8 +285,7 @@ class PaidGrantPrepareStream
                 continue;
             }
             $snapshot = $spool.'/slot-'.$slot.'.snapshot';
-            clearstatcache(true, $snapshot);
-            $unusable = @lstat($snapshot) !== false;
+            $unusable = false;
             foreach (['reserve' => 20, 'holder' => 64] as $suffix => $size) {
                 $sidecar = $spool.'/slot-'.$slot.'.'.$suffix;
                 clearstatcache(true, $sidecar);
@@ -286,7 +293,7 @@ class PaidGrantPrepareStream
                 $unusable = $unusable || ($stat !== false && (($stat['mode'] & 0170000) !== 0100000 || ($stat['mode'] & 07777) !== 0600
                     || $stat['nlink'] !== 1 || $stat['uid'] !== $owner || $stat['size'] !== $size));
             }
-            if ($unusable) {
+            if ($unusable || ! $this->recovered($spool, $slot, $snapshot, $owner)) {
                 fclose($candidate);
 
                 continue;
@@ -296,6 +303,40 @@ class PaidGrantPrepareStream
         }
 
         throw new \UnexpectedValueException;
+    }
+
+    /**
+     * True when the slot (whose lock the caller holds) has no snapshot, or had a crash leftover of exactly this spool's shape
+     * that is now removed with its sidecars reset. False leaves everything as found.
+     */
+    private function recovered(string $spool, int $slot, string $snapshot, int $owner): bool
+    {
+        clearstatcache(true, $snapshot);
+        $stat = @lstat($snapshot);
+        if ($stat === false) {
+            return true;
+        }
+        if (($stat['mode'] & 0170000) !== 0100000 || ! in_array($stat['mode'] & 07777, [0600, 0400], true) || $stat['nlink'] !== 1
+            || $stat['uid'] !== $owner || $stat['size'] > DeliveryAssetFiles::MAX_BYTES || realpath($snapshot) !== $snapshot) {
+            return false;
+        }
+        clearstatcache(true, $snapshot);
+        $again = @lstat($snapshot);
+        if (! is_array($again) || $again['dev'] !== $stat['dev'] || $again['ino'] !== $stat['ino'] || ! $this->unlinkSpool($snapshot)) {
+            return false;
+        }
+        foreach (['reserve' => 20, 'holder' => 64] as $suffix => $length) {
+            $sidecar = $this->reservation($spool.'/slot-'.$slot.'.'.$suffix, $length);
+            try {
+                $this->write($sidecar, str_repeat('0', $length));
+            } finally {
+                fclose($sidecar);
+            }
+        }
+        // The paid family has no operator channel of its own; the slot index only, never a path, hash or customer data.
+        Log::warning('Paid delivery spool slot recovered after a worker stopped mid-snapshot.', ['slot' => $slot]);
+
+        return true;
     }
 
     /**
