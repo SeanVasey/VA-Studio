@@ -22,13 +22,38 @@ The JUnit logs give 211 distinct skipped (class, method) pairs.
 
 ## Result
 
+The full run is on `d3e1c39a`; the policy this PR changes is `main`'s at `89e3e61f`. The two comparisons are kept apart.
+
+### 1. Full run against its own source policy (`d3e1c39a`, 174 pairs)
+
 - **Listed but not skipped:** none.
-- **Skipped but not listed:** 33 pairs, appended in this change. The census grows from 183 to 216 pairs; the existing entries and their order are unchanged.
+- **Skipped but not listed:** 37 pairs.
+
+### 2. Integrated policy (`main` at `89e3e61f`, 183 pairs; this PR makes it 216)
+
+- **Between the two sources:** PR #54 (`d3e1c39a..89e3e61f`) added nine pairs to the policy.
+  - Four of them are among the 37 above: three `MembershipSchemaPreparationTest` pairs and one `MemberOriginalSchemaPreparationTest` pair.
+  - Five are billing pairs for test files that do not exist at `d3e1c39a`.
+- **This PR appends the remaining 33 of the 37.** The existing entries and their order are unchanged.
 - **Every appended pair:**
   - is a method that exists in the tree;
   - skips itself when the driver is not MySQL (in the method, or for the whole file in `setUp()`; checked for all 33), because it covers native dictionary admission, native row locks or observed contention.
+- **What PR #54 changed, and the extra run that covers it:**
+  - Test changes: only under `tests/Feature/ProductionMembership*` and `tests/Support/`.
+  - Application changes: only `app/Domain/Memberships/`, one job and one console command.
+  - No test outside those directories references the changed classes or the support fixtures (checked with grep).
+  - So the integrated tree at this PR's head `c233eb62` was re-run for those directories on SQLite.
+
+| Directory at `c233eb62` | Result |
+| --- | --- |
+| `ProductionMembership` | 44 tests, 3 skipped, OK |
+| `ProductionMembershipBilling` | 180 tests, 5 skipped, OK |
+| `ProductionMemberOriginals` | 24 tests, 1 skipped, OK |
+
+In those classes, the run skipped 9 distinct pairs and the policy at the head lists 9. Listed but not skipped: none. Skipped but not listed: none.
+
+- **Combined:** for every other file, the `d3e1c39a` run applies unchanged. The result is that the 216-pair policy equals the SQLite skips of the integrated tree, up to the limits below.
 - **Census self-test:** `python3 -I scripts/ci/test-database-receipts.py` gives 34 tests OK.
-- **Pairs already on `main`:** four further skipped pairs (three `MembershipSchemaPreparationTest`, one `MemberOriginalSchemaPreparationTest`) were added to the census by PR #54 after `d3e1c39a`. PR #54's five billing pairs are for test files that do not exist at `d3e1c39a`, so this run cannot confirm them; PR #54's own evidence covers them.
 
 ## Failures seen in this run (not census entries)
 
@@ -46,3 +71,4 @@ The JUnit logs give 211 distinct skipped (class, method) pairs.
 
 - MySQL shards. MySQL runs every listed method instead of skipping it.
 - The Foundation workflow itself, which stays manual for the final integrated commit.
+- A complete SQLite run of the integrated tree. The combination above rests on PR #54's diff being confined to the re-run directories.
