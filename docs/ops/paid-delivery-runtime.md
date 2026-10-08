@@ -71,7 +71,14 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
    - Bound it: set `listen.backlog` on the paid pool, and give the proxy short connect and queue timeouts for these
      routes, so an overloaded pool refuses quickly instead of queueing past the lifetime.
    - Size `pm.max_children` so the expected concurrent redeems and document requests do not queue.
-8. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
+8. **Host-local spool with coherent locking.** The private delivery spool (`paid-spool/`) must be on a filesystem local to
+   each web host, where `flock` is coherent. Slot leases, the one-slot-per-buyer holder check, the admission lock and
+   crash recovery of a slot all depend on it. A network filesystem with host-local or emulated locks would let two hosts
+   use the same slot (review addendum 12, C11 (i)).
+9. **Per-request start time.** Redeem admission reads the server's request-start time (`REQUEST_TIME_FLOAT`), clamped to
+   the last 60 s. Under PHP-FPM it is set per request. If a persistent-worker runtime (for example Octane) is ever used,
+   verify that the value is still per request before mounting (review addendum 12, C11 (j)).
+10. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
    Long preparations continue in the background of the same request: the page polls saved status and continues,
    condition C13. So a client timeout never needs to reach these server bounds.
 
@@ -119,11 +126,13 @@ Record the results in the activation packet (`docs/ops/production-activation-pac
   send timeout is disconnected, and its spool slot is free again within the worker timeout.
 - Sequential read throughput of the private storage is measured and meets requirement 5.
 - The cache store is shared and lock-capable across every web host (requirement 6).
+- The spool directory is on a host-local filesystem with coherent `flock` on each web host (requirement 8).
 - Under a burst of concurrent redeems, no request waits in the FPM backlog or a proxy queue longer than its bound
   (requirement 7).
 - A synthetic multi-line preparation longer than 320 s completes. The page shows progress and ends with the order
   fulfilled, without a manual retry.
 - A real worst-case completion on the chosen storage is timed. The page follows a request for 320 s plus its wait
-  window (`paidContinuation.wait` in `PaidGrantJourney.tsx`). A completion longer than that needs a later click, so
-  confirm it fits (review A11-I4).
+  window (`paidContinuation.wait` in `PaidGrantJourney.tsx`), within its cap of 20 document requests per click. When
+  the long request is the page's own, the cap can end the wait earlier, about 620 s after the click. A completion longer
+  than that needs a later click, so confirm it fits (review A11-I4, A12-I3).
 - The proxy temp directory is not reachable over HTTP and holds nothing after the transfers finish.
