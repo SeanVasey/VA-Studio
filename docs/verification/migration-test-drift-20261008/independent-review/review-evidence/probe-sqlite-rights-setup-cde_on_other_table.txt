@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-migdrift/phpunit.xml
+
+REMAINING cde triggers by table: {"catalog_discovery_epoch":3,"users":3,"offers":3,"offer_revisions":3,"license_templates":3,"license_versions":3,"license_review_evidence":3,"media_assets":3,"media_processing_runs":3,"stems_recordings":3,"rights_scopes":3,"rights_scope_offers":3,"exclusive_activations":3,"exclusive_sales":3,"inventory_reservations":3,"inventory_claims":3}
+.                                                                   1 / 1 (100%)
+
+Time: 00:01.030, Memory: 77.00 MB
+
+[30;42mOK (1 test, 7 assertions)[0m

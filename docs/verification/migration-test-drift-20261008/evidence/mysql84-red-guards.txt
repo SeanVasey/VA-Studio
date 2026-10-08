@@ -1,0 +1,39 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+FE                                                                  2 / 2 (100%)
+
+Time: 03:46.974, Memory: 85.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionTrackCapabilitiesGuardsTest::test_empty_migration_can_rollback_and_recreate_all_three_tables
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:172
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+<worktree>/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+<scratchpad>/red/ProductionTrackCapabilitiesGuardsTest.php:176
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTrackCapabilitiesGuardsTest::test_models_and_populated_rollback_refuse_history_changes
+Failed asserting that exception of type "LogicException" matches expected exception "RuntimeException". Message was: "Unexpected production capability external foreign key reference; rollback refused before schema changes." at
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:172
+<worktree>/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+<worktree>/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+<scratchpad>/red/ProductionTrackCapabilitiesGuardsTest.php:162
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+.
+
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 2, Assertions: 9, Errors: 1, Failures: 1.

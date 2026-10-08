@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fail","files":[{"path":"tests\/ReviewProbePintCanary.php","fixers":["single_space_around_construct","function_declaration","blank_line_after_opening_tag","no_singleline_whitespace_before_semicolons","braces_position","statement_indentation"]}]}

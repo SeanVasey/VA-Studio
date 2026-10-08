@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\CapabilityRollbackFixture;
 use Tests\TestCase;
 
 class ProductionTrackCapabilitiesMigrationOwnershipTest extends TestCase
@@ -28,14 +29,9 @@ class ProductionTrackCapabilitiesMigrationOwnershipTest extends TestCase
             Schema::clearResolvedInstance('db.schema');
         });
         $this->artisan('migrate:fresh', ['--database' => 'production_capability_ownership_fixture', '--force' => true])->assertExitCode(0);
-        // Remove the explicitly empty additive child before testing retained capability ownership.
-        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
-        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
-        Schema::drop('production_buyer_assent_observations');
-        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
-            $this->assertDatabaseCount($table, 0);
-        }
-        (require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php'))->down();
+        // Remove the explicitly empty later dependents (derived from the catalog) before testing
+        // retained capability ownership. Explicit disposable-fixture cleanup, FK enforcement unchanged.
+        CapabilityRollbackFixture::isolateCapabilityTables();
     }
 
     private function migration(): object

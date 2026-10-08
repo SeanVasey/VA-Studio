@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-migdrift/phpunit.xml
+
+SETUP REFUSAL (renamed_cde): Unexpected rights evidence additional trigger for rights_declarations; existing schema and data are unchanged. Investigate before retrying.
+.                                                                   1 / 1 (100%)
+
+Time: 00:29.731, Memory: 79.00 MB
+
+[30;42mOK (1 test, 2 assertions)[0m

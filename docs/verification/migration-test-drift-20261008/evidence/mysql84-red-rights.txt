@@ -1,0 +1,37 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+EE                                                                  2 / 2 (100%)
+
+Time: 01:50.205, Memory: 93.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:159
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:159
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 0 with data (0)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:192
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/red/RightsEvidenceGuardMigrationTest.php:192
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 2, Assertions: 3, Errors: 2.

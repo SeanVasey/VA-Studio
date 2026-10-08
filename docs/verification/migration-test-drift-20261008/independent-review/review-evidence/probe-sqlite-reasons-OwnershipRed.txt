@@ -1,0 +1,53 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-migdrift/phpunit.xml
+
+.................[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m                                             21 / 21 (100%)
+
+Time: 00:18.121, Memory: 99.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\ReviewProbeOwnershipRedReasonsTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#17 with data ('view under absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-migdrift/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-migdrift/tests/Feature/ReviewProbeOwnershipRedReasonsTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ReviewProbeOwnershipRedReasonsTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#18 with data ('uppercase absent owned table name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-migdrift/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-migdrift/tests/Feature/ReviewProbeOwnershipRedReasonsTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ReviewProbeOwnershipRedReasonsTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#19 with data ('foreign index under absent ow...x name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-migdrift/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-migdrift/tests/Feature/ReviewProbeOwnershipRedReasonsTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ReviewProbeOwnershipRedReasonsTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl#20 with data ('foreign table under absent guard name')
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:312
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-migdrift/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-migdrift/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-migdrift/tests/Feature/ReviewProbeOwnershipRedReasonsTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 21[0m[37;41m, Assertions: 118[0m[37;41m, Errors: 4[0m[37;41m.[0m

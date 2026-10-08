@@ -12,6 +12,7 @@ use App\Domain\Media\QueueMediaProcessing;
 use App\Domain\Media\VerifiedMedia;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use DOMDocument;
 use DOMXPath;
 use Filament\Facades\Filament;
@@ -446,7 +447,7 @@ class PrivateTrackReviewTest extends TestCase
         {
             public int $calls = 0;
 
-            public function blockers(Track $track): array
+            public function blockers(Track $track, ?CarbonInterface $at = null): array
             {
                 $this->calls++;
 
