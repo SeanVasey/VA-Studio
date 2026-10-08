@@ -55,6 +55,12 @@ final class ProductionTaxPaidLineAdapterV2
             && $tax['authority'] === 'provider_calculated_buyer_reviewed' && $tax['calculator'] === 'stripe_checkout_automatic_tax'
             && $tax['currency'] === 'USD' && in_array($tax['tax_behavior'], ['exclusive', 'inclusive'], true)
             && ($tax['automatic_tax']['enabled'] ?? null) === true && ($tax['automatic_tax']['status'] ?? null) === 'complete');
+        // The line's own retained execution context must agree with its funds, account, provenance and tax behavior.
+        $context = $line['execution_context'];
+        CheckoutException::require(is_array($context) && ($context['funds_mode'] ?? null) === $line['funds_mode']
+            && ($context['provenance'] ?? null) === $line['provenance'] && ($context['account_id'] ?? null) === $line['provider_account']
+            && ($context['tax']['strategy'] ?? null) === 'provider_calculated' && ($context['tax']['behavior'] ?? null) === $tax['tax_behavior']
+            && is_int($context['tax']['maximum_rate_bps'] ?? null) && $context['tax']['maximum_rate_bps'] >= 0 && $context['tax']['maximum_rate_bps'] <= 10000);
         foreach (['line', 'order'] as $scope) {
             $subtotal = $tax[$scope.'_subtotal_minor'];
             $taxed = $tax[$scope.'_tax_minor'];
@@ -66,6 +72,9 @@ final class ProductionTaxPaidLineAdapterV2
         CheckoutException::require($tax['line_subtotal_minor'] === ($preTax['line_amount_minor'] ?? null)
             && $tax['order_subtotal_minor'] === ($preTax['order_subtotal_minor'] ?? null)
             && $tax['line_subtotal_minor'] <= $tax['order_subtotal_minor'] && $tax['line_tax_minor'] <= $tax['order_tax_minor']);
+        // Same approved machine-policy ceiling the producer enforced; checked, never adjusted.
+        $net = $tax['tax_behavior'] === 'exclusive' ? $tax['order_subtotal_minor'] : $tax['order_subtotal_minor'] - $tax['order_tax_minor'];
+        CheckoutException::require($net >= 0 && $net * $context['tax']['maximum_rate_bps'] >= $tax['order_tax_minor'] * 10000, 'tax_ceiling');
 
         return $line;
     }

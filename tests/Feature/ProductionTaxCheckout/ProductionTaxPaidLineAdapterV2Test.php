@@ -40,7 +40,8 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
             'product' => $product, 'product_hash' => CanonicalJson::hash($product), 'assent' => $assent, 'assent_hash' => CanonicalJson::hash($assent),
             'license_version_id' => 7, 'license' => $license, 'license_hash' => CanonicalJson::hash($license),
             'asset_revisions' => $assets, 'asset_revisions_hash' => CanonicalJson::hash($assets), 'candidate' => ['candidate_id' => 1],
-            'execution_context' => ['funds_mode' => 'test'], 'inventory' => $inventory, 'inventory_hash' => CanonicalJson::hash($inventory),
+            'execution_context' => ['funds_mode' => 'test', 'provenance' => 'synthetic_rehearsal', 'account_id' => 'acct_SYNTHETIC',
+                'tax' => ['strategy' => 'provider_calculated', 'behavior' => 'exclusive', 'maximum_rate_bps' => 2500]], 'inventory' => $inventory, 'inventory_hash' => CanonicalJson::hash($inventory),
             'pre_tax' => ['currency' => 'USD', 'line_amount_minor' => 4999, 'order_subtotal_minor' => 4999],
             'tax' => ['authority' => 'provider_calculated_buyer_reviewed', 'calculator' => 'stripe_checkout_automatic_tax',
                 'automatic_tax' => ['enabled' => true, 'provider' => 'stripe', 'status' => 'complete'], 'tax_behavior' => 'exclusive', 'currency' => 'USD',
@@ -74,7 +75,8 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
     {
         $line = self::line();
         $this->assertSame($line, ProductionTaxPaidLineAdapterV2::accept($line, 'synthetic_rehearsal'));
-        $inclusive = self::line(['tax' => ['tax_behavior' => 'inclusive', 'line_total_minor' => 4999, 'order_total_minor' => 4999]]);
+        $inclusive = self::line(['tax' => ['tax_behavior' => 'inclusive', 'line_total_minor' => 4999, 'order_total_minor' => 4999],
+            'execution_context' => ['tax' => ['behavior' => 'inclusive']]]);
         $this->assertSame($inclusive, ProductionTaxPaidLineAdapterV2::accept($inclusive, 'synthetic_rehearsal'));
     }
 
@@ -119,6 +121,10 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
             'live funds under rehearsal' => [fn (array $l): array => self::sealed([...$l, 'funds_mode' => 'live'])],
             'exclusive license' => [fn (array $l): array => self::sealed([...$l, 'license' => ['type' => 'exclusive'], 'license_hash' => CanonicalJson::hash(['type' => 'exclusive'])])],
             'mismatched product hash' => [fn (array $l): array => self::sealed([...$l, 'product_hash' => str_repeat('0', 64)])],
+            'tax behavior differs from the retained execution context' => [fn (array $l): array => self::sealed(array_replace_recursive($l, ['execution_context' => ['tax' => ['behavior' => 'inclusive']]]))],
+            'tax above the retained approved ceiling' => [fn (array $l): array => self::sealed(array_replace_recursive($l, ['execution_context' => ['tax' => ['maximum_rate_bps' => 800]]]))],
+            'execution context names another account' => [fn (array $l): array => self::sealed(array_replace_recursive($l, ['execution_context' => ['account_id' => 'acct_OTHER']]))],
+            'execution context funds mode differs' => [fn (array $l): array => self::sealed(array_replace_recursive($l, ['execution_context' => ['funds_mode' => 'live']]))],
             'foreign origin key' => [fn (array $l): array => self::sealed([...$l, 'origin_key' => 'production_checkout_v1:'.$l['order_id'].':'.$l['line_id']])],
         ];
     }
