@@ -1,0 +1,4 @@
+cmd: /home/user/VA-Studio/vendor/bin/pint --test app/Domain/Grants/Paid/PaidGrantDocuments.php tests/Feature/PaidGrantCompletionBudgetTest.php
+head: d6ae43cf173773ce359272bcaefd0fd5a94e467c
+{"tool":"pint","result":"passed"}
+rc=0
