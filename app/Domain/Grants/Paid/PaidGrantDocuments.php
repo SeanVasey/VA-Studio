@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -19,101 +21,150 @@ final class PaidGrantDocuments
 
     public const LEASE_SECONDS = 300;
 
-    public function prepare(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
+    /** The buyer's heavy-work lock outlives one step (claim frame, a line's 300 s budget and its record frame) by a margin. */
+    public const HEAVY_LOCK_SECONDS = self::LEASE_SECONDS + 60;
+
+    /**
+     * Prepares as many lines as this request's budget allows, then completes the order. The request ends with the current
+     * projection, not a refusal, when its call budget is spent or other work holds the buyer's preparation (condition C13);
+     * the page then continues with another request.
+     *
+     * @param  bool|null  $busy  Set to true when this request yielded to other work (another request's live claim or the
+     *                           buyer's heavy-work lock), false otherwise.
+     */
+    public function prepare(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null,
+        ?bool &$busy = null): array
     {
         PaidGrantInput::uuid($batchId);
+        $busy = false;
         $deadline = PaidGrantDeadline::start(self::LEASE_SECONDS);
         $commands = new PaidGrantCommands;
         for ($lineNumber = 0; $lineNumber < 10; $lineNumber++) {
-            $deadline->proveCurrent();
-            $claim = $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows): array {
-                if ($graph['complete'] !== null) {
-                    return ['done' => true];
-                }
-                foreach ($graph['lines'] as $line) {
-                    if ($line['work']['state'] === 'complete') {
-                        continue;
-                    }
-                    $at = CarbonImmutable::now('UTC')->startOfSecond();
-                    if ($line['work']['state'] === 'claimed' && $at->lessThan($line['work']['expires_at'])) {
-                        return ['busy' => true, 'projection' => (new PaidGrants)->project($graph)];
-                    }
-                    PaidGrantException::require((int) $line['work']['attempts'] < self::MAX_ATTEMPTS, 409);
-                    $claimId = (string) Str::uuid();
-                    $lease = $at->addSeconds(self::LEASE_SECONDS)->format('Y-m-d H:i:s');
-                    $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'claimed', attempts = attempts + 1, claim_id = ?, expires_at = ? WHERE id = ?",
-                        [$claimId, $lease, $line['work']['id']]);
-
-                    return ['origin' => $line['origin']['public_id'], 'origin_hash' => $line['origin']['payload_hash'], 'claim_id' => $claimId,
-                        'body' => $line['body'], 'expires_at' => $lease];
-                }
-
-                return ['done' => true];
-            }, $deadline);
-            if (isset($claim['busy'])) {
-                // A fresh terminal read mints the body receipt; an earlier claim frame cannot lend it.
-                return $commands->run($batchId, $principal, $actor,
-                    fn (array $graph): array => (new PaidGrants)->project($graph), $deadline, projectionRead: $projectionRead);
+            // The call budget only decides whether another line may be claimed. Once it is spent the request answers with
+            // what it achieved instead of 410, and the page continues with a new request (C13).
+            if (hrtime(true) > $deadline->value()) {
+                return $this->current($batchId, $principal, $actor, $projectionRead);
             }
-            if (isset($claim['done'])) {
+            // One heavy step per buyer account at a time (C12, availability only): held from just before the claim through
+            // the line's render, asset hash and record or failure frame. Another request holding it means no claim, no
+            // render and no hashing here; no attempt is spent.
+            $lock = $this->heavyLock($principal);
+            if ($lock === null) {
+                $busy = true;
+
+                return $this->current($batchId, $principal, $actor, $projectionRead);
+            }
+            try {
+                $prepared = $this->prepareLine($batchId, $principal, $actor, $deadline, $commands);
+            } finally {
+                $lock->release();
+            }
+            if ($prepared === 'busy') {
+                $busy = true;
+
+                return $this->current($batchId, $principal, $actor, $projectionRead);
+            }
+            if ($prepared === 'done') {
                 break;
             }
-            // The call-wide budget only gates new claims (the loop top and the claim frame). A claimed line gets its own
-            // budget, started now to match its database lease, for its render, asset verification, record frame and
-            // failure frame, so a line claimed late in the call is not cut off with most of its lease left and its attempt
-            // spent. The record frame still refuses once the lease itself has ended.
-            $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
-            try {
-                $budget->proveCurrent();
-                $input = PaidGrantRenderInput::fromOrigin($claim['body']);
-                $expected = (new PaidGrantText)->build($input);
-                $rendered = app(PaidGrantRendererProcess::class)->render($input, $claim['body']['profile']);
-                PaidGrantException::require($rendered instanceof RenderedContract
-                    && hash_equals($expected['text_digest'], $rendered->textDigest)
-                    && hash_equals(CanonicalJson::hash($claim['body']['profile']), $rendered->profileHash));
-                $artifact = app(PaidGrantFiles::class)->store($claim['origin'], $claim['claim_id'], $claim['body']['source']['provenance'], $rendered);
-                $budget->proveCurrent();
-                (new PaidGrantAssets)->verify($claim['body']['assets'], $budget->value());
-                $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim, $artifact, $expected, $actor): array {
-                    $line = $this->line($graph, $claim['origin']);
-                    PaidGrantException::require($line['origin']['payload_hash'] === $claim['origin_hash'] && $line['body'] === $claim['body']
-                        && $line['original'] === [] && $line['work']['state'] === 'claimed' && $line['work']['claim_id'] === $claim['claim_id']
-                        && $line['work']['expires_at'] === $claim['expires_at'] && CarbonImmutable::now('UTC')->lessThan($claim['expires_at']), 409);
-                    $at = CarbonImmutable::now('UTC')->startOfSecond();
-                    $manifest = ['schema_version' => 'paid-first-original-v1', 'origin_hash' => $claim['origin_hash'], 'claim_id' => $claim['claim_id'],
-                        'profile_hash' => CanonicalJson::hash($claim['body']['profile']), 'input_hash' => $expected['input_hash'], 'text_digest' => $expected['text_digest'],
-                        'asset_manifest_hash' => CanonicalJson::hash($claim['body']['assets']), 'artifact' => $artifact, 'prepared_at' => $at->format('Y-m-d\TH:i:s\Z')];
-                    PaidGrantRecords::insert('paid_originals', ['origin_id' => (int) $line['origin']['id'], 'claim_id' => $claim['claim_id'],
-                        ...PaidGrantRecords::encode($manifest), 'created_at' => $at->format('Y-m-d H:i:s')], $rows);
-                    $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'complete' WHERE id = ?", [$line['work']['id']]);
-                    $this->audit('paid_original.prepared', $graph, ['original_hash' => CanonicalJson::hash($manifest)], $actor);
-
-                    return ['prepared' => true];
-                }, $budget);
-            } catch (Throwable $error) {
-                // Only this still-owned claim may become failed. Withdrawal/staleness never renews authority. The line's
-                // own budget lets a late line's failure be recorded after the call-wide budget lapsed; once the line's
-                // budget has lapsed too, the claim stays until its lease ends.
-                try {
-                    $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim): array {
-                        $line = $this->line($graph, $claim['origin']);
-                        if ($line['original'] === [] && $line['work']['state'] === 'claimed' && $line['work']['claim_id'] === $claim['claim_id']) {
-                            $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'failed' WHERE id = ?", [$line['work']['id']]);
-                        }
-
-                        return [];
-                    }, $budget);
-                } catch (Throwable) {
-                    // Retained lease/attempt remains truthful until a fresh authorized retry after expiry.
-                }
-                throw $error;
-            }
+        }
+        if (hrtime(true) > $deadline->value()) {
+            return $this->current($batchId, $principal, $actor, $projectionRead);
         }
 
-        return $this->complete($batchId, $principal, $actor, $deadline, $projectionRead);
+        return $this->complete($batchId, $principal, $actor, $deadline, $projectionRead, $busy);
     }
 
-    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline, ?PaidGrantProjectionRead $projectionRead): array
+    /** One claimed line from its claim through its record or failure frame; 'busy', 'done' or 'prepared'. */
+    private function prepareLine(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline, PaidGrantCommands $commands): string
+    {
+        $claim = $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows): array {
+            if ($graph['complete'] !== null) {
+                return ['done' => true];
+            }
+            foreach ($graph['lines'] as $line) {
+                if ($line['work']['state'] === 'complete') {
+                    continue;
+                }
+                $at = CarbonImmutable::now('UTC')->startOfSecond();
+                if ($line['work']['state'] === 'claimed' && $at->lessThan($line['work']['expires_at'])) {
+                    return ['busy' => true, 'projection' => (new PaidGrants)->project($graph)];
+                }
+                PaidGrantException::require((int) $line['work']['attempts'] < self::MAX_ATTEMPTS, 409);
+                $claimId = (string) Str::uuid();
+                $lease = $at->addSeconds(self::LEASE_SECONDS)->format('Y-m-d H:i:s');
+                $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'claimed', attempts = attempts + 1, claim_id = ?, expires_at = ? WHERE id = ?",
+                    [$claimId, $lease, $line['work']['id']]);
+
+                return ['origin' => $line['origin']['public_id'], 'origin_hash' => $line['origin']['payload_hash'], 'claim_id' => $claimId,
+                    'body' => $line['body'], 'expires_at' => $lease];
+            }
+
+            return ['done' => true];
+        }, $deadline);
+        if (isset($claim['busy'])) {
+            // Another request's live claim; the caller answers with a fresh terminal read.
+            return 'busy';
+        }
+        if (isset($claim['done'])) {
+            return 'done';
+        }
+        // The call-wide budget only gates new claims (the loop top and the claim frame). A claimed line gets its own
+        // budget, started now to match its database lease, for its render, asset verification, record frame and
+        // failure frame, so a line claimed late in the call is not cut off with most of its lease left and its attempt
+        // spent. The record frame still refuses once the lease itself has ended.
+        $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+        try {
+            $budget->proveCurrent();
+            $input = PaidGrantRenderInput::fromOrigin($claim['body']);
+            $expected = (new PaidGrantText)->build($input);
+            $rendered = app(PaidGrantRendererProcess::class)->render($input, $claim['body']['profile']);
+            PaidGrantException::require($rendered instanceof RenderedContract
+                && hash_equals($expected['text_digest'], $rendered->textDigest)
+                && hash_equals(CanonicalJson::hash($claim['body']['profile']), $rendered->profileHash));
+            $artifact = app(PaidGrantFiles::class)->store($claim['origin'], $claim['claim_id'], $claim['body']['source']['provenance'], $rendered);
+            $budget->proveCurrent();
+            (new PaidGrantAssets)->verify($claim['body']['assets'], $budget->value());
+            $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim, $artifact, $expected, $actor): array {
+                $line = $this->line($graph, $claim['origin']);
+                PaidGrantException::require($line['origin']['payload_hash'] === $claim['origin_hash'] && $line['body'] === $claim['body']
+                    && $line['original'] === [] && $line['work']['state'] === 'claimed' && $line['work']['claim_id'] === $claim['claim_id']
+                    && $line['work']['expires_at'] === $claim['expires_at'] && CarbonImmutable::now('UTC')->lessThan($claim['expires_at']), 409);
+                $at = CarbonImmutable::now('UTC')->startOfSecond();
+                $manifest = ['schema_version' => 'paid-first-original-v1', 'origin_hash' => $claim['origin_hash'], 'claim_id' => $claim['claim_id'],
+                    'profile_hash' => CanonicalJson::hash($claim['body']['profile']), 'input_hash' => $expected['input_hash'], 'text_digest' => $expected['text_digest'],
+                    'asset_manifest_hash' => CanonicalJson::hash($claim['body']['assets']), 'artifact' => $artifact, 'prepared_at' => $at->format('Y-m-d\TH:i:s\Z')];
+                PaidGrantRecords::insert('paid_originals', ['origin_id' => (int) $line['origin']['id'], 'claim_id' => $claim['claim_id'],
+                    ...PaidGrantRecords::encode($manifest), 'created_at' => $at->format('Y-m-d H:i:s')], $rows);
+                $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'complete' WHERE id = ?", [$line['work']['id']]);
+                $this->audit('paid_original.prepared', $graph, ['original_hash' => CanonicalJson::hash($manifest)], $actor);
+
+                return ['prepared' => true];
+            }, $budget);
+        } catch (Throwable $error) {
+            // Only this still-owned claim may become failed. Withdrawal/staleness never renews authority. The line's
+            // own budget lets a late line's failure be recorded after the call-wide budget lapsed; once the line's
+            // budget has lapsed too, the claim stays until its lease ends.
+            try {
+                $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim): array {
+                    $line = $this->line($graph, $claim['origin']);
+                    if ($line['original'] === [] && $line['work']['state'] === 'claimed' && $line['work']['claim_id'] === $claim['claim_id']) {
+                        $rows->execute('UPDATE '.$rows->table('paid_document_work')." SET state = 'failed' WHERE id = ?", [$line['work']['id']]);
+                    }
+
+                    return [];
+                }, $budget);
+            } catch (Throwable) {
+                // Retained lease/attempt remains truthful until a fresh authorized retry after expiry.
+            }
+            throw $error;
+        }
+
+        return 'prepared';
+    }
+
+    private function complete(string $batchId, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline, ?PaidGrantProjectionRead $projectionRead,
+        ?bool &$busy): array
     {
         $commands = new PaidGrantCommands;
         $bundle = $commands->run($batchId, $principal, $actor, function (array $graph): array {
@@ -128,11 +179,22 @@ final class PaidGrantDocuments
             // Each line's physical re-verification gets its own non-extendable bound, the same as the per-line render
             // lease, so a large order (up to 10 lines of 1 GiB assets) is not bounded by the one budget that prepare()
             // started. A refused line fulfils nothing, and a retry finds every line prepared and gets fresh bounds.
-            $lineBudget = PaidGrantDeadline::start(self::LEASE_SECONDS);
-            // Existing originals are exact restore-only. Missing bytes never create another render claim.
-            app(PaidGrantFiles::class)->verify($line['manifest']['artifact']);
-            (new PaidGrantAssets)->verify($line['body']['assets'], $lineBudget->value());
-            $lineBudget->proveCurrent();
+            // The same buyer lock as a render step (C12): no re-verification runs beside other heavy work of this buyer.
+            $lock = $this->heavyLock($principal);
+            if ($lock === null) {
+                $busy = true;
+
+                return $this->current($batchId, $principal, $actor, $projectionRead);
+            }
+            try {
+                $lineBudget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+                // Existing originals are exact restore-only. Missing bytes never create another render claim.
+                app(PaidGrantFiles::class)->verify($line['manifest']['artifact']);
+                (new PaidGrantAssets)->verify($line['body']['assets'], $lineBudget->value());
+                $lineBudget->proveCurrent();
+            } finally {
+                $lock->release();
+            }
         }
 
         // A fresh observation budget for the fulfillment frame and its body receipt. The frame still requires the exact
@@ -156,6 +218,25 @@ final class PaidGrantDocuments
 
             return (new PaidGrants)->project($graph);
         }, $commit, projectionRead: $projectionRead);
+    }
+
+    /** The current projection through a fresh terminal read frame; its own receipt, never one lent by an earlier frame. */
+    private function current(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead): array
+    {
+        return (new PaidGrantCommands)->run($batchId, $principal, $actor,
+            fn (array $graph): array => (new PaidGrants)->project($graph), PaidGrantDeadline::start(), projectionRead: $projectionRead);
+    }
+
+    /**
+     * Non-blocking per-account lock on the default cache store (C12). It only keeps one buyer from running parallel heavy
+     * I/O; claims, leases and `batch_once` stay the correctness guarantees. A crashed worker's lock expires after
+     * HEAVY_LOCK_SECONDS. Released by its owner token only.
+     */
+    private function heavyLock(ProductionCustomerPrincipal $principal): ?Lock
+    {
+        $lock = Cache::lock('paid-grant-heavy:'.hash('sha256', 'paid-heavy-v1:'.$principal->accountId), self::HEAVY_LOCK_SECONDS);
+
+        return $lock->get() ? $lock : null;
     }
 
     private function line(array $graph, string $id): array

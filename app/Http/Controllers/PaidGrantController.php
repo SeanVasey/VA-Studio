@@ -79,8 +79,12 @@ final class PaidGrantController
             PaidGrantInput::keys($this->body($request), []);
 
             $read = PaidGrantProjectionRead::begin();
+            $busy = false;
+            $origin = (new PaidGrantDocuments)->prepare($batch, $principal, $actor, $read, $busy);
 
-            return $this->json(['origin' => (new PaidGrantDocuments)->prepare($batch, $principal, $actor, $read)], $read);
+            // `busy` (a boolean, no token) tells the page that other work holds this buyer's preparation, so it waits and
+            // polls instead of stopping (condition C13). Progress is visible in the projection itself.
+            return $this->json(['origin' => $origin, 'busy' => $busy], $read);
         });
     }
 

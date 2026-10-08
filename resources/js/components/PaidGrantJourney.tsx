@@ -52,8 +52,9 @@ function listing(x: unknown): x is Listing {
     && Array.isArray(x.origins) && x.origins.length <= 20 && new Set(x.origins.map(o => obj(o) ? o.id : null)).size === x.origins.length
     && x.origins.every(o => obj(o) && exact(o, ['id', 'orderId', 'createdAt', 'provenance']) && uuid(o.id) && uuid(o.orderId) && sqlDate(o.createdAt) && provenance(o.provenance));
 }
-function validStatus(x: unknown, origin: PaidOrigin): x is Status {
-  return obj(x) && exact(x, ['schemaVersion', 'originId', 'fulfilled', 'lines']) && x.schemaVersion === 1 && x.originId === origin.id && x.fulfilled === origin.fulfilled
+function validStatus(x: unknown, origin: PaidOrigin, anyFulfilled = false): x is Status {
+  return obj(x) && exact(x, ['schemaVersion', 'originId', 'fulfilled', 'lines']) && x.schemaVersion === 1 && x.originId === origin.id
+    && (anyFulfilled ? typeof x.fulfilled === 'boolean' : x.fulfilled === origin.fulfilled)
     && Array.isArray(x.lines) && x.lines.length === origin.lines.length && x.lines.every((l, i) => obj(l)
       && exact(l, ['id', 'attemptCount', 'maxDownloads', 'historyLimit', 'history', 'renderRetryAllowed', 'renderRetryAfter']) && l.id === origin.lines[i].id
       && int(l.attemptCount, 0, 100) && int(l.maxDownloads, 1, 100) && (l.attemptCount as number) <= (l.maxDownloads as number) && l.historyLimit === 20
@@ -85,49 +86,71 @@ const unknown = 'The result could not be confirmed. Refresh saved licenses befor
  */
 export const paidRequestTimeouts = { read: 80_000, finalize: 80_000, authorize: 80_000, document: 320_000 } as const;
 export type PaidOperation = keyof typeof paidRequestTimeouts;
+/**
+ * Continuing a preparation after one click (condition C13). The server answers each document request with what it achieved
+ * (its call budget spent, or other work holding the buyer's preparation), so the page sends another request while each one
+ * makes progress, at most `posts` per click and never two within `spacing` (the route allows 6 a minute). While another
+ * request holds the work it polls saved status every `poll`, for at most `wait` without progress: a render lease (300 s)
+ * plus a margin.
+ */
+export const paidContinuation = { posts: 20, spacing: 10_000, poll: 15_000, wait: 360_000 } as const;
+type Outcome = 'ok' | 'lost' | 'refused' | 'denied' | 'invalid' | 'skipped';
+const ready = (o: PaidOrigin) => o.lines.filter(l => l.documentStatus === 'complete').length;
+const readyText = (o: PaidOrigin) => o.fulfilled ? 'Your files are ready.' : `Preparing your files: ${ready(o)} of ${o.lines.length} lines ready.`;
+/** The document answer: the order and a token-free `busy` flag (other work holds this buyer's preparation). */
+function documentAnswer(x: unknown, o: PaidOrigin): { origin: PaidOrigin; busy: boolean } | null {
+  if (!obj(x) || !(exact(x, ['origin']) || exact(x, ['origin', 'busy']) && typeof x.busy === 'boolean') || !validPaidOrigin(x.origin)
+    || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) return null;
+  return { origin: x.origin, busy: x.busy === true };
+}
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
   const [status, setStatus] = useState<Status | null>(null), [issued, setIssued] = useState<{ auth: Authorization; originId: string }[]>([]);
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
-  const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState(''), [progress, setProgress] = useState('');
+  // A continuing preparation: its run number (bumped to stop it), whether it is running, and the last document POST time.
+  const runs = useRef(0), auto = useRef(false), lastDocument = useRef(Number.NEGATIVE_INFINITY);
+  function stopContinuing() { runs.current++; auto.current = false; }
   const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
-  function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
-  function refuse() { clear(); kept.current = []; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
+  function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setProgress(''); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
+  function refuse() { stopContinuing(); clear(); kept.current = []; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
     active.current = true;
-    const leave = () => { generation.current++; request.current?.abort(); clear(); kept.current = []; setIssued([]); inflight.current = false; setBusy(false); };
+    const leave = () => { stopContinuing(); generation.current++; request.current?.abort(); clear(); kept.current = []; setIssued([]); inflight.current = false; setBusy(false); };
     // Hiding the tab is not leaving: everything shown is cleared and an in-flight request is abandoned, but an uncertain
     // finalize or authorize keeps its exact replay (same request key and nonce, held in memory and never rendered), so a
     // committed authorization can still be recovered instead of duplicated. Hidden download frames are kept too: removing
     // one would abort a download whose redemption the server may still commit. Actual departure (pagehide) clears both.
     const visibility = () => { if (document.visibilityState !== 'hidden') return; const interrupted = inflight.current;
-      generation.current++; request.current?.abort(); clear(true, true); inflight.current = false; setBusy(false); if (interrupted) setMessage(unknown); };
+      stopContinuing(); generation.current++; request.current?.abort(); clear(true, true); inflight.current = false; setBusy(false); if (interrupted) setMessage(unknown); };
     window.addEventListener('pagehide', leave); document.addEventListener('visibilitychange', visibility);
-    return () => { active.current = false; generation.current++; request.current?.abort(); frames.current.forEach(f => f.remove()); window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', visibility); };
+    return () => { active.current = false; stopContinuing(); generation.current++; request.current?.abort(); frames.current.forEach(f => f.remove()); window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', visibility); };
   }, []);
   useEffect(() => { if (message) alert.current?.focus(); }, [message]);
-  async function call(operation: PaidOperation, path: string, body: Record<string, unknown> | null, commit: (x: unknown) => void) {
-    if (inflight.current || denied) return; inflight.current = true; setBusy(true); setMessage('');
+  async function call(operation: PaidOperation, path: string, body: Record<string, unknown> | null, commit: (x: unknown) => void): Promise<Outcome> {
+    if (inflight.current || denied) return 'skipped'; inflight.current = true; setBusy(true); setMessage('');
     const abort = new AbortController(), mine = ++generation.current; request.current = abort;
     const timer = window.setTimeout(() => abort.abort(), paidRequestTimeouts[operation]), owns = () => active.current && mine === generation.current;
     try {
-      const token = csrf(); if (body && !token) { refuse(); return; }
+      const token = csrf(); if (body && !token) { refuse(); return 'denied'; }
       const response = await Promise.race([fetch(path, { method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: abort.signal,
         headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token! } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }),
       new Promise<never>((_, reject) => abort.signal.addEventListener('abort', () => reject(new Error()), { once: true }))]);
-      if (!owns() || abort.signal.aborted) return;
-      if ([403, 404, 419].includes(response.status)) { refuse(); return; }
-      const value = await readJson(response, abort.signal); if (!owns() || abort.signal.aborted) return;
+      if (!owns() || abort.signal.aborted) return 'skipped';
+      if ([403, 404, 419].includes(response.status)) { refuse(); return 'denied'; }
+      const value = await readJson(response, abort.signal); if (!owns() || abort.signal.aborted) return 'skipped';
       // A body closure can deny before private bytes after headers have already left the server.
       if (obj(value) && exact(value, ['error', 'status']) && value.error === 'Paid grant request unavailable.'
         && Number.isInteger(value.status) && [403, 404, 419, 503].includes(value.status as number)) {
-        if ([403, 404, 419].includes(value.status as number)) refuse(); else setMessage(unknown);
-        return;
+        if ([403, 404, 419].includes(value.status as number)) { refuse(); return 'denied'; }
+        setMessage(unknown); return 'refused';
       }
-      if (!response.ok) { setMessage(unknown); return; }
-      commit(value);
-    } catch { if (owns()) { if (!body) { setData(null); setOrigin(null); setStatus(null); } setMessage(unknown); } }
-    finally { window.clearTimeout(timer); if (owns()) { inflight.current = false; setBusy(false); request.current = null; } }
+      if (!response.ok) { setMessage(unknown); return 'refused'; }
+      try { commit(value); } catch { setMessage(unknown); return 'invalid'; }
+      return 'ok';
+    } catch { if (owns()) { if (!body) { setData(null); setOrigin(null); setStatus(null); } setMessage(unknown); return 'lost'; } return 'skipped'; }
+    // A continuing preparation keeps the page busy between its requests.
+    finally { window.clearTimeout(timer); if (owns()) { inflight.current = false; setBusy(auto.current); request.current = null; } }
   }
   function refresh() { void call('read', '/paid-grants/index', null, x => { if (!listing(x)) throw new Error(); setData(x); setOrigin(null); setStatus(null); setReviewedSaved(true); }); }
   function open(id: string, orderId: string) { setOrigin(null); setStatus(null); setOrder(''); void call('read', `/paid-grants/origins/${id}`, null, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== id || x.origin.orderId !== orderId) throw new Error(); setOrigin(x.origin); }); }
@@ -145,7 +168,62 @@ export function PaidGrantJourney() {
     setPending(null); setReviewedSaved(false);
   }); }
   function finalize() { if (!uuid(order) || pending) return; const p: Pending = { path: `/paid-grants/orders/${order}/finalize`, body: {}, orderId: order }; setPending(p); setReviewedSaved(false); execute(p); }
-  function prepare() { if (!origin) return; const o = origin; void call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
+  function prepare() { if (origin) void continuePreparing(origin); }
+  /**
+   * One click keeps preparing until the order is fulfilled (condition C13): another document request while the last one made
+   * progress; saved-status polling while other work holds the order (a live claim or the buyer's lock) or after a lost
+   * answer; a stop on no progress, a refusal or denial, the request cap, or a hidden or left page. Nothing resumes by itself.
+   */
+  async function continuePreparing(start: PaidOrigin) {
+    if (auto.current || inflight.current || denied) return;
+    const run = ++runs.current; auto.current = true; setBusy(true);
+    const current = () => active.current && run === runs.current;
+    const pause = (ms: number) => new Promise<void>(resolve => { window.setTimeout(resolve, ms); });
+    let o = start, posts = 0, waitingSince: number | null = null;
+    setProgress(readyText(o));
+    try {
+      while (current()) {
+        if (posts >= paidContinuation.posts) { setProgress(`${readyText(o)} Paused after ${posts} requests; choose prepare to continue.`); return; }
+        const delay = lastDocument.current + paidContinuation.spacing - Date.now();
+        if (delay > 0) { await pause(delay); if (!current()) return; }
+        lastDocument.current = Date.now(); posts++;
+        let answer: { origin: PaidOrigin; busy: boolean } | null = null;
+        const before = o;
+        const outcome = await call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { answer = documentAnswer(x, before); if (!answer) throw new Error(); });
+        if (!current()) return;
+        if (outcome === 'ok' && answer) {
+          const next: { origin: PaidOrigin; busy: boolean } = answer; o = next.origin; setOrigin(o); setStatus(null); setProgress(readyText(o));
+          if (o.fulfilled) return;
+          if (!next.busy) {
+            if (ready(o) > ready(before)) { waitingSince = null; continue; }
+            setProgress(`${readyText(o)} Preparation stopped; no further progress was possible.`); return;
+          }
+        } else if (outcome !== 'lost') return;
+        // Other work holds the order, or the answer was lost while the server may still be working: poll saved status.
+        waitingSince ??= Date.now();
+        let proceed = false;
+        while (current() && !proceed) {
+          if (Date.now() - waitingSince >= paidContinuation.wait) { setProgress(`${readyText(o)} Still waiting for other work; refresh later.`); return; }
+          setProgress(`${readyText(o)} Another request is still working on this order; checking again shortly.`);
+          await pause(paidContinuation.poll); if (!current()) return;
+          let saved: Status | null = null;
+          const at = o;
+          const read = await call('read', `/paid-grants/origins/${at.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, at, true)) throw new Error(); saved = x.status; });
+          // A failed saved read clears the page as any read does, so the continuation stops there.
+          if (!current() || read !== 'ok' || !saved) return;
+          const s: Status = saved;
+          if (s.fulfilled) {
+            const shown = await call('read', `/paid-grants/origins/${at.id}`, null, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== at.id || x.origin.orderId !== at.orderId) throw new Error(); o = x.origin; });
+            if (current() && shown === 'ok') { setOrigin(o); setStatus(null); setProgress(readyText(o)); }
+            return;
+          }
+          // A live claim by other work: keep waiting. Otherwise ask again; the server says whether the work is still held.
+          proceed = !s.lines.some(l => l.renderRetryAfter !== null && !l.renderRetryAllowed);
+          if (!proceed) setStatus(s);
+        }
+      }
+    } finally { if (run === runs.current) { auto.current = false; if (!inflight.current) setBusy(false); } }
+  }
   function savedStatus() { if (!origin) return; const o = origin, p = pending, issuedAt = performance.now(); void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p ? { pending: p, issuedAt } : null); setReviewedSaved(true); }); }
   // An authorize whose answer was lost may have committed. Only a saved status read taken after that request may show it is
   // not live, so the customer can drop it and ask again; a live one is recovered by the exact retry instead, so it never
@@ -219,6 +297,7 @@ export function PaidGrantJourney() {
     {origin && <section aria-label="Retained paid order"><p className="paid-license-reference">Order {origin.orderId}</p>
       {origin.provenance === 'synthetic_rehearsal' && <p>Rehearsal original. No real payment or production legal facts are certified.</p>}
       <p>{origin.fulfilled ? 'Complete-order preparation is recorded. Exact files are checked again for each download.' : 'This order is waiting for complete preparation. No line can download yet.'}</p>
+      <p role="status" aria-live="polite" className="paid-preparation-progress">{progress}</p>
       {unfinished.length > 0 && <button type="button" disabled={busy || !retryAllowed} onClick={prepare}>Prepare original licenses and files</button>}
       {finishable && <button type="button" disabled={busy} onClick={prepare}>Finish preparing this order</button>}
       <button type="button" disabled={busy} onClick={savedStatus}>Refresh preparation and download status</button>

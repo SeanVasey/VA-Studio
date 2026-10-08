@@ -107,7 +107,11 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $this->assertPrivate($page);
         $origin = $this->call('POST', '/paid-grants/orders/'.$f['order']['orderId'].'/finalize', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk()->json('origin');
         $this->assertFalse($origin['fulfilled']);
-        $complete = $this->call('POST', '/paid-grants/origins/'.$origin['id'].'/document', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk()->json('origin');
+        $document = $this->call('POST', '/paid-grants/origins/'.$origin['id'].'/document', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk();
+        // Condition C13: the document answer also says whether other work holds this buyer's preparation (token-free boolean).
+        $this->assertSame(['origin', 'busy'], array_keys($document->json()));
+        $this->assertFalse($document->json('busy'));
+        $complete = $document->json('origin');
         $this->assertTrue($complete['fulfilled']);
         $original = (array) DB::table('paid_originals')->sole();
         $firstBatch = (array) DB::table('paid_order_origins')->sole();

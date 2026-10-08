@@ -113,9 +113,14 @@ final class PaidGrantPreparationBudgetTest extends TestCase
         $f = $this->order(3);
         $renderer = $this->slowRenderer(120);
 
-        // Line 3 is claimed at about 240 s and finishes at about 360 s inside its own lease. The call-wide budget then
-        // refuses at the loop top (410) before anything else is claimed, with every line prepared.
-        $this->assertSame(410, $this->refusedStatus(fn () => $this->prepare($f)));
+        // Line 3 is claimed at about 240 s and finishes at about 360 s inside its own lease. The call-wide budget then ends
+        // the request at the loop top before anything else is claimed (condition C13: it returns the current projection,
+        // no longer 410), with every line prepared and nothing fulfilled yet.
+        $busy = null;
+        $progress = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'], null, $busy);
+        $this->assertFalse($progress['fulfilled']);
+        $this->assertSame(['complete', 'complete', 'complete'], array_column($progress['lines'], 'documentStatus'));
+        $this->assertFalse($busy, 'The request made progress itself; nothing else holds the work.');
         $this->assertSame(3, $renderer->renders);
         $this->assertSame(['complete', 'complete', 'complete'], $this->states());
         $this->assertSame([1, 1, 1], $this->attempts());

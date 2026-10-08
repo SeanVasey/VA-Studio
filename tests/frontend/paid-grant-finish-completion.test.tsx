@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaidGrantJourney, type PaidOrigin } from '../../resources/js/components/PaidGrantJourney';
 
@@ -15,7 +15,7 @@ const listing = () => ({ schemaVersion: 1, originLimit: 20, origins: [{ id: batc
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 const finish = 'Finish preparing this order', prepare = 'Prepare original licenses and files';
 beforeEach(() => { document.head.insertAdjacentHTML('beforeend', `<meta data-paid-csrf name="csrf-token" content="${'c'.repeat(40)}">`); });
-afterEach(() => { vi.restoreAllMocks(); document.head.querySelectorAll('[data-paid-csrf]').forEach(e => e.remove()); });
+afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); document.head.querySelectorAll('[data-paid-csrf]').forEach(e => e.remove()); });
 async function openOrder() {
   fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
   fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` }));
@@ -40,14 +40,24 @@ describe('finishing a prepared but unfulfilled paid order', () => {
     expect(screen.queryByRole('button', { name: finish })).not.toBeInTheDocument();
   });
 
-  it('keeps the control after a lost answer, so the order stays recoverable', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: prepared }))
-      .mockRejectedValueOnce(new Error('SYNTHETIC CLIENT TIMEOUT'));
+  it('keeps the order recoverable after a lost answer by polling saved status and finishing it (C13)', async () => {
+    const status = { status: { schemaVersion: 1, originId: batchId, fulfilled: false, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20,
+      renderRetryAllowed: false, renderRetryAfter: null, history: [] }] } };
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: prepared }))
+      .mockRejectedValueOnce(new Error('SYNTHETIC CLIENT TIMEOUT')).mockResolvedValueOnce(response(status)).mockResolvedValueOnce(response({ origin: fulfilled, busy: false }));
     render(<PaidGrantJourney />);
     await openOrder();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
     fireEvent.click(screen.getByRole('button', { name: finish }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
-    await waitFor(() => expect(screen.getByRole('button', { name: finish })).toBeEnabled());
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(screen.getByRole('alert')).toHaveTextContent('could not be confirmed');
+    expect(screen.getByRole('status')).toHaveTextContent('checking again shortly');
+    await act(() => vi.advanceTimersByTimeAsync(15_000));
+    expect(fetcher.mock.calls.map(([path]) => String(path)).slice(2)).toEqual([`/paid-grants/origins/${batchId}/document`, `/paid-grants/origins/${batchId}/downloads`,
+      `/paid-grants/origins/${batchId}/document`]);
+    vi.useRealTimers();
+    expect(screen.getByText(/Complete-order preparation is recorded/)).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Your files are ready.');
   });
 
   it('offers no finish control for a fulfilled order or while any line is unprepared', async () => {
