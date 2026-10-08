@@ -160,6 +160,7 @@ assertions, exit 2) has 14 errors that are the known C1 activation blocker in th
 `initialize` fixture and one new Low, A2-7: `ProductionSuppressionMigrationTest::
 test_recorded_gap_and_non_prefix_installation_refuse_without_repair` creates the intents table
 without its targets parent, which MySQL refuses (error 1824) and SQLite allows; fixed below.
+A2-7 is fixed: the fixture now installs the targets table plus its first guard (a feasible non-prefix state MySQL accepts) instead of an orphan intents table; evidence in `conditions/review-a2-7/`.
 A2-4 (Low, deployment): MySQL sessions are not pinned to UTC (`config/database.php` has no
 `timezone` key); DST fall-back instants are accepted and a spring-forward gap is refused or
 moved by the column; recommendation for U-02: `'timezone' => '+00:00'` or a UTC server. A2-2
