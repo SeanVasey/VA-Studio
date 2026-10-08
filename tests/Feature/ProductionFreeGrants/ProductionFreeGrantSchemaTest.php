@@ -100,7 +100,12 @@ final class ProductionFreeGrantSchemaTest extends TestCase
         $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'external_dependent');
         $pdo->exec('DROP TABLE foreign_free_dependent');
         $pdo->exec('CREATE VIEW foreign_free_view AS SELECT id FROM production_free_originals');
-        $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'external_dependent');
+        try {
+            $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'external_dependent');
+        } finally {
+            // A persistent native schema keeps views across migrate:fresh; never leak this probe to later cases.
+            $pdo->exec('DROP VIEW foreign_free_view');
+        }
     }
 
     public function test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused(): void
