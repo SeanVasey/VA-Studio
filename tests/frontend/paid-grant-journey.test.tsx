@@ -188,8 +188,10 @@ describe('per-operation request timeouts', () => {
     const lost = { id: authorizationId, kind: 'master_wav', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', attemptedAt: null };
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
       .mockResolvedValueOnce(statusWith([])).mockRejectedValueOnce(new Error('lost authorize answer'))
+      .mockResolvedValueOnce(statusWith([{ ...lost, status: 'expired' }]))
       .mockResolvedValueOnce(statusWith([{ ...lost, status: 'unused' }])).mockResolvedValueOnce(statusWith([{ ...lost, status: 'expired' }]))
       .mockResolvedValueOnce(response({ authorization: { ...authorization, id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' } }));
+    let now = 0; vi.spyOn(performance, 'now').mockImplementation(() => now);
     render(<PaidGrantJourney />); await openSaved();
     const authorize = () => screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' });
     const refreshStatus = async (calls: number) => { fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(calls)); await waitFor(() => expect(authorize().closest('section')).not.toHaveAttribute('aria-busy', 'true')); };
@@ -198,17 +200,21 @@ describe('per-operation request timeouts', () => {
     fireEvent.click(authorize()); expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
     const setAside = screen.getByRole('button', { name: 'Set aside and request a new authorization' });
     expect(setAside).toBeDisabled(); expect(authorize()).toBeDisabled();
+    // A read issued before the client authorize timeout has passed since the request was sent cannot prove it finished:
+    // the server may still commit it after this read.
+    now = paidRequestTimeouts.authorize - 1; await refreshStatus(5); expect(setAside).toBeDisabled();
+    now = paidRequestTimeouts.authorize;
     // The lost request may have committed a live authorization: only the exact retry may recover it.
-    await refreshStatus(5);
+    await refreshStatus(6);
     expect(screen.getByRole('button', { name: 'Retry the exact request' })).toBeEnabled(); expect(setAside).toBeDisabled(); expect(authorize()).toBeDisabled();
     // Once a later read shows that file has no live authorization on the line, the customer may drop the old request.
-    await refreshStatus(6); expect(setAside).toBeEnabled();
+    await refreshStatus(7); expect(setAside).toBeEnabled();
     fireEvent.click(setAside);
     expect(screen.getByRole('alert')).toHaveTextContent('set aside');
     expect(screen.queryByRole('button', { name: 'Retry the exact request' })).not.toBeInTheDocument(); expect(authorize()).toBeEnabled();
     fireEvent.click(authorize()); await screen.findByRole('button', { name: 'Download authorized file' });
-    const [first, fresh] = [JSON.parse(String(fetcher.mock.calls[3][1]?.body)), JSON.parse(String(fetcher.mock.calls[6][1]?.body))];
-    expect(fetcher.mock.calls[6][0]).toBe(fetcher.mock.calls[3][0]); expect(fresh.requestKey).not.toBe(first.requestKey); expect(fresh.nonce).not.toBe(first.nonce);
+    const [first, fresh] = [JSON.parse(String(fetcher.mock.calls[3][1]?.body)), JSON.parse(String(fetcher.mock.calls[7][1]?.body))];
+    expect(fetcher.mock.calls[7][0]).toBe(fetcher.mock.calls[3][0]); expect(fresh.requestKey).not.toBe(first.requestKey); expect(fresh.nonce).not.toBe(first.nonce);
     expect(fresh).toEqual({ requestKey: expect.stringMatching(/^[a-f0-9-]{36}$/), originHash: origin.lines[0].originHash, kind: 'master_wav', nonce: expect.stringMatching(/^[a-f0-9]{64}$/) });
   });
   it('does not treat a full status window as proof that a pushed-out authorization expired', async () => {
@@ -219,10 +225,12 @@ describe('per-operation request timeouts', () => {
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
       .mockRejectedValueOnce(new Error('lost authorize answer'))
       .mockResolvedValueOnce(statusWith(newer('unused'))).mockResolvedValueOnce(statusWith(newer('attempted'))).mockResolvedValueOnce(statusWith(newer('expired', 19)));
+    let now = 0; vi.spyOn(performance, 'now').mockImplementation(() => now);
     render(<PaidGrantJourney />); await openSaved();
     const authorize = () => screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' });
     const refreshStatus = async (calls: number) => { fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(calls)); await waitFor(() => expect(authorize().closest('section')).not.toHaveAttribute('aria-busy', 'true')); };
     fireEvent.click(authorize()); expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+    now = paidRequestTimeouts.authorize;
     const setAside = screen.getByRole('button', { name: 'Set aside and request a new authorization' });
     await refreshStatus(4); expect(setAside).toBeDisabled();
     await refreshStatus(5); expect(setAside).toBeDisabled();

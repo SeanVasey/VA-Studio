@@ -77,7 +77,9 @@ const unknown = 'The result could not be confirmed. Refresh saved licenses befor
 /**
  * Client abort per operation, in milliseconds. Every request waits past the server's own hard budget (60 s for reads,
  * finalize and authorize, the 300 s render lease for document) plus the 5 s session-lock wait and a 15 s margin, so the
- * browser never discards an answer the server can still give or commit; a deliberate retry then cannot race the original.
+ * browser never discards an answer the server can still give or commit. A request abandoned earlier (hidden tab, network
+ * error) may still be running on the server; its exact retry is safe anyway, because the server returns the same row for
+ * the same request key.
  * Measured native work: finalize 18 s, authorize 12-20 s, document 65-76 s
  * (docs/verification/paid252-composition-20261007/hardening/codex-1/README.md).
  */
@@ -86,9 +88,9 @@ export type PaidOperation = keyof typeof paidRequestTimeouts;
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
   const [status, setStatus] = useState<Status | null>(null), [authorization, setAuthorization] = useState<Authorization | null>(null);
-  const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<Pending | null>(null);
+  const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState('');
-  const active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
+  const sentAt = useRef(0), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setAuthorization(null); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); frames.current.forEach(f => f.remove()); frames.current = []; }
   function refuse() { clear(); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
@@ -128,7 +130,7 @@ export function PaidGrantJourney() {
   }
   function refresh() { void call('read', '/paid-grants/index', null, x => { if (!listing(x)) throw new Error(); setData(x); setOrigin(null); setStatus(null); setReviewedSaved(true); }); }
   function open(id: string, orderId: string) { setOrigin(null); setStatus(null); setOrder(''); void call('read', `/paid-grants/origins/${id}`, null, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== id || x.origin.orderId !== orderId) throw new Error(); setOrigin(x.origin); }); }
-  function execute(p: Pending) { void call(p.orderId ? 'finalize' : 'authorize', p.path, p.body, x => {
+  function execute(p: Pending) { sentAt.current = performance.now(); void call(p.orderId ? 'finalize' : 'authorize', p.path, p.body, x => {
     if (p.orderId) { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.orderId !== p.orderId) throw new Error(); setOrigin(x.origin); setOrder(''); setStatus(null); }
     else { const a = obj(x) && exact(x, ['authorization']) ? x.authorization : null, line = p.origin?.lines.find(l => l.id === p.lineId);
       if (!obj(a) || !exact(a, ['id', 'token', 'expiresAt', 'kind', 'filename', 'mimeType']) || !uuid(a.id) || typeof a.token !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(a.token)
@@ -140,14 +142,18 @@ export function PaidGrantJourney() {
   }); }
   function finalize() { if (!uuid(order) || pending) return; const p: Pending = { path: `/paid-grants/orders/${order}/finalize`, body: {}, orderId: order }; setPending(p); setReviewedSaved(false); execute(p); }
   function prepare() { if (!origin) return; const o = origin; void call('document', `/paid-grants/origins/${o.id}/document`, {}, x => { if (!obj(x) || !exact(x, ['origin']) || !validPaidOrigin(x.origin) || x.origin.id !== o.id || x.origin.orderId !== o.orderId || x.origin.lines.some((l, i) => l.id !== o.lines[i]?.id || l.originHash !== o.lines[i]?.originHash)) throw new Error(); setOrigin(x.origin); setStatus(null); }); }
-  function savedStatus() { if (!origin) return; const o = origin, p = pending; void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p); setReviewedSaved(true); }); }
+  function savedStatus() { if (!origin) return; const o = origin, p = pending, issuedAt = performance.now(); void call('read', `/paid-grants/origins/${o.id}/downloads`, null, x => { if (!obj(x) || !exact(x, ['status']) || !validStatus(x.status, o)) throw new Error(); setStatus(x.status); setStatusAfter(p ? { pending: p, issuedAt } : null); setReviewedSaved(true); }); }
   // An authorize whose answer was lost may have committed. Only a saved status read taken after that request may show it is
   // not live, so the customer can drop it and ask again; a live one is recovered by the exact retry instead, so it never
   // spends the per-line issuance limit twice. The read lists the line's newest `historyLimit` authorizations. Every
   // authorization on a line shares the batch's fixed lifetime and is issued in id order under the batch lock, so it
   // expires no later than any newer one: a window that is not full holds the whole line, and an expired entry in a full
-  // window proves every older authorization (one pushed out of the window included) expired too.
-  const pendingLine = pending && !pending.orderId && reviewedSaved && statusAfter === pending && status && status.originId === pending.origin?.id
+  // window proves every older authorization (one pushed out of the window included) expired too. The read must also be
+  // issued at least the client authorize timeout after the request was last sent: by then the server has finished it
+  // (its 60 s budget plus the session-lock wait), so a transmission that was abandoned (hidden tab, network error, a lost
+  // retry) can no longer commit after the read.
+  const pendingLine = pending && !pending.orderId && reviewedSaved && statusAfter?.pending === pending && statusAfter.issuedAt - sentAt.current >= paidRequestTimeouts.authorize
+    && status && status.originId === pending.origin?.id
     ? status.lines.find(s => s.id === pending.lineId) : undefined;
   const abandonable = !!pendingLine && !pendingLine.history.some(h => h.kind === pending?.body.kind && h.status === 'unused')
     && (pendingLine.history.length < pendingLine.historyLimit || pendingLine.history.some(h => h.status === 'expired'));
