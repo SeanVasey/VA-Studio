@@ -1,0 +1,45 @@
+== S3 at 1860e00d3a7d3852d19126ae01ee54f50cef8660
+applied S3
+$ git diff --stat
+ app/Domain/Grants/ProductionFree/ProductionFreeGrants.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php
+index 1b1990b9..6e3b24f8 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php
+@@ -63,7 +63,7 @@ final class ProductionFreeGrants
+             ProductionFreeGrantException::require($rows->count('production_free_origins', 'account_id = ? AND definition_id = ?',
+                 [(int) $binding['account_id'], $definitionId]) === 0, 'already_granted');
+             $count = $rows->count('production_free_origins', 'definition_id = ?', [$definitionId]);
+-            ProductionFreeGrantException::require($count < $graph['payload']['max_origins'], 'cap_reached');
++            
+             $proof = (new ProductionFreeGrantDefinitions)->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
+             $at = ProductionFreeGrantInput::now();
+             $id = (string) Str::uuid();
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256-mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:05.183, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantAssentTest::test_definition_cap_is_enforced_and_closing_preserves_earlier_originals
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'cap_reached'
++'refused_by_guard'
+
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAssentTest.php:159
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAssentTest.php:121
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 4, Failures: 1.
+rc=1
+after revert: git diff --quiet -- app database resources rc=0

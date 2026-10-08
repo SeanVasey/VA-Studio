@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+PROBE addendum6.preflight:
+  unbroken @ (widest glyph per byte), name W: estimate=1042 -> pages=2 bytes=884035 (2.2s)
+  unbroken @ (widest glyph per byte), name @: estimate=1042 -> pages=2 bytes=884028 (2.0s)
+  lines of 52 @ (one char past a full line), name W: estimate=1435 -> pages=12 bytes=938361 (1.1s)
+  lines of 52 @ (one char past a full line), name @: estimate=1435 -> pages=12 bytes=938354 (1.4s)
+  short lines a\n, name W: estimate=1385 -> pages=20 bytes=938173 (0.7s)
+  short lines a\n, name @: estimate=1385 -> pages=20 bytes=938166 (0.7s)
+  spaces between words of 51 @, name W: estimate=996 -> RENDER REFUSED render_failed (3.7s)
+  spaces between words of 51 @, name @: estimate=996 -> RENDER REFUSED render_failed (3.6s)
+.                                                                   1 / 1 (100%)
+
+Time: 00:16.636, Memory: 87.00 MB
+
+OK (1 test, 6 assertions)
+rc=0

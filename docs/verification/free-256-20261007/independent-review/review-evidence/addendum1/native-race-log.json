@@ -1,0 +1,195 @@
+[
+    {
+        "round": 0,
+        "scenario": "cap1-free",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "ok": "a7229faa-a692-46c2-8700-2def70e0a3d2"
+            },
+            {
+                "refused": "refused_by_guard"
+            }
+        ]
+    },
+    {
+        "round": 1,
+        "scenario": "cap1-held",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "error": "PDOException: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction"
+            },
+            {
+                "ok": "bb27ae82-009f-4d2b-98a5-a8a6e76a590d"
+            }
+        ]
+    },
+    {
+        "round": 2,
+        "scenario": "cap1-free",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "refused": "refused_by_guard"
+            },
+            {
+                "ok": "5136050a-91df-46f0-93ce-ad4cbbc65e97"
+            }
+        ]
+    },
+    {
+        "round": 3,
+        "scenario": "cap1-held",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "error": "PDOException: SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction"
+            },
+            {
+                "ok": "b4e420c2-fcef-4bfe-8b1f-0ad3684038a8"
+            }
+        ]
+    },
+    {
+        "round": 4,
+        "scenario": "cap1-free",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "ok": "9a6148cb-ea00-4b08-87b5-57a312d32ba4"
+            },
+            {
+                "refused": "refused_by_guard"
+            }
+        ]
+    },
+    {
+        "round": 5,
+        "scenario": "cap1-held",
+        "cap": 1,
+        "origins": 1,
+        "outcomes": [
+            {
+                "refused": "refused_by_guard"
+            },
+            {
+                "ok": "86ce5a78-5cf6-4854-9d11-2aedeec1413a"
+            }
+        ]
+    },
+    {
+        "round": 6,
+        "scenario": "cap2-free",
+        "cap": 2,
+        "origins": 2,
+        "outcomes": [
+            {
+                "ok": "e9874a6d-c720-495f-90d8-1267392174eb"
+            },
+            {
+                "ok": "03d902d7-d926-44e1-8387-c7dd8fb0f26f"
+            }
+        ]
+    },
+    {
+        "round": 7,
+        "scenario": "cap2-held",
+        "cap": 2,
+        "origins": 2,
+        "outcomes": [
+            {
+                "ok": "5dbd90a7-822b-4663-a80f-2c8b99e5bce7"
+            },
+            {
+                "ok": "633f5104-7b3a-4fb5-a3af-dd36688a9178"
+            }
+        ]
+    },
+    {
+        "round": 8,
+        "scenario": "cap2-free",
+        "cap": 2,
+        "origins": 2,
+        "outcomes": [
+            {
+                "ok": "d6398451-fb34-4d0d-81d0-a60c207d5462"
+            },
+            {
+                "ok": "8351094c-c1ba-479d-af59-94d1ea7832c0"
+            }
+        ]
+    },
+    {
+        "round": 9,
+        "scenario": "cap2-held",
+        "cap": 2,
+        "origins": 2,
+        "outcomes": [
+            {
+                "ok": "8498ab47-0976-495b-9476-16c08ada450d"
+            },
+            {
+                "ok": "616c02e0-d1b6-4cbc-9811-6a6dc9106fdc"
+            }
+        ]
+    },
+    {
+        "scenario": "render-race",
+        "outcomes": [
+            {
+                "refused": "claim_in_progress"
+            },
+            {
+                "ok": "complete"
+            }
+        ],
+        "work": [
+            "claimed"
+        ],
+        "originals": 1
+    },
+    {
+        "scenario": "redemption-race",
+        "attempts": [
+            {
+                "outcomes": [
+                    {
+                        "refused": "refused_by_guard"
+                    },
+                    {
+                        "ok": "streamed:49"
+                    }
+                ],
+                "redemptions": 1
+            },
+            {
+                "outcomes": [
+                    {
+                        "ok": "streamed:49"
+                    },
+                    {
+                        "refused": "refused_by_guard"
+                    }
+                ],
+                "redemptions": 1
+            },
+            {
+                "outcomes": [
+                    {
+                        "ok": "streamed:49"
+                    },
+                    {
+                        "refused": "refused_by_guard"
+                    }
+                ],
+                "redemptions": 1
+            }
+        ]
+    }
+]

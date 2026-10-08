@@ -1,0 +1,3 @@
+start port 3781 2026-10-08T07:58:50Z
+shutdown port 3781 pid 14992 mysqladmin rc=0 2026-10-08T08:23:49Z
+verify 2026-10-08T08:23:56Z: pid 14992 gone; datadir deleted; LISTEN on 3781: False

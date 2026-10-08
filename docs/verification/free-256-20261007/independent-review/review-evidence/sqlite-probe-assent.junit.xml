@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\AssentProbeTest" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AssentProbeTest.php" tests="2" assertions="44" errors="0" failures="0" skipped="0" time="10.659429">
+    <testcase name="test_assent_is_literal_and_bound_to_the_exact_approved_terms_hash" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AssentProbeTest.php" line="29" class="Tests\ReviewProbes\Free256\AssentProbeTest" classname="Tests.ReviewProbes.Free256.AssentProbeTest" assertions="22" time="3.210534"/>
+    <testcase name="test_replayed_and_cross_principal_assent" file="/home/user/VA-Studio-review-free256/docs/verification/free-256-20261007/independent-review/review-evidence/probes/AssentProbeTest.php" line="62" class="Tests\ReviewProbes\Free256\AssentProbeTest" classname="Tests.ReviewProbes.Free256.AssentProbeTest" assertions="22" time="7.448896"/>
+  </testsuite>
+</testsuites>

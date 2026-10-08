@@ -1,0 +1,42 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+FEPROBE delivery.gib: MAX+1 refused at propose (invalid_input); exactly 1073741824 bytes snapshot+streamed with sha 49bc20df15e412a64472421e13fe86ff1c5165e18b2afccf160d4dc19fe68a14 in 8.3s
+.                                                                 3 / 3 (100%)
+
+Time: 00:21.329, Memory: 89.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\Free256\DeliveryProbeTest::test_a_failed_consumer_consumes_the_one_use_authorization_and_parallel_transfers_are_unbounded
+App\Domain\Grants\ProductionFree\ProductionFreeGrantException: Production free grant unavailable.
+
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:141
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:30
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:143
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:83
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\Free256\DeliveryProbeTest::test_every_role_requires_exact_owner_short_lived_one_use_authorization
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => 'slot-0.lock',
++]
+
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/probes/DeliveryProbeTest.php:81
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 3, Assertions: 49, Errors: 1, Failures: 1.
+rc=2

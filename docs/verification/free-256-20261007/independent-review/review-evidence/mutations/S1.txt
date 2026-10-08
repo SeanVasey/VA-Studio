@@ -1,0 +1,45 @@
+== S1 at 1860e00d3a7d3852d19126ae01ee54f50cef8660
+applied S1
+$ git diff --stat
+ app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php
+index c6593a98..b1d92b9f 100644
+--- a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php
++++ b/app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php
+@@ -62,7 +62,7 @@ final class ProductionFreeGrantDefinitions
+             $graph = $this->graph($definitionId, $rows);
+             ProductionFreeGrantException::require(hash_equals($graph['definition']['definition_hash'], $hash), 'stale_definition');
+             ProductionFreeGrantException::require($graph['review'] === [], 'already_reviewed');
+-            ProductionFreeGrantException::require((int) $graph['payload']['author_user_id'] !== (int) $reviewer->getKey(), 'self_review');
++            
+             $proof = $this->prove($policy, $graph['payload']['source'], $graph['payload']['assets']);
+             $at = ProductionFreeGrantInput::now();
+             $id = (string) Str::uuid();
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256-mut/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:01.824, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantApprovalTest::test_reviewer_must_differ_from_author
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'self_review'
++'refused_by_guard'
+
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php:183
+/home/user/VA-Studio-review-free256-mut/tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 2, Failures: 1.
+rc=1
+after revert: git diff --quiet -- app database resources rc=0

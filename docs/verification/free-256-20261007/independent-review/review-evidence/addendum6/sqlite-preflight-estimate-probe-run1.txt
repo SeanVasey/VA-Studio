@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-free256b/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 00:14.681, Memory: 87.00 MB
+
+There was 1 error:
+
+1) Tests\ReviewProbes\Free256\Addendum6\PreflightEstimateProbeTest::test_worst_shapes_under_the_skip_estimate_stay_far_below_100_pages
+App\Domain\Contracts\ContractIssuanceException: Test contract issuance is unavailable.
+
+/home/user/VA-Studio-review-free256b/app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php:121
+/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum6/probes/PreflightEstimateProbeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 11, Errors: 1.
+rc=2

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="31" errors="0" failures="0" skipped="0" time="223.568702">
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryTest" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryTest.php" tests="3" assertions="31" errors="0" failures="0" skipped="0" time="223.568702">
+      <testcase name="test_owner_library_lists_exact_artifact_hashes_and_status_without_private_material" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryTest.php" line="24" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantLibraryTest" assertions="18" time="77.896946"/>
+      <testcase name="test_foreign_owner_sees_an_empty_library_and_cannot_open_another_origin" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryTest.php" line="47" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantLibraryTest" assertions="6" time="62.113438"/>
+      <testcase name="test_revocation_and_closing_keep_the_original_visible_to_its_owner" file="/home/user/VA-Studio-review-free256b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryTest.php" line="67" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantLibraryTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantLibraryTest" assertions="7" time="83.558318"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,42 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m.[41;37mF[0m                                                               5 / 5 (100%)
+
+Time: 00:09.463, Memory: 91.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantRenderableTest::test_an_arabic_or_markless_unsupported_definition_field_is_refused_at_propose_with_nothing_written
+Must refuse unsupported_text
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:142
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:51
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantRenderableTest::test_a_stored_definition_with_unrenderable_text_cannot_be_approved
+Must refuse unsupported_text
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:142
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantRenderableTest::test_an_unrenderable_buyer_name_is_refused_at_review_and_accept_with_no_origin_written
+Must refuse unsupported_text
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:142
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:82
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantRenderableTest::test_the_admission_check_agrees_with_the_real_renderer
+Disagreement for 65cc81
+Failed asserting that false is identical to true.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php:114
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 28[0m[37;41m, Failures: 4[0m[37;41m.[0m
+rc=1
