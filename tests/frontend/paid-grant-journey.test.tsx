@@ -104,6 +104,45 @@ describe('mounted original paid-purpose journey', () => {
       expect(fetcher.mock.calls[4][0]).toBe(fetcher.mock.calls[2][0]); expect(fetcher.mock.calls[4][1]?.body).toBe(fetcher.mock.calls[2][1]?.body);
     } finally { visibility.mockRestore(); }
   });
+  it('keeps every issued authorization with its order until it is submitted, across reads, other orders and other authorizations', async () => {
+    const contract = { id: authorizationId, token: 'ISSUED_CONTRACT_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' };
+    const master = { ...contract, id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee', token: 'ISSUED_MASTER_TOKEN'.padEnd(43, 'a'), kind: 'master_wav', filename: `paid-license-${lineId}-master_wav.wav`, mimeType: 'audio/wav' };
+    const status = response({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null, history: [] }] } });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response({ authorization: contract }))
+      .mockResolvedValueOnce(status).mockResolvedValueOnce(response({ authorization: master }))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }));
+    const forms: string[] = [];
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(function (this: HTMLFormElement) { forms.push((this.querySelector('input[name="token"]') as HTMLInputElement).value); });
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    await screen.findByText(`${contract.filename}; expires ${contract.expiresAt} UTC.`);
+    // A status read and a second authorization no longer throw the first token away.
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh preparation and download status' })); await screen.findByLabelText('Download status for Original synthetic recording');
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' }));
+    await screen.findByText(`${master.filename}; expires ${master.expiresAt} UTC.`);
+    expect(screen.getByText(`${contract.filename}; expires ${contract.expiresAt} UTC.`)).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Download authorized file' })).toHaveLength(2);
+    // Leaving the order hides them; reopening it shows them again.
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh paid licenses' })); await screen.findByRole('button', { name: `Open saved order ${orderId}` });
+    expect(screen.queryByRole('button', { name: 'Download authorized file' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    expect(screen.getAllByRole('button', { name: 'Download authorized file' })).toHaveLength(2);
+    // Submitting one removes only that one; the token never reaches the DOM.
+    fireEvent.click(screen.getAllByRole('button', { name: 'Download authorized file' })[0]);
+    expect(forms).toEqual([contract.token]); expect(screen.getAllByRole('button', { name: 'Download authorized file' })).toHaveLength(1);
+    expect(document.body.innerHTML).not.toContain(contract.token); expect(document.body.innerHTML).not.toContain(master.token);
+  });
+  it('drops issued authorizations when the page is left', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ authorization: { id: authorizationId, token: 'DROPPED_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' } }))
+      .mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }));
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' })); await screen.findByRole('button', { name: 'Download authorized file' });
+    act(() => { window.dispatchEvent(new Event('pagehide')); });
+    fireEvent.click(screen.getByRole('button', { name: 'Open paid licenses' }));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${orderId}` })); await screen.findByLabelText('Retained paid order');
+    expect(screen.queryByRole('button', { name: 'Download authorized file' })).not.toBeInTheDocument();
+  });
   it('keeps a refused download retryable only after a later saved read shows that exact authorization still unused', async () => {
     const token = 'KEPT_SYNTHETIC_PAID_TOKEN'.padEnd(43, 'a');
     const auth = { id: authorizationId, token, expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' };
