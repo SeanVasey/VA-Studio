@@ -815,3 +815,151 @@ SHA-256 of the changed files is in `addendum5/sha256-501b3335.txt`:
 - Private instance :3791 (pid 10637) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3791. Its datadir `scratchpad/review-free256e-mysql/data` was deleted.
 - The lifecycle is in `addendum5/native/private-instance-lifecycle.txt`.
 - The review worktree `/home/user/VA-Studio-review-free256b` is detached at `471005ac`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum5/`. Nothing was committed or pushed.
+
+## Addendum 6: render preflight, transfer deadline and blocking sources, `471005ac..c5395d7c` (evidence `f9060e6a`, `c8d88e76`)
+
+- Scope:
+  - `e410c711`: fixes for A4-1 (render preflight) and A4-4 (transfer deadline).
+  - `c5395d7c`: Codex P2, which ignored `stream_set_timeout` failures and so could block forever on a FIFO or pipe.
+- Base: before checkout, the addendum-5 files were compared byte for byte with `256c29c2`: all identical.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3797 with schema `rv256f`. The container rebooted after the native run had finished (rc recorded), so nothing needed re-running. The datadir was deleted afterwards (see Cleanup).
+- **PR head `4c659ae0`** is `c8d88e76` plus a merge of main (`705a712e`). `git diff c8d88e76 4c659ae0 -- app/Domain/Grants` is **not empty**: it changes `Member/MemberGrantPolicy.php` and `Member/MemberGrantSchema.php`, which came in from main through the membership lane (#51).
+  - Over every Free256-owned path, the same diff **is empty** (rc 0): `app/Domain/Grants/ProductionFree`, the config, migration `256000`, `tests/Feature/ProductionFreeGrants`, the two support fixtures, the renderer script and `resources/contracts/production-free-v1`.
+  - This decision covers Free256 code only; the merged Member and Tax255 changes are reviewed in their own lanes.
+- Evidence is in `review-evidence/addendum6/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `c8d88e76` (and to `4c659ae0` for the Free256-owned paths) for a development merge.**
+
+- A4-4 is closed for its stated defect: valid-to-start is now separate from the transfer deadline.
+- The `c5395d7c` blocking-source rule is sound for host-local sources.
+- **A4-1 is only partly closed.** The preflight's cheap skip lets through text that the pinned renderer cannot render (A6-1).
+- Two new Low findings, both conditions: A6-1 before activation, A6-2 before the delivery mount.
+
+### (1) Preflight and its cheap skip
+
+- **The skip is not sound.** It assumes text estimated under 1,500 lines (newlines plus 1 plus bytes/60) cannot fail. That holds for page count with ordinary text, but not for long tokens.
+- **Measured with the real pinned renderer** (`PreflightEstimateProbeTest`, `RenderShapeProbeTest`):
+
+| Terms text | Estimate | Rendered result |
+| --- | --- | --- |
+| 60,000 unbroken `@` | 1,042 | 2 pages |
+| Lines of 52 `@` | 1,435 | 12 pages |
+| 1,300 short lines | 1,385 | 20 pages |
+| 100 words of 51 `@` | under 1,500 | 3 pages |
+| 150 words of 51 `@` | under 1,500 | 5 pages |
+| 200 words of 51 `@` | under 1,500 | 10 pages |
+| 200 URL-like 95-character tokens, joined by spaces | under 1,500 | 10 pages |
+| 300 words of 51 `@` | about 260 | **`render_failed`** |
+| 300 words of 60 `@` | under 1,500 | **`render_failed`** |
+| 600, 900 and 1,100 words of 51 `@` | under 1,500 | **`render_failed`** |
+
+  - Page count grows faster than linearly with long tokens.
+  - **End to end**, the first failing shape (300 words of 51 `@`) passed propose, approve, open, review and accept with the preflight skipped. Rendering then failed with `render_failed` every time, so the sealed origin can never render. That is the A4-1 defect, reached by a different route. I did not establish the renderer's internal cause (it is not a page or output limit at 300 words); the preflight would have caught it, because it uses the same renderer.
+- **Is a 120-`W` declared name really the worst case? Practically yes.**
+  - The widest glyph admission accepts, per byte, is `@` (width 1000), slightly ahead of `W` (989). The widest glyphs overall are multi-byte (U+2031 at 1735 for 3 bytes), so they are narrower per byte (`widest-glyphs.txt`).
+  - With names of 120 `W` and of 120 `@`, every shape gave the same page count and a size within a few bytes.
+  - Info: use `@` for exactness.
+- Title (160 bytes), terms reference (160), assent text (2,000) and asset list (3 or fewer) are small, fixed parts of the document. They cannot move page count materially.
+
+### (2) Approve does not re-render: acceptable
+
+Approve changes no text and opens nothing. `open`, including every reopen after a close, runs `requireCurrent` and the preflight against the sealed definition under the current runtime before the availability write. Assent requires an open definition. Because the render is deterministic, the preflight being outside the transaction is not a time-of-check gap: the open command re-checks the profile inside the transaction. Once A6-1 removes the skip, this is complete.
+
+### (3) Transfer deadline
+
+- **Valid-to-start: correct.** `$requested` is taken once before the first inspection, and both inspections compare it with `expires_at`. A redemption that started in time is not expired by a slow snapshot, and a redemption after the TTL still records nothing.
+- **Snapshot:** has its own `snapshot_seconds` bound (default 300), and the per-read 5-second cap still applies.
+- **Stream:** the deadline is `min(transfer_max_seconds, base + ceil(bytes/rate))` from the redemption commit. A 1 GiB asset gets 4,126 s.
+- **Is the slot released after read-back or held for the stream? Held for the whole stream.**
+  - `ProductionFreeGrantSpool` hands its `flock` lease to `PreparedDeliveryStream`, which releases it only on `close()`. The addendum-1 probe showed a fourth snapshot refused while three were held.
+  - This is inherent to bounding disk use: the unlinked snapshot occupies disk until the stream is closed.
+- **Slow-loris: yes (A6-2).**
+  - A client can hold one of the 3 slots for up to `min(7200, 30 + bytes/256 KiB)` seconds per authorization: 4,126 s for a 1 GiB master. Three slow or idle clients make every other redemption fail with `spool_busy` for over an hour; legitimate slow clients do the same.
+  - The minimum rate only sets the total deadline. Nothing checks progress.
+  - `writeTo` checks the deadline only between chunks, so a consumer write blocked on a stalled client extends the hold until the web server's send timeout.
+
+### (4) `c5395d7c`: regular-file test against blocking
+
+- **Rule:** the deadline is checked before the source is configured. A regular file (fstat type regular) is admitted without a timeout. Anything else is admitted only if both `stream_set_blocking` and `stream_set_timeout` succeed.
+- **Classified on this host** (`stream-kinds.txt`):
+
+| Stream | fstat mode | Outcome |
+| --- | --- | --- |
+| Plain file | `100644` | admitted, no timeout |
+| `php://temp`, `php://memory` | `100666` | admitted, no timeout |
+| TCP socket (as behind `http://`) | `140777` | admitted, both calls succeed |
+| `compress.zlib://` | none | **refused** (no fstat; timeout unsupported) |
+| FIFO | `10600` | **refused** (timeout unsupported) |
+| Character device (`/dev/zero`) | `20666` | **refused** |
+| User stream wrapper without `stream_set_option` | none | **refused** |
+
+- **Ruling: sound for host-local sources.** It fails closed for everything that cannot be time-boxed. A compressed source is refused, so an adapter must decompress before handing the stream over; that is a refusal, not a wrong admission.
+- **It can wrongly admit:**
+  - a regular file on NFS or FUSE (for example an object-store mount), which is S_IFREG and can still block in the kernel. This is the existing condition-5 note: keep the source host-local.
+  - an adapter's own `open()` (DNS, connect, HTTP headers), which runs inside the held slot and before the 256 checks; it must bound itself.
+- The socket probe re-run at `c8d88e76` is unchanged: 3-second gap `ok`; 7-second gap refused at 5.1 s; trickle `ok`; slot released.
+
+### Findings in this delta (Low or above)
+
+| ID | Severity | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- |
+| A6-1 | Low (before activation; leaves A4-1 open) | **The preflight skip admits unrenderable definitions.** The skip estimate (fewer than 1,500 estimated lines) lets definitions through that the pinned renderer cannot render: 300 or more words of about one line width. One such definition passed every admission step and then could never render. Pages grow faster than linearly with long tokens, so the estimate does not bound them. | **Always run the preflight** at `propose` and `open` (about 1–4 s per staff action), and drop the skip. Use `@` as the worst-case name glyph. Separately, record the long-token renderer failure for the renderer r2 work. | `sqlite-render-shape-probe.txt` (and runs 1 and 2), `sqlite-preflight-estimate-probe.txt` |
+| A6-2 | Low (before the delivery mount) | **Slow clients can hold every spool slot.** Each transfer holds a spool slot for up to its derived deadline (up to 2 h; 4,126 s for 1 GiB). Progress is not enforced, and a blocked consumer write is not bounded, so 3 slow or idle clients exhaust the 3-slot spool. | Enforce a minimum progress rate during streaming: abort when delivered bytes fall below rate × (elapsed − base). Cap open transfers per account or origin. Set a send timeout at the mount. Size slots, or a reservation-based disk budget, for the expected concurrency. | Code review (`ProductionFreeGrantSpool::prepare` lease to `PreparedDeliveryStream`; `Downloads::redeem`; `Transfer::writeTo`); addendum-1 probe for slot holding |
+
+### Codex P2 on `ProductionFreeGrants.php:211` (APP_KEY rotation through the identity layer)
+
+**Opinion: confirmed, pre-existing on main, and better handled in a separate identity lane than as a blocker for #53.**
+
+- `customerCommand()` calls `ProductionCustomerAccess::lock()`, which derives through `IdentityPolicy::digest()`. That function HMACs with `config('app.key')` only, with no previous-key fallback.
+- Both files are byte-identical to base `fad3ab44`, and `origin/main` has the same `digest()` (line 83). Free256 did not introduce this.
+- The same identity gate is used by production checkout (`ProductionCheckout`, `CheckoutWriteAdmission`, `TaxExemptions`) and account features. So after an `APP_KEY` rotation, every customer-facing family refuses with `identity_refused` or its equivalent, not only 256.
+- A fix belongs to whoever owns identity. It must keep previous keys for verification only while writing with the current key, which is the same shape as Free256's F-8 fix. Fixing it inside #53 would touch shared identity files that 256 deliberately does not own.
+- #53 is default-off with no live keys, so this does not affect the development merge. It remains a **pre-production condition**, already recorded since Addendum 1 as A1-7 plus the identity key-rotation note.
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `256c29c2` (code `e410c711`) | SQLite | 0 | 153 tests, 1103 assertions, 2 skipped |
+| `tests/Feature/ProductionFreeGrants` at `c8d88e76` | SQLite | 0 | 154 tests, 1109 assertions, 2 skipped |
+| `ProductionFreeGrantPreflightTest` and `ProductionFreeGrantTransferDeadlineTest` | MySQL :3797 | 0 | 8 tests, 47 assertions, 0 skipped. 09:02:59Z to 09:18:54Z |
+| `addendum6/probes/PreflightEstimateProbeTest.php` | SQLite | 0 | 1 test. Run 1 errored: the probe threw on the first refusal instead of logging it. Retained |
+| `addendum6/probes/RenderShapeProbeTest.php` | SQLite | 0 | 1 test. Runs 1 and 2 are retained with smaller shape sets |
+| `addendum6/probes/widest-glyphs.php` and `stream-kinds.php` | PHP CLI | 0 | as above |
+| Addendum-4 socket probe re-run at `c8d88e76` | SQLite | 0 | unchanged |
+| Pint `--test`: 8 files at `e410c711`, 2 files at `c5395d7c` | n/a | 0, 0 | passed |
+
+The FIFO regression in `c5395d7c` is filesystem-only; no native run was needed for it.
+
+SHA-256 of the changed files is in `addendum6/sha256-e410c711.txt` and `addendum6/sha256-c5395d7c.txt`:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantRenderable.php` (`e410c711`) | `d202f667d8b86f7ab64f725899dbac1430c7164471e3d9e248174d04e3f6c3db` |
+| `ProductionFreeGrantTransfer.php` (`e410c711`) | `a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e` |
+| `ProductionFreeGrantDefinitions.php` (`e410c711`) | `5d131f76958ed2e0f63236838296800874a400de2856b315f23bf8250b8bbc4a` |
+| `ProductionFreeGrantPolicy.php` (`e410c711`) | `c060049aea8dfefaca8836f076530bdddf54d8f9abcf575bf52b219aa6669e1c` |
+| `ProductionFreeGrantDownloads.php` (`c5395d7c`) | `c25eb3febc7157086fc4582c8c7752abf617c5e7548caa0b536d856f8418b6e2` |
+
+### Conditions after Addendum 6
+
+- **Closed:** A4-4. The `c5395d7c` blocking-source gap is fixed.
+- **Open:**
+  - A6-1 (replaces A4-1) before activation;
+  - A6-2 before the delivery mount;
+  - the source adapter must be host-local and bound its own `open()`;
+  - Renderable r2 or hash-checked font inputs;
+  - A1-1, the `contention` mount mapping, and A1-7 with the identity key-rotation handling (the identity-lane item above);
+  - A2-2;
+  - conditions 3 and 5;
+  - F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3797 (pid 6562) **was not shut down cleanly**: the container reboot ended it after the native run had finished and recorded rc 0.
+- Verified at 10:54:26Z: `/proc/6562` absent and nothing in LISTEN on 3797. The datadir `scratchpad/review-free256f-mysql/data` was then deleted.
+- The lifecycle is in `addendum6/native/private-instance-lifecycle.txt`. No other instance and not :3306 was touched.
+- The review worktree `/home/user/VA-Studio-review-free256b` is detached at `c8d88e76`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum6/`. Nothing was committed or pushed.

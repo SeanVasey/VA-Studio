@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\Free256\Addendum6\RenderShapeProbeTest" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum6/probes/RenderShapeProbeTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="43.602126">
+    <testcase name="test_small_shapes_and_the_end_to_end_consequence" file="/home/user/VA-Studio-review-free256b/docs/verification/free-256-20261007/independent-review/review-evidence/addendum6/probes/RenderShapeProbeTest.php" line="25" class="Tests\ReviewProbes\Free256\Addendum6\RenderShapeProbeTest" classname="Tests.ReviewProbes.Free256.Addendum6.RenderShapeProbeTest" assertions="3" time="43.602126"/>
+  </testsuite>
+</testsuites>

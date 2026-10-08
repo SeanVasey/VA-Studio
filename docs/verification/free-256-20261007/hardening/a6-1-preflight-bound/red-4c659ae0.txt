@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-free256h/phpunit.xml
+
+...[41;37mF[0m[41;37mF[0m                                                               5 / 5 (100%)
+
+Time: 00:10.686, Memory: 91.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantPreflightTest::test_long_unbreakable_tokens_under_the_old_estimate_are_rendered_and_refused_at_propose
+Must refuse unrenderable_definition
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantPreflightTest.php:126
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantPreflightTest.php:90
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantPreflightTest::test_the_skip_bound_counts_every_character_of_the_rendered_definition_text
+One character more is rendered.
+Failed asserting that 0 is identical to 1.
+
+/home/user/VA-Studio-free256h/tests/Feature/ProductionFreeGrants/ProductionFreeGrantPreflightTest.php:106
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 22[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=1

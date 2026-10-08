@@ -461,3 +461,23 @@ data): red = the pre-fix code blocked on the read until a 60 s guard killed it (
 "deadline checked before the first read" case now passes because the deadline check runs before stream setup.
 Directory SQLite 154 / 1109, 2 native-only skips; Pint passed. NFS-backed regular files remain the reviewer's
 host-local storage condition for the sources adapter.
+
+## Review addendum 6, A6-1: a sound preflight skip bound (`a6-1-preflight-bound/`)
+
+Addendum 6 showed the preflight skip (estimated lines = newlines + 1 + bytes/60, under 1,500) was an estimate, not a
+bound: 300 words of 51 `@` (about 260 estimated lines) skipped the render, passed propose, approve, open, review and
+accept, and then failed `render_failed` on every attempt. The skip now applies only when the rendered definition text
+(title, reference, terms and assent, newlines included) is at most 2,000 characters. Wrapping never places fewer than
+one character on a line, so even the worst case stays near a third of the 100-page limit. Anything longer runs the
+real pinned renderer at propose and open. Regressions:
+
+- `test_long_unbreakable_tokens_under_the_old_estimate_are_rendered_and_refused_at_propose`: the addendum's input is
+  refused `unrenderable_definition` with nothing written.
+- `test_the_skip_bound_counts_every_character_of_the_rendered_definition_text`: exactly 2,000 multibyte characters skip
+  the render, and 2,001 render.
+
+Red is the pre-fix renderable at `4c659ae0`: both new tests fail (`red-4c659ae0.txt`). Green is the preflight file at
+5 tests / 24 assertions (`green.txt`). The directory runs on SQLite at 156 / 1117 with 2 native-only skips
+(`sqlite-directory.txt`), and Pint passed on the changed files (`pint.txt`). A6-2 (slow clients holding spool slots)
+remains a condition before the delivery mount, recorded in addendum 6. The long-token renderer failure itself is input
+for the renderer r2 work.
