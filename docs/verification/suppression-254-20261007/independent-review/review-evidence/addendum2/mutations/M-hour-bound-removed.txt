@@ -1,0 +1,37 @@
+# mutation M-hour-bound-removed at e7593a9c (SQLite), worktree /home/user/VA-Studio-review-supp254d-mut
+diff --git a/app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php b/app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php
+index 68a86c22..d6b380aa 100644
+--- a/app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php
++++ b/app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php
+@@ -382,7 +382,7 @@ final class ProductionSuppressionSchema
+         // (YEAR() is 0 only for it; a TIMESTAMP is otherwise 1970..2038). The CHAR pattern and the STR_TO_DATE round trip hold the exact
+         // format and calendar validity under any sql_mode; a NULL anywhere makes the guard fail closed through COALESCE.
+         $stamp = $driver === 'sqlite'
+-            ? "NEW.created_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]' AND substr(NEW.created_at,12,2)<'24' AND datetime(NEW.created_at)=NEW.created_at"
++            ? "NEW.created_at GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]' AND datetime(NEW.created_at)=NEW.created_at"
+             : "CAST(NEW.created_at AS CHAR) REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\$' AND YEAR(NEW.created_at)>0 AND NEW.created_at=STR_TO_DATE(CAST(NEW.created_at AS CHAR), '%Y-%m-%d %H:%i:%s')";
+         $target = "NEW.purpose='email_marketing' AND ".$stamp.' AND '.$uuid('public_id').' AND '.$hex('recipient_hmac').' AND '.$bytes('recipient_ciphertext').' BETWEEN 1 AND 8192'
+             ." AND EXISTS (SELECT 1 FROM production_account_feature_bindings b WHERE b.id=NEW.binding_id AND b.feature='consent_preferences')"
+# PHPUNIT tests/Feature/ProductionSuppression
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254d-mut/phpunit.xml
+
+......................................SSSSSS...F                  48 / 48 (100%)
+
+Time: 01:39.472, Memory: 165.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+production_suppression_targets accepted a created_at of hour 24.
+
+/home/user/VA-Studio-review-supp254d-mut/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:105
+/home/user/VA-Studio-review-supp254d-mut/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:92
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 48, Assertions: 650, Failures: 1, Skipped: 6.
+exit=1
+reverted: git diff --quiet -- app exit=0

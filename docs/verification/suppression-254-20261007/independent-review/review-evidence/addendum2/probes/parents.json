@@ -1,0 +1,14 @@
+{
+    "binding": 1,
+    "hmac": "665d0698dbc8fb95afc25c3a4d9cf280d87a585b7999243ca6008fd03258975f",
+    "e1": 1,
+    "e2": 2,
+    "t0": "2026-01-01 00:00:00",
+    "t10": "2026-01-01 00:00:10",
+    "e1_created_at": "2026-01-01 00:00:00",
+    "e2_created_at": "2026-01-01 00:00:10",
+    "zero_binding": 2,
+    "zero_hmac": "bf7e2ed8f62e72eb6fe0db2bfc870ff3c73a85b90bc26c6806b65a75cd53e1df",
+    "zero_event": 3,
+    "zero_event_created_at": "0000-00-00 00:00:00"
+}

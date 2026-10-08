@@ -1,0 +1,12 @@
+# reviewer (addendum 2 finisher) 2026-10-08T03:07:18Z at e7593a9c8efb8e2e617fcb26acdefd69b35c3286, SQLite (phpunit.xml default), public/build absent
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254d/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:06.118, Memory: 87.00 MB
+
+OK (3 tests, 118 assertions)
+exit=0

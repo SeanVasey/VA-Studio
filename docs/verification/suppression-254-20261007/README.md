@@ -141,3 +141,27 @@ Documented as out of model or accepted (reviewer Info findings, no code change):
 ## Private instance cleanup
 
 The private instance was used only for the native admission selection above. It was stopped with `mysqladmin shutdown`, and a lingering process was terminated. Its datadir `$SCRATCH/mysql-supp254` and socket `/tmp/claude-0/s254.sock` were removed. A connection check confirmed port 3417 was closed. The shared :3306 server was not used.
+
+## Independent review addendum 2 (`72d7ae29..e7593a9c`)
+
+APPROVE WITH CONDITIONS carries to `e7593a9c` (`independent-review/DECISION.md`, addendum 2;
+evidence `independent-review/review-evidence/addendum2/`). The three trigger-guard changes are
+correct on SQLite and on native MySQL 8.4.11: the five malformed timestamps plus the 2038
+overflow were inserted raw on all four tables under strict, `sql_mode=''`, `ALLOW_INVALID_DATES`
+and strict-with-`INSERT IGNORE` (96 inserts, none left a row; strict refuses at the column,
+the other modes at the guard); coerced inputs (`T` separator, fractional seconds, offsets,
+whitespace) store values that pass `ProductionFeatureShape::timestamp()` on read; hour 24 and
+second 60 are refused; `public_id` uppercase accepted, trailing space / NUL / newline / `g`
+refused; an intent before its withdrawal refused, the same instant accepted. Mutations: hour
+bound and intent-time removals killed by the lane tests; `YEAR()>0` removal survives the lane
+suite and is killed natively only when the trigger is created under `sql_mode=''` with a
+zero-dated parent (A2-1, test gap, recorded). The native whole-directory run (48 tests, 538
+assertions, exit 2) has 14 errors that are the known C1 activation blocker in the 253
+`initialize` fixture and one new Low, A2-7: `ProductionSuppressionMigrationTest::
+test_recorded_gap_and_non_prefix_installation_refuse_without_repair` creates the intents table
+without its targets parent, which MySQL refuses (error 1824) and SQLite allows; fixed below.
+A2-4 (Low, deployment): MySQL sessions are not pinned to UTC (`config/database.php` has no
+`timezone` key); DST fall-back instants are accepted and a spring-forward gap is refused or
+moved by the column; recommendation for U-02: `'timezone' => '+00:00'` or a UTC server. A2-2
+(Low, adjacent): the 253 consent-events insert guard has no `created_at` shape check; routed
+to the 253 owner. R2 and R9 remain open activation gates for Sean.
