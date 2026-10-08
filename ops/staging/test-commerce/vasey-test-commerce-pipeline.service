@@ -1,0 +1,33 @@
+# VASEY.AUDIO staging: one bounded sweep of the Stripe TEST-mode post-payment pipeline.
+# Started every minute by vasey-test-commerce-pipeline.timer. See docs/ops/staging-test-purchase.md.
+#
+# Install (root), after replacing <APP_USER> and <APP_ROOT>:
+#   install -m 0644 vasey-test-commerce-pipeline.service vasey-test-commerce-pipeline.timer /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now vasey-test-commerce-pipeline.timer
+# Logs: journalctl -u vasey-test-commerce-pipeline.service
+# Stop: systemctl disable --now vasey-test-commerce-pipeline.timer
+#
+# <APP_USER> must be the user that owns storage/app/private and runs the queue workers (on Forge,
+# usually "forge"). The script reads no secret itself; artisan reads the application's .env.
+[Unit]
+Description=VASEY.AUDIO staging test-commerce pipeline sweep (Stripe test mode only)
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<APP_USER>
+Group=<APP_USER>
+WorkingDirectory=<APP_ROOT>
+ExecStart=/usr/bin/bash <APP_ROOT>/scripts/ops/run-test-commerce-pipeline.sh
+# Bounded sweep: MAX_PAGES x PAGE_LIMIT items per stage, COMMAND_TIMEOUT_SECONDS per call.
+Environment=PAGE_LIMIT=25
+Environment=CONTRACT_PAGE_LIMIT=5
+Environment=MAX_PAGES=20
+Environment=COMMAND_TIMEOUT_SECONDS=600
+Environment=RECONCILE_INTERVAL_SECONDS=900
+TimeoutStartSec=3600
+Nice=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full

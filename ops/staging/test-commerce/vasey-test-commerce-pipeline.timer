@@ -1,0 +1,13 @@
+# Runs vasey-test-commerce-pipeline.service one minute after the previous sweep finished.
+# The script also holds a non-blocking flock, so a slow sweep is never overlapped.
+[Unit]
+Description=Every-minute VASEY.AUDIO staging test-commerce pipeline sweep
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=60s
+AccuracySec=5s
+Unit=vasey-test-commerce-pipeline.service
+
+[Install]
+WantedBy=timers.target
