@@ -98,9 +98,10 @@ export function PaidGrantJourney() {
     const leave = () => { generation.current++; request.current?.abort(); clear(); kept.current = null; setIssued([]); inflight.current = false; setBusy(false); };
     // Hiding the tab is not leaving: everything shown is cleared and an in-flight request is abandoned, but an uncertain
     // finalize or authorize keeps its exact replay (same request key and nonce, held in memory and never rendered), so a
-    // committed authorization can still be recovered instead of duplicated. Actual departure (pagehide) clears it too.
+    // committed authorization can still be recovered instead of duplicated. Hidden download frames are kept too: removing
+    // one would abort a download whose redemption the server may still commit. Actual departure (pagehide) clears both.
     const visibility = () => { if (document.visibilityState !== 'hidden') return; const interrupted = inflight.current;
-      generation.current++; request.current?.abort(); clear(true); inflight.current = false; setBusy(false); if (interrupted) setMessage(unknown); };
+      generation.current++; request.current?.abort(); clear(true, true); inflight.current = false; setBusy(false); if (interrupted) setMessage(unknown); };
     window.addEventListener('pagehide', leave); document.addEventListener('visibilitychange', visibility);
     return () => { active.current = false; generation.current++; request.current?.abort(); frames.current.forEach(f => f.remove()); window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', visibility); };
   }, []);
@@ -180,8 +181,9 @@ export function PaidGrantJourney() {
     const mine = generation.current;
     frame.addEventListener('load', () => { if (!active.current || mine !== generation.current) return; try {
       const doc = frame.contentDocument; if (!doc || doc.location.href === 'about:blank') return; const raw = doc.body?.textContent ?? ''; if (raw.length > 4096) throw new Error(); const failure = JSON.parse(raw);
-      // Only this submission's frame is removed: another download still waiting for its response keeps its frame.
-      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; frame.remove(); frames.current = frames.current.filter(f => f !== frame); clear(false, true); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } else throw new Error();
+      // Only this submission's frame is removed: another download still waiting for its response keeps its frame, and an
+      // unrelated uncertain authorize keeps its exact replay (a refusal body cannot say whether that authorize committed).
+      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; frame.remove(); frames.current = frames.current.filter(f => f !== frame); clear(true, true); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } else throw new Error();
     } catch { setMessage('The attachment result could not be confirmed. Check browser downloads and refresh saved status.'); } });
     document.body.append(frame); frames.current.push(frame);
     const form = document.createElement('form'); form.method = 'POST'; form.action = `/paid-grants/authorizations/${a.id}/redeem`; form.target = frame.name; form.enctype = 'application/x-www-form-urlencoded'; form.hidden = true;

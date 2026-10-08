@@ -132,6 +132,40 @@ describe('mounted original paid-purpose journey', () => {
     expect(forms).toEqual([contract.token]); expect(screen.getAllByRole('button', { name: 'Download authorized file' })).toHaveLength(1);
     expect(document.body.innerHTML).not.toContain(contract.token); expect(document.body.innerHTML).not.toContain(master.token);
   });
+  it('keeps download frames across a hidden tab and removes them only when the page is left', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ authorization: { id: authorizationId, token: 'FRAME_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' } }));
+    const visibility = vi.spyOn(document, 'visibilityState', 'get');
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    visibility.mockReturnValue('hidden'); act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    // Removing the frame would abort a download the server may still commit, consuming an attempt without the file.
+    expect(frame.isConnected).toBe(true); expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument();
+    visibility.mockReturnValue('visible'); act(() => { window.dispatchEvent(new Event('pagehide')); });
+    expect(frame.isConnected).toBe(false);
+  });
+  it('keeps an unrelated uncertain authorize replay when another download is refused', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
+      .mockResolvedValueOnce(response({ authorization: { id: authorizationId, token: 'EARLIER_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' } }))
+      .mockRejectedValueOnce(new Error('lost master authorize answer'));
+    render(<PaidGrantJourney />); await openSaved();
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize contract for Original synthetic recording' }));
+    await screen.findByRole('button', { name: 'Download authorized file' });
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize master_wav for Original synthetic recording' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed');
+    await screen.findByRole('button', { name: 'Retry the exact request' });
+    fireEvent.click(screen.getByRole('button', { name: 'Download authorized file' }));
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    Object.defineProperty(frame, 'contentDocument', { value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' }, body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { frame.dispatchEvent(new Event('load')); });
+    expect(screen.getByRole('alert')).toHaveTextContent('refused');
+    // The master authorize may have committed: its exact replay must survive the unrelated refusal.
+    expect(screen.getByRole('button', { name: 'Retry the exact request' })).toBeInTheDocument();
+  });
   it('drops issued authorizations when the page is left', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(listing())).mockResolvedValueOnce(response({ origin: complete }))
       .mockResolvedValueOnce(response({ authorization: { id: authorizationId, token: 'DROPPED_TOKEN'.padEnd(43, 'a'), expiresAt: '2026-10-07 01:03:03', kind: 'contract', filename: `paid-license-${lineId}-contract.pdf`, mimeType: 'application/pdf' } }))
