@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionFreeGrants;
 
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDefinitions;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantPolicy;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantSources;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\ProductionFreeGrantFixtures;
@@ -172,6 +173,30 @@ final class ProductionFreeGrantApprovalTest extends TestCase
             $shared .= file_get_contents($provider);
         }
         $this->assertStringNotContainsString('ProductionFree', $shared);
+    }
+
+    /**
+     * Codex P2: a render lease shorter than the pinned renderer child's timeout lets a slow but successful render store
+     * an immutable original whose publication is refused `lease_expired`. The policy requires the lease to outlive the
+     * child plus a storage/publication margin, and the mirrored timeout must match the pinned renderer file.
+     */
+    public function test_render_lease_must_outlive_the_renderer_timeout_plus_margin(): void
+    {
+        $author = $this->staff();
+        $minimum = ProductionFreeGrantPolicy::RENDERER_TIMEOUT_SECONDS + ProductionFreeGrantPolicy::RENDER_LEASE_MARGIN_SECONDS;
+        foreach ([30, ProductionFreeGrantPolicy::RENDERER_TIMEOUT_SECONDS, $minimum - 1] as $lease) {
+            config(['production-free-grants.render_lease_seconds' => $lease]);
+            $this->refuses(fn () => $this->definitions->propose($this->definitionInput(), $author), 'changed_policy', "lease {$lease}");
+        }
+        $this->assertSame(0, DB::table('production_free_definitions')->count());
+        config(['production-free-grants.render_lease_seconds' => $minimum]);
+        $this->assertNotEmpty($this->definitions->propose($this->definitionInput(), $author)['id']);
+
+        $renderer = file_get_contents(base_path('app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php'));
+        $timeout = ProductionFreeGrantPolicy::RENDERER_TIMEOUT_SECONDS;
+        $this->assertStringContainsString("'max_execution_time={$timeout}'", $renderer);
+        $this->assertStringContainsString("setTimeout({$timeout})", $renderer);
+        $this->assertGreaterThanOrEqual($minimum, config('production-free-grants.render_lease_seconds'));
     }
 
     private function refuses(callable $operation, string $reason, string $message = ''): void

@@ -8,6 +8,17 @@ use Illuminate\Support\Facades\Config;
 /** Default-off capability baseline. It never approves terms, templates, assets or production storage. */
 final class ProductionFreeGrantPolicy
 {
+    /**
+     * The pinned renderer child's hard timeout (`ProductionFreeGrantRendererProcess`: `setTimeout(60)` and
+     * `max_execution_time=60`; that file is hash-pinned in the render profile, so the value is mirrored here and a
+     * test fails if the two drift). A render lease must outlive the child plus a margin for storing and publishing the
+     * original; otherwise a render that succeeds near the timeout stores an immutable PDF whose publication is refused
+     * `lease_expired`, and repeated claims exhaust the origin.
+     */
+    public const RENDERER_TIMEOUT_SECONDS = 60;
+
+    public const RENDER_LEASE_MARGIN_SECONDS = 60;
+
     public const REHEARSAL = 'synthetic_rehearsal';
 
     /** @return array{enabled:true,version:1,provenance:string,approved_terms_hashes:list<string>,authorization_ttl_seconds:int,render_lease_seconds:int,spool_slots:int,spool_reserve_bytes:int,storage_root:?string,environment:string} */
@@ -56,7 +67,7 @@ final class ProductionFreeGrantPolicy
             && array_key_exists('provenance', $policy) && ($policy['provenance'] === null || is_string($policy['provenance']))
             && is_array($policy['approved_terms_hashes'] ?? null) && array_is_list($policy['approved_terms_hashes'])
             && is_int($policy['authorization_ttl_seconds'] ?? null) && $policy['authorization_ttl_seconds'] >= 30 && $policy['authorization_ttl_seconds'] <= 300
-            && is_int($policy['render_lease_seconds'] ?? null) && $policy['render_lease_seconds'] >= 30 && $policy['render_lease_seconds'] <= 900
+            && is_int($policy['render_lease_seconds'] ?? null) && $policy['render_lease_seconds'] >= self::RENDERER_TIMEOUT_SECONDS + self::RENDER_LEASE_MARGIN_SECONDS && $policy['render_lease_seconds'] <= 900
             && is_int($policy['spool_slots'] ?? null) && $policy['spool_slots'] >= 1 && $policy['spool_slots'] <= 16
             && is_int($policy['spool_reserve_bytes'] ?? null) && $policy['spool_reserve_bytes'] >= 16777216 && $policy['spool_reserve_bytes'] <= 1099511627776
             && array_key_exists('storage_root', $policy) && ($policy['storage_root'] === null || is_string($policy['storage_root']))
