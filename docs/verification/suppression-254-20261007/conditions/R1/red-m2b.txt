@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:05.400, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm
+wrong provider hash
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'status' => 'unknown',
++    'status' => 'confirmed',
+ ]
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 12[0m[37;41m, Failures: 1[0m[37;41m.[0m

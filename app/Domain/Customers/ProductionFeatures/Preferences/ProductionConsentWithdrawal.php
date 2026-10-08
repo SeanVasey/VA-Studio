@@ -6,19 +6,33 @@ use App\Domain\Customers\Preferences\ConsentException;
 use App\Domain\Customers\Preferences\ConsentPolicy;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureContext;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureOperation;
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureShape;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use JsonSerializable;
 use LogicException;
+use WeakMap;
 
-/** Sealed server capture, usable only inside the caller's still-held operation and final fences. */
-final readonly class ProductionConsentWithdrawal implements JsonSerializable
+/** Sealed server capture, usable only inside the caller's still-held operation and final fences.
+ * The capture lives outside the instance, so var_export, (array) casts, print_r/var_dump and
+ * instance Reflection see no recipient; only serverSnapshot() on the minted instance returns it.
+ */
+final class ProductionConsentWithdrawal implements JsonSerializable
 {
-    private function __construct(private array $snapshot) {}
+    /** @var WeakMap<self, array>|null */
+    private static ?WeakMap $sealed = null;
+
+    private function __construct(array $snapshot)
+    {
+        self::$sealed ??= new WeakMap;
+        self::$sealed[$this] = $snapshot;
+    }
 
     public static function capture(ProductionFeatureContext $context, int $expectedVersion): ?self
     {
+        // A public mint path or leaked context must not skip run()'s committing/postcommit proofs.
+        ProductionFeatureOperation::assertLive($context);
         if ($context->identity->feature !== 'consent_preferences') {
             throw new IdentityException;
         }
@@ -93,17 +107,28 @@ final readonly class ProductionConsentWithdrawal implements JsonSerializable
     /** Private recipient and signed ownership evidence: never an HTTP projection. */
     public function serverSnapshot(): array
     {
-        return $this->snapshot;
+        // Clones and crafted unserialized instances were never minted and carry no capture.
+        if (self::$sealed === null || ! isset(self::$sealed[$this])) {
+            throw new LogicException('Withdrawal evidence is not a minted server capture.');
+        }
+
+        return self::$sealed[$this];
     }
 
+    /** Authority marker only: no purpose version, identifier or recipient. */
     public function __debugInfo(): array
     {
-        return ['purpose' => ConsentPolicy::PURPOSE, 'version' => $this->snapshot['consentVersion']];
+        return ['production_consent_withdrawal' => true];
     }
 
     public function __serialize(): never
     {
         throw new LogicException('Withdrawal evidence must not be serialized.');
+    }
+
+    public function __unserialize(array $data): never
+    {
+        throw new LogicException('Withdrawal evidence must not be unserialized.');
     }
 
     public function jsonSerialize(): never

@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+REASON: Non-prefix production suppression installation requires inspection; nothing was changed.
+.                                                                   1 / 1 (100%)
+
+Time: 01:08.549, Memory: 79.00 MB
+
+OK (1 test, 2 assertions)
+exit=0

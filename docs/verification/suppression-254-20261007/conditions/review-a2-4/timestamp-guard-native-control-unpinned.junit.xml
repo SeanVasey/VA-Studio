@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php" tests="1" assertions="2" errors="1" failures="0" skipped="0" time="195.012681">
+    <testcase name="test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php" line="59" class="Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionTimestampGuardTest" assertions="2" time="195.012681">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:65
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

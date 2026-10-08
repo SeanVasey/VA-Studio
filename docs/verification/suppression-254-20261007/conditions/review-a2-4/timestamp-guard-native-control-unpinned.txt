@@ -1,0 +1,22 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-supp254/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 03:15.014, Memory: 81.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:65
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 2, Errors: 1.

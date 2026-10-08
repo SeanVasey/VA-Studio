@@ -1,0 +1,35 @@
+<?php
+
+namespace Tests\Feature\ReviewSupp254d;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Support\CustomerFixtures;
+use Tests\TestCase;
+
+/**
+ * Independent reviewer throwaway (addendum 2): no migrate. Adds a second binding and, in a NON-STRICT session, a withdrawn 253
+ * consent event whose created_at is the zero date (the 253 event guard has no created_at condition). This is the only parent
+ * shape under which the 254 YEAR(NEW.created_at)>0 term is the sole refusal of a zero-dated target.
+ */
+class Supp254dSeedZeroDateParentTest extends TestCase
+{
+    public function test_seed_zero_date_parent(): void
+    {
+        $account = CustomerFixtures::account(['email' => 'review-supp254d-zero@example.test'])['account'];
+        $binding = DB::table('production_account_feature_bindings')->insertGetId(['public_id' => (string) Str::uuid(), 'account_id' => $account->id,
+            'origin_public_id' => (string) Str::uuid(), 'feature' => 'consent_preferences', 'feature_schema_version' => 1,
+            'feature_policy_version' => 'production-consent-preferences-identity-v1', 'binding_hash' => hash('sha256', 'binding-zero'),
+            'binding_ciphertext' => 'synthetic', 'created_at' => '2026-01-01 00:00:00']);
+        DB::statement("SET SESSION sql_mode=''");
+        $hmac = hash('sha256', 'recipient-zero');
+        $event = DB::table('production_consent_events')->insertGetId(['public_id' => (string) Str::uuid(), 'binding_id' => $binding, 'purpose' => 'email_marketing',
+            'revision' => 1, 'status' => 'withdrawn', 'policy_id' => null, 'source' => 'first_party_customer', 'affirmative' => 0,
+            'recipient_hmac' => $hmac, 'recipient_ciphertext' => 'synthetic', 'created_at' => 'zzzz']);
+        $stored = DB::table('production_consent_events')->where('id', $event)->value('created_at');
+        $path = getenv('PROBE_PARENTS');
+        file_put_contents($path, json_encode([...json_decode(file_get_contents($path), true), 'zero_binding' => $binding, 'zero_hmac' => $hmac, 'zero_event' => $event,
+            'zero_event_created_at' => $stored], JSON_PRETTY_PRINT));
+        $this->assertSame('0000-00-00 00:00:00', $stored);
+    }
+}
