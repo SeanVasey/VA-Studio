@@ -1,0 +1,12 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..31f5c8af 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -258,7 +258,6 @@ final class TaxCheckoutEvidence
+                 && is_int($payment['amount_capturable'] ?? null) && $payment['amount_capturable'] >= 0 && $payment['amount_capturable'] <= $total
+                 && ($payment['capture_method'] ?? null) === $context['capture_method'] && ($payment['payment_method_types'] ?? null) === ['card']
+                 && in_array($payment['status'] ?? null, ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'requires_capture', 'canceled', 'succeeded'], true));
+-            Evidence::same($request['params']['payment_intent_data']['metadata'], $payment['metadata'] ?? null);
+             foreach (['account', 'context', 'application', 'application_fee_amount', 'on_behalf_of', 'transfer_data', 'transfer_group', 'setup_future_usage'] as $field) {
+                 CheckoutException::require(($payment[$field] ?? null) === null);
+             }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" tests="6" assertions="21" errors="0" failures="4" skipped="0" time="20.399467">
+    <testcase name="test_duplicate_after_a_successful_observation_dispatches_nothing" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="46" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="5" time="5.689972"/>
+    <testcase name="test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="62" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="3" time="3.173798">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged
+Failed asserting that null is identical to Array &amp;0 [
+    'binding_id' =&gt; 'd6f6b75b-978a-4788-85ac-23972db80a2d',
+    'invoice_ref' =&gt; 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:72
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_two_duplicates_after_a_lost_dispatch_still_result_in_one_observation" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="80" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="2" time="3.119262">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_two_duplicates_after_a_lost_dispatch_still_result_in_one_observation
+Failed asserting that null is not null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:87
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_an_observation_older_than_the_hint_does_not_cover_it" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="96" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="2" time="2.843221">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_an_observation_older_than_the_hint_does_not_cover_it
+Failed asserting that null is not null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:105
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="109" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="2" time="2.385614">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations
+The expected [App\Jobs\RetrieveMembershipInvoice] job was pushed 0 times instead of 2 times.
+Failed asserting that 0 is identical to 2.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:172
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:152
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:118
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_duplicates_of_events_that_name_no_retrievable_invoice_dispatch_nothing" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php" line="127" class="Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest" classname="Tests.Feature.ProductionMembershipBilling.BillingWebhookRedeliveryTest" assertions="7" time="3.187601"/>
+  </testsuite>
+</testsuites>

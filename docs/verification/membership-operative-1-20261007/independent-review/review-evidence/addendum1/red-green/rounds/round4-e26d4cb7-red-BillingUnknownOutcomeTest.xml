@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" tests="11" assertions="14" errors="0" failures="9" skipped="0" time="11.967428">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity" tests="7" assertions="7" errors="0" failures="7" skipped="0" time="7.730666">
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #0" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.274835">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #0
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #1" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="0.950264">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #1
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #2" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.181765">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #2
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #3" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.078925">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #3
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #4" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.121956">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #4
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #5" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.143598">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #5
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #6" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="41" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="0.979323">
+        <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity with data set #6
+A first retrieval that validated no provider graph claims no identity.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:47
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_a_timeout_under_the_wrong_binding_pins_nothing_and_the_right_binding_still_succeeds" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="70" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.148156">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_a_timeout_under_the_wrong_binding_pins_nothing_and_the_right_binding_still_succeeds
+An unvalidated first retrieval records nothing.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:76
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_ambiguous_provider_response_is_unknown_not_refused_and_is_recorded_only_under_an_owned_identity" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="86" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="1" time="1.185860">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest::test_ambiguous_provider_response_is_unknown_not_refused_and_is_recorded_only_under_an_owned_identity
+A first ambiguous retrieval records nothing.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php:93
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_configuration_refusal_records_no_observation" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="105" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="3" time="0.905055"/>
+    <testcase name="test_retrieval_inside_an_application_transaction_is_refused_before_provider_io" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php" line="119" class="Tests\Feature\ProductionMembershipBilling\BillingUnknownOutcomeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingUnknownOutcomeTest" assertions="2" time="0.997692"/>
+  </testsuite>
+</testsuites>

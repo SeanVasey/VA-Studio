@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+OBSERVATION F2 reservation hash = award/consume/reserve seal: {"award":"refused","consume":"refused","reserve":"admitted"}
+.OBSERVATION F2 consume(R1) against reserve(R2): consume=refused_by_257 activation=refused
+.OBSERVATION F2 timestamps: earlier=refused equal=admitted
+.OBSERVATION Billing sync dispatch: first=threw BindingResolutionException events=1 redelivery duplicate=true scheduled=null observations=0 binding=58ee6a43-6150-4c8e-ac08-9263d22f1fe3
+.OBSERVATION Billing wrong binding first: first outcome=refused reason=subscription then right binding=conflicting_invoice invoices=1
+.OBSERVATION Billing signed paid event: disposition=retrieval_hint observations=0 credit_events=0
+.                                                              6 / 6 (100%)
+
+Time: 13:23.657, Memory: 89.00 MB
+
+[30;42mOK (6 tests, 13 assertions)[0m

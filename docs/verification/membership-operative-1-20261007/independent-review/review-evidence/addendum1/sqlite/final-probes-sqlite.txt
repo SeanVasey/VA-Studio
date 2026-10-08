@@ -1,0 +1,22 @@
+head e26d4cb74d464943178201133612e73b16945cf1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/phpunit.xml
+
+OBSERVATION same-second: first scheduled=dispatched obs=1; dup@T0 scheduled=dispatched obs=2; dup@T0+1 scheduled=dispatched obs=3; dup@T0+2 scheduled=null obs=3; created_at=2026-10-07 01:00:00,2026-10-07 01:00:00,2026-10-07 01:00:01; event received_at=2026-10-07 01:00:00; chain_ok=3 credit_events=0
+.OBSERVATION stale-read: invoice read at T0 (open); hint received_at=2026-10-07 01:00:01 dispatch_lost=yes; observation outcome=not_settled reason=invoice_open retrieved_at=2026-10-07 01:00:02 created_at=2026-10-07 01:00:02; redelivery@T0+3 duplicate=true scheduled=null pushed=0
+.OBSERVATION refusal-loop: deliveries=6 retrievals=6 reasons=binding_refused_subscription|msg=Production membership billing unavailable. events=1 invoices=0 observations=0 wrong_binding=d8a1f6ec
+.OBSERVATION failed-job: scheduled=dispatched queued=1 worker_status=0 failed_jobs=1 first_line="App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable. in /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/app/Domain/Memberships/Billing/BillingException.php:16" mentions_binding_refused=no mentions_line58=no payload_has_plain_invoice_ref=yes logged=[error:Production membership billing unavailable.|ctx_reason=binding_refused_subscription] invoices=0 observations=0
+.OBSERVATION mode-first: wrong binding outcome=refused reason=mode identity_owner=wrong; right binding then=conflicting_invoice invoices=1
+.OBSERVATION unknown-first: wrong binding first=threw provider_unavailable invoices_after_first=0; right binding then=saved settled
+.OBSERVATION first-unknown failed-job: scheduled=dispatched worker_status=0 failed_jobs=1 first_line="App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable. in /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/app/Domain/Memberships/Billing/BillingException.php:16" mentions_provider_unavailable=no logged=[error:Production membership billing unavailable.|ctx_reason=provider_unavailable] events=1 invoices=0 observations=0; redelivery scheduled=dispatched
+.OBSERVATION unknown-cover: newer observation outcome=unknown seq=2; redelivery scheduled=dispatched
+.OBSERVATION storm: duplicates=25 pushed=25 (bound per invoice only by MAX_OBSERVATIONS=1000 once jobs run)
+.SSSSSS                                                   15 / 15 (100%)
+
+Time: 00:37.140, Memory: 93.00 MB
+
+OK, but some tests were skipped!
+Tests: 15, Assertions: 18, Skipped: 6.
+rc=0

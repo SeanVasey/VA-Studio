@@ -1,0 +1,37 @@
+# GREEN: tests and app at 9c2f9928
+## BillingObservationLedgerTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 00:36.699, Memory: 91.00 MB
+
+OK (11 tests, 38 assertions)
+rc=0
+## BillingWebhookRedeliveryTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 00:21.635, Memory: 89.00 MB
+
+OK (6 tests, 34 assertions)
+rc=0
+## BillingWebhookIntakeTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+.....                                                               5 / 5 (100%)
+
+Time: 00:14.895, Memory: 89.00 MB
+
+OK (5 tests, 38 assertions)
+rc=0

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="1.478521">
+    <testcase name="test_f1_destroyed_clone_releases_the_pin_of_the_live_frame" file="/home/user/VA-Studio-review-member/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/probes/ReviewerOperativeProbeTest.php" line="191" class="Tests\Feature\ReviewProbes\ReviewerOperativeProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerOperativeProbeTest" assertions="1" time="1.478521"/>
+  </testsuite>
+</testsuites>

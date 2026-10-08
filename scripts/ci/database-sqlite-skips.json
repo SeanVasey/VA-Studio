@@ -659,6 +659,26 @@
       "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
     ],
     [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_installer_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+    ],
+    [
       "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
       "test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"
     ],

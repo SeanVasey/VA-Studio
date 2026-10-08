@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="332.224648">
+    <testcase name="test_newer_non_settled_observation_hides_an_older_settled_one_and_nothing_is_renewed" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php" line="54" class="Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest" classname="Tests.Feature.ProductionMembershipBilling.BillingObservationLedgerTest" assertions="6" time="168.724624"/>
+    <testcase name="test_a_forged_seal_or_payload_breaks_the_chain_audit" file="/home/user/VA-Studio-member-ops-native/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php" line="89" class="Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest" classname="Tests.Feature.ProductionMembershipBilling.BillingObservationLedgerTest" assertions="2" time="163.500023"/>
+  </testsuite>
+</testsuites>

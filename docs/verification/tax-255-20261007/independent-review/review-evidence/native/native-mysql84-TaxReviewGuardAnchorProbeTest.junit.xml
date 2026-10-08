@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\TaxReviewGuardAnchorProbeTest" file="/home/user/VA-Studio-review-tax255/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="214.184014">
+    <testcase name="test_q3_trailing_line_feed_in_provider_identifiers" file="/home/user/VA-Studio-review-tax255/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewGuardAnchorProbeTest.php" line="42" class="Tests\ReviewProbes\TaxReviewGuardAnchorProbeTest" classname="Tests.ReviewProbes.TaxReviewGuardAnchorProbeTest" assertions="4" time="214.184014"/>
+  </testsuite>
+</testsuites>

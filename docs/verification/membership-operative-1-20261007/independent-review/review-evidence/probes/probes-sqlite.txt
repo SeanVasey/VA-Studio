@@ -1,0 +1,22 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member/phpunit.xml
+
+OBSERVATION F1 variadic lower after capture: registered=true assertCurrent=changed_primary_or_schema calls=0
+.OBSERVATION F1 max(2) after capture: registered=true one()=changed_primary_or_schema calls=0
+.OBSERVATION F1 pin after cycles: BINARY=false NOCASE=false lower(1)=false
+.OBSERVATION F1 allowlisted extension names snippet/highlight registered by app: reader=admitted calls=0
+.OBSERVATION O3 forged closure: policy env=testing billing env=testing calls during policy reads=0 app()->environment()=production
+.OBSERVATION O3 instance: membership env=testing app()->environment()=testing billing=changed_policy
+.OBSERVATION F2 reservation hash = award/consume/reserve seal: {"award":"refused","consume":"refused","reserve":"admitted"}
+.OBSERVATION F2 consume(R1) against reserve(R2): consume=refused_by_257 activation=refused
+.OBSERVATION F2 timestamps: earlier=refused equal=admitted
+.OBSERVATION Billing sync dispatch: first=threw BindingResolutionException events=1 redelivery duplicate=true scheduled=null observations=0 binding=21ba92e6-8e76-4cba-86ec-6bd0b1e37d1a
+.OBSERVATION Billing wrong binding first: first outcome=refused reason=subscription then right binding=conflicting_invoice invoices=1
+.OBSERVATION Billing signed paid event: disposition=retrieval_hint observations=0 credit_events=0
+.                                                      12 / 12 (100%)
+
+Time: 00:09.953, Memory: 89.00 MB
+
+[30;42mOK (12 tests, 31 assertions)[0m

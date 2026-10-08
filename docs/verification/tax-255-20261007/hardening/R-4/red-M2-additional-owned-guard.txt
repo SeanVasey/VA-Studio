@@ -1,0 +1,23 @@
+# R-4 red: installer mutation M2-additional-owned-guard, native case 'additional owned guard' must fail
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_M2 root=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/mut-snap start 2026-10-08T06:36:08Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/mut-snap/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 02:27.336, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl@additional owned guard with data (Closure Object (), 'additional owned guard')
+Damaged installation was adopted.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/mut-snap/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php:134
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1
+# end 2026-10-08T06:38:36Z

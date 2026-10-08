@@ -1,0 +1,38 @@
+# round3-4716ae52: head 4716ae5278607b87a31317b343e4550e8403e0dc base af089d401376205adbe9db36234a4f1e6b5a1ec4 status-lines=0
+## red (app app/Domain/Memberships/Billing/BillingWebhookIntake.php at af089d401376205adbe9db36234a4f1e6b5a1ec4)
+ M app/Domain/Memberships/Billing/BillingWebhookIntake.php
+### BillingWebhookIntakeTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+.....F                                                              6 / 6 (100%)
+
+Time: 00:07.883, Memory: 89.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookIntakeTest::test_events_from_any_api_version_other_than_the_pin_are_refused_before_a_row_or_dispatch
+An event from an unpinned API version must refuse.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookIntakeTest.php:148
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 43, Failures: 1.
+rc=1
+restored status-lines=0
+## green (app at 4716ae5278607b87a31317b343e4550e8403e0dc)
+### BillingWebhookIntakeTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 00:05.896, Memory: 89.00 MB
+
+OK (6 tests, 48 assertions)
+rc=0

@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+index b7e96b5e..3b5824e3 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php
+@@ -74,7 +74,7 @@ final class ProductionTaxPaidLineAdapterV2
+             && $tax['line_subtotal_minor'] <= $tax['order_subtotal_minor'] && $tax['line_tax_minor'] <= $tax['order_tax_minor']);
+         // Same approved machine-policy ceiling the producer enforced; checked, never adjusted.
+         $net = $tax['tax_behavior'] === 'exclusive' ? $tax['order_subtotal_minor'] : $tax['order_subtotal_minor'] - $tax['order_tax_minor'];
+-        CheckoutException::require($net >= 0 && $net * $context['tax']['maximum_rate_bps'] >= $tax['order_tax_minor'] * 10000, 'tax_ceiling');
++        
+ 
+         return $line;
+     }

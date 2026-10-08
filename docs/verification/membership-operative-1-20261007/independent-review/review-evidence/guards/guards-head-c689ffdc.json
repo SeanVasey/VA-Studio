@@ -1,0 +1,166 @@
+{
+    "sqlite": {
+        "production_member_profiles_insert": {
+            "sql": "CREATE TRIGGER \"production_member_profiles_insert\" BEFORE INSERT ON main.\"production_member_profiles\" WHEN NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE profile_hash = NEW.profile_hash)),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE profile_hash = NEW.profile_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_profiles_update": {
+            "sql": "CREATE TRIGGER \"production_member_profiles_update\" BEFORE UPDATE ON main.\"production_member_profiles\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_profiles_delete": {
+            "sql": "CREATE TRIGGER \"production_member_profiles_delete\" BEFORE DELETE ON main.\"production_member_profiles\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_insert": {
+            "sql": "CREATE TRIGGER \"production_member_definitions_insert\" BEFORE INSERT ON main.\"production_member_definitions\" WHEN NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE definition_hash = NEW.definition_hash) AND EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND provenance = NEW.provenance)),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE definition_hash = NEW.definition_hash) AND EXISTS (SELECT 1 FROM \"production_member_profiles\" WHERE id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND provenance = NEW.provenance)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_update": {
+            "sql": "CREATE TRIGGER \"production_member_definitions_update\" BEFORE UPDATE ON main.\"production_member_definitions\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_delete": {
+            "sql": "CREATE TRIGGER \"production_member_definitions_delete\" BEFORE DELETE ON main.\"production_member_definitions\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_insert": {
+            "sql": "CREATE TRIGGER \"production_member_origins_insert\" BEFORE INSERT ON main.\"production_member_origins\" WHEN NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance) AND EXISTS (SELECT 1 FROM production_membership_redemptions r JOIN production_membership_paid_periods p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM \"production_member_definitions\" WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance) AND EXISTS (SELECT 1 FROM production_membership_redemptions r JOIN production_membership_paid_periods p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_update": {
+            "sql": "CREATE TRIGGER \"production_member_origins_update\" BEFORE UPDATE ON main.\"production_member_origins\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_delete": {
+            "sql": "CREATE TRIGGER \"production_member_origins_delete\" BEFORE DELETE ON main.\"production_member_origins\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_insert": {
+            "sql": "CREATE TRIGGER \"production_member_artifacts_insert\" BEFORE INSERT ON main.\"production_member_artifacts\" WHEN NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_artifacts\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_artifacts\" WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role)) AND NEW.ordinal = (SELECT COUNT(*) FROM \"production_member_artifacts\" WHERE origin_id = NEW.origin_id) AND EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE id = NEW.origin_id AND artifact_count > NEW.ordinal)),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_artifacts\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_artifacts\" WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role)) AND NEW.ordinal = (SELECT COUNT(*) FROM \"production_member_artifacts\" WHERE origin_id = NEW.origin_id) AND EXISTS (SELECT 1 FROM \"production_member_origins\" WHERE id = NEW.origin_id AND artifact_count > NEW.ordinal)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_update": {
+            "sql": "CREATE TRIGGER \"production_member_artifacts_update\" BEFORE UPDATE ON main.\"production_member_artifacts\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_delete": {
+            "sql": "CREATE TRIGGER \"production_member_artifacts_delete\" BEFORE DELETE ON main.\"production_member_artifacts\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_insert": {
+            "sql": "CREATE TRIGGER \"production_member_activations_insert\" BEFORE INSERT ON main.\"production_member_activations\" WHEN NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_activations\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_activations\" WHERE origin_id = NEW.origin_id OR redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM \"production_member_origins\" o WHERE o.id = NEW.origin_id AND o.redemption_id = NEW.redemption_id AND o.artifact_manifest_hash = NEW.artifact_manifest_hash AND NEW.created_at < o.honor_deadline AND o.artifact_count = (SELECT COUNT(*) FROM \"production_member_artifacts\" WHERE origin_id = o.id))),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM \"production_member_activations\" WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM \"production_member_activations\" WHERE origin_id = NEW.origin_id OR redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM \"production_member_origins\" o WHERE o.id = NEW.origin_id AND o.redemption_id = NEW.redemption_id AND o.artifact_manifest_hash = NEW.artifact_manifest_hash AND NEW.created_at < o.honor_deadline AND o.artifact_count = (SELECT COUNT(*) FROM \"production_member_artifacts\" WHERE origin_id = o.id))), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_update": {
+            "sql": "CREATE TRIGGER \"production_member_activations_update\" BEFORE UPDATE ON main.\"production_member_activations\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_delete": {
+            "sql": "CREATE TRIGGER \"production_member_activations_delete\" BEFORE DELETE ON main.\"production_member_activations\" WHEN NOT COALESCE((0 = 1),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_consume": {
+            "sql": "CREATE TRIGGER \"production_member_activations_consume\" BEFORE INSERT ON main.\"production_member_activations\" WHEN NOT COALESCE((EXISTS (SELECT 1 FROM production_membership_credit_events c JOIN production_membership_credit_events r ON r.id = c.reservation_event_id WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at AND r.kind = 'reserve' AND r.period_id = c.period_id AND r.redemption_id = NEW.redemption_id AND r.seal = NEW.reservation_event_hash)),0) BEGIN SELECT RAISE(ABORT, 'Retain production member originals'); END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((EXISTS (SELECT 1 FROM production_membership_credit_events c JOIN production_membership_credit_events r ON r.id = c.reservation_event_id WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at AND r.kind = 'reserve' AND r.period_id = c.period_id AND r.redemption_id = NEW.redemption_id AND r.seal = NEW.reservation_event_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        }
+    },
+    "mysql": {
+        "production_member_profiles_insert": {
+            "sql": "CREATE TRIGGER `production_member_profiles_insert` BEFORE INSERT ON `production_member_profiles` FOR EACH ROW BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_profiles` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_profiles` WHERE profile_hash = NEW.profile_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_profiles` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_profiles` WHERE profile_hash = NEW.profile_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_profiles_update": {
+            "sql": "CREATE TRIGGER `production_member_profiles_update` BEFORE UPDATE ON `production_member_profiles` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_profiles_delete": {
+            "sql": "CREATE TRIGGER `production_member_profiles_delete` BEFORE DELETE ON `production_member_profiles` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_insert": {
+            "sql": "CREATE TRIGGER `production_member_definitions_insert` BEFORE INSERT ON `production_member_definitions` FOR EACH ROW BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_definitions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_definitions` WHERE definition_hash = NEW.definition_hash) AND EXISTS (SELECT 1 FROM `production_member_profiles` WHERE id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND provenance = NEW.provenance)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_definitions` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_definitions` WHERE definition_hash = NEW.definition_hash) AND EXISTS (SELECT 1 FROM `production_member_profiles` WHERE id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND provenance = NEW.provenance)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_update": {
+            "sql": "CREATE TRIGGER `production_member_definitions_update` BEFORE UPDATE ON `production_member_definitions` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_definitions_delete": {
+            "sql": "CREATE TRIGGER `production_member_definitions_delete` BEFORE DELETE ON `production_member_definitions` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_insert": {
+            "sql": "CREATE TRIGGER `production_member_origins_insert` BEFORE INSERT ON `production_member_origins` FOR EACH ROW BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_origins` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_origins` WHERE redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM `production_member_definitions` WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance) AND EXISTS (SELECT 1 FROM production_membership_redemptions r JOIN production_membership_paid_periods p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_origins` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_origins` WHERE redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM `production_member_definitions` WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance) AND EXISTS (SELECT 1 FROM production_membership_redemptions r JOIN production_membership_paid_periods p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash) AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_update": {
+            "sql": "CREATE TRIGGER `production_member_origins_update` BEFORE UPDATE ON `production_member_origins` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_origins_delete": {
+            "sql": "CREATE TRIGGER `production_member_origins_delete` BEFORE DELETE ON `production_member_origins` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_insert": {
+            "sql": "CREATE TRIGGER `production_member_artifacts_insert` BEFORE INSERT ON `production_member_artifacts` FOR EACH ROW BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_artifacts` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_artifacts` WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role)) AND NEW.ordinal = (SELECT COUNT(*) FROM `production_member_artifacts` WHERE origin_id = NEW.origin_id) AND EXISTS (SELECT 1 FROM `production_member_origins` WHERE id = NEW.origin_id AND artifact_count > NEW.ordinal)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_artifacts` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_artifacts` WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role)) AND NEW.ordinal = (SELECT COUNT(*) FROM `production_member_artifacts` WHERE origin_id = NEW.origin_id) AND EXISTS (SELECT 1 FROM `production_member_origins` WHERE id = NEW.origin_id AND artifact_count > NEW.ordinal)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_update": {
+            "sql": "CREATE TRIGGER `production_member_artifacts_update` BEFORE UPDATE ON `production_member_artifacts` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_artifacts_delete": {
+            "sql": "CREATE TRIGGER `production_member_artifacts_delete` BEFORE DELETE ON `production_member_artifacts` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_insert": {
+            "sql": "CREATE TRIGGER `production_member_activations_insert` BEFORE INSERT ON `production_member_activations` FOR EACH ROW BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_activations` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_activations` WHERE origin_id = NEW.origin_id OR redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM `production_member_origins` o WHERE o.id = NEW.origin_id AND o.redemption_id = NEW.redemption_id AND o.artifact_manifest_hash = NEW.artifact_manifest_hash AND NEW.created_at < o.honor_deadline AND o.artifact_count = (SELECT COUNT(*) FROM `production_member_artifacts` WHERE origin_id = o.id))), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((NOT EXISTS (SELECT 1 FROM `production_member_activations` WHERE id = NEW.id) AND NOT EXISTS (SELECT 1 FROM `production_member_activations` WHERE origin_id = NEW.origin_id OR redemption_id = NEW.redemption_id) AND EXISTS (SELECT 1 FROM `production_member_origins` o WHERE o.id = NEW.origin_id AND o.redemption_id = NEW.redemption_id AND o.artifact_manifest_hash = NEW.artifact_manifest_hash AND NEW.created_at < o.honor_deadline AND o.artifact_count = (SELECT COUNT(*) FROM `production_member_artifacts` WHERE origin_id = o.id))), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_update": {
+            "sql": "CREATE TRIGGER `production_member_activations_update` BEFORE UPDATE ON `production_member_activations` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "UPDATE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_delete": {
+            "sql": "CREATE TRIGGER `production_member_activations_delete` BEFORE DELETE ON `production_member_activations` FOR EACH ROW BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "DELETE",
+            "body": "BEGIN IF NOT COALESCE((0 = 1), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        },
+        "production_member_activations_consume": {
+            "sql": "CREATE TRIGGER `production_member_activations_consume` BEFORE INSERT ON `production_member_activations` FOR EACH ROW BEGIN IF NOT COALESCE((EXISTS (SELECT 1 FROM production_membership_credit_events c JOIN production_membership_credit_events r ON r.id = c.reservation_event_id WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at AND r.kind = 'reserve' AND r.period_id = c.period_id AND r.redemption_id = NEW.redemption_id AND r.seal = NEW.reservation_event_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END",
+            "event": "INSERT",
+            "body": "BEGIN IF NOT COALESCE((EXISTS (SELECT 1 FROM production_membership_credit_events c JOIN production_membership_credit_events r ON r.id = c.reservation_event_id WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at AND r.kind = 'reserve' AND r.period_id = c.period_id AND r.redemption_id = NEW.redemption_id AND r.seal = NEW.reservation_event_hash)), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END"
+        }
+    }
+}

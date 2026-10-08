@@ -1,0 +1,26 @@
+diff --git a/app/Domain/Grants/Member/MemberGrantPolicy.php b/app/Domain/Grants/Member/MemberGrantPolicy.php
+index b475e314..58298630 100644
+--- a/app/Domain/Grants/Member/MemberGrantPolicy.php
++++ b/app/Domain/Grants/Member/MemberGrantPolicy.php
+@@ -62,7 +62,7 @@ final class MemberGrantPolicy
+         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
+         MemberGrantException::require(is_array($items) && is_array($items['member-grants'] ?? null), 'changed_policy');
+         $policy = $items['member-grants'];
+-        $environment = $this->environment($instances);
++        $environment = $instances['env'] ?? null;
+         MemberGrantException::require(is_bool($policy['enabled'] ?? null) && is_int($policy['version'] ?? null)
+             && is_string($policy['family'] ?? null) && is_string($policy['purpose'] ?? null)
+             && ($environment === null || is_string($environment)), 'changed_policy');
+diff --git a/app/Domain/Memberships/Production/MembershipPolicy.php b/app/Domain/Memberships/Production/MembershipPolicy.php
+index 421cc074..b524337d 100644
+--- a/app/Domain/Memberships/Production/MembershipPolicy.php
++++ b/app/Domain/Memberships/Production/MembershipPolicy.php
+@@ -69,7 +69,7 @@ final class MembershipPolicy
+         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
+         MembershipException::require(is_array($items) && is_array($items['production-memberships'] ?? []), 'changed_policy');
+         $policy = $items['production-memberships'] ?? [];
+-        $environment = $this->environment($instances);
++        $environment = $instances['env'] ?? null;
+         $database = $items['database'] ?? null;
+         MembershipException::require(is_array($database) && is_string($database['default'] ?? null)
+             && is_array($database['connections'] ?? null) && is_array($database['connections'][$database['default']] ?? null), 'changed_policy');

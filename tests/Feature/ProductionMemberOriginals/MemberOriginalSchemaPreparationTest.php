@@ -14,6 +14,7 @@ use PDO;
 use PDOException;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\MemberCreditEventFixtures;
 use Tests\TestCase;
 
 /** Only synthetic structural fixtures. Ciphertext placeholders never authorize grants or legal originals. */
@@ -36,8 +37,11 @@ class MemberOriginalSchemaPreparationTest extends TestCase
     public function test_contiguous_empty_tail_can_restart_but_an_earlier_guard_hole_is_not_owned(): void
     {
         $pdo = DB::connection()->getPdo();
+        // The contiguous empty tail is now delete plus the additive consume coupling guard (F2).
+        $pdo->exec('DROP TRIGGER production_member_activations_consume');
         $pdo->exec('DROP TRIGGER production_member_activations_delete');
         (new MemberGrantSchema)->up();
+        $this->assertTrue($this->guardExists('production_member_activations_consume'));
         $pdo->exec('DROP TRIGGER production_member_profiles_update');
         $this->refuses(fn () => (new MemberGrantSchema)->up());
         $this->assertFalse($this->guardExists('production_member_profiles_update'));
@@ -82,6 +86,10 @@ class MemberOriginalSchemaPreparationTest extends TestCase
     {
         $origin = $this->origin();
         $activation = $this->activation($origin);
+        // Coupled credit history first (F2), so every refusal below is the artifact gate alone.
+        [, $reserve] = MemberCreditEventFixtures::reserve($origin['redemption_id']);
+        MemberCreditEventFixtures::consume($reserve, $origin['id'], $activation['readiness_receipt_hash']);
+        $activation['reservation_event_hash'] = $reserve['seal'];
         $this->pdoRefuses(fn () => $this->insert(MemberGrantSchema::TABLES[4], $activation));
         $artifact = $this->artifact($origin, 0, 'member_contract');
         $this->insert(MemberGrantSchema::TABLES[3], $artifact);

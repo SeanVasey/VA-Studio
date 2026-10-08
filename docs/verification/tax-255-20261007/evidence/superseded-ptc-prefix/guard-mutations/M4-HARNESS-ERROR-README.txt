@@ -1,0 +1,1 @@
+Harness error, retained: the M4 mutation pattern matched twice (uuidV4 and uuidAny), the mutation script refused to apply it, and the suite then ran against the UNMUTATED source (green). This is not red evidence. See M4b for the applied mutation.

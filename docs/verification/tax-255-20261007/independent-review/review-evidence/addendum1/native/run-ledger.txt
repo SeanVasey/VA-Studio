@@ -1,0 +1,54 @@
+2026-10-08T07:44:33Z start b-Guard worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php filter=none db=rv_b_b_guard_
+2026-10-08T07:44:33Z start a-Journey worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php filter=none db=rv_a_a_journey_
+2026-10-08T07:46:20Z start c-TaxReviewAddendumAnchorProbeTest worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumAnchorProbeTest.php filter=none db=rv_c_c_taxreviewaddendumanchorprobetest_
+2026-10-08T07:46:21Z end c-TaxReviewAddendumAnchorProbeTest exit=0 OK (1 test, 8 assertions)
+2026-10-08T07:46:21Z stream c DONE
+2026-10-08T08:01:04Z end b-Guard exit=0 OK (7 tests, 123 assertions)
+2026-10-08T08:01:05Z start b-NativeInstaller worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=none db=rv_b_b_nativeinstaller_
+2026-10-08T08:04:03Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@drifted guard body db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:07:47Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:07:47Z stream m DONE
+2026-10-08T08:07:47Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@interior gap db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:12:11Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:12:11Z stream m DONE
+2026-10-08T08:12:11Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@populated incomplete installation db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:14:17Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:14:18Z stream m DONE
+2026-10-08T08:14:18Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@temporary shadow db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:16:33Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:16:33Z stream m DONE
+2026-10-08T08:16:33Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@foreign trigger db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:19:06Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:19:06Z stream m DONE
+2026-10-08T08:19:06Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@foreign routine db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:21:37Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:21:38Z stream m DONE
+2026-10-08T08:21:38Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@additional owned index db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:24:01Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:24:01Z stream m DONE
+2026-10-08T08:24:01Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@column collation drift db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:26:13Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:26:13Z stream m DONE
+2026-10-08T08:26:13Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@guard recreated under another definer db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:28:38Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:28:38Z stream m DONE
+2026-10-08T08:28:39Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@guard recreated under another SQL mode db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:30:52Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:30:52Z stream m DONE
+2026-10-08T08:36:22Z end b-NativeInstaller exit=0 OK (14 tests, 46 assertions)
+2026-10-08T08:36:22Z start b-SourceV2 worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php filter=none db=rv_b_b_sourcev2_
+2026-10-08T08:47:29Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@drifted guard body db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:49:57Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:49:57Z stream m DONE
+2026-10-08T08:49:57Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@interior gap db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:52:42Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:52:42Z stream m DONE
+2026-10-08T08:52:42Z start m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl worktree=/home/user/VA-Studio-review-tax255b-aux head=30ec1c9a dirty_app=1 file=tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php filter=test_native_installer_refuses_before_ddl@populated incomplete installation db=rv_m_m_productiontaxcheckoutnativeinstallerte
+2026-10-08T08:57:48Z end m-ProductionTaxCheckoutNativeInstallerTest-test_native_installer_refuses_before_ddl exit=1 Tests: 1, Assertions: 1, Failures: 1.
+2026-10-08T08:57:48Z stream m DONE
+2026-10-08T08:58:22Z end b-SourceV2 exit=0 OK (5 tests, 52 assertions)
+2026-10-08T08:58:23Z start b-PaidLineAdapterV2 worktree=/home/user/VA-Studio-review-tax255b head=30ec1c9a dirty_app=0 file=tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php filter=none db=rv_b_b_paidlineadapterv2_
+2026-10-08T08:58:24Z end b-PaidLineAdapterV2 exit=0 OK (20 tests, 26 assertions)
+2026-10-08T08:58:24Z stream b DONE
+2026-10-08T09:01:46Z end a-Journey exit=0 OK (21 tests, 139 assertions)
+2026-10-08T09:01:46Z stream a DONE

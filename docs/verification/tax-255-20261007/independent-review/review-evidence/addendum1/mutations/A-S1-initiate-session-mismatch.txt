@@ -1,0 +1,21 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+................F....                                             21 / 21 (100%)
+
+Time: 01:49.499, Memory: 114.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutJourneyTest::test_initiate_refuses_a_retrieved_session_that_is_not_the_created_one_and_binds_nothing
+A different retrieved session was bound or returned.
+
+/home/user/VA-Studio-review-tax255b-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php:273
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 21, Assertions: 135, Failures: 1.
+

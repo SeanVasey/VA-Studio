@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" tests="10" assertions="9" errors="2" failures="7" skipped="0" time="14.071257">
+    <testcase name="test_activation_without_any_credit_event_is_refused" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="22" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="2.012321">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_activation_without_any_credit_event_is_refused
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:25
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_activation_with_only_award_and_reserve_is_refused" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="30" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.261988">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_activation_with_only_award_and_reserve_is_refused
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:34
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_exact_consume_admits_one_activation_and_every_mismatch_is_refused" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.769080">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_exact_consume_admits_one_activation_and_every_mismatch_is_refused
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_consume_for_another_origin_does_not_couple" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="55" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.063717">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_consume_for_another_origin_does_not_couple
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:61
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_consume_for_another_redemption_does_not_couple" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="65" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.534950">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_consume_for_another_redemption_does_not_couple
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:73
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_released_reservation_cannot_be_consumed_or_activated" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="77" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="2" time="1.225822">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_released_reservation_cannot_be_consumed_or_activated
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_consume_after_activation_time_does_not_couple" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="93" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.316839">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_consume_after_activation_time_does_not_couple
+An activation must be coupled to its exact consume event.
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:149
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:99
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_additive_successor_completes_an_empty_pre_coupling_install" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="102" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="0" time="1.087904">
+      <error type="PDOException">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_additive_successor_completes_an_empty_pre_coupling_install
+PDOException: SQLSTATE[HY000]: General error: 1 no such trigger: production_member_activations_consume
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:105
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_additive_successor_refuses_to_adopt_an_uncoupled_activation" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="115" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="0" time="1.379835">
+      <error type="PDOException">Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest::test_additive_successor_refuses_to_adopt_an_uncoupled_activation
+PDOException: SQLSTATE[HY000]: General error: 1 no such trigger: production_member_activations_consume
+
+/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_successor_down_refuses" file="/home/user/VA-Studio-member-ops/tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php" line="134" class="Tests\Feature\ProductionMemberOriginals\MemberActivationCouplingSchemaTest" classname="Tests.Feature.ProductionMemberOriginals.MemberActivationCouplingSchemaTest" assertions="1" time="1.418802"/>
+  </testsuite>
+</testsuites>

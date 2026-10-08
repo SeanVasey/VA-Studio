@@ -12,6 +12,15 @@ final class MemberGrantSchema
 {
     public const TABLES = ['production_member_profiles', 'production_member_definitions', 'production_member_origins', 'production_member_artifacts', 'production_member_activations'];
 
+    /**
+     * Additive guard suffix (finding F2). An activation is admitted only beside the exact 257 consume
+     * event for its origin, redemption, readiness receipt and member purpose, whose reservation is the
+     * reserve event sealed as reservation_event_hash. It is the last owned guard, so a schema installed
+     * before it existed is an owned contiguous prefix that the 258100 migration completes only while
+     * no activation row exists. Write order in the owned transaction: consume event, then activation.
+     */
+    public const COUPLING = 'consume';
+
     public function table(string $logical): string
     {
         MemberGrantException::require(in_array($logical, self::TABLES, true), 'schema');
@@ -147,7 +156,7 @@ final class MemberGrantSchema
 
     private function physical(string $logical): string
     {
-        if (in_array($logical, [...self::TABLES, 'production_membership_redemptions', 'production_membership_paid_periods'], true)) {
+        if (in_array($logical, [...self::TABLES, 'production_membership_redemptions', 'production_membership_paid_periods', 'production_membership_credit_events'], true)) {
             return DB::connection()->getTablePrefix().$logical;
         }
         MemberGrantException::require(in_array($logical, ['users', 'customer_accounts'], true), 'schema');
@@ -247,9 +256,17 @@ final class MemberGrantSchema
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE origin_id = NEW.origin_id OR redemption_id = NEW.redemption_id)'
                 .' AND EXISTS (SELECT 1 FROM '.$origins.' o WHERE o.id = NEW.origin_id AND o.redemption_id = NEW.redemption_id AND o.artifact_manifest_hash = NEW.artifact_manifest_hash AND NEW.created_at < o.honor_deadline AND o.artifact_count = (SELECT COUNT(*) FROM '.$artifacts.' WHERE origin_id = o.id))';
         }
+        $guards = [['insert', 'insert', $insert], ['update', 'update', '0 = 1'], ['delete', 'delete', '0 = 1']];
+        if ($logical === self::TABLES[4]) {
+            $events = $this->physical('production_membership_credit_events');
+            $guards[] = [self::COUPLING, 'insert', 'EXISTS (SELECT 1 FROM '.$events.' c JOIN '.$events.' r ON r.id = c.reservation_event_id'
+                ." WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id"
+                .' AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at'
+                ." AND r.kind = 'reserve' AND r.period_id = c.period_id AND r.redemption_id = NEW.redemption_id AND r.seal = NEW.reservation_event_hash)"];
+        }
         $result = [];
-        foreach (['insert' => $insert, 'update' => '0 = 1', 'delete' => '0 = 1'] as $event => $condition) {
-            $guard = $name.'_'.$event;
+        foreach ($guards as [$suffix, $event, $condition]) {
+            $guard = $name.'_'.$suffix;
             $condition = $driver === 'sqlite' ? str_replace('main.', '', $condition) : $condition;
             $body = "BEGIN IF NOT COALESCE(({$condition}), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain production member originals'; END IF; END";
             $sql = $driver === 'mysql' ? 'CREATE TRIGGER `'.$guard.'` BEFORE '.strtoupper($event).' ON '.$table.' FOR EACH ROW '.$body
@@ -267,7 +284,7 @@ final class MemberGrantSchema
             $name = DB::connection()->getTablePrefix().$logical;
             $this->table($logical);
             $reserved[strtolower($name)] = ['name' => $name, 'type' => 'table'];
-            foreach (['insert', 'update', 'delete'] as $event) {
+            foreach ([...['insert', 'update', 'delete'], ...($logical === self::TABLES[4] ? [self::COUPLING] : [])] as $event) {
                 $guard = $name.'_'.$event;
                 $reserved[strtolower($guard)] = ['name' => $guard, 'type' => 'trigger'];
             }

@@ -1,0 +1,57 @@
+# round2-af089d40: head af089d401376205adbe9db36234a4f1e6b5a1ec4 base 9c2f99289da36a17f405e68ab7396fa2d7d6a9d9 status-lines=0
+## red (app app/Domain/Memberships/Billing/BillingWebhookIntake.php at 9c2f99289da36a17f405e68ab7396fa2d7d6a9d9)
+ M app/Domain/Memberships/Billing/BillingWebhookIntake.php
+### BillingWebhookRedeliveryTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+......F.FF.                                                       11 / 11 (100%)
+
+Time: 00:14.876, Memory: 91.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_invoice_payment_paid_dispatches_for_the_binding_that_owns_the_invoice_identity
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => '52bdaaca-f591-4394-a679-40fa6e3a0fb2',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:155
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_a_lost_invoice_payment_dispatch_is_recovered_by_redelivery_through_the_same_identity
+The unbound gateway must make the first dispatch fail after the hint committed.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:249
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:180
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingWebhookRedeliveryTest::test_concurrent_loser_recovers_a_winner_whose_dispatch_was_lost
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => 'fc1594c4-877e-4fdd-9b8f-8a767ab61add',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php:196
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 50, Failures: 3.
+rc=1
+restored status-lines=0
+## green (app at af089d401376205adbe9db36234a4f1e6b5a1ec4)
+### BillingWebhookRedeliveryTest
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-redgreen/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 00:14.540, Memory: 91.00 MB
+
+OK (11 tests, 56 assertions)
+rc=0

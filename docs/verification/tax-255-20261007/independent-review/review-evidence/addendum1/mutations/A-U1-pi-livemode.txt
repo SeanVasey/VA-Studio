@@ -1,0 +1,34 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+.....................                                             21 / 21 (100%)
+
+Time: 01:43.313, Memory: 114.00 MB
+
+OK (21 tests, 139 assertions)
+
+===== /home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php::test_q1_provider_facts exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255b-aux/phpunit.xml
+
+.....F............                                                18 / 18 (100%)
+
+Time: 01:25.551, Memory: 112.00 MB
+
+There was 1 failure:
+
+1) Tests\ReviewProbes\TaxReviewMoneyProbeTest::test_q1_provider_facts_that_must_not_be_retained@PI livemode true with data (null, Closure Object (), 'provider_uncertain/503')
+reconcile accepted
+
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php:98
+/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/probes/TaxReviewMoneyProbeTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 18, Assertions: 70, Failures: 1.
+

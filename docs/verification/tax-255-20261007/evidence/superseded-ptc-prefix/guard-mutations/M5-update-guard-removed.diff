@@ -1,0 +1,11 @@
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 22:45:34.773059803 +0000
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 22:46:15.585489509 +0000
+@@ -88,7 +88,7 @@
+             }
+         }
+         foreach (self::definitions() as $table => $definition) {
+-            foreach (['INSERT', 'UPDATE', 'DELETE'] as $operation) {
++            foreach (['INSERT', 'DELETE'] as $operation) {
+                 $name = $definition['prefix'].'_'.strtolower($operation);
+                 $condition = $operation === 'INSERT' ? self::insertCondition($driver, $definition['kind']) : null;
+                 if ($mysql) {

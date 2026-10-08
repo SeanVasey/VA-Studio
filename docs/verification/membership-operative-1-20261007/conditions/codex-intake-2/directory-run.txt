@@ -1,0 +1,12 @@
+# Directory run tests/Feature/ProductionMembershipBilling (SQLite in-memory)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops/phpunit.xml
+
+...............................................................  63 / 104 ( 60%)
+.........................................                       104 / 104 (100%)
+
+Time: 01:35.531, Memory: 107.00 MB
+
+OK (104 tests, 451 assertions)
