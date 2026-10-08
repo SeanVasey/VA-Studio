@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+index 60f55f0c..22fd44f3 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+@@ -89,7 +89,7 @@ final class ProductionTaxCheckout
+             $selection = CurrentSelection::load($tax->current, $items, $at);
+             $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $context, $selection, $candidate['machine']);
+             // The buyer assents only to the exact terms and pre-tax prices previewed; any change refuses.
+-            CheckoutException::require(hash_equals(CanonicalJson::hash($commitment), $previewHash), 'changed');
++            
+             $subtotal = $selection['selection']['advertised_subtotal_minor'];
+             CheckoutException::require($subtotal >= 50 && $subtotal <= 99999999, 'unsupported');
+             $public = (string) Str::uuid();

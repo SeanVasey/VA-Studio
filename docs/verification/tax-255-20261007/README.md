@@ -120,9 +120,8 @@ What is **not** native evidence, retained under its own name:
 
 ## Untested
 
-- Native MySQL for `ProductionTaxCheckoutMigrationTest` (the installer refusal matrix) and for the Journey, SourceV2, HttpBoundary and Policy classes. Only the Guard and NativeSchema classes ran natively, as above. No MySQL concurrency or race proof of the unique keys (for example two concurrent `initiate` calls racing on one request).
+- Lane-authored native runs beyond Guard and NativeSchema. The independent reviewer has since run Migration, Policy, Journey, SourceV2, PaidLineAdapterV2 and FrozenV1 natively (114 / 713 with its probes, 0 failures; see the review section below); `ProductionTaxCheckoutMigrationTest` still skips 8 of its 10 cases on MySQL by design, and HttpBoundary ran on SQLite only. No MySQL concurrency or race proof of the unique keys (for example two concurrent `initiate` calls racing on one request).
 - Foundation CI (manual final verification only, per the cost policy). No hosted workflow was dispatched for this branch.
-- Integration with current `main` (`fad3ab44`): the branch is not rebased, and nothing was run against it.
 - HTTP mounting: the routes, privacy middleware, response sanitization and provider registration are not mounted, so no real request path was exercised. `ProductionTaxCheckoutHttpBoundaryTest` drives the controller and middleware directly.
 - The migration lives in `database/migrations/`, so an ordinary `php artisan migrate` installs the four tables wherever it runs. The tables stay empty and inert while the policy is off.
 - Any real Stripe call. All provider responses come from `tests/Support/RecordingTaxCheckoutTransport.php`, a synthetic in-process fixture restricted to testing and test funds. Its tax figures (437 minor units per line) stand in for a provider calculation and are not one. Real Stripe Tax behavior is unverified: `automatic_tax.status` transitions, line `amount_tax` with `tax_behavior`, rounding, `liability`, and the expanded `line_items.data.price.tax_behavior`.
@@ -152,3 +151,42 @@ assertions, 0 failures, 0 errors, 3 skipped (native-only), exit 0
 `fad3ab44`; the A1b `CheckoutCommitAdmission` interface and the now-public
 `MachinePolicyV1::origin()` are the only changes to V1 helpers Tax255 calls, and Tax255
 registers no observer.
+
+## Independent review (`9ec94d8c`)
+
+`independent-review/DECISION.md`: **APPROVE WITH CONDITIONS for a development merge
+only** of a default-off, unregistered and unmounted family. It does not approve
+activation, registering the provider/middleware/routes, any real transport, Stripe call or
+test charge, live funds, wiring the adapter or SourceV2 into Paid252 or any grant path, or
+any merchant or tax fact. The lane's own release blockers stand (V2
+`CheckoutCommitAdmission`, the A4 transport, unknown-outcome retention, MySQL race proof).
+
+Native MySQL 8.4.11 (reviewer, private instance): Guard 6/118, NativeSchema 3/22,
+Migration 10/191 (8 skipped by design), Policy 43/147, Journey 15/109, SourceV2 3/42,
+PaidLineAdapterV2 19/24, FrozenV1 2/27, installer probe 12/29, line-feed probe 1/4;
+114 / 713, 0 failures. Frozen V1: all nine files byte-identical on the composition record,
+`9ec94d8c` and `fad3ab44`. The 17 adjacent failures reproduce identically on `fad3ab44`
+and `73c898db`. 14 mutations applied and reverted.
+
+Conditions:
+
+1. **R-1 Medium (no consumer yet):** `ProductionTaxPaidLineAdapterV2::accept()` checks
+   only an unkeyed self-hash, so a resealed forged line (moved to another order with zero
+   tax, or a `verified_production`/`live` line with an id no producer can mint) is
+   accepted. Before any Paid252/V2 wiring: bind `accept` to the held source line
+   (`Evidence::same($source->line($p), $line)`) or key the hash, refuse
+   `verified_production`/`live` until a reviewed live producer exists, and add both
+   forgeries as regressions.
+2. **R-2 Low:** the lane suite misses PaymentIntent amount/`amount_received` and
+   currency mismatches (four mutations survive it). Port the reviewer's money-probe cases
+   into the Journey test before activation or A4.
+3. **R-3 Low:** the MySQL provider-id guards' `REGEXP '...$'` accepts a trailing line
+   feed (`acct_…\n`, `cs_test_…\n`, `pi_…\n`); SQLite refuses. Runtime checks stop the
+   app writing them. Bound the pattern and add the three cases to the Guard test.
+4. **R-4 Low:** the installer refusal matrix is untested on MySQL by design. Port the
+   reviewer's 11-case native installer probe into the suite and the census.
+5. **R-5 Low:** `initiate()` (and `reconcile()`) never compare the retrieved `session.id`
+   with the created one; `retain()` refuses the mismatch later. Require equality at both.
+
+The three native-only `ProductionTaxCheckoutNativeSchemaTest` methods were added to the
+exact SQLite census in `75d3ea85`.

@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+index 60f55f0c..00d69086 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxCheckout.php
+@@ -137,7 +137,7 @@ final class ProductionTaxCheckout
+         if ($prepared['intent']['reviewed'] !== null) {
+             return $this->status($principal, $buyer, $orderId);
+         }
+-        $transport = TaxCheckoutPolicy::transport($this->transport);
++        $transport = $this->transport;
+         $context = $prepared['order']['context'];
+         $request = $prepared['intent']['body'];
+         try {

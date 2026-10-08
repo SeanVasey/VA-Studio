@@ -1,0 +1,29 @@
+# Registration and configuration census at head 9ec94d8c9838e92311cb60f24fffdc0ec9af64de and origin/main fad3ab444e89ffb57dc915f61f7f788b626e330a
+## HEAD
+  bootstrap/providers.php: matches=0
+  bootstrap/app.php: matches=0
+  routes/web.php: matches=0
+  routes/console.php: matches=0
+  config/app.php: matches=0
+  repo-wide references to ProductionTaxCheckoutServiceProvider / routes/production-tax-checkout.php / ProductionTaxCheckoutPrivacy outside owned files:
+## fad3ab444e89ffb57dc915f61f7f788b626e330a
+  bootstrap/providers.php: matches=0
+  bootstrap/app.php: matches=0
+  routes/web.php: matches=0
+  routes/console.php: matches=0
+  config/app.php: matches=0
+  repo-wide references to ProductionTaxCheckoutServiceProvider / routes/production-tax-checkout.php / ProductionTaxCheckoutPrivacy outside owned files:
+## config/production-tax-checkout.php env()/getenv/$_ENV/$_SERVER reads:
+  none
+## owned runtime env()/getenv reads:
+  none
+## .env.example mentions:
+  none
+## Route table (artisan route:list filter tax-checkout), APP_ENV=testing:
+
+   ERROR  Your application doesn't have any routes matching the given criteria.  
+
+## Registered providers containing Tax (runtime):
+[]
+bound TaxCheckoutTransport: false
+config enabled: {"enabled":false,"provider":null,"funds_mode":null,"account_id":null,"return_origin":null,"stripe_sdk_version":"21.3.2","stripe_api_version":"2026-08-26.dahlia"}

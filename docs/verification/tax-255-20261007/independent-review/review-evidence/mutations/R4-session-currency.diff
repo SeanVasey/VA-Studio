@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..021ad366 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -173,7 +173,7 @@ final class TaxCheckoutEvidence
+         $automatic = $session['automatic_tax'] ?? null;
+         CheckoutException::require(($session['object'] ?? null) === 'checkout.session' && OwnAccountStripeGateway::sessionId($session['id'] ?? null, $mode)
+             && ($session['livemode'] ?? null) === ($mode === 'live') && ($session['account'] ?? null) === null && ($session['context'] ?? null) === null
+-            && ($session['mode'] ?? null) === 'payment' && ($session['currency'] ?? null) === 'usd' && ($session['client_reference_id'] ?? null) === $request['order_public_id']
++            && ($session['mode'] ?? null) === 'payment' && ($session['client_reference_id'] ?? null) === $request['order_public_id']
+             && ($session['amount_subtotal'] ?? null) === $subtotal && is_int($tax) && $tax >= 0 && is_int($session['amount_total'] ?? null)
+             && ($session['expires_at'] ?? null) === $params['expires_at'] && ($session['total_details']['amount_discount'] ?? null) === 0
+             && in_array($session['total_details']['amount_shipping'] ?? null, [0, null], true)
