@@ -1,0 +1,65 @@
+### tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..E.                                                                4 / 4 (100%)
+
+Time: 00:06.426, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_retrieval_that_began_first_and_finished_first_is_still_appended_in_order
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (superseded_retrieval).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingException.php:19
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingLedger.php:120
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingLedger.php:113
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingReconciliation.php:80
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:157
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:87
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 4, Assertions: 15, Errors: 1.
+rc=2
+### tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+.............                                                     13 / 13 (100%)
+
+Time: 00:16.347, Memory: 99.00 MB
+
+OK (13 tests, 42 assertions)
+rc=0
+### tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..............                                                    14 / 14 (100%)
+
+Time: 00:19.084, Memory: 99.00 MB
+
+OK (14 tests, 54 assertions)
+rc=0
+### tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 00:15.495, Memory: 97.00 MB
+
+OK (11 tests, 90 assertions)
+rc=0

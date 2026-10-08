@@ -1,0 +1,14 @@
+diff --git a/app/Jobs/RetrieveMembershipInvoice.php b/app/Jobs/RetrieveMembershipInvoice.php
+index 828ad6f6..1d215433 100644
+--- a/app/Jobs/RetrieveMembershipInvoice.php
++++ b/app/Jobs/RetrieveMembershipInvoice.php
+@@ -57,9 +57,6 @@ final class RetrieveMembershipInvoice implements ShouldQueue
+         try {
+             $observation = $reconciliation->retrieve($this->bindingId, $this->invoiceRef());
+         } catch (BillingException $error) {
+-            if ($error->reason === 'superseded_retrieval') {
+-                return;
+-            }
+ 
+             throw $error;
+         }

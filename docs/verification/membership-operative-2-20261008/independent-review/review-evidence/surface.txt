@@ -1,0 +1,20 @@
+$ git diff --stat 2bd78cce 212d0d4c -- routes bootstrap app/Providers config database composer.json composer.lock package.json package-lock.json .github
+rc=0
+$ grep -rnE "BillingProviderGateway|BillingWebhookIntake|RetrieveMembershipInvoice|BillingReconciliation|SweepMembershipBillingHints|sweep-hints" app/Providers routes bootstrap config
+rc=1 (1 = nothing registered or bound)
+$ git diff 2bd78cce 212d0d4c -- app | grep -nE "^\+.*(credit_event|award|grant|UPDATE |DELETE |->update\(|->delete\()"
+rc=1
+$ git diff --stat 212d0d4c 6219f283 -- app/Domain/Memberships app/Jobs app/Console tests/Feature/ProductionMembershipBilling tests/Feature/ProductionMembership
+rc=0
+$ php artisan list | grep membership-billing (APP_KEY synthetic)
+membership-billing:sweep-hints            List retained membership billing webhook hints that no retrieval has covered; --dispatch re-queues their retrievals.
+rc=0
+$ php artisan membership-billing:sweep-hints (shipped config, testing env, sqlite)
+Refused (disabled).
+rc=1
+$ grep -n "enabled\|provider_io" config/production-membership-billing.php
+9:    'enabled' => false,
+10:    'provider_io_enabled' => false,
+$ ls database/migrations | grep 259
+2026_10_07_259000_production_membership_billing.php
+migration diff rc=0

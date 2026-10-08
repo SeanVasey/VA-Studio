@@ -1,0 +1,26 @@
+### tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...............F.                                                 17 / 17 (100%)
+
+Time: 00:18.007, Memory: 97.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembership\MembershipRowsFunctionClosureTest::test_a_clone_of_a_captured_frame_is_refused_and_destroying_it_never_releases_the_live_pin
+The live frame still pins the handle, so SQLite must refuse to replace BINARY.
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:203
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 17, Assertions: 59, Failures: 1.
+rc=1

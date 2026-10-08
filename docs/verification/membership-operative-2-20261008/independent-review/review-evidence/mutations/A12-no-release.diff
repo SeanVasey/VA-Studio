@@ -1,0 +1,13 @@
+diff --git a/app/Jobs/RetrieveMembershipInvoice.php b/app/Jobs/RetrieveMembershipInvoice.php
+index 828ad6f6..8166f77d 100644
+--- a/app/Jobs/RetrieveMembershipInvoice.php
++++ b/app/Jobs/RetrieveMembershipInvoice.php
+@@ -66,7 +66,7 @@ final class RetrieveMembershipInvoice implements ShouldQueue
+         $attempt = $this->attempts();
+         if (BillingReconciliation::isInconclusive($observation) && $attempt < $this->tries) {
+             $backoff = $this->backoff();
+-            $this->release($backoff[$attempt - 1] ?? $backoff[array_key_last($backoff)]);
++            // release removed
+         }
+     }
+ }

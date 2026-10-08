@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingException.php b/app/Domain/Memberships/Billing/BillingException.php
+index 7567ec5d..cc90f42d 100644
+--- a/app/Domain/Memberships/Billing/BillingException.php
++++ b/app/Domain/Memberships/Billing/BillingException.php
+@@ -10,7 +10,7 @@ final class BillingException extends \RuntimeException
+ {
+     public function __construct(public readonly string $reason = 'unavailable')
+     {
+-        parent::__construct('Production membership billing unavailable ('.(preg_match('/\A[a-z0-9_]{1,80}\z/D', $reason) === 1 ? $reason : 'unavailable').').');
++        parent::__construct('Production membership billing unavailable.');
+     }
+ 
+     public static function require(bool $condition, string $reason = 'unavailable'): void

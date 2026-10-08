@@ -1,0 +1,24 @@
+### tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..............                                                    14 / 14 (100%)
+
+Time: 00:19.828, Memory: 99.00 MB
+
+OK (14 tests, 54 assertions)
+rc=0
+### tests/Feature/ProductionMembershipBilling/BillingSettlementTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...........................................                       43 / 43 (100%)
+
+Time: 00:01.214, Memory: 71.00 MB
+
+OK (43 tests, 133 assertions)
+rc=0

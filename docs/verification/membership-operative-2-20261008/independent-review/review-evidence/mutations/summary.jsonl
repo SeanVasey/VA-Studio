@@ -1,0 +1,19 @@
+{"id": "R1-no-pin-drop", "file": "app/Domain/Memberships/Production/MembershipRows.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R1-no-clone-guard", "file": "app/Domain/Memberships/Production/MembershipRows.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R6-no-app-check", "file": "app/Domain/Memberships/Billing/BillingLedger.php", "rcs": [1, 2], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R6-strict-equal", "file": "app/Domain/Memberships/Billing/BillingLedger.php", "rcs": [2, 0, 0, 0], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R6-no-trigger-clause", "file": "app/Domain/Memberships/Billing/BillingSchema.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R6-no-mysql-lock", "file": "app/Domain/Memberships/Billing/BillingLedger.php", "rcs": [0], "verdict": "SURVIVED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "R6-start-after-io", "file": "app/Domain/Memberships/Billing/BillingReconciliation.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A11-no-validated", "file": "app/Domain/Memberships/Billing/BillingReconciliation.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A11-validated-ignores-invoice-id", "file": "app/Domain/Memberships/Billing/BillingSettlement.php", "rcs": [0, 0], "verdict": "SURVIVED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A12-no-release", "file": "app/Jobs/RetrieveMembershipInvoice.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A12-tries-1", "file": "app/Jobs/RetrieveMembershipInvoice.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A12-superseded-rethrown", "file": "app/Jobs/RetrieveMembershipInvoice.php", "rcs": [2], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A12-sweep-no-dedupe", "file": "app/Domain/Memberships/Billing/BillingHintSweep.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A12-sweep-no-policy", "file": "app/Console/Commands/SweepMembershipBillingHints.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A13-created-at", "file": "app/Domain/Memberships/Billing/BillingHintRecovery.php", "rcs": [1, 0], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A13-same-second-covers", "file": "app/Domain/Memberships/Billing/BillingHintRecovery.php", "rcs": [0, 0], "verdict": "SURVIVED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A14-plaintext-ref", "file": "app/Jobs/RetrieveMembershipInvoice.php", "rcs": [2], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A14-generic-message", "file": "app/Domain/Memberships/Billing/BillingException.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}
+{"id": "A14-unfiltered-reason", "file": "app/Domain/Memberships/Billing/BillingException.php", "rcs": [1], "verdict": "KILLED", "restored_hash_matches_head": true, "clean_status": true}

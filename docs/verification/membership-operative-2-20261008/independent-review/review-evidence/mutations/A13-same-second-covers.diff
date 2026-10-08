@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingHintRecovery.php b/app/Domain/Memberships/Billing/BillingHintRecovery.php
+index 5d416608..b4b63451 100644
+--- a/app/Domain/Memberships/Billing/BillingHintRecovery.php
++++ b/app/Domain/Memberships/Billing/BillingHintRecovery.php
+@@ -84,7 +84,7 @@ final class BillingHintRecovery
+         $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
+             .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.retrieval_started_at >= ? AND o.outcome <> ? '
+             .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
+-        $statement->execute([$invoiceRefHash, BillingValues::utcMicro($received->addSecond()), 'unknown']);
++        $statement->execute([$invoiceRefHash, BillingValues::utcMicro($received), 'unknown']);
+         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+             if ($row['outcome'] !== 'refused') {
+                 return true;

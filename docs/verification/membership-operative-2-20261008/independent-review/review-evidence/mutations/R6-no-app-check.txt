@@ -1,0 +1,61 @@
+### tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+FF..                                                                4 / 4 (100%)
+
+Time: 00:05.542, Memory: 91.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_settled_snapshot_appended_after_a_newer_reversal_is_refused_and_never_becomes_current
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:65
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_first_retrieval_cannot_claim_the_tail_after_a_fresh_one_created_the_identity
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'superseded_retrieval'
++'observation_contention'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:79
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 17, Failures: 2.
+rc=1
+### tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..........E..                                                     13 / 13 (100%)
+
+Time: 00:16.347, Memory: 99.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_overtaken_by_a_newer_one_completes_without_a_retry_and_records_nothing
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (observation_contention).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingLedger.php:146
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingReconciliation.php:80
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:135
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 13, Assertions: 39, Errors: 1.
+rc=2
