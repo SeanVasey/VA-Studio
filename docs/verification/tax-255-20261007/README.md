@@ -15,7 +15,7 @@ A new, separate family, `App\Domain\Commerce\ProductionTaxCheckout`. It never ch
 3. **Hosted session binding.** With an admitted transport, `create` returns only a locator. An authoritative `retrieve` must match the retained request exactly before the provider session id is bound (one row).
 4. **Buyer-reviewed session retained once.** `reconcile()` does authoritative GETs only. It retains a session only when it is `complete`, `paid`, `automatic_tax.status = complete`, and the PaymentIntent has `succeeded` with `amount_received` equal to the provider total. The record keeps the provider's subtotal, tax and total, the per-line tax, `automatic_tax {enabled, status, provider}`, and the safe session and payment projections. Customer details, address, email, tax ids and `client_secret` are never retained.
 5. **SourceV2.** `ProductionTaxPaidOrderLocatorV2` and `ProductionTaxPaidOrderSourceV2` follow the V1 seam shape: locate without a lock, prelock T23 historical identity, `lockedRead` under a held transaction (reusing V1 `HeldSourceTransaction`), `proveRetainedCurrent`, and refusal to serialize. The line format is a **new purpose**: `schema_version: 2`, `producer: production_tax_checkout_v2`. Tax facts sit in a separate `tax` block next to `pre_tax`. The V1 top-level field names `line_tax_minor`, `line_amount_minor`, `amounts` and `payment_id` are absent at the top level. Tax figures appear only nested inside `pre_tax` and `tax`.
-6. **Separate V2 paid consumer adapter.** `ProductionTaxPaidLineAdapterV2::accept($line, $provenance)` returns an authenticated V2 line unchanged, or refuses with 409. It refuses any V1-shaped line outright (`source_version`), including a V2 line with a grafted V1 tax field. It recomputes `source_hash` and every sub-hash and checks the tax arithmetic and provenance. Since follow-up commit `39e3da68` it also requires the line's own retained `execution_context` to agree with the line's funds mode, provider account, provenance and tax behavior, and refuses an order tax above that context's `maximum_rate_bps` (`tax_ceiling`, 409). `source_hash` is an unkeyed self-hash, so the adapter checks consistency. Authenticity comes from `ProductionTaxPaidOrderSourceV2::lockedRead` reading the retained rows. The V1 reader (`PaidGrantPolicy::source` on the paid252 lane) is untouched.
+6. **Separate V2 paid consumer adapter.** `ProductionTaxPaidLineAdapterV2::accept($source, $position, $line, $provenance)` (since the R-1 hardening; see `hardening/README.md`) requires `$line` to be byte-identical to the held `ProductionTaxPaidOrderSourceV2`'s `line($position)` (`source_binding`) and refuses any provenance other than `synthetic_rehearsal` (`live_unsupported`); it returns the authenticated V2 line unchanged, or refuses with 409. It refuses any V1-shaped line outright (`source_version`), including a V2 line with a grafted V1 tax field. It recomputes `source_hash` and every sub-hash and checks the tax arithmetic and provenance. Since follow-up commit `39e3da68` it also requires the line's own retained `execution_context` to agree with the line's funds mode, provider account, provenance and tax behavior, and refuses an order tax above that context's `maximum_rate_bps` (`tax_ceiling`, 409). `source_hash` is an unkeyed self-hash, so those checks (now `assertSelfConsistent()`) establish consistency only; authenticity comes from binding the line to the held `ProductionTaxPaidOrderSourceV2::lockedRead` source, which reads the APP_KEY-sealed retained rows. The V1 reader (`PaidGrantPolicy::source` on the paid252 lane) is untouched.
 
 ### Tax is never computed locally
 
@@ -190,3 +190,18 @@ Conditions:
 
 The three native-only `ProductionTaxCheckoutNativeSchemaTest` methods were added to the
 exact SQLite census in `75d3ea85`.
+
+## Hardening after review (R-1 to R-6)
+
+Fixed on this branch with regressions red before and green after; details and evidence in
+`hardening/README.md`. R-1 binds `accept` to the held source and refuses non-synthetic provenance;
+R-2 adds the PaymentIntent amount/`amount_received`/currency and session currency cases; R-3 bounds
+the MySQL provider and session id guards without `$` (migration 255000 has never been applied to a
+production database, so its guard text is edited in place; any dev or CI database that ran the old
+text must be recreated, because the installer will not adopt it); R-4 adds the native-only
+`ProductionTaxCheckoutNativeInstallerTest` (14 cases, census +2 names); R-5 requires the retrieved
+session id to equal the created or bound one (`session_mismatch`); R-6 (Codex) refuses a guard trigger
+whose `DEFINER` or `SQL_MODE` differs from the installer's session, as V1 does.
+SQLite directory 142 / 995, 17 native-only skips; native MySQL 8.4.11: NativeInstaller 14/46,
+Guard 7/123, NativeSchema 3/22, Migration 10/191; Journey, SourceV2, adapter, Policy and HttpBoundary
+SQLite only. Frozen V1 files untouched.
