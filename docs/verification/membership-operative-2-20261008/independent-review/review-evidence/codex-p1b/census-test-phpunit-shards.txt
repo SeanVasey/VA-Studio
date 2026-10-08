@@ -1,0 +1,7 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42; cmd: python3 -I scripts/ci/test-phpunit-shards.py; no untracked file under tests/: 0 entries
+....................................
+----------------------------------------------------------------------
+Ran 36 tests in 0.036s
+
+OK
+rc=0

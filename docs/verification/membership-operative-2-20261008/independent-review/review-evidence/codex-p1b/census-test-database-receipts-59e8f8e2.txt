@@ -1,0 +1,7 @@
+# head: 59e8f8e2a60e378499c9df103b2e28ecf3b8ad1b; cmd: python3 -I scripts/ci/test-database-receipts.py; untracked under tests/: 0
+..................................
+----------------------------------------------------------------------
+Ran 34 tests in 9.209s
+
+OK
+rc=0

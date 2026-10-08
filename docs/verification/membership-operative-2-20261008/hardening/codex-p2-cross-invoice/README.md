@@ -34,7 +34,11 @@ owned-schema check compares the stored trigger with the text this class generate
     `EXISTS invoices WHERE id = NEW.invoice_id` reads only the row's own invoice (which its append already locks).
   - events: `id`, `provider_event_ref_hash` (unique), hint `position`, `hint_position` (unique): no OR. Unchanged.
   - positions: `NEW.id < 1`, no subquery. Unchanged.
-- `lockIdentity()` is kept unchanged (the review's storm data shows it reduces same-invoice deadlocks).
+- `lockIdentity()` is kept unchanged. It is not load-bearing for correctness: the UNIQUE `(invoice_id, sequence)` index and the
+  append retry serialize each chain. The follow-up review's storms showed no measurable deadlock difference with or without it
+  (`../../independent-review/ADDENDUM-CODEX-P1B.md`, P1B-3). It is kept so same-invoice appenders queue, and it no longer
+  delays unrelated invoices. An earlier version of this line said the storm data showed it reduces deadlocks; the data does
+  not support that.
 
 `observations()` under the lock: left as is. Inside the append transaction it proves the owned schema (information_schema reads)
 and recomputes every seal of the chain before deciding the tail. Moving the schema proof before the lock would open a window in

@@ -1,0 +1,18 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42; untracked under tests/: 0
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --log-junit sqlite-01-ProductionMembershipBilling.xml tests/Feature/ProductionMembershipBilling
+# start: 2026-10-08T20:14:25Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+.............SSSS..............................................  63 / 179 ( 35%)
+............................................................... 126 / 179 ( 70%)
+.....................................................           179 / 179 (100%)
+
+Time: 02:09.322, Memory: 205.00 MB
+
+OK, but some tests were skipped!
+Tests: 179, Assertions: 886, Skipped: 4.
+rc=0
+# end: 2026-10-08T20:16:34Z
