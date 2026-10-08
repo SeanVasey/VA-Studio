@@ -602,3 +602,138 @@ Note on the committed reviewer probe: Pint flags `addendum1/probes/AddendumProbe
 - Private instance :3751 (pid 14614) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3751; the only remaining entries are client sockets in TIME_WAIT. Its datadir `scratchpad/review-free256c-mysql/data` was deleted.
 - The lifecycle is in `addendum3/native/private-instance-lifecycle.txt`.
 - The review worktree `/home/user/VA-Studio-review-free256b` is detached at `613bf539`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum3/`. Nothing was committed or pushed.
+
+## Addendum 4: stalled reads, renderable text, sidecars and render lease, `613bf539..06dfb531` (evidence head `2f787589`)
+
+Scope:
+
+| Code commit | Evidence commit | Fix |
+| --- | --- | --- |
+| `81ca184b` | `792af167` | A3-1 (stalled source reads) and A3-2 (renderer-unsupported text), Codex P2 6 and 7 |
+| `17ef19bc` | `817dd34c` | Partial reservation sidecars |
+| `06dfb531` | `2f787589` | Render lease must outlive the renderer timeout |
+
+- Before checkout, the addendum-3 files were compared byte for byte with `fad51001`: all identical, nothing lost.
+- Same reviewer and rules: no commit or push, and no change to app code, flags or registration.
+- Native environment: a private `mysqld` 8.4.11 on 127.0.0.1:3781 with schema `rv256d`. It was shut down and its datadir deleted. Other lanes' instances (3711, 3741, 3767) and 3306 were not touched.
+- Evidence is in `review-evidence/addendum4/`.
+
+### Verdict
+
+**APPROVE WITH CONDITIONS carries to `2f787589` for a development merge.**
+
+- A3-1 is closed for its stated defect: spinning and hanging reads.
+- A3-2 is closed for script, combining-mark and glyph coverage.
+- The partial-sidecar fix and the render-lease fix are correct for what they target.
+- Four new findings at Low or above:
+  - A4-1: page or output overflow still seals an origin that cannot render.
+  - A4-2: an unreclaimable sidecar on slot 0 blocks the whole spool.
+  - A4-3: the stalled-source test fails natively on a wall-clock bound.
+  - A4-4: the authorization TTL bounds the whole transfer, so a 1 GiB master cannot reach slow clients.
+
+### (1) Stalled source reads (`81ca184b`)
+
+- **Mechanism.** The source is set to blocking mode. `stream_set_timeout(max(1, min(5, remaining)))` is set **once** before the loop, not before each read. The deadline is checked before every read, and a timed-out read or an empty read before EOF is refused at once.
+- **Probe with a real unix socket source** (a forked writer, `Addendum4ProbeTest`, one spool slot):
+  - 3-second mid-stream gap: `ok` in 3.4 s.
+  - 1 byte per second for 8 s: `ok` in 8.6 s.
+  - **7-second gap: `refused:artifact_unavailable` in 5.2 s.**
+- **Can a slow but legitimate source be refused spuriously?** **Yes**, if it is silent for more than 5 s between bytes, even with most of the 300-second authorization left. The deadline-only design avoids this; the 5-second cap is a liveness tradeoff.
+  - Acceptable for a host-local adapter, which never stalls for 5 s.
+  - For a remote or object-store adapter, the per-read cap should be configurable, or the adapter should stage locally first.
+  - `stream_set_timeout` has no effect on plain files, so a read hung in the kernel (for example on NFS) is still unbounded. Keep the source host-local.
+  - Recorded as part of condition 5, the sources adapter.
+- **Is the slot and reservation always released?** **Yes**, in every probe outcome: `slot-0.reserve` read back as `00000000000000000000`, no residue was left, and the single slot was reusable afterwards. The lane test asserts the same.
+- **Probe hygiene:** run 1 is retained as `sqlite-addendum4-probe-run1-forked-writer-leak.*`. There the forked writer, writing to a socket the reader had already refused and closed, raised a broken-pipe warning, which the test framework turned into an exception, and so it returned into PHPUnit. The parent's results were the same as in run 2; run 2 uses a writer that always ends with SIGKILL.
+- **Native.** `ProductionFreeGrantStalledSourceTest` fails on MySQL: **A4-3**.
+
+### (2) Renderable text (`ProductionFreeGrantRenderable`)
+
+- **Repertoire.** Admission builds a probe with the renderer's own input builder (`RenderInput::fromOrigin`) and runs the renderer's own `Text::build`, so the script, mark and control rules (`supportedText`) are shared code.
+- **Glyph test.** This is a re-implementation over the same font definition and CIDToGID files.
+  - **Sample verification:** I compared `Renderable::glyph` (via reflection) with the Tcpdf API that `PdfRenderer` uses (`insert` both styles, then `isCharDefined` and a non-zero `getGidForOrd`) on 112,293 scalar values. These were every BMP non-surrogate, about 48,800 random supplementary values, and edge cases. **0 differences.** 5,381 code points are covered in both styles. U+02EF has no glyph, while U+0301 and U+0627 do have glyphs, so their refusal comes from the repertoire, not the font (`glyph-sample.txt`).
+- **Ruling: acceptable for the development merge.** The re-implementation is proved equal on r1 and pinned by `VERIFIED_REVISION`, so a new renderer revision cannot move without repeating the comparison. If the font files drift, the pinned renderer itself refuses through `verifyRuntime`, so the two checks fail together, never with admission looser than rendering.
+- **Recommendation:** share the function through the next renderer profile revision (r2). Before production, have `Renderable` load its fonts through the profile's hash-checked asset list rather than an unhashed path.
+- **Coverage of renderer-fed fields at every write site: complete for repertoire and glyphs.**
+  - Staff fields (title, terms reference, terms text, assent text) are checked at `propose` and re-checked on the stored payload at `approve`, `open` and the customer `review`/`accept`.
+  - The declared name is checked at `review` and `accept`.
+  - Every other rendered value is system-generated or pattern-bound: UUIDs, hashes, ISO times, the account public id, ASCII source ids, generated file names and constant labels.
+  - Probe: Arabic, a decomposed `e` + U+0301 and U+02EF are refused with `unsupported_text` at `review`, `accept` and `propose` (title, terms reference, assent text), with 0 origins written. The addendum-3 probe now flips at `review` as expected.
+- **Gap: A4-1.** Admission does not check the renderer's page limit (100) or output limit (16 MiB). Terms of 32,768 lines (65,535 characters, within the input limit and the repertoire) passed `propose`, `approve`, `open`, `review` and `accept`, and rendering then failed with `render_failed` every time. The sealed origin can never get its original.
+
+### (3) Partial reservation sidecars (`17ef19bc`)
+
+- **Can the reclaim touch a sidecar a live holder is using? No.** `reservation()` for slot N runs only inside `admit()`, after `slot()` has taken N's `flock` under the admission lock. A live holder of N would hold that flock, and `flock` conflicts across open file descriptions even within one process. Other slots' sidecars are never written there.
+- **Can `pending()` misread a sidecar mid-rename? No.** Creation (temporary name, write, `rename`) happens under the admission lock, and `pending()` runs under the same lock. `rename` is atomic, and `pending()` reads only the sidecars of slots whose lock is held.
+  - The only write that `pending()` can overlap is a holder resetting its own 20-byte value to zero at completion or failure, which happens outside the gate. In theory a concurrent read could see a mix of the old and new digits. The effect would be one spuriously refused or over-admitted snapshot, so this is Info.
+- **Probe.** An own-user 5-byte sidecar on slot 0 is reclaimed and recreated at 20 bytes (`ok`), and no temporary sidecar names are left.
+- **A4-2:** an unreclaimable sidecar on slot 0 (foreign-owned, or a directory) refuses **every** admission with `artifact_unavailable`, even with slots 1 and 2 free. `slot()` always offers the lowest free slot, and `reservation()` failing aborts the whole admission instead of skipping to the next slot. The docblock says such a sidecar "keeps the slot unusable"; in fact it makes the whole spool unusable.
+
+### (4) Render lease (`06dfb531`)
+
+- The policy now requires `render_lease_seconds >= RENDERER_TIMEOUT_SECONDS (60) + RENDER_LEASE_MARGIN_SECONDS (60)`, with a test that the pinned child still uses 60. The default is 300.
+- **Is 60 s enough margin? Yes, for host-local storage.** After the child returns, the parent:
+  - decodes at most 24 MiB of JSON into a PDF of at most 16 MiB;
+  - writes, fsyncs, chmods and reads back that original (`Files::store`, at most 16 MiB);
+  - `link()`s it into place;
+  - runs the publish transaction. Natively that transaction includes the schema-ownership check, about 1–3 s observed.
+
+  On a degraded network filesystem, 60 s for 16 MiB is about 270 KiB/s, which is still generous. With the 300 s default, the margin is 240 s.
+- **Failure mode at expiry stays safe.** Publication is refused with `lease_expired`, the stored file is orphaned under its own claim path, and a new claim renders again. A deterministic profile gives identical bytes.
+- **Other pairings with the same shape:**
+  - **Authorization TTL against a 1 GiB transfer: A4-4.** One deadline (TTL at most 300 s) covers the snapshot copy, the read-back **and** the whole stream to the client. Streaming 1 GiB in 300 s needs about 3.6 MB/s (29 Mbit/s), less the snapshot time (about 8 s locally). On a slower client, `writeTo` stops with `expired` mid-stream. The authorization is one-use and already consumed, and with no range support each retry restarts from zero, with 5 authorizations per minute.
+  - **Spool deadline against the authorization:** consistent. The spool uses the authorization deadline, so a slot is held for at most the TTL. Snapshot time is subtracted from streaming time, which is part of A4-4.
+  - **Per-read timeout against the deadline:** bounded. The 5-second per-read cap means at most about 5 s of overrun past the deadline, and the next `$write`/`within()` refuses.
+
+### Findings in this delta (Low or above)
+
+| ID | Severity | Finding | Recommendation | Evidence |
+| --- | --- | --- | --- | --- |
+| A4-1 | Low (before activation) | **Overflow still seals an unrenderable origin.** Renderable admits text that exceeds the renderer's page limit (100) or output limit (16 MiB). 32,768-line terms passed every admission site, and rendering always fails, so origins sealed under that definition can never get an original or their assets. | At `propose` (and re-checked at `open`), run a full preflight render of the definition through the pinned isolated renderer, using the longest allowed declared name (120 characters, one line, so it cannot add pages). Alternatively, bound line count and length so 100 pages cannot be exceeded. | `sqlite-addendum4-probe.txt` (`addendum4.text`) |
+| A4-2 | Low (before mount) | **One bad sidecar blocks the whole spool.** An unreclaimable `slot-0.reserve` (foreign uid or directory) refuses every admission (`artifact_unavailable`, 3 of 3) while slots 1 and 2 are free. | Treat an unreclaimable sidecar like an unreclaimable snapshot: skip that slot inside `slot()` and try the next. Correct the docblock. | `sqlite-sidecar-probe.txt` |
+| A4-3 | Low (before the final Foundation CI run) | **Stalled-source test fails natively.** `test_a_stalled_source_is_refused_at_once_and_releases_its_slot_and_reservation` asserts that the whole `redeem()` takes under 5 s. On MySQL that includes two customer transactions with schema-ownership checks, and it took 5.67 s: **native run rc=1, 10 tests, 83 assertions, 1 failure**. The refusal itself is immediate, and the test's own read-count assertion (2 or fewer) already proves there is no spinning. | Remove the wall-clock bound, or measure only the snapshot, or bound by the read count and the stall's own length. The other 9 native cases passed: all of `ProductionFreeGrantRenderableTest` and the rest of the stalled-source class. | `native/native4-tests.txt` and `.junit.xml` |
+| A4-4 | Low (before the delivery mount) | **The TTL bounds the whole transfer.** The authorization TTL (at most 300 s) bounds the snapshot and the full client stream, so a 1 GiB master is undeliverable to clients below about 29 Mbit/s. Each attempt consumes the one-use authorization and restarts from zero. | Separate "valid to start" (TTL) from a transfer deadline derived from size and a minimum rate. Alternatively, support resumable or range delivery with re-authorization, or stream to the client without coupling the stream to the authorization deadline once the snapshot is verified. | Code review (`Downloads::redeem`, `Transfer::writeTo`, Policy TTL bounds) |
+
+### Runs (exit codes captured on their own line)
+
+| Selection | Driver | rc | Result |
+| --- | --- | --- | --- |
+| `tests/Feature/ProductionFreeGrants` at `792af167` | SQLite | 0 | 139 tests, 1016 assertions, 2 skipped |
+| `tests/Feature/ProductionFreeGrants` at `2f787589` | SQLite | 0 | 142 tests, 1039 assertions, 2 skipped |
+| `ProductionFreeGrantRenderableTest` and `ProductionFreeGrantStalledSourceTest` at `792af167` | MySQL :3781 | **1** | 10 tests, 83 assertions, 1 failure (A4-3). 07:59:43Z to 08:23:05Z |
+| `addendum4/probes/Addendum4ProbeTest.php` | SQLite | 0 | 2 tests, 10 assertions. Run 1 is retained; see the probe-hygiene note above |
+| `addendum4/probes/glyph-sample.php` | PHP CLI | 0 | 112,293 scalars, 0 differences |
+| `addendum4/probes/SidecarProbeTest.php` at `2f787589` | SQLite | 0 | 1 test. Run 1 failed only on the probe's own log-count assertion and is retained |
+| Addendum-3 renderer-input probe re-run | SQLite | 2 | Expected flip: `unsupported_text` at `review` |
+| Addendum-2 spool crash probe re-run at `2f787589` | SQLite | 0 | Unchanged: no leak; a live holder is counted; foreign residue is kept |
+| Pint `--test`, the 7 changed files of `81ca184b` and the 4 of `17ef19bc` plus `06dfb531` | n/a | 0, 0 | passed |
+
+The `17ef19bc` and `06dfb531` changes are filesystem and policy only, so no native run was needed for them. SHA-256 lists are `addendum4/sha256-81ca184b.txt` and `addendum4/sha256-06dfb531.txt`. Key files:
+
+| File | SHA-256 |
+| --- | --- |
+| `ProductionFreeGrantRenderable.php` (`81ca184b`) | `edae2068027545a0bcca2e936905f4cf1e1702e332bc8493b949eb652224d023` |
+| `ProductionFreeGrantDownloads.php` (`81ca184b`) | `de7ef77fddeb413886b7b3528b0e0581162a598baecf256414fb4de2b3f4c7b3` |
+| `ProductionFreeGrantSpool.php` (`06dfb531`) | `b33c84743fc379162469855e61797601fcc07809238687e7af84672f624b037c` |
+| `ProductionFreeGrantPolicy.php` (`06dfb531`) | `48afc2ee9b0fb4d0853db90f8b24117a4ee674b012591a03a303a20575affbf0` |
+
+### Conditions after Addendum 4
+
+- **Closed:** A3-1 (spin and hang) and A3-2 (repertoire and glyphs).
+- **Added:**
+  - A4-1 before activation;
+  - A4-2 and A4-4 before the delivery mount;
+  - A4-3 before the final Foundation CI run;
+  - for the sources adapter (condition 5): host-local storage, or a configurable per-read cap.
+- **Before production:** move the glyph test into the renderer profile (r2) or hash-check its font inputs.
+- **Unchanged:**
+  - A1-1, the `contention` mount mapping, and A1-7 with the identity key-rotation handling;
+  - A2-2;
+  - conditions 3 and 5;
+  - F-4 and F-6.
+
+### Cleanup
+
+- Private instance :3781 (pid 14992) was shut down with `mysqladmin shutdown` (rc 0). Its error log ends with "MySQL Server - end", the process is gone and nothing is in LISTEN on 3781. Its datadir `scratchpad/review-free256d-mysql/data` was deleted.
+- The lifecycle is in `addendum4/native/private-instance-lifecycle.txt`.
+- The review worktree `/home/user/VA-Studio-review-free256b` is detached at `2f787589`. Its only changes are the modified `DECISION.md` and the untracked `review-evidence/addendum4/`. Nothing was committed or pushed.
