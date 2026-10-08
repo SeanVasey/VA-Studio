@@ -61,7 +61,17 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      bound.
    - Measure it on the chosen host before mount. This replaces a size-derived lease, which would lengthen every
      crash-recovery wait and the per-buyer heavy-work lock (Codex round 18).
-6. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
+6. **Shared, lock-capable cache store.** The per-buyer heavy-work lock (condition C12) is an atomic cache lock. It only
+   works if every web host uses the same lock-capable store. `CACHE_STORE=database` (the default, using the migrated
+   `cache_locks` table) or a shared Redis qualifies. `file`, `array` or `null`, or a per-host store, silently disables
+   the bound (review A11-I2). Correctness does not depend on it: claims, leases and unique keys still decide every write.
+7. **Bounded queueing before PHP starts.** Time a redeem spends waiting in the FPM `listen` backlog, or in a proxy queue,
+   comes out of the authorization lifetime. The server compares expiry with the moment PHP begins the request, so it
+   cannot see that wait (review A11-L2/(h)).
+   - Bound it: set `listen.backlog` on the paid pool, and give the proxy short connect and queue timeouts for these
+     routes, so an overloaded pool refuses quickly instead of queueing past the lifetime.
+   - Size `pm.max_children` so the expected concurrent redeems and document requests do not queue.
+8. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
    Long preparations continue in the background of the same request: the page polls saved status and continues,
    condition C13. So a client timeout never needs to reach these server bounds.
 
@@ -108,6 +118,12 @@ Record the results in the activation packet (`docs/ops/production-activation-pac
 - A synthetic 1 GiB redemption through the real proxy completes. A client that stops reading for longer than the proxy
   send timeout is disconnected, and its spool slot is free again within the worker timeout.
 - Sequential read throughput of the private storage is measured and meets requirement 5.
+- The cache store is shared and lock-capable across every web host (requirement 6).
+- Under a burst of concurrent redeems, no request waits in the FPM backlog or a proxy queue longer than its bound
+  (requirement 7).
 - A synthetic multi-line preparation longer than 320 s completes. The page shows progress and ends with the order
   fulfilled, without a manual retry.
+- A real worst-case completion on the chosen storage is timed. The page follows a request for 320 s plus its wait
+  window (`paidContinuation.wait` in `PaidGrantJourney.tsx`). A completion longer than that needs a later click, so
+  confirm it fits (review A11-I4).
 - The proxy temp directory is not reachable over HTTP and holds nothing after the transfers finish.
