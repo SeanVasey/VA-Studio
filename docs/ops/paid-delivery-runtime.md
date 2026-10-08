@@ -52,7 +52,16 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      web root, writable only by the proxy user (mode 0700), and on encrypted storage if the private disk is encrypted.
    - It must be sized for concurrent transfers: at least 3 × 1 GiB plus margin.
    - It must never be backed up, synced or exposed.
-5. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
+5. **Private storage throughput floor.**
+   - First preparation of a line renders its original (about 65–76 s measured natively) and hashes all of the line's
+     assets within one 300 s claim. That is up to three files of 1 GiB each.
+   - The private storage holding masters and stems must therefore sustain sequential reads well above 14 MiB/s per
+     request. Below that, a maximum-size line can never finish, and each try spends one of its five attempts.
+   - Target at least 100 MiB/s. That also keeps a 10-line completion check (up to 30 GiB) within the document-route
+     bound.
+   - Measure it on the chosen host before mount. This replaces a size-derived lease, which would lengthen every
+     crash-recovery wait and the per-buyer heavy-work lock (Codex round 18).
+6. **Client timeouts match.** The page already allows 320 s for a document request and 80 s for other paid requests.
    Long preparations continue in the background of the same request: the page polls saved status and continues,
    condition C13. So a client timeout never needs to reach these server bounds.
 
@@ -98,6 +107,7 @@ Record the results in the activation packet (`docs/ops/production-activation-pac
 
 - A synthetic 1 GiB redemption through the real proxy completes. A client that stops reading for longer than the proxy
   send timeout is disconnected, and its spool slot is free again within the worker timeout.
+- Sequential read throughput of the private storage is measured and meets requirement 5.
 - A synthetic multi-line preparation longer than 320 s completes. The page shows progress and ends with the order
   fulfilled, without a manual retry.
 - The proxy temp directory is not reachable over HTTP and holds nothing after the transfers finish.
