@@ -1,0 +1,16 @@
+# head: 6184118d363b0bf6a7590b9b54043b60aef319a9  (worktree clean apart from untracked review files: 0 tracked changes)
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3793, database r54p1_review; DB_CONNECTION=mysql APP_ENV=testing
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php
+# start: 2026-10-08T18:11:25Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 15:43.167, Memory: 95.00 MB
+
+OK (12 tests, 63 assertions)
+rc=0
+# end: 2026-10-08T18:27:09Z

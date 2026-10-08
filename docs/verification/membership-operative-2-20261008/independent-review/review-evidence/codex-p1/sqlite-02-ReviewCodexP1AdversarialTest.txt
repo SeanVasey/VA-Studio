@@ -1,0 +1,35 @@
+# head: 6184118d363b0bf6a7590b9b54043b60aef319a9; untracked review test sha256: 1693d858e66cc8f4
+# engine: SQLite :memory: (phpunit.xml default)
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --testdox tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+...
+[review] driver=sqlite explicit-id outcomes={"0":"admitted as id 0","-5":"admitted as id -5"} rows=[[-5,"retrieval"],[0,"retrieval"],[1,"retrieval"],[2,"retrieval"]]
+.
+[review] driver=sqlite reissue state={"stale_position":3,"hint_position":2,"fresh_position":3,"stale_appended_position":3,"stale_outcome":"settled","stale_sequence":2}
+[review] fresh append refusal: App\Domain\Memberships\Billing\BillingException superseded_retrieval
+..
+[review] driver=sqlite codex-p1 state={"b":["settled",2],"a":"job returned normally","chain":[["settled",2]]}
+.
+[review] driver=sqlite previous-shape assertOwned refused: schema
+
+[review] driver=sqlite previous-shape up refused: schema
+.                                                            8 / 8 (100%)
+
+Time: 00:08.757, Memory: 93.00 MB
+
+Review Codex P1Adversarial (Tests\Feature\ProductionMembershipBilling\ReviewCodexP1Adversarial)
+ ✔ Hints tied on received at across page boundaries are each examined exactly once
+ ✔ Probe a hint received behind a cursor is missed by that pass and found by a fresh pass
+ ✔ An app key rotation refuses old cursors and a fresh pass still works with previous keys
+ ✔ Explicit non positive position ids cannot back evidence or move the counter
+ ✔ Probe after a counter regression an in flight stale retrieval borrows a reissued position
+ ✔ Probe a clock ahead tail refuses a later reversal with clock and stays fresh for the skew
+ ✔ Probe codex p1 start positions do not order reads and a pre reversal settled read stays the tail
+ ✔ A database with the previous 259000 shape is refused and not adopted
+
+OK (8 tests, 58 assertions)
+rc=0
