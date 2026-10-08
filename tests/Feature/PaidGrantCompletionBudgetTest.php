@@ -11,6 +11,8 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
+use App\Domain\Delivery\DeliveryAssetFiles;
+use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\Paid\PaidGrantDeadline;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantDownloads;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantClockedAssetFiles;
 use Tests\Support\PaidGrantDependencyFixtures;
 use Tests\Support\PaidGrantMonotonicClock;
 use Tests\Support\ProductionCheckoutFixtures;
@@ -50,6 +53,8 @@ final class PaidGrantCompletionBudgetTest extends TestCase
     use PaidGrantDependencyFixtures;
     use ProductionCheckoutJourneyFixture;
 
+    private PaidGrantClockedAssetFiles $assets;
+
     protected function beforeRefreshingDatabase(): void
     {
         $this->preparePaidDependencies();
@@ -73,6 +78,9 @@ final class PaidGrantCompletionBudgetTest extends TestCase
             'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
                 'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
         Queue::fake();
+        // Every asset hash must receive a deadline that is current on the paid clock and at most one 300 s bound away.
+        $this->assets = new PaidGrantClockedAssetFiles(300);
+        app()->instance(DeliveryAssetFiles::class, $this->assets);
     }
 
     protected function tearDown(): void
@@ -115,6 +123,8 @@ final class PaidGrantCompletionBudgetTest extends TestCase
         $this->assertSame([1, 1], array_column($complete['lines'], 'attempts'));
         $this->assertDatabaseCount('paid_originals', 2);
         $this->assertDatabaseCount('paid_fulfillments', 1);
+        // Render loop and completion each hashed both lines' assets, every time under a current per-line bound.
+        $this->assertAssetDeadlines(4);
 
         // The fulfilled order authorizes and redeems normally on every line.
         app()->forgetInstance(PaidGrantFiles::class);
@@ -139,8 +149,10 @@ final class PaidGrantCompletionBudgetTest extends TestCase
         $f = $this->twoLineOrder();
         $files = $this->slowVerification(301);
 
-        $this->assertSame(410, $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])));
+        // The original check took the whole line bound, so the line's asset hash refuses (as the adapter does on a slow clock).
+        $this->assertSame(DeliveryException::class, $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])));
         $this->assertSame(1, $files->verified, 'The first line already overran its own bound.');
+        $this->assertAssetDeadlines(2, lapsed: 1);
         $this->assertSame(['complete', 'complete'], DB::table('paid_document_work')->orderBy('id')->pluck('state')->all());
         $this->assertDatabaseCount('paid_originals', 2);
         $this->assertDatabaseCount('paid_fulfillments', 0);
@@ -159,7 +171,7 @@ final class PaidGrantCompletionBudgetTest extends TestCase
         $f = $this->twoLineOrder();
         // First call: line 2 overruns its own bound after line 1 took 290 s; nothing is fulfilled.
         $files = $this->slowVerification(290, [2 => 301]);
-        $this->assertSame(410, $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])));
+        $this->assertSame(DeliveryException::class, $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])));
         $this->assertSame(2, $files->verified);
         $this->assertDatabaseCount('paid_fulfillments', 0);
         // Retry: 290 s per line (580 s in total) still completes, because each line and the final frame get fresh budgets.
@@ -168,9 +180,42 @@ final class PaidGrantCompletionBudgetTest extends TestCase
         $this->assertTrue($complete['fulfilled']);
         $this->assertSame(2, $files->verified);
         $this->assertDatabaseCount('paid_fulfillments', 1);
-        // An already fulfilled order re-verifies under the same per-line bounds and stays exactly fulfilled.
+        $this->assertAssetDeadlines(4, lapsed: 1);
+        // A later call on the fulfilled order returns the same projection and stays exactly fulfilled.
         $this->assertSame($complete, (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
         $this->assertDatabaseCount('paid_fulfillments', 1);
+    }
+
+    public function test_preparing_an_already_fulfilled_order_hashes_no_file_and_returns_the_same_projection(): void
+    {
+        $f = $this->twoLineOrder();
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $hashed = $this->assets->verified;
+        $this->assertGreaterThanOrEqual(4, $hashed);
+        $rows = $this->preparationRows();
+
+        // Independent review A10-L1: a fulfilled order is not re-verified (downloads re-hash the exact bytes anyway). The
+        // fulfillment frame still runs, requires the unchanged bundle and returns the projection.
+        $files = $this->slowVerification(0);
+        $this->assertSame($complete, (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+        $this->assertSame(0, $files->verified, 'No original was re-verified.');
+        $this->assertSame($hashed, $this->assets->verified, 'No asset was re-hashed.');
+        $this->assertSame($rows, $this->preparationRows());
+        $this->assertAssetDeadlines(4);
+    }
+
+    private function preparationRows(): array
+    {
+        return array_map(fn (string $table): array => DB::table($table)->orderBy('id')->get()->map(fn ($row): array => (array) $row)->all(),
+            ['paid_document_work', 'paid_originals', 'paid_fulfillments', 'paid_authorizations', 'paid_redemptions']);
+    }
+
+    private function assertAssetDeadlines(int $minimumChecks, int $lapsed = 0): void
+    {
+        $this->assertSame([], $this->assets->violations, 'Paid code handed the asset hash a deadline outside the expected bound.');
+        $this->assertSame($lapsed, $this->assets->lapsed, 'Asset hashes refused for a deadline already lapsed on the paid clock.');
+        $this->assertGreaterThanOrEqual($minimumChecks, $this->assets->verified);
     }
 
     /** The virtual clock must reach paid code, or every scenario above would pass for the wrong reason. */

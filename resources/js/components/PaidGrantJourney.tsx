@@ -202,6 +202,9 @@ export function PaidGrantJourney() {
     .filter(r => shown.every(a => a.id !== r.id) && status.lines.some(l => l.history.some(h => h.id === r.id && h.kind === r.kind && h.status === 'unused')));
   const unfinished = origin?.lines.filter(l => l.documentStatus !== 'complete') ?? [];
   const retryAllowed = unfinished.length > 0 && unfinished.every(l => l.attempts < 5 && (l.documentStatus !== 'claimed' || status?.lines.find(s => s.id === l.id)?.renderRetryAllowed === true));
+  // Every line is prepared but completion was refused or its answer was lost (it can outlast the client timeout): the same
+  // document request finishes the order. Completion claims nothing and spends no preparation attempt.
+  const finishable = !!origin && !origin.fulfilled && unfinished.length === 0;
   return <section aria-label="Paid license journey" aria-busy={busy}>
     <p>Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.</p>
     {message && <div role="alert" tabIndex={-1} ref={alert} className="customer-account-message">{message}{denied && <a href="/customer/sign-in">Open a fresh sign-in page</a>}</div>}
@@ -217,6 +220,7 @@ export function PaidGrantJourney() {
       {origin.provenance === 'synthetic_rehearsal' && <p>Rehearsal original. No real payment or production legal facts are certified.</p>}
       <p>{origin.fulfilled ? 'Complete-order preparation is recorded. Exact files are checked again for each download.' : 'This order is waiting for complete preparation. No line can download yet.'}</p>
       {unfinished.length > 0 && <button type="button" disabled={busy || !retryAllowed} onClick={prepare}>Prepare original licenses and files</button>}
+      {finishable && <button type="button" disabled={busy} onClick={prepare}>Finish preparing this order</button>}
       <button type="button" disabled={busy} onClick={savedStatus}>Refresh preparation and download status</button>
       {origin.lines.map(l => <article className="paid-license-line" key={l.id}><h2>{l.title}</h2><p>{l.currency} {(l.lineAmountMinor / 100).toFixed(2)} + tax {(l.lineTaxMinor / 100).toFixed(2)} from the original accepted order.</p>
         <p>Declared name: {l.declaredName}</p><p>License accepted: {l.assentedAt}</p><p>Original PDF: {l.documentStatus}; preparation attempts {l.attempts}/5.</p>

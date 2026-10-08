@@ -6,7 +6,6 @@ use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
-use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
@@ -15,6 +14,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\Paid\PaidGrantCommands;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
 use App\Domain\Grants\Paid\PaidGrantException;
 use App\Domain\Grants\Paid\PaidGrantFiles;
 use App\Domain\Grants\Paid\PaidGrantProjectionRead;
@@ -135,17 +135,30 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $bytes = file_get_contents($path);
         rename($path, $path.'.retained-away');
         try {
-            $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
-            $this->fail('A missing original must never cause a replacement claim or be reported available.');
-        } catch (ContractIssuanceException $error) {
-            $this->assertSame('original_unavailable', $error->reason);
+            // Independent review A10-L1: preparation no longer re-verifies a fulfilled order, so it does not report the
+            // missing original. It still never causes a replacement claim, and the download refuses the missing original
+            // before any attempt is recorded (each redemption re-verifies the exact bytes).
+            $this->assertSame($complete, $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
             $this->assertSame($before, $this->ownedRows());
+            $auth = (new PaidGrantDownloads)->authorize($complete['id'], $complete['lines'][0]['id'],
+                ['requestKey' => (string) Str::uuid(), 'originHash' => $complete['lines'][0]['originHash'], 'kind' => 'contract', 'nonce' => bin2hex(random_bytes(32))],
+                $f['buyer']['principal'], $f['buyer']['user']);
+            try {
+                (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+                $this->fail('A missing original must never be delivered.');
+            } catch (DeliveryException $error) {
+                $this->assertSame('target_unavailable', $error->reason);
+            }
+            $this->assertDatabaseCount('paid_redemptions', 0);
         } finally {
             rename($path.'.retained-away', $path);
         }
         $this->assertSame($bytes, file_get_contents($path));
         $this->assertSame($complete, $documents->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
-        $this->assertSame($before, $this->ownedRows());
+        $after = $this->ownedRows();
+        $this->assertCount(1, $after['paid_authorizations']);
+        unset($before['paid_authorizations'], $after['paid_authorizations']);
+        $this->assertSame($before, $after);
         $this->assertDatabaseCount('license_grants', 0);
     }
 

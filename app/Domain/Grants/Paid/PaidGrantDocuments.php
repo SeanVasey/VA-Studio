@@ -58,8 +58,13 @@ final class PaidGrantDocuments
             if (isset($claim['done'])) {
                 break;
             }
+            // The call-wide budget only gates new claims (the loop top and the claim frame). A claimed line gets its own
+            // budget, started now to match its database lease, for its render, asset verification, record frame and
+            // failure frame, so a line claimed late in the call is not cut off with most of its lease left and its attempt
+            // spent. The record frame still refuses once the lease itself has ended.
+            $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
             try {
-                $deadline->proveCurrent();
+                $budget->proveCurrent();
                 $input = PaidGrantRenderInput::fromOrigin($claim['body']);
                 $expected = (new PaidGrantText)->build($input);
                 $rendered = app(PaidGrantRendererProcess::class)->render($input, $claim['body']['profile']);
@@ -67,8 +72,8 @@ final class PaidGrantDocuments
                     && hash_equals($expected['text_digest'], $rendered->textDigest)
                     && hash_equals(CanonicalJson::hash($claim['body']['profile']), $rendered->profileHash));
                 $artifact = app(PaidGrantFiles::class)->store($claim['origin'], $claim['claim_id'], $claim['body']['source']['provenance'], $rendered);
-                $deadline->proveCurrent();
-                (new PaidGrantAssets)->verify($claim['body']['assets'], $deadline->value());
+                $budget->proveCurrent();
+                (new PaidGrantAssets)->verify($claim['body']['assets'], $budget->value());
                 $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim, $artifact, $expected, $actor): array {
                     $line = $this->line($graph, $claim['origin']);
                     PaidGrantException::require($line['origin']['payload_hash'] === $claim['origin_hash'] && $line['body'] === $claim['body']
@@ -84,9 +89,11 @@ final class PaidGrantDocuments
                     $this->audit('paid_original.prepared', $graph, ['original_hash' => CanonicalJson::hash($manifest)], $actor);
 
                     return ['prepared' => true];
-                }, $deadline);
+                }, $budget);
             } catch (Throwable $error) {
-                // Only this still-owned claim may become failed. Withdrawal/staleness never renews authority.
+                // Only this still-owned claim may become failed. Withdrawal/staleness never renews authority. The line's
+                // own budget lets a late line's failure be recorded after the call-wide budget lapsed; once the line's
+                // budget has lapsed too, the claim stays until its lease ends.
                 try {
                     $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($claim): array {
                         $line = $this->line($graph, $claim['origin']);
@@ -95,7 +102,7 @@ final class PaidGrantDocuments
                         }
 
                         return [];
-                    }, $deadline);
+                    }, $budget);
                 } catch (Throwable) {
                     // Retained lease/attempt remains truthful until a fresh authorized retry after expiry.
                 }
@@ -114,7 +121,10 @@ final class PaidGrantDocuments
 
             return $graph;
         }, $deadline);
-        foreach ($bundle['lines'] as $line) {
+        // An already fulfilled order is not re-verified: each download re-hashes its exact bytes anyway, and re-hashing up
+        // to 10 lines of 1 GiB assets per request only spends the server (independent review A10-L1). The fulfillment
+        // frame below still runs: it requires the unchanged bundle, inserts nothing and returns the projection.
+        foreach ($bundle['complete'] === null ? $bundle['lines'] : [] as $line) {
             // Each line's physical re-verification gets its own non-extendable bound, the same as the per-line render
             // lease, so a large order (up to 10 lines of 1 GiB assets) is not bounded by the one budget that prepare()
             // started. A refused line fulfils nothing, and a retry finds every line prepared and gets fresh bounds.
