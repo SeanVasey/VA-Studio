@@ -1,0 +1,14 @@
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+index cbf6cf16..60f95a03 100644
+--- a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++++ b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+@@ -513,8 +513,7 @@ final class IdentityMigrationOwnership
+     {
+         $database = $this->database($pdo);
+ 
+-        return $this->references($sql, $tables) && (strtolower((string) $schema) === strtolower($database)
+-            || $this->references($sql, [$database, 'prepare']));
++        return $this->references($sql, $tables) && strtolower((string) $schema) === strtolower($database);
+     }
+ 
+     private function references(mixed $sql, array $tables): bool

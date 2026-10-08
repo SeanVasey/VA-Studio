@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" tests="17" assertions="92" errors="0" failures="1" skipped="0" time="41.515407">
+    <testcase name="test_committing_offer_withdrawal_refuses_new_intent_rolls_back_and_restores_dispatcher" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="47" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="9" time="3.180531"/>
+    <testcase name="test_committing_fresh_withdrawal_refuses_new_intent" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="64" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="2.604321"/>
+    <testcase name="test_only_the_new_intent_frame_holds_the_observer_and_retry_record_status_reconcile_hold_none" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="76" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="11" time="3.869839"/>
+    <testcase name="test_capability_closed_after_intent_commit_refuses_before_first_create" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="100" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="6" time="2.900339"/>
+    <testcase name="test_fresh_withdrawal_after_intent_commit_refuses_before_first_create_with_disabled" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="117" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="3.079919"/>
+    <testcase name="test_offer_withdrawn_before_retried_create_refuses_second_provider_call" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="128" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="7" time="3.686388"/>
+    <testcase name="test_committing_authoring_withdrawal_refuses_new_authority" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="142" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="1.640605"/>
+    <testcase name="test_committing_capability_closure_refuses_new_authority" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="154" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="1.610094"/>
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="4.463749">
+      <testcase name="test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis with data set &quot;owner delegation&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="175" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="2.227872"/>
+      <testcase name="test_committing_owner_delegation_or_offer_withdrawal_refuses_new_basis with data set &quot;offer&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="175" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="2.235877"/>
+    </testsuite>
+    <testcase name="test_staff_capsule_fresh_admission_itself_refuses_authoring_and_owner_withdrawal" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="192" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="3" time="1.983806"/>
+    <testcase name="test_committing_capability_closure_refuses_new_intent_and_provider_io" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="223" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="2" time="2.707735">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_capability_closure_refuses_new_intent_and_provider_io
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'write_source_changed'
++'changed'
+
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:350
+/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:234
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_qualifier_staff_withdrawal_refuses_new_basis" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="4.137033">
+      <testcase name="test_committing_qualifier_staff_withdrawal_refuses_new_basis with data set &quot;role&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="249" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="2.048626"/>
+      <testcase name="test_committing_qualifier_staff_withdrawal_refuses_new_basis with data set &quot;mfa&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="249" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="5" time="2.088407"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_committing_owner_staff_withdrawal_refuses_new_authority" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="3.352795">
+      <testcase name="test_committing_owner_staff_withdrawal_refuses_new_authority with data set &quot;role&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="262" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="1.646844"/>
+      <testcase name="test_committing_owner_staff_withdrawal_refuses_new_authority with data set &quot;mfa&quot;" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="262" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="4" time="1.705951"/>
+    </testsuite>
+    <testcase name="test_staff_replays_install_no_observer_and_positive_caller_write_survives" file="/home/user/VA-Studio-review-admission2/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php" line="273" class="Tests\Feature\ProductionCheckoutWriteAdmissionAllTest" classname="Tests.Feature.ProductionCheckoutWriteAdmissionAllTest" assertions="8" time="2.298254"/>
+  </testsuite>
+</testsuites>

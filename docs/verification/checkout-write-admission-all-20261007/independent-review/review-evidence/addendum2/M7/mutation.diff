@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+index 4ea5c81a..d2de6b23 100644
+--- a/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++++ b/app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
+@@ -42,7 +42,7 @@ final class CheckoutStaffWriteAdmission implements CheckoutCommitAdmission
+     public static function basis(Records $rows, User $qualifier, array $staff, User $buyer, array $identity, array $current,
+         array $selection, array $authority, array $policy, array $attestation, array $record, string $requestKey): self
+     {
+-        $until = [$policy['effective_until'], $attestation['effective_until'], ...self::licenseUntil($selection)];
++        $until = [$policy['effective_until'], $attestation['effective_until']];
+         [$frame, $plans] = self::open($rows, $qualifier, $staff, $until);
+         $plans->actor($buyer);
+         $plans->identity($identity);

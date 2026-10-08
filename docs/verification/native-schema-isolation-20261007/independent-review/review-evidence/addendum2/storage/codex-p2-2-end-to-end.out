@@ -1,0 +1,17 @@
+# selected DB_DATABASE=bb on the private instance; peer schema a`b (name contains a backtick)
+## 1. peer routine naming its OWN inquiry_notification_intents table
+ROUTINE_SCHEMA	ROUTINE_DEFINITION
+a`b	SELECT COUNT(*) FROM `aa`bb`.`inquiry_notification_intents`
+migrate:fresh rc=1 wall=25s
+70:  2026_10_07_243000_inquiry_notification_intents ................ 45.76ms FAIL
+74:  Unexpected inquiry notification external routine reference; existing schema  
+  , guards and evidence are unchanged. Investigate before retrying.            
+                                                                               
+
+## 2. control: peer routine renamed to schema a`c (stored `aa`cc`), same body otherwise
+ROUTINE_SCHEMA	ROUTINE_DEFINITION
+a`c	SELECT COUNT(*) FROM `aa`cc`.`inquiry_notification_intents`
+migrate:fresh rc=0 wall=74s
+DONE lines: 77
+  2026_10_07_258000_create_production_member_originals ............... 2s DONE
+

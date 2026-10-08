@@ -1,0 +1,56 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-admission4/phpunit.xml
+
+..E..FF...............                                            22 / 22 (100%)
+
+Time: 00:59.081, Memory: 104.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_only_new_intent_and_pre_create_frames_hold_the_observer_and_record_status_reconcile_hold_none
+App\Domain\Commerce\ProductionCheckout\CheckoutException: PRODUCTION_CHECKOUT_UNAVAILABLE
+
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CheckoutException.php:15
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php:46
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CheckoutIntentAdmission.php:38
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:174
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:162
+/home/user/VA-Studio-review-admission4/app/Domain/Commerce/ProductionCheckout/HostedCheckout.php:28
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:91
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@offer, retry with data ('offer', true)
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'write_source_changed'
++'write_frame'
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:426
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionCheckoutWriteAdmissionAllTest::test_withdrawal_in_the_pre_create_reprove_commit_refuses_before_provider_create@capability, retry with data ('capability', true)
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'write_source_changed'
++'write_frame'
+
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:426
+/home/user/VA-Studio-review-admission4/tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 22, Assertions: 126, Errors: 1, Failures: 2.

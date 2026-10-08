@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\ReproveCommitAdmissionCanaryTest" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="3.875912">
+    <testcase name="test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create" file="/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php" line="42" class="Tests\Canary\ReproveCommitAdmissionCanaryTest" classname="Tests.Canary.ReproveCommitAdmissionCanaryTest" assertions="3" time="3.875912">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Canary\ReproveCommitAdmissionCanaryTest::test_offer_withdrawn_in_the_reprove_commit_refuses_before_provider_create
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; Array &amp;1 [
++        'params' =&gt; Array &amp;2 [
++            'adaptive_pricing' =&gt; Array &amp;3 [
++                'enabled' =&gt; false,
++            ],
++            'allow_promotion_codes' =&gt; false,
++            'automatic_tax' =&gt; Array &amp;4 [
++                'enabled' =&gt; false,
++            ],
++            'cancel_url' =&gt; 'https://review.invalid/production/checkout/orders/6cd2bee5-44fe-4c21-87d5-b1f67a4e64c6/return',
++            'client_reference_id' =&gt; '6cd2bee5-44fe-4c21-87d5-b1f67a4e64c6',
++            'customer_creation' =&gt; 'if_required',
++            'expand' =&gt; Array &amp;5 [
++                0 =&gt; 'line_items.data.price.product',
++            ],
++            'expires_at' =&gt; 1791399401,
++            'line_items' =&gt; Array &amp;6 [
++                0 =&gt; Array &amp;7 [
++                    'price_data' =&gt; Array &amp;8 [
++                        'currency' =&gt; 'usd',
++                        'product_data' =&gt; Array &amp;9 [
++                            'metadata' =&gt; Array &amp;10 [
++                                'line_hash' =&gt; '3a63142546a22391965e3576f889f5baf07096a1144467dba557c150a9ec1d4f',
++                                'line_id' =&gt; '2d15eeaa-ae6f-469f-af6d-7fa233ef62bb',
++                            ],
++                            'name' =&gt; 'Synthetic quote recording — NONBINDING TEST FIXTURE',
++                        ],
++                        'unit_amount' =&gt; 4999,
++                    ],
++                    'quantity' =&gt; 1,
++                ],
++            ],
++            'metadata' =&gt; Array &amp;11 [
++                'attempt_id' =&gt; '2fb27c31-d128-4337-8185-9cc188d04e94',
++                'buyer_origin_id' =&gt; '1f7c45f2-e51e-4d86-a749-6b3f2ce81300',
++                'funds_mode' =&gt; 'test',
++                'intent_id' =&gt; 'f8879605-0db2-4028-823b-07b45df4f925',
++                'order_hash' =&gt; '35b017591861017fb23a7b5b477a14183f1a5c6c446e30bd4fe56aa16db478ad',
++                'order_id' =&gt; '6cd2bee5-44fe-4c21-87d5-b1f67a4e64c6',
++                'producer' =&gt; 'production_checkout_v1',
++                'schema_version' =&gt; '1',
++            ],
++            'mode' =&gt; 'payment',
++            'payment_intent_data' =&gt; Array &amp;12 [
++                'capture_method' =&gt; 'automatic',
++                'metadata' =&gt; Array &amp;13 [
++                    'attempt_id' =&gt; '2fb27c31-d128-4337-8185-9cc188d04e94',
++                    'buyer_origin_id' =&gt; '1f7c45f2-e51e-4d86-a749-6b3f2ce81300',
++                    'funds_mode' =&gt; 'test',
++                    'intent_id' =&gt; 'f8879605-0db2-4028-823b-07b45df4f925',
++                    'order_hash' =&gt; '35b017591861017fb23a7b5b477a14183f1a5c6c446e30bd4fe56aa16db478ad',
++                    'order_id' =&gt; '6cd2bee5-44fe-4c21-87d5-b1f67a4e64c6',
++                    'producer' =&gt; 'production_checkout_v1',
++                    'schema_version' =&gt; '1',
++                ],
++            ],
++            'payment_method_types' =&gt; Array &amp;14 [
++                0 =&gt; 'card',
++            ],
++            'success_url' =&gt; 'https://review.invalid/production/checkout/orders/6cd2bee5-44fe-4c21-87d5-b1f67a4e64c6/return',
++        ],
++        'key' =&gt; 'va-production-checkout-v1-f8879605-0db2-4028-823b-07b45df4f925',
++    ],
++]
+
+/home/user/VA-Studio-review-admission4/docs/verification/checkout-write-admission-all-20261007/conditions/codex-reprove-admission/canary/ReproveCommitAdmissionCanaryTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

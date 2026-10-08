@@ -17,7 +17,7 @@ use PDO;
 use ReflectionProperty;
 
 /** Sealed server-authenticated NEW write admission. No caller snapshot or renewed identity proof at commit. */
-final class CheckoutWriteAdmission
+final class CheckoutWriteAdmission implements CheckoutCommitAdmission
 {
     private array $plans = [];
 

@@ -265,6 +265,84 @@ class CustomerSuppressionTest extends TestCase
         $this->assertSame(2, $a->sent);
     }
 
+    public static function retainedOutcomes(): array
+    {
+        return ['positive' => ['positive'], 'null receipt' => ['null'], 'transport throws' => ['throw']];
+    }
+
+    #[DataProvider('retainedOutcomes')]
+    public function test_email_change_after_withdrawal_delivers_retained_captured_target_exactly_once(string $outcome): void
+    {
+        $c = $this->withdraw();
+        $old = $c['user']->email;
+        $target = SuppressionTarget::sole();
+        User::whereKey($c['user']->id)->update(['email' => 'synthetic-changed@example.test']);
+        $requests = [];
+        $a = new SuppressionFixtures;
+        $a->onSuppress = function (SuppressionRequest $r) use (&$requests, $outcome) {
+            $requests[] = $r;
+            $this->assertSame(1, SuppressionAttempt::count(), 'The attempt is durable before transport.');
+
+            return match ($outcome) {
+                'positive' => SuppressionFixtures::positive($r),
+                'null' => null,
+                'throw' => throw new \RuntimeException('Synthetic ambiguous transport'),
+            };
+        };
+        $a->onInspect = function (SuppressionRequest $r) use (&$requests) {
+            $requests[] = $r;
+
+            return SuppressionFixtures::positive($r);
+        };
+        $s = new SuppressionDelivery($a);
+        $first = $outcome === 'positive' ? 'confirmed' : 'unknown';
+        $this->assertSame(['status' => $first], $s->process($c['principal'], $c['user'], 1));
+        $this->assertSame(['status' => 'not_requested'], $s->process($c['principal'], $c['user'], 1), 'An attempted target is never sent again.');
+        $this->assertSame(1, $a->sent);
+        $this->assertSame(1, SuppressionAttempt::count());
+        $this->assertSame($target->id, SuppressionAttempt::sole()->target_id);
+        if ($outcome !== 'positive') {
+            $this->assertSame(0, SuppressionConfirmation::count());
+            $this->assertSame(['status' => 'confirmed'], $s->reconcile($c['principal'], $c['user'], 1));
+            $this->assertSame(1, $a->inspected);
+        }
+        $this->assertSame(['status' => 'not_requested'], $s->reconcile($c['principal'], $c['user'], 1));
+        $this->assertSame(1, $a->sent);
+        $this->assertSame($outcome === 'positive' ? 0 : 1, $a->inspected);
+        $this->assertSame(1, SuppressionConfirmation::count());
+        foreach ($requests as $request) {
+            $this->assertSame($old, $request->recipient);
+            $this->assertSame($target->recipient_hmac, $request->recipientHmac);
+        }
+        // Nothing is derived for the current address: no target, intent or status for it.
+        $this->assertSame(1, SuppressionTarget::count());
+        $this->assertSame(1, SuppressionIntent::count());
+        $this->assertSame('not_requested', (new CustomerConsentPreferences)->read($c['principal'], $c['user'])['purposes'][0]['suppression']['status']);
+    }
+
+    public function test_retained_and_current_pending_targets_are_each_sent_once_oldest_first(): void
+    {
+        $c = $this->withdraw();
+        $old = $c['user']->email;
+        User::whereKey($c['user']->id)->update(['email' => 'synthetic-changed@example.test']);
+        (new CustomerConsentPreferences)->change($c['principal'], $c['user'], ConsentFixtures::withdraw(1));
+        $recipients = [];
+        $a = new SuppressionFixtures;
+        $a->onSuppress = function (SuppressionRequest $r) use (&$recipients) {
+            $recipients[] = $r->recipient;
+
+            return SuppressionFixtures::positive($r);
+        };
+        $s = new SuppressionDelivery($a);
+        foreach ([1, 2, 3] as $call) {
+            $this->assertSame(['status' => 'confirmed'], $s->process($c['principal'], $c['user'], 2));
+        }
+        $this->assertSame([$old, 'synthetic-changed@example.test'], $recipients);
+        $this->assertSame(2, SuppressionTarget::count());
+        $this->assertSame(2, SuppressionAttempt::count());
+        $this->assertSame(2, SuppressionConfirmation::count());
+    }
+
     public function test_saved_attempt_callback_cannot_replace_intended_operation_and_commit_transport(): void
     {
         $c = $this->withdraw();

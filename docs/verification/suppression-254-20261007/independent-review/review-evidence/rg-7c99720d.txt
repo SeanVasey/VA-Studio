@@ -1,0 +1,14 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254-rg/phpunit.xml
+
+.
+[review] fiber-suspended context use from outside callback frame: released-while-suspended
+...
+[review] static WeakMap reachable via Reflection: yes; via Closure::bind: yes
+......                                                        10 / 10 (100%)
+
+Time: 00:22.756, Memory: 99.00 MB
+
+[30;42mOK (10 tests, 70 assertions)[0m

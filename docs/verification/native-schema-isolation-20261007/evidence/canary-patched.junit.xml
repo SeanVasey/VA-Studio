@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\MembershipForeignSchemaCanaryTest" file="/home/user/VA-Studio-trigscan-canary/tests/Feature/MembershipForeignSchemaCanaryTest.php" tests="1" assertions="7" errors="0" failures="0" skipped="0" time="132.449280">
+    <testcase name="test_foreign_schema_user_reference_is_refused_before_missing_suffix_ddl" file="/home/user/VA-Studio-trigscan-canary/tests/Feature/MembershipForeignSchemaCanaryTest.php" line="17" class="Tests\Feature\MembershipForeignSchemaCanaryTest" classname="Tests.Feature.MembershipForeignSchemaCanaryTest" assertions="7" time="132.449280"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,3 @@
+M8-native-observer db=va_rev_a3 port=3473 exit=1 wall=489.340673597s
+M8-native-reprove-cases db=va_rev_a3 port=3471 exit=1 wall=1065.405887642s
+M8-native-terminal-cases db=va_rev_a3 port=3472 exit=1 wall=1270.439710073s

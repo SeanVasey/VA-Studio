@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Canary\TerminalReproofCanaryTest" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/conditions/codex-terminal-reproof/canary/TerminalReproofCanaryTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="4.147755">
+    <testcase name="test_no_unadmitted_commit_between_the_admitted_reproof_and_provider_create" file="/home/user/VA-Studio-admission/docs/verification/checkout-write-admission-all-20261007/conditions/codex-terminal-reproof/canary/TerminalReproofCanaryTest.php" line="44" class="Tests\Canary\TerminalReproofCanaryTest" classname="Tests.Canary.TerminalReproofCanaryTest" assertions="5" time="4.147755"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,40 @@
+<?php
+
+namespace Tests\Feature\ReviewSupp254d;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Support\CustomerFixtures;
+use Tests\TestCase;
+
+/**
+ * Independent reviewer throwaway (addendum 2): migrate the private probe database with the real installer and seed the
+ * 253 parents through raw inserts that pass the 253 guards. The 254 probes then run as raw PDO (probe-254.php).
+ */
+class Supp254dSeedProbeParentsTest extends TestCase
+{
+    public function test_seed(): void
+    {
+        $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+        $t0 = '2026-01-01 00:00:00';
+        $t10 = '2026-01-01 00:00:10';
+        $account = CustomerFixtures::account(['email' => 'review-supp254d@example.test'])['account'];
+        $binding = DB::table('production_account_feature_bindings')->insertGetId(['public_id' => (string) Str::uuid(), 'account_id' => $account->id,
+            'origin_public_id' => (string) Str::uuid(), 'feature' => 'consent_preferences', 'feature_schema_version' => 1,
+            'feature_policy_version' => 'production-consent-preferences-identity-v1', 'binding_hash' => hash('sha256', 'binding'),
+            'binding_ciphertext' => 'synthetic', 'created_at' => $t0]);
+        $hmac = hash('sha256', 'recipient');
+        $e1 = DB::table('production_consent_events')->insertGetId(['public_id' => (string) Str::uuid(), 'binding_id' => $binding, 'purpose' => 'email_marketing',
+            'revision' => 1, 'status' => 'withdrawn', 'policy_id' => null, 'source' => 'first_party_customer', 'affirmative' => 0,
+            'recipient_hmac' => $hmac, 'recipient_ciphertext' => 'synthetic', 'created_at' => $t0]);
+        DB::table('production_consent_states')->insert(['binding_id' => $binding, 'purpose' => 'email_marketing', 'revision' => 1, 'event_id' => $e1,
+            'withdrawal_event_id' => $e1, 'created_at' => $t0, 'updated_at' => $t0]);
+        $e2 = DB::table('production_consent_events')->insertGetId(['public_id' => (string) Str::uuid(), 'binding_id' => $binding, 'purpose' => 'email_marketing',
+            'revision' => 2, 'status' => 'withdrawn', 'policy_id' => null, 'source' => 'first_party_customer', 'affirmative' => 0,
+            'recipient_hmac' => $hmac, 'recipient_ciphertext' => 'synthetic', 'created_at' => $t10]);
+        file_put_contents(getenv('PROBE_PARENTS'), json_encode(['binding' => $binding, 'hmac' => $hmac, 'e1' => $e1, 'e2' => $e2, 't0' => $t0, 't10' => $t10,
+            'e1_created_at' => DB::table('production_consent_events')->where('id', $e1)->value('created_at'),
+            'e2_created_at' => DB::table('production_consent_events')->where('id', $e2)->value('created_at')], JSON_PRETTY_PRINT));
+        $this->assertTrue(true);
+    }
+}

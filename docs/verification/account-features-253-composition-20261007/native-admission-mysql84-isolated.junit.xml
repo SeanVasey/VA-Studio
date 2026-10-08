@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" tests="3" assertions="65" errors="0" failures="0" skipped="0" time="373.801946">
+    <testsuite name="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl" tests="2" assertions="44" errors="0" failures="0" skipped="0" time="268.704830">
+      <testcase name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set &quot;exact&quot;" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="42" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="22" time="139.832458"/>
+      <testcase name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl with data set &quot;native uppercase alias&quot;" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="42" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="22" time="128.872373"/>
+    </testsuite>
+    <testcase name="test_temporary_table_using_an_owned_guard_name_refuses_before_ddl" file="/home/user/VA-Studio-features253/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php" line="55" class="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" classname="Tests.Feature.ProductionFeatures.ProductionFeatureNativeAdmissionTest" assertions="21" time="105.097116"/>
+  </testsuite>
+</testsuites>

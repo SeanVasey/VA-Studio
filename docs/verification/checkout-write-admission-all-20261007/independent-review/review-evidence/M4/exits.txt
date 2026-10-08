@@ -1,0 +1,2 @@
+canary-HostedIntent 1
+feature-WriteAdmissionAll 2

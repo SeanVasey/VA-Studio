@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php b/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+index 0255487b..e997d7c8 100644
+--- a/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
++++ b/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php
+@@ -281,7 +281,7 @@ final class CapabilityMigrationOwnership
+      */
+     private function qualifies(string $sql, string $database): bool
+     {
+-        if (str_contains($database, '`') || str_contains($database, '"')) {
++        if (str_contains($database, '`')) {
+             $this->reject('dependency definition for an identifier-delimited database name');
+         }
+         $name = preg_quote($database, '/');

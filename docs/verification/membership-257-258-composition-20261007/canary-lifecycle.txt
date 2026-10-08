@@ -1,0 +1,18 @@
+2026-10-07T14:11:18Z allocate (root account; no additional user or GRANT created, nothing to revoke)
+mysql: [Warning] Using a password on the command line interface can be insecure.
+8.4.11
+mysql: [Warning] Using a password on the command line interface can be insecure.
+mysql: [Warning] Using a password on the command line interface can be insecure.
+users	CREATE TABLE `users` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+canary-foreign-schema 1 0 {'tests': '1', 'assertions': '7', 'failures': '0', 'errors': '0', 'skipped': '0'} 
+2026-10-07T14:13:15Z canary sha256 after run: 72648803519da41d025222e000ecfeceef051ca3e0cdcd0dd01c4dbdbcdaca8a
+2026-10-07T14:13:15Z cleanup: drop vaseyaudio_service_review then vaseyaudio_member257_foreign
+mysql: [Warning] Using a password on the command line interface can be insecure.
+2026-10-07T14:13:15Z post-cleanup schemata:
+mysql: [Warning] Using a password on the command line interface can be insecure.
+2026-10-07T14:13:15Z post-cleanup cross-schema FKs referencing foreign schema (count):
+mysql: [Warning] Using a password on the command line interface can be insecure.
+0
+2026-10-07T14:13:15Z post-cleanup grants mentioning foreign schema (count):
+mysql: [Warning] Using a password on the command line interface can be insecure.
+0

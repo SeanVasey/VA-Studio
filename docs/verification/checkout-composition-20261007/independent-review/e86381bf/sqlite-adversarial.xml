@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Review\ReviewAdversarialCompositionTest" file="/home/user/VA-Studio-review/review-evidence/ReviewAdversarialCompositionTest.php" tests="2" assertions="23" errors="0" failures="0" skipped="0" time="17.396869">
+    <testcase name="test_a_receipt_on_command_frame_withdrawn_admission_rolls_back_whole_frame_and_never_closes" file="/home/user/VA-Studio-review/review-evidence/ReviewAdversarialCompositionTest.php" line="56" class="Tests\Review\ReviewAdversarialCompositionTest" classname="Tests.Review.ReviewAdversarialCompositionTest" assertions="12" time="10.567065"/>
+    <testcase name="test_b_refused_new_order_frame_does_not_leak_after_commit_callbacks_into_next_commit" file="/home/user/VA-Studio-review/review-evidence/ReviewAdversarialCompositionTest.php" line="111" class="Tests\Review\ReviewAdversarialCompositionTest" classname="Tests.Review.ReviewAdversarialCompositionTest" assertions="11" time="6.829804"/>
+  </testsuite>
+</testsuites>

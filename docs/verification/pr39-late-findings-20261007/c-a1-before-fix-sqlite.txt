@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-p2/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:01.738, Memory: 81.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\CustomerSuppressionRetainedTargetTest::test_unauthentic_older_target_never_silently_blocks_genuine_pending_target
+Genuine pending withdrawal target silently not delivered: ["not_requested","not_requested"]
+Failed asserting that false is true.
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionRetainedTargetTest.php:56
+
+2) Tests\Feature\CustomerSuppressionRetainedTargetTest::test_same_connection_temp_attempts_shadow_refuses_instead_of_silently_skipping_retained_target
+A temp shadow must not silently skip the retained target: not_requested
+
+/home/user/VA-Studio-p2/tests/Feature/CustomerSuppressionRetainedTargetTest.php:70
+
+FAILURES!
+Tests: 2, Assertions: 5, Failures: 2.

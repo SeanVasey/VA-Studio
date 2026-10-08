@@ -1,0 +1,143 @@
+<?php
+
+namespace Tests\Feature\MembershipReview;
+
+use App\Domain\Grants\Member\MemberGrantSchema;
+use App\Domain\Memberships\Production\MemberGrantIntent;
+use App\Domain\Memberships\Production\MembershipSchema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use PDOException;
+use Tests\Support\CustomerFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\TestCase;
+
+/**
+ * Independent throwaway review probe (not product source) of c4's origin guard:
+ * retained redemption -> paid period -> exact account/user/original identity/invoice + current active pair.
+ * Variants the author probes did not cover. The final section characterizes (does not approve)
+ * that the origin/activation guards are not coupled to an actual reserve/consume credit event.
+ */
+class MemberOriginalRedemptionJoinReviewTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    public function test_origin_join_refuses_uncovered_owner_variants_and_characterizes_reserve_coupling(): void
+    {
+        $observed = [];
+        // 1. Same account/user/invoice, different original T23 identity origin id.
+        [$origin] = $this->origin();
+        $observed['identity_origin_mismatch_refused'] = $this->refused([...$origin, 'identity_origin_id' => 2]);
+        // 2. Swapped pair: the period's account with a different (active) user id.
+        $other = CustomerFixtures::account();
+        $observed['period_account_other_user_refused'] = $this->refused([...$origin, 'user_id' => $other['user']->id]);
+        // 3. Other active account with the period's user id.
+        $observed['other_account_period_user_refused'] = $this->refused([...$origin, 'account_id' => $other['account']->id]);
+        // 4. Exact period owner, but the current user is no longer verified (customer_accounts rows are
+        //    retained by an identity guard, so the user-side current-state predicate is probed instead).
+        DB::table('users')->where('id', $origin['user_id'])->update(['email_verified_at' => null]);
+        $observed['unverified_exact_owner_refused'] = $this->refused($origin);
+        DB::table('users')->where('id', $origin['user_id'])->update(['email_verified_at' => '2026-10-07 00:00:00']);
+        // 5. Different honor deadline than the retained redemption.
+        $observed['changed_honor_deadline_refused'] = $this->refused([...$origin, 'honor_deadline' => '2026-10-09 00:00:00']);
+        // 6. Positive control: exact retained graph is structurally admitted.
+        $observed['exact_graph_admitted'] = ! $this->refused($origin);
+        $events = (int) DB::connection()->getPdo()->query('SELECT COUNT(*) FROM production_membership_credit_events')->fetchColumn();
+        // 7. Characterization: the admitted origin and a full activation exist with zero award/reserve/consume events.
+        foreach ([0 => 'member_contract', 1 => 'licensed_audio'] as $ordinal => $role) {
+            $this->insert(MemberGrantSchema::TABLES[3], $this->artifact($origin, $ordinal, $role));
+        }
+        $observed['activation_without_reserve_event_admitted'] = ! $this->refused($this->activation($origin), MemberGrantSchema::TABLES[4]);
+        $observed['credit_events_present'] = $events;
+        $observed['driver'] = DB::getDriverName();
+        file_put_contents(__DIR__.'/origin-join-observation-'.DB::getDriverName().'.json', json_encode($observed, JSON_PRETTY_PRINT)."\n");
+
+        foreach (['identity_origin_mismatch_refused', 'period_account_other_user_refused', 'other_account_period_user_refused',
+            'unverified_exact_owner_refused', 'changed_honor_deadline_refused', 'exact_graph_admitted'] as $key) {
+            $this->assertTrue($observed[$key], $key.' '.json_encode($observed));
+        }
+        // Recorded fact, not an approval: structural rows are not coupled to credit events.
+        $this->assertSame(0, $events);
+        $this->assertTrue($observed['activation_without_reserve_event_admitted']);
+    }
+
+    private function refused(array $row, string $table = MemberGrantSchema::TABLES[2]): bool
+    {
+        try {
+            $this->insert($table, $row);
+
+            return false;
+        } catch (PDOException) {
+            return true;
+        }
+    }
+
+    private function origin(): array
+    {
+        $profileId = (string) Str::uuid();
+        $profile = ['id' => $profileId, 'profile_hash' => hash('sha256', $profileId), 'original_terms_hash' => str_repeat('d', 64),
+            'implementation_hash' => str_repeat('e', 64), 'font_manifest_hash' => str_repeat('f', 64), 'provenance' => 'synthetic_rehearsal',
+            'payload_ciphertext' => 'synthetic review placeholder', 'seal' => hash('sha256', 'profile'.$profileId), 'created_at' => '2026-10-07 00:00:00'];
+        $this->insert(MemberGrantSchema::TABLES[0], $profile);
+        $definitionId = (string) Str::uuid();
+        $definition = ['id' => $definitionId, 'profile_id' => $profileId, 'definition_hash' => hash('sha256', $definitionId),
+            'original_terms_hash' => $profile['original_terms_hash'], 'policy_hash' => str_repeat('a', 64), 'license_manifest_hash' => str_repeat('b', 64),
+            'asset_manifest_hash' => str_repeat('c', 64), 'retention_policy_hash' => str_repeat('a', 64), 'family' => MemberGrantIntent::FAMILY,
+            'purpose' => MemberGrantIntent::PURPOSE, 'version' => 1, 'provenance' => 'synthetic_rehearsal',
+            'payload_ciphertext' => 'synthetic review placeholder', 'seal' => hash('sha256', 'definition'.$definitionId), 'created_at' => '2026-10-07 00:00:00'];
+        $this->insert(MemberGrantSchema::TABLES[1], $definition);
+        $c = CustomerFixtures::account();
+        $planId = (string) Str::uuid();
+        $this->insert(MembershipSchema::TABLES[0], ['id' => $planId, 'policy_hash' => hash('sha256', $planId), 'original_terms_hash' => str_repeat('a', 64),
+            'provenance' => 'synthetic_rehearsal', 'payload_ciphertext' => 'synthetic review placeholder', 'seal' => hash('sha256', 'plan'.$planId), 'created_at' => '2026-10-07 00:00:00']);
+        $periodId = (string) Str::uuid();
+        $period = ['id' => $periodId, 'account_id' => $c['account']->id, 'user_id' => $c['user']->id, 'identity_origin_id' => 1, 'plan_version_id' => $planId,
+            'source_invoice_hash' => hash('sha256', 'invoice'.$periodId), 'invoice_graph_hash' => hash('sha256', 'graph'.$periodId),
+            'owner_binding_hash' => hash('sha256', 'owner'.$periodId), 'allowance' => 2, 'period_start' => '2026-10-07 00:00:00',
+            'period_end' => '2026-11-07 00:00:00', 'credit_expires_at' => null, 'payload_ciphertext' => 'synthetic review placeholder',
+            'seal' => hash('sha256', 'period'.$periodId), 'created_at' => '2026-10-07 00:00:00'];
+        $this->insert(MembershipSchema::TABLES[1], $period);
+        $redemptionId = (string) Str::uuid();
+        $redemption = ['id' => $redemptionId, 'period_id' => $periodId, 'request_key_hash' => hash('sha256', 'request'.$redemptionId),
+            'owner_binding_hash' => $period['owner_binding_hash'], 'credit_amount' => 1, 'selection_hash' => str_repeat('a', 64),
+            'license_manifest_hash' => str_repeat('b', 64), 'asset_manifest_hash' => str_repeat('c', 64), 'original_terms_hash' => str_repeat('d', 64),
+            'intent_hash' => hash('sha256', 'intent'.$redemptionId), 'honor_deadline' => '2026-10-08 00:00:00',
+            'payload_ciphertext' => 'synthetic review placeholder', 'seal' => hash('sha256', 'redemption'.$redemptionId), 'created_at' => '2026-10-07 00:00:01'];
+        $this->insert(MembershipSchema::TABLES[2], $redemption);
+        $id = (string) Str::uuid();
+
+        return [['id' => $id, 'redemption_id' => $redemptionId, 'definition_id' => $definitionId, 'profile_id' => $profileId,
+            'account_id' => $period['account_id'], 'user_id' => $period['user_id'], 'identity_origin_id' => 1,
+            'invoice_identity_hash' => $period['source_invoice_hash'], 'owner_binding_hash' => $redemption['owner_binding_hash'],
+            'intent_hash' => $redemption['intent_hash'], 'license_manifest_hash' => $redemption['license_manifest_hash'],
+            'asset_manifest_hash' => $redemption['asset_manifest_hash'], 'original_terms_hash' => $redemption['original_terms_hash'],
+            'artifact_count' => 2, 'artifact_manifest_hash' => str_repeat('f', 64), 'honor_deadline' => $redemption['honor_deadline'],
+            'provenance' => 'synthetic_rehearsal', 'payload_ciphertext' => 'synthetic review placeholder',
+            'seal' => hash('sha256', 'origin'.$id), 'created_at' => '2026-10-07 00:00:02']];
+    }
+
+    private function artifact(array $origin, int $ordinal, string $role): array
+    {
+        $id = (string) Str::uuid();
+
+        return ['id' => $id, 'origin_id' => $origin['id'], 'ordinal' => $ordinal, 'role' => $role, 'sha256' => hash('sha256', $id), 'bytes' => 1,
+            'storage_policy_hash' => str_repeat('a', 64), 'payload_ciphertext' => 'synthetic review placeholder',
+            'seal' => hash('sha256', 'artifact'.$id), 'created_at' => '2026-10-07 00:00:03'];
+    }
+
+    private function activation(array $origin): array
+    {
+        $id = (string) Str::uuid();
+
+        return ['id' => $id, 'origin_id' => $origin['id'], 'redemption_id' => $origin['redemption_id'], 'artifact_manifest_hash' => $origin['artifact_manifest_hash'],
+            'readiness_receipt_hash' => str_repeat('a', 64), 'reservation_event_hash' => str_repeat('b', 64), 'purpose' => MemberGrantIntent::PURPOSE,
+            'payload_ciphertext' => 'synthetic review placeholder', 'seal' => hash('sha256', 'activation'.$id), 'created_at' => '2026-10-07 00:00:04'];
+    }
+
+    private function insert(string $table, array $row): void
+    {
+        $schema = in_array($table, MemberGrantSchema::TABLES, true) ? new MemberGrantSchema : new MembershipSchema;
+        $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.$schema->table($table).' ('.implode(',', array_map(fn ($k) => '`'.$k.'`', array_keys($row))).') VALUES ('.implode(',', array_fill(0, count($row), '?')).')');
+        $statement->execute(array_values($row));
+    }
+}

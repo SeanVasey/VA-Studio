@@ -1,0 +1,8 @@
+now()	id	db	left(info,100)
+2026-10-07 13:42:04	53	vaseyaudio_member257	alter table `service_project_events` add constraint `service_project_events_actor_id_foreign` foreig
+2026-10-07 13:42:04	55	vaseyaudio_p2	alter table `track_metadata_presets` add index `track_metadata_presets_archived_at_index`(`archived_
+TRIGGER_SCHEMA	count(*)
+sys	2
+vaseyaudio_features253	279
+vaseyaudio_member257	345
+vaseyaudio_p2	164

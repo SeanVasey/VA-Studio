@@ -1,0 +1,32 @@
+{
+  "native-257-foreign-check": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ],
+  "native-257-data-bearing-prefix": [
+    {
+      "attempt": 1,
+      "exit": 0,
+      "counts": {
+        "tests": "1",
+        "assertions": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      "env_interference": false,
+      "waited_s": 0
+    }
+  ]
+}

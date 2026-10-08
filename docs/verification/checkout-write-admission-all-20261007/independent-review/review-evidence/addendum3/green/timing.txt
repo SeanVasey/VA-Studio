@@ -1,0 +1,5 @@
+canary exit=0 wall=6.438043446s
+archived-c6-physical exit=0 wall=7.252421892s
+ProductionCheckoutExemptionAuthorityTest exit=0 wall=26.017003003s
+ProductionCheckoutJourneyTest exit=0 wall=34.616074659s
+ProductionCheckoutWriteAdmissionAllTest exit=0 wall=66.199953137s
