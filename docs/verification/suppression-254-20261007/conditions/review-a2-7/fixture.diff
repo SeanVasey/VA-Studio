@@ -1,0 +1,19 @@
+diff --git a/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php b/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php
+index d530b2a9..1d128a4e 100644
+--- a/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php
++++ b/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php
+@@ -116,7 +116,13 @@ class ProductionSuppressionMigrationTest extends TestCase
+         DB::unprepared('DROP TRIGGER production_suppression_confirmations_retain_delete');
+         $this->refusesBeforeDDL();
+         $this->reset();
+-        DB::unprepared($this->steps()[1][2]);
++        // A later step (the targets table's first guard) exists while the intents table is missing. Installing the intents table
++        // itself would not do: it references the missing targets table, which MySQL refuses (error 1824) and SQLite allows.
++        $steps = $this->steps();
++        $this->assertSame(['table', 'production_suppression_targets'], [$steps[0][0], $steps[0][1]]);
++        $this->assertSame(['trigger', 'production_suppression_targets_retain_insert'], [$steps[4][0], $steps[4][1]]);
++        DB::unprepared($steps[0][2]);
++        DB::unprepared($steps[4][2]);
+         $this->refusesBeforeDDL();
+     }
+ 

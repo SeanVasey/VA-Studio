@@ -1,0 +1,162 @@
+<?php
+// Independent reviewer throwaway (addendum 2): raw PDO probes of the 254 insert guards on the private MySQL 8.4.11 :3494.
+// Usage (from the review worktree): php tests/Feature/ReviewSupp254d/probe-254.php <parents.json> <out.json>  (text report on stdout)
+// Every probe runs in its own transaction and is rolled back; only the four valid chain rows (one per table, at t0) are committed.
+require getcwd().'/vendor/autoload.php';
+
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureShape;
+use Illuminate\Support\Str;
+
+$p = json_decode(file_get_contents($argv[1]), true);
+$out = $argv[2];
+const STRICT = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+$modes = ['strict(laravel)' => STRICT, 'nonstrict(empty)' => '', 'ALLOW_INVALID_DATES' => 'ALLOW_INVALID_DATES'];
+
+function conn(string $mode, string $tz): PDO
+{
+    $pdo = new PDO('mysql:host=127.0.0.1;port=3494;dbname=vaseyaudio_review_supp254d_probe;charset=utf8mb4', 'root', 'review-supp254d-only',
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => true]);
+    $pdo->exec('SET SESSION sql_mode='.$pdo->quote($mode));
+    $pdo->exec('SET SESSION time_zone='.$pdo->quote($tz));
+
+    return $pdo;
+}
+
+$h = fn (string $s) => hash('sha256', $s);
+$ids = ['target' => null, 'intent' => null, 'attempt' => null];
+$rows = [
+    'production_suppression_targets' => fn (array $o) => ['public_id' => (string) Str::uuid(), 'binding_id' => $p['binding'], 'purpose' => 'email_marketing',
+        'recipient_hmac' => $p['hmac'], 'recipient_ciphertext' => 'synthetic', 'withdrawal_event_id' => $p['e1'], 'created_at' => $p['t0'], ...$o],
+    'production_suppression_intents' => fn (array $o) => ['public_id' => (string) Str::uuid(), 'target_id' => $GLOBALS['ids']['target'], 'withdrawal_event_id' => $p['e1'], 'created_at' => $p['t0'], ...$o],
+    'production_suppression_attempts' => fn (array $o) => ['public_id' => (string) Str::uuid(), 'target_id' => $GLOBALS['ids']['target'], 'intent_id' => $GLOBALS['ids']['intent'],
+        'provider_hash' => $h('provider'), 'provider_ciphertext' => 'synthetic', 'request_hash' => $h('request'), 'created_at' => $p['t0'], ...$o],
+    'production_suppression_confirmations' => fn (array $o) => ['attempt_id' => $GLOBALS['ids']['attempt'], 'request_hash' => $h('request'), 'receipt_hash' => $h('receipt'),
+        'receipt_ciphertext' => 'synthetic', 'created_at' => $p['t0'], ...$o],
+];
+
+$results = [];
+function probe(string $group, string $table, array $row, string $modeName, string $mode, string $tz, bool $ignore = false, string $label = ''): array
+{
+    $pdo = conn($mode, $tz);
+    $count = fn () => (int) $pdo->query("SELECT COUNT(*) FROM `$table`")->fetchColumn();
+    $pdo->beginTransaction();
+    $before = $count();
+    $r = ['group' => $group, 'table' => $table, 'label' => $label, 'mode' => $modeName.($ignore ? '+INSERT IGNORE' : ''), 'tz' => $tz,
+        'created_at_in' => $row['created_at'], 'public_id_in' => $row['public_id'] ?? null];
+    $cols = array_keys($row);
+    $sql = 'INSERT '.($ignore ? 'IGNORE ' : '')."INTO `$table` (`".implode('`,`', $cols).'`) VALUES ('.implode(',', array_fill(0, count($cols), '?')).')';
+    try {
+        $st = $pdo->prepare($sql);
+        $st->execute(array_values($row));
+        $id = (int) $pdo->lastInsertId();
+        $warnings = $pdo->query('SHOW WARNINGS')->fetchAll(PDO::FETCH_NUM);
+        $after = $count();
+        if ($after === $before) {
+            $r['outcome'] = 'no row (statement ok)';
+        } else {
+            $stored = $pdo->query("SELECT created_at, CAST(created_at AS CHAR) c, UNIX_TIMESTAMP(created_at) u".(isset($row['public_id']) ? ', public_id, HEX(public_id) hx, CHAR_LENGTH(public_id) n' : '')." FROM `$table` WHERE id=$id")->fetch(PDO::FETCH_ASSOC);
+            $pdo->exec("SET SESSION time_zone='+00:00'");
+            $utc = $pdo->query("SELECT created_at FROM `$table` WHERE id=$id")->fetchColumn();
+            $r['outcome'] = 'ACCEPTED';
+            $r['stored_session'] = $stored['created_at'];
+            $r['stored_utc'] = $utc;
+            $r['runtime_shape_ok(utc read)'] = ProductionFeatureShape::timestamp($utc);
+            if (isset($row['public_id'])) {
+                $r['public_id_stored_hex'] = $stored['hx'];
+                $r['public_id_len'] = (int) $stored['n'];
+                $r['isUuid(stored)'] = Str::isUuid($stored['public_id']);
+            }
+        }
+        $r['warnings'] = array_map(fn ($w) => $w[1].' '.$w[2], $warnings);
+    } catch (PDOException $e) {
+        $code = $e->errorInfo[1] ?? null;
+        $msg = (string) ($e->errorInfo[2] ?? $e->getMessage());
+        $r['outcome'] = str_contains($msg, 'Retained production suppression refused') ? 'refused by GUARD ('.$code.' 45000)' : 'refused by COLUMN/server ('.$code.' '.$msg.')';
+        $after = $count();
+    }
+    $r['rows_left_in_txn'] = $after - $before;
+    $pdo->rollBack();
+
+    return $r;
+}
+
+function commit(string $table, array $row): int
+{
+    $pdo = conn(STRICT, '+00:00');
+    $cols = array_keys($row);
+    $pdo->prepare("INSERT INTO `$table` (`".implode('`,`', $cols).'`) VALUES ('.implode(',', array_fill(0, count($cols), '?')).')')->execute(array_values($row));
+
+    return (int) $pdo->lastInsertId();
+}
+
+$malformed = ['zzzz', '2026-02-30 00:00:00', '2026-11-31 00:00:00', '2026-13-01 00:00:00', '0000-00-00 00:00:00', '2038-01-19 03:14:08'];
+$coerced = ['2026-10-07T12:00:00', '2026-10-07 12:00:00.5', '2026-10-07 23:59:59.6', '20261007120000', '2026-10-07 12:00', '2026/10/07 12:00:00',
+    '2026-10-07 12:00:00+02:00', ' 2026-10-07 12:00:00', "2026-10-07 12:00:00\n", '2026-10-07 24:20:59', '2026-10-07 12:00:60', '2026-10-07 12:00:00 '];
+$uuidShapes = [
+    'uppercase hex' => strtoupper((string) Str::uuid()),
+    'lowercase hex' => (string) Str::uuid(),
+    'last char replaced by space (36)' => substr((string) Str::uuid(), 0, 35).' ',
+    'valid uuid + trailing space (37)' => ((string) Str::uuid()).' ',
+    '35 chars + NUL (36)' => substr((string) Str::uuid(), 0, 35)."\0",
+    '35 chars + newline (36)' => substr((string) Str::uuid(), 0, 35)."\n",
+    'non-hex g (36)' => 'g'.substr((string) Str::uuid(), 1),
+    'non-ascii e-acute in place of a hex digit (36 chars)' => 'é'.substr((string) Str::uuid(), 1),
+];
+$dst = [
+    ['Europe/London', '2026-03-29 01:30:00', 'spring-forward gap'],
+    ['Europe/London', '2026-10-25 01:30:00', 'fall-back ambiguous, plain literal'],
+    ['Europe/London', '2026-10-25 01:30:00+00:00', 'fall-back second occurrence via offset literal'],
+    ['Europe/London', '2026-10-25 01:30:00+01:00', 'fall-back first occurrence via offset literal'],
+    ['America/New_York', '2026-03-08 02:30:00', 'spring-forward gap'],
+    ['America/New_York', '2026-11-01 01:30:00-05:00', 'fall-back second occurrence via offset literal'],
+    ['America/New_York', '2026-11-01 01:30:00-04:00', 'fall-back first occurrence via offset literal'],
+];
+
+foreach ($rows as $table => $make) {
+    foreach ($malformed as $v) {
+        foreach ($modes as $mn => $m) {
+            $results[] = probe('a-malformed', $table, $make(['created_at' => $v]), $mn, $m, '+00:00');
+        }
+        $results[] = probe('a-malformed', $table, $make(['created_at' => $v]), 'strict(laravel)', STRICT, '+00:00', true);
+    }
+    foreach ($coerced as $v) {
+        foreach (['strict(laravel)' => STRICT, 'nonstrict(empty)' => ''] as $mn => $m) {
+            $results[] = probe('b-coerced', $table, $make(['created_at' => $v]), $mn, $m, '+00:00');
+        }
+    }
+    if ($table !== 'production_suppression_confirmations') {
+        foreach ($uuidShapes as $label => $v) {
+            foreach (['strict(laravel)' => STRICT, 'nonstrict(empty)' => ''] as $mn => $m) {
+                $results[] = probe('c-public-id', $table, $make(['public_id' => $v]), $mn, $m, '+00:00', false, $label);
+            }
+        }
+    }
+    foreach ($dst as [$tz, $v, $label]) {
+        foreach (['strict(laravel)' => STRICT, 'nonstrict(empty)' => ''] as $mn => $m) {
+            $results[] = probe('dst', $table, $make(['created_at' => $v]), $mn, $m, $tz, false, $label);
+        }
+    }
+    // Positive control in each mode and zone: the exact valid t0 row is accepted (then rolled back).
+    foreach (['strict(laravel)' => STRICT, 'nonstrict(empty)' => ''] as $mn => $m) {
+        $results[] = probe('control', $table, $make([]), $mn, $m, '+00:00', false, 'valid t0');
+    }
+    if ($table === 'production_suppression_intents') {
+        // (d): target references e1 (t0); intent references e2 (t0+10s). Only e.created_at<=NEW.created_at can refuse t0+9s.
+        $results[] = probe('d-intent-before-withdrawal', $table, $make(['withdrawal_event_id' => $p['e2'], 'created_at' => '2026-01-01 00:00:09']), 'strict(laravel)', STRICT, '+00:00', false, 'intent 1 s before its withdrawal event');
+        $results[] = probe('d-intent-before-withdrawal', $table, $make(['withdrawal_event_id' => $p['e2'], 'created_at' => '2026-01-01 00:00:10']), 'strict(laravel)', STRICT, '+00:00', false, 'intent at the same instant (control)');
+        $results[] = probe('d-intent-before-withdrawal', $table, $make(['withdrawal_event_id' => $p['e2'], 'created_at' => '2026-01-01 00:00:09.6']), 'strict(laravel)', STRICT, '+00:00', false, 'intent 0.4 s before, rounded up by the column');
+    }
+    $key = ['production_suppression_targets' => 'target', 'production_suppression_intents' => 'intent', 'production_suppression_attempts' => 'attempt'][$table] ?? null;
+    if ($key) {
+        $ids[$key] = commit($table, $make([]));
+        $GLOBALS['ids'] = $ids;
+    }
+}
+
+file_put_contents($out, json_encode(['parents' => $p, 'committed' => $ids, 'results' => $results], JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_SLASHES));
+foreach ($results as $r) {
+    printf("%-26s %-38s %-34s %-34s %-17s in=%-30s => %s%s%s\n", $r['group'], $r['table'], $r['label'] ?: '-', $r['mode'], $r['tz'],
+        json_encode($r['group'] === 'c-public-id' ? $r['public_id_in'] : $r['created_at_in'], JSON_INVALID_UTF8_SUBSTITUTE),
+        $r['outcome'], isset($r['stored_utc']) ? ' stored_session='.$r['stored_session'].' stored_utc='.$r['stored_utc'].' runtime_shape_ok='.json_encode($r['runtime_shape_ok(utc read)']).(isset($r['isUuid(stored)']) ? ' isUuid(stored)='.json_encode($r['isUuid(stored)']).' len='.$r['public_id_len'] : '') : '',
+        ' rows_left='.$r['rows_left_in_txn'].($r['warnings'] ?? [] ? ' warnings='.json_encode($r['warnings']) : ''));
+}

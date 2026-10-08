@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php" tests="1" assertions="16" errors="0" failures="1" skipped="0" time="1.972125">
+    <testcase name="test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php" line="59" class="Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionTimestampGuardTest" assertions="16" time="1.972125">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+production_suppression_targets accepted a created_at of non-date text.
+
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:105
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:92
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

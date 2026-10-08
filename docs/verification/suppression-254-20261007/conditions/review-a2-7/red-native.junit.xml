@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionMigrationTest" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php" tests="1" assertions="7" errors="1" failures="0" skipped="0" time="68.554862">
+    <testcase name="test_recorded_gap_and_non_prefix_installation_refuse_without_repair" file="/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php" line="113" class="Tests\Feature\ProductionSuppression\ProductionSuppressionMigrationTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionMigrationTest" assertions="7" time="68.554862">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionSuppression\ProductionSuppressionMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'production_suppression_targets' (Connection: mysql, Host: 127.0.0.1, Port: 3555, Database: vaseyaudio_supp254_a27, SQL: CREATE TABLE `production_suppression_intents` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `target_id` bigint unsigned NOT NULL, `withdrawal_event_id` bigint unsigned NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `production_suppression_intents_public_unique` (`public_id`), UNIQUE KEY `production_suppression_intents_withdrawal_unique` (`withdrawal_event_id`), KEY `production_suppression_intents_target_index` (`target_id`), CONSTRAINT `production_suppression_intents_target_id_fk` FOREIGN KEY (`target_id`) REFERENCES `production_suppression_targets` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `production_suppression_intents_withdrawal_event_id_fk` FOREIGN KEY (`withdrawal_event_id`) REFERENCES `production_consent_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained production suppression v1')
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:644
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

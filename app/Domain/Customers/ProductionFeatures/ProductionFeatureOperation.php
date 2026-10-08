@@ -18,6 +18,17 @@ use Throwable;
 /** A regular durable transaction followed by read-only validation of its original authority. */
 final class ProductionFeatureOperation
 {
+    /** Contexts whose minting run callback is executing now. Only run() writes it; there is no setter. */
+    private static array $live = [];
+
+    /** Sealed consumers accept only a context minted by run() whose callback is still executing. */
+    public static function assertLive(ProductionFeatureContext $context): void
+    {
+        if ((self::$live[spl_object_id($context)] ?? null) !== $context) {
+            throw new ProductionFeatureException;
+        }
+    }
+
     public function run(ProductionAccountFeatureIdentity $identity, callable $operation): array
     {
         // One operation budget includes source callbacks, commit events and validation; never renewed.
@@ -54,7 +65,12 @@ final class ProductionFeatureOperation
             $frame = $observer->frame();
             $reader = new CurrentRows($primary, $connection->getDriverName());
             $context = ProductionFeatureContext::locked($identity, $access, $reader, $frame, $deadline, $configuration);
-            $projection = $operation($context);
+            self::$live[spl_object_id($context)] = $context;
+            try {
+                $projection = $operation($context);
+            } finally {
+                unset(self::$live[spl_object_id($context)]);
+            }
             $observer->prepare($context);
             // Normal Laravel committing/afterCommit/committed dispatch; observer proves after delegates.
             $connection->commit();

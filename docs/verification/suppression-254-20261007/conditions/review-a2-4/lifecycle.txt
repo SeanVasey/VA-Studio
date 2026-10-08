@@ -1,0 +1,5 @@
+2026-10-08T04:27:06Z phase1 started on 3621 pid 30821
+2026-10-08T04:27:12Z phase2 restarted on 3621 with --default-time-zone=Europe/London pid 31406; schema vaseyaudio_supp254_tz
+2026-10-08 pre-start LISTEN ports: 2024 2025 3531 3567 3613 37277 41441 (other lanes/processes, untouched); chosen port 3621 was free; 3306 not listening and untouched. The time zone tables were loaded with mysql_tzinfo_to_sql after the first start (499 zones) and the server was restarted with --default-time-zone=Europe/London (@@global.time_zone confirmed Europe/London).
+2026-10-08T04:34:46Z mysqladmin shutdown on :3621; pid 31406 absent from /proc; LISTEN ports afterwards: 2024 2025 3531 3567 3613 3641 37277 41441  (3621 and 3306 absent)
+2026-10-08T04:34:46Z removed $scratchpad/supp254-tz-mysql (datadir, logs, pid file, pinned config backup) with rm -rf; ls afterwards: No such file or directory

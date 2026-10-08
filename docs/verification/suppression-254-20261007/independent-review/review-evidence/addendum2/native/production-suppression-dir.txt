@@ -1,0 +1,177 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-supp254d/phpunit.xml
+
+.EEEEEEEEEE.......................E.........EEEE                  48 / 48 (100%)
+
+Time: 02:13:48.045, Memory: 145.00 MB
+
+There were 15 errors:
+
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionDefaultConfigurationTest::test_production_environment_refuses_with_shipped_defaults_before_any_row_or_provider_call
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionDefaultConfigurationTest.php:42
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionSuppression\ProductionSuppressionIntentGuardTest::test_intent_is_refused_before_its_withdrawal_event_and_accepted_at_the_same_instant
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionIntentGuardTest.php:35
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_withdraw_attempt_committed_before_transport_unknown_without_resend_until_inspect_confirms
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_receipts_scoped_to_another_recipient_provider_or_account_never_confirm
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:88
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_later_grant_never_deletes_or_reverses_a_suppression
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:121
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_email_change_never_retargets_and_reconcile_inspects_the_authentic_captured_target
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_postcommit_authority_loss_after_the_durable_attempt_never_reaches_transport
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:190
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_unbound_provider_records_a_pending_intent_without_any_attempt_or_transport
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:338
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:236
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php:98
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1129
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:76
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:212
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_disabled_or_malformed_parent_refuses_before_any_lookup_or_write
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:338
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php:86
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php:45
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:74
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:273
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:224
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_legacy_251_history_never_becomes_production_lineage
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:253
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\ProductionSuppression\ProductionSuppressionMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'production_suppression_targets' (Connection: mysql, Host: 127.0.0.1, Port: 3493, Database: vaseyaudio_review_supp254d, SQL: CREATE TABLE `production_suppression_intents` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `target_id` bigint unsigned NOT NULL, `withdrawal_event_id` bigint unsigned NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `production_suppression_intents_public_unique` (`public_id`), UNIQUE KEY `production_suppression_intents_withdrawal_unique` (`withdrawal_event_id`), KEY `production_suppression_intents_target_index` (`target_id`), CONSTRAINT `production_suppression_intents_target_id_fk` FOREIGN KEY (`target_id`) REFERENCES `production_suppression_targets` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `production_suppression_intents_withdrawal_event_id_fk` FOREIGN KEY (`withdrawal_event_id`) REFERENCES `production_consent_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained production suppression v1')
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:644
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'production_suppression_targets'
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:650
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:644
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+12) Tests\Feature\ProductionSuppression\ProductionSuppressionPublicIdGuardTest::test_every_public_id_the_runtime_validates_must_be_a_uuid_at_the_trigger
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionPublicIdGuardTest.php:38
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+13) Tests\Feature\ProductionSuppression\ProductionSuppressionSealTest::test_context_not_minted_by_run_cannot_reach_the_reader_or_254_rows
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php:34
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+14) Tests\Feature\ProductionSuppression\ProductionSuppressionSealTest::test_transport_request_never_renders_its_recipient
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+15) Tests\Feature\ProductionSuppression\ProductionSuppressionTimestampGuardTest::test_every_created_at_the_runtime_validates_must_be_a_real_timestamp_at_the_trigger
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254d/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254d/tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php:65
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 48, Assertions: 538, Errors: 15.
