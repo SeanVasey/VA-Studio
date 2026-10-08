@@ -1,0 +1,11 @@
+cmd: probe copy of tests/frontend/paid-grant-review-addendum4.test.tsx with it.fails -> it; probe file deleted after
+head: dc5b5c0e870fd9f9115f3199a623abc8ef02f37e
+ ❯ tests/frontend/zz-a4-probe.test.tsx (3 tests | 1 failed) 511ms
+     × does not offer the retry while the original submission has not reported back 101ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/zz-a4-probe.test.tsx > review addendum 4: retry of a refused download > does not offer the retry while the original submission has not reported back
+Error: [2mexpect([22m[31melement[39m[2m).not.toBeInTheDocument()[22m
+[31mexpected document not to contain element, found <button
+ ❯ tests/frontend/zz-a4-probe.test.tsx:67:25
+      Tests  1 failed | 2 passed (3)
+rc=1
