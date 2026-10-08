@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" tests="23" assertions="126" errors="6" failures="0" skipped="0" time="19.163169">
+    <testcase name="test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="54" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.947086">
+      <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl" tests="21" assertions="118" errors="4" failures="0" skipped="0" time="17.545178">
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #0" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.721922"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #1" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.802608"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #2" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.808412"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #3" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.688628"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #4" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.891846"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #5" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.849680"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #6" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.789617"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #7" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.755009"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #8" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.814375"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #9" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.843401"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #10" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.817219"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #11" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.785473"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #12" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.843697"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #13" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.831780"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #14" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.900679"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #15" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.845531"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #16" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.006032"/>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #17" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.958754">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #17
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #18" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.860486">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #18
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #19" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.914401">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #19
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #20" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.815627">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #20
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema" file="/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="178" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="0.670905">
+      <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-prefix/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-prefix/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-prefix/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

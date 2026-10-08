@@ -1,0 +1,13 @@
+source: 9593fcdf12ab6ec2151311872e3592b80a82b592  php: 8.4.26  mysqld: 8.4.11
+== migrate:fresh --force on rv256_3
+  2026_10_06_238000_production_track_preparation_packets ....... 380.43ms DONE
+exit=0 migrations_done=72
+== migrate:fresh --force on rv256_4
+  2026_10_06_238000_production_track_preparation_packets ........ 22.87ms FAIL
+  Unexpected production capability external or additional table guard; rollba  
+exit=1 migrations_done=55
+TRIGGER_SCHEMA	triggers
+rv256_3	512
+rv256_4	279
+TRIGGER_SCHEMA	TRIGGER_NAME
+rv256_3	ptp_packet_insert
