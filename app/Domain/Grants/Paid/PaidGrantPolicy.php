@@ -18,13 +18,7 @@ final class PaidGrantPolicy
     {
         PaidGrantException::require($this->enabled(), 404);
         $policy = config('paid-grants.delivery_policy');
-        PaidGrantException::require(is_array($policy) && ! array_is_list($policy), 503);
-        PaidGrantInput::keys($policy, ['schema_version', 'version', 'purpose', 'provenance', 'max_downloads', 'authorization_seconds']);
-        PaidGrantException::require($policy['schema_version'] === 1 && $policy['purpose'] === 'paid-original-delivery'
-            && is_string($policy['version']) && preg_match('/\A[a-z][a-z0-9_-]{0,79}\z/D', $policy['version']) === 1
-            && in_array($policy['provenance'], ['synthetic_rehearsal', 'verified_production'], true)
-            && is_int($policy['max_downloads']) && $policy['max_downloads'] >= 1 && $policy['max_downloads'] <= 100
-            && is_int($policy['authorization_seconds']) && $policy['authorization_seconds'] >= 30 && $policy['authorization_seconds'] <= 600, 503);
+        self::wellFormed($policy, 503);
         $this->transfer();
 
         return $policy;
@@ -52,6 +46,31 @@ final class PaidGrantPolicy
             && is_int($max) && $max >= 60 && $max <= 14400, 503);
 
         return ['rate' => $rate, 'base' => $base, 'max' => $max];
+    }
+
+    /**
+     * An order keeps the delivery policy it was finalized under, and its download limit and authorization lifetime
+     * come from that retained copy. Revising the configured policy (its version, limit or lifetime) for future orders
+     * must not lock earlier buyers out of their license and files, so a retained policy is accepted when it is a
+     * well-formed policy of the current provenance. Enablement, provenance and identity are still proven against the
+     * current configuration (`capture()`, `provePure()`); a rehearsal order never runs under a production policy or
+     * the reverse.
+     */
+    public static function retained(mixed $retained, array $current): void
+    {
+        self::wellFormed($retained, 409);
+        PaidGrantException::require($retained['provenance'] === $current['provenance'], 409);
+    }
+
+    private static function wellFormed(mixed $policy, int $status): void
+    {
+        PaidGrantException::require(is_array($policy) && ! array_is_list($policy), $status);
+        PaidGrantInput::keys($policy, ['schema_version', 'version', 'purpose', 'provenance', 'max_downloads', 'authorization_seconds']);
+        PaidGrantException::require($policy['schema_version'] === 1 && $policy['purpose'] === 'paid-original-delivery'
+            && is_string($policy['version']) && preg_match('/\A[a-z][a-z0-9_-]{0,79}\z/D', $policy['version']) === 1
+            && in_array($policy['provenance'], ['synthetic_rehearsal', 'verified_production'], true)
+            && is_int($policy['max_downloads']) && $policy['max_downloads'] >= 1 && $policy['max_downloads'] <= 100
+            && is_int($policy['authorization_seconds']) && $policy['authorization_seconds'] >= 30 && $policy['authorization_seconds'] <= 600, $status);
     }
 
     /** Captured repository only: caller resolves all injectable services before terminal raw proof. */

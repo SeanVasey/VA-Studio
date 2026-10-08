@@ -59,8 +59,8 @@ final class PaidGrantCommands
                 }
                 $graph = $grants->graph($batchId, $binding['account_id'], $rows);
                 PaidGrantException::require(CanonicalJson::encode($graph['payload']['original_buyer']) === CanonicalJson::encode($original)
-                    && CanonicalJson::encode($graph['payload']['delivery_policy']) === CanonicalJson::encode($policy)
                     && CanonicalJson::encode(array_column(array_column($graph['lines'], 'body'), 'source')) === CanonicalJson::encode($sources), 409);
+                PaidGrantPolicy::retained($graph['payload']['delivery_policy'], $policy);
                 $result = $operation($graph, $rows);
                 PaidGrantException::require(is_array($result));
                 $expected = $grants->graph($batchId, $binding['account_id'], $rows);

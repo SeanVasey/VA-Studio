@@ -231,8 +231,8 @@ final class PaidGrants
     private function sameSources(array $graph, array $sources, array $policy, array $original): void
     {
         PaidGrantException::require(CanonicalJson::encode($graph['payload']['original_buyer']) === CanonicalJson::encode($original)
-            && CanonicalJson::encode($graph['payload']['delivery_policy']) === CanonicalJson::encode($policy)
             && CanonicalJson::encode(array_column(array_column($graph['lines'], 'body'), 'source')) === CanonicalJson::encode($sources), 409);
+        PaidGrantPolicy::retained($graph['payload']['delivery_policy'], $policy);
     }
 
     public function project(array $graph): array
