@@ -113,8 +113,10 @@ final class PaidGrantDownloads
         $locator = $this->locate($id, $principal, $actor);
         // The authorization lifetime is the valid-to-start deadline: the first frame compares it with its own current time,
         // and the second frame re-checks that same admitted instant, so a slow snapshot cannot turn a redemption that
-        // started in time into an expired one. The original observation budget still bounds both frames and the snapshot;
-        // the stream then gets a transfer deadline derived from the snapshot size (see below).
+        // started in time into an expired one. Three budgets follow, none extendable: this 60 s observation budget bounds
+        // locating and the first frame; the snapshot gets its own `snapshot_seconds` bound from when the first frame closes;
+        // the commit frame and the before-first-byte proof get a fresh 60 s observation budget. The stream then gets a
+        // transfer deadline derived from the snapshot size (see below).
         $admitted = null;
         $inspect = function (array $graph, PaidGrantRows $rows) use ($locator, $id, $token, &$admitted): array {
             $matches = array_values(array_filter($graph['lines'], fn (array $line): bool => (int) $line['origin']['id'] === (int) $locator['origin_id']));
@@ -141,11 +143,17 @@ final class PaidGrantDownloads
         // One held spool slot per buyer account, so one buyer's slow transfers cannot occupy every slot (refused before any
         // attempt is recorded). The digest only names the account inside the private spool.
         $holder = hash('sha256', 'paid-spool-holder-v1:'.$before['graph']['batch']['account_id']);
-        $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $deadline->value(), $holder);
+        // Started when the first frame closes, so a slow first frame cannot leave the snapshot only its leftover seconds.
+        $snapshotDeadline = hrtime(true) + app(PaidGrantPolicy::class)->snapshotSeconds() * 1_000_000_000;
+        $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $snapshotDeadline, $holder);
         $projectionRead = PaidGrantProjectionRead::begin();
         try {
             // Derived and validated before the attempt is consumed, so a refused transfer policy records nothing.
             $seconds = app(PaidGrantPolicy::class)->transferSeconds($prepared->sizeBytes);
+            // A fresh observation budget for the commit frame and the before-first-byte proof, so time spent before the
+            // snapshot finished cannot fail the post-commit proof after the attempt is recorded. The frame re-proves
+            // everything itself: the same inspection and admitted instant, unchanged state and the attempt limit.
+            $commit = PaidGrantDeadline::start();
             $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before): array {
                 $current = $inspect($graph, $rows);
                 PaidGrantException::require($current === $before, 409);
@@ -153,10 +161,10 @@ final class PaidGrantDownloads
                 PaidGrantRecords::insert('paid_redemptions', ['authorization_id' => (int) $current['auth']['id'], 'created_at' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s')], $rows);
 
                 return [];
-            }, $deadline, additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($before['auth'], $rows),
+            }, $commit, additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($before['auth'], $rows),
                 projectionRead: $projectionRead);
 
-            // Counted from the redemption commit; the first byte still needs the original observation budget (proveBeforeBytes).
+            // Counted from the redemption commit; the first byte still needs the commit frame's observation budget (proveBeforeBytes).
             return new PaidGrantTransfer($prepared, $this->filename($before['line']['origin']['public_id'], $before['auth']['target']), $this->mime($before['auth']['target']),
                 $projectionRead, $this->tick() + $seconds * 1_000_000_000, $this->clock);
         } catch (Throwable $error) {

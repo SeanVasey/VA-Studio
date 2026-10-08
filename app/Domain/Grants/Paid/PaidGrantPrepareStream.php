@@ -21,14 +21,21 @@ class PaidGrantPrepareStream
 
     public const RESERVE_BYTES = 16777216;
 
+    /** Bound on a snapshot whose caller passes no deadline (tests and non-account callers). */
     public const MAX_SECONDS = 60;
 
+    /** Ceiling on a caller's snapshot deadline: the largest accepted `paid-grants.snapshot_seconds`. */
+    public const MAX_DEADLINE_SECONDS = 1800;
+
     /**
+     * @param  int|null  $snapshotDeadline  Monotonic nanoseconds bounding only this snapshot's own copy and read-back;
+     *                                      redemption passes its separate snapshot budget, capped here at
+     *                                      MAX_DEADLINE_SECONDS. Null means MAX_SECONDS.
      * @param  string|null  $holder  64-hex digest naming the buyer account the snapshot is for. One buyer holds at most one
      *                               slot at a time, so a buyer's own slow transfers cannot take every slot from other
      *                               customers; null (tests and non-account callers) records no holder.
      */
-    public function handle(array $target, ?int $originalDeadline = null, ?string $holder = null): PreparedDeliveryStream
+    public function handle(array $target, ?int $snapshotDeadline = null, ?string $holder = null): PreparedDeliveryStream
     {
         ActivationPolicy::outsideTransactions();
         $policy = (new PaidGrantPolicy)->capture();
@@ -40,7 +47,9 @@ class PaidGrantPrepareStream
         $owned = null;
         try {
             $this->target($target);
-            $deadline = min($originalDeadline ?? PHP_INT_MAX, hrtime(true) + self::MAX_SECONDS * 1000000000);
+            $now = hrtime(true);
+            $deadline = $snapshotDeadline === null ? $now + self::MAX_SECONDS * 1000000000
+                : min($snapshotDeadline, $now + self::MAX_DEADLINE_SECONDS * 1000000000);
             $files = app(DeliveryAssetFiles::class);
             $root = $files->privateRoot();
             $directories = $this->directories($root, true);

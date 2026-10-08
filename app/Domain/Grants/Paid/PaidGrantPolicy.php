@@ -20,8 +20,21 @@ final class PaidGrantPolicy
         $policy = config('paid-grants.delivery_policy');
         self::wellFormed($policy, 503);
         $this->transfer();
+        $this->snapshotSeconds();
 
         return $policy;
+    }
+
+    /**
+     * Seconds the private delivery snapshot may take, counted from when the first redemption frame closes and independent
+     * of the observation budget and the authorization lifetime. Bounds mirror ProductionFreeGrantPolicy.
+     */
+    public function snapshotSeconds(): int
+    {
+        $seconds = config('paid-grants.snapshot_seconds');
+        PaidGrantException::require(is_int($seconds) && $seconds >= 30 && $seconds <= 1800, 503);
+
+        return $seconds;
     }
 
     /**

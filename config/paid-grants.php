@@ -11,4 +11,8 @@ return [
     'transfer_min_bytes_per_second' => 262144,
     'transfer_base_seconds' => 30,
     'transfer_max_seconds' => 7200,
+    // The private delivery snapshot (copy and hash read-back of up to 1 GiB) has its own bound, started when the first
+    // redemption frame closes, so a slow first frame cannot leave it only the observation budget's leftover seconds.
+    // 30 to 1800 s; same default and bounds as Free256. Not part of the retained delivery_policy.
+    'snapshot_seconds' => 300,
 ];
