@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use App\Domain\Rights\CreateLicenseDraft;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\SaveLicenseTemplate;
@@ -46,7 +47,13 @@ try {
                     'required_asset_roles' => ['master_wav']]], $actor)->fresh();
         }
         $after = bulkLicenseSourceRows();
+        // The discovery epoch (migration 240) is a monotonic invalidation counter that every license
+        // write legitimately advances; its identity stays exact and it may never move backwards.
+        UnpaidReleaseBrowserFixture::check(bulkLicenseSourceEpoch($after) >= bulkLicenseSourceEpoch($before));
         foreach ($before as $table => $records) {
+            if ($table === DiscoveryEpoch::TABLE) {
+                continue;
+            }
             foreach ($records as $key => $record) {
                 UnpaidReleaseBrowserFixture::check(($after[$table][$key] ?? null) === $record);
             }
@@ -158,6 +165,10 @@ try {
         foreach (array_keys($added) as $id) {
             unset($actual['audit_events'][$id]);
         }
+        // A no-op phase must not write at all, so the epoch is exact; reviewed edits may only advance it.
+        $epoch = bulkLicenseSourceEpoch($actual);
+        UnpaidReleaseBrowserFixture::check($expectedCount === 0 ? $epoch === bulkLicenseSourceEpoch($original) : $epoch >= bulkLicenseSourceEpoch($original));
+        unset($actual[DiscoveryEpoch::TABLE], $original[DiscoveryEpoch::TABLE]);
         UnpaidReleaseBrowserFixture::check($actual === $original && bulkLicenseSourceGuards() === $fixture['guards']);
         echo json_encode(['verified' => true, 'phase' => $phase, 'versionIds' => $fixture['versionIds'],
             'sources' => $actualSources, 'rowHashes' => $rowHashes, 'updates' => $expectedCount, 'auditIds' => $auditIds,
@@ -183,6 +194,17 @@ function bulkLicenseSourceRows(): array
     }
 
     return $result;
+}
+
+function bulkLicenseSourceEpoch(array $rows): int
+{
+    $records = $rows[DiscoveryEpoch::TABLE] ?? null;
+    UnpaidReleaseBrowserFixture::check(is_array($records) && count($records) === 1 && isset($records['1']));
+    $row = json_decode($records['1'], true, 4, JSON_THROW_ON_ERROR);
+    UnpaidReleaseBrowserFixture::check(is_array($row) && array_keys($row) === ['id', 'epoch', 'schema_version']
+        && $row['id'] === 1 && $row['schema_version'] === 1 && is_int($row['epoch']));
+
+    return $row['epoch'];
 }
 
 function bulkLicenseSourceGuards(): string

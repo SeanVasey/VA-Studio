@@ -33,13 +33,19 @@ class DiscoveryEpochMigrationTest extends TestCase
         if ($populated) {
             Track::create(['title' => 'Synthetic retained draft', 'slug' => 'retained-draft']);
         }
+        // Later migrations legitimately run after 240, so a fixed --step 1 selects the newest
+        // migration, which is absent from --path ("Migration not found") and never reaches 240.
+        // Derive the smallest step that reaches 240 in the repository's own rollback order.
+        $order = array_column(app('migration.repository')->getMigrations(PHP_INT_MAX), 'migration');
+        $position = array_search(self::MIGRATION, $order, true);
+        $this->assertIsInt($position, 'The discovery epoch migration must be recorded before rollback is exercised.');
         $before = $this->rows();
         $queries = [];
         DB::listen(function ($query) use (&$queries): void {
             $queries[] = $query->sql;
         });
         try {
-            Artisan::call('migrate:rollback', ['--path' => [database_path('migrations/'.self::MIGRATION.'.php')], '--realpath' => true, '--step' => 1, '--force' => true]);
+            Artisan::call('migrate:rollback', ['--path' => [database_path('migrations/'.self::MIGRATION.'.php')], '--realpath' => true, '--step' => $position + 1, '--force' => true]);
             $this->fail('Operational teardown admitted.');
         } catch (LogicException $error) {
             $this->assertSame('Retain discovery epoch, guards and migration bookkeeping; operational teardown is unsupported.', $error->getMessage());
