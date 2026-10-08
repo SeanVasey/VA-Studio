@@ -3,7 +3,8 @@
 # Usage: [DBS="db1 db2 db1"] two-db-repro.sh <checkout dir>
 # Databases must already exist on the private daemon (see mysqld-up.sh).
 set -uo pipefail
-cd "$1"
+# A missing or unreadable checkout stops here, so the evidence is never bound to whatever directory the caller is in.
+cd "${1:?usage: two-db-repro.sh <checkout dir>}" || { echo "cannot enter checkout: $1" >&2; exit 2; }
 # Every migrate:fresh status and the final catalog dump are accumulated; the script exits nonzero when any one failed.
 status=0
 MYSQL=/opt/mysql84/mysql-8.4.11-linux-glibc2.28-x86_64/bin/mysql
