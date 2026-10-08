@@ -1,0 +1,11 @@
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 22:45:34.773059803 +0000
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchema.php	2026-10-07 22:45:34.850678904 +0000
+@@ -136,7 +136,7 @@
+                 "NEW.funds_mode IN ('test', 'live')", 'NEW.idempotency_key = '.self::concat($driver, "'".self::IDEMPOTENCY_PREFIX."'", 'NEW.public_id'),
+                 "NEW.currency = 'USD'", self::integer($driver, 'subtotal_minor', 50, 99999999), "NEW.tax_behavior IN ('exclusive', 'inclusive')",
+                 self::integer($driver, 'maximum_rate_bps', 0, 10000), self::timestamp($driver, 'provider_expires_at'), 'NEW.provider_expires_at > NEW.created_at',
+-                'EXISTS (SELECT 1 FROM '.$o.' o WHERE o.id = NEW.order_id AND o.created_at <= NEW.created_at AND o.currency = NEW.currency AND o.subtotal_minor = NEW.subtotal_minor)'],
++                'EXISTS (SELECT 1 FROM '.$o.' o WHERE o.id = NEW.order_id AND o.currency = NEW.currency AND o.subtotal_minor = NEW.subtotal_minor)'],
+             'binding' => [self::integer($driver, 'request_id', 1, 21474836470), self::providerId($driver, 'account_id', 'acct_', 64),
+                 "NEW.funds_mode IN ('test', 'live')", self::sessionId($driver, 'provider_session_id'),
+                 'EXISTS (SELECT 1 FROM '.$r.' r WHERE r.id = NEW.request_id AND r.created_at <= NEW.created_at AND r.account_id = NEW.account_id AND r.funds_mode = NEW.funds_mode)'],

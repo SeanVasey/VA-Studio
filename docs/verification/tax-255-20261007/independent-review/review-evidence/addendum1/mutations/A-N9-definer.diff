@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..a1b674d3 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -121,7 +121,7 @@ final class TaxCheckoutSchemaInstaller
+                     $identity = DB::selectOne('SELECT CURRENT_USER() AS definer, @@SESSION.sql_mode AS sql_mode');
+                     if ($object['EVENT_OBJECT_TABLE'] !== $expected['table'] || $object['ACTION_TIMING'] !== 'BEFORE'
+                         || $object['EVENT_MANIPULATION'] !== $expected['operation'] || $object['ACTION_ORIENTATION'] !== 'ROW'
+-                        || $object['ACTION_STATEMENT'] !== $expected['body'] || $object['DEFINER'] !== $identity->definer
++                        || $object['ACTION_STATEMENT'] !== $expected['body']
+                         || $object['SQL_MODE'] !== $identity->sql_mode || (int) $object['ACTION_ORDER'] !== 1) {
+                         $this->reject('guard definition');
+                     }

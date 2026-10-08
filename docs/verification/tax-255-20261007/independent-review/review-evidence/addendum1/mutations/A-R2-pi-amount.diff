@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..da81ecc2 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -254,7 +254,7 @@ final class TaxCheckoutEvidence
+             $context = $request['execution_context'];
+             CheckoutException::require($payment !== null && ($payment['object'] ?? null) === 'payment_intent' && ($payment['id'] ?? null) === $locator
+                 && ($payment['livemode'] ?? null) === ($context['funds_mode'] === 'live') && ($payment['currency'] ?? null) === 'usd'
+-                && ($payment['amount'] ?? null) === $total && is_int($payment['amount_received'] ?? null) && $payment['amount_received'] >= 0 && $payment['amount_received'] <= $total
++                && is_int($payment['amount_received'] ?? null) && $payment['amount_received'] >= 0 && $payment['amount_received'] <= $total
+                 && is_int($payment['amount_capturable'] ?? null) && $payment['amount_capturable'] >= 0 && $payment['amount_capturable'] <= $total
+                 && ($payment['capture_method'] ?? null) === $context['capture_method'] && ($payment['payment_method_types'] ?? null) === ['card']
+                 && in_array($payment['status'] ?? null, ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'requires_capture', 'canceled', 'succeeded'], true));

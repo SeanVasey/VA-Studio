@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\ReviewProbes\TaxReviewAddendumAnchorProbeTest" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumAnchorProbeTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="0.245767">
+    <testcase name="test_a1_shape_fragments_refuse_line_terminators_on_this_driver" file="/home/user/VA-Studio-review-tax255b/docs/verification/tax-255-20261007/independent-review/review-evidence/addendum1/probes/TaxReviewAddendumAnchorProbeTest.php" line="32" class="Tests\ReviewProbes\TaxReviewAddendumAnchorProbeTest" classname="Tests.ReviewProbes.TaxReviewAddendumAnchorProbeTest" assertions="8" time="0.245767"/>
+  </testsuite>
+</testsuites>

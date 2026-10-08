@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="65" assertions="241" errors="15" failures="2" skipped="0" time="92.626956">
+    <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" tests="9" assertions="22" errors="0" failures="2" skipped="0" time="11.289285">
+      <testsuite name="Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate" tests="2" assertions="2" errors="0" failures="2" skipped="0" time="3.331304">
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;empty&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="2.178404">
+          <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "empty"
+Operational teardown admitted.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+        <testcase name="test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set &quot;populated&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="31" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.152901">
+          <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate with data set "populated"
+Operational teardown admitted.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+        </testcase>
+      </testsuite>
+      <testcase name="test_down_refuses_before_any_database_read_or_write" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="69" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.308479"/>
+      <testcase name="test_actual_insert_update_delete_upsert_replace_aba_and_rollback_invalidate_atomically" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="84" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="9" time="1.402465"/>
+      <testcase name="test_missing_changed_guard_and_modified_table_fail_closed" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="111" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="0.830536"/>
+      <testcase name="test_overflow_refuses_parent_write_and_preserves_epoch_and_data" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="137" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="3" time="1.082568"/>
+      <testcase name="test_exact_installed_migration_is_idempotent_and_preserves_retained_data" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="155" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.094590"/>
+      <testcase name="test_foreign_guard_on_absent_installation_is_not_adopted_or_replaced" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="164" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="2" time="1.219327"/>
+      <testcase name="test_connection_local_dependency_shadow_refuses_capture" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/DiscoveryEpochMigrationTest.php" line="188" class="Tests\Feature\DiscoveryEpochMigrationTest" classname="Tests.Feature.DiscoveryEpochMigrationTest" assertions="1" time="1.020015"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" tests="23" assertions="126" errors="6" failures="0" skipped="0" time="28.729604">
+      <testcase name="test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="54" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.384337">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_red_predecessor_foreign_trigger_on_absent_owned_schema_is_preserved_by_refusal
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:57
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testsuite name="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl" tests="21" assertions="118" errors="4" failures="0" skipped="0" time="26.142748">
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #0" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.482291"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #1" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.247221"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #2" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.147214"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #3" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.333156"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #4" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.123120"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #5" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.279572"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #6" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.329483"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #7" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.090548"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #8" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.804961"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #9" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.228193"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #10" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.136601"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #11" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.408060"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #12" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.635231"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #13" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.055982"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #14" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.528678"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #15" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="1.071948"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #16" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="6" time="0.947258"/>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #17" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.497886">
+          <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #17
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #18" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.476204">
+          <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #18
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #19" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.009638">
+          <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #19
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #20" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="84" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.309503">
+          <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_every_unowned_modified_partial_shadow_or_external_dependency_is_preserved_before_ddl with data set #20
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php" line="178" class="Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest" classname="Tests.Feature.ProductionTrackCapabilitiesMigrationOwnershipTest" assertions="4" time="1.202519">
+        <error type="LogicException">Tests\Feature\ProductionTrackCapabilitiesMigrationOwnershipTest::test_exact_empty_owned_teardown_recreate_and_repeated_absent_noop_preserve_unrelated_schema
+LogicException: Unexpected production capability external foreign key reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:273
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:109
+/home/user/VA-Studio-review-tax255-aux/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:29
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_06_236000_production_track_policy_capabilities.php:155
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" tests="33" assertions="93" errors="9" failures="0" skipped="0" time="52.608067">
+      <testcase name="test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="141" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="6.120520">
+        <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:159
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored" tests="8" assertions="0" errors="8" failures="0" skipped="0" time="11.582039">
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 0&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.491801">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 0"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 1&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.568619">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 1"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 2&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.304226">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 2"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 3&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.303213">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 3"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 4&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.410077">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 4"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 5&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.475580">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 5"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 6&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.446961">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 6"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set &quot;recognized prefix 7&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="183" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="0" time="1.581561">
+          <error type="LogicException">Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored with data set "recognized prefix 7"
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+/home/user/VA-Studio-review-tax255-aux/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:121
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php:192
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+      </testsuite>
+      <testcase name="test_an_impossible_nonprefix_installation_is_refused_before_any_ddl_or_data_repair" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="202" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.551893"/>
+      <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard" tests="7" assertions="21" errors="0" failures="0" skipped="0" time="9.714014">
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_immutable_update&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.413336"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_immutable_delete&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.270865"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_verified_insert&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.397281"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;rights_evidence_verified_identity_insert&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.515912"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_delete&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.008583"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_update&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.663215"/>
+        <testcase name="test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard with data set &quot;tracks_rights_evidence_insert&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="217" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.444822"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard" tests="5" assertions="20" errors="0" failures="0" skipped="0" time="7.677012">
+        <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;body&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.325855"/>
+        <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;table&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.775792"/>
+        <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;timing&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.470087"/>
+        <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;operation&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.744744"/>
+        <testcase name="test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard with data set &quot;case&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="238" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.360534"/>
+      </testsuite>
+      <testcase name="test_temporary_table_and_engine_specific_trigger_shadows_cannot_redirect_schema_or_guard_recovery" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="268" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="12" time="1.631952"/>
+      <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="2.835296">
+        <testcase name="test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards with data set &quot;rights verification key&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="302" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.764180"/>
+        <testcase name="test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards with data set &quot;track title key&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="302" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.071116"/>
+      </testsuite>
+      <testcase name="test_a_collation_or_prefix_change_to_the_actual_parent_unique_key_is_refused_without_ddl" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="312" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.291907"/>
+      <testcase name="test_a_cascading_foreign_key_is_not_silently_accepted_as_the_supported_restrict_schema" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="325" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.315540"/>
+      <testcase name="test_a_changed_required_rights_column_is_refused_without_correcting_data_or_installing_guards" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="338" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.166943"/>
+      <testcase name="test_an_additional_trigger_on_a_protected_table_is_refused_before_restoring_missing_guards" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="348" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.448645"/>
+      <testcase name="test_engine_specific_column_or_index_collation_drift_is_refused_before_any_guard_ddl" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="360" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="3" time="1.591751"/>
+      <testsuite name="Tests\Feature\RightsEvidenceGuardMigrationTest::test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="3.175059">
+        <testcase name="test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact with data set &quot;orphan track&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="382" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.647565"/>
+        <testcase name="test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact with data set &quot;orphan verifier&quot;" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="382" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="4" time="1.527494"/>
+      </testsuite>
+      <testcase name="test_retained_nonpositive_verified_identity_is_refused_without_fabricating_or_repairing_history" file="/home/user/VA-Studio-review-tax255-aux/tests/Feature/RightsEvidenceGuardMigrationTest.php" line="398" class="Tests\Feature\RightsEvidenceGuardMigrationTest" classname="Tests.Feature.RightsEvidenceGuardMigrationTest" assertions="5" time="1.505495"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

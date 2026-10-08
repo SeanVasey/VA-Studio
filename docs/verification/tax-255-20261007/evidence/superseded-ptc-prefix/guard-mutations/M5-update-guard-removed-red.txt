@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255/phpunit.xml
+
+.....F                                                              6 / 6 (100%)
+
+Time: 00:09.417, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_every_table_refuses_update_and_delete
+order accepted update.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:242
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 217, Failures: 1.

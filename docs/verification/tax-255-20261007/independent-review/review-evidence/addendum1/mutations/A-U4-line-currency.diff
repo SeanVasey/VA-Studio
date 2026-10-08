@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+index d8834d2c..9427caa3 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutEvidence.php
+@@ -202,7 +202,7 @@ final class TaxCheckoutEvidence
+             $target = $expected[$id];
+             $amount = $target['unit_amount'];
+             $taxed = $line['amount_tax'] ?? null;
+-            CheckoutException::require(($line['quantity'] ?? null) === 1 && ($line['currency'] ?? null) === 'usd' && ($line['price']['currency'] ?? null) === 'usd'
++            CheckoutException::require(($line['quantity'] ?? null) === 1 && ($line['price']['currency'] ?? null) === 'usd'
+                 && ($line['price']['unit_amount'] ?? null) === $amount && ($line['price']['tax_behavior'] ?? null) === $behavior
+                 && ($line['amount_subtotal'] ?? null) === $amount && ($line['amount_discount'] ?? null) === 0 && is_int($taxed) && $taxed >= 0
+                 && ($line['amount_total'] ?? null) === ($behavior === 'exclusive' ? $amount + $taxed : $amount)

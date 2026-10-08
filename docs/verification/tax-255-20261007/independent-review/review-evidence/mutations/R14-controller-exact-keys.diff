@@ -1,0 +1,13 @@
+diff --git a/app/Http/Controllers/ProductionTaxCheckoutController.php b/app/Http/Controllers/ProductionTaxCheckoutController.php
+index 2c32d595..5ac94a15 100644
+--- a/app/Http/Controllers/ProductionTaxCheckoutController.php
++++ b/app/Http/Controllers/ProductionTaxCheckoutController.php
+@@ -37,7 +37,7 @@ final class ProductionTaxCheckoutController
+     public function order(Request $request): Response
+     {
+         return $this->run($request, function (User $buyer, array $body, ProductionCustomerPrincipal $principal): array {
+-            Evidence::keys($body, ['candidateId', 'items', 'previewHash', 'accepted', 'buyer', 'requestKey']);
++            
+             CheckoutException::require(is_int($body['candidateId']) && $body['candidateId'] > 0 && is_array($body['items'])
+                 && Evidence::hash($body['previewHash']) && $body['accepted'] === true && is_array($body['buyer'])
+                 && is_string($body['requestKey']), 'invalid', 422);

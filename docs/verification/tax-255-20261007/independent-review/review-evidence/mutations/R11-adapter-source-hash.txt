@@ -1,0 +1,69 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 01:20.331, Memory: 104.00 MB
+
+OK (15 tests, 109 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:16.697, Memory: 96.00 MB
+
+OK (3 tests, 42 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+..F................                                               19 / 19 (100%)
+
+Time: 00:01.241, Memory: 63.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2Test::test_tampered_or_inconsistent_v2_lines_are_refused@tampered without resealing with data (Closure Object ())
+An inconsistent V2 line was accepted.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php:137
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 19, Assertions: 24, Failures: 1.
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...........................................                       43 / 43 (100%)
+
+Time: 00:02.529, Memory: 65.00 MB
+
+OK (43 tests, 147 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+.................                                                 17 / 17 (100%)
+
+Time: 00:31.973, Memory: 102.00 MB
+
+OK (17 tests, 131 assertions)
+

@@ -1,0 +1,6 @@
+2026-10-08T03:18:33Z reviewer private mysqld 8.4.11 --no-defaults, port 3567 (free per /proc/net/tcp listeners: 2024 2025 3531 3541 3555 37277 41441), datadir $scratchpad/review-tax255-mysql/data, --socket= empty (TCP only); shared 3306 and other lanes' instances (3531, 3541, 3555) untouched
+2026-10-08T03:18:45Z started pid 28307; root password set to throwaway 'ci-only-password' (loopback only)
+2026-10-08T06:07:25Z before shutdown: pid 28307 alive=yes; schemas: review_tax255_httpboundary 
+2026-10-08T06:07:28Z mysqladmin shutdown exit=0; /proc/28307 present=no; LISTEN sockets on 3567=; err.log tail: 2026-10-08T06:07:26.550775Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+2026-10-08T06:07:29Z removed $scratchpad/review-tax255-mysql (256M: data/, err.log, init.log, start.log, mysqld.pid); exists after=no. Other lanes' mysqld (3531, 3541, 3555) and shared 3306 untouched; remaining mysqld pids: 823 6342 
+2026-10-08T06:07:33Z correction: the LISTEN count above is empty because /proc/net/tcp6 does not exist here; recount from /proc/net/tcp only: LISTEN sockets on 3567=0. pgrep -x mysqld: 823 6342 (none is pid 28307)

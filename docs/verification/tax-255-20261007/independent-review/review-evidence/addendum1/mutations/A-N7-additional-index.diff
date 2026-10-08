@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+index 29599f13..fc609b21 100644
+--- a/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
++++ b/app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutSchemaInstaller.php
+@@ -216,7 +216,7 @@ final class TaxCheckoutSchemaInstaller
+         }
+         ksort($indexes);
+         ksort($actual);
+-        $this->same($indexes, $actual, 'indexes');
++        
+         $foreign = [];
+         foreach ($definition['foreign'] as $field => $parent) {
+             $foreign[$definition['prefix'].'_f_'.$field] = [$field, $database, $parent, 'id', 'RESTRICT', 'RESTRICT'];

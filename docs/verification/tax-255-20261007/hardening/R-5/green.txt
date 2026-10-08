@@ -1,0 +1,23 @@
+# green: R-5 regression on the fixed code, then the whole Journey class
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 00:06.354, Memory: 96.00 MB
+
+OK (2 tests, 10 assertions)
+rc=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.....................                                             21 / 21 (100%)
+
+Time: 01:07.060, Memory: 114.00 MB
+
+OK (21 tests, 139 assertions)
+rc=0

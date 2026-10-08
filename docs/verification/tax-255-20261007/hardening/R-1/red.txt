@@ -1,0 +1,41 @@
+# red: R-1 regressions against the unfixed adapter (accept($line, $provenance) ignores the held source)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255h/phpunit.xml
+
+.FF..                                                               5 / 5 (100%)
+
+Time: 00:15.461, Memory: 100.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxSourceV2Test::test_a_resealed_line_moved_to_another_order_with_zero_tax_is_refused_and_the_genuine_line_is_accepted
+A resealed forged line was accepted.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:136
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:153
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:114
+/home/user/VA-Studio-tax255h/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-tax255h/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:111
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxSourceV2Test::test_a_resealed_live_line_is_refused_until_a_reviewed_live_producer_exists
+A resealed live line was accepted.
+
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:136
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:173
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:114
+/home/user/VA-Studio-tax255h/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:27
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-tax255h/app/Domain/Commerce/ProductionCheckout/CommandTransaction.php:24
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:111
+/home/user/VA-Studio-tax255h/tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php:167
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 47, Failures: 2.
+rc=1

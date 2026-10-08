@@ -1,0 +1,75 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 01:15.678, Memory: 104.00 MB
+
+OK (15 tests, 109 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:11.689, Memory: 96.00 MB
+
+OK (3 tests, 42 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:00.676, Memory: 63.00 MB
+
+OK (19 tests, 24 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+F....F.....................................                       43 / 43 (100%)
+
+Time: 00:01.305, Memory: 65.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutPolicyTest::test_policy_is_enabled_only_by_literal_true_in_local_or_testing@production / true with data ('production', true, false)
+Failed asserting that true is identical to false.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php:41
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutPolicyTest::test_policy_is_enabled_only_by_literal_true_in_local_or_testing@staging / true with data ('staging', true, false)
+Failed asserting that true is identical to false.
+
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php:41
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 43, Assertions: 143, Failures: 2.
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+.................                                                 17 / 17 (100%)
+
+Time: 00:22.941, Memory: 102.00 MB
+
+OK (17 tests, 131 assertions)
+

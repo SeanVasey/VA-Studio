@@ -1,0 +1,29 @@
+# R-6 red: definer and sql_mode drift cases on native MySQL, unfixed installer
+# native MySQL 8.4.11 private instance 127.0.0.1:3721 schema h255_r6red root=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap start 2026-10-08T06:23:53Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 03:19.320, Memory: 87.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl@guard recreated under another definer with data (Closure Object (), 'guard definition')
+Damaged installation was adopted.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php:134
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeInstallerTest::test_native_installer_refuses_before_ddl@guard recreated under another SQL mode with data (Closure Object (), 'guard definition')
+Damaged installation was adopted.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/red-snap/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php:134
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 2, Failures: 2.
+rc=1
+# end 2026-10-08T06:27:13Z

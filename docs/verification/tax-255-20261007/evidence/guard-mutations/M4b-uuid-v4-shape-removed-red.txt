@@ -1,0 +1,34 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-tax255/phpunit.xml
+
+F.FF..                                                              6 / 6 (100%)
+
+Time: 00:07.944, Memory: 83.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_order_guard_refuses_every_malformed_field_and_accepts_the_valid_row
+uppercase uuid was accepted by the order guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:129
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_binding_guard_refuses_malformed_and_out_of_order_rows
+uppercase uuid was accepted by the binding guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:173
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutGuardTest::test_reviewed_guard_refuses_inconsistent_provider_amounts_and_out_of_order_rows
+uppercase uuid was accepted by the reviewed guard.
+
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:65
+/home/user/VA-Studio-tax255/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php:203
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 75, Failures: 3.

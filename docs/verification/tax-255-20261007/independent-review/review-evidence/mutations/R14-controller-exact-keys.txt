@@ -1,0 +1,72 @@
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...............                                                   15 / 15 (100%)
+
+Time: 01:12.525, Memory: 104.00 MB
+
+OK (15 tests, 109 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...                                                                 3 / 3 (100%)
+
+Time: 00:15.081, Memory: 96.00 MB
+
+OK (3 tests, 42 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:00.766, Memory: 63.00 MB
+
+OK (19 tests, 24 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php exit=0
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+...........................................                       43 / 43 (100%)
+
+Time: 00:01.321, Memory: 65.00 MB
+
+OK (43 tests, 147 assertions)
+
+===== tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php exit=1
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-tax255-aux/phpunit.xml
+
+................F                                                 17 / 17 (100%)
+
+Time: 00:25.150, Memory: 102.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutHttpBoundaryTest::test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount
+Expected response status code [422] but received 200.
+Failed asserting that 200 is identical to 422.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio-review-tax255-aux/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php:129
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 17, Assertions: 110, Failures: 1.
+
