@@ -365,3 +365,23 @@ still refused, and a revocation during the render still blocks publication. Regr
 mid-render, then renders for real): red 1 error (close superseded the render; the revocation control already refused),
 green 2 tests, 11 assertions. Directory SQLite 144 / 1050, 2 native-only skips; Pint passed; pinned renderer files
 untouched (`ProductionFreeGrantDocuments` is not in the render profile).
+
+## Review addendum 4 items fixed here: A4-2 and A4-3 (`review-a4/`)
+
+- **A4-2:** an unreclaimable `slot-0.reserve` (a directory, symlink, hard link or another user's file) made every
+  admission fail even with free slots, because `slot()` offered the lowest free slot and a failed `reservation()`
+  aborted the whole admission. `slot()` now checks the sidecar while holding the slot's flock: a wrong-size own regular
+  single-link sidecar is removed for recreation; anything else skips the slot and the next one is tried. Regression
+  `test_an_unreclaimable_sidecar_skips_its_slot_instead_of_blocking_admission` (directory at slot 0, symlink at slot
+  1): red 1 error, green; the download uses slot 2 and leaves both untouched. With one slot, a symlinked sidecar now
+  refuses `spool_busy` (the slot is skipped) rather than `artifact_unavailable`; the target is still untouched.
+- **A4-3:** `test_a_stalled_source_is_refused_at_once…` asserted the whole `redeem()` took under 5 s, which includes
+  two customer transactions whose schema checks exceed that on MySQL (5.67 s natively). The wall-clock bound is
+  dropped for that case; the read-count assertion (at most 2 reads) still proves the stalled read is refused rather than
+  spun on. The direct-snapshot and transfer cases keep their bounds (no database work; they passed natively).
+- **Still open as conditions:** A4-1 (preflight the renderer's 100-page / 16 MiB limits at propose and open, or bound
+  line count and length) before activation; A4-4 (separate "valid to start" from a size- and rate-derived transfer
+  deadline, or add range delivery) before the delivery mount.
+
+Spool and stalled-source classes 9 tests / 64 assertions; directory SQLite 145 / 1056, 2 native-only skips; Pint
+passed.
