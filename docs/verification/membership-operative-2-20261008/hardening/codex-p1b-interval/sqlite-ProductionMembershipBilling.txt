@@ -1,0 +1,15 @@
+# green: tests/Feature/ProductionMembershipBilling, SQLite, worktree tree based on 3fed2392 plus this change (rerun after CP-4 test)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.............SSSS..............................................  63 / 179 ( 35%)
+............................................................... 126 / 179 ( 70%)
+.....................................................           179 / 179 (100%)
+
+Time: 02:14.019, Memory: 205.00 MB
+
+OK, but some tests were skipped!
+Tests: 179, Assertions: 886, Skipped: 4.
+rc=0
