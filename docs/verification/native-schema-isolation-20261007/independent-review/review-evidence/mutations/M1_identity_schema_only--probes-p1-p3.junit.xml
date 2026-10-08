@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" tests="2" assertions="38" errors="0" failures="2" skipped="0" time="164.574209">
+    <testcase name="test_p1_peer_view_created_with_selected_default_is_stored_qualified_and_refused" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="63" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="20" time="162.900683">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p1_peer_view_created_with_selected_default_is_stored_qualified_and_refused
+P1 identity view vs identity
+Failed asserting that false is identical to true.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:76
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused" file="/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php" line="113" class="Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest" classname="Tests.Feature.ReviewProbes.ReviewerSchemaIsolationProbeTest" assertions="18" time="1.673526">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused
+P3 identity backtick+comment
+Failed asserting that two strings are not identical.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

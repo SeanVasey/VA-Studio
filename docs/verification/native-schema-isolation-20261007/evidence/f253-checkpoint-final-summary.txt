@@ -1,0 +1,3 @@
+final tree=c7f9987be14daed388cdc5836b35b58deb7157fd staged=0 start=2026-10-07T17:04:59Z load=6.56 7.50 7.78
+exit=0 wall=1051s end=2026-10-07T17:22:30Z load=5.08 5.23 6.24
+OK (10 tests, 115 assertions)

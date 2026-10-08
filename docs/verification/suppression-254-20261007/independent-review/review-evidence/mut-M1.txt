@@ -1,0 +1,4 @@
+1) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_withdraw_attempt_committed_before_transport_unknown_without_resend_until_inspect_confirms
+Commit, then I/O.
+2) Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_postcommit_authority_loss_after_the_durable_attempt_never_reaches_transport
+[37;41mTests: 7[0m[37;41m, Assertions: 76[0m[37;41m, Failures: 2[0m[37;41m.[0m

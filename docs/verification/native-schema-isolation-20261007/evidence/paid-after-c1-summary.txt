@@ -1,0 +1,4 @@
+after-c1 source=2bbc8f8ad314e032573fe64aae4c269b734c05e3 staged=161 start=2026-10-07T15:22:15Z server_statements_before=349686
+exit=2 wall=340s end=2026-10-07T15:27:55Z server_statements_after=700636
+1) Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+Tests: 1, Assertions: 14, Errors: 1.

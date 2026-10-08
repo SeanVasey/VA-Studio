@@ -1,0 +1,7 @@
+unit-test body  db=a`b    0  SELECT COUNT(*) FROM `a``b`.`owned`
+unit-test body  db=a"b    1  SELECT COUNT(*) FROM `a"b`.`owned`
+unit-test body  db=a``b   0  SELECT COUNT(*) FROM `a````b`.`owned`
+unit-test body  db="a     1  SELECT COUNT(*) FROM `"a`.`owned`
+stored body     db=rv`bt  0  SELECT COUNT(*) AS q_backtick FROM `rrv`btt`.`owned`
+stored body     db=rv"q   1  SELECT COUNT(*) AS q_dquote FROM `rv"q`.`owned`
+stored body     db=rv"q   0  SELECT COUNT(*) AS ansi_dq FROM "rrv"qq"."owned"

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" tests="7" assertions="15" errors="7" failures="0" skipped="0" time="1285.185998">
+    <testcase name="test_withdraw_attempt_committed_before_transport_unknown_without_resend_until_inspect_confirms" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="42" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="218.470981">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_withdraw_attempt_committed_before_transport_unknown_without_resend_until_inspect_confirms
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_later_grant_never_deletes_or_reverses_a_suppression" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="86" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="164.383266">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_later_grant_never_deletes_or_reverses_a_suppression
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:88
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_email_change_never_retargets_and_reconcile_inspects_the_authentic_captured_target" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="123" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="214.027044">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_email_change_never_retargets_and_reconcile_inspects_the_authentic_captured_target
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:125
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_postcommit_authority_loss_after_the_durable_attempt_never_reaches_transport" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="155" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="212.938553">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_postcommit_authority_loss_after_the_durable_attempt_never_reaches_transport
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:157
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_unbound_provider_records_a_pending_intent_without_any_attempt_or_transport" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="177" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="188.319559">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_unbound_provider_records_a_pending_intent_without_any_attempt_or_transport
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:179
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_disabled_or_malformed_parent_refuses_before_any_lookup_or_write" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="189" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="2" time="163.071789">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_disabled_or_malformed_parent_refuses_before_any_lookup_or_write
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:240
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:191
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_legacy_251_history_never_becomes_production_lineage" file="/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php" line="208" class="Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest" classname="Tests.Feature.ProductionSuppression.ProductionSuppressionJourneyTest" assertions="3" time="123.974806">
+      <error type="App\Domain\Customers\ProductionFeatures\ProductionFeatureException">Tests\Feature\ProductionSuppression\ProductionSuppressionJourneyTest::test_legacy_251_history_never_becomes_production_lineage
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException: Reload your account before trying again.
+
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php:119
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:47
+/home/user/VA-Studio-review-supp254/app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php:31
+/home/user/VA-Studio-review-supp254/tests/Feature/ProductionSuppression/ProductionSuppressionJourneyTest.php:220
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

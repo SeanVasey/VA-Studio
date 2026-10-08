@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+index cbf6cf16..3fb56969 100644
+--- a/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++++ b/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+@@ -573,7 +573,7 @@ final class IdentityMigrationOwnership
+         $branches = array_map(fn (int $position): string => 'SELECT /*+ NO_MERGE(lookup) */ '.$position.' AS identity_lookup, lookup.* FROM lookup WHERE '.$predicate, array_keys($names));
+         // IN is the disjunction of the branch equalities (same operands, same comparison collation),
+         // so the prefilter keeps exactly the rows some branch would match, including LOWER() aliases.
+-        $prefilter = ' AND '.$part[4].$part[5].$part[6].' IN ('.implode(',', array_fill(0, count($names), '?')).')';
++        $prefilter = ' AND BINARY '.$part[4].$part[5].$part[6].' IN ('.implode(',', array_fill(0, count($names), '?')).')';
+         $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key'.$ordering.' FROM '.$part[2].' WHERE '.$part[3].$prefilter.') '.implode(' UNION ALL ', $branches)
+             .($order === [] ? '' : ' ORDER BY identity_lookup'.implode('', array_map(fn (int $index): string => ', identity_order_'.$index, array_keys($order))));
+         foreach ($this->query($pdo, $statement, [...$names, ...$names]) as $row) {

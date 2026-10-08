@@ -1,0 +1,46 @@
+ok   rvpeer.q_dot       db=rv.dot   guards=1       variant=1 resolves=rv.dot.owned | dot inside the name
+     stored: SELECT COUNT(*) AS q_dot FROM `rv.dot`.`owned`
+ok   rvpeer.q_block     db=rv/*c    guards=1       variant=1 resolves=rv/*c.owned | block-comment opener inside the name
+     stored: SELECT COUNT(*) AS q_block FROM `rv/*c`.`owned`
+ok   rvpeer.q_dash      db=rv--c    guards=1       variant=1 resolves=rv--c.owned | dash-dash inside the name
+     stored: SELECT COUNT(*) AS q_dash FROM `rv--c`.`owned`
+ok   rvpeer.q_hash      db=rv#c     guards=1       variant=1 resolves=rv#c.owned | hash inside the name
+     stored: SELECT COUNT(*) AS q_hash FROM `rv#c`.`owned`
+ok   rvpeer.q_space     db=rv sp    guards=1       variant=1 resolves=rv sp.owned | inner space; spaces around the dot
+     stored: SELECT COUNT(*) AS q_space FROM `rv sp` . `owned`
+ok   rvpeer.q_backslash db=rv\bs    guards=1       variant=1 resolves=rv\bs.owned | backslash inside the name
+     stored: SELECT COUNT(*) AS q_backslash FROM `rv\bs`.`owned`
+ok   rvpeer.q_dquote    db=rv"q     guards=refuse  variant=1 resolves=rv"q.owned | double quote: fail-closed guard
+     stored: SELECT COUNT(*) AS q_dquote FROM `rv"q`.`owned`
+ok   rvpeer.ansi_dq     db=rv"q     guards=refuse  variant=0 resolves=rv"q.owned (stored mangled "rrv"qq") | ANSI_QUOTES doubled quote: fail-closed guard
+     stored: SELECT COUNT(*) AS ansi_dq FROM "rrv"qq"."owned"
+ok   rvpeer.q_backtick  db=rv`bt    guards=refuse  variant=0 resolves=rv`bt.owned (stored mangled `rrv`btt`) | backtick: fail-closed guard
+     stored: SELECT COUNT(*) AS q_backtick FROM `rrv`btt`.`owned`
+ok   rvpeer.q_dot       db=rv       guards=1       variant=1 resolves=rv.dot.owned (peer) | selected rv, peer rv.dot: over-refusal (safe)
+     stored: SELECT COUNT(*) AS q_dot FROM `rv.dot`.`owned`
+ok   rvpeer.q_hash      db=rv       guards=1       variant=1 resolves=rv#c.owned (peer) | selected rv, peer rv#c: # consumes to the later dot, over-refusal (safe)
+     stored: SELECT COUNT(*) AS q_hash FROM `rv#c`.`owned`
+ok   rvpeer.q_block     db=rv       guards=0       variant=0 resolves=rv/*c.owned (peer) | selected rv, peer rv/*c: unterminated comment, no match
+     stored: SELECT COUNT(*) AS q_block FROM `rv/*c`.`owned`
+ok   rvpeer.q_dash      db=rv       guards=0       variant=0 resolves=rv--c.owned (peer) | selected rv, peer rv--c: -- needs whitespace, no match
+     stored: SELECT COUNT(*) AS q_dash FROM `rv--c`.`owned`
+ok   rvpeer.q_space     db=rv       guards=0       variant=0 resolves=rv sp.owned (peer) | selected rv, peer "rv sp": no match
+     stored: SELECT COUNT(*) AS q_space FROM `rv sp` . `owned`
+ok   a`b.own            db=bb       guards=1       variant=0 resolves=a`b.owned (peer itself, 7 rows) | Codex P2-2: peer a`b stored `aa`bb`: over-refusal for selected bb
+     stored: SELECT COUNT(*) AS own_a_bt_b FROM `aa`bb`.`owned`
+ok   a`b.t_own          db=bb       guards=1       variant=0 resolves=a`b.owned (peer itself) | Codex P2-2, trigger form
+     stored: SET @t_own = (SELECT COUNT(*) FROM `aa`bb`.`owned`)
+ok   aa`bb.own          db=bbb      guards=1       variant=0 resolves=aa`bb.owned (peer itself, 5 rows) | same mangling one level longer (`aaa`bbb`)
+     stored: SELECT COUNT(*) AS own_aa_bt_bb FROM `aaa`bbb`.`owned`
+ok   a`b.own            db=b        guards=0       variant=0 resolves=a`b.owned (peer) | selected b: `bb` ≠ `b`, bare b preceded by b
+     stored: SELECT COUNT(*) AS own_a_bt_b FROM `aa`bb`.`owned`
+ok   rvpeer.nosep       db=bb       guards=1       variant=0 resolves=bb.owned (2 rows) | FROM`bb`.`owned`: real dependency on bb
+     stored: SELECT COUNT(*) AS nosep FROM`bb`.`owned`
+ok   rvpeer.nosep2      db=bb       guards=1       variant=0 resolves=bb.owned (2 rows) | FROM`bb` inside a derived table
+     stored: SELECT COUNT(*) AS nosep2 FROM(SELECT id FROM`bb`.`owned`)x
+ok   rvpeer.t_nosep     db=bb       guards=1       variant=0 resolves=bb.owned (2 rows) | trigger form
+     stored: SET @t_nosep = (SELECT COUNT(*) FROM`bb`.`owned`)
+ok   rvpeer.ansi_bb     db=bb       guards=1       variant=0 resolves=bb.owned (2 rows) | ANSI_QUOTES FROM"bb"."owned"
+     stored: SELECT COUNT(*) AS ansi_bb FROM"bb"."owned"
+cases=22 mismatches=0
+exit=0

@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan/phpunit.xml
+
+..................................                                34 / 34 (100%)
+
+Time: 06:46.510, Memory: 89.00 MB
+
+OK (34 tests, 357 assertions)

@@ -1,0 +1,50 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-trigscan/phpunit.xml
+
+P1 capability: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`production_buyer_assent_observations`.`id` AS `id` from `vaseyaudio_review_trigscan`.`production_buyer_assent_observations`
+P1 view on production_buyer_assent_observations -> capability: refused LogicException: Unexpected production capability external view reference; rollback refused before schema changes.
+P1 view on production_buyer_assent_observations -> inquiry: admitted
+P1 view on production_buyer_assent_observations -> identity: admitted
+P1 inquiry: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`inquiry_notification_intents`.`id` AS `id` from `vaseyaudio_review_trigscan`.`inquiry_notification_intents`
+P1 view on inquiry_notification_intents -> capability: admitted
+P1 view on inquiry_notification_intents -> inquiry: refused LogicException: Unexpected inquiry notification external view reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P1 view on inquiry_notification_intents -> identity: admitted
+P1 identity: VIEW_DEFINITION=select `vaseyaudio_review_trigscan`.`production_identity_origins`.`id` AS `id` from `vaseyaudio_review_trigscan`.`production_identity_origins`
+P1 view on production_identity_origins -> capability: admitted
+P1 view on production_identity_origins -> inquiry: admitted
+P1 view on production_identity_origins -> identity: admitted
+FP3 capability backtick+comment: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability unquoted+newlines: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 capability ansi-quotes: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability upper-case-qualifier: refused LogicException: Unexpected production capability external or additional table guard; rollback refused before schema changes.
+P3 capability line-comment-then-name: refused LogicException: Unexpected production capability external routine reference; rollback refused before schema changes.
+P3 inquiry backtick+comment: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry unquoted+newlines: refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry ansi-quotes: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry upper-case-qualifier: refused LogicException: Unexpected inquiry notification external trigger reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 inquiry line-comment-then-name: refused LogicException: Unexpected inquiry notification external routine reference; existing schema, guards and evidence are unchanged. Investigate before retrying.
+P3 identity backtick+comment: admitted
+F                                                                  2 / 2 (100%)
+
+Time: 02:44.577, Memory: 81.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p1_peer_view_created_with_selected_default_is_stored_qualified_and_refused
+P1 identity view vs identity
+Failed asserting that false is identical to true.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:76
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ReviewProbes\ReviewerSchemaIsolationProbeTest::test_p3_quoted_commented_ansi_and_mixed_case_qualifiers_are_refused
+P3 identity backtick+comment
+Failed asserting that two strings are not identical.
+
+/home/user/VA-Studio-review-trigscan/docs/verification/native-schema-isolation-20261007/independent-review/review-evidence/probes/ReviewerSchemaIsolationProbeTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 38, Failures: 2.

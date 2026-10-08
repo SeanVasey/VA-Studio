@@ -1,0 +1,39 @@
+# main moved: git log --oneline e86381bf..origin/main | wc -l
+23
+# main changes to the five lane files since base
+# trial merge of 61b8ee17 into origin/main (no commit, temp index)
+merge-tree exit=0 (0 = clean, no conflicts)
+# server-wide (unfiltered) TRIGGERS/VIEWS/ROUTINES/EVENTS reads in app/ and database/ at origin/main
+origin/main:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:161:        foreach (DB::table('information_schema.TRIGGERS')->get() as $guard) {
+origin/main:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:174:        foreach (DB::table('information_schema.VIEWS')->get() as $view) {
+origin/main:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:179:        foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
+origin/main:app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:179:            foreach ($pdo->query('SELECT * FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
+origin/main:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:430:        foreach (DB::table('information_schema.TRIGGERS')->get() as $guard) {
+origin/main:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:438:        foreach (DB::table('information_schema.VIEWS')->get() as $view) {
+origin/main:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:443:        foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
+# same at 61b8ee17
+61b8ee17:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:161:        foreach (DB::table('information_schema.TRIGGERS')->get() as $guard) {
+61b8ee17:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:175:        foreach (DB::table('information_schema.VIEWS')->get() as $view) {
+61b8ee17:app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:180:        foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
+61b8ee17:app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:192:            foreach ($pdo->query('SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
+61b8ee17:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:430:        foreach (DB::table('information_schema.TRIGGERS')->get() as $guard) {
+61b8ee17:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:438:        foreach (DB::table('information_schema.VIEWS')->get() as $view) {
+61b8ee17:database/migrations/2026_10_07_243000_inquiry_notification_intents.php:443:        foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
+# dynamically named catalog reads (information_schema.'.$x or "information_schema.$x") at origin/main
+origin/main:app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php:87:            $rows = DB::select('SELECT o.* FROM information_schema.'.$catalog.' o JOIN ('.$reserved.') r ON CONVERT(o.'.$column.' USING utf8mb3) COLLATE utf8mb3_general_ci = r.name WHERE o.'.$schemaColumn.' = ?', [...$names, $database]);
+origin/main:app/Domain/Customers/Preferences/ConsentMigrationAdmission.php:34:                    if ($this->query("SELECT $column FROM information_schema.$dictionary WHERE $schema=DATABASE() AND $column=?", [$name]) !== []) {
+origin/main:app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php:166:                    $statement = $pdo->prepare('SELECT '.$column.' FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.'=?');
+origin/main:app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php:182:                    $statement = $pdo->prepare('SELECT TABLE_NAME,'.$column.' name FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.'=?');
+origin/main:app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php:252:            $statement = $pdo->prepare('SELECT '.$schema.' schema_name,'.$column.' name,'.$owner.' owner,'.$kind.' kind,'.$matches.' FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.' IN ('.$placeholders.')');
+origin/main:app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php:298:            $statement = $pdo->prepare('SELECT '.$column.' FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.' IN ('.$placeholders.')');
+origin/main:app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php:308:            $statement = $pdo->prepare('SELECT TABLE_NAME,'.$column.' name,'.$matches.' FROM information_schema.'.$dictionary.' WHERE '.$schema.'=DATABASE() AND '.$column.' IN ('.$placeholders.')');
+origin/main:app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:195:                foreach ($pdo->query('SELECT '.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+origin/main:app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:247:                    if ($this->query($pdo, "SELECT $column FROM information_schema.$dictionary WHERE $schema=DATABASE() AND $column=?", [$name]) !== []) {
+origin/main:app/Domain/Grants/Free/FreeGrantSchema.php:388:                .' JOIN information_schema.'.$catalog.' t ON CONVERT(t.'.$column.' USING utf8mb3) COLLATE utf8mb3_general_ci = r.reserved_name COLLATE utf8mb3_general_ci'
+origin/main:app/Domain/ProductAuthoring/PrivateDraftSchema.php:115:            if (DB::selectOne('SELECT 1 AS present FROM information_schema.'.$catalog.' WHERE '.$schemaColumn.' = ?'
+origin/main:app/Domain/Services/Projects/ServiceProjectSchema.php:359:                .' JOIN information_schema.'.$catalog.' t ON CONVERT(t.'.$column.' USING utf8mb3) COLLATE utf8mb3_general_ci = r.reserved_name COLLATE utf8mb3_general_ci'
+# files under app/ database/ added or changed on main since base that read information_schema
+origin/main:app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
+origin/main:app/Domain/Grants/Member/MemberGrantSchema.php
+origin/main:app/Domain/Memberships/Production/MembershipSchema.php
+# MemberGrantSchema / MembershipSchema (new on main since base): every information_schema read filters BINARY <schema> = BINARY DATABASE(); no unfiltered TRIGGERS/VIEWS/ROUTINES scan (checked with grep of 'information_schema' at origin/main).

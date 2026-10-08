@@ -1,0 +1,59 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan/phpunit.xml
+
+FFFFFF                                                              6 / 6 (100%)
+
+Time: 01:00.185, Memory: 81.00 MB
+
+There were 6 failures:
+
+1) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@capability: peer trigger naming this schema in upper case with data ('capability', 'peer trigger naming this sche...r case')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Unexpected production capability external or additional table guard; rollback refused before schema changes.'
++'Buyer observation table already exists; installation refused before DDL.'
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@capability: peer routine naming this schema in upper case with data ('capability', 'peer routine naming this sche...r case')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Unexpected production capability external routine reference; rollback refused before schema changes.'
++'Buyer observation table already exists; installation refused before DDL.'
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@inquiry: peer trigger naming this schema in upper case with data ('inquiry', 'peer trigger naming this sche...r case')
+inquiry up admitted a peer trigger naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@inquiry: peer routine naming this schema in upper case with data ('inquiry', 'peer routine naming this sche...r case')
+inquiry up admitted a peer routine naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@identity: peer trigger naming this schema in upper case with data ('identity', 'peer trigger naming this sche...r case')
+identity up admitted a peer trigger naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused@identity: peer routine naming this schema in upper case with data ('identity', 'peer routine naming this sche...r case')
+identity up admitted a peer routine naming this schema in upper case.
+
+/home/user/VA-Studio-trigscan/tests/Feature/NativeSchemaIsolationTest.php:156
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 43, Failures: 6.

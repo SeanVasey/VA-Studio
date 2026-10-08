@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionBuyerAssentObservationMigrationTest" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php" tests="4" assertions="24" errors="0" failures="0" skipped="0" time="233.098488">
+    <testsuite name="Tests\Feature\ProductionBuyerAssentObservationMigrationTest::test_real_rollback_retains_schema_guards_data_and_bookkeeping" tests="2" assertions="20" errors="0" failures="0" skipped="0" time="148.936144">
+      <testcase name="test_real_rollback_retains_schema_guards_data_and_bookkeeping with data set &quot;empty&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php" line="46" class="Tests\Feature\ProductionBuyerAssentObservationMigrationTest" classname="Tests.Feature.ProductionBuyerAssentObservationMigrationTest" assertions="10" time="43.888442"/>
+      <testcase name="test_real_rollback_retains_schema_guards_data_and_bookkeeping with data set &quot;retained report&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php" line="46" class="Tests\Feature\ProductionBuyerAssentObservationMigrationTest" classname="Tests.Feature.ProductionBuyerAssentObservationMigrationTest" assertions="10" time="105.047701"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionBuyerAssentObservationMigrationTest::test_each_actual_sql_replacement_refuses_without_changing_retained_evidence" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="84.162344">
+      <testcase name="test_each_actual_sql_replacement_refuses_without_changing_retained_evidence with data set &quot;upsert&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php" line="79" class="Tests\Feature\ProductionBuyerAssentObservationMigrationTest" classname="Tests.Feature.ProductionBuyerAssentObservationMigrationTest" assertions="2" time="39.962838"/>
+      <testcase name="test_each_actual_sql_replacement_refuses_without_changing_retained_evidence with data set &quot;direct replace&quot;" file="/home/user/VA-Studio-trigscan/tests/Feature/ProductionBuyerAssentObservationMigrationTest.php" line="79" class="Tests\Feature\ProductionBuyerAssentObservationMigrationTest" classname="Tests.Feature.ProductionBuyerAssentObservationMigrationTest" assertions="2" time="44.199506"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

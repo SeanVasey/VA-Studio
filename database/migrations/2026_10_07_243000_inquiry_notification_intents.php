@@ -431,20 +431,65 @@ return new class extends Migration
             if ($guard->TRIGGER_SCHEMA === $database && in_array($guard->TRIGGER_NAME, $ownedGuards, true)) {
                 continue;
             }
-            if ($this->referencesTable($guard->ACTION_STATEMENT)) {
+            if ($this->dependsOnTable($guard->TRIGGER_SCHEMA, $guard->ACTION_STATEMENT, $database)) {
                 $this->unexpected('external trigger reference');
             }
         }
         foreach (DB::table('information_schema.VIEWS')->get() as $view) {
-            if ($this->referencesTable($view->VIEW_DEFINITION)) {
+            if ($this->dependsOnTable($view->TABLE_SCHEMA, $view->VIEW_DEFINITION, $database)) {
                 $this->unexpected('external view reference');
             }
         }
         foreach (DB::table('information_schema.ROUTINES')->get() as $routine) {
-            if ($this->referencesTable($routine->ROUTINE_DEFINITION)) {
+            if ($this->dependsOnTable($routine->ROUTINE_SCHEMA, $routine->ROUTINE_DEFINITION, $database)) {
                 $this->unexpected('external routine reference');
             }
         }
+    }
+
+    /**
+     * Unqualified names in a stored trigger, routine or view resolve to that object's
+     * own schema, so another schema reaches this table only by naming this database
+     * or through dynamic SQL. Same-named objects in a parallel schema are not dependents.
+     */
+    private function dependsOnTable(mixed $schema, mixed $sql, string $database): bool
+    {
+        if (! $this->referencesTable($sql)) {
+            return false;
+        }
+        if (strtolower((string) $schema) === strtolower($database) || $this->qualifiesDatabase($sql, $database)) {
+            return true;
+        }
+
+        return preg_match('/(?<![a-z0-9_])prepare(?![a-z0-9_])/i', $sql) === 1;
+    }
+
+    /**
+     * Whether the definition names the selected database as a complete qualifier: the whole
+     * identifier (bare, backtick or ANSI-quoted) followed, past optional whitespace and
+     * comments, by the dot. A peer schema that merely extends the selected name, such as
+     * `<db>-2`, `<db>$x` or `<db>é`, is another schema; MySQL stores its objects qualified
+     * (`` `<db>-2`.`t` ``), so a plain word-boundary search would find `<db>` inside that name
+     * and refuse the peer's own objects. The name is compared case-insensitively because a
+     * `lower_case_table_names` 1 or 2 server resolves `` `DB`.`t` `` to the same schema.
+     * A database name containing a backtick or a double quote is refused outright: MySQL stores
+     * doubled delimiters inside routine and trigger bodies mangled (`` `a``b` `` is kept as
+     * `` `aa`bb` ``), so neither the raw nor the SQL-escaped spelling is a reliable match and
+     * a dependency on such a database could be admitted. A regex failure refuses. The same expression is in `CapabilityMigrationOwnership::qualifies()`
+     * and `IdentityMigrationOwnership::qualifies()`.
+     */
+    private function qualifiesDatabase(string $sql, string $database): bool
+    {
+        if (str_contains($database, '`') || str_contains($database, '"')) {
+            $this->unexpected('dependency definition for an identifier-delimited database name');
+        }
+        $name = preg_quote($database, '/');
+        $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
+        if ($match === false) {
+            $this->unexpected('unreadable dependency definition');
+        }
+
+        return $match === 1;
     }
 
     private function referencesTable(mixed $sql): bool

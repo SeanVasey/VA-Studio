@@ -1,0 +1,42 @@
+# git rev-parse
+61b8ee173b6d331610215a99bf65202edc90e042
+c7f9987be14daed388cdc5836b35b58deb7157fd
+489369c7ec08cffaab1f3537802b745b5a809857
+5dd4e35b2c08e9661fdd7ccde54228c30106171d
+e86381bf139b4351bba534f3fe0b26f4f8efbdd0
+73c898dba15bae80e6205565bcde510ee28b536d
+# merge-base origin/main 61b8ee17
+e86381bf139b4351bba534f3fe0b26f4f8efbdd0
+# diff --stat origin/main 61b8ee17 (whole tree)
+ .../rr-green-f65d921d-sqlite.xml                   |   7 -
+ .../re-review-evidence/rr-pint.txt                 |   1 -
+ .../rr-probe-f65d921d-sqlite.txt                   |  12 -
+ .../re-review-evidence/rr-red-bf6e5937-sqlite.txt  |  26 --
+ .../rr-suppression-native-mysql.xml                |  12 -
+ scripts/ci/database-sqlite-skips.json              |  12 +
+ .../CustomerSuppressionRetainedTargetTest.php      |  81 ----
+ tests/Feature/CustomerSuppressionTest.php          |  78 ----
+ tests/Feature/NativeSchemaIsolationTest.php        | 225 +++++++++++
+ .../IdentityInspectionCostTest.php                 |  68 ++++
+ .../ProductionIdentityCommittedFrameTest.php       |  53 ---
+ .../MemberOriginalPreparationTest.php              |  87 -----
+ .../MemberOriginalSchemaPreparationTest.php        | 280 --------------
+ .../MembershipNativeStatementClosureTest.php       |  56 ---
+ .../MembershipPreparationTest.php                  | 172 ---------
+ .../MembershipRawConfigurationClosureTest.php      |  93 -----
+ .../MembershipSchemaPreparationTest.php            | 304 ---------------
+ tests/Unit/ProductionCheckoutConfigTest.php        |  52 ---
+ tests/frontend/customer-listening-library.test.tsx |   4 +-
+ 247 files changed, 2410 insertions(+), 8374 deletions(-)
+# diff --stat 489369c7 c7f9987b vs origin/main for 253 paths
+(empty above = 253 commits carry no diff against origin/main)
+# code-vs-docs: git diff --stat c7f9987b 61b8ee17 -- app database tests scripts config routes
+(empty = docs only)
+# lane code diff e86381bf..489369c7
+ .../CapabilityMigrationOwnership.php               |  18 +-
+ .../IdentityMigrationOwnership.php                 | 149 +++++++++++---
+ ...6_10_07_243000_inquiry_notification_intents.php |  28 ++-
+ scripts/ci/database-sqlite-skips.json              |  12 ++
+ tests/Feature/NativeSchemaIsolationTest.php        | 225 +++++++++++++++++++++
+ .../IdentityInspectionCostTest.php                 |  68 +++++++
+ 6 files changed, 463 insertions(+), 37 deletions(-)

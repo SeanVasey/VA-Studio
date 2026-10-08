@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\NativeSchemaIsolationTest" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" tests="3" assertions="30" errors="3" failures="0" skipped="0" time="429.689856">
+    <testsuite name="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration" tests="3" assertions="30" errors="3" failures="0" skipped="0" time="429.689856">
+      <testcase name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set &quot;hyphen&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="92" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="160.282543">
+        <error type="LogicException">Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set "hyphen"
+LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:621
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:210
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_07_247000_production_customer_identity.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:249
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:124
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set &quot;dollar&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="92" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="191.861427">
+        <error type="LogicException">Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set "dollar"
+LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:621
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:210
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_07_247000_production_customer_identity.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:249
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:124
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set &quot;non-ASCII&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="92" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="77.545885">
+        <error type="LogicException">Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration with data set "non-ASCII"
+LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:621
+/home/user/VA-Studio-review-trigscan/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:210
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_07_247000_production_customer_identity.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:249
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:124
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

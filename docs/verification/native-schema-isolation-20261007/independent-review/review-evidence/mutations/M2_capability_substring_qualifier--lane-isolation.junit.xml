@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\NativeSchemaIsolationTest" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" tests="25" assertions="233" errors="1" failures="0" skipped="0" time="312.980265">
+    <testcase name="test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="56" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="179.542763">
+      <error type="LogicException">Tests\Feature\NativeSchemaIsolationTest::test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration
+LogicException: Unexpected production capability external view reference; rollback refused before schema changes.
+
+/home/user/VA-Studio-review-trigscan/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:285
+/home/user/VA-Studio-review-trigscan/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:177
+/home/user/VA-Studio-review-trigscan/app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php:32
+/home/user/VA-Studio-review-trigscan/database/migrations/2026_10_06_238000_production_track_preparation_packets.php:16
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:341
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:192
+/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php:80
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused" tests="24" assertions="225" errors="0" failures="0" skipped="0" time="133.437502">
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="9" time="118.259462"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.269720"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.197133"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.182433"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.304495"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.202890"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.309763"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;capability: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="8" time="0.216091"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.331620"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.374595"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.232919"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.255706"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.296207"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.273465"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.249661"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;inquiry: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="0.258335"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer trigger naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.160381"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer routine naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.174728"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer view naming this schema&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.495716"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer dynamic routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.528121"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: peer foreign key&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.904520"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local trigger&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.362972"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local routine&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.274013"/>
+      <testcase name="test_dependencies_reaching_the_selected_schema_are_still_refused with data set &quot;identity: local view&quot;" file="/home/user/VA-Studio-review-trigscan/tests/Feature/NativeSchemaIsolationTest.php" line="87" class="Tests\Feature\NativeSchemaIsolationTest" classname="Tests.Feature.NativeSchemaIsolationTest" assertions="10" time="1.322556"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

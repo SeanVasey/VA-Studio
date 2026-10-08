@@ -1,0 +1,38 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-trigscan/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m.                                                               5 / 5 (100%)
+
+Time: 00:00.466, Memory: 61.00 MB
+
+There were 4 failures:
+
+1) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@backtick with data ('a`b')
+capability admitted the delimited database name a`b
+
+/home/user/VA-Studio-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@double quote with data ('a"b')
+capability admitted the delimited database name a"b
+
+/home/user/VA-Studio-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@doubled backtick with data ('a``b')
+capability admitted the delimited database name a``b
+
+/home/user/VA-Studio-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching@leading quote with data ('"a')
+capability admitted the delimited database name "a
+
+/home/user/VA-Studio-trigscan/tests/Unit/SchemaQualifierDelimiterTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 10[0m[37;41m, Failures: 4[0m[37;41m.[0m
+rc=1
