@@ -6,7 +6,6 @@ use App\Domain\Delivery\DeliveryAssetFiles;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -126,8 +125,7 @@ final class ProductionFreeGrantDefinitions
                 && $r['decision'] === 'approved' && $r['reviewer_user_id'] === (int) $review['reviewer_user_id']
                 && $r['reviewer_user_id'] !== $payload['author_user_id'], 'tampered');
         }
-        $events = $rows->all('production_free_availability', 'definition_id = ?', [$definitionId], 1000);
-        usort($events, fn (array $a, array $b): int => (int) $a['ordinal'] <=> (int) $b['ordinal']);
+        $events = $rows->chain('production_free_availability', 'definition_id = ?', [$definitionId], ProductionFreeGrantSchema::MAX_AVAILABILITY_EVENTS);
         foreach ($events as $ordinal => $event) {
             $e = $event['payload'];
             ProductionFreeGrantException::require((int) $event['ordinal'] === $ordinal && $review !== [] && $event['review_id'] === $review['id']
@@ -174,7 +172,7 @@ final class ProductionFreeGrantDefinitions
     /** One staff transaction: policy, locked current staff row first, MFA/gate re-proved after every callback. */
     public function staffCommand(User $actor, callable $work, callable $project): array
     {
-        return DB::transaction(function () use ($actor, $work, $project): array {
+        return ProductionFreeGrantTransactions::run(function () use ($actor, $work, $project): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $staff = new ProductionFreeGrantStaff;
@@ -193,7 +191,7 @@ final class ProductionFreeGrantDefinitions
         ProductionFreeGrantInput::uuid($definitionId);
         ProductionFreeGrantInput::keys($input, ['definitionHash', 'expectedOrdinal']);
         $hash = ProductionFreeGrantInput::hash($input['definitionHash']);
-        $expected = ProductionFreeGrantInput::integer($input['expectedOrdinal'], 0, 9999);
+        $expected = ProductionFreeGrantInput::integer($input['expectedOrdinal'], 0, ProductionFreeGrantSchema::MAX_AVAILABILITY_EVENTS);
 
         return $this->staffCommand($actor, function (array $policy, ProductionFreeGrantRows $rows) use ($definitionId, $hash, $expected, $kind, $actor): array {
             $graph = $this->graph($definitionId, $rows);
@@ -201,6 +199,8 @@ final class ProductionFreeGrantDefinitions
             ProductionFreeGrantException::require($graph['review'] !== [], 'not_reviewed');
             ProductionFreeGrantException::require(count($graph['events']) === $expected, 'stale_availability');
             ProductionFreeGrantException::require($kind === 'open' ? ! $graph['open'] : $graph['open'], 'stale_availability');
+            // The chain is bounded by the schema (ordinals 0-999) and read completely; refuse before writing past it.
+            ProductionFreeGrantException::require(count($graph['events']) < ProductionFreeGrantSchema::MAX_AVAILABILITY_EVENTS, 'availability_exhausted');
             if ($kind === 'open') {
                 ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
                 (new ProductionFreeGrantPolicy)->requireApprovedTerms($policy, $graph['payload']['terms_hash']);

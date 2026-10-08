@@ -8,14 +8,16 @@ use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
 use Tests\Support\ProductionFreeGrantFixtures;
 use Tests\TestCase;
 
 /**
  * Codex P2 (4): the library page is the newest origins by creation time, selected in SQL, however many origins an
- * account holds. The 1,001 older filler rows below sort below every real UUID, so the previous "first 1,000 by id,
- * then sort" window held only fillers. They are inserted with the append-only guards removed and then restored,
- * which only this test does; they are never part of the returned page.
+ * account holds. The neutral test runs on every driver with real origins whose UUIDs sort opposite to their age. The
+ * 1,001-filler case below is SQLite only (it needs the append-only guards removed and restored, written for SQLite
+ * `sqlite_master`); on another driver it only asserts the driver and returns. The native MySQL run of the neutral
+ * test is pending the independent reviewer.
  */
 final class ProductionFreeGrantLibraryWindowTest extends TestCase
 {
@@ -27,9 +29,46 @@ final class ProductionFreeGrantLibraryWindowTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap(): void
+    public function test_the_page_is_the_newest_origins_even_when_their_uuids_sort_lowest(): void
     {
         $this->freeSetup();
+        [$owner, $ids] = $this->origins([
+            'ffffffff-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000002', '00000000-0000-4000-8000-000000000003']);
+
+        $page = (new ProductionFreeGrantLibrary(limit: 2))->index($owner['principal'], $owner['user']);
+
+        $this->assertSame(3, $page['total']);
+        $this->assertSame(2, $page['limit']);
+        $this->assertSame([$ids[2], $ids[1]], array_column($page['items'], 'id'));
+        $this->assertSame(array_reverse($ids), array_column((new ProductionFreeGrantLibrary)->index($owner['principal'], $owner['user'])['items'], 'id'));
+    }
+
+    public function test_the_newest_origins_are_listed_when_the_account_holds_more_than_the_scan_cap_on_sqlite(): void
+    {
+        $this->freeSetup();
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->assertNotSame('sqlite', DB::getDriverName());
+
+            return;
+        }
+        [$owner, $ids] = $this->origins([]);
+        $this->insertFillers(1001);
+
+        $page = (new ProductionFreeGrantLibrary(limit: 3))->index($owner['principal'], $owner['user']);
+
+        $this->assertSame(1004, $page['total']);
+        $this->assertSame(3, $page['limit']);
+        $this->assertSame(array_reverse($ids), array_column($page['items'], 'id'));
+    }
+
+    /**
+     * Three origins of one account, ten seconds apart. With `$uuids` the origin ids are forced in that order.
+     *
+     * @param  list<string>  $uuids
+     * @return array{0:array,1:list<string>}
+     */
+    private function origins(array $uuids): array
+    {
         $owner = $this->customer();
         $grants = new ProductionFreeGrants;
         $ids = [];
@@ -38,16 +77,24 @@ final class ProductionFreeGrantLibraryWindowTest extends TestCase
             CarbonImmutable::setTestNow($base->addSeconds(10 * $i));
             $definition = $this->openDefinition();
             $review = $grants->review($definition['id'], 'Declared Synthetic Buyer', $owner['principal'], $owner['user']);
-            $ids[] = $grants->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user'])['id'];
+            $input = $this->assentInput($review);
+            if ($uuids !== []) {
+                // The origin id is the only UUID `accept` generates.
+                $forced = $uuids[$i];
+                Str::createUuidsUsing(fn () => Uuid::fromString($forced));
+            }
+            try {
+                $ids[] = $grants->accept($definition['id'], $input, $owner['principal'], $owner['user'])['id'];
+            } finally {
+                Str::createUuidsNormally();
+            }
+            if ($uuids !== []) {
+                $this->assertSame($uuids[$i], $ids[$i]);
+            }
         }
         CarbonImmutable::setTestNow();
-        $this->insertFillers(1001);
 
-        $page = (new ProductionFreeGrantLibrary(limit: 3))->index($owner['principal'], $owner['user']);
-
-        $this->assertSame(1004, $page['total']);
-        $this->assertSame(3, $page['limit']);
-        $this->assertSame(array_reverse($ids), array_column($page['items'], 'id'));
+        return [$owner, $ids];
     }
 
     private function insertFillers(int $count): void

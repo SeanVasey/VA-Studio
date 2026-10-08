@@ -7,7 +7,6 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use App\Support\CanonicalJson;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -148,8 +147,7 @@ final class ProductionFreeGrants
         ProductionFreeGrantException::require(count($available) === 1 && $available[0]['kind'] === 'open', 'tampered');
         $originalDisplay = $this->display(['definition' => $definition['definition'], 'payload' => $d, 'current' => $available[0]]);
         ProductionFreeGrantException::require(hash_equals($this->displayHash($originalDisplay, $p['declared_name']), $p['display_hash']), 'tampered');
-        $work = $rows->all('production_free_document_work', 'origin_id = ?', [$originId], 64);
-        usort($work, fn (array $a, array $b): int => (int) $a['ordinal'] <=> (int) $b['ordinal']);
+        $work = $rows->chain('production_free_document_work', 'origin_id = ?', [$originId], ProductionFreeGrantSchema::MAX_WORK_ROWS);
         foreach ($work as $ordinal => $item) {
             ProductionFreeGrantException::require((int) $item['ordinal'] === $ordinal && ($item['payload']['schema_version'] ?? null) === 'production-free-work-v1'
                 && $item['payload']['claim_id'] === $item['claim_id'] && $item['payload']['kind'] === $item['kind']
@@ -204,7 +202,7 @@ final class ProductionFreeGrants
     public function customerCommand(ProductionCustomerPrincipal $principal, User $actor, callable $work): array
     {
         try {
-            return DB::transaction(function () use ($principal, $actor, $work): array {
+            return ProductionFreeGrantTransactions::run(function () use ($principal, $actor, $work): array {
                 $policy = (new ProductionFreeGrantPolicy)->current();
                 $rows = new ProductionFreeGrantRows;
                 $access = new ProductionCustomerAccess;

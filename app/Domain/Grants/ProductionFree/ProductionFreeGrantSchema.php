@@ -23,6 +23,11 @@ final class ProductionFreeGrantSchema
 
     public const ROLES = ['contract', 'master_wav', 'download_mp3', 'stems_zip'];
 
+    /** Row bounds of the two ordinal chains: the CHECK constraints, the complete reads and the write caps all use these. */
+    public const MAX_AVAILABILITY_EVENTS = 1000;
+
+    public const MAX_WORK_ROWS = 64;
+
     public const TABLES = ['production_free_definitions', 'production_free_reviews', 'production_free_availability',
         'production_free_origins', 'production_free_document_work', 'production_free_originals',
         'production_free_revocations', 'production_free_authorizations', 'production_free_redemptions'];
@@ -268,7 +273,7 @@ final class ProductionFreeGrantSchema
             $unique = [['definition_id', 'ordinal']];
             $foreign = ['definition_id' => $definitions, 'review_id' => $reviews, 'actor_user_id' => 'users'];
             $uuids = [...$uuids, 'definition_id', 'review_id'];
-            $check .= " AND ordinal BETWEEN 0 AND 9999 AND kind IN ('open','closed') AND actor_user_id > 0";
+            $check .= ' AND ordinal BETWEEN 0 AND '.(self::MAX_AVAILABILITY_EVENTS - 1)." AND kind IN ('open','closed') AND actor_user_id > 0";
         } elseif ($logical === $origins) {
             $columns += ['definition_id' => $id, 'availability_id' => $id, 'account_id' => $reference, 'user_id' => $reference,
                 'identity_origin_id' => $id, 'owner_binding_hash' => $hash, 'request_key_hash' => $hash, 'definition_hash' => $hash,
@@ -285,7 +290,7 @@ final class ProductionFreeGrantSchema
             $foreign = ['origin_id' => $origins];
             $uuids = [...$uuids, 'origin_id', 'claim_id'];
             $times[] = 'lease_expires_at';
-            $check .= " AND ordinal BETWEEN 0 AND 63 AND kind IN ('claimed','failed') AND created_at < lease_expires_at";
+            $check .= ' AND ordinal BETWEEN 0 AND '.(self::MAX_WORK_ROWS - 1)." AND kind IN ('claimed','failed') AND created_at < lease_expires_at";
         } elseif ($logical === $originals) {
             $columns += ['origin_id' => $id, 'work_id' => $id, 'claim_id' => $id, 'sha256' => $hash, 'bytes' => 'INTEGER NOT NULL',
                 'profile_hash' => $hash, 'input_hash' => $hash, 'text_digest' => $hash];

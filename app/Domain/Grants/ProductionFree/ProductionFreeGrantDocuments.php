@@ -5,7 +5,6 @@ namespace App\Domain\Grants\ProductionFree;
 use App\Domain\Contracts\ContractIo;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -19,7 +18,7 @@ final class ProductionFreeGrantDocuments
     public function render(string $originId): array
     {
         ProductionFreeGrantInput::uuid($originId);
-        $claim = DB::transaction(function () use ($originId): array {
+        $claim = ProductionFreeGrantTransactions::run(function () use ($originId): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $graph = $this->graph($originId, $rows);
@@ -54,7 +53,7 @@ final class ProductionFreeGrantDocuments
             ProductionFreeGrantException::require(hash_equals(CanonicalJson::hash($payload['profile']), $rendered->profileHash), 'profile_changed');
             $artifact = (new ProductionFreeGrantFiles)->store($originId, $work['claim_id'], $rendered);
 
-            return DB::transaction(function () use ($originId, $claim, $work, $input, $rendered, $artifact): array {
+            return ProductionFreeGrantTransactions::run(function () use ($originId, $claim, $work, $input, $rendered, $artifact): array {
                 $policy = (new ProductionFreeGrantPolicy)->current();
                 $rows = new ProductionFreeGrantRows;
                 $current = $this->graph($originId, $rows);
@@ -89,7 +88,7 @@ final class ProductionFreeGrantDocuments
     public function recover(string $originId): array
     {
         ProductionFreeGrantInput::uuid($originId);
-        $graph = DB::transaction(function () use ($originId): array {
+        $graph = ProductionFreeGrantTransactions::run(function () use ($originId): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $graph = $this->graph($originId, $rows);
@@ -130,7 +129,7 @@ final class ProductionFreeGrantDocuments
     private function fail(string $originId, array $work): void
     {
         try {
-            DB::transaction(function () use ($originId, $work): void {
+            ProductionFreeGrantTransactions::run(function () use ($originId, $work): void {
                 $rows = new ProductionFreeGrantRows;
                 $graph = $this->graph($originId, $rows);
                 $last = $graph['work'] === [] ? null : $graph['work'][array_key_last($graph['work'])];

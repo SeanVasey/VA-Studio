@@ -53,7 +53,7 @@ final class ProductionFreeGrantRows
     /** @return list<array<string, mixed>> */
     public function all(string $logical, string $where, array $bindings, int $limit): array
     {
-        ProductionFreeGrantException::require($limit >= 1 && $limit <= 1000, 'schema');
+        ProductionFreeGrantException::require($limit >= 1 && $limit <= 1001, 'schema');
         $result = [];
         foreach ($this->reader->rows($this->schema->table($logical), $where, $bindings, $limit) as $row) {
             $row['payload'] = ProductionFreeGrantRecords::verify($logical, $row);
@@ -61,6 +61,24 @@ final class ProductionFreeGrantRows
         }
 
         return $result;
+    }
+
+    /**
+     * One complete ordinal chain, ordered by ordinal. `$max` is the schema's row bound for the chain, so the read can
+     * never be a partial window: the reader is asked for one row more, and a row beyond the bound (which the CHECK
+     * constraint forbids) reads as tampered rather than being silently left out. The id-ordered reader is kept so
+     * the locking and committed-read behavior of `CurrentRows` stays the same; the order is applied here.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function chain(string $logical, string $where, array $bindings, int $max): array
+    {
+        ProductionFreeGrantException::require($max >= 1 && $max <= 1000, 'schema');
+        $rows = $this->all($logical, $where, $bindings, $max + 1);
+        ProductionFreeGrantException::require(count($rows) <= $max, 'tampered');
+        usort($rows, fn (array $a, array $b): int => (int) $a['ordinal'] <=> (int) $b['ordinal']);
+
+        return $rows;
     }
 
     /**
@@ -108,8 +126,9 @@ final class ProductionFreeGrantRows
             .implode(', ', array_map(fn (string $column): string => $quote.$column.$quote, $columns)).') VALUES ('.implode(', ', array_fill(0, count($values), '?')).')');
         try {
             $statement->execute(array_values($values));
-        } catch (\PDOException) {
-            throw new ProductionFreeGrantException('refused_by_guard');
+        } catch (\PDOException $error) {
+            // A deadlock or lock wait is contention, not a guard refusal; either way the transaction writes nothing.
+            throw new ProductionFreeGrantException(ProductionFreeGrantTransactions::contended($error) ? 'contention' : 'refused_by_guard');
         }
         $row = $this->one($logical, 'id = ?', [$values['id']]);
         ProductionFreeGrantException::require($row !== [] && ProductionFreeGrantRecords::strings(array_diff_key($row, ['payload' => true])) === ProductionFreeGrantRecords::strings($values), 'tampered');
