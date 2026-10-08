@@ -253,3 +253,74 @@ written its definition or origin row (the hook is the policy re-proof every comm
 remain, and the same request key then succeeds exactly once. A classification test accepts deadlock and lock-wait
 errors, including wrapped in `QueryException` or `DeadlockException`, and rejects duplicate-key, access-denied and plain
 exceptions.
+
+## Stalled source reads (Codex P2 6, A3-1) and unrenderable text (Codex P2 7, A3-2)
+
+Evidence: `codex-6/` and `codex-7/` (`red.txt`, `green.txt`, `pint.txt`, `sqlite-directory.txt`, `database-receipts.txt`),
+`codex-6/red-hung-read.txt`, `codex-7/glyph-equivalence.txt`. SQLite directory run: **139 tests, 1016 assertions,
+2 skipped (the same native-only cases), rc=0**; census self-test OK; Pint passes on
+the changed and new files. No MySQL was run.
+
+### P2 6 and A3-1: no read loop can spin or hang
+
+| Test file | Red | Green |
+| --- | --- | --- |
+| `ProductionFreeGrantStalledSourceTest` | 3 failures: the old loops spun to the stream's 20,000-read safety cap (`artifact_drift`, `expired` not reached, 20,001 reads) | OK 4 tests, 28 assertions (the 4th, a hung blocking socket, hangs on the old code: `red-hung-read.txt`, killed by a 40 s guard, rc=124) |
+
+Change (`ProductionFreeGrantDownloads::snapshot`, `ProductionFreeGrantTransfer::writeTo`):
+
+- The authorization deadline is checked before every read of the source, not only when a chunk is written.
+- The source stream is set blocking and given a read timeout of `max(1, min(5, remaining seconds))`, so a read that never returns
+  is bounded by the authorization; a timed-out read (`stream_get_meta_data()['timed_out']`) or an empty read before EOF is
+  refused immediately as `artifact_unavailable`. Refusing at once (rather than allowing a few empties) is correct because a
+  blocking read returns an empty string only at EOF or after its timeout; an adapter that wants to wait must block inside
+  its own stream. The spool slot and reservation are released through the existing failure path (tests assert the single slot
+  is reusable and the reservation file is zero).
+- `Transfer::writeTo` already checked the deadline per iteration; it now also refuses an empty read before EOF instead of
+  spinning until the deadline.
+
+Class audit of every read, copy and stream loop in the namespace:
+
+| Loop | Verdict |
+| --- | --- |
+| Downloads source fill | fixed (above) |
+| Downloads write closure | each chunk checks the deadline and the byte bound; a short or zero `fwrite` throws |
+| Spool read-back | already checks the deadline each iteration and refuses an empty read before EOF |
+| Spool fill/flush, slot search, `pending()` | bounded by slot count and the glob of slot files |
+| Files store and verify | writes are bounded by the rendered size (zero-length `fwrite` throws); reads are one `stream_get_contents` capped at `MAX_BYTES` on a local regular file |
+| Renderer child I/O | Symfony `Process` with a 60 s timeout, 24 MiB stdout cap, 8 KiB stderr cap |
+| `Transfer::writeTo` | fixed (empty read) |
+| Library, chains, definitions | bounded SQL reads, no stream loops |
+
+### P2 7 and A3-2: renderable text only
+
+| Test file | Red | Green |
+| --- | --- | --- |
+| `ProductionFreeGrantRenderableTest` | 4 failures (Arabic title, decomposed name, no glyph accepted; disagreement with the real renderer) | OK 6 tests, 61 assertions |
+
+New `ProductionFreeGrantRenderable` runs the renderer's own code on a probe built by the renderer's own input builder
+(`RenderInput::fromOrigin`): `Text::build` applies the script, mark and control repertoire (`supportedText`) to every
+label and value, and the finished text is then checked for font glyphs exactly as `PdfRenderer` does. It is called, before
+any write, at definition propose (title, terms reference, terms, assent text), at approve, open and customer review/accept
+re-checks of the stored definition, and for the buyer's declared name at review and accept. Refusal reason: `unsupported_text`.
+
+- **Normalization:** none; unrenderable input is refused as typed. NFC-normalizing first would seal a value different from what the
+  person entered, and a decomposed accent is a combining mark, which the repertoire already excludes, so refusing is
+  both simpler and exact. Precomposed accents, Greek and Cyrillic are accepted.
+- **Glyph coverage was a real gap, beyond the scripts.** About 6,500 code points pass the script/mark filter but have no glyph in the
+  retained DejaVu fonts (for example U+02EF); the real renderer refuses them with `unsupported_input`. The check covers them.
+- **One source of truth, and its limit.** The repertoire is the renderer's own `Text::build`. The glyph test lives in the pinned
+  child renderer (`PdfRenderer`), which cannot be called from the web process without defining the process-wide
+  `K_PATH_FONTS` constant that the other renderers in the same process define to their own font folders. So the
+  glyph test reads the same font definition and CIDToGID files with the same rule. It was compared with the Tcpdf API the renderer uses over
+  every Unicode scalar value (1,112,032 code points, 0 differences; `glyph-equivalence.txt`), and a test checks
+  agreement with the real isolated renderer on 13 sample characters. A drift guard (`VERIFIED_REVISION`) fails the suite when
+  a new renderer revision is released until that comparison is repeated. Sharing the function itself would mean moving it
+  into the pinned renderer files, i.e. a new profile revision (r2); I did not make that change in this round.
+- **Other inputs feeding the renderer or paths:** asset source ids (ASCII-only pattern), asset file names (generated from roles),
+  UUIDs, hashes and the account public id are system generated or pattern bound; the revoke reason and source manifest are
+  stored but not rendered. Nothing else needed a change.
+
+Pre-activation consideration (A3-2): definitions and origins sealed before this check could hold text that cannot render. No
+sealed production origin exists, so no operator recovery path is added; before any activation, confirm that no earlier
+rehearsal definition or origin holds unrenderable text, because a sealed origin is immutable and can only stay `failed`.

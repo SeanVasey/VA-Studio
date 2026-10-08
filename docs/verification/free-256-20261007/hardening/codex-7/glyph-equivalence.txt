@@ -1,0 +1,3 @@
+scratch comparison of ProductionFreeGrantRenderable::glyph against the Tcpdf font API the renderer uses (isCharDefined and getGidForOrd, styles B and regular), U+0020..U+10FFFF excluding surrogates
+checked 1112032, differences 0, covered 5778
+rc=0
