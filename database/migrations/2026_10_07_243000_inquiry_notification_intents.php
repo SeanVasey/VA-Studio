@@ -472,11 +472,17 @@ return new class extends Migration
      * (`` `<db>-2`.`t` ``), so a plain word-boundary search would find `<db>` inside that name
      * and refuse the peer's own objects. The name is compared case-insensitively because a
      * `lower_case_table_names` 1 or 2 server resolves `` `DB`.`t` `` to the same schema.
-     * A regex failure refuses. The same expression is in `CapabilityMigrationOwnership::qualifies()`
+     * A database name containing a backtick or a double quote is refused outright: MySQL stores
+     * doubled delimiters inside routine and trigger bodies mangled (`` `a``b` `` is kept as
+     * `` `aa`bb` ``), so neither the raw nor the SQL-escaped spelling is a reliable match and
+     * a dependency on such a database could be admitted. A regex failure refuses. The same expression is in `CapabilityMigrationOwnership::qualifies()`
      * and `IdentityMigrationOwnership::qualifies()`.
      */
     private function qualifiesDatabase(string $sql, string $database): bool
     {
+        if (str_contains($database, '`') || str_contains($database, '"')) {
+            $this->unexpected('dependency definition for an identifier-delimited database name');
+        }
         $name = preg_quote($database, '/');
         $match = preg_match('/(?:`'.$name.'`|"'.$name.'"|(?<![A-Za-z0-9_$\x{80}-\x{10FFFF}])'.$name.')(?:\s|\/\*.*?\*\/|(?:--\s|#)[^\n]*)*\./isu', $sql);
         if ($match === false) {

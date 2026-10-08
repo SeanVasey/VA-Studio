@@ -125,6 +125,27 @@ upper-case cases; the old word-boundary match, applied to each guard on its own,
 three extended-name cases at that guard. Source-bound commands and results:
 `conditions/codex-qualifier-dot/` (`run.sh`, `summary.txt`).
 
+### Codex P2 on the merge head `855610be`: a delimiter inside the selected database name
+
+Codex noted that a selected database name containing a backtick would be stored in a
+qualified reference as `` `a``b`.`t` ``, which the matcher (searching the raw name) would
+not find, admitting a real cross-schema dependency. The reviewer's storage check
+(`independent-review/review-evidence/addendum1/storage/`) shows the actual stored form on
+MySQL 8.4.11 is mangled token-locally (`` `a``b` `` is kept as `` `aa`bb` ``), so neither
+the raw nor the SQL-escaped spelling is a reliable match for such a name. Instead of
+guessing a spelling, all three matchers now refuse outright when the selected database
+name contains a backtick or a double quote (`CapabilityMigrationOwnership::qualifies()`,
+`IdentityMigrationOwnership::qualifies()`, migration 243 `qualifiesDatabase()`), before the
+regex runs; the refusal reaches the caller as the guard's usual exception, and plain names
+are decided exactly as before. `tests/Unit/SchemaQualifierDelimiterTest.php` invokes the
+three private matchers by reflection on any engine: four delimited names are refused by
+each guard (red before the fix: each guard admitted them, `conditions/codex-delimited-name/red-sqlite.txt`),
+and a hyphenated plain name still matches its own qualifier and not its `-2` peer
+(`green-sqlite.txt`: 36 tests / 453 assertions with `IdentityInspectionCostTest` and
+`ProductionFeatureMigrationTest`, 1 native-only skip). Such a name is unsupported for
+this store rather than matched; no native run was added, because the refusal happens
+before any dictionary read.
+
 ### Regression test
 
 `tests/Feature/NativeSchemaIsolationTest.php` is native-only and listed in
