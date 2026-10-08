@@ -79,7 +79,8 @@ before and after. The cap case was corrected after the red run, so it has only b
 - Native MySQL: the transfer tests use an injected clock, and no changed path is MySQL-only.
 - A MySQL lock wait (50 s default) inside a frame can exceed the client's 15 s margin. The user then sees "could not be
   confirmed" and can retry idempotently.
-- A pending authorize whose replay is refused as expired keeps its retry banner until the page is left.
+- A pending authorize whose replay is refused as expired kept its retry banner until the page was left; round 3
+  (`../codex-3/`) adds a gated way to set it aside.
 - The redeem cost on MySQL (about 18.7k statements within the 60 s budget, review M2/C2) is unchanged.
 
 ## For Sean
