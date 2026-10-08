@@ -1,0 +1,137 @@
+### tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+.EEEEEEEEFEFF                                                     13 / 13 (100%)
+
+Time: 00:13.928, Memory: 99.00 MB
+
+There were 9 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@first attempt with data (1, 60)
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:62
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@second attempt with data (2, 600)
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:62
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_an_unknown_outcome_under_an_owned_identity_is_appended_then_released_while_attempts_remain@last attempt completes with data (3, null)
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:62
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_provider_incomplete_outcome_under_an_owned_identity_is_appended_then_released
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:78
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_definitive_outcome_completes_the_job_without_a_release@settled with data ('settled')
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:98
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_definitive_outcome_completes_the_job_without_a_release@not settled with data ('open')
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:98
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_definitive_outcome_completes_the_job_without_a_release@reversed with data ('refunded')
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:98
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_definitive_outcome_completes_the_job_without_a_release@refused with data ('refused')
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:98
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_overtaken_by_a_newer_one_completes_without_a_retry_and_records_nothing
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (ciphertext).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Domain/Memberships/Billing/BillingValues.php:90
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:49
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/app/Jobs/RetrieveMembershipInvoice.php:58
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:186
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:128
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_first_retrieval_that_ends_unknown_throws_so_the_queue_retries_and_writes_nothing
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'provider_unavailable'
++'ciphertext'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:118
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_the_serialized_job_carries_no_plaintext_invoice_reference_and_still_retrieves_it
+Failed asserting that Binary String: 0x4f3a33343a224170705c4a6f62735c52657472696576654d656d62657273686970496e766f696365223a31373a7b733a353a227472696573223b693a333b733a35323a22004170705c4a6f62735c52657472696576654d656d62657273686970496e766f696365007365616c6564496e766f696365526566223b733a31323a22696e5f53594e544845544943223b733a393a2262696e64696e674964223b733a33363a2237636661393966332d623034612d343236332d386666622d656662313134663733613938223b733a333a226a6f62223b4e3b733a31303a22636f6e6e656374696f6e223b4e3b733a353a227175657565223b4e3b733a31323a226d65737361676547726f7570223b4e3b733a31323a2264656475706c696361746f72223b4e3b733a31333a226465626f756e63654f776e6572223b733a303a22223b733a31353a22756e697175654c6f636b4f776e6572223b733a303a22223b733a353a2264656c6179223b4e3b733a31313a226166746572436f6d6d6974223b4e3b733a31303a226d6964646c6577617265223b613a303a7b7d733a373a22636861696e6564223b613a303a7b7d733a31353a22636861696e436f6e6e656374696f6e223b4e3b733a31303a22636861696e5175657565223b4e3b733a31393a22636861696e436174636843616c6c6261636b73223b4e3b7d [ASCII](length: 504) does not contain "in_SYNTHETIC" [ASCII](length: 12).
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:149
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_first_retrieval_refusal_message_names_its_reason
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'binding_refused_subscription'
++'ciphertext'
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:169
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 13, Assertions: 5, Errors: 9, Failures: 3.
+rc=2

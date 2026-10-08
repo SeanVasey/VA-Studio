@@ -1,0 +1,102 @@
+<?php
+
+namespace Tests\Feature\ReviewProbes;
+
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+use Tests\Support\BillingStripeFixtures as F;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\TestCase;
+
+/**
+ * Reviewer native probe (CODEX-P1B addendum): four processes, released together, each deliver 10 DISTINCT webhook events (intake:
+ * hint position + event row), then, released together again, each claim 10 DISTINCT invoice identities (the split invoices guard).
+ * Records the server-global InnoDB deadlock counter around each phase and every outcome. Run alone on the instance.
+ */
+class ReviewIntakeClaimStormTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    public function test_native_concurrent_distinct_intakes_and_distinct_invoice_claims(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native only.');
+        }
+        F::configure();
+        $binding = F::binding();
+        $deadlocks = fn (): int => (int) DB::selectOne("SELECT COUNT AS c FROM information_schema.INNODB_METRICS WHERE NAME = 'lock_deadlocks'")->c;
+        $directory = storage_path('framework/testing/review-p1b-'.Str::uuid());
+        (new Filesystem)->makeDirectory($directory, 0700, true);
+        $db = DB::connection()->getConfig();
+        $processes = [];
+        try {
+            foreach (range(0, 3) as $worker) {
+                $p = new Process([PHP_BINARY, getenv('REVIEW_STORM_WORKER')], base_path(), ['APP_ENV' => 'testing', 'APP_DEBUG' => 'false',
+                    'APP_KEY' => (string) config('app.key'), 'DB_CONNECTION' => 'mysql', 'DB_URL' => '', 'DB_HOST' => (string) $db['host'],
+                    'DB_PORT' => (string) $db['port'], 'DB_DATABASE' => (string) $db['database'], 'DB_USERNAME' => (string) $db['username'],
+                    'DB_PASSWORD' => (string) $db['password'], 'DB_SOCKET' => '', 'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array',
+                    'QUEUE_CONNECTION' => 'sync', 'VA_REVIEW_LANE2_ONLY' => '1', 'VA_REVIEW_LANE2_DIRECTORY' => $directory,
+                    'VA_REVIEW_LANE2_WORKER' => (string) $worker], json_encode(['binding_id' => $binding['id'], 'rounds' => 10], JSON_THROW_ON_ERROR), 300);
+                $p->start();
+                $processes[] = $p;
+            }
+            $this->await($directory, array_map(fn ($w) => 'ready-'.$w, range(0, 3)), $processes);
+            $d0 = $deadlocks();
+            $this->signal($directory, 'start');
+            $this->await($directory, array_map(fn ($w) => 'intakes-'.$w, range(0, 3)), $processes);
+            $d1 = $deadlocks();
+            $this->signal($directory, 'claims');
+            $results = [];
+            foreach ($processes as $p) {
+                $p->wait();
+                $this->assertSame(0, $p->getExitCode(), $p->getOutput().$p->getErrorOutput());
+                $results[] = json_decode($p->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+            }
+            $d2 = $deadlocks();
+        } finally {
+            foreach ($processes as $p) {
+                if ($p->isRunning()) {
+                    $p->stop(1);
+                }
+            }
+            (new Filesystem)->deleteDirectory($directory);
+        }
+        $intakes = array_merge(...array_column($results, 'intakes'));
+        $claims = array_merge(...array_column($results, 'claims'));
+        $tally = fn (array $xs): array => array_count_values(array_map(fn ($x) => preg_replace('/: .*/', '', $x), $xs));
+        $status = (string) (DB::selectOne('SHOW ENGINE INNODB STATUS')->Status ?? '');
+        fwrite(STDERR, 'OBSERVATION intake-storm: lock_deadlocks during intakes '.($d1 - $d0).', during claims '.($d2 - $d1)
+            .'; intakes '.json_encode($tally($intakes)).'; claims '.json_encode($tally($claims))
+            .'; events stored '.DB::table('production_membership_billing_events')->count()
+            .'; invoices stored '.DB::table('production_membership_billing_invoices')->count().PHP_EOL);
+        if (str_contains($status, 'LATEST DETECTED DEADLOCK')) {
+            $start = strpos($status, 'LATEST DETECTED DEADLOCK');
+            fwrite(STDERR, 'DEADLOCK-SECTION '.str_replace("\n", ' / ', substr($status, $start, 3000)).PHP_EOL);
+        }
+        $this->assertCount(40, $intakes);
+        $this->assertCount(40, $claims);
+    }
+
+    private function await(string $directory, array $names, array $processes): void
+    {
+        $deadline = microtime(true) + 240;
+        while (array_filter($names, fn ($n) => ! is_file($directory.'/'.$n)) !== []) {
+            foreach ($processes as $p) {
+                if (! $p->isRunning()) {
+                    $this->fail('Worker exited early: '.$p->getOutput().$p->getErrorOutput());
+                }
+            }
+            $this->assertLessThan($deadline, microtime(true), 'barrier timed out');
+            usleep(5000);
+            clearstatcache();
+        }
+    }
+
+    private function signal(string $directory, string $name): void
+    {
+        file_put_contents($directory.'/'.$name.'.tmp', '1');
+        rename($directory.'/'.$name.'.tmp', $directory.'/'.$name);
+    }
+}

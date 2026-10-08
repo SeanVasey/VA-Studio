@@ -1,0 +1,126 @@
+$ git rev-parse HEAD: 83821fc0423d4eadd0715c7077c7ed64caba158d (application code unchanged; new tests only)
+$ php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+FEEEFFE                                                             7 / 7 (100%)
+
+Time: 00:17.702, Memory: 93.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_all_pages_until_exhausted_and_reaches_an_uncovered_hint_beyond_the_first_window
+Symfony\Component\Console\Exception\InvalidOptionException: The "--all" option does not exist.
+
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:154
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:121
+/home/user/VA-Studio/vendor/symfony/console/Input/Input.php:53
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:295
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_all_with_dispatch_queues_one_retrieval_per_uncovered_invoice_across_pages
+Symfony\Component\Console\Exception\InvalidOptionException: The "--all" option does not exist.
+
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:154
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:121
+/home/user/VA-Studio/vendor/symfony/console/Input/Input.php:53
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:295
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:105
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_all_stops_at_the_overall_bound_and_reports_the_cursor_that_continues_it
+Symfony\Component\Console\Exception\InvalidOptionException: The "--all" option does not exist.
+
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:154
+/home/user/VA-Studio/vendor/symfony/console/Input/ArrayInput.php:121
+/home/user/VA-Studio/vendor/symfony/console/Input/Input.php:53
+/home/user/VA-Studio/vendor/symfony/console/Command/Command.php:295
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/home/user/VA-Studio/vendor/symfony/console/Application.php:1094
+/home/user/VA-Studio/vendor/symfony/console/Application.php:356
+/home/user/VA-Studio/vendor/symfony/console/Application.php:195
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:127
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_a_forged_hint_beyond_the_first_page_still_fails_the_sweep_closed
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: production_membership_billing_positions (Connection: sqlite, Database: :memory:, SQL: insert into "production_membership_billing_positions" ("kind", "created_at") values (hint, 2026-10-07 00:00:00))
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:554
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:200
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1 no such table: production_membership_billing_positions
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:595
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Connection.php:554
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:4320
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:200
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_an_uncovered_hint_beyond_the_first_window_is_reached_by_following_the_cursor
+More retained hints exist than --limit examined; run again with a higher --limit.
+Dry run: 0 uncovered hint(s) across 0 invoice(s); 3 examined hint(s) need nothing. Pass --dispatch to queue 0 retrieval(s).
+
+Failed asserting that 0 is identical to 1.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:233
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:60
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_an_invalid_tampered_or_foreign_cursor_is_refused_before_anything_is_listed_or_dispatched
+More retained hints exist than --limit examined; run again with a higher --limit.
+Dry run: 0 uncovered hint(s) across 0 invoice(s); 3 examined hint(s) need nothing. Pass --dispatch to queue 0 retrieval(s).
+
+Failed asserting that 0 is identical to 1.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:233
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:151
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_the_policy_is_checked_before_the_cursor_or_any_ledger_read
+More retained hints exist than --limit examined; run again with a higher --limit.
+Dry run: 0 uncovered hint(s) across 0 invoice(s); 3 examined hint(s) need nothing. Pass --dispatch to queue 0 retrieval(s).
+
+Failed asserting that 0 is identical to 1.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:233
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:184
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 7, Assertions: 6, Errors: 4, Failures: 3.
+rc=2

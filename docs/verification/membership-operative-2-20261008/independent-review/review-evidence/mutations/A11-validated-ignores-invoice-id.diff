@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingSettlement.php b/app/Domain/Memberships/Billing/BillingSettlement.php
+index d47a4d4b..a552e8e2 100644
+--- a/app/Domain/Memberships/Billing/BillingSettlement.php
++++ b/app/Domain/Memberships/Billing/BillingSettlement.php
+@@ -245,7 +245,7 @@ final class BillingSettlement
+         $invoice = $s->invoice;
+ 
+         return ($s->account['object'] ?? null) === 'account' && ($s->account['id'] ?? null) === $e->accountRef
+-            && ($invoice['object'] ?? null) === 'invoice' && ($invoice['id'] ?? null) === $s->requestedInvoiceRef
++            
+             && BillingValues::ref($invoice['customer'] ?? null) === $e->customerRef
+             && ($invoice['parent']['type'] ?? null) === 'subscription_details'
+             && BillingValues::ref($invoice['parent']['subscription_details']['subscription'] ?? null) === $e->subscriptionRef;

@@ -1,0 +1,179 @@
+RED: tested source = base 705a712e6a3d22ea8e4483c44d2cc47a2d9fa52b app/ exactly as origin/main (git diff --stat -- app: 0 lines), with only the final new/changed test files applied.
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+EEEEEEFE.E                                                        10 / 10 (100%)
+
+Time: 00:11.714, Memory: 91.00 MB
+
+There were 8 errors:
+
+1) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_key_candidates_are_current_first_deduplicated_and_require_a_current_key
+Error: Call to undefined method App\Domain\Customers\ProductionIdentity\IdentityPolicy::keys()
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:40
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_matches_any_configured_key_and_refuses_unconfigured_removed_or_relabelled_digests
+Error: Call to undefined method App\Domain\Customers\ProductionIdentity\IdentityPolicy::digests()
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:65
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_enrolled_identity_reads_locks_proves_and_signs_in_after_rotation_without_rewriting_evidence
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:235
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:37
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:37
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerPrincipal.php:28
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:21
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:84
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_removed_or_unconfigured_previous_key_refuses_existing_identity_until_restored
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:235
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:37
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:37
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerPrincipal.php:28
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionCustomerAccess.php:21
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_request_and_completion_replays_after_rotation_find_the_original_rows
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityEvidence.php:45
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/CompleteIdentity.php:30
+/home/user/VA-Studio-idkeys/tests/Support/ProductionIdentityFixture.php:85
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:121
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_recovery_after_rotation_reuses_the_address_fence_and_original_credential_binding
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityEvidence.php:45
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:121
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:74
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityRequests.php:35
+/home/user/VA-Studio-idkeys/tests/Support/ProductionIdentityFixture.php:68
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:135
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_digest_and_evidence_forged_under_an_unconfigured_key_are_refused
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/VA-Studio-idkeys/app/Domain/Customers/ProductionIdentity/IdentityEvidence.php:45
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:179
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_pre_rotation_session_marker_is_refused_and_a_new_sign_in_reissues_it
+ErrorException: Trying to access array offset on null
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:218
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionIdentity\ProductionIdentityKeyRotationTest::test_two_address_fences_selected_by_different_key_candidates_are_refused_not_picked
+Expected the identity layer to refuse.
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:254
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php:162
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 25, Errors: 8, Failures: 1.
+exit=2
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:04.821, Memory: 85.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionFeatures\ProductionConsentKeyRotationTest::test_consent_status_withdrawal_capture_and_new_events_survive_rotation
+Failed asserting that null is not null.
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php:80
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php:41
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFeatures\ProductionConsentKeyRotationTest::test_consent_digest_under_a_removed_key_is_refused_while_identity_still_verifies
+Failed asserting that null is not null.
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php:80
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php:61
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 6, Failures: 2.
+exit=1
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+E.                                                                  2 / 2 (100%)
+
+Time: 00:03.166, Memory: 83.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\CustomerIdentityKeyRotationTest::test_exact_request_after_rotation_resends_the_original_proof_on_the_original_fence
+Illuminate\Database\MultipleRecordsFoundException: 2 records were found.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/BuildsQueries.php:449
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:858
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2912
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2928
+/home/user/VA-Studio-idkeys/tests/Feature/CustomerIdentityKeyRotationTest.php:39
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 2, Assertions: 4, Errors: 1.
+exit=2
+
+### php vendor/phpunit/phpunit/phpunit --filter test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.....F                                                              6 / 6 (100%)
+
+Time: 00:11.490, Memory: 87.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest::test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback#5 with data ('previous_keys')
+The original receipt cannot close changed authority or a callback-capable primary.
+
+/home/user/VA-Studio-idkeys/tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php:140
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 6, Assertions: 20, Failures: 1.
+exit=1
+

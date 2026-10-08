@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+OBSERVATION native-lock-race: r1[first denied superseded_retrieval seq=- start=12:56:42.412472 | second saved reversed seq=2 start=12:56:47.269970] r2[first saved settled seq=3 start=12:56:54.102185 | second saved reversed seq=4 start=12:56:55.931866] r3[first denied superseded_retrieval seq=- start=12:57:02.205461 | second saved reversed seq=5 start=12:57:07.298282] r4[first saved settled seq=6 start=12:57:13.392291 | second saved reversed seq=7 start=12:57:15.318515] r5[first denied superseded_retrieval seq=- start=12:57:20.797093 | second saved reversed seq=8 start=12:57:24.466520] r6[first denied superseded_retrieval seq=- start=12:57:29.364494 | second saved reversed seq=9 start=12:57:33.388121] chain=1:settled,2:reversed,3:settled,4:reversed,5:reversed,6:settled,7:reversed,8:reversed,9:reversed starts_monotonic=yes tail=reversed
+.                                                                   1 / 1 (100%)
+
+Time: 03:54.583, Memory: 85.00 MB
+
+OK (1 test, 45 assertions)
+rc=0

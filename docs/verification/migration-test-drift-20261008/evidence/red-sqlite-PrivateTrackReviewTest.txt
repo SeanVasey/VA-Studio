@@ -1,0 +1,2 @@
+............................Fatal error: Premature end of PHP process when running Tests\Feature\PrivateTrackReviewTest::test_unexpected_readiness_failure_cannot_render_ready_or_return_sensitive_exception_details.
+exit 2

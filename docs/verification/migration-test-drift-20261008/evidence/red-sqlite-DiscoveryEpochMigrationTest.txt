@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+FF.......                                                           9 / 9 (100%)
+Time: 00:10.230, Memory: 87.00 MB
+There were 2 failures:
+1) Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate@empty with data (false)
+Operational teardown admitted.
+<scratchpad>/red/DiscoveryEpochMigrationTest.php:43
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+2) Tests\Feature\DiscoveryEpochMigrationTest::test_real_artisan_rollback_preserves_data_guards_bookkeeping_and_forward_migrate@populated with data (true)
+Operational teardown admitted.
+<scratchpad>/red/DiscoveryEpochMigrationTest.php:43
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+FAILURES!
+Tests: 9, Assertions: 22, Failures: 2.

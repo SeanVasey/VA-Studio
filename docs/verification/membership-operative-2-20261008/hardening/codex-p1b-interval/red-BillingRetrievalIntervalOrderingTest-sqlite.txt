@@ -1,0 +1,125 @@
+# red at 3fed2392 (tests only changed): BillingRetrievalIntervalOrderingTest, SQLite
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+EEEEEEFFFFE                                                       11 / 11 (100%)
+
+Time: 00:11.411, Memory: 95.00 MB
+
+There were 7 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_reversal_appended_first_keeps_the_tail_when_the_overlapping_older_settled_read_appends_after_it
+Error: Call to undefined method App\Domain\Memberships\Billing\BillingLedger::endRetrieval()
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:71
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_reversal_that_overlaps_a_settled_tail_is_refused_for_retry_and_the_retry_reads_and_records_the_reversal
+Error: Call to undefined method App\Domain\Memberships\Billing\BillingLedger::endRetrieval()
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:89
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_that_began_after_the_tails_read_finished_is_admitted_and_one_that_wholly_preceded_it_is_superseded
+Error: Call to undefined method App\Domain\Memberships\Billing\BillingLedger::endRetrieval()
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:109
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_enclosing_the_tails_read_or_starting_at_its_end_position_is_concurrent
+Error: Call to undefined method App\Domain\Memberships\Billing\BillingLedger::endRetrieval()
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:130
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_ledger_refuses_an_end_position_that_is_not_after_its_start_or_was_not_issued_as_an_end
+Error: Call to undefined method App\Domain\Memberships\Billing\BillingLedger::endRetrieval()
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:143
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:324
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_first_retrieval_has_no_tail_and_records_both_positions_with_the_end_allocated_after_the_last_read
+ErrorException: Undefined array key "retrieval_end_position"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:171
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_hint_received_between_a_retrievals_start_and_end_positions_is_not_covered_by_it
+ErrorException: Undefined array key "retrieval_end_position"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:257
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_refused_first_retrieval_leaves_only_its_two_anonymous_positions
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'retrieval',
+     1 => 'retrieval',
+-    2 => 'retrieval',
+-    3 => 'retrieval',
+ ]
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:184
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_appends_the_reversal_and_overlapping_b_cannot_append_its_older_settlement_after_it
+Failed asserting that Array &0 [
+    'id' => '160698a1-258e-4fd6-9f89-705197c815ed',
+    'invoice_id' => '097cb747-00a7-4147-9741-a713b72162ac',
+    'sequence' => 3,
+    'outcome' => 'settled',
+    'facts_hash' => '08bf5316985f80c7575ac8b0a83c8c58a7c2b8e3850094788257dd42ff7f7435',
+    'line_period_start' => '2026-10-07 00:00:00',
+    'line_period_end' => '2026-11-07 00:00:00',
+    'amount_minor' => 1234,
+    'currency' => 'XTS',
+    'retrieved_at' => '2026-10-07 01:00:00',
+    'retrieval_started_at' => '2026-10-07 01:00:00.000000',
+    'retrieval_position' => 3,
+    'freshness_deadline' => '2026-10-07 01:10:00',
+    'api_version' => '2026-08-26.dahlia',
+    'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525',
+    'prior_seal' => 'd52cfd920bec80feadb0f2808ad86bd300da888449c0661b8584eef054dea267',
+    'payload_ciphertext' => 'eyJpdiI6Im9zQXdlZi80REtMQURza2o2aUlUSkE9PSIsInZhbHVlIjoiZXV6Z3QvczFUc3V5TU1KaVYwRjlhckpRVzMvdUNvb0tlV2hoZFg2TmpBVzlkS01JYlY5VXB4R2d6cDhUNGlkYXU3N0NsWnR4VzhWT21CRHF5UDhWUEh1UzhnOHN0N0FmbVhnMDJBMExWbmhwRHV4dXB0RWVjYUhheEJsTWdCYm50Zmhaakt6M282ZkljRmp1VnNWazhISE5lZUlQZEFrVThpUUVFaDFoR3VNejNSd1ZYMjVCeXd0YlFHR0QrV0hHS2orbmd1NnlrV1FPVTNLaGszZlVURnhHOU9Ca2VzVFVYNm9VU0RzRzNoTHMrYVRqQVJqK08zNnZXZ2VSMnlQZEFYZkxyM2FuQTFqdUp2YzVBMEZFMDlKYi8zQ25VZHRlbTRtYkVNRnRvUnR0RFBsQXFtVEwvcVExTXJPUWhSb2JVQVNhek9IenROQm9RbjhKNUxVMjhlZ1JLeXRmZjh4VDRuWm82TlppbzNWQVNrT0kxczdtYjhKYUhYZ0IwMnR3QVpGVnlNMzlvWVR0ZGg5K1pLVnJNVUtTRkl4QWNhRXFsejZLTmU2R1pwa2ZVa1VxaWhic0hEL3JXb0xHZTVzaFZhOWtYSVdmZzBLSlQ0THpXeUxLcEY1SmgyZTkrakZsNU5Nd1VYT0ZyVkdQN0MzV0QvTTJMZmlleUovMWhhRVdINXI2RE4reUdzT2UvMmZkNkt6U1J3dnJoS29BSTBnMFR3aFJVYjZ2eVhpSzJmUGYwd1RCcU1wT1EzbndlMTFXd2ZzMnRVMzNMay9keWNlTDFWVkF5bnFiYXFGeGRONlNoNTRUQWMzT3BqQUg0OTRCb1NrdVJRT3ROanZNU0Ewam9KUFNIMGVMelZianp6UEp1dmQzcXUzeWNPc2ZCeDNYQUpuWm00QTVFSG1yM2V5S1hoVUt2SC84SGZWYzdpcFFpS3c4NUJubUFPWHJLYWZKbERQYjlnOUwyOUFqWUxlcnM4TzBrZGRZUnFFOXYvVEVtSXJtMXpqK1I4eFp6WmQxRTFLOVc2VEx1cmxHZkowZFpseHYydz09IiwibWFjIjoiMmM1YTJjZWNkODk5NjUyZTJhZGUyNDRlZWVhNGY5YTFiM2U1Yzk1YWVjYzJiNzViZTYyYWFiMzgyMzU0NjJlNCIsInRhZyI6IiJ9',
+    'seal' => '35eec0d85b4a2d93765b9ab0a82bfb3518b3d6eddf837690d900643cb4257fec',
+    'created_at' => '2026-10-07 01:00:00',
+] is identical to 'concurrent_retrieval'.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:204
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_is_retried_when_b_appended_first_and_the_retry_records_the_reversal
+A read that began before the tail's read finished is retried, not ended.
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'concurrent_retrieval'
++'superseded_retrieval'
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:223
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_that_finished_before_the_tails_read_began_is_superseded
+Expected a billing refusal.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:328
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php:240
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 11, Assertions: 18, Errors: 7, Failures: 4.
+rc=2

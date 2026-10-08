@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalRetrievalRaceTest" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php" tests="2" assertions="28" errors="0" failures="0" skipped="0" time="128.021869">
+    <testcase name="test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php" line="30" class="Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalRetrievalRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeIntervalRetrievalRaceTest" assertions="15" time="54.651821"/>
+    <testcase name="test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php" line="57" class="Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalRetrievalRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeIntervalRetrievalRaceTest" assertions="13" time="73.370048"/>
+  </testsuite>
+</testsuites>

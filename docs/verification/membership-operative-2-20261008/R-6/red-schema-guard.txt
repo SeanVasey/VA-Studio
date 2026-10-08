@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+EE                                                                  2 / 2 (100%)
+
+Time: 00:02.278, Memory: 83.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_that_began_before_the_tail_is_refused_by_the_guard_and_an_equal_or_later_start_is_admitted
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_started_at
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:204
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:66
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp
+PDOException: SQLSTATE[HY000]: General error: 1 table main.production_membership_billing_observations has no column named retrieval_started_at
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:204
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:83
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 2, Assertions: 1, Errors: 2.
+rc=2

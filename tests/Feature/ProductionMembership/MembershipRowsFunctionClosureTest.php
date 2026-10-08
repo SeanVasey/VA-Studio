@@ -180,6 +180,39 @@ class MembershipRowsFunctionClosureTest extends TestCase
         DB::transaction(fn () => new MembershipRows);
     }
 
+    /**
+     * Regression for review R-1 (docs/verification/membership-operative-1-20261007/independent-review/DECISION.md). The frame's pin is
+     * an object property closed in __destruct, so destroying a clone released the live frame's pin and SQLite then admitted a
+     * built-in collation replacement whose callback ran 25,812 times inside assertCurrent(). A captured frame is not clonable.
+     */
+    public function test_a_clone_of_a_captured_frame_is_refused_and_destroying_it_never_releases_the_live_pin(): void
+    {
+        config(['production-memberships.enabled' => true]);
+        try {
+            DB::transaction(function () {
+                $rows = new MembershipRows;
+                $cloneRefused = $this->refused(function () use ($rows): void {
+                    $copy = clone $rows;
+                    unset($copy);
+                });
+                if (DB::getDriverName() === 'sqlite') {
+                    /** @var Sqlite $pdo */
+                    $pdo = DB::connection()->getPdo();
+                    self::$calls = 0;
+                    $registered = $pdo->createCollation('BINARY', $this->withdrawingCollation());
+                    $this->assertFalse($registered, 'The live frame still pins the handle, so SQLite must refuse to replace BINARY.');
+                    $this->assertFalse($this->refused(fn () => $rows->assertCurrent()));
+                    $this->assertSame(0, self::$calls);
+                    $this->assertTrue(config('production-memberships.enabled'));
+                }
+                $this->assertTrue($cloneRefused, 'A captured frame must refuse clone.');
+                $rows->assertCurrent();
+            });
+        } finally {
+            DB::purge();
+        }
+    }
+
     public function test_class_fetch_mode_is_refused_before_metadata_reads(): void
     {
         config(['production-memberships.enabled' => true]);

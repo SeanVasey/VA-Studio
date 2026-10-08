@@ -1,0 +1,19 @@
+head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0 start 2026-10-08T11:00:18Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member2/phpunit.xml
+
+OBSERVATION sweep-oldest-first: hints=7 (6 covered old, 1 uncovered newest); limit=5 exit=0 pushed=0 truncated_warning=yes; limit=7 exit=0 pushed=1; limit=1001 exit=2 (cap)
+.OBSERVATION sweep-unroutable: dispositions=retrieval_hint,retrieval_hint exit=0 output="Dry run: 0 uncovered hint(s) across 0 invoice(s); 2 examined hint(s) need nothing. Pass --dispatch to queue 0 retrieval(s)."
+.OBSERVATION superseded-by-unknown: fresh=unknown seq=2; stale(reversed) job=returned; chain=settled,unknown currentSettled=null
+.OBSERVATION app-key-rotation: plaintext_in_serialized=no; with previous_keys=decrypted; without=refused ciphertext message="Production membership billing unavailable (ciphertext)."
+.OBSERVATION deterministic-refusal: attempts=binding_refused_subscription,binding_refused_subscription,binding_refused_subscription (each a full provider read; the queue would retry with the 60/600 s backoff)
+.SS                                                             7 / 7 (100%)
+
+Time: 00:10.117, Memory: 93.00 MB
+
+OK, but some tests were skipped!
+Tests: 7, Assertions: 13, Skipped: 2.
+rc=0
+end 2026-10-08T11:00:28Z

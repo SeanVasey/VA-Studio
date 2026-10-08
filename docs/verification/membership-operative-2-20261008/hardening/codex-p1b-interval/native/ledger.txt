@@ -1,0 +1,11 @@
+BillingNativeIntervalRetrievalRaceTest OK (2 tests, 28 assertions) rc=0
+BillingNativeStaleRetrievalRaceTest OK (2 tests, 27 assertions) rc=0
+BillingSchemaPreparationTest OK (13 tests, 77 assertions) rc=0
+BillingRetrievalIntervalOrderingTest OK (11 tests, 66 assertions) rc=0
+BillingClockSkewOrderingTest OK (8 tests, 26 assertions) rc=0
+BillingSweepHintsCursorTest OK (8 tests, 122 assertions) rc=0
+BillingNativeDedupRaceTest OK (1 test, 15 assertions) rc=0
+BillingOverlappingRetrievalTest OK (4 tests, 20 assertions) rc=0
+BillingRetrievalJobTest OK (16 tests, 54 assertions) rc=0
+BillingObservationLedgerTest OK (14 tests, 54 assertions) rc=0
+BillingWebhookRedeliveryTest OK (19 tests, 81 assertions) rc=0

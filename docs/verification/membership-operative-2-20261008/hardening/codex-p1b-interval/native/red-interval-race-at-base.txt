@@ -1,0 +1,46 @@
+# red at base 3fed2392 (scratch copy: git archive 3fed2392 + only BillingNativeIntervalRetrievalRaceTest.php and membership-billing-interval-race-worker.php), MySQL 8.4.11 127.0.0.1:3917
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/base-3fed2392/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 04:12.635, Memory: 89.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it
+{"a":{"role":"a","scenario":"reversal_first","result":"saved","sequence":2,"outcome":"reversed","position":2,"end_position":null,"reason":null,"error_class":null,"error_message":null,"connection_id":9,"pid":8244,"transaction_level":0},"b":{"role":"b","scenario":"reversal_first","result":"saved","sequence":3,"outcome":"settled","position":3,"end_position":null,"reason":null,"error_class":null,"error_message":null,"connection_id":10,"pid":8245,"transaction_level":0}}
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'denied',
+-    1 => 'concurrent_retrieval',
++    0 => 'saved',
++    1 => null,
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/base-3fed2392/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php:42
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal
+{"a":{"role":"a","scenario":"settled_first","result":"denied","sequence":null,"outcome":null,"position":null,"end_position":null,"reason":"superseded_retrieval","error_class":null,"error_message":null,"connection_id":13,"pid":16430,"transaction_level":0},"b":{"role":"b","scenario":"settled_first","result":"saved","sequence":2,"outcome":"settled","position":3,"end_position":null,"reason":null,"error_class":null,"error_message":null,"connection_id":12,"pid":16431,"transaction_level":0}}
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'denied',
+-    1 => 'concurrent_retrieval',
++    1 => 'superseded_retrieval',
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/base-3fed2392/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php:69
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 14, Failures: 2.
+rc=1

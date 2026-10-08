@@ -35,10 +35,18 @@ final class BillingReconciliation
         $binding = $this->ledger->binding($bindingId, $configuration);
         // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
         $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
-        $attemptedAt = CarbonImmutable::now('UTC')->timestamp;
+        // The retrieval's database-issued start position, committed before the first provider read. A webhook hint is covered only by
+        // a retrieval whose start is above the hint's position; the append time says nothing, and no application clock is compared
+        // (Codex P1 on PR #54, review L2-3). The start alone does not order the reads (a retrieval can stall after taking it), so the
+        // reads are bracketed by an end position too, below. The worker clock at the start is recorded as information only.
+        $position = $this->ledger->startRetrieval();
+        $startedAt = CarbonImmutable::now('UTC');
+        $attemptedAt = $startedAt->timestamp;
+        $validated = false;
         try {
             $snapshots = $this->snapshots($invoiceRef, $provenance);
             $verdict = BillingSettlement::evaluate($snapshots, $binding['expectation']);
+            $validated = BillingSettlement::bindingValidated($snapshots, $binding['expectation']);
             $retrievedAt = $snapshots->retrievedAt;
         } catch (BillingException $error) {
             if ($error->reason === 'provider_incomplete') {
@@ -50,6 +58,10 @@ final class BillingReconciliation
             }
             $retrievedAt = $attemptedAt;
         }
+        // The end position, committed after the last provider read (or the provider failure that ended the reads) and before anything
+        // is appended. The append admits this observation only if its start is above the tail's end: its reads began after the tail's
+        // reads ended. An overlapping read is refused as `concurrent_retrieval` and retried (Codex P1 on PR #54, :42).
+        $end = $this->ledger->endRetrieval($position);
         // Configuration withdrawn during provider I/O records nothing.
         $policy->proveConfiguration($configuration);
         // The invoice-identity row is immutable and its unique hash can never move to another binding, so it is claimed only
@@ -63,12 +75,30 @@ final class BillingReconciliation
         if ($invoice === null) {
             BillingException::require($verdict->outcome !== 'unknown', (string) $verdict->reason);
             BillingException::require(! ($verdict->outcome === 'refused' && $verdict->reason === 'provider_incomplete'), 'provider_incomplete');
-            BillingException::require(! ($verdict->outcome === 'refused' && in_array($verdict->reason, self::BINDING_REFUSALS, true)),
+            // Settlement refuses account, invoice identity and mode before it looks at the customer and subscription, so those refusals
+            // can precede validation. Whatever refusal comes first, a first retrieval claims the identity only once the retrieved
+            // account, invoice, customer and parent subscription all match the binding (Addendum 1, A1-1). A refusal for a
+            // reason after that point (currency, amount, shape, ...) is about an invoice this binding owns and is recorded.
+            BillingException::require(! ($verdict->outcome === 'refused' && (in_array($verdict->reason, self::BINDING_REFUSALS, true) || ! $validated)),
                 'binding_refused_'.$verdict->reason);
             $invoice = $this->ledger->invoice($binding, $invoiceRef);
         }
 
-        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance);
+        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $position, $end, $startedAt);
+    }
+
+    /**
+     * Whether a stored observation read a usable provider state. `unknown` (a timeout or ambiguous response) and a `provider_incomplete`
+     * refusal (an unbounded list, so nothing was read) did not, and a job retries them.
+     */
+    public static function isInconclusive(array $observation): bool
+    {
+        if ($observation['outcome'] === 'unknown') {
+            return true;
+        }
+
+        return $observation['outcome'] === 'refused'
+            && (BillingValues::decrypt($observation['payload_ciphertext'])['reason'] ?? null) === 'provider_incomplete';
     }
 
     private function snapshots(string $invoiceRef, string $provenance): BillingSnapshots

@@ -1,0 +1,17 @@
+# head: 6184118d363b0bf6a7590b9b54043b60aef319a9
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling
+# date: 2026-10-08T18:07:29Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+.............SS................................................  63 / 161 ( 39%)
+............................................................... 126 / 161 ( 78%)
+...................................                             161 / 161 (100%)
+
+Time: 01:47.492, Memory: 187.00 MB
+
+OK, but some tests were skipped!
+Tests: 161, Assertions: 782, Skipped: 2.
+rc=0

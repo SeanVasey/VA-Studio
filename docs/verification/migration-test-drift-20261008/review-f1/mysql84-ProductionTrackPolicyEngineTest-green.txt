@@ -1,0 +1,15 @@
+# head: eca1bbc9e3345d969700b4d4f2ce28001b111f53 + working-tree change to tests/Feature/ProductionTrackPolicyEngineTest.php
+# engine: mysqld 8.4.11 --no-defaults, private instance 127.0.0.1:3955, database m58f1
+# start: 2026-10-08T19:09:18Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-migtests/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:31.791, Memory: 81.00 MB
+
+OK (1 test, 34 assertions)
+rc=0
+# end: 2026-10-08T19:09:50Z

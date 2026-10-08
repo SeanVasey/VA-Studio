@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Commerce\Models\Order;
@@ -98,6 +99,11 @@ try {
             unset($actual['audit_events'][$id]);
         }
         unset($actual['offers'][$offerId], $original['offers'][$offerId]);
+        // The discovery epoch (migration 240) is a monotonic invalidation counter that every offer write
+        // legitimately advances. A no-op phase must not write at all, so it stays exact; edits may only advance it.
+        $epoch = offerDraftEpoch($actual);
+        UnpaidReleaseBrowserFixture::check($expectedCount === 0 ? $epoch === offerDraftEpoch($original) : $epoch >= offerDraftEpoch($original));
+        unset($actual[DiscoveryEpoch::TABLE], $original[DiscoveryEpoch::TABLE]);
         UnpaidReleaseBrowserFixture::check($actual === $original && offerDraftGuards() === $fixture['guards']);
         echo json_encode(['verified' => true, 'phase' => $phase, 'offerId' => $offer->id,
             'revisionId' => $offer->current_revision_id, 'price' => $offer->price_minor, 'updates' => $expectedCount,
@@ -123,6 +129,17 @@ function offerDraftRows(): array
     }
 
     return $result;
+}
+
+function offerDraftEpoch(array $rows): int
+{
+    $records = $rows[DiscoveryEpoch::TABLE] ?? null;
+    UnpaidReleaseBrowserFixture::check(is_array($records) && count($records) === 1 && isset($records['1']));
+    $row = json_decode($records['1'], true, 4, JSON_THROW_ON_ERROR);
+    UnpaidReleaseBrowserFixture::check(is_array($row) && array_keys($row) === ['id', 'epoch', 'schema_version']
+        && $row['id'] === 1 && $row['schema_version'] === 1 && is_int($row['epoch']));
+
+    return $row['epoch'];
 }
 
 function offerDraftGuards(): string

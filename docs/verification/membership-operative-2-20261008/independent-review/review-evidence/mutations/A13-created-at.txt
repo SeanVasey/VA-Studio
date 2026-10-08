@@ -1,0 +1,37 @@
+### tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...F                                                                4 / 4 (100%)
+
+Time: 00:06.090, Memory: 91.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_retrieval_that_began_before_the_hint_does_not_cover_it_and_one_that_began_after_does
+A retrieval that began before the hint must not cover it.
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => '8e77882f-6ba3-4feb-b6a5-7da30ccb18a2',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 15, Failures: 1.
+rc=1
+### tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:28.137, Memory: 105.00 MB
+
+OK (19 tests, 81 assertions)
+rc=0

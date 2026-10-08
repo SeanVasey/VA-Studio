@@ -3,6 +3,7 @@
 namespace App\Domain\Memberships\Billing;
 
 use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use SensitiveParameter;
@@ -49,6 +50,33 @@ final class BillingValues
         BillingException::require($timestamp > 0 && $timestamp < 253402300800, 'invalid_value');
 
         return gmdate('Y-m-d H:i:s', $timestamp);
+    }
+
+    /**
+     * UTC wall time at microsecond resolution, 26 ASCII bytes. It orders the starts of overlapping retrievals; whole seconds
+     * could not tell apart two retrievals that began in the same second (review R-6).
+     */
+    public static function utcMicro(CarbonImmutable $moment): string
+    {
+        $utc = $moment->setTimezone('UTC');
+        BillingException::require($utc->getTimestamp() > 0 && $utc->getTimestamp() < 253402300800, 'invalid_value');
+
+        return $utc->format('Y-m-d H:i:s.u');
+    }
+
+    /**
+     * A driver may return an integer column as a digit string; the seal hashes the integer the writer stored. Only canonical
+     * positive digit strings are converted, so anything else still fails the seal.
+     */
+    public static function integers(array $row, array $columns): array
+    {
+        foreach ($columns as $column) {
+            if (isset($row[$column]) && is_string($row[$column]) && preg_match('/\A(0|[1-9][0-9]{0,18})\z/D', $row[$column]) === 1) {
+                $row[$column] = (int) $row[$column];
+            }
+        }
+
+        return $row;
     }
 
     public static function id(): string

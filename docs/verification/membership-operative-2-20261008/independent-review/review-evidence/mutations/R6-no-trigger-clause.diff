@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingSchema.php b/app/Domain/Memberships/Billing/BillingSchema.php
+index 67a0dcc6..be62f6af 100644
+--- a/app/Domain/Memberships/Billing/BillingSchema.php
++++ b/app/Domain/Memberships/Billing/BillingSchema.php
+@@ -248,7 +248,7 @@ final class BillingSchema
+                 ." AND ((NEW.sequence = 1 AND NEW.prior_seal = '".str_repeat('0', 64)."')"
+                 .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND o.created_at <= NEW.created_at'
+                 // A retrieval that began before the one that produced the tail is stale evidence and never becomes the tail (review R-6).
+-                .' AND o.retrieval_started_at <= NEW.retrieval_started_at))';
++                .'))';
+         } else {
+             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)';
+         }

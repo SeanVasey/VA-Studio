@@ -1,0 +1,18 @@
+# head: 59e8f8e2a60e378499c9df103b2e28ecf3b8ad1b; untracked under tests/: 0
+# cmd: php -r '...phpunit' -- --colors=never --log-junit sqlite-04-ProductionMembershipBilling-59e8f8e2.xml tests/Feature/ProductionMembershipBilling
+# start: 2026-10-08T21:06:35Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+............S.SSSS.............................................  63 / 180 ( 35%)
+............................................................... 126 / 180 ( 70%)
+......................................................          180 / 180 (100%)
+
+Time: 02:24.518, Memory: 205.00 MB
+
+OK, but some tests were skipped!
+Tests: 180, Assertions: 886, Skipped: 5.
+rc=0
+# end: 2026-10-08T21:09:00Z

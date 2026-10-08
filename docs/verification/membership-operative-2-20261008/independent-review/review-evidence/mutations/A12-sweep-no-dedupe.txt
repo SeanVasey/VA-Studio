@@ -1,0 +1,25 @@
+### tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..F..                                                               5 / 5 (100%)
+
+Time: 00:07.459, Memory: 93.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_dispatch_queues_one_retrieval_per_uncovered_invoice_and_leaves_covered_hints_alone
+The expected [App\Jobs\RetrieveMembershipInvoice] job was pushed 2 times instead of 1 time.
+Failed asserting that 2 is identical to 1.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:172
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/QueueFake.php:152
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:103
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 21, Failures: 1.
+rc=1

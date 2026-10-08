@@ -48,7 +48,7 @@ final class ProductionSuppressionRecords
                 || $capture['purpose'] !== ConsentPolicy::PURPOSE || ! is_string($capture['email']) || IdentityPolicy::email($capture['email']) !== $capture['email']
                 || (int) $target['binding_id'] !== (int) $this->binding['row']['id'] || $target['purpose'] !== ConsentPolicy::PURPOSE
                 || ! Str::isUuid($target['public_id']) || ! ProductionFeatureShape::timestamp($target['created_at'])
-                || ! hash_equals(ProductionConsentRecords::recipientHash($this->binding, $capture['email'], $this->context->configuration()), $target['recipient_hmac'])) {
+                || ! ProductionConsentRecords::recipientMatches($this->binding, $capture['email'], $target['recipient_hmac'], $this->context->configuration())) {
                 throw new ProductionFeatureException;
             }
             $event = $this->withdrawalEvent((int) $target['withdrawal_event_id'], $target['recipient_hmac']);

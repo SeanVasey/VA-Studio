@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\CapabilityRollbackFixture;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\ProductionTrackCapabilitiesFixtures;
@@ -149,14 +150,9 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         } catch (LogicException) {
             $this->assertDatabaseCount(CapabilityHistory::CANDIDATES, 1);
         }
-        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
-        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
-        Schema::drop('production_buyer_assent_observations');
-        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
-            $this->assertDatabaseCount($table, 0);
-        }
-        $preparation = require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
-        $preparation->down();
+        // Explicit disposable-fixture cleanup of the empty later dependents (derived from the
+        // catalog), with FK enforcement unchanged.
+        CapabilityRollbackFixture::isolateCapabilityTables();
         $migration = require base_path('database/migrations/2026_10_06_236000_production_track_policy_capabilities.php');
         $this->expectException(\RuntimeException::class);
         $migration->down();
@@ -164,14 +160,10 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
 
     public function test_empty_migration_can_rollback_and_recreate_all_three_tables(): void
     {
-        // Explicit disposable-fixture cleanup, with FK enforcement unchanged.
-        $this->assertDatabaseCount('production_buyer_assent_observations', 0);
-        Schema::drop('production_buyer_assent_observations');
-        foreach (['production_track_preparation_packet_lines', 'production_track_preparation_packets'] as $table) {
-            $this->assertDatabaseCount($table, 0);
-        }
+        // Explicit disposable-fixture cleanup of the empty later dependents (derived from the
+        // catalog), with FK enforcement unchanged.
+        CapabilityRollbackFixture::isolateCapabilityTables();
         $preparation = require database_path('migrations/2026_10_06_238000_production_track_preparation_packets.php');
-        $preparation->down();
         $migration = require base_path('database/migrations/2026_10_06_236000_production_track_policy_capabilities.php');
         $migration->down();
         $migration->up();

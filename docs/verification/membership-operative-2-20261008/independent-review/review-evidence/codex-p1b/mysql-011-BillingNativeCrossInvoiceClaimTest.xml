@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeCrossInvoiceClaimTest" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php" tests="1" assertions="11" errors="0" failures="1" skipped="0" time="161.616450">
+    <testcase name="test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock" file="/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php" line="34" class="Tests\Feature\ProductionMembershipBilling\BillingNativeCrossInvoiceClaimTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeCrossInvoiceClaimTest" assertions="11" time="161.616450">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingNativeCrossInvoiceClaimTest::test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock
+{"claim_seconds":3.444,"claim":"claimed 36","retrieve_seconds":9.18,"retrieve":"saved sequence 1","lock_wait_timeout":3,"connection_id":100,"pid":20856,"transaction_level":0,"done_while_locked":true,"held_seconds":12.639}
+Failed asserting that 3.444 is less than 3.
+
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php:54
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

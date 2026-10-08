@@ -1,0 +1,77 @@
+# scratch copy of 2e08af42 (+ untracked review probe); each mutation reverted before the next. SQLite.
+## Ma: end position allocated right after the start, before the provider reads
+1
+42:        $position = $this->ledger->startRetrieval();
+43-        $end = $this->ledger->endRetrieval($position);
+-- lane BillingRetrievalIntervalOrderingTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_first_retrieval_has_no_tail_and_records_both_positions_with_the_end_allocated_after_the_last_read
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_appends_the_reversal_and_overlapping_b_cannot_append_its_older_settlement_after_it
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_retrieval_a_stalled_before_reading_is_retried_when_b_appended_first_and_the_retry_records_the_reversal
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_read_that_finished_before_the_tails_read_began_is_superseded
+5) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_hint_received_between_a_retrievals_start_and_end_positions_is_not_covered_by_it
+Tests: 11, Assertions: 53, Failures: 5.
+-- lane BillingRetrievalJobTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_overtaken_by_a_newer_one_completes_without_a_retry_and_records_nothing
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@first attempt with data (1, 60)
+3) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@second attempt with data (2, 600)
+4) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_retrieval_whose_read_overlapped_the_tails_read_is_released_with_the_backoff_and_records_nothing@last attempt fails visibly with data (3, null)
+Tests: 16, Assertions: 47, Failures: 4.
+-- lane BillingOverlappingRetrievalTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_settled_snapshot_appended_after_a_newer_reversal_is_refused_and_never_becomes_current
+2) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_first_retrieval_cannot_claim_the_tail_after_a_fresh_one_created_the_identity
+Tests: 4, Assertions: 17, Failures: 2.
+-- lane BillingClockSkewOrderingTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_an_older_retrieval_on_a_clock_ahead_worker_is_refused_and_the_newer_reversal_stays_the_tail
+2) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_an_older_first_retrieval_on_a_clock_ahead_worker_cannot_claim_the_tail_after_a_newer_one_created_the_identity
+3) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_overlapping_retrievals_with_identical_clock_readings_are_still_ordered_and_the_stale_one_is_refused
+4) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_the_position_is_committed_before_any_provider_read_and_no_transaction_is_open_during_provider_io
+Tests: 8, Assertions: 18, Failures: 4.
+-- lane BillingWebhookRedeliveryTest:
+OK (19 tests, 81 assertions)
+-- lane BillingSweepHintsCursorTest:
+OK (8 tests, 122 assertions)
+-- review probes (without the 1680 enumeration):
+1) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_probe_cp2_a_reissued_start_still_admits_the_stale_read_once_but_the_holder_is_retried_not_ended
+1) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_cp1_gateway_before_read_is_released_for_retry_and_the_retry_records_the_reversal
+2) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_three_way_interleavings_through_the_reconciliation_never_admit_an_older_read_after_a_newer_one@A then B with data ('A then B')
+3) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_three_way_interleavings_through_the_reconciliation_never_admit_an_older_read_after_a_newer_one@B then A with data ('B then A')
+4) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_a_failed_end_allocation_or_a_lost_append_leaves_only_anonymous_positions_and_changes_no_coverage
+Tests: 9, Assertions: 21, Errors: 1, Failures: 4, Skipped: 1.
+## Mb: hint coverage compares the END position (o.retrieval_end_position > ?)
+1
+-- lane BillingRetrievalIntervalOrderingTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_a_hint_received_between_a_retrievals_start_and_end_positions_is_not_covered_by_it
+Tests: 11, Assertions: 65, Failures: 1.
+-- lane BillingRetrievalJobTest:
+OK (16 tests, 54 assertions)
+-- lane BillingOverlappingRetrievalTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_retrieval_that_began_before_the_hint_does_not_cover_it_and_one_that_began_after_does
+Tests: 4, Assertions: 17, Failures: 1.
+-- lane BillingClockSkewOrderingTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingClockSkewOrderingTest::test_a_retrieval_that_began_before_a_hint_does_not_cover_it_even_when_the_worker_clock_is_ahead_of_the_intake_clock
+Tests: 8, Assertions: 25, Failures: 1.
+-- lane BillingWebhookRedeliveryTest:
+OK (19 tests, 81 assertions)
+-- lane BillingSweepHintsCursorTest:
+OK (8 tests, 122 assertions)
+-- review probes (without the 1680 enumeration):
+OK, but some tests were skipped!
+Tests: 9, Assertions: 47, Skipped: 1.
+## Mc: superseded when the new end is below the tail's END (widens the normal end into some overlaps)
+1
+-- lane BillingRetrievalIntervalOrderingTest:
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalIntervalOrderingTest::test_the_reversal_appended_first_keeps_the_tail_when_the_overlapping_older_settled_read_appends_after_it
+Tests: 11, Assertions: 64, Failures: 1.
+-- lane BillingRetrievalJobTest:
+OK (16 tests, 54 assertions)
+-- lane BillingOverlappingRetrievalTest:
+OK (4 tests, 20 assertions)
+-- lane BillingClockSkewOrderingTest:
+OK (8 tests, 26 assertions)
+-- lane BillingWebhookRedeliveryTest:
+OK (19 tests, 81 assertions)
+-- lane BillingSweepHintsCursorTest:
+OK (8 tests, 122 assertions)
+-- review probes (all, including the 1680 enumeration):
+1) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarialTest::test_all_1680_three_retrieval_schedules_admit_exactly_the_reads_that_began_after_the_tail_ended
+Tests: 10, Assertions: 104, Failures: 1, Skipped: 1.

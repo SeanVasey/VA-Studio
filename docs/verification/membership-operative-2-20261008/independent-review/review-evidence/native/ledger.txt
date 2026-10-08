@@ -1,0 +1,30 @@
+2026-10-08T10:54:54Z start BillingNativeStaleRetrievalRaceTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T10:57:17Z end BillingNativeStaleRetrievalRaceTest phpunit_rc=0
+2026-10-08T10:57:17Z start BillingNativeDedupRaceTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T10:59:38Z end BillingNativeDedupRaceTest phpunit_rc=0
+2026-10-08T10:59:38Z start BillingOverlappingRetrievalTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T11:07:21Z end BillingOverlappingRetrievalTest phpunit_rc=0
+2026-10-08T11:07:21Z start BillingRetrievalJobTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T11:32:55Z end BillingRetrievalJobTest phpunit_rc=0
+2026-10-08T11:32:55Z start MembershipRowsClone head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T11:35:20Z end MembershipRowsClone phpunit_rc=0
+2026-10-08T11:35:20Z start BillingSweepHintsCommandTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T11:42:40Z end BillingSweepHintsCommandTest phpunit_rc=0
+2026-10-08T11:42:40Z start BillingObservationLedgerTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T12:03:27Z end BillingObservationLedgerTest phpunit_rc=0
+2026-10-08T12:03:27Z start BillingWebhookRedeliveryTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T12:30:00Z end BillingWebhookRedeliveryTest phpunit_rc=0
+2026-10-08T12:30:00Z start BillingWebhookIntakeTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T12:38:47Z end BillingWebhookIntakeTest phpunit_rc=0
+2026-10-08T12:38:47Z start StripeSdkBillingGatewayTest head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T12:49:12Z end StripeSdkBillingGatewayTest phpunit_rc=0
+2026-10-08T12:49:12Z CHAIN DONE
+2026-10-08T12:49:13Z start probes-native head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T12:53:47Z end probes-native phpunit_rc=1
+2026-10-08T12:53:47Z start mutation-R6-no-mysql-lock-native mutation=R6-no-mysql-lock worktree=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=1
+2026-10-08T12:57:42Z end mutation-R6-no-mysql-lock-native phpunit_rc=0 restored_dirty=0
+2026-10-08T12:57:43Z CHAIN2 DONE
+2026-10-08T12:58:11Z start probes-native-2-cross-invoice head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0
+2026-10-08T13:02:41Z end probes-native-2-cross-invoice phpunit_rc=0
+2026-10-08T13:03:03Z start mutation-R6-no-mysql-lock-storm-native mutation=R6-no-mysql-lock worktree=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=1
+2026-10-08T13:07:32Z end mutation-R6-no-mysql-lock-storm-native phpunit_rc=0 restored_dirty=0

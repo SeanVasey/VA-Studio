@@ -148,7 +148,7 @@ final class ProductionCustomerAccess
         if ($user === [] || $account === [] || $origin === [] || (int) $account['user_id'] !== $binding['user_id']
             || $account['public_id'] !== $binding['account_public_id'] || $origin['public_id'] !== $binding['origin_id']
             || (int) $origin['user_id'] !== $binding['user_id'] || $origin['provenance'] !== $binding['provenance']
-            || ! hash_equals($origin['owner_digest'], IdentityPolicy::digest('owner', $account['owner_key']))
+            || ! IdentityPolicy::matches('owner', $account['owner_key'], $origin['owner_digest'])
             || $origin['identity_policy_version'] !== $binding['identity_policy_version'] || $origin['identity_policy_hash'] !== $binding['identity_policy_hash']) {
             throw new IdentityException;
         }
@@ -198,6 +198,7 @@ final class ProductionCustomerAccess
 
         $reader->assertPermanent();
 
+        // The projected owner digest is a current-key value for in-process comparison only (receipt closure).
         return ['user_id' => (int) $user['id'], 'account' => ['id' => (int) $account['id'], 'public_id' => $account['public_id'],
             'user_id' => (int) $account['user_id'], 'owner_digest' => IdentityPolicy::digest('owner', $account['owner_key'])],
             'origin' => $origin, 'verification_prefix' => $prefix, 'challenges' => $challenges];
@@ -229,7 +230,7 @@ final class ProductionCustomerAccess
         $origins = $reader->rows('production_identity_origins', 'account_id = ?', [(int) $account['id']], 2);
         $origin = count($origins) === 1 ? $origins[0] : [];
         if ($origin === [] || (int) $origin['user_id'] !== (int) $user['id']
-            || ! hash_equals($origin['owner_digest'], IdentityPolicy::digest('owner', $account['owner_key']))
+            || ! IdentityPolicy::matches('owner', $account['owner_key'], $origin['owner_digest'])
             || $origin['provenance'] !== $policy->provenance() || $origin['identity_policy_version'] !== IdentityPolicy::VERSION
             || ! hash_equals($origin['identity_policy_hash'], $policy->hash())) {
             throw new IdentityException;
@@ -261,12 +262,15 @@ final class ProductionCustomerAccess
                 || (int) $challenge['bound_user_id'] !== (int) $user['id'] || (int) $challenge['bound_account_id'] !== (int) $account['id']))) {
             throw new IdentityException;
         }
+        // Stored evidence verifies under any configured key. The returned private digests are current-key values
+        // compared only with another read in this process (principal mint/match), never with stored evidence.
         $credential = IdentityPolicy::digest('credential', $user['password']);
-        $recipient = IdentityPolicy::digest('recipient', IdentityPolicy::email($user['email']));
+        $recipient = IdentityPolicy::email($user['email']);
         if ((int) $observation['sequence'] !== count($observations) || (int) $observation['account_id'] !== (int) $account['id']
             || (int) $observation['user_id'] !== (int) $user['id'] || $observation['provenance'] !== $origin['provenance']
             || $observation['identity_policy_version'] !== IdentityPolicy::VERSION || ! hash_equals($observation['identity_policy_hash'], $policy->hash())
-            || ! hash_equals($observation['credential_binding'], $credential) || ! hash_equals($observation['recipient_hmac'], $recipient)) {
+            || ! IdentityPolicy::matches('credential', $user['password'], $observation['credential_binding'])
+            || ! IdentityPolicy::matches('recipient', $recipient, $observation['recipient_hmac'])) {
             throw new IdentityException;
         }
         $binding = ['schema_version' => 1, 'origin_id' => $origin['public_id'], 'provenance' => $origin['provenance'],

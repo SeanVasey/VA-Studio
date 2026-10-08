@@ -1,0 +1,16 @@
+head 6219f283df9bb644ee04a45bb9323ede2e401a80 dirty=0 start 2026-10-08T10:54:19Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-member2/phpunit.xml
+
+.....S.........................................................  63 / 143 ( 44%)
+............................................................... 126 / 143 ( 88%)
+.................                                               143 / 143 (100%)
+
+Time: 01:56.086, Memory: 171.00 MB
+
+OK, but some tests were skipped!
+Tests: 143, Assertions: 626, Skipped: 1.
+rc=0
+end 2026-10-08T10:56:19Z

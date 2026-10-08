@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" tests="7" assertions="13" errors="0" failures="0" skipped="2" time="10.112592">
+    <testcase name="test_probe_sweep_examines_only_the_oldest_hints_so_a_newer_uncovered_one_is_unreachable_past_the_limit" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="62" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="2" time="1.728569"/>
+    <testcase name="test_probe_sweep_counts_unroutable_hints_as_needing_nothing" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="91" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="2" time="1.102495"/>
+    <testcase name="test_probe_a_definitive_read_superseded_by_a_later_unknown_is_dropped" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="109" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="3" time="1.991134"/>
+    <testcase name="test_probe_job_ciphertext_under_app_key_rotation" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="137" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="4" time="1.273897"/>
+    <testcase name="test_probe_a_deterministic_first_retrieval_refusal_is_thrown_each_attempt" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="164" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="2" time="1.669979"/>
+    <testcase name="test_native_concurrent_appends_are_ordered_by_start_under_the_lock" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="185" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="0" time="1.244321">
+      <skipped/>
+    </testcase>
+    <testcase name="test_native_append_lock_blocks_only_appends_of_the_same_invoice" file="/home/user/VA-Studio-review-member2/docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php" line="225" class="Tests\Feature\ReviewProbes\Lane2ReviewProbeTest" classname="Tests.Feature.ReviewProbes.Lane2ReviewProbeTest" assertions="0" time="1.102197">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

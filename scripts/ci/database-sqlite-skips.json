@@ -685,6 +685,54 @@
     [
       "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
       "test_native_temporary_shadow_of_an_owned_table_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_two_candidate_recoveries_wait_on_the_exact_old_key_fence_then_serialize_without_deadlock"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_concurrent_first_requests_for_new_addresses_create_one_fence_with_one_or_two_keys"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_mixed_configuration_processes_create_two_fences_and_the_address_is_then_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+      "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_changed_enum_check_is_not_normalized_into_owned_provenance"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
+      "test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+      "test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeCrossInvoiceClaimTest",
+      "test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock"
     ]
   ]
 }

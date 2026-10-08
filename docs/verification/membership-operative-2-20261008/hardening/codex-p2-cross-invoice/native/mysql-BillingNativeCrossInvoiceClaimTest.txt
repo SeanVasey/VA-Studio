@@ -1,0 +1,15 @@
+# green: BillingNativeCrossInvoiceClaimTest, MySQL 8.4.11 private 127.0.0.1:3923, worktree at 2e08af42 + this change (final source)
+2026-10-08T20:27:38Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+OBSERVATION cross-invoice: {"claim_seconds":1.51,"claim":"claimed 36","retrieve_seconds":4.141,"retrieve":"saved sequence 1","lock_wait_timeout":3,"connection_id":21,"pid":3256,"transaction_level":0,"done_while_locked":true,"held_seconds":5.663}
+.                                                                   1 / 1 (100%)
+
+Time: 00:45.939, Memory: 85.00 MB
+
+OK (1 test, 15 assertions)
+rc=0
+elapsed_seconds=46

@@ -1,0 +1,4 @@
+# 59e8f8e2: census pairs for tests/Feature/ProductionMembershipBilling vs skipped cases in sqlite-04 JUnit
+census_pairs_total 183 billing_census 5 junit_cases 180 junit_skipped 5 equal True
+only_in_census []
+only_skipped []

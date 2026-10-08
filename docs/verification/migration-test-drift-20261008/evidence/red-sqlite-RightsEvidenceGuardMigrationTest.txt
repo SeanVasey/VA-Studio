@@ -1,0 +1,147 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+EEEEEEEEEWHY test_an_impossible_nonprefix_installation_is_refused_before_any_ddl_or_data_repair [] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["rights_evidence_immutable_update"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["rights_evidence_immutable_delete"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["rights_evidence_verified_insert"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["rights_evidence_verified_identity_insert"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["tracks_rights_evidence_delete"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["tracks_rights_evidence_update"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_foreign_definitions_at_each_owned_guard_name_are_refused_before_installing_any_other_guard ["tracks_rights_evidence_insert"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard ["body"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard ["table"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard ["timing"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard ["operation"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_late_owned_guard_drift_is_refused_before_restoring_an_earlier_missing_guard ["case"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_temporary_table_and_engine_specific_trigger_shadows_cannot_redirect_schema_or_guard_recovery [] => Unexpected rights evidence temporary object shadow; existing schema and data are unchanged. Investigate before retrying.
+WHY test_temporary_table_and_engine_specific_trigger_shadows_cannot_redirect_schema_or_guard_recovery [] => Unexpected rights evidence temporary object shadow; existing schema and data are unchanged. Investigate before retrying.
+WHY test_temporary_table_and_engine_specific_trigger_shadows_cannot_redirect_schema_or_guard_recovery [] => Unexpected rights evidence temporary object shadow; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards ["rights_declarations","verified_at"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_unowned_unique_conflict_keys_are_refused_before_restoring_missing_guards ["tracks","title"] => Unexpected rights evidence index definition for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_a_collation_or_prefix_change_to_the_actual_parent_unique_key_is_refused_without_ddl [] => Unexpected rights evidence index collation or expression for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_a_cascading_foreign_key_is_not_silently_accepted_as_the_supported_restrict_schema [] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_a_changed_required_rights_column_is_refused_without_correcting_data_or_installing_guards [] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_an_additional_trigger_on_a_protected_table_is_refused_before_restoring_missing_guards [] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_engine_specific_column_or_index_collation_drift_is_refused_before_any_guard_ddl [] => Unexpected rights evidence index collation or expression for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact ["track_id"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_retained_orphan_references_are_refused_before_any_guard_ddl_and_remain_exact ["verified_by"] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.WHY test_retained_nonpositive_verified_identity_is_refused_without_fabricating_or_repairing_history [] => Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+.                                 33 / 33 (100%)
+
+Time: 01:02.386, Memory: 129.00 MB
+
+There were 9 errors:
+
+1) Tests\Feature\RightsEvidenceGuardMigrationTest::test_additive_install_retry_and_operational_rollback_preserve_exact_historical_rows_audits_and_protection
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:160
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:160
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 0 with data (0)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 1 with data (1)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 2 with data (2)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 3 with data (3)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 4 with data (4)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 5 with data (5)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 6 with data (6)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\RightsEvidenceGuardMigrationTest::test_only_the_missing_suffix_of_a_recognized_installation_prefix_is_restored@recognized prefix 7 with data (7)
+LogicException: Unexpected rights evidence additional trigger for tracks; existing schema and data are unchanged. Investigate before retrying.
+
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:325
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:271
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:110
+<worktree>/database/migrations/2026_10_02_000035_rights_evidence_guards.php:18
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:121
+<scratchpad>/why/red/RightsEvidenceGuardMigrationTest.php:193
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 33, Assertions: 93, Errors: 9.

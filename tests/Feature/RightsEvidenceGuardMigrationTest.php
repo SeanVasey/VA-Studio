@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
@@ -28,6 +29,23 @@ class RightsEvidenceGuardMigrationTest extends TestCase
     private const GUARDS = ['rights_evidence_immutable_update', 'rights_evidence_immutable_delete',
         'rights_evidence_verified_insert', 'rights_evidence_verified_identity_insert',
         'tracks_rights_evidence_delete', 'tracks_rights_evidence_update', 'tracks_rights_evidence_insert'];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // 035 admits only its own guards and its predecessors' triggers on the protected tables.
+        // The later discovery epoch (240) legitimately adds AFTER triggers to both tables, and 240
+        // refuses operational teardown. Reduce the disposable fixture to 035's own baseline by
+        // dropping exactly those triggers, derived from their owning schema class.
+        foreach (DiscoveryEpoch::guards(DB::getDriverName()) as $name => $guard) {
+            if (in_array($guard['table'], ['tracks', 'rights_declarations'], true)) {
+                DB::unprepared('DROP TRIGGER '.$name);
+            }
+        }
+        // Baseline proof: the reduced fixture is an exact, admitted 035 installation, so every
+        // refusal case below is caused by its own drift rather than by an unrelated later trigger.
+        $this->assertSame([], $this->ddlDuring(fn () => $this->migration()->up()));
+    }
 
     private function migration(): object
     {

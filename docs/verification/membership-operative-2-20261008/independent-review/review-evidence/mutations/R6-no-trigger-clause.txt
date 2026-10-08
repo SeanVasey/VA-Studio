@@ -1,0 +1,22 @@
+### tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+..F........                                                       11 / 11 (100%)
+
+Time: 00:12.860, Memory: 93.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_that_began_before_the_tail_is_refused_by_the_guard_and_an_equal_or_later_start_is_admitted
+Immutable billing evidence must refuse.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:222
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:68
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 11, Assertions: 46, Failures: 1.
+rc=1

@@ -23,8 +23,9 @@ final class IdentityRequests
         $database = new IdentityDatabase;
         $database->close(false);
         $now = now()->utc()->format('Y-m-d H:i:s');
-        $addressHash = IdentityPolicy::digest('address', $email);
-        $requestHash = IdentityPolicy::digest('request', $purpose."\0".$email."\0".$requestKey);
+        // Lookups select stored rows under any configured key; new rows are written with the current key ([0]).
+        $addressHashes = IdentityPolicy::digests('address', $email);
+        $requestHashes = IdentityPolicy::digests('request', $purpose."\0".$email."\0".$requestKey);
         $publicId = (string) Str::uuid();
         $proof = bin2hex(random_bytes(32));
         $scope = $policy->provenance();
@@ -32,20 +33,27 @@ final class IdentityRequests
         $payload = CanonicalJson::encode(['schema_version' => 1, 'recipient' => $email, 'purpose' => $purpose,
             'url' => $this->url($scope).'#'.$purpose.'.'.$publicId.'.'.$proof]);
         $ciphertext = Crypt::encryptString($payload); // Before the retained transaction and final authority reads.
-        $noticeId = $database->connection->transaction(function () use ($database, $policy, $purpose, $email, $now, $addressHash, $requestHash, $publicId, $proof, $scope, $policyHash, $payload, $ciphertext): ?int {
+        $noticeId = $database->connection->transaction(function () use ($database, $policy, $purpose, $email, $now, $addressHashes, $requestHashes, $publicId, $proof, $scope, $policyHash, $payload, $ciphertext): ?int {
             $database->close(true);
             $policy->requireEnabled();
             if ($policy->provenance() !== $scope || $policy->hash() !== $policyHash) {
                 throw new IdentityException;
             }
             // The same opaque address fence serializes enrollment, recovery and rate admission.
-            $addresses = $database->rows->rows('production_identity_addresses', 'address_hash = ?', [$addressHash], 1);
+            $addresses = self::candidates($database, 'production_identity_addresses', 'address_hash', $addressHashes);
             if ($addresses === []) {
-                $database->insert('production_identity_addresses', ['address_hash' => $addressHash]);
-                $addresses = $database->rows->rows('production_identity_addresses', 'address_hash = ?', [$addressHash], 1);
+                $database->insert('production_identity_addresses', ['address_hash' => $addressHashes[0]]);
+                $addresses = $database->rows->rows('production_identity_addresses', 'address_hash = ?', [$addressHashes[0]], 1);
+            }
+            // Key candidates selecting two fences (or two prior requests) are ambiguous: refuse rather than pick one.
+            if (count($addresses) !== 1) {
+                throw new IdentityException;
             }
             $address = $addresses[0];
-            $existing = $database->rows->rows('production_identity_challenges', 'request_hash = ?', [$requestHash], 1);
+            $existing = self::candidates($database, 'production_identity_challenges', 'request_hash', $requestHashes);
+            if (count($existing) > 1) {
+                throw new IdentityException;
+            }
             if ($existing !== []) {
                 IdentityEvidence::verify('challenge', $existing[0], 'challenge_hash');
 
@@ -74,13 +82,15 @@ final class IdentityRequests
             $available = $purpose === 'enroll' ? $users === [] : $this->recoverable($user, $account, $origin, $observations, $scope, $policyHash, $email);
             $challenge = ['public_id' => $publicId, 'provenance' => $scope, 'identity_policy_version' => IdentityPolicy::VERSION,
                 'identity_policy_hash' => $policyHash, 'address_id' => (int) $address['id'], 'purpose' => $purpose,
-                'request_hash' => $requestHash, 'recipient_hmac' => IdentityPolicy::digest('recipient', $email),
+                'request_hash' => $requestHashes[0], 'recipient_hmac' => IdentityPolicy::digest('recipient', $email),
                 'payload_ciphertext' => $ciphertext, 'payload_hash' => IdentityPolicy::digest('payload', $payload),
                 'proof_hash' => IdentityPolicy::digest('proof', $proof), 'bound_user_id' => $available && $purpose === 'recover' ? (int) $user['id'] : 0,
                 'bound_account_id' => $available && $purpose === 'recover' ? (int) $account['id'] : 0,
                 'bound_origin_id' => $available && $purpose === 'recover' ? (int) $origin['id'] : 0,
                 'bound_access_version' => $available && $purpose === 'recover' ? (int) $account['access_version'] : 0,
-                'bound_credential_binding' => $available && $purpose === 'recover' ? IdentityPolicy::digest('credential', $user['password']) : IdentityEvidence::EMPTY_HASH,
+                // The binding recoverable() verified, copied as stored: historical prefixes compare it byte-for-byte
+                // with the prior observation, which may have been written under a previous key.
+                'bound_credential_binding' => $available && $purpose === 'recover' ? $observations[array_key_last($observations)]['credential_binding'] : IdentityEvidence::EMPTY_HASH,
                 'availability' => $available ? 'pending' : 'unavailable', 'created_at' => $now,
                 'expires_at' => gmdate('Y-m-d H:i:s', strtotime($now.' UTC') + IdentityPolicy::TTL_SECONDS)];
             $challenge['challenge_hash'] = IdentityEvidence::hash('challenge', $challenge);
@@ -131,8 +141,26 @@ final class IdentityRequests
         }
         $last = $observations[array_key_last($observations)];
 
-        return hash_equals($last['credential_binding'], IdentityPolicy::digest('credential', $user['password']))
-            && hash_equals($last['recipient_hmac'], IdentityPolicy::digest('recipient', $email));
+        return IdentityPolicy::matches('credential', $user['password'], $last['credential_binding'])
+            && IdentityPolicy::matches('recipient', $email, $last['recipient_hmac']);
+    }
+
+    /**
+     * One exact unique-key lookup per key candidate, in candidate order (current key first), so every process
+     * takes the same InnoDB record/gap locks a single-key `= ?` lookup takes. An `IN (...)` list was rejected:
+     * on an empty or stale-statistics table MySQL scans PRIMARY and locks the whole table (see the evidence).
+     */
+    private static function candidates(IdentityDatabase $database, string $table, string $column, array $digests): array
+    {
+        $rows = [];
+        foreach ($digests as $digest) {
+            foreach ($database->rows->rows($table, $column.' = ?', [$digest], 1) as $row) {
+                $rows[(int) $row['id']] = $row;
+            }
+        }
+        ksort($rows);
+
+        return array_values($rows);
     }
 
     private function url(string $scope): string

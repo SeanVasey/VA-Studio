@@ -1,0 +1,26 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:02.740, Memory: 87.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_the_serialized_job_carries_no_plaintext_invoice_reference_and_still_retrieves_it
+Failed asserting that 'O:34:"App\Jobs\RetrieveMembershipInvoice":17:{s:5:"tries";i:1;s:9:"bindingId";s:36:"8694aa60-3569-428e-aa16-c351c8302588";s:10:"invoiceRef";s:12:"in_SYNTHETIC";s:3:"job";N;s:10:"connection";N;s:5:"queue";N;s:12:"messageGroup";N;s:12:"deduplicator";N;s:13:"debounceOwner";s:0:"";s:15:"uniqueLockOwner";s:0:"";s:5:"delay";N;s:11:"afterCommit";N;s:10:"middleware";a:0:{}s:7:"chained";a:0:{}s:15:"chainConnection";N;s:10:"chainQueue";N;s:19:"chainCatchCallbacks";N;}' [ASCII](length: 462) does not contain "in_SYNTHETIC" [ASCII](length: 12).
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:149
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingRetrievalJobTest::test_a_first_retrieval_refusal_message_names_its_reason
+Failed asserting that 'Production membership billing unavailable.' [ASCII](length: 42) contains "binding_refused_subscription" [ASCII](length: 28).
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php:170
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 3, Failures: 2.
+rc=1

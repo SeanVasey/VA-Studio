@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingHintRecovery.php b/app/Domain/Memberships/Billing/BillingHintRecovery.php
+index 5d416608..f598d26fa 100644
+--- a/app/Domain/Memberships/Billing/BillingHintRecovery.php
++++ b/app/Domain/Memberships/Billing/BillingHintRecovery.php
+@@ -82,7 +82,7 @@ final class BillingHintRecovery
+         BillingException::require($received !== false, 'tampered_ledger');
+         $schema = new BillingSchema;
+         $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
+-            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.retrieval_started_at >= ? AND o.outcome <> ? '
++            .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.created_at >= ? AND o.outcome <> ? '
+             .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
+         $statement->execute([$invoiceRefHash, BillingValues::utcMicro($received->addSecond()), 'unknown']);
+         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
