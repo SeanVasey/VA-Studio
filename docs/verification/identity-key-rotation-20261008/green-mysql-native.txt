@@ -1,0 +1,110 @@
+Private MySQL 8.4.11: mysqld --no-defaults --user=root --datadir=<scratchpad>/idkeys-mysql/data --port=33071 --bind-address=127.0.0.1 --socket= --mysqlx=OFF
+Env: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33071 DB_DATABASE=vaseyaudio_idkeys DB_USERNAME=root DB_PASSWORD= DB_URL=
+Runner: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- <args>
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 09:02.189, Memory: 87.00 MB
+
+OK (6 tests, 1145 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit --filter test_native_plain_closed_prefix_does_not_wait_for_or_acquire_mutable_identity_row_locks|test_current_original_closed_prefix_refuses_changed_policy_primary_or_owner_without_callback tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 12:34.832, Memory: 89.00 MB
+
+OK (7 tests, 25 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit --filter test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 01:38.755, Memory: 81.00 MB
+
+OK (1 test, 6 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityConcurrencyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+.........                                                           9 / 9 (100%)
+
+Time: 11:27.250, Memory: 93.00 MB
+
+OK (9 tests, 535 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionFeatures/ProductionConsentKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 04:06.096, Memory: 89.00 MB
+
+OK (2 tests, 18 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/CustomerIdentityKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 02:40.149, Memory: 85.00 MB
+
+OK (2 tests, 14 assertions)
+exit=0
+
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+..........                                                        10 / 10 (100%)
+
+Time: 14:48.743, Memory: 93.00 MB
+
+OK (10 tests, 71 assertions)
+exit=0
+
+DONE
+### php vendor/phpunit/phpunit/phpunit tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-idkeys/phpunit.xml
+
+identity inspection: 104 statements, 290.5 ms
+.                                                                   1 / 1 (100%)
+
+Time: 01:02.465, Memory: 79.00 MB
+
+OK (1 test, 6 assertions)
+exit=0
+

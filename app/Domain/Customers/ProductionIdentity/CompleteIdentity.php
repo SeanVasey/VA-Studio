@@ -28,26 +28,27 @@ final class CompleteIdentity
         $database->close(false);
         $initial = $database->rows->rows('production_identity_challenges', 'public_id = ?', [$publicId], 1)[0] ?? [];
         IdentityEvidence::verify('challenge', $initial, 'challenge_hash');
-        if ($initial['availability'] !== 'pending' || ! hash_equals($initial['proof_hash'], IdentityPolicy::digest('proof', $proof))) {
+        if ($initial['availability'] !== 'pending' || ! IdentityPolicy::matches('proof', $proof, $initial['proof_hash'])) {
             throw new IdentityException;
         }
         $payload = Crypt::decryptString($initial['payload_ciphertext']);
-        if (! hash_equals($initial['payload_hash'], IdentityPolicy::digest('payload', $payload))) {
+        if (! IdentityPolicy::matches('payload', $payload, $initial['payload_hash'])) {
             throw new IdentityException;
         }
         $decoded = json_decode($payload, true, 8, JSON_THROW_ON_ERROR);
         $email = IdentityPolicy::email($decoded['recipient'] ?? '');
-        if (! hash_equals($initial['recipient_hmac'], IdentityPolicy::digest('recipient', $email))) {
+        if (! IdentityPolicy::matches('recipient', $email, $initial['recipient_hmac'])) {
             throw new IdentityException;
         }
-        $completionHash = IdentityPolicy::digest('completion', CanonicalJson::encode(['id' => $publicId, 'proof' => $proof, 'password' => $password, 'name' => $name, 'request_key' => $requestKey]));
+        $completion = CanonicalJson::encode(['id' => $publicId, 'proof' => $proof, 'password' => $password, 'name' => $name, 'request_key' => $requestKey]);
+        $completionHash = IdentityPolicy::digest('completion', $completion);
         $passwordHash = Hash::make($password); // No password hashing callback after the final locked proof.
         $now = now()->utc()->format('Y-m-d H:i:s');
-        $result = $database->connection->transaction(function () use ($database, $policy, $initial, $email, $completionHash, $passwordHash, $name, $now): array {
+        $result = $database->connection->transaction(function () use ($database, $policy, $initial, $email, $completion, $completionHash, $passwordHash, $name, $now): array {
             $database->close(true);
             $policy->requireEnabled();
             $address = $database->rows->one('production_identity_addresses', (int) $initial['address_id']);
-            if ($address === [] || ! hash_equals($address['address_hash'], IdentityPolicy::digest('address', $email))) {
+            if ($address === [] || ! IdentityPolicy::matches('address', $email, $address['address_hash'])) {
                 throw new IdentityException;
             }
             $users = $database->rows->rows('users', 'LOWER(email) = ?', [$email], 2);
@@ -75,11 +76,11 @@ final class CompleteIdentity
             if ($completed !== []) {
                 $observation = $completed[0];
                 IdentityEvidence::verify('verification', $observation, 'observation_hash');
-                if ($origin === [] || $account === [] || ! hash_equals($observation['completion_hash'], $completionHash)
+                if ($origin === [] || $account === [] || ! IdentityPolicy::matches('completion', $completion, $observation['completion_hash'])
                     || (string) $user['is_admin'] !== '0' || $user['email_verified_at'] === null || (string) $account['active'] !== '1'
                     || (int) $account['access_version'] !== ($challenge['purpose'] === 'enroll' ? 1 : (int) $challenge['bound_access_version'])
-                    || ! hash_equals($observation['credential_binding'], IdentityPolicy::digest('credential', $user['password']))
-                    || ! hash_equals($observation['recipient_hmac'], IdentityPolicy::digest('recipient', $email))) {
+                    || ! IdentityPolicy::matches('credential', $user['password'], $observation['credential_binding'])
+                    || ! IdentityPolicy::matches('recipient', $email, $observation['recipient_hmac'])) {
                     throw new IdentityException;
                 }
 
@@ -111,7 +112,7 @@ final class CompleteIdentity
                     || $user['email_verified_at'] === null || (string) $account['active'] !== '1'
                     || (int) $challenge['bound_origin_id'] !== (int) $origin['id'] || (int) $challenge['bound_user_id'] !== (int) $user['id']
                     || (int) $challenge['bound_account_id'] !== (int) $account['id'] || (int) $challenge['bound_access_version'] !== (int) $account['access_version']
-                    || ! hash_equals($challenge['bound_credential_binding'], IdentityPolicy::digest('credential', $user['password']))) {
+                    || ! IdentityPolicy::matches('credential', $user['password'], $challenge['bound_credential_binding'])) {
                     throw new IdentityException;
                 }
                 IdentityEvidence::verify('origin', $origin, 'origin_hash');

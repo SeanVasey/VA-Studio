@@ -1,0 +1,16 @@
+# source HEAD: f59f9b827ef21832e00e627c55c739ee37710719
+# worktree diff (app tests) sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+# untracked tests: tests/Feature/ProductionFreeGrants/ReviewFree256IdentityRotationTest.php tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationNativeRaceTest.php tests/Support/review-identity-rotation-race-worker.php 
+# date: 2026-10-08T13:20:45Z  uptime:  13:20:45 up  2:29,  0 user,  load average: 5.30, 5.64, 5.70
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-idkeys/phpunit.xml
+
+........                                                            8 / 8 (100%)
+
+Time: 00:12.911, Memory: 87.00 MB
+
+[30;42mOK (8 tests, 47 assertions)[0m
+rc=0

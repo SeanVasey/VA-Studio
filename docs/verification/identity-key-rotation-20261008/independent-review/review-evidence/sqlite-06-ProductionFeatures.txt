@@ -1,0 +1,18 @@
+# source HEAD: f59f9b827ef21832e00e627c55c739ee37710719
+# worktree diff (app tests) sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+# untracked tests: 
+# date: 2026-10-08T13:10:48Z  uptime:  13:10:48 up  2:19,  0 user,  load average: 4.58, 5.48, 5.76
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- tests/Feature/ProductionFeatures
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-idkeys/phpunit.xml
+
+.............................................................[36;1mS[0m[36;1mS[0m[36;1mS[0m. 65 / 89 ( 73%)
+........................                                          89 / 89 (100%)
+
+Time: 03:15.894, Memory: 251.00 MB
+
+[30;42mOK, but some tests were skipped![0m
+[30;42mTests: 89[0m[30;42m, Assertions: 915[0m[30;42m, Skipped: 3[0m[30;42m.[0m
+rc=0

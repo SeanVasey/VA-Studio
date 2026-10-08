@@ -687,6 +687,18 @@
       "test_native_temporary_shadow_of_an_owned_table_is_refused"
     ],
     [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_two_candidate_recoveries_wait_on_the_exact_old_key_fence_then_serialize_without_deadlock"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_concurrent_first_requests_for_new_addresses_create_one_fence_with_one_or_two_keys"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_mixed_configuration_processes_create_two_fences_and_the_address_is_then_refused"
+    ],
+    [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
       "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
     ],
