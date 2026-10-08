@@ -12,6 +12,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTranspor
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
+use App\Support\PhpCliBinary;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -31,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(MediaWorkflowBudget::class);
         $this->app->bind(ContractRenderer::class,
             IsolatedContractRenderer::class);
+        $this->app->bind(PhpCliBinary::class,
+            fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));
         $this->app->bind(StripeCheckoutGateway::class,
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripePaymentGateway::class,

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\IsolatedContractRenderer;
 use App\Support\CanonicalJson;
+use App\Support\PhpCliBinary;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
@@ -122,6 +123,38 @@ class TestIsolatedContractRendererTest extends TestCase
             $expected = $reason === 'private-marker' ? 'render_failed' : $reason;
             $this->rejectedRender($expected, fn () => $this->rendererCode($this->outputCode(['error' => $reason]))->render([], []));
         }
+    }
+
+    public function test_simulated_fpm_without_a_configured_cli_binary_fails_closed_before_any_child(): void
+    {
+        $this->app->instance(PhpCliBinary::class, new PhpCliBinary(null, 'fpm-fcgi', '/usr/sbin/php-fpm8.4'));
+        $started = 0;
+        $renderer = new IsolatedContractRenderer(function () use (&$started) { $started++; });
+        $this->rejectedRender('render_failed', fn () => $renderer->render([], []));
+        $this->assertSame(0, $started);
+    }
+
+    public function test_simulated_fpm_spawns_only_the_validated_cli_binary_with_unchanged_hardening(): void
+    {
+        $profile = ['test' => 'synthetic-profile']; $reply = $this->reply($profile);
+        // A distinct same-version CLI stand-in, so the spawned path cannot coincide with PHP_BINARY.
+        $directory = sys_get_temp_dir().'/php-cli-renderer-'.bin2hex(random_bytes(8)); mkdir($directory, 0700);
+        $cli = $directory.'/php-cli';
+        file_put_contents($cli, "#!/bin/sh\nprintf '%s' ".escapeshellarg('cli '.PHP_VERSION)."\n"); chmod($cli, 0700);
+        $commands = [];
+        $capture = function ($command, $root, $environment, $payload) use (&$commands, $reply) {
+            $commands[] = array_map(fn ($argument) => str_replace($environment['TMPDIR'], '{workspace}', $argument), $command);
+            return new Process([PHP_BINARY, '-r', $this->outputCode($reply)], $root, $environment, $payload, 60);
+        };
+        try {
+            (new IsolatedContractRenderer($capture))->render([], $profile);
+            $this->app->instance(PhpCliBinary::class, new PhpCliBinary($cli, 'fpm-fcgi', '/usr/sbin/php-fpm8.4'));
+            (new IsolatedContractRenderer($capture))->render([], $profile);
+        } finally { unlink($cli); rmdir($directory); }
+        $this->assertCount(2, $commands);
+        $this->assertSame(PHP_BINARY, $commands[0][0]);
+        $this->assertSame($cli, $commands[1][0]);
+        $this->assertSame(array_slice($commands[0], 1), array_slice($commands[1], 1));
     }
 
     public function test_secondary_database_transaction_blocks_rendering_before_process_creation(): void
