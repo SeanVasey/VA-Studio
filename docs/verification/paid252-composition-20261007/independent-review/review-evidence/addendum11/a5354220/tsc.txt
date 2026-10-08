@@ -1,0 +1,3 @@
+cmd: npx tsc --noEmit (probe moved aside)
+head: a535422086043edc30443eb3bf3a06b401c394d8
+rc=0
