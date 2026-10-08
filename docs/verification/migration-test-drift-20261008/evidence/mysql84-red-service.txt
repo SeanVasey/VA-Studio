@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:37.645, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ServiceProjectSchemaTest::test_actual_rollback_failure_retains_original_rows_and_migration_bookkeeping
+Retained service evidence must refuse rollback.
+
+<scratchpad>/red/ServiceProjectSchemaTest.php:71
+<main-checkout>/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.

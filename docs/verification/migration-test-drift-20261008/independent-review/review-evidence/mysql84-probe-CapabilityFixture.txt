@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-migdrift/phpunit.xml
+
+.[41;37mF[0m...                                                               5 / 5 (100%)
+
+Time: 03:35.028, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbeCapabilityFixtureTest::test_full_schema_236_down_still_refuses_on_later_dependents_without_ddl
+Failed asserting that 'Unexpected production capability external or additional table guard; rollback refused before schema changes.' [ASCII](length: 108) contains "external foreign key reference" [ASCII](length: 30).
+
+/home/user/VA-Studio-review-migdrift/tests/Feature/ReviewProbeCapabilityFixtureTest.php:81
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 76[0m[37;41m, Failures: 1[0m[37;41m.[0m
