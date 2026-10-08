@@ -1,0 +1,37 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/phpunit.xml
+
+OBSERVATION race-two-bindings-unknown: [w0 denied seq=- outcome=- reason=conflicting_invoice err=-] [w1 saved seq=1 outcome=unknown reason=- err=-] invoices=1 observations=1
+.OBSERVATION race-right-vs-wrong: [w0 saved seq=1 outcome=settled reason=- err=-] [w1 denied seq=- outcome=- reason=binding_refused_subscription err=-] invoices=1 owner=right
+.OBSERVATION race-same-binding-unknown: [w0 saved seq=1 outcome=unknown reason=- err=-] [w1 saved seq=2 outcome=unknown reason=- err=-] invoices=1 chain=1,2
+.OBSERVATION intake-insert-race: lock_waiters_before_release=0 [w0 billing_exception event_identity frames=receive@addendum1-intake-race-worker.php:40] [w1 billing_exception event_identity frames=receive@addendum1-intake-race-worker.php:40] events=0 loser_branch_line=92; sequential redelivery afterwards scheduled=dispatched pushed=1 observations=0
+FE                                                               5 / 5 (100%)
+
+Time: 19:25.096, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ReviewProbes\Addendum1ProbeTest::test_probe_native_stale_settled_appended_after_reversal
+Symfony\Component\Process\Exception\ProcessTimedOutException: The process "'/usr/bin/php8.4' '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/addendum1/probes/addendum1-stale-race-worker.php'" exceeded the timeout of 90 seconds.
+
+/home/user/VA-Studio/vendor/symfony/process/Process.php:1215
+/home/user/VA-Studio/vendor/symfony/process/Process.php:481
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/addendum1/probes/Addendum1ProbeTest.php:386
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/addendum1/probes/Addendum1ProbeTest.php:333
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ReviewProbes\Addendum1ProbeTest::test_probe_native_concurrent_insert_loser_recovers_the_lost_dispatch
+Failed asserting that 0 is identical to 2.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member-head/docs/verification/membership-operative-1-20261007/independent-review/review-evidence/addendum1/probes/Addendum1ProbeTest.php:316
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 5, Assertions: 40, Errors: 1, Failures: 1.
+rc=2

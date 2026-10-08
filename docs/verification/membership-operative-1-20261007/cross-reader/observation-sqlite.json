@@ -1,0 +1,60 @@
+{
+    "driver": "sqlite",
+    "sqlite_version": "3.45.1",
+    "cases": {
+        "function_lower": {
+            "identity_rows_construct": {
+                "outcome": "admitted",
+                "application_callbacks": 966
+            },
+            "current_rows_users_by_id": {
+                "outcome": "admitted",
+                "application_callbacks": 0
+            },
+            "member_grant_schema_assert_owned": {
+                "outcome": "admitted",
+                "application_callbacks": 69552
+            },
+            "membership_rows_construct": {
+                "outcome": "refused:sqlite_application_function",
+                "application_callbacks": 0
+            }
+        },
+        "function_length": {
+            "identity_rows_construct": {
+                "outcome": "admitted",
+                "application_callbacks": 0
+            },
+            "current_rows_users_by_id": {
+                "outcome": "admitted",
+                "application_callbacks": 0
+            },
+            "member_grant_schema_assert_owned": {
+                "outcome": "admitted",
+                "application_callbacks": 0
+            },
+            "membership_rows_construct": {
+                "outcome": "refused:sqlite_application_function",
+                "application_callbacks": 0
+            }
+        },
+        "collation_binary": {
+            "identity_rows_construct": {
+                "outcome": "admitted",
+                "application_callbacks": 19333
+            },
+            "current_rows_users_by_id": {
+                "outcome": "admitted",
+                "application_callbacks": 0
+            },
+            "member_grant_schema_assert_owned": {
+                "outcome": "admitted",
+                "application_callbacks": 32392
+            },
+            "membership_rows_construct": {
+                "outcome": "admitted",
+                "application_callbacks": 25137
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" tests="3" assertions="5" errors="0" failures="1" skipped="0" time="0.410668">
+    <testcase name="test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="32" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="2" time="0.362073"/>
+    <testcase name="test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="41" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="2" time="0.029865"/>
+    <testcase name="test_replaced_environment_binding_is_refused_without_being_invoked" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="50" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="1" time="0.018730">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'changed_policy'
++'provenance'
+
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:61
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

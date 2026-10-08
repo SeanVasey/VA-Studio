@@ -5,8 +5,10 @@ namespace App\Domain\Grants\Member;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
+use ReflectionFunction;
 use ReflectionProperty;
 
 /** A default-off capability baseline, never approval of facts, originals or artifact readiness. */
@@ -60,7 +62,7 @@ final class MemberGrantPolicy
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
         MemberGrantException::require(is_array($items) && is_array($items['member-grants'] ?? null), 'changed_policy');
         $policy = $items['member-grants'];
-        $environment = $instances['env'] ?? null;
+        $environment = $this->environment($instances);
         MemberGrantException::require(is_bool($policy['enabled'] ?? null) && is_int($policy['version'] ?? null)
             && is_string($policy['family'] ?? null) && is_string($policy['purpose'] ?? null)
             && ($environment === null || is_string($environment)), 'changed_policy');
@@ -71,5 +73,31 @@ final class MemberGrantPolicy
         }
 
         return [...$result, 'environment' => $environment];
+    }
+
+    /**
+     * Laravel binds `env` through Container::offsetSet as `fn () => $value`, never as an instance.
+     * Read that captured value by reflection instead of resolving the binding, and refuse any other
+     * binding: resolving it would run a callback. An instance, if one is ever set, keeps precedence
+     * exactly as the container gives it.
+     */
+    private function environment(array $instances): mixed
+    {
+        if (array_key_exists('env', $instances)) {
+            return $instances['env'];
+        }
+        $bindings = (new ReflectionProperty(Container::class, 'bindings'))->getValue($this->container);
+        $concrete = is_array($bindings) ? ($bindings['env']['concrete'] ?? null) : null;
+        if ($concrete === null) {
+            return null;
+        }
+        MemberGrantException::require($concrete instanceof Closure, 'changed_policy');
+        $function = new ReflectionFunction($concrete);
+        $variables = $function->getStaticVariables();
+        MemberGrantException::require($function->getClosureScopeClass()?->getName() === Container::class
+            && $function->getClosureThis() === $this->container && array_keys($variables) === ['value']
+            && is_string($variables['value']), 'changed_policy');
+
+        return $variables['value'];
     }
 }

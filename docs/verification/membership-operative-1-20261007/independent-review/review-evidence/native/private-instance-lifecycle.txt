@@ -1,0 +1,5 @@
+2026-10-07T17:45:23Z reviewer private mysqld 8.4.11 --no-defaults, port 3461, datadir $scratchpad/my/data, socket $scratchpad/my/s; shared 3306 untouched
+2026-10-07T17:45:31Z started pid 10138; database vaseyaudio_review_member created
+2026-10-07T22:10:31Z completing reviewer: no clean shutdown was recorded. my/err.log ended at 'ready for connections' (17:45:28Z, port 3461, socket $scratchpad/my/s) with no shutdown entry; pid 10138 died with the previous reviewer agent's shell after the ledger's DONE (18:17:03Z).
+2026-10-07T22:10:31Z completing reviewer: before cleanup: /proc/10138 absent; processes whose executable is mysqld = 0; 'pgrep -x mysqld' exit 1; LISTEN sockets on 3306 or 3461 in /proc/net/tcp = 0 (ss is not installed).
+2026-10-07T22:10:31Z completing reviewer: removed $scratchpad/my (218M: data/, err.log, init.log, pid, socket s, s.lock, start.log); removed=yes. No new instance was started; shared 3306 untouched.

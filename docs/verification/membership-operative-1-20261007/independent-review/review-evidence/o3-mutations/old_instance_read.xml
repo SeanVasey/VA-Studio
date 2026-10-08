@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" tests="3" assertions="1" errors="2" failures="1" skipped="0" time="0.397230">
+    <testcase name="test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="32" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="0" time="0.340775">
+      <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/home/user/VA-Studio-review-member/app/Domain/Memberships/Production/MembershipException.php:16
+/home/user/VA-Studio-review-member/app/Domain/Memberships/Production/MembershipPolicy.php:41
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:35
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="41" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="0" time="0.031442">
+      <error type="App\Domain\Grants\Member\MemberGrantException">Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/home/user/VA-Studio-review-member/app/Domain/Grants/Member/MemberGrantException.php:15
+/home/user/VA-Studio-review-member/app/Domain/Grants/Member/MemberGrantPolicy.php:37
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:44
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_replaced_environment_binding_is_refused_without_being_invoked" file="/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php" line="50" class="Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest" classname="Tests.Feature.ProductionMembership.MembershipPolicyEnvironmentTest" assertions="1" time="0.025013">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembership\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'changed_policy'
++'provenance'
+
+/home/user/VA-Studio-review-member/tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php:61
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
