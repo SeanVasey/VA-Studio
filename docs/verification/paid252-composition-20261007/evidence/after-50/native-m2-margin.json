@@ -1,0 +1,46 @@
+{
+    "status": 200,
+    "bytes_len": 211758,
+    "expires_at": "2026-10-08 06:36:54",
+    "expires_epoch": 1791441414,
+    "now_epoch": 1791441410.84775,
+    "remaining_after_bytes_s": 3.152378,
+    "marks": [
+        {
+            "label": "before_finalize",
+            "t": 1791441264.179806,
+            "utc": "2026-10-08 06:34:24",
+            "questions": 35633
+        },
+        {
+            "label": "after_finalize",
+            "t": 1791441282.065163,
+            "utc": "2026-10-08 06:34:42",
+            "questions": 45667
+        },
+        {
+            "label": "after_document",
+            "t": 1791441347.482312,
+            "utc": "2026-10-08 06:35:47",
+            "questions": 82681
+        },
+        {
+            "label": "authorization_returned",
+            "t": 1791441366.981303,
+            "utc": "2026-10-08 06:36:06",
+            "questions": 93463
+        },
+        {
+            "label": "redeem_returned",
+            "t": 1791441410.016734,
+            "utc": "2026-10-08 06:36:50",
+            "questions": 112159
+        },
+        {
+            "label": "bytes_written",
+            "t": 1791441410.847558,
+            "utc": "2026-10-08 06:36:50",
+            "questions": 112753
+        }
+    ]
+}

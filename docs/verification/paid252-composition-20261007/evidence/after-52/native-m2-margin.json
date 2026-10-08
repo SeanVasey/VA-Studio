@@ -1,0 +1,46 @@
+{
+    "status": 403,
+    "bytes_len": 0,
+    "expires_at": "2026-10-08 11:29:37",
+    "expires_epoch": 1791458977,
+    "now_epoch": 1791458977.368247,
+    "remaining_after_bytes_s": -0.36805,
+    "marks": [
+        {
+            "label": "before_finalize",
+            "t": 1791458783.114429,
+            "utc": "2026-10-08 11:26:23",
+            "questions": 37054
+        },
+        {
+            "label": "after_finalize",
+            "t": 1791458807.543323,
+            "utc": "2026-10-08 11:26:47",
+            "questions": 47088
+        },
+        {
+            "label": "after_document",
+            "t": 1791458907.698245,
+            "utc": "2026-10-08 11:28:27",
+            "questions": 84102
+        },
+        {
+            "label": "authorization_returned",
+            "t": 1791458937.883935,
+            "utc": "2026-10-08 11:28:57",
+            "questions": 94884
+        },
+        {
+            "label": "redeem_returned",
+            "t": 1791458977.367045,
+            "utc": "2026-10-08 11:29:37",
+            "questions": 110002
+        },
+        {
+            "label": "bytes_written",
+            "t": 1791458977.36799,
+            "utc": "2026-10-08 11:29:37",
+            "questions": 110003
+        }
+    ]
+}

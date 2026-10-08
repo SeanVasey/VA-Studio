@@ -1,0 +1,11 @@
+PaidGrantCommitCapsuleTest rc=0 wall=61s
+PaidGrantCommittingAdmissionTest rc=0 wall=11s
+PaidGrantDocumentJourneyTest rc=0 wall=44s
+PaidGrantDownloadJourneyTest rc=0 wall=65s
+PaidGrantHttpJourneyTest rc=0 wall=60s
+PaidGrantRedeemFrameConjunctTest rc=0 wall=17s
+PaidGrantRefusedFrameCallbackTest rc=0 wall=11s
+PaidGrantSchemaRecoveryTest rc=0 wall=2s
+PaidGrantSourceJourneyTest rc=0 wall=63s
+SchemaQualifierDelimiterTest rc=0 wall=1s
+DONE

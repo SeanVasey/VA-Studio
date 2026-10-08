@@ -1,0 +1,23 @@
+start 06:19:46
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 06:11.963, Memory: 121.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRedeemFrameConjunctTest::test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization
+Failed asserting that two strings are identical.
+--- Expected/Actual: binary WAV body diff elided (expected 211758 bytes, actual empty string; the streamed body was refused after the original authorization expired) ---
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 17779[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1
+wall=372s end 06:25:58

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantDocumentJourneyTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDocumentJourneyTest.php" tests="4" assertions="87" errors="0" failures="0" skipped="0" time="44.061787">
+    <testcase name="test_actual_claim_render_original_and_complete_order_are_idempotent_and_missing_original_is_restore_only" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDocumentJourneyTest.php" line="121" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="24" time="13.611418"/>
+    <testcase name="test_failed_second_line_retains_first_original_without_any_activation_until_exact_fresh_retry" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDocumentJourneyTest.php" line="152" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="24" time="14.905058"/>
+    <testcase name="test_busy_original_claim_returns_only_a_fresh_one_use_body_receipt_without_new_claim_or_activation" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDocumentJourneyTest.php" line="190" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="20" time="8.519199"/>
+    <testcase name="test_credential_withdrawal_during_real_render_cannot_publish_original_or_extend_claim_authority" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDocumentJourneyTest.php" line="220" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="19" time="7.026113"/>
+  </testsuite>
+</testsuites>
