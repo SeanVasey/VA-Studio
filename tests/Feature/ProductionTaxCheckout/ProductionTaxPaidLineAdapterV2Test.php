@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
+use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Support\CanonicalJson;
 use Closure;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -71,13 +72,15 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
         return [...$v1, 'source_hash' => CanonicalJson::hash($v1)];
     }
 
-    public function test_a_consistent_v2_line_is_returned_unchanged(): void
+    public function test_a_consistent_v2_line_passes_the_self_consistency_checks(): void
     {
         $line = self::line();
-        $this->assertSame($line, ProductionTaxPaidLineAdapterV2::accept($line, 'synthetic_rehearsal'));
+        ProductionTaxPaidLineAdapterV2::assertSelfConsistent($line, 'synthetic_rehearsal');
+        $this->addToAssertionCount(1);
         $inclusive = self::line(['tax' => ['tax_behavior' => 'inclusive', 'line_total_minor' => 4999, 'order_total_minor' => 4999],
             'execution_context' => ['tax' => ['behavior' => 'inclusive']]]);
-        $this->assertSame($inclusive, ProductionTaxPaidLineAdapterV2::accept($inclusive, 'synthetic_rehearsal'));
+        ProductionTaxPaidLineAdapterV2::assertSelfConsistent($inclusive, 'synthetic_rehearsal');
+        $this->addToAssertionCount(1);
     }
 
     public function test_v1_shaped_lines_are_refused_and_never_routed_as_v2(): void
@@ -86,7 +89,7 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
         $this->assertFalse(ProductionTaxPaidLineAdapterV2::isV2($v1));
         foreach ([$v1, [...$v1, 'schema_version' => 2], self::sealed([...$v1, 'schema_version' => 2, 'producer' => 'production_tax_checkout_v2'])] as $candidate) {
             try {
-                ProductionTaxPaidLineAdapterV2::accept($candidate, 'synthetic_rehearsal');
+                ProductionTaxPaidLineAdapterV2::assertSelfConsistent($candidate, 'synthetic_rehearsal');
                 $this->fail('A V1-shaped line was accepted by the V2 adapter.');
             } catch (CheckoutException $error) {
                 $this->assertSame(['source_version', 409], [$error->reason, $error->status]);
@@ -94,11 +97,18 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
         }
         // Grafting the V1 tax field onto an otherwise valid V2 line is still refused.
         try {
-            ProductionTaxPaidLineAdapterV2::accept(self::sealed([...self::line(), 'line_tax_minor' => 437]), 'synthetic_rehearsal');
+            ProductionTaxPaidLineAdapterV2::assertSelfConsistent(self::sealed([...self::line(), 'line_tax_minor' => 437]), 'synthetic_rehearsal');
             $this->fail('A V1 tax field was accepted beside V2 tax facts.');
         } catch (CheckoutException $error) {
             $this->assertSame('source_version', $error->reason);
         }
+    }
+
+    public function test_the_only_acceptance_path_requires_the_held_source(): void
+    {
+        $parameters = (new \ReflectionMethod(ProductionTaxPaidLineAdapterV2::class, 'accept'))->getParameters();
+        $this->assertSame(['source', 'position', 'line', 'provenance'], array_map(fn ($p) => $p->getName(), $parameters));
+        $this->assertSame(ProductionTaxPaidOrderSourceV2::class, (string) $parameters[0]->getType());
     }
 
     public static function refusals(): array
@@ -133,7 +143,7 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
     public function test_tampered_or_inconsistent_v2_lines_are_refused(Closure $mutation): void
     {
         try {
-            ProductionTaxPaidLineAdapterV2::accept($mutation(self::line()), 'synthetic_rehearsal');
+            ProductionTaxPaidLineAdapterV2::assertSelfConsistent($mutation(self::line()), 'synthetic_rehearsal');
             $this->fail('An inconsistent V2 line was accepted.');
         } catch (CheckoutException $error) {
             $this->assertSame(409, $error->status);

@@ -27,11 +27,34 @@ final class ProductionTaxPaidLineAdapterV2
         return ($line['schema_version'] ?? null) === 2 && ($line['producer'] ?? null) === TaxCheckoutPolicy::PRODUCER;
     }
 
-    /** Returns the authenticated V2 line unchanged, or refuses with 409. Never coerces or fills a field. */
-    public static function accept(array $line, string $provenance): array
+    /**
+     * Returns the authenticated V2 line unchanged, or refuses with 409. Never coerces or fills a field.
+     *
+     * Authentication is binding to the HELD source: `$line` must be byte-identical to what the held
+     * `ProductionTaxPaidOrderSourceV2::line($position)` mints from the retained, APP_KEY-sealed rows. The caller
+     * therefore calls this inside the same held transaction in which it read the source, and keeps its own
+     * `proveRetainedCurrent` after use. `source_hash` is an unkeyed self-hash and proves nothing about origin, so it is
+     * only one of the consistency checks that run after the binding. Provenance other than `synthetic_rehearsal`
+     * (live funds) is refused outright: no reviewed live producer exists in this family.
+     */
+    public static function accept(ProductionTaxPaidOrderSourceV2 $source, int $position, array $line, string $provenance): array
     {
-        CheckoutException::require(self::isV2($line) && ! array_key_exists('line_tax_minor', $line) && ! array_key_exists('line_amount_minor', $line)
-            && ! array_key_exists('amounts', $line) && ! array_key_exists('payment_id', $line), 'source_version');
+        CheckoutException::require($provenance === 'synthetic_rehearsal', 'live_unsupported');
+        self::requireV2Shape($line);
+        CheckoutException::require(CanonicalJson::encode($source->line($position)) === CanonicalJson::encode($line), 'source_binding');
+        self::assertSelfConsistent($line, $provenance);
+
+        return $line;
+    }
+
+    /**
+     * Shape, hash, arithmetic, execution-context and ceiling consistency of one line. This is NOT authentication: a
+     * forger who can compute SHA-256 can pass it. It exists so `accept` and tests share one set of checks, and no
+     * consumer may use it as an acceptance path.
+     */
+    public static function assertSelfConsistent(array $line, string $provenance): void
+    {
+        self::requireV2Shape($line);
         CheckoutException::require(count($line) === count(self::KEYS) && array_diff(self::KEYS, array_keys($line)) === []);
         $source = $line;
         unset($source['source_hash']);
@@ -75,7 +98,11 @@ final class ProductionTaxPaidLineAdapterV2
         // Same approved machine-policy ceiling the producer enforced; checked, never adjusted.
         $net = $tax['tax_behavior'] === 'exclusive' ? $tax['order_subtotal_minor'] : $tax['order_subtotal_minor'] - $tax['order_tax_minor'];
         CheckoutException::require($net >= 0 && $net * $context['tax']['maximum_rate_bps'] >= $tax['order_tax_minor'] * 10000, 'tax_ceiling');
+    }
 
-        return $line;
+    private static function requireV2Shape(array $line): void
+    {
+        CheckoutException::require(self::isV2($line) && ! array_key_exists('line_tax_minor', $line) && ! array_key_exists('line_amount_minor', $line)
+            && ! array_key_exists('amounts', $line) && ! array_key_exists('payment_id', $line), 'source_version');
     }
 }

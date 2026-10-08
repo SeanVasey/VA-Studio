@@ -117,9 +117,12 @@ final class TaxCheckoutSchemaInstaller
                     $this->mysqlTable($name, $tables[$name], $object);
                 } else {
                     $expected = $statements[$name];
+                    // A same-text guard that runs under another definer or SQL mode is not this installer's guard (as in the V1 installer).
+                    $identity = DB::selectOne('SELECT CURRENT_USER() AS definer, @@SESSION.sql_mode AS sql_mode');
                     if ($object['EVENT_OBJECT_TABLE'] !== $expected['table'] || $object['ACTION_TIMING'] !== 'BEFORE'
                         || $object['EVENT_MANIPULATION'] !== $expected['operation'] || $object['ACTION_ORIENTATION'] !== 'ROW'
-                        || $object['ACTION_STATEMENT'] !== $expected['body'] || (int) $object['ACTION_ORDER'] !== 1) {
+                        || $object['ACTION_STATEMENT'] !== $expected['body'] || $object['DEFINER'] !== $identity->definer
+                        || $object['SQL_MODE'] !== $identity->sql_mode || (int) $object['ACTION_ORDER'] !== 1) {
                         $this->reject('guard definition');
                     }
                 }

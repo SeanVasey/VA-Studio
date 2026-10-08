@@ -149,9 +149,11 @@ final class ProductionTaxCheckout
                 CheckoutException::require(OwnAccountStripeGateway::sessionId($sessionId, $context->fundsMode));
             }
             $safe = TaxCheckoutEvidence::session($transport->retrieve($context, $sessionId), $request);
+            // The authoritative read must be the session that was created (or already bound), never another one carrying this request's metadata.
+            CheckoutException::require($safe['session_id'] === $sessionId, 'session_mismatch');
         } catch (Throwable $error) {
             $this->access->current($principal, $buyer);
-            throw $error instanceof CheckoutException && in_array($error->reason, ['retry_window', 'tax_ceiling'], true)
+            throw $error instanceof CheckoutException && in_array($error->reason, ['retry_window', 'tax_ceiling', 'session_mismatch'], true)
                 ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($prepared['intent']['binding'] === null) {
@@ -178,11 +180,12 @@ final class ProductionTaxCheckout
         try {
             $session = $transport->retrieve($context, $sessionId);
             $safe = TaxCheckoutEvidence::session($session, $request);
+            CheckoutException::require($safe['session_id'] === $sessionId, 'session_mismatch');
             $payment = $safe['payment_intent_id'] === null ? null : $transport->paymentIntent($context, $safe['payment_intent_id']);
             $financial = TaxCheckoutEvidence::financial($session, $payment, $request);
         } catch (Throwable $error) {
             $this->access->current($principal, $buyer);
-            throw $error instanceof CheckoutException && $error->reason === 'tax_ceiling' ? $error : new CheckoutException('provider_uncertain', 503);
+            throw $error instanceof CheckoutException && in_array($error->reason, ['tax_ceiling', 'session_mismatch'], true) ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($financial['outcome'] === 'confirmed') {
             $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transport->boundTo());

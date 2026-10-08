@@ -30,6 +30,9 @@ final class RecordingTaxCheckoutTransport implements TaxCheckoutTransport
 
     public ?\Closure $mutateSession = null;
 
+    /** Test seam: rewrites the synthetic PaymentIntent before it is returned, so provider-fact refusals can be exercised. */
+    public ?\Closure $mutatePayment = null;
+
     public function boundTo(): string
     {
         return 'synthetic-tax-transport-v1';
@@ -64,9 +67,11 @@ final class RecordingTaxCheckoutTransport implements TaxCheckoutTransport
         CheckoutException::require($paymentId === self::PAYMENT && $this->paid);
         $total = $this->session($context->taxBehavior)['amount_total'];
 
-        return ['id' => self::PAYMENT, 'object' => 'payment_intent', 'livemode' => false, 'currency' => 'usd', 'amount' => $total, 'amount_received' => $total,
+        $intent = ['id' => self::PAYMENT, 'object' => 'payment_intent', 'livemode' => false, 'currency' => 'usd', 'amount' => $total, 'amount_received' => $total,
             'amount_capturable' => 0, 'capture_method' => $this->params['payment_intent_data']['capture_method'], 'payment_method_types' => ['card'],
             'status' => 'succeeded', 'metadata' => $this->params['payment_intent_data']['metadata'], 'client_secret' => 'pi_SYNTHETICTAX_secret_NOTRETAINED'];
+
+        return $this->mutatePayment === null ? $intent : ($this->mutatePayment)($intent);
     }
 
     private function guard(TaxExecutionContext $context): void

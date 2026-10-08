@@ -244,7 +244,10 @@ final class TaxCheckoutSchema
                 ." AND SUBSTR(NEW.{$column}, 1, {$length}) = '{$prefix}' AND SUBSTR(NEW.{$column}, ".($length + 1).") NOT GLOB '*[^A-Za-z0-9]*'";
         }
 
-        return "NEW.{$column} REGEXP '^{$prefix}[A-Za-z0-9]{1,{$maximum}}\$'";
+        // No end anchor: ICU `$` also matches before a final line terminator, so the tail is bounded by length and by a
+        // negated class instead. That mirrors the SQLite guard exactly and refuses LF, CR, CR LF and any other tail byte.
+        return "CHAR_LENGTH(NEW.{$column}) BETWEEN ".($length + 1).' AND '.($length + $maximum)
+            ." AND SUBSTR(NEW.{$column}, 1, {$length}) = '{$prefix}' AND SUBSTR(NEW.{$column}, ".($length + 1).") NOT REGEXP '[^A-Za-z0-9]'";
     }
 
     /** `cs_<funds_mode>_` followed by 1..120 ASCII letters/digits; the session mode must equal the row's funds mode. */
@@ -255,7 +258,9 @@ final class TaxCheckoutSchema
                 ." AND SUBSTR(NEW.{$column}, 8, 1) = '_' AND SUBSTR(NEW.{$column}, 9) NOT GLOB '*[^A-Za-z0-9]*'";
         }
 
-        return "NEW.{$column} REGEXP '^cs_(test|live)_[A-Za-z0-9]{1,120}\$' AND SUBSTR(NEW.{$column}, 4, 4) = NEW.funds_mode";
+        // Same unanchored form as providerId(): see the note there.
+        return "CHAR_LENGTH(NEW.{$column}) BETWEEN 9 AND 128 AND SUBSTR(NEW.{$column}, 1, 3) = 'cs_' AND SUBSTR(NEW.{$column}, 4, 4) = NEW.funds_mode"
+            ." AND SUBSTR(NEW.{$column}, 8, 1) = '_' AND SUBSTR(NEW.{$column}, 9) NOT REGEXP '[^A-Za-z0-9]'";
     }
 
     private static function concat(string $driver, string $left, string $right): string

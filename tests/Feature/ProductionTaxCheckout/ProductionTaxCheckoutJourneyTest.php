@@ -215,6 +215,92 @@ class ProductionTaxCheckoutJourneyTest extends TestCase
         $this->assertArrayNotHasKey('reviewedAmounts', $status);
     }
 
+    /**
+     * Reviewer finding R-2: each case alters exactly one provider money fact on an otherwise valid paid session, so a
+     * check that is removed from TaxCheckoutEvidence::financial()/session() turns exactly its own case red.
+     */
+    public static function refusedMoneyFacts(): array
+    {
+        return [
+            'PaymentIntent amount_received is short of the session total' => [null, fn (array $p): array => ['amount_received' => $p['amount'] - 1] + $p],
+            'PaymentIntent amount differs from the session total' => [null, fn (array $p): array => ['amount' => $p['amount'] + 1] + $p],
+            'PaymentIntent currency is not usd' => [null, fn (array $p): array => ['currency' => 'eur'] + $p],
+            'session currency is not usd' => [fn (array $s): array => ['currency' => 'eur'] + $s, null],
+        ];
+    }
+
+    #[DataProvider('refusedMoneyFacts')]
+    public function test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained(?\Closure $session, ?\Closure $payment): void
+    {
+        $f = $this->taxOrder();
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->paid = true;
+        $f['transport']->mutateSession = $session;
+        $f['transport']->mutatePayment = $payment;
+        try {
+            $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('A paid session with a mismatched money fact was retained.');
+        } catch (CheckoutException $error) {
+            $this->assertSame(['provider_uncertain', 503], [$error->reason, $error->status]);
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 0);
+        $this->assertSame('unverified', $f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+
+        // The identical session without the alteration is retained, so the refusal above is caused by that one fact.
+        $f['transport']->mutateSession = null;
+        $f['transport']->mutatePayment = null;
+        $paid = $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame(['verified', 5436], [$paid['paymentStatus'], $paid['reviewedAmounts']['total_minor']]);
+    }
+
+    /** Reviewer finding R-5: a retrieved session must be the session that was created and bound, not another one. */
+    private static function otherSession(array $session): array
+    {
+        $session['id'] = 'cs_test_OTHERSESSION';
+        $session['url'] = $session['url'] === null ? null : 'https://checkout.stripe.com/c/pay/cs_test_OTHERSESSION';
+
+        return $session;
+    }
+
+    public function test_initiate_refuses_a_retrieved_session_that_is_not_the_created_one_and_binds_nothing(): void
+    {
+        $f = $this->taxOrder();
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['transport']->mutateSession = self::otherSession(...);
+        try {
+            $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('A different retrieved session was bound or returned.');
+        } catch (CheckoutException $error) {
+            $this->assertSame(['session_mismatch', 409], [$error->reason, $error->status]);
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['request'], 1);
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['binding'], 0);
+
+        // The same order proceeds once the provider returns the created session, so the refusal was caused by the id alone.
+        $f['transport']->mutateSession = null;
+        $open = $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame('https://checkout.stripe.com/c/pay/cs_test_SYNTHETICTAX', $open['checkoutUrl']);
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['binding'], 1);
+    }
+
+    public function test_reconcile_refuses_a_retrieved_session_that_is_not_the_bound_one_and_retains_nothing(): void
+    {
+        $f = $this->taxOrder();
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->paid = true;
+        $f['transport']->mutateSession = self::otherSession(...);
+        try {
+            $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('A different retrieved session was reconciled.');
+        } catch (CheckoutException $error) {
+            $this->assertSame(['session_mismatch', 409], [$error->reason, $error->status]);
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 0);
+        $this->assertSame('unverified', $f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+    }
+
     public function test_provider_tax_above_the_approved_ceiling_is_refused_never_adjusted(): void
     {
         $f = $this->taxOrder('exclusive', 800);

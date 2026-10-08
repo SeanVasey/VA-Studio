@@ -659,6 +659,14 @@
       "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
     ],
     [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_installer_refuses_before_ddl"
+    ],
+    [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
       "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
     ],

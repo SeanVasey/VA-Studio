@@ -212,6 +212,50 @@ class ProductionTaxCheckoutGuardTest extends TestCase
         }
     }
 
+    /**
+     * Reviewer finding R-3: a provider identifier with a trailing line terminator must be refused on both drivers. MySQL's
+     * ICU `$` matches before a final line feed, so the guard no longer relies on an end anchor. Each attempt is rolled back,
+     * so a driver that wrongly admits one case still reports every case instead of stopping at the first stored row.
+     */
+    public function test_provider_identifiers_with_a_trailing_line_terminator_are_refused(): void
+    {
+        $ids = ['order' => $this->accepts('order', self::order())];
+        $ids['request'] = $this->accepts('request', self::request($ids['order']));
+        $ids['binding'] = $this->accepts('binding', self::binding($ids['request']));
+        // The first binding exists for the reviewed case; the request and binding cases use parents of their own.
+        $second = $this->accepts('order', self::order(['public_id' => '11111111-1111-4111-8111-111111111112', 'request_key' => str_repeat('d', 64)]));
+        $third = $this->accepts('order', self::order(['public_id' => '11111111-1111-4111-8111-111111111113', 'request_key' => str_repeat('e', 64)]));
+        $request = fn (int $order, string $id, array $replace = []): array => self::request($order, ['public_id' => $id,
+            'idempotency_key' => TaxCheckoutSchema::IDEMPOTENCY_PREFIX.$id] + $replace);
+        $freshRequest = $this->accepts('request', $request($third, '33333333-3333-4333-8333-333333333334'));
+        $attempts = [];
+        foreach (["\n" => 'line feed', "\r" => 'carriage return', "\r\n" => 'CR LF'] as $suffix => $name) {
+            $attempts['request account_id, '.$name] = ['request', $request($second, '33333333-3333-4333-8333-333333333335', ['account_id' => 'acct_SYNTHETIC'.$suffix])];
+            $attempts['binding provider_session_id, '.$name] = ['binding', self::binding($freshRequest, ['public_id' => '44444444-4444-4444-8444-444444444445',
+                'provider_session_id' => 'cs_test_SYNTHETICTAX'.$suffix])];
+            $attempts['reviewed provider_payment_id, '.$name] = ['reviewed', self::reviewed($ids, ['provider_payment_id' => 'pi_SYNTHETICTAX'.$suffix])];
+        }
+        $admitted = [];
+        foreach ($attempts as $label => [$kind, $row]) {
+            DB::beginTransaction();
+            try {
+                DB::table(TaxCheckoutSchema::TABLES[$kind])->insert($row);
+                $admitted[] = $label;
+            } catch (QueryException) {
+                // Refused by the guard (or, on MySQL, by a typed-column error); either way nothing may be stored.
+            } finally {
+                DB::rollBack();
+            }
+        }
+        $this->assertSame([], $admitted, 'These provider identifiers with a trailing line terminator were stored.');
+        $this->assertSame(0, DB::table(TaxCheckoutSchema::TABLES['reviewed'])->count());
+        // The same rows without the terminator are admitted, so the refusals above are caused by the terminator alone.
+        $this->assertGreaterThan(0, $this->accepts('request', $request($second, '33333333-3333-4333-8333-333333333335')));
+        $this->assertGreaterThan(0, $this->accepts('binding', self::binding($freshRequest, ['public_id' => '44444444-4444-4444-8444-444444444445',
+            'provider_session_id' => 'cs_test_SYNTHETICSECOND'])));
+        $this->assertGreaterThan(0, $this->accepts('reviewed', self::reviewed($ids)));
+    }
+
     public function test_inclusive_reviewed_rows_keep_tax_inside_the_unchanged_total(): void
     {
         $ids = ['order' => $this->accepts('order', self::order())];
