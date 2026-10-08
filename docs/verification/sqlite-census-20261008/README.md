@@ -52,6 +52,30 @@ The full run is on `d3e1c39a`; the policy this PR changes is `main`'s at `89e3e6
 
 In those classes, the run skipped 9 distinct pairs and the policy at the head lists 9. Listed but not skipped: none. Skipped but not listed: none.
 
+Commands, in a detached worktree at `c233eb62` created with `scripts/dev/mkworktree.sh`, with `public/build` absent:
+
+```sh
+for d in ProductionMembership ProductionMembershipBilling ProductionMemberOriginals; do
+  php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- \
+    --colors=never --log-junit "$d.xml" "tests/Feature/$d"
+done
+```
+
+## Evidence files (`evidence/`)
+
+| File | Content |
+| --- | --- |
+| `skipped-pairs-d3e1c39a-full.txt` | The 211 distinct skipped `Class::method` pairs of the full `d3e1c39a` run, derived from its four JUnit reports |
+| `integrated-<directory>.junit.xml` | The three JUnit reports of the `c233eb62` rerun; worktree path prefix removed |
+| `integrated-<directory>.txt` | Each rerun's PHPUnit summary line |
+| `skipped-pairs-c233eb62-membership.txt` | The 9 distinct skipped pairs of that rerun |
+
+Both pair lists come from the same derivation:
+- each `<testcase>` with a `<skipped>` child is keyed as (`class`, `name` without its ` with data set` suffix);
+- the keys are de-duplicated and sorted.
+
+The policy comparisons are set operations between those keys and `scripts/ci/database-sqlite-skips.json` at the stated commit. The four full-run JUnit reports (about 0.7 MB each) are not committed; the pair list is their identity-bearing content.
+
 - **Combined:** for every other file, the `d3e1c39a` run applies unchanged. The result is that the 216-pair policy equals the SQLite skips of the integrated tree, up to the limits below.
 - **Census self-test:** `python3 -I scripts/ci/test-database-receipts.py` gives 34 tests OK.
 
