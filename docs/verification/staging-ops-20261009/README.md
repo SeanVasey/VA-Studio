@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `7bced5ecb91593e28854297a2ca14247931c3448`. The kit integrates main's CI
+Current tested functional source: `a44664f4afffb8780093ba247b616b5375ed86e7`. The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -202,3 +202,26 @@ failed1 case, and is retained as `build-admission-ops-harness-attempt.txt`. Corr
 and the exact committed45 PASS remain separate. No privileged host operation or provider call occurred.
 
 Independent [build admission addendum](independent-review/BUILD-ADMISSION-ADDENDUM.md) **APPROVES exact7bced5ec**, carried to34b8d2dc by empty runtime-source diff and inspected prose. Six delta probes pass; oldc9 selected2methods reproduce11 safety failures. The publication wording now explicitly limits closed admission to activation failures before a healthy resume. Final evidence-only successor source remains unchanged.
+
+## Recovery admission repair at `a44664f4`
+
+Codex on3b7d1b9 added4226365351 (same-SHA unhealthy retry reports success),4226365357 (first-install
+migration skips snapshot),4226365364 (already-mounted private bind omits persistent fstab entry).
+`same-sha-health-red.txt` retains2methods/2failures; `recovery-admission-red.txt` retains13methods/2failures.
+Expanded3method red adds a real Bash failure: served-release selection swallowed failed sealer status
+when called inside conditional command substitution. `recovery-admission-expanded-red.txt` has3failures.
+
+The same-SHA no-op now requires read-only root `healthy <sha>`: sealed selected current, persistent bind,
+exact open admission, no maintenance, activeFPM, every supervised PID on that release andHTTP200. Partial
+state refuses without repair. Every migration attempt now snapshots/proves first, including first-install
+retries. Mounted attach reconciles the exact fstab line before success and refuses unrelated mounts;
+served-release selection explicitly propagates failed sealing checks.
+
+Exact committed current ops `final-ops-a44664f4.txt` **50 PASS**, runtime `final-runtime-a44664f4.txt`
+**13/63 PASS**. New canonical health method exercises13complete/partial states with genuine process cwd
+and readonly gate/fstab/maintenance bytes; service/root/mount/HTTP authority remain bounded fixtures.
+Earlier native28transport proof remains at11248 with unchanged HTTP source. Both precommit recovery49
+then50 receipts are preserved; neither is relabeled as the committed run. Five Bash syntax/Shellcheck
+checks pass. First-install restore sets still do not establish historical encryption-key custody.
+
+Publication formatting strips only unittest progress whitespace and the empty-stdout assertion suffix in the new recovery reds; outcomes and traces are unchanged.
