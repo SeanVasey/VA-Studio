@@ -1,0 +1,154 @@
+test_closed_gate_blocks_repeated_future_sweeps (__main__.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps) ... FAIL
+test_exclusive_root_lock_blocks_an_open_gate_sweep (__main__.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep) ... FAIL
+test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) ...
+  test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='missing') ... FAIL
+  test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='malformed') ... FAIL
+  test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='null-byte') ... FAIL
+  test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='symlink') ... FAIL
+  test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='writable') ... FAIL
+test_open_gate_runs_all_five_stages (__main__.PipelineAdmissionTest.test_open_gate_runs_all_five_stages) ... ok
+test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (__main__.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness) ... FAIL
+test_quiesce_leaves_future_invocations_closed_after_helper_exits (__main__.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits) ... FAIL
+test_snapshot_does_not_cross_an_already_admitted_shared_writer (__main__.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer) ... FAIL
+test_snapshot_requires_the_durable_closed_gate (__main__.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate) ... FAIL
+test_writer_lock_survives_runner_death_until_its_child_finishes (__main__.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes) ... FAIL
+
+======================================================================
+FAIL: test_closed_gate_blocks_repeated_future_sweeps (__main__.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 103, in test_closed_gate_blocks_repeated_future_sweeps
+    self.assertIn("writer admission closed", run.stdout)
+AssertionError: 'writer admission closed' not found in '2026-10-09T02:00:17Z test-commerce-pipeline sweep start\n2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1\n2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1\n2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1\n2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1\n2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1\n2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0\n'
+
+======================================================================
+FAIL: test_exclusive_root_lock_blocks_an_open_gate_sweep (__main__.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 125, in test_exclusive_root_lock_blocks_an_open_gate_sweep
+    self.assertFalse(self.trace.exists(), "runner ignored root's writer barrier")
+AssertionError: True is not false : runner ignored root's writer barrier
+
+======================================================================
+FAIL: test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 117, in test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan
+    self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+AssertionError: 0 != 2 : 2026-10-09T02:00:17Z test-commerce-pipeline sweep start
+2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0
+
+
+======================================================================
+FAIL: test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='malformed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 117, in test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan
+    self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+AssertionError: 0 != 2 : 2026-10-09T02:00:17Z test-commerce-pipeline sweep start
+2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0
+
+
+======================================================================
+FAIL: test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='null-byte')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 117, in test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan
+    self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+AssertionError: 0 != 2 : 2026-10-09T02:00:17Z test-commerce-pipeline sweep start
+2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0
+
+
+======================================================================
+FAIL: test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 117, in test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan
+    self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+AssertionError: 0 != 2 : 2026-10-09T02:00:17Z test-commerce-pipeline sweep start
+2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0
+
+
+======================================================================
+FAIL: test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) (case='writable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 117, in test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan
+    self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+AssertionError: 0 != 2 : 2026-10-09T02:00:17Z test-commerce-pipeline sweep start
+2026-10-09T02:00:17Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T02:00:17Z test-commerce-pipeline sweep end status=0
+
+
+======================================================================
+FAIL: test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (__main__.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 130, in test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness
+    self.assertEqual(self.run_runner().returncode, 2)
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_quiesce_leaves_future_invocations_closed_after_helper_exits (__main__.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 177, in test_quiesce_leaves_future_invocations_closed_after_helper_exits
+    self.assertEqual(self.gate.read_text(), "closed\n")
+AssertionError: 'open\n' != 'closed\n'
+- open
++ closed
+
+
+======================================================================
+FAIL: test_snapshot_does_not_cross_an_already_admitted_shared_writer (__main__.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 189, in test_snapshot_does_not_cross_an_already_admitted_shared_writer
+    self.assertNotEqual(run.returncode, 0, "snapshot crossed an admitted pipeline child")
+AssertionError: 0 == 0 : snapshot crossed an admitted pipeline child
+
+======================================================================
+FAIL: test_snapshot_requires_the_durable_closed_gate (__main__.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 171, in test_snapshot_requires_the_durable_closed_gate
+    self.assertNotEqual(run.returncode, 0, "snapshot accepted an open writer gate")
+AssertionError: 0 == 0 : snapshot accepted an open writer gate
+
+======================================================================
+FAIL: test_writer_lock_survives_runner_death_until_its_child_finishes (__main__.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/va-admission-red-source-uh9s9_px/tests/ops/test_staging_pipeline_admission.py", line 155, in test_writer_lock_survives_runner_death_until_its_child_finishes
+    with self.assertRaises(BlockingIOError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: BlockingIOError not raised
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.305s
+
+FAILED (failures=12)

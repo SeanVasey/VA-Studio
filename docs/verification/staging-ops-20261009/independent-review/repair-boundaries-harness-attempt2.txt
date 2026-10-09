@@ -3,13 +3,13 @@ test_detach_rejects_an_unrelated_mount_before_unmount (__main__.RepairedBoundari
 test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks (__main__.RepairedBoundaries.test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks) ... FAIL
 test_failed_activation_phase_does_not_claim_stopped_writers (__main__.RepairedBoundaries.test_failed_activation_phase_does_not_claim_stopped_writers) ... ok
 test_failed_reproof_removes_old_success_marker (__main__.RepairedBoundaries.test_failed_reproof_removes_old_success_marker) ... ok
-test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) ... 
+test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) ...
   test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='regular') ... FAIL
   test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='outside') ... FAIL
   test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='dangling') ... FAIL
 test_quoted_production_flag_is_refused (__main__.RepairedBoundaries.test_quoted_production_flag_is_refused) ... ok
 test_refresh_preserves_key_saves_old_env_and_stops_on_control_failure (__main__.RepairedBoundaries.test_refresh_preserves_key_saves_old_env_and_stops_on_control_failure) ... ok
-test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) ... 
+test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) ...
   test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) (failure=None) ... FAIL
 
 ======================================================================

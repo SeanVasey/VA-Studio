@@ -1,9 +1,13 @@
 # PR #63 current verification
 
-Reviewed functional source: `2c91f8e620cd870a2e213b4af790a1dbfab8de9a`. The kit integrates main's CI cost
-policy and the reviewed D1 command. [Independent decision](independent-review/DECISION.md): **APPROVE** for
-a focused development merge. All nine identified runtime defects are repaired; actual host activation
-remains an external acceptance step. Evidence-only successors need a source-equivalence check.
+Current tested functional source: `ca7e3ae46b312e1673a2067bb5d122e8aa9bc11e`. The kit integrates main's CI
+cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
+[decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
+[integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
+sweeps escaped the stopped-writer boundary and the Forge example targeted the mirror. The current repair
+adds durable root admission and a shared writer barrier. The fresh [repair decision](independent-review/PIPELINE-ADMISSION-ADDENDUM.md)
+**APPROVES exact `ca7e3ae4`**: I-1/I-2 closed within the controlled-runner boundary. Publication requires
+an explicit source-equivalence check. Actual host activation remains external.
 
 ## Actual local evidence
 
@@ -16,11 +20,19 @@ remains an external acceptance step. Evidence-only successors need a source-equi
 | `nonroot-mysql84.txt` | Genuine disposable MySQL 8.4.11 with binary logging: non-SUPER trigger refused 1419 with trust OFF, succeeds ON; app-account migrations exit 0, repeat is a no-op; 79 migrations / 184 tables / 567 triggers |
 | `native-dump-guarded-final.txt` | Genuine MySQL client/server 8.4.11, one synthetic table/trigger: raw first/redump differ, normalized dumps match, restored row exact and altered INSERT remains different; exit 0 |
 | `independent-review/nginx-fpm-routing.txt` | Genuine nginx 1.26.3 / PHP 8.4.26 FPM, 26 checks pass in an owned loopback TLS prefix against a synthetic FastCGI responder; unchanged kit templates |
+| `integration-runtime.txt`, `integration-normalization.txt`, `integration-refresh.txt` | Kit plus reviewed #62 candidate at `e898282d`: runtime 13/63, normalization 12 and frozen-refresh 1, all exit 0; Bash syntax checked separately for each script and Shellcheck `-x` pass |
+| `pipeline-admission-red.txt`, `pipeline-admission-red-corrected.txt` | Initial 8-method red has 10 failures; corrected final 9-method authority fixture against extracted old `e898282d` runner/helper has 12 failures, exit 1, including future starts, snapshot admission and orphan child lock |
+| `pipeline-admission-final-paths.txt` | Current 9 methods pass, exit 0: real locks/processes, closed/no-private-write starts, active and orphan writers, partial/malformed/NUL/symlink/writable admission, and ordinary nongated local harness |
+| `pipeline-repair-final-sqlite.txt` | Exact committed `ca7e3ae4`, validator/runner/profile journeys/runtime: 89 tests / 876 assertions, exit 0, no skips |
+| `independent-review/pipeline-admission-final.txt`, `pipeline-current-path-final.txt`, `pipeline-admission-canonical-final.txt` | Independent exact `ca7e3ae4`: 12 admission tests, 1 additional selected physical-release cwd/private-state case, and 9 canonical tests, all exit 0; 12-method receipt does not include the later added method |
+| `independent-review/pipeline-admission-red.txt` | Read-only old `e898282d` source: 3 selected product safety assertion failures, exit 1, distinct from the reviewer fixture umask error |
 
-The original seven independent red receipts remain unchanged. Final independent methods pass: actual
+The original seven independent red receipts remain unchanged. Historical independent methods at
+`2c91f8e` passed: actual
 two-process helper concurrency **1**, lock/descriptor/nightly boundaries **6**, SQL-context **4**, repaired
-activation/configuration/recovery boundaries **9**. The reviewer separately ran the genuine runtime
-validator **13/63**, canonical normalization **12** and frozen refresh **1**, all exit 0. Helpers use bounded
+activation/configuration/recovery boundaries **9**. At `2c91f8e`, the reviewer separately ran the genuine runtime
+validator **13/63**, canonical normalization **12** and frozen refresh **1**, all exit 0. These older
+helper probes have not been rerun against the admission repair; its new independent receipt is separate. Helpers use bounded
 authority substitutes for root ownership, mount/unmount/removal and service controls; they do not prove
 those operations on a real host. F8's red and green show the competing attach first crossing prune's final
 read, then waiting under genuine `flock`. No actual private store was mounted or removed.
@@ -37,7 +49,8 @@ source /workspace/.va-studio-toolchain/activate.sh
 /workspace/.va-studio-toolchain/standalone/bin/php8.4 -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Unit/StagingRuntimeValidatorTest.php
 python3 tests/ops/test_staging_dump_normalization.py
 python3 tests/ops/test_staging_deploy_refresh.py
-bash -n ops/staging/{provision.sh,forge-deploy.sh,backup.sh,bin/vasey-staging-ctl}
+python3 tests/ops/test_staging_pipeline_admission.py
+for script in ops/staging/{provision.sh,forge-deploy.sh,backup.sh,bin/vasey-staging-ctl}; do bash -n "$script"; done
 /workspace/.va-studio-toolchain/root/usr/bin/shellcheck -x ops/staging/{provision.sh,forge-deploy.sh,backup.sh,bin/vasey-staging-ctl}
 ```
 
@@ -58,6 +71,16 @@ and final native receipts pass. The intermediate successful dump receipt and lat
 reruns remain separately named. Earlier owned nginx harness path mistakes remain in the independent
 directory; its final routing receipt passed. None of these unsuccessful runs is passing evidence.
 
+Publication formatting removes trailing spaces from exactly three unittest progress lines: two in
+`independent-review/repair-boundaries-harness-attempt2.txt` and one in `routine-literal-red.txt`.
+Their outcomes and the original seven red artifacts are preserved; no result was changed.
+
+The first two gate-repair attempts retain fixture setup errors: the stat authority stand-in did not
+handle `--`, then the harness umask created a 0600 lock rather than the explicitly intended 0644 file.
+The corrected fixture models ownership/ancestry only and uses genuine file modes, links, byte comparison,
+processes and `flock`. No root host, real SQL writer, mount, backup or service was substituted into a
+passing host claim. The final corrected pre-repair run reproduces 12 failures; current 9 methods pass.
+
 ## Recovery and limits
 
 The root helper seals every privileged ancestor and holds a separate root-owned control lock through
@@ -77,3 +100,5 @@ AppArmor, ACME/DNS, real retained-media backup/shipping/encryption and real Lara
 The native HTTP responder does not verify Stripe signatures or purchases. Hosting, secure TEST secrets,
 hostname, real staff/catalog/rights/terms/tag and backup target remain Sean's inputs. This is private TEST
 staging preparation; live checkout and paid-route mounting retain their separate conditions.
+
+Publication formatting also removes trailing whitespace from unittest progress lines in new admission receipts: `pipeline-admission-red-corrected.txt` (1), `pipeline-admission-red.txt` (1). Assertions, failure details and outcomes are unchanged.

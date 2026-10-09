@@ -1,0 +1,14 @@
+test_closed_gate_blocks_repeated_future_sweeps (__main__.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps) ... ok
+test_exclusive_root_lock_blocks_an_open_gate_sweep (__main__.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep) ... ok
+test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) ... ok
+test_open_gate_runs_all_five_stages (__main__.PipelineAdmissionTest.test_open_gate_runs_all_five_stages) ... ok
+test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (__main__.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness) ... ok
+test_quiesce_leaves_future_invocations_closed_after_helper_exits (__main__.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits) ... ok
+test_snapshot_does_not_cross_an_already_admitted_shared_writer (__main__.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer) ... ok
+test_snapshot_requires_the_durable_closed_gate (__main__.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate) ... ok
+test_writer_lock_survives_runner_death_until_its_child_finishes (__main__.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.558s
+
+OK
