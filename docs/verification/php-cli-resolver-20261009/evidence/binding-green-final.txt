@@ -1,0 +1,3 @@
+# source af232a80dd7b9786217deea1b682812cb2a5c050 + working tree (final provider sha256 187cc7f05934f492)
+OK (13 tests, 183 assertions)
+rc=0

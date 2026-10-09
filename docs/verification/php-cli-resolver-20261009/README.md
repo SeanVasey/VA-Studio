@@ -22,7 +22,10 @@ against `main`'s product source (`evidence/fpm-red-main.txt`, `evidence/fpm-red-
 - `App\Support\PhpCliProcess` (new). The pinned renderers (`FreeGrantRendererProcess`,
   `ProductionFreeGrantRendererProcess`, `PaidGrantRendererProcess`) are frozen by `resources/contracts/*-v1/
   profile-assets.json` and are **not edited**. Each already accepts an optional process factory. Outside the CLI the
-  container passes them this factory: it refuses any command not built around this process's own `PHP_BINARY` with `-n`,
+  container passes this factory to the Free and Paid renderers. **Family 256 (production free) is not bound:**
+  `ProductionFreeGrantApprovalTest::test_shipped_configuration_is_literally_default_off` requires that nothing ships
+  binding it ("root composes it after review"), so the step that composes and mounts it adds the same binding. Tests and
+  the FPM smoke prove that binding for it explicitly. The factory: it refuses any command not built around this process's own `PHP_BINARY` with `-n`,
   replaces only `command[0]` with the validated CLI path, and re-derives the renderer's fixed sibling library rule
   (`dirname(binary, 2)/lib/<arch>`) from that binary. Flags, script, working directory, scrubbed environment, input and
   the 60 s limit pass through; each renderer still verifies its pinned profile and bounds its own output. In the CLI the
@@ -32,6 +35,10 @@ against `main`'s product source (`evidence/fpm-red-main.txt`, `evidence/fpm-red-
   candidate environment. `ops/staging/env.staging.example` sets `VASEY_PHP_CLI_BINARY=/usr/bin/php8.4`;
   `docs/ops/staging-runbook.md` §7 describes the behaviour and the pre-enable host check.
 - Pins: `git diff origin/main -- resources/contracts` is empty.
+- **Main was red after #56** on `ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported`,
+  which asserted `app/Domain/Grants/Paid` does not exist (reproduced at `6dca2379`). Its intent is kept: no family-256
+  file imports the paid or old free family, and (new) none is a byte copy of one of their files. A copied paid file in
+  the family-256 directory fails it (mutation run, not retained).
 
 ## Results
 
@@ -47,8 +54,8 @@ the generic family uses its fixture input and the current profile). `cgi-fcgi` s
 | Pool | Source | `VASEY_PHP_CLI_BINARY` | Result |
 | --- | --- | --- | --- |
 | red | `main` product (`49489697`; Paid at `6dca2379` = #56 head) | unset | `PHP_BINARY=/usr/sbin/php-fpm8.4`; raw spawn exit 64 with usage text; free, production-free, generic and paid all `render_failed` |
-| green | this branch | `/usr/bin/php8.4` | all four render; SHA-256 **identical to the CLI render of the same payload**: free `d3fb73c9…`, production-free `2e5f8b94…`, paid `c30389d3…`, generic `790fd796…` |
-| unconfigured | this branch | unset | all four `render_failed` |
+| green | this branch | `/usr/bin/php8.4` | free, paid, generic and production-free **with its composition binding** render; SHA-256 **identical to the CLI render of the same payload**: free `d3fb73c9…`, production-free `2e5f8b94…`, paid `c30389d3…`, generic `790fd796…`. Production-free through the shipped container (unbound) stays `render_failed` (`fpm-green-final2.txt`) |
+| unconfigured | this branch | unset | all `render_failed` (`fpm-unconfigured-final2.txt`) |
 | wrong version | this branch | `/usr/bin/php8.3` | `render_failed` |
 | FPM binary configured | this branch | `/usr/sbin/php-fpm8.4` | `render_failed` |
 | alternatives link | this branch | `/usr/bin/php` (currently → php8.4) | renders; accepted only because the probe proves the current target. The runbook still says not to configure it. |
@@ -59,8 +66,8 @@ CLI hashes: `evidence/*.cli-sha256.txt` and `evidence/cli-generic.txt`.
 
 | Run | Result | Evidence |
 | --- | --- | --- |
-| New binding tests (Free, ProductionFree) red: provider without the renderer bindings | 6 tests: 2 errors, 4 failures, rc 2 | `evidence/binding-red.txt` |
-| Same, green | 6 tests, 29 assertions, rc 0 | `evidence/binding-green.txt` |
+| Binding tests red: final tests with `main`'s provider (no bindings) | 9 tests: the 6 Free/Paid tests fail (2 errors, 4 failures); the 3 family-256 tests pass by design; rc 2 | `evidence/binding-red-final.txt` |
+| Same with the final provider, plus the family-256 guards | 13 tests, 183 assertions, rc 0 | `evidence/binding-green-final.txt` |
 | Affected suites (see below) | SUITES_PLACEHOLDER | `evidence/suites-*.txt` |
 
 ## Not tested

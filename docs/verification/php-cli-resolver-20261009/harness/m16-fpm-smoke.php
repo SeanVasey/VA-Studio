@@ -26,6 +26,13 @@ try {
         $classes = ['free' => 'App\Domain\Grants\Free\FreeGrantRendererProcess',
             'production-free' => 'App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess',
             'paid' => 'App\Domain\Grants\Paid\PaidGrantRendererProcess', 'generic' => ContractRenderer::class];
+        $composed = $family === 'production-free-composed';
+        if ($composed) {
+            // Family 256 ships unbound; this is the binding its composition step adds (runbook section 7).
+            app()->bind($classes['production-free'], fn ($app) => new App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess(
+                App\Support\PhpCliProcess::factory($app->make(App\Support\PhpCliBinary::class))));
+            $family = 'production-free';
+        }
         if ($family === 'generic') {
             $input = Tests\Support\ContractRendererFixtures::input();
             $profile = ContractRenderProfile::current();
@@ -34,7 +41,7 @@ try {
             ['input' => $input, 'profile' => $profile] = $payload;
         }
         $rendered = app($classes[$family])->render($input, $profile);
-        $out += ['ok' => true, 'sha256' => $rendered->sha256, 'size_bytes' => $rendered->sizeBytes ?? null];
+        $out += ['ok' => true, 'sha256' => $rendered->sha256, 'size_bytes' => $rendered->sizeBytes ?? null, 'composed' => $composed];
     }
 } catch (ContractIssuanceException $error) {
     $out += ['ok' => false, 'reason' => $error->reason];

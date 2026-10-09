@@ -207,9 +207,10 @@ render failed closed with `render_failed` (`docs/verification/php-cli-resolver-2
   running `PHP_VERSION` and the same thread-safety and debug build. Success is cached per file identity; a replaced
   binary is probed again. Unset, invalid or mismatched fails closed with `render_failed`; the path is never shown.
 - The pinned renderers (`FreeGrantRendererProcess`, `ProductionFreeGrantRendererProcess`, `PaidGrantRendererProcess`)
-  are frozen by their contract profiles, so they are not edited. The container gives them, outside the CLI only, a
-  process factory (`App\Support\PhpCliProcess`) that replaces just the executable and re-derives the fixed sibling
-  library directory from the CLI binary. Flags, script, working directory, scrubbed environment, input and the 60 s
+  are frozen by their contract profiles, so they are not edited. The container gives the free and paid renderers,
+  outside the CLI only, a process factory (`App\Support\PhpCliProcess`). Family 256 (production free grants) ships
+  unbound by design; the step that composes and mounts it must add the same binding. The factory replaces just the
+  executable and re-derives the fixed sibling library directory from the CLI binary. Flags, script, working directory, scrubbed environment, input and the 60 s
   limit are unchanged, and each renderer still verifies its pinned profile and bounds its output.
 - Do not point `VASEY_PHP_CLI_BINARY` at `/usr/bin/php`: it is an `update-alternatives` link that can move to another
   version. A move is caught by the probe, but then rendering stops until the setting is fixed.
