@@ -65,9 +65,9 @@ The lanes are separate worktrees with no overlapping files. "Review" means an in
 | --- | --- | --- | --- | --- | --- | --- |
 | M-01 | Provision the VPS through Forge (PHP 8.4, MySQL 8.4, nginx, ClamAV, ffmpeg, prlimit, qpdf/poppler, Node 24) | A: Sean in Forge + `ops/staging/provision.sh` | L | S-2 | light (security) | kit being written |
 | M-02 | Staging kit: nginx with basic auth, FPM pools per `docs/ops/paid-delivery-runtime.md`, queue workers and scheduler, Forge deploy script, env template, non-root MySQL trigger privilege proof, backups, runbook | A `VA-Studio-ops` / `harness/staging-ops` | M | — | light | in progress |
-| M-03 | Test-commerce policy profile and validator | B `VA-Studio-commerce` / `harness/staging-test-commerce` | M | — (values: S-4) | **payment** | in progress |
-| M-04 | Pipeline runner (receipts → reconcile → finalize → contracts → activation, draining cursors) | B | S–M | — | **payment** | in progress |
-| M-05 | Stripe event delivery (`stripe listen` unit or a test dashboard endpoint) plus the read-only preflight probe | B | S | M-02, S-4 | payment | in progress |
+| M-03 | Test-commerce policy profile and validator | B `VA-Studio-commerce` / `harness/staging-test-commerce` | M | — (values: S-4) | **payment** | preparation merged #62 at `0d864771`; final SQLite 76/813, template 36 checks, independent APPROVE; actual host values/probe await S-2–S-4 |
+| M-04 | Pipeline runner (receipts → reconcile → finalize → contracts → activation, draining cursors) | B | S–M | — | **payment** | merged #62: durable checked cursors, one-minute minimum, late observations remain exceptions; native journeys 9/249; systemd/host execution pending |
+| M-05 | Stripe event delivery (`stripe listen` unit or a test dashboard endpoint) plus the read-only preflight probe | B | S | M-02, S-4 | payment | reviewed templates/walkthrough merged #62; actual account GET, Dashboard/CLI event and purchase untested, blocked on S-2–S-4 |
 | M-06 | `staging` environment admission plus MFA, live mode refused | B2 `VA-Studio-stagingenv` / `harness/staging-env-admission` | L | — | **auth/payment** | in progress |
 | M-07 | Synthetic end-to-end run on staging, plus drills (declined card, expired session, duplicate webhook, reconcile without webhook) | integrator | L | M-02–M-05, host up | payment evidence | waiting |
 | M-08 | Fix buffer for first-real-interop defects (Stripe test, media, renderer), each fix with a regression test | integrator + reviewer | L | M-07 | **payment/licensing** | waiting |
@@ -138,6 +138,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | Time (UTC) | Update |
 | --- | --- |
+| 2026-10-09 01:41 | #62 merged at `0d864771`, expected head `4902c45e`; SQLite 76/813, template 36, native journeys 9/249, independent APPROVE, preflight 37870562968 success, five Codex findings repaired/resolved and final code review complete. Active host/events/real purchase remain untested. #63 integration checks pass; its final review/merge is next. Forge/DigitalOcean access expected tomorrow; S-2–S-10 still required. |
 | 2026-10-09 00:16 | #65 merged at `c8d51000`, expected head `8453909e`: D1 operator command, current SQLite/MySQL 8.4.11 suites each 11/236, independent APPROVE, preflight success, Codex P2 fixed/resolved. Forge + VPS reconfirmed; access tomorrow. Next #62/#63 reviews. S-2–S-4 still block host/Stripe rehearsal; S-5–S-10 still needed for content, export and backup. |
 | 2026-10-08 23:30 | Claude handoff to Codex: see `CODEX-HANDOFF.md`. Open: #56 (addendum 15), #60, #62, #63; WIP branches for D1, M-16, B2 and the embed fix. |
 | 2026-10-08 23:00 | PR #44 merged (`672f5826`). PR #56 round 22 pushed, addendum 14 APPROVE WITH CONDITIONS. Census run complete: PR #60 opened. M-18 done. |
