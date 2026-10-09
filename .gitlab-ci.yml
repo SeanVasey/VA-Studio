@@ -144,7 +144,9 @@ backend-mysql:
 
 backend-sqlite:
   extends: .database
-  timeout: 60m
+  # Same 2-shard partition as GitHub, where one shard needs about 65 minutes (Foundation 37967128232);
+  # 100 minutes stays under GitLab.com's hosted 3-hour cap.
+  timeout: 100m
   parallel:
     matrix:
       - SHARD: ['1', '2']
