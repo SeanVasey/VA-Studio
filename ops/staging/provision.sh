@@ -80,6 +80,75 @@ mysql_admin_defaults_custody() {
     || die "--mysql-admin-defaults requires a root-owned 0600 regular single-link file; recover it privately"
 }
 
+initialize_runtime_directories() {
+  python3 - "$ROOT" "$(id -u "$APP_USER")" "$(id -g "$APP_USER")" \
+    "$(id -u "$NGINX_USER")" "$(id -g "$NGINX_USER")" <<'PY'
+from contextlib import ExitStack
+import os
+import stat
+import sys
+
+root, app_uid, app_gid, nginx_uid, nginx_gid = sys.argv[1:]
+app_uid, app_gid, nginx_uid, nginx_gid = map(int, (app_uid, app_gid, nginx_uid, nginx_gid))
+directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+
+try:
+    with ExitStack() as handles:
+        def held(fd):
+            handles.callback(os.close, fd)
+            return fd
+
+        def open_directory(path):
+            parent = held(os.open("/", directory_flags))
+            for component in path.split("/")[1:]:
+                if not component or component in (".", ".."):
+                    raise ValueError("noncanonical directory")
+                parent = held(os.open(component, directory_flags, dir_fd=parent))
+            return parent
+
+        def initialize(parent, name, uid, gid, mode):
+            try:
+                os.mkdir(name, 0o700, dir_fd=parent)
+            except FileExistsError:
+                pass
+            child = held(os.open(name, directory_flags, dir_fd=parent))
+            os.fchown(child, uid, gid)
+            os.fchmod(child, mode)
+            entry = os.stat(name, dir_fd=parent, follow_symlinks=False)
+            inode = os.fstat(child)
+            if (entry.st_dev, entry.st_ino) != (inode.st_dev, inode.st_ino):
+                raise ValueError("directory changed during initialization")
+            return child
+
+        base = open_directory(root)
+        initialize(base, "evidence", app_uid, app_gid, 0o750)
+        temporary = initialize(base, "tmp", app_uid, app_gid, 0o700)
+        initialize(temporary, "php-upload", app_uid, app_gid, 0o700)
+        initialize(temporary, "php-sys", app_uid, app_gid, 0o700)
+        private = initialize(base, "private", app_uid, app_gid, 0o700)
+        initialize(private, "branding", app_uid, app_gid, 0o700)
+        try:
+            ignore = held(os.open(".gitignore", os.O_WRONLY | os.O_CREAT | os.O_EXCL
+                                  | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=private))
+        except FileExistsError:
+            ignore = held(os.open(".gitignore", os.O_RDONLY | os.O_NONBLOCK
+                                  | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=private))
+            existing = os.fstat(ignore)
+            if not stat.S_ISREG(existing.st_mode) or existing.st_nlink != 1:
+                raise ValueError("unsafe existing private gitignore")
+        else:
+            with os.fdopen(os.dup(ignore), "wb") as contents:
+                contents.write(b"*\n!.gitignore\n")
+            os.fchown(ignore, app_uid, app_gid)
+            os.fchmod(ignore, 0o644)
+        nginx = open_directory("/var/lib/nginx")
+        initialize(nginx, "vasey-staging-fastcgi", nginx_uid, nginx_gid, 0o700)
+except (OSError, ValueError):
+    print("provision: ERROR: unsafe runtime directory or private gitignore; recover it privately", file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
 [[ "$HOST" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]] || die "--host must be a lowercase DNS name"
 [[ "$APP_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] && id "$APP_USER" >/dev/null 2>&1 || die "app user '$APP_USER' does not exist"
 [ "$(id -u "$APP_USER")" -gt 0 ] || die "application account must be nonroot"
@@ -196,22 +265,12 @@ runuser -u "$APP_USER" -- test -r /var/lib/clamav/daily.cvd -o -r /var/lib/clama
 # ---------------------------------------------------------------- 4. directories and modes
 install -d -m 0755 -o root -g root "$ROOT"
 install -d -m 0755 -o root -g root "$ROOT/releases"
-install -d -m 0750 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/evidence"
 install -d -m 0700 -o root -g root "$ROOT/backups"
-install -d -m 0700 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/tmp" "$ROOT/tmp/php-upload" "$ROOT/tmp/php-sys"
-# Persistent private storage: masters, stems, contracts, tag, site images, uploads. vasey:doctor and every
-# private-file adapter require 0700, owned by the worker user, with no symlink anywhere in its path.
-if [ ! -d "$ROOT/private" ]; then install -d -m 0700 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/private"; fi
-chown "$APP_USER:$APP_GROUP" "$ROOT/private"; chmod 0700 "$ROOT/private"
-install -d -m 0700 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/private/branding"   # seller tag (runbook section 3)
-if [ ! -e "$ROOT/private/.gitignore" ]; then
-  printf '*\n!.gitignore\n' > "$ROOT/private/.gitignore"   # same bytes as the tracked storage/app/private/.gitignore
-  chown "$APP_USER:$APP_GROUP" "$ROOT/private/.gitignore"; chmod 0644 "$ROOT/private/.gitignore"
-fi
-[ "$(readlink -f "$ROOT/private")" = "$ROOT/private" ] || die "$ROOT/private resolves through a symlink; the app refuses that"
+# App/nginx-owned paths can be replaced by those identities on a rerun. Never grant permissions
+# through a pathname below them: every child opens no-follow relative to a retained directory FD.
+initialize_runtime_directories
 install -m 0600 -o "$APP_USER" -g "$APP_GROUP" /dev/null "$ROOT/.deploy.lock.new"
 [ -e "$ROOT/.deploy.lock" ] || mv "$ROOT/.deploy.lock.new" "$ROOT/.deploy.lock"; rm -f "$ROOT/.deploy.lock.new"
-install -d -m 0700 -o "$NGINX_USER" -g "$NGINX_GROUP" /var/lib/nginx/vasey-staging-fastcgi
 install -d -m 0750 -o root -g "$APP_GROUP" /var/log/vasey-staging
 install -d -m 0755 -o root -g root /etc/vasey-staging
 # Preserve the lock inode on re-provision: replacing it would split concurrent helpers' authority.

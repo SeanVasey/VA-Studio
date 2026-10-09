@@ -81,6 +81,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
+- Staging runtime directory initialization uses no-follow pinned directory handles for ownership/mode changes, and exclusively creates private `.gitignore` without following application-placed links.
+
 - Staging provisioning refuses an unsafe MySQL administrator defaults file before host changes or database queries, requiring canonical root-owned 0600 single-link custody under protected ancestry.
 
 - Staging provisioning authenticates the persisted app credential as its exact database identity before grants, using a private temporary client file with cleanup and no password in arguments or environment.

@@ -156,7 +156,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 ### What provision.sh does
 
 1. **Checks:** Ubuntu 24.04; RAM (refuses under about 3.7 GB, warns under 8 GB); swap; PHP extensions in the CLI and in FPM; ffmpeg encoders; `prlimit` limits; tool paths; ClamAV signature age and readability by the app user.
-2. **Directories:** as in [Server layout](#server-layout), with the stated owners and modes. Private storage gets the same `.gitignore` bytes the repository tracks, so a backup restores exactly the tree the release expects.
+2. **Directories:** as in [Server layout](#server-layout), with the stated owners and modes. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; concurrent entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying.
 3. **MySQL** (as root over the local socket, or with `--mysql-admin-defaults FILE`):
    The optional admin file must be a canonical absolute, root-owned 0600 regular single-link
    file with no symlinks and root-owned parent directories that are not group/world writable.
