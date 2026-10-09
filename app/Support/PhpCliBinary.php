@@ -95,6 +95,11 @@ final class PhpCliBinary
         }
         $environment['LANG'] = 'C';
         $environment['LC_ALL'] = 'C';
+        // Validate the binary under the loader path its renderer children get (rootless PHP with sibling libraries).
+        $libraries = PhpCliProcess::libraries($path);
+        if ($libraries !== []) {
+            $environment['LD_LIBRARY_PATH'] = implode(PATH_SEPARATOR, $libraries);
+        }
         $output = '';
         $errorBytes = 0;
         try {

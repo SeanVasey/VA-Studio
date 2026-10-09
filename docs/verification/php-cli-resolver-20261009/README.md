@@ -15,7 +15,8 @@ against `main`'s product source (`evidence/fpm-red-main.txt`, `evidence/fpm-red-
 
 - `App\Support\PhpCliBinary` (WIP, hardened here). In the CLI, and in its built-in server (`cli-server`: `php -S`, `artisan serve`, the browser-spec server; independent review L-2), it returns `PHP_BINARY` unchanged. Outside the CLI it
   requires `VASEY_PHP_CLI_BINARY` (`config('app.php_cli_binary')`): an absolute path without control characters whose
-  canonical target is a regular executable file, proved by a `-n -r` probe with a scrubbed environment (`LANG=C`), a
+  canonical target is a regular executable file, proved by a `-n -r` probe with a scrubbed environment (`LANG=C`, plus the renderers' sibling `lib/<arch>` loader path
+  when it exists; Codex P2 on #67), a
   10 s limit, **at most 128 bytes of output and no stderr** (new), reporting `cli`, exactly the running `PHP_VERSION` and
   **the same thread-safety and debug build** (new). Success is cached per path, device, inode, size, mtime, ctime,
   version and build; failures are not cached. Failures are fixed reason codes; no path or child output leaves.
@@ -72,6 +73,9 @@ CLI hashes: `evidence/*.cli-sha256.txt` and `evidence/cli-generic.txt`.
 | `cli-server` treated as the CLI (review L-2), red | new unit case fails on `0f5890f0`, rc 1 | `evidence/cli-server-red.txt` |
 | Same, green, plus the focused M-16 files (resolver, Free/Paid/production-free CLI renderer, runtime validator, family-256 frozen-bytes and approval guards) | 7 files, 53 tests, 429 assertions, rc 0 each | `evidence/focused-cli-server-final.txt` |
 | Real `php -S` (cli-server) with `VASEY_PHP_CLI_BINARY` unset | free, paid and generic render with the same SHA-256 as the CLI | `evidence/cli-server-green.txt` |
+| Probe under the renderers' sibling library path (Codex P2 4228948830), red | a CLI that needs its sibling `lib/<arch>` is refused (`probe_failed`) at `fc779d06`, rc 2 | `evidence/probe-libraries-red.txt` |
+| Same, green: the 7 focused files | 54 tests, rc 0 each | `evidence/probe-libraries-green.txt` |
+| Genuine FPM smoke after that fix, with the independent reviewer's captured payloads | free, paid and composed production-free render with **exactly the reviewer's stored CLI SHA-256** (`c4e812cf…`, `20841190…`, `024b4fc9…`); generic `790fd796…`; shipped production-free and every family with the binary unset stay `render_failed`. A first attempt in this round had no capture directory mounted (harness `M16_CAPTURE_DIR`) and failed before rendering; it is not counted | `evidence/fpm-green-probe-libraries.txt` |
 
 ## Independent review
 

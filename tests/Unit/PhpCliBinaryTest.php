@@ -25,11 +25,20 @@ class PhpCliBinaryTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (array_diff(scandir($this->directory) ?: [], ['.', '..']) as $name) {
-            unlink($this->directory.'/'.$name);
-        }
-        rmdir($this->directory);
+        $this->remove($this->directory);
         parent::tearDown();
+    }
+
+    private function remove(string $path): void
+    {
+        if (is_dir($path) && ! is_link($path)) {
+            foreach (array_diff(scandir($path) ?: [], ['.', '..']) as $name) {
+                $this->remove($path.'/'.$name);
+            }
+            rmdir($path);
+        } else {
+            unlink($path);
+        }
     }
 
     private function fpm(?string $configured): PhpCliBinary
@@ -165,6 +174,24 @@ class PhpCliBinaryTest extends TestCase
         $server = new PhpCliBinary(null, 'cli-server', '/opt/running/php');
         $this->assertTrue($server->isCli());
         $this->assertSame('/opt/running/php', $server->path());
+    }
+
+    /**
+     * Codex P2 (PR #67): a rootless CLI whose libraries sit in its fixed sibling `lib/<arch>` directory runs in the
+     * renderers with that loader path (`PhpCliProcess::libraries()`), so the probe must validate it under the same path.
+     */
+    public function test_the_probe_runs_with_the_renderers_sibling_library_path(): void
+    {
+        mkdir($this->directory.'/bin');
+        mkdir($this->directory.'/lib/x86_64-linux-gnu', 0700, true);
+        $libraries = realpath($this->directory.'/lib/x86_64-linux-gnu');
+        $php = $this->directory.'/bin/php';
+        // Stands in for a binary that cannot load without its sibling libraries.
+        file_put_contents($php, "#!/bin/sh\n[ \"\$LD_LIBRARY_PATH\" = ".escapeshellarg($libraries)." ] || exit 127\nprintf '%s' "
+            .escapeshellarg('cli '.PHP_VERSION.' '.self::BUILD)."\n");
+        chmod($php, 0700);
+
+        $this->assertSame(realpath($php), $this->fpm($php)->path());
     }
 
     public function test_failing_or_malformed_probes_are_refused(): void
