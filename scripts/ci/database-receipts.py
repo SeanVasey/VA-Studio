@@ -40,6 +40,9 @@ MAX_FILE = 8 * 1024 * 1024
 MAX_ZIP = 8 * 1024 * 1024
 MAX_UNPACKED = 16 * 1024 * 1024
 MAX_JSON = 1024 * 1024
+# Members read from one artifact before the exact expected-name check. A 16-shard MySQL archive holds 37: the
+# manifest, the source listing, 16 configurations, 16 listings, and the shard's results, start and receipt.
+MAX_ZIP_MEMBERS = 40
 MAX_XML_DEPTH = 32
 MAX_XML_NODES = 50000
 POLICY_FILES = (
@@ -50,7 +53,7 @@ POLICY_FILES = (
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
 )
-COUNTS = {"mysql": 8, "sqlite": 2}
+COUNTS = {"mysql": 16, "sqlite": 2}
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
 MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
@@ -704,7 +707,7 @@ def archive(raw: bytes, expected: set[str]) -> dict[str, bytes]:
     try:
         with zipfile.ZipFile(io.BytesIO(raw)) as zip_:
             entries = zip_.infolist()
-            require(len(entries) == len(expected) and len(entries) <= 32
+            require(len(entries) == len(expected) and len(entries) <= MAX_ZIP_MEMBERS
                     and {entry.filename for entry in entries} == expected, "Missing, duplicate or unexpected ZIP entry")
             require(sum(entry.file_size for entry in entries) <= MAX_UNPACKED, "Oversized expanded artifact")
             result = {}

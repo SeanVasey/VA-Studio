@@ -45,7 +45,8 @@ INCLUDED = "tests/Feature/SyntheticDriverBranchTest.php"
 # Completed below, once the fixture rows exist: the pinned pattern files and one reviewed residual file.
 SELECTION = {"file_pattern": PATTERN, "include_files": (INCLUDED,)}
 ROWS = [("Tests\\Feature\\Synthetic" + str(index) + "Test", f"tests/Feature/Synthetic{index}Test.php", "test_retained", None) for index in range(8)]
-ROWS += [("Tests\\Feature\\Synthetic" + str(index) + "MigrationTest", f"tests/Feature/Synthetic{index}MigrationTest.php", "test_schema", None) for index in range(8)]
+# Sixteen migration files, so every one of the sixteen MySQL shards owns at least one selected file, as the sharder requires.
+ROWS += [("Tests\\Feature\\Synthetic" + str(index) + "MigrationTest", f"tests/Feature/Synthetic{index}MigrationTest.php", "test_schema", None) for index in range(16)]
 ROWS.append((SKIP[0], "tests/Feature/SyntheticMysqlTest.php", SKIP[1], "lock & \"quoted\"\nlabel"))
 ROWS.append(("Tests\\Feature\\SyntheticDriverBranchTest", INCLUDED, "test_native_branch", None))
 # A selected migration file's SQLite-only method, listed in the reviewed MySQL skip census.
@@ -55,7 +56,7 @@ ROWS.append((MYSQL_SKIP[0], "tests/Feature/SyntheticSqliteOnlyMigrationTest.php"
 EXTRA_SQLITE_SKIPS = set()
 # Methods a MySQL result skips; adversarial tests replace it to forge missing or unlisted skips.
 MYSQL_RESULT_SKIPS = {MYSQL_SKIP}
-# MySQL runs only files owning a reviewed SQLite skip, migration files and reviewed include files: eleven of nineteen here.
+# MySQL runs only files owning a reviewed SQLite skip, migration files and reviewed include files: nineteen of twenty-seven here.
 SELECTED_ROWS = [row for row in ROWS if (row[0], row[2]) == SKIP or re.fullmatch(PATTERN, row[1]) or row[1] == INCLUDED]
 MIGRATION_ROWS = [row for row in SELECTED_ROWS if re.fullmatch(PATTERN, row[1])]
 RESIDUAL = ROWS[0][1]
@@ -258,7 +259,7 @@ class NativeSelectionTests(unittest.TestCase):
         full = receipt.inventory(listing(ROWS), ROOT)
         selected = receipt.native_selection(full, {SKIP}, SELECTION)
         self.assertEqual({row[1] for row in SELECTED_ROWS}, set(selected.values()))
-        self.assertEqual(11, len(selected))
+        self.assertEqual(19, len(selected))
         self.assertIn(INCLUDED, selected.values())
         self.assertNotIn("tests/Feature/Synthetic0Test.php", selected.values())
         self.verify(evidence("mysql", 1))
@@ -396,7 +397,7 @@ class NativeSelectionTests(unittest.TestCase):
     def test_mysql_partition_missing_a_selected_case_rejects(self):
         files = evidence("mysql", 2)
         # Shard 1 owns two selected files; its retained listing silently drops the second one.
-        self.assertEqual(SELECTED_ROWS[0::8], SELECTED_ROWS[0:1] + SELECTED_ROWS[8:9])
+        self.assertEqual(SELECTED_ROWS[0::16], SELECTED_ROWS[0:1] + SELECTED_ROWS[16:17])
         files["phpunit-ci-mysql-1-tests.xml"] = listing(SELECTED_ROWS[0:1])
         with self.assertRaisesRegex(receipt.ReceiptError, "Partition loses or duplicates"):
             self.verify(files, shard=2)
@@ -404,7 +405,7 @@ class NativeSelectionTests(unittest.TestCase):
     def test_mysql_partition_containing_an_unselected_file_rejects(self):
         files = evidence("mysql", 1)
         name = "phpunit-ci-mysql-2-tests.xml"
-        files[name] = listing(SELECTED_ROWS[1::8] + ROWS[:1])
+        files[name] = listing(SELECTED_ROWS[1::16] + ROWS[:1])
         manifest = json.loads(files["phpunit-ci-mysql-manifest.json"])
         manifest["shards"][1]["files"] = sorted(set(receipt.inventory(files[name], ROOT)["cases"].values()))
         manifest["shards"][1]["test_cases"] += 1
@@ -490,6 +491,18 @@ class NativeSelectionTests(unittest.TestCase):
         with patch.object(receipt, "MAX_FILE", 1), self.assertRaises(receipt.ReceiptError):
             receipt.archive(zipped({"evidence.json": b"{}"}), expected)
 
+    def test_archive_member_bound_fits_every_committed_shard_count_and_refuses_more(self):
+        # Every committed provider count must fit the member bound, or its own archives would be refused.
+        for engine, count in receipt.COUNTS.items():
+            self.assertLessEqual(len(receipt.evidence_names(engine, count, shard_count=count)), receipt.MAX_ZIP_MEMBERS, engine)
+        self.assertEqual(37, len(receipt.evidence_names("mysql", 16, shard_count=16)))
+        # One past the bound is refused even when the caller expects exactly those names.
+        names = {f"member-{index}.json" for index in range(receipt.MAX_ZIP_MEMBERS + 1)}
+        with self.assertRaisesRegex(receipt.ReceiptError, "unexpected ZIP entry"):
+            receipt.archive(zipped({name: b"{}" for name in names}), names)
+        fitting = set(sorted(names)[:receipt.MAX_ZIP_MEMBERS])
+        self.assertEqual(fitting, set(receipt.archive(zipped({name: b"{}" for name in fitting}), fitting)))
+
     def test_download_origin_rejects_http_credentials_localhost_and_suffix_confusion(self):
         self.assertTrue(receipt.download_host("https://productionresultssa1.blob.core.windows.net/path?sig=synthetic"))
         for url in ("http://productionresultssa1.blob.core.windows.net/path", "https://user:token@productionresultssa1.blob.core.windows.net/path",
@@ -507,10 +520,10 @@ class CollectorTests(unittest.TestCase):
                 patch.object(receipt, "validate_discovered_files"), patch.object(receipt, "locked_dependencies", return_value=({}, runtime("mysql")["dependencies"])):
             return receipt.collect(Path(ROOT), {}, api)
 
-    def test_ten_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
+    def test_eighteen_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
         value = self.collect(FakeGithub())
-        self.assertEqual(10, len(value["database_receipts"]))
-        self.assertEqual({"mysql": 8, "sqlite": 2}, receipt.COUNTS)
+        self.assertEqual(18, len(value["database_receipts"]))
+        self.assertEqual({"mysql": 16, "sqlite": 2}, receipt.COUNTS)
         # MySQL runs every selected case except its one reviewed SQLite-only skip, which SQLite executed.
         self.assertEqual(len(SELECTED_ROWS) - 1, sum(row["results"]["executed_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
         self.assertEqual(1, sum(row["results"]["skipped_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
@@ -521,31 +534,33 @@ class CollectorTests(unittest.TestCase):
         self.assertIn("pending", value["outer_acceptance"])
         self.assertEqual("unknown", value["shadow"]["prior_full_acceptance"])
 
-    def test_four_shard_or_incomplete_eight_shard_jobs_cannot_satisfy_the_gate(self):
-        for mutation in ("only_four", "missing_five", "missing_eight", "duplicate_eight", "old_denominator"):
+    def test_four_or_eight_shard_or_incomplete_sixteen_shard_jobs_cannot_satisfy_the_gate(self):
+        for mutation in ("only_four", "only_eight", "missing_nine", "missing_sixteen", "duplicate_sixteen", "old_denominator_four", "old_denominator_eight"):
             api = FakeGithub()
-            if mutation == "only_four":
-                api.jobs = [job for job in api.jobs if job["name"] not in {f"backend-mysql ({n}/8)" for n in range(5, 9)}]
+            if mutation.startswith("only_"):
+                kept = 4 if mutation == "only_four" else 8
+                api.jobs = [job for job in api.jobs if job["name"] not in {f"backend-mysql ({n}/16)" for n in range(kept + 1, 17)}]
             elif mutation.startswith("missing_"):
-                missing = 5 if mutation == "missing_five" else 8
-                api.jobs = [job for job in api.jobs if job["name"] != f"backend-mysql ({missing}/8)"]
-            elif mutation == "duplicate_eight":
-                duplicate = deepcopy(next(job for job in api.jobs if job["name"] == "backend-mysql (8/8)"))
+                missing = 9 if mutation == "missing_nine" else 16
+                api.jobs = [job for job in api.jobs if job["name"] != f"backend-mysql ({missing}/16)"]
+            elif mutation == "duplicate_sixteen":
+                duplicate = deepcopy(next(job for job in api.jobs if job["name"] == "backend-mysql (16/16)"))
                 duplicate["id"] = 99
                 api.jobs.append(duplicate)
             else:
+                old = "/4)" if mutation == "old_denominator_four" else "/8)"
                 for job in api.jobs:
-                    job["name"] = job["name"].replace("/8)", "/4)")
+                    job["name"] = job["name"].replace("/16)", old)
             with self.subTest(mutation=mutation), self.assertRaisesRegex(receipt.ReceiptError, "required database job"):
                 self.collect(api)
 
-    def test_old_four_shard_archives_and_mixed_manifest_cardinality_reject(self):
-        for mutation in ("old_archive", "short_manifest"):
+    def test_old_four_or_eight_shard_archives_and_mixed_manifest_cardinality_reject(self):
+        for mutation in ("old_archive_four", "old_archive_eight", "short_manifest_four", "short_manifest_eight"):
             api = FakeGithub()
-            files = evidence("mysql", 1, count=4 if mutation == "old_archive" else 8)
-            if mutation == "short_manifest":
+            files = evidence("mysql", 1, count={"old_archive_four": 4, "old_archive_eight": 8}.get(mutation, 16))
+            if mutation.startswith("short_manifest"):
                 name = "phpunit-ci-mysql-manifest.json"
-                manifest = json.loads(files[name]); manifest["shards"] = manifest["shards"][:4]
+                manifest = json.loads(files[name]); manifest["shards"] = manifest["shards"][:4 if mutation.endswith("four") else 8]
                 files[name] = receipt.canonical(manifest)
                 final_name = "phpunit-ci-mysql-1-receipt.json"
                 final = json.loads(files.pop(final_name))
@@ -556,7 +571,7 @@ class CollectorTests(unittest.TestCase):
                 self.collect(api)
 
     def test_successful_late_shard_jobs_still_require_one_exact_artifact_each(self):
-        for shard in (5, 8):
+        for shard in (9, 16):
             for mutation in ("missing", "duplicate"):
                 api = FakeGithub()
                 name = f"backend-mysql-{shard}-123-1"
@@ -568,8 +583,8 @@ class CollectorTests(unittest.TestCase):
                 with self.subTest(shard=shard, mutation=mutation), self.assertRaisesRegex(receipt.ReceiptError, "required database artifact"):
                     self.collect(api)
 
-    def test_unknown_ninth_shard_rejects_before_any_source_or_runtime_probe(self):
-        with patch("sys.argv", ["database-receipts.py", "start", "--engine=mysql", "--shard=9"]), \
+    def test_unknown_seventeenth_shard_rejects_before_any_source_or_runtime_probe(self):
+        with patch("sys.argv", ["database-receipts.py", "start", "--engine=mysql", "--shard=17"]), \
                 patch.object(receipt, "source_identity") as source_probe, patch.object(receipt, "runtime_identity") as runtime_probe, \
                 redirect_stderr(io.StringIO()) as output:
             self.assertEqual(1, receipt.main())
@@ -874,7 +889,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertIn(f"- name: {receipt.PARTITION_STEPS[engine]}\n", block)
             # Only MySQL narrows to the reviewed native selection; SQLite keeps the complete suite.
             self.assertEqual(engine == "mysql", "--mysql-native-selection" in block)
-        self.assertIn("Verify all ten current-run database receipts without enabling reuse", workflow)
+        self.assertIn("Verify all eighteen current-run database receipts without enabling reuse", workflow)
 
     def test_native_isolation_variables_are_set_only_on_the_mysql_job(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
@@ -890,7 +905,7 @@ class WorkflowTests(unittest.TestCase):
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
-        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8]", "shard: [1, 2]",
+        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]", "shard: [1, 2]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
                          "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):

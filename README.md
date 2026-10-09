@@ -151,7 +151,9 @@ include list (163 of 557 files, 1,765 of 7,642 cases). Other tests no longer run
 MySQL in Foundation CI, including 47 driver-branching test files pinned in its `residual_files`.
 MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
 and each of them must have run on SQLite. GitHub and the GitLab workflow both split that selection
-into 8 MySQL shards; GitLab's 175-minute job limit stays under its hosted runners' 3-hour cap.
+into 16 MySQL shards, weighted by hosted timings from Foundation run 37967128232. GitLab's 175-minute
+job limit stays under its hosted runners' 3-hour cap; whether every shard finishes inside the GitHub
+and GitLab limits is unproven until the next hosted run.
 All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real
