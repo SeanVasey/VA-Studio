@@ -149,6 +149,8 @@ conditions recorded. Prefer local affected checks; manually request
 files owning a method in the SQLite skip census, migration test files and a reviewed
 include list (158 of 555 files, 1,703 of 7,633 cases). Other tests no longer run on
 MySQL in Foundation CI, including 50 files that branch on the database driver.
+MySQL may skip only the 56 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
+and each of them must have run on SQLite.
 All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real

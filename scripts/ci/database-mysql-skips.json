@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "purpose": "reviewed-sqlite-only-mysql-skip-methods",
+  "methods": [
+    [
+      "Tests\\Feature\\CustomerListeningMigrationTest",
+      "test_foreign_or_drifted_objects_are_never_adopted_or_dropped"
+    ],
+    [
+      "Tests\\Feature\\CustomerListeningMigrationTest",
+      "test_temporary_shadow_is_never_adopted_or_dropped"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionMigrationTest",
+      "test_missing_identity_dependency_and_disabled_fk_enforcement_are_refused_without_installing"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionMigrationTest",
+      "test_sqlite_replace_cannot_delete_retained_target_or_intent"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names"
+    ],
+    [
+      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutMigrationTest",
+      "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_parent_floor_drift_is_refused_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+      "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+      "test_migration_installs_exactly_four_tables_and_twelve_guards_and_a_rerun_is_a_no_op"
+    ]
+  ]
+}

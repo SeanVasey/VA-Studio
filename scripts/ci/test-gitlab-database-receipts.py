@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Native GitLab provenance and complete-shard adversarial unit fixtures, not acceptance."""
+from contextlib import ExitStack
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import importlib.util
@@ -71,7 +72,7 @@ def evidence(engine, shard, job, alternate=False, mysql_rows=None):
     value = initial | {'purpose': 'gitlab-database-receipt-not-acceptance', 'runtime_sha256': proof.digest(proof.canonical(runtime(engine))),
                        'test_step_outcome': 'success', 'finished_at': at(-30),
                        **proof.database_evidence(files, {'checkout_root': str(ROOT), 'policy_sha256': identity()['policy_sha256']}, engine, shard, {fixtures.SKIP}, shard_count=native.COUNTS[engine],
-                                                  selection=fixtures.SELECTION)}
+                                                  selection=fixtures.SELECTION, mysql_skips={fixtures.MYSQL_SKIP})}
     files[prefix + '-receipt.json'] = proof.canonical(value)
     return files
 
@@ -152,9 +153,12 @@ class NativeCollectorTests(unittest.TestCase):
                 with self.subTest(engine=engine, forged_archive_missing=extension), self.assertRaisesRegex(proof.ReceiptError, 'Unsupported PHP runtime'):
                     self.collect(api)
 
+    mysql_census = frozenset({fixtures.MYSQL_SKIP})
+
     def collect(self, api):
         with patch.object(native, 'source', return_value=identity()), patch.object(proof, 'sqlite_skip_pairs', return_value={fixtures.SKIP}), \
-                patch.object(proof, 'mysql_selection', return_value=fixtures.SELECTION), patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
+                patch.object(proof, 'mysql_selection', return_value=fixtures.SELECTION), patch.object(proof, 'mysql_skip_pairs', return_value=self.mysql_census), \
+                patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
             return native.collect(ROOT, env(), api)
 
     def test_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
@@ -164,7 +168,8 @@ class NativeCollectorTests(unittest.TestCase):
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
-        self.assertEqual(len(fixtures.SELECTED_ROWS), sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(len(fixtures.SELECTED_ROWS) - 1, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(1, sum(r['results']['skipped_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
         self.assertEqual(len(fixtures.ROWS) - 1, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'sqlite'))
         self.assertIn('native selection', value['mysql_scope'])
 
@@ -176,6 +181,49 @@ class NativeCollectorTests(unittest.TestCase):
             api = FakeGitlab(mysql_rows=fixtures.MIGRATION_ROWS)
             with self.assertRaisesRegex(proof.ReceiptError, 'SQLite-skipped identity was not executed on genuine MySQL'):
                 self.collect(api)
+
+    def forge(self, *, mysql_skips=None, sqlite_skips=None):
+        """Forge every per-shard proof (fixture and native module copies) so only collector checks can refuse."""
+        def forging(original):
+            def call(*args, **kwargs):
+                args = list(args)
+                if args[2] == 'mysql' and mysql_skips is not None:
+                    kwargs = kwargs | {'mysql_skips': mysql_skips}
+                if args[2] == 'sqlite' and sqlite_skips is not None:
+                    args[4] = sqlite_skips
+                return original(*args, **kwargs)
+            return call
+        stack = ExitStack()
+        stack.enter_context(patch.object(proof, 'database_evidence', side_effect=forging(proof.database_evidence)))
+        stack.enter_context(patch.object(fixtures.receipt, 'database_evidence', side_effect=forging(fixtures.receipt.database_evidence)))
+        return stack
+
+    def test_collector_refuses_a_method_in_both_skip_censuses(self):
+        api = FakeGitlab()
+        self.mysql_census = frozenset({fixtures.MYSQL_SKIP, fixtures.SKIP})
+        with self.forge(mysql_skips={fixtures.MYSQL_SKIP}), self.assertRaisesRegex(proof.ReceiptError, 'both the SQLite and the MySQL'):
+            self.collect(api)
+
+    def test_collector_refuses_mysql_skips_that_differ_from_the_reviewed_census(self):
+        fixtures.MYSQL_RESULT_SKIPS = set()
+        try:
+            with self.forge(mysql_skips=set()):
+                api = FakeGitlab()
+        finally:
+            fixtures.MYSQL_RESULT_SKIPS = {fixtures.MYSQL_SKIP}
+        with self.forge(mysql_skips=set()), self.assertRaisesRegex(proof.ReceiptError, 'Genuine MySQL skip identities differ'):
+            self.collect(api)
+
+    def test_collector_refuses_a_mysql_skipped_identity_that_sqlite_also_skipped(self):
+        fixtures.EXTRA_SQLITE_SKIPS.add(fixtures.MYSQL_SKIP)
+        try:
+            with self.forge(sqlite_skips={fixtures.SKIP, fixtures.MYSQL_SKIP}):
+                api = FakeGitlab()
+        finally:
+            fixtures.EXTRA_SQLITE_SKIPS.clear()
+        with self.forge(sqlite_skips={fixtures.SKIP, fixtures.MYSQL_SKIP}), \
+                self.assertRaisesRegex(proof.ReceiptError, 'A MySQL-skipped identity was not executed on SQLite'):
+            self.collect(api)
 
     def test_collector_recomputes_the_mysql_selection_instead_of_trusting_the_executed_shards(self):
         # Every per-shard proof (fixture and native module copies) is forged to accept a selection

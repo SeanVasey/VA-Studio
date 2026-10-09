@@ -2,6 +2,7 @@
   "schema_version": 1,
   "purpose": "reviewed-mysql-native-selection",
   "sqlite_skip_policy": "scripts/ci/database-sqlite-skips.json",
+  "mysql_skip_policy": "scripts/ci/database-mysql-skips.json",
   "file_pattern": "^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\\.php$",
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",

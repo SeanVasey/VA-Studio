@@ -197,9 +197,9 @@ class PartitionProofTest(unittest.TestCase):
         groups = Counter({("money", "A::one"): 1, ("native", "C::race"): 1, ("native", "Order::up"): 1})
         return Inventory(cases, groups, methods)
 
-    def native_selection(self, pairs=frozenset({("C", "race")}), include=()):
+    def native_selection(self, pairs=frozenset({("C", "race")}), include=(), mysql_pairs=frozenset()):
         pattern = r"^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$"
-        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64, tuple(include))
+        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64, tuple(include), set(mysql_pairs), "3" * 64)
 
     def selected_shards(self, target, count):
         assignments = module.partition(target, count)
@@ -226,6 +226,14 @@ class PartitionProofTest(unittest.TestCase):
         self.assertEqual({"C::race", "C::plain", "Order::up", "Ledger::up", "B::one"}, set(target.cases))
         with self.assertRaisesRegex(PartitionError, "include file was not discovered: tests/Feature/GoneTest.php"):
             module.select_native(source, self.native_selection(include=("tests/B.php", "tests/Feature/GoneTest.php")))
+
+    def test_mysql_skip_census_must_be_discovered_selected_and_disjoint_from_the_sqlite_census(self):
+        source = self.native_source()
+        module.select_native(source, self.native_selection(mysql_pairs={("C", "plain"), ("Order", "up")}))
+        for pairs, message in [({("Order", "removed")}, "undiscovered"), ({("C", "race")}, "both the SQLite and the MySQL"),
+                               ({("B", "one")}, "outside the selection")]:
+            with self.subTest(pairs=pairs), self.assertRaisesRegex(PartitionError, message):
+                module.select_native(source, self.native_selection(mysql_pairs=pairs))
 
     def test_selected_partition_missing_a_reviewed_include_file_rejects(self):
         source = self.native_source()
@@ -280,22 +288,34 @@ class PartitionProofTest(unittest.TestCase):
         root = self.root / "policy"
         (root / "scripts/ci").mkdir(parents=True)
         census = {"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods", "methods": [["C", "race"]]}
+        mysql_census = {"schema_version": 1, "purpose": "reviewed-sqlite-only-mysql-skip-methods", "methods": [["A", "one"], ["B", "two"]]}
         valid = {"schema_version": 1, "purpose": "reviewed-mysql-native-selection", "sqlite_skip_policy": module.SQLITE_SKIP_POLICY,
+                 "mysql_skip_policy": module.MYSQL_SKIP_POLICY,
                  "file_pattern": "^tests/Feature/[A-Za-z]*MigrationTest\\.php$", "include_files": ["tests/A.php", "tests/Unit/BTest.php"]}
 
-        def read(policy, skips=census):
+        def read(policy, skips=census, mysql_skips=mysql_census):
             (root / module.SELECTION_POLICY).write_text(policy if isinstance(policy, str) else json.dumps(policy))
             (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps(skips))
+            (root / module.MYSQL_SKIP_POLICY).write_text(mysql_skips if isinstance(mysql_skips, str) else json.dumps(mysql_skips))
             return module.read_selection(root)
 
         parsed = read(valid)
         self.assertEqual({("C", "race")}, parsed.skip_pairs)
         self.assertEqual(64, len(parsed.policy_sha256))
         self.assertEqual(("tests/A.php", "tests/Unit/BTest.php"), parsed.include_files)
+        self.assertEqual({("A", "one"), ("B", "two")}, parsed.mysql_skip_pairs)
+        self.assertEqual(64, len(parsed.mysql_skip_policy_sha256))
+        self.assertEqual(set(), read(valid, mysql_skips={**mysql_census, "methods": []}).mysql_skip_pairs)
+        for mysql_skips in ["not json", {**mysql_census, "methods": [["B", "two"], ["A", "one"]]}, {**mysql_census, "methods": [["A", "one"], ["A", "one"]]},
+                            {**mysql_census, "purpose": "reviewed-mysql-only-sqlite-skip-methods"}, {**mysql_census, "methods": [["A"]]},
+                            {**mysql_census, "extra": 1}]:
+            with self.assertRaises(PartitionError, msg=str(mysql_skips)):
+                read(valid, mysql_skips=mysql_skips)
         for policy in ["not json", [], {**valid, "schema_version": 2}, {**valid, "schema_version": True}, {**valid, "extra": 1},
                        {**valid, "purpose": "other"}, {**valid, "sqlite_skip_policy": "elsewhere.json"}, {**valid, "file_pattern": "Migration"},
                        {**valid, "file_pattern": "^tests/(unclosed$"}, {**valid, "file_pattern": 3},
                        {key: value for key, value in valid.items() if key != "include_files"}, {**valid, "include_files": "tests/A.php"},
+                       {key: value for key, value in valid.items() if key != "mysql_skip_policy"}, {**valid, "mysql_skip_policy": "elsewhere.json"},
                        {**valid, "include_files": ["tests/Unit/BTest.php", "tests/A.php"]}, {**valid, "include_files": ["tests/A.php", "tests/A.php"]},
                        {**valid, "include_files": ["tests/../app/A.php"]}, {**valid, "include_files": ["app/A.php"]}, {**valid, "include_files": [3]}]:
             with self.assertRaises(PartitionError, msg=str(policy)):
@@ -331,7 +351,10 @@ class PartitionProofTest(unittest.TestCase):
         (root / "scripts/ci").mkdir(parents=True)
         (root / "phpunit.xml").write_text('<phpunit><testsuites><testsuite name="All"><directory>tests</directory></testsuite></testsuites></phpunit>')
         (root / module.SELECTION_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-native-selection",
-            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "file_pattern": self.native_selection().pattern, "include_files": ["tests/B.php"]}))
+            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "mysql_skip_policy": module.MYSQL_SKIP_POLICY,
+            "file_pattern": self.native_selection().pattern, "include_files": ["tests/B.php"]}))
+        (root / module.MYSQL_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-sqlite-only-mysql-skip-methods",
+                                                                "methods": [["C", "plain"]]}))
         (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods",
                                                                  "methods": [["C", "race"]]}))
         source = self.native_source()
@@ -361,6 +384,7 @@ class PartitionProofTest(unittest.TestCase):
         self.assertEqual({"policy": module.SELECTION_POLICY,
                           "policy_sha256": module.hashlib.sha256((root / module.SELECTION_POLICY).read_bytes()).hexdigest(),
                           "sqlite_skip_policy_sha256": module.hashlib.sha256((root / module.SQLITE_SKIP_POLICY).read_bytes()).hexdigest(),
+                          "mysql_skip_policy_sha256": module.hashlib.sha256((root / module.MYSQL_SKIP_POLICY).read_bytes()).hexdigest(),
                           "files": 4, "test_cases": 5,
                           "case_identity_sha256": module.hashlib.sha256(json.dumps(sorted(selected.items())).encode()).hexdigest()}, manifest["selection"])
         self.assertEqual(sorted(set(selected.values())), sorted(file for shard in manifest["shards"] for file in shard["files"]))

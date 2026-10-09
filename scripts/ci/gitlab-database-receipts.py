@@ -148,7 +148,8 @@ def start(root: Path, engine: str, shard: int, env: dict) -> None:
 
 def evidence(files: dict, identity: dict, checkout_root: str, engine: str, shard: int, root: Path) -> dict:
     return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root), shard_count=COUNTS[engine],
-                                   selection=proof.mysql_selection(root) if engine == "mysql" else None)
+                                   selection=proof.mysql_selection(root) if engine == "mysql" else None,
+                                   mysql_skips=proof.mysql_skip_pairs(root) if engine == "mysql" else None)
 
 
 def finish(root: Path, engine: str, shard: int, env: dict) -> None:
@@ -362,15 +363,21 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
                           "digest_origin": "computed from authenticated exact-job download; GitLab exposes no archive digest here"})
     proof.require(len({proof.canonical(receipt["source_census"]) for receipt in receipts}) == 1, "Different complete source censuses")
     # SQLite must execute the complete census; MySQL exactly the selection recomputed from it and the committed policies.
-    expected = {"sqlite": set(full["cases"]), "mysql": set(proof.native_selection(full, proof.sqlite_skip_pairs(root), proof.mysql_selection(root)))}
+    sqlite_census, mysql_census = proof.sqlite_skip_pairs(root), proof.mysql_skip_pairs(root)
+    proof.require(not sqlite_census & mysql_census, "A method is in both the SQLite and the MySQL skip policies")
+    expected = {"sqlite": set(full["cases"]), "mysql": set(proof.native_selection(full, sqlite_census, proof.mysql_selection(root)))}
+    mysql_expected_skips = {key for key in expected["mysql"] if full["methods"][key] in mysql_census}
     for engine, sets in inventories.items():
         observed = Counter(key for item in sets for key in item["cases"])
         proof.require(observed == Counter({key: 1 for key in expected[engine]}), "Executed partitions lose or duplicate source cases"
                       if engine == "sqlite" else "Executed MySQL partitions differ from the MySQL-native selection")
         proof.require(len({r["file_sha256"][f"phpunit-ci-{engine}-manifest.json"] for r in receipts if r["engine"] == engine}) == 1, "Different per-engine partition manifests")
-    proof.require(sum(r["results"]["executed_cases"] for r in receipts if r["engine"] == "mysql") == len(expected["mysql"]), "Incomplete genuine MySQL execution")
+    mysql_skipped = {key for r in receipts if r["engine"] == "mysql" for key in r["results"]["skipped_ids"]}
+    proof.require(mysql_skipped == mysql_expected_skips, "Genuine MySQL skip identities differ from the reviewed SQLite-only policy")
+    proof.require(sum(r["results"]["executed_cases"] for r in receipts if r["engine"] == "mysql") == len(expected["mysql"] - mysql_skipped), "Incomplete genuine MySQL execution")
     sqlite_skipped = {key for r in receipts if r["engine"] == "sqlite" for key in r["results"]["skipped_ids"]}
-    mysql_executed = {key for item in inventories["mysql"] for key in item["cases"]}
+    mysql_executed = {key for item in inventories["mysql"] for key in item["cases"]} - mysql_skipped
+    proof.require(mysql_skipped <= expected["sqlite"] - sqlite_skipped, "A MySQL-skipped identity was not executed on SQLite")
     proof.require(sqlite_skipped <= mysql_executed, "A SQLite-skipped identity was not executed on genuine MySQL")
     final_jobs = accept_jobs(api.jobs(identity["pipeline_id"]), identity, number(env, "CI_JOB_ID"))
     for name, (engine, shard) in DATABASE_JOBS.items():
@@ -386,8 +393,9 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
             "source": identity, "upstream_jobs": {name: jobs[name]["id"] for name in sorted(UPSTREAM)},
             "artifacts": artifacts, "database_receipts": receipts, "reuse_enabled": False,
             "sqlite_skip_policy": "exact reviewed methods only; every counterpart executed on genuine MySQL",
+            "mysql_skip_policy": "exact reviewed SQLite-only methods inside the selection; every counterpart executed on SQLite",
             "mysql_scope": "SQLite executed every source case once (less reviewed skips); genuine MySQL executed exactly the reviewed "
-                           "native selection (files owning SQLite-skipped methods, migration test files and the reviewed include list) once, with zero skips"}
+                           "native selection (files owning SQLite-skipped methods, migration test files and the reviewed include list) once, skipping only the reviewed SQLite-only methods"}
 
 
 def main() -> int:

@@ -16,7 +16,9 @@ With --mysql-native-selection (MySQL only), discovery stays complete, but only t
 selected by the reviewed scripts/ci/database-mysql-selection.json are partitioned: every
 file owning a method from the reviewed SQLite skip census, every file whose repository
 path matches the policy's migration file pattern, and every file in the policy's reviewed
-include_files list (each must be discovered). The proof then requires
+include_files list (each must be discovered). The reviewed MySQL skip census
+(scripts/ci/database-mysql-skips.json) must name only discovered, selected methods that are
+not in the SQLite census; its hash is recorded with the selection. The proof then requires
 every selected case exactly once, and the manifest keeps the complete source census.
 
 CLI contract: https://docs.phpunit.de/en/12.5/textui.html#listing-tests
@@ -48,6 +50,7 @@ XSI = "http://www.w3.org/2001/XMLSchema-instance"
 ET.register_namespace("xsi", XSI)
 SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
+MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
 
 
 class PartitionError(Exception):
@@ -184,6 +187,31 @@ class Selection:
     sqlite_skip_policy_sha256: str
     # Reviewed repository paths selected explicitly: native-only proofs that SQLite reaches through a fallback.
     include_files: tuple[str, ...] = ()
+    # Reviewed SQLite-only (class, method) pairs that skip on MySQL; they must lie inside the selection.
+    mysql_skip_pairs: set[tuple[str, str]] = field(default_factory=set)
+    mysql_skip_policy_sha256: str = ""
+
+
+def read_census(raw: bytes, purpose: str, label: str, *, require_entries: bool, require_sorted: bool) -> set[tuple[str, str]]:
+    """Parse a reviewed (class, method) skip census; duplicates and unknown shapes are refused."""
+    try:
+        census = json.loads(raw)
+    except ValueError as error:
+        raise PartitionError(label + " skip policy is not valid JSON") from error
+    if (not isinstance(census, dict) or set(census) != {"schema_version", "purpose", "methods"}
+            or not is_count(census["schema_version"], 1) or census["schema_version"] != 1
+            or census["purpose"] != purpose or not isinstance(census["methods"], list)
+            or (require_entries and not census["methods"])):
+        raise PartitionError("Unknown " + label + " skip policy shape")
+    pairs: set[tuple[str, str]] = set()
+    for pair in census["methods"]:
+        if (not isinstance(pair, list) or len(pair) != 2 or not all(isinstance(item, str) and item for item in pair)
+                or tuple(pair) in pairs):
+            raise PartitionError("Invalid or duplicate " + label + " skip method")
+        pairs.add(tuple(pair))
+    if require_sorted and census["methods"] != sorted(census["methods"]):
+        raise PartitionError(label + " skip policy methods must be sorted")
+    return pairs
 
 
 def read_selection(root: Path) -> Selection:
@@ -193,9 +221,11 @@ def read_selection(root: Path) -> Selection:
         policy = json.loads(raw)
     except ValueError as error:
         raise PartitionError("MySQL selection policy is not valid JSON") from error
-    if (not isinstance(policy, dict) or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern", "include_files"}
+    if (not isinstance(policy, dict)
+            or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "include_files"}
             or not is_count(policy["schema_version"], 1) or policy["schema_version"] != 1
             or policy["purpose"] != "reviewed-mysql-native-selection" or policy["sqlite_skip_policy"] != SQLITE_SKIP_POLICY
+            or policy["mysql_skip_policy"] != MYSQL_SKIP_POLICY
             or not isinstance(policy["file_pattern"], str) or not policy["file_pattern"].startswith("^")
             or not policy["file_pattern"].endswith("$")):
         raise PartitionError("Unknown MySQL selection policy shape")
@@ -209,22 +239,11 @@ def read_selection(root: Path) -> Selection:
             or include != sorted(set(include))):
         raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
     skip_raw = (root / SQLITE_SKIP_POLICY).read_bytes()
-    try:
-        census = json.loads(skip_raw)
-    except ValueError as error:
-        raise PartitionError("SQLite skip policy is not valid JSON") from error
-    if (not isinstance(census, dict) or set(census) != {"schema_version", "purpose", "methods"}
-            or not is_count(census["schema_version"], 1) or census["schema_version"] != 1
-            or census["purpose"] != "reviewed-mysql-only-sqlite-skip-methods"
-            or not isinstance(census["methods"], list) or not census["methods"]):
-        raise PartitionError("Unknown SQLite skip policy shape")
-    pairs: set[tuple[str, str]] = set()
-    for pair in census["methods"]:
-        if (not isinstance(pair, list) or len(pair) != 2 or not all(isinstance(item, str) and item for item in pair)
-                or tuple(pair) in pairs):
-            raise PartitionError("Invalid or duplicate SQLite skip method")
-        pairs.add(tuple(pair))
-    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest(), tuple(include))
+    pairs = read_census(skip_raw, "reviewed-mysql-only-sqlite-skip-methods", "SQLite", require_entries=True, require_sorted=False)
+    mysql_raw = (root / MYSQL_SKIP_POLICY).read_bytes()
+    mysql_pairs = read_census(mysql_raw, "reviewed-sqlite-only-mysql-skip-methods", "MySQL", require_entries=False, require_sorted=True)
+    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest(), tuple(include),
+                     mysql_pairs, hashlib.sha256(mysql_raw).hexdigest())
 
 
 def select_native(source: Inventory, selection: Selection) -> Inventory:
@@ -246,6 +265,15 @@ def select_native(source: Inventory, selection: Selection) -> Inventory:
     files |= set(selection.include_files)
     if not files:
         raise PartitionError("The MySQL-native selection is empty")
+    # The MySQL skip census names only discovered, selected methods and never a SQLite census method,
+    # so no case can be skipped by both engines.
+    if not selection.mysql_skip_pairs <= discovered:
+        raise PartitionError("Reviewed MySQL skip policy contains an undiscovered method")
+    if selection.mysql_skip_pairs & selection.skip_pairs:
+        raise PartitionError("A method is in both the SQLite and the MySQL skip policies")
+    outside = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.mysql_skip_pairs} - files
+    if outside:
+        raise PartitionError("Reviewed MySQL skip policy names a method outside the selection: " + ", ".join(sorted(outside)))
     cases = {identifier: file for identifier, file in source.cases.items() if file in files}
     groups = Counter({key: value for key, value in source.groups.items() if key[1] in cases})
     methods = {identifier: method for identifier, method in source.methods.items() if identifier in cases}
@@ -401,6 +429,7 @@ def main() -> None:
         manifest["selection"] = {
             "policy": SELECTION_POLICY, "policy_sha256": selection.policy_sha256,
             "sqlite_skip_policy_sha256": selection.sqlite_skip_policy_sha256,
+            "mysql_skip_policy_sha256": selection.mysql_skip_policy_sha256,
             "files": len(target.files), "test_cases": len(target.cases),
             "case_identity_sha256": hashlib.sha256(json.dumps(sorted(target.cases.items())).encode()).hexdigest(),
         }
