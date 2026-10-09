@@ -116,31 +116,28 @@ The queue workers (Lane A: `payments`, `contracts`, `default`, `media`) give fas
 
 ### 5. Make each offer purchasable: link its rights scope
 
-**Required workaround.** Order preparation reserves every selected offer revision against a rights scope (`ReserveQuoteInventory`). An offer published through Studio has no scope link, and Studio has no screen to add one. Without it, "Prepare order" fails with `INVENTORY_SCOPE_UNAVAILABLE`.
+Order preparation reserves every selected offer revision against a rights scope (`ReserveQuoteInventory`). After publishing a track and its offers, use the reviewed operator command from a trusted interactive console as the application user. An unlinked revision still fails "Prepare order" with `INVENTORY_SCOPE_UNAVAILABLE`.
 
-After a track and its offers are published, link each offer's current revision, once per offer, as the application user. Use your own operator account email and the offer ID from its Studio URL (`/admin/offers/<id>/edit`):
+List the current published revisions that need linking, then register the actual rights identity and link each relevant revision. Replace the placeholders with the verified catalog staff account's numeric ID, the chosen stable scope key, the **revision** ID from `list`, and non-secret references to the retained private evidence:
 
 ```sh
-OPERATOR_EMAIL='you@example.com' OFFER_ID=123
-php artisan tinker --execute='
-$operator = App\Models\User::where("email", "'"$OPERATOR_EMAIL"'")->firstOrFail();
-$offer = App\Domain\Catalog\Models\Offer::findOrFail('"$OFFER_ID"');
-$scopes = app(App\Domain\Commerce\Inventory\ManageRightsScope::class);
-$scope = $scopes->register("offer-revision-".$offer->current_revision_id, "STAGING-SCOPE-REVISION-".$offer->current_revision_id, $operator);
-$link = $scopes->link($scope->id, $offer->current_revision_id, "STAGING-LINK-REVISION-".$offer->current_revision_id, $operator);
-echo "scope=", $scope->public_id, " revision=", $link->offer_revision_id, PHP_EOL;'
+php artisan vasey:rights-scope list
+php artisan vasey:rights-scope register --actor-id=STAFF_ID --scope=SCOPE_KEY --reference=EVIDENCE_REFERENCE
+php artisan vasey:rights-scope link --actor-id=STAFF_ID --scope=SCOPE_KEY --revision=REVISION_ID --reference=LINK_REFERENCE
+php artisan vasey:rights-scope list
 ```
 
-- Each offer revision gets its own scope (`offer-revision-<revision id>`), so tiers never block each other.
-- Running it again for the same revision is harmless and prints the same result.
-- A new offer revision (for example after a price change) needs its own link. Run the command again.
-- The service rechecks that the track and offer are published and ready, and that the operator is verified staff. A link is an operator assertion, not proof of ownership; it is audited.
+- Each write confirms the staff password at a hidden prompt. Writes refuse `--no-interaction` and terminals that cannot hide input. Never pass passwords or evidence contents as arguments.
+- Related variants of the same actual right share a scope only after the operator verifies that relationship. Unrelated rights need distinct scopes. A quote cannot select two variants of one scope, and a reservation blocks every linked variant of that scope.
+- An exact repeated request is harmless; changing its immutable reference conflicts. A successor commercial revision needs a fresh explicit link to its actual rights identity.
+- The service rechecks current staff authority and track/offer/license/rights/media readiness. A link is an audited operator assertion, not proof of ownership. See [shared-rights command and uncertainty recovery](../shared-rights-inventory.md#operator-command-for-test-purchases).
+- If a write reports an unconfirmed result, inspect and retry the **exact original request**, preserving scope, revision and reference. A nonzero exit does not prove rollback.
 
 **An unpaid order keeps its offer reserved.** Preparing an order moves the offer revision's reservation to `pending`, and it stays `pending` until the order is finalized. A paid order releases it. An abandoned, declined-then-abandoned, expired or late-paid order never does (unpaid release is outside this profile). While a reservation is held or pending, nobody else can prepare an order for that offer revision: "Prepare order" fails with `INVENTORY_UNAVAILABLE`. So:
 
-- Two buyers cannot check out the same tier of the same track at the same time.
+- Two buyers cannot prepare orders against the same rights scope at the same time, including other linked variants.
 - Run the failure drills on a dedicated drill offer, not on an offer you want to keep buying.
-- To make an offer purchasable again after an abandoned order, publish a new revision of it in Studio and link that revision with the command above. The old reservation stays as retained evidence.
+- An abandoned reservation needs a separately reviewed resolution/release path, outside this profile. Publishing a successor or inventing a replacement scope does not establish that the original reservation is resolved. Preserve it as evidence and use dedicated drill content; never change a rights identity to bypass occupancy.
 
 ## The purchase
 
