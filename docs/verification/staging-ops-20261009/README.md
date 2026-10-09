@@ -171,4 +171,4 @@ Five scripts parsed separately and Shellcheck `-x` passed. Ownership/root/servic
 limits above still apply. The independent final decision is recorded separately; these owner checks are
 not a substitute for that decision.
 
-Publication formatting removes trailing whitespace only from new unittest progress lines; assertions, failure details and outcomes are unchanged.
+Publication formatting removes trailing whitespace from new unittest progress lines and one empty-stdout assertion line; assertions, failure details and outcomes are unchanged.

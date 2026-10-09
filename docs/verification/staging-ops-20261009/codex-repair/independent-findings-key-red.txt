@@ -16,7 +16,7 @@ FAIL: test_key_looking_lines_inside_multiline_values_are_not_admitted (test_stag
 Traceback (most recent call last):
   File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 125, in test_key_looking_lines_inside_multiline_values_are_not_admitted
     self.assertNotEqual(run.returncode, 0, run.stdout)
-AssertionError: 0 == 0 : 
+AssertionError: 0 == 0 :
 
 ======================================================================
 FAIL: test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) (manifest='b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2  database.sql\n')
