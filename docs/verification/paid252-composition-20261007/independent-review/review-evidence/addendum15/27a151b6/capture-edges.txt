@@ -1,0 +1,161 @@
+# source: 27a151b66d10b80d07d54685791a2a3d0efd44dc (worktree /home/user/rv56-a15)
+# command: php docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum15/27a151b6/capture-edges.php.txt /home/user/rv56-a15 
+now = 2026-10-08 12:00:00.250000; LARAVEL_START = undefined; expected fallback = 2026-10-08 12:00:00.250000
+ok   +1.0 s (boundary, clamped)                       expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.000001 s (just over, rejected)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.0000004 s (float lands at +1.000001, rejected) expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0 s (boundary, admitted)                     expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   -60.000001 s (just over, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0000004 s (rounds to -60.000000)             expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   int now-30 (fraction dropped)                    expected 2026-10-08 11:59:30.000000   actual 2026-10-08 11:59:30.000000
+ok   int now+1 (0.75 s ahead, clamped)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   int now+2 (1.75 s ahead, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -5.123456 s (microseconds kept)                  expected 2026-10-08 11:59:55.126544   actual 2026-10-08 11:59:55.126544
+ok   0 (int epoch)                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   0.0 (float epoch)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -0.0                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -1.0 (negative epoch)                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   1e12 (year 33658)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   NAN                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   INF                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -INF                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   numeric string now-5                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   false                                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   true                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   null                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   array [now-5]                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   Stringable object                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+DIFF 1e20 (finite, out of Carbon range)               expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF PHP_INT_MAX                                      expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF -1e15                                            expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+3 case(s) differ from the documented rule
+rc=1
+
+# command: php docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum15/27a151b6/capture-edges.php.txt /home/user/rv56-a15 -10
+now = 2026-10-08 12:00:00.250000; LARAVEL_START = 2026-10-08 11:59:50.250000; expected fallback = 2026-10-08 11:59:50.250000
+ok   +1.0 s (boundary, clamped)                       expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.000001 s (just over, rejected)                expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   +1.0000004 s (float lands at +1.000001, rejected) expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -60.0 s (boundary, admitted)                     expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   -60.000001 s (just over, rejected)               expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -60.0000004 s (rounds to -60.000000)             expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   int now-30 (fraction dropped)                    expected 2026-10-08 11:59:30.000000   actual 2026-10-08 11:59:30.000000
+ok   int now+1 (0.75 s ahead, clamped)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   int now+2 (1.75 s ahead, rejected)               expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -5.123456 s (microseconds kept)                  expected 2026-10-08 11:59:55.126544   actual 2026-10-08 11:59:55.126544
+ok   0 (int epoch)                                    expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   0.0 (float epoch)                                expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -0.0                                             expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -1.0 (negative epoch)                            expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   1e12 (year 33658)                                expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   NAN                                              expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   INF                                              expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   -INF                                             expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   numeric string now-5                             expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   false                                            expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   true                                             expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   null                                             expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   array [now-5]                                    expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+ok   Stringable object                                expected 2026-10-08 11:59:50.250000   actual 2026-10-08 11:59:50.250000
+DIFF 1e20 (finite, out of Carbon range)               expected 2026-10-08 11:59:50.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF PHP_INT_MAX                                      expected 2026-10-08 11:59:50.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF -1e15                                            expected 2026-10-08 11:59:50.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+3 case(s) differ from the documented rule
+rc=1
+
+# command: php docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum15/27a151b6/capture-edges.php.txt /home/user/rv56-a15 -61
+now = 2026-10-08 12:00:00.250000; LARAVEL_START = 2026-10-08 11:58:59.250000; expected fallback = 2026-10-08 12:00:00.250000
+ok   +1.0 s (boundary, clamped)                       expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.000001 s (just over, rejected)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.0000004 s (float lands at +1.000001, rejected) expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0 s (boundary, admitted)                     expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   -60.000001 s (just over, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0000004 s (rounds to -60.000000)             expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   int now-30 (fraction dropped)                    expected 2026-10-08 11:59:30.000000   actual 2026-10-08 11:59:30.000000
+ok   int now+1 (0.75 s ahead, clamped)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   int now+2 (1.75 s ahead, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -5.123456 s (microseconds kept)                  expected 2026-10-08 11:59:55.126544   actual 2026-10-08 11:59:55.126544
+ok   0 (int epoch)                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   0.0 (float epoch)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -0.0                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -1.0 (negative epoch)                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   1e12 (year 33658)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   NAN                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   INF                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -INF                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   numeric string now-5                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   false                                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   true                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   null                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   array [now-5]                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   Stringable object                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+DIFF 1e20 (finite, out of Carbon range)               expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF PHP_INT_MAX                                      expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF -1e15                                            expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+3 case(s) differ from the documented rule
+rc=1
+
+# command: php docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum15/27a151b6/capture-edges.php.txt /home/user/rv56-a15 +0.5
+now = 2026-10-08 12:00:00.250000; LARAVEL_START = 2026-10-08 12:00:00.750000; expected fallback = 2026-10-08 12:00:00.250000
+ok   +1.0 s (boundary, clamped)                       expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.000001 s (just over, rejected)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.0000004 s (float lands at +1.000001, rejected) expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0 s (boundary, admitted)                     expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   -60.000001 s (just over, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0000004 s (rounds to -60.000000)             expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   int now-30 (fraction dropped)                    expected 2026-10-08 11:59:30.000000   actual 2026-10-08 11:59:30.000000
+ok   int now+1 (0.75 s ahead, clamped)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   int now+2 (1.75 s ahead, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -5.123456 s (microseconds kept)                  expected 2026-10-08 11:59:55.126544   actual 2026-10-08 11:59:55.126544
+ok   0 (int epoch)                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   0.0 (float epoch)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -0.0                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -1.0 (negative epoch)                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   1e12 (year 33658)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   NAN                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   INF                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -INF                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   numeric string now-5                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   false                                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   true                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   null                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   array [now-5]                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   Stringable object                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+DIFF 1e20 (finite, out of Carbon range)               expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF PHP_INT_MAX                                      expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF -1e15                                            expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+3 case(s) differ from the documented rule
+rc=1
+
+# command: php docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum15/27a151b6/capture-edges.php.txt /home/user/rv56-a15 +2
+now = 2026-10-08 12:00:00.250000; LARAVEL_START = 2026-10-08 12:00:02.250000; expected fallback = 2026-10-08 12:00:00.250000
+ok   +1.0 s (boundary, clamped)                       expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.000001 s (just over, rejected)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   +1.0000004 s (float lands at +1.000001, rejected) expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0 s (boundary, admitted)                     expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   -60.000001 s (just over, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -60.0000004 s (rounds to -60.000000)             expected 2026-10-08 11:59:00.250000   actual 2026-10-08 11:59:00.250000
+ok   int now-30 (fraction dropped)                    expected 2026-10-08 11:59:30.000000   actual 2026-10-08 11:59:30.000000
+ok   int now+1 (0.75 s ahead, clamped)                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   int now+2 (1.75 s ahead, rejected)               expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -5.123456 s (microseconds kept)                  expected 2026-10-08 11:59:55.126544   actual 2026-10-08 11:59:55.126544
+ok   0 (int epoch)                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   0.0 (float epoch)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -0.0                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -1.0 (negative epoch)                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   1e12 (year 33658)                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   NAN                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   INF                                              expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   -INF                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   numeric string now-5                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   false                                            expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   true                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   null                                             expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   array [now-5]                                    expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+ok   Stringable object                                expected 2026-10-08 12:00:00.250000   actual 2026-10-08 12:00:00.250000
+DIFF 1e20 (finite, out of Carbon range)               expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF PHP_INT_MAX                                      expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+DIFF -1e15                                            expected 2026-10-08 12:00:00.250000   actual THROWS Carbon\Exceptions\InvalidFormatException
+3 case(s) differ from the documented rule
+rc=1
+

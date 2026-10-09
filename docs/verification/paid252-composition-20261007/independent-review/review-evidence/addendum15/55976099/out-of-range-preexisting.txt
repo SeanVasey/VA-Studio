@@ -1,0 +1,7 @@
+# source: 55976099a5ac4f705ffe1e7d9d0491efa4981fda; is A15-I1 pre-existing? (round 21 receivedAt(), same rule)
+# command: php -r 'require "vendor/autoload.php"; ... PaidGrantDownloads::receivedAt(v) for v in 1e20, PHP_INT_MAX, -1e15, NAN'
+1e20 => THROWS Carbon\Exceptions\InvalidFormatException
+PHP_INT_MAX => THROWS Carbon\Exceptions\InvalidFormatException
+-1e15 => THROWS Carbon\Exceptions\InvalidFormatException
+NAN => 2026-10-08 12:00:00.250000
+rc=0

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantTransferDeadlineTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" tests="6" assertions="78" errors="4" failures="1" skipped="0" time="86.214437">
+    <testcase name="test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="103" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="13" time="17.446461">
+      <error type="TypeError">Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes
+TypeError: Tests\Feature\PaidGrantTransferDeadlineTest::derived(): Return value must be of type int, null returned
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:261
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="124" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="13" time="17.727943">
+      <error type="TypeError">Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream
+TypeError: Tests\Feature\PaidGrantTransferDeadlineTest::derived(): Return value must be of type int, null returned
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:261
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:128
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_the_derived_deadline_is_capped_by_the_configured_maximum" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="141" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="14" time="17.984664">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantTransferDeadlineTest::test_the_derived_deadline_is_capped_by_the_configured_maximum
+Failed asserting that 60 is greater than 60.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_redeeming_after_the_authorization_expired_is_still_refused_and_records_nothing" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="157" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="15" time="14.507023"/>
+    <testcase name="test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="166" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="13" time="16.239148">
+      <error type="App\Domain\Grants\Paid\PaidGrantException">Tests\Feature\PaidGrantTransferDeadlineTest::test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:222
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:116
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:133
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:185
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_shipped_defaults_policy_bounds_and_derived_formula" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="201" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="10" time="2.309198">
+      <error type="ErrorException">Tests\Feature\PaidGrantTransferDeadlineTest::test_shipped_defaults_policy_bounds_and_derived_formula
+ErrorException: Undefined array key "transfer_min_bytes_per_second"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:204
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

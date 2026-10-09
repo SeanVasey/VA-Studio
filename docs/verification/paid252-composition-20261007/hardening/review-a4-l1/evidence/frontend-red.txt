@@ -1,0 +1,54 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-review-addendum4.test.tsx (3 tests | 2 failed) 1389ms
+   ❯ review addendum 4: retry of a refused download (3)
+     × does not offer the retry while the original submission has not reported back 204ms
+     × a refusal removes only its own frame, never another download still waiting for its response 355ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum4.test.tsx > review addendum 4: retry of a refused download > does not offer the retry while the original submission has not reported back
+Error: [2mexpect([22m[31melement[39m[2m).not.toBeInTheDocument()[22m
+
+[31mexpected document not to contain element, found <button
+  type="button"
+>
+  Retry the authorized download
+</button> instead[39m
+ ❯ tests/frontend/paid-grant-review-addendum4.test.tsx:67:25
+     65|     await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(4));
+     66|     await waitFor(() => expect(button('Refresh preparation and downloa…
+     67|     expect(retry()).not.toBeInTheDocument();
+       |                         ^
+     68|   });
+     69|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum4.test.tsx > review addendum 4: retry of a refused download > a refusal removes only its own frame, never another download still waiting for its response
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/frontend/paid-grant-review-addendum4.test.tsx:84:74
+     82|     const [pending, refused] = frames(); expect(frames()).toHaveLength…
+     83|     await act(async () => { refuseFrame(refused); });
+     84|     expect(refused.isConnected).toBe(false); expect(pending.isConnecte…
+       |                                                                          ^
+     85|     expect(screen.getByRole('alert')).toHaveTextContent('refused'); ex…
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 25 passed (27)
+   Start at  17:58:46
+   Duration  3.56s (tests 58%, environment 30%, transform 7%, setup 4%, import 1%)
+
+rc=1

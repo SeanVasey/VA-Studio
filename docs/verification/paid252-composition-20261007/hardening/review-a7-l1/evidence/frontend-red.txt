@@ -1,0 +1,39 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-review-addendum7.test.tsx (3 tests | 1 failed) 2517ms
+   ❯ review addendum 7 (3)
+     × never evicts an unresolved download frame when a fourth download is submitted 878ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum7.test.tsx > review addendum 7 > never evicts an unresolved download frame when a fourth download is submitted
+AssertionError: expected [ <iframe …(4)></iframe>, …(2) ] to have a length of 4 but got 3
+
+- Expected
++ Received
+
+- 4
++ 3
+
+ ❯ tests/frontend/paid-grant-review-addendum7.test.tsx:101:22
+     99|     const first = frames()[0];
+    100|     for (let i = 0; i < 3; i++) fireEvent.click(downloads()[0]);
+    101|     expect(frames()).toHaveLength(4); // no eviction: every submission…
+       |                      ^
+    102|     expect(first.isConnected).toBe(true);
+    103|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 39 passed (40)
+   Start at  18:12:28
+   Duration  9.33s (tests 57%, environment 33%, setup 5%, transform 4%, import 1%)
+
+Environment  jsdom was created 6 times · 7.91s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=1

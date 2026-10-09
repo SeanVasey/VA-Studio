@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantTransferDeadlineTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" tests="6" assertions="133" errors="0" failures="0" skipped="0" time="90.469856">
+    <testcase name="test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="103" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="18" time="16.396659"/>
+    <testcase name="test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="124" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="16" time="14.803787"/>
+    <testcase name="test_the_derived_deadline_is_capped_by_the_configured_maximum" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="141" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="17" time="13.880627"/>
+    <testcase name="test_redeeming_after_the_authorization_expired_is_still_refused_and_records_nothing" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="158" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="15" time="15.993252"/>
+    <testcase name="test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="167" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="19" time="16.750982"/>
+    <testcase name="test_shipped_defaults_policy_bounds_and_derived_formula" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php" line="202" class="Tests\Feature\PaidGrantTransferDeadlineTest" classname="Tests.Feature.PaidGrantTransferDeadlineTest" assertions="48" time="12.644549"/>
+  </testsuite>
+</testsuites>

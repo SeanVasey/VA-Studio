@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Independent review: the three Step 5 native cases, one PHPUnit process at a time, on the private MySQL 8.4.11.
+set -u
+cd /home/user/VA-Studio-review-paid252 || exit 2
+D=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-paid252-mysql
+PORT=$(cat "$D/port")
+E=docs/verification/paid252-composition-20261007/independent-review/review-evidence
+export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=$PORT DB_DATABASE=vaseyaudio_review_paid252 DB_USERNAME=root DB_PASSWORD= DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync
+run() {
+  local label=$1; shift
+  {
+    echo "cmd: (env: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=$PORT DB_DATABASE=vaseyaudio_review_paid252 DB_USERNAME=root DB_PASSWORD= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync APP_ENV=testing) php -r '\$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- $*"
+    echo "head: $(git rev-parse HEAD)"
+    echo "server: $(mysql -h127.0.0.1 -P"$PORT" -uroot -N -e 'SELECT VERSION()')"
+    echo "start: $(date -u +%FT%TZ)"
+    echo "uptime_start: $(uptime)"
+    s=$(date +%s)
+    php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- "$@" 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | head -c 200000
+    echo "rc=${PIPESTATUS[0]}"
+    echo "wall_s=$(( $(date +%s) - s ))"
+    echo "uptime_end: $(uptime)"
+    echo "end: $(date -u +%FT%TZ)"
+  } > "$E/native-$label.txt" 2>&1
+}
+run a-conjunct --log-junit "$E/native-a-conjunct.xml" tests/Feature/PaidGrantRedeemFrameConjunctTest.php
+run b-http-journey --filter test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals --log-junit "$E/native-b-http-journey.xml" tests/Feature/PaidGrantHttpJourneyTest.php
+run c-refused-frame --log-junit "$E/native-c-refused-frame.xml" tests/Feature/PaidGrantRefusedFrameCallbackTest.php
+echo "trio done $(date -u +%FT%TZ)" > "$E/native-trio.done"

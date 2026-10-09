@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantDownloadJourneyTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" tests="5" assertions="102" errors="0" failures="1" skipped="0" time="1721.620639">
+    <testcase name="test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" line="135" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="18" time="372.510441">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+Failed asserting that 410 is identical to 409.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_actual_mailbox_recovery_keeps_original_paid_origin_and_pdf_and_allows_only_fresh_same_account_download" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" line="172" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="31" time="340.621303"/>
+    <testcase name="test_actual_source_copy_withdrawal_cannot_consume_attempt_or_return_private_bytes" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" line="224" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="18" time="300.195316"/>
+    <testcase name="test_actual_final_commit_policy_withdrawal_refuses_stream_and_retains_truthful_consumed_attempt" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" line="252" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="17" time="387.618477"/>
+    <testcase name="test_held_transfer_rechecks_original_owner_before_first_byte_without_new_transaction_or_principal" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php" line="274" class="Tests\Feature\PaidGrantDownloadJourneyTest" classname="Tests.Feature.PaidGrantDownloadJourneyTest" assertions="18" time="320.675102"/>
+  </testsuite>
+</testsuites>

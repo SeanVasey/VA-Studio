@@ -1,0 +1,13 @@
+cmd: npx vitest run tests/frontend/paid-grant-review-addendum12.test.tsx (untracked reviewer probe)
+head: 36be2a33d63ef73d67079e67d8fc819a7c226d04 + untracked probe; node v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+A12 P3 stopped after 620000 ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:52:22
+   Duration  1.55s (tests 44%, environment 40%, transform 9%, setup 6%, import 1%)
+
+rc=0

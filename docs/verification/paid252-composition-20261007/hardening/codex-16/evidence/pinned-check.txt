@@ -1,0 +1,7 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0
+app/Domain/Grants/Paid/PaidGrantDocuments.php pinned_in=0
+tests/Feature/PaidGrantCompletionBudgetTest.php pinned_in=0
+ CHANGELOG.md                                  |  2 +-
+ app/Domain/Grants/Paid/PaidGrantDocuments.php | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 6 deletions(-)

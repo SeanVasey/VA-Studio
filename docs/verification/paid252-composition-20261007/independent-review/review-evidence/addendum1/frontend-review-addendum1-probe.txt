@@ -1,0 +1,8 @@
+cmd: probe copy with it.fails -> it (confirms the failing assertion), file deleted after
+     × a failed exact retry invalidates the earlier saved status read for setting the request aside 541ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/zz-review-probe.test.tsx > review addendum 1: set-aside gate for a lost authorize > a failed exact retry invalidates the earlier saved status read for setting the request aside
+Received element is not disabled:
+ ❯ tests/frontend/zz-review-probe.test.tsx:57:24
+      Tests  1 failed | 3 passed (4)
+rc=1

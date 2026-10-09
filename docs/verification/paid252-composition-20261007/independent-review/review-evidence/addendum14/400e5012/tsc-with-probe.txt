@@ -1,0 +1,3 @@
+cmd: npx tsc --noEmit (with the untracked addendum 14 probe)
+head: 400e501280f05a79a32a44db959a6b33751464ed + untracked probe
+rc=0

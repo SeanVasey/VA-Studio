@@ -1,0 +1,22 @@
+start 06:36:54
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m....                                                               5 / 5 (100%)
+
+Time: 28:42.498, Memory: 107.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantDownloadJourneyTest::test_exact_paid_master_and_original_pdf_are_one_attempt_each_with_token_free_bounded_status_and_consumed_replay_refusal
+Failed asserting that 410 is identical to 409.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantDownloadJourneyTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 5[0m[37;41m, Assertions: 102[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1
+wall=1723s end 07:05:37

@@ -1,0 +1,28 @@
+# source: 703674d7 + round 21 final working tree + mutation B4-no-operator-warning (scratch worktree)
+B4-no-operator-warning applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/phpunit.xml
+
+....E.....                                                        10 / 10 (100%)
+
+Time: 00:25.556, Memory: 193.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_crashed_holders_leftover_snapshot_is_recovered_and_the_redemption_succeeds
+Mockery\Exception\InvalidCountException: Method warning(<Any Arguments>) from Mockery_2_Illuminate_Log_LogManager should be called
+ at least 1 times but called 0 times.
+
+/home/user/VA-Studio/vendor/mockery/mockery/library/Mockery/CountValidator/AtLeast.php:44
+/home/user/VA-Studio/vendor/mockery/mockery/library/Mockery/Expectation.php:755
+/home/user/VA-Studio/vendor/mockery/mockery/library/Mockery/ReceivedMethodCalls.php:36
+/home/user/VA-Studio/vendor/mockery/mockery/library/Mockery/VerificationDirector.php:87
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantSpoolRecoveryTest.php:49
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 111, Errors: 1.
+rc=2

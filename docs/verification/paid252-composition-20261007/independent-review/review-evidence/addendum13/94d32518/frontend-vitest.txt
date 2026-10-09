@@ -1,0 +1,17 @@
+cmd: npx vitest run tests/frontend/paid-grant-continuation.test.tsx tests/frontend/paid-grant-finish-completion.test.tsx tests/frontend/paid-grant-journey.test.tsx tests/frontend/paid-grant-review-addendum1.test.tsx tests/frontend/paid-grant-review-addendum10.test.tsx tests/frontend/paid-grant-review-addendum11.test.tsx tests/frontend/paid-grant-review-addendum12.test.tsx tests/frontend/paid-grant-review-addendum4.test.tsx tests/frontend/paid-grant-review-addendum5.test.tsx tests/frontend/paid-grant-review-addendum6.test.tsx tests/frontend/paid-grant-review-addendum7.test.tsx tests/frontend/paid-grant-review-addendum9.test.tsx 
+head: 94d325185d57eea57011d7466934a9b854c9d448; node v24.21.0; node_modules symlinked for this run only
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+A12 P3 stopped after 620000 ms
+
+ Test Files  12 passed (12)
+      Tests  68 passed (68)
+   Start at  22:31:24
+   Duration  10.62s (tests 56%, environment 36%, setup 5%, transform 2%, import 1%)
+
+Environment  jsdom was created 12 times · 10.14s total, 36% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=0

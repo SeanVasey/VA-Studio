@@ -1,0 +1,15 @@
+cmd: npx vitest run tests/frontend/paid-grant-journey.test.tsx (node_modules temporarily symlinked from /home/user/VA-Studio, removed after)
+head: 0397231ef17235f39ac8cfdcc691e300c3f6844c
+node: v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  16:00:43
+   Duration  5.71s (environment 46%, tests 43%, transform 6%, setup 4%)
+
+rc=0
+wall_s=8
+symlink removed: yes

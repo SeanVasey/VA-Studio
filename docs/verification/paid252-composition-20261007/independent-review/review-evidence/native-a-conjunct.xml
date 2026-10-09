@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantRedeemFrameConjunctTest" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php" tests="1" assertions="17448" errors="0" failures="1" skipped="0" time="466.891429">
+    <testcase name="test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php" line="89" class="Tests\Feature\PaidGrantRedeemFrameConjunctTest" classname="Tests.Feature.PaidGrantRedeemFrameConjunctTest" assertions="17448" time="466.891429">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantRedeemFrameConjunctTest::test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization
+deadline conjunct: observer#3919 was 0.005s past its original deadline in historicalReceipt
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,8 @@
+# mutation M1: issued entry keeps an empty orderId (sha256 3955ec5a935a51ae)
+     × reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 482ms
+     × drops the reopen control once the authorization is submitted, and a denial drops it with the token 297ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+      Tests  2 failed (2)
+rc=1

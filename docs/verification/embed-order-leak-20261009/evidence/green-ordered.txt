@@ -1,0 +1,17 @@
+# source: 875b7edc301749cb67746ca282560db7458edd31 + working tree: tests/TestCase.php sha256 da50491fabe195ca (WITH Livewire::flushState, final comment), tests/Feature/LivewireStateIsolationTest.php sha256 9232553e52f0c893
+# one process, executionOrder=default; same config as red:
+        <testsuite name="ordered">
+            <file>/home/user/wt-embed/tests/Feature/MembershipAdministrationActionTest.php</file>
+            <file>/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php</file>
+        </testsuite>
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/embed-ordered.xml
+
+..........................................                        42 / 42 (100%)
+
+Time: 01:14.826, Memory: 148.00 MB
+
+OK (42 tests, 1456 assertions)
+rc=0

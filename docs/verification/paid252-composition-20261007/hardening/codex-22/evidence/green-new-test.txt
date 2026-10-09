@@ -1,0 +1,12 @@
+# source: 2f0d7ca2 + working tree
+# command: npx vitest run tests/frontend/paid-grant-reopen-pending.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  22:43:44
+   Duration  1.17s (environment 41%, tests 39%, transform 13%, setup 6%, import 1%)
+
+rc=0

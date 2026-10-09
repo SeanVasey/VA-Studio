@@ -1,0 +1,13 @@
+cmd: php review-evidence/addendum9/d00e0fa0/seam-probe.php.txt early ; ... late   (worktree autoload, head 093f9081, PHP-identical to d00e0fa0)
+mode=early shadow_defined=true
+offset 0: |paid - real| < 50 ms: true
+offset 1000 s: paid deadline - real now (s): 1001 => seam LIVE
+proveCurrent at offset 1000 on a fresh deadline: ok
+array form untouched: true
+rc=0
+mode=late shadow_defined=true
+offset 0: |paid - real| < 50 ms: true
+offset 1000 s: paid deadline - real now (s): 1 => seam DEAD (global hrtime cached)
+proveCurrent at offset 1000 on a fresh deadline: App\Domain\Grants\Paid\PaidGrantException
+array form untouched: true
+rc=0

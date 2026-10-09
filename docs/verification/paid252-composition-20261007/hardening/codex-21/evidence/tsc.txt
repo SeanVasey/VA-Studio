@@ -1,0 +1,2 @@
+# command: npx tsc --noEmit (final working tree)
+rc=0

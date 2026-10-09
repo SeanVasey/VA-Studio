@@ -1,0 +1,4 @@
+cmd: /home/user/VA-Studio/vendor/bin/pint --test app/Domain/Grants/Paid/PaidGrantDownloads.php app/Domain/Grants/Paid/PaidGrantPrepareStream.php app/Http/Controllers/PaidGrantController.php tests/Feature/PaidGrantRequestInstantTest.php tests/Feature/PaidGrantSpoolRecoveryTest.php
+head: 94d325185d57eea57011d7466934a9b854c9d448
+{"tool":"pint","result":"passed"}
+rc=0

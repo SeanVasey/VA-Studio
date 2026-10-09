@@ -1,0 +1,334 @@
+<?php
+
+namespace App\Domain\Grants\Paid;
+
+use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Models\User;
+use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
+use Closure;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use PDO;
+use Throwable;
+
+final class PaidGrantDownloads
+{
+    private const KINDS = ['contract', 'master_wav', 'download_mp3', 'stems_zip'];
+
+    /**
+     * The authorize frame's observation budget. The row is inserted inside the frame, but the token reaches the customer
+     * only after the frame commits and passes its post-commit proofs, up to this many seconds later. The authorization
+     * therefore expires this much after `created_at + authorization_seconds`, so the policy lifetime counts from the latest
+     * moment the token can be in the customer's hands (Codex 4223825193).
+     */
+    public const AUTHORIZE_BUDGET_SECONDS = 60;
+
+    /**
+     * How long before admission the request may have started (Codex 4224514947). The server's own request-start time is
+     * taken before the identity proof; between it and the controller there is only request parsing and middleware (the
+     * session lock waits at most 5 s), so one observation budget is generous. An older value is treated as broken. It
+     * is checked once, at capture; the identity proof that follows is not counted against it (Codex 4224939409).
+     */
+    public const ADMISSION_MAX_AGE_SECONDS = 60;
+
+    /**
+     * The instant the server began this request, validated once, when captured (`PaidGrantRequestInstant::capture()`):
+     * the SAPI's `REQUEST_TIME_FLOAT`, else `LARAVEL_START`, else now, within ADMISSION_MAX_AGE_SECONDS of now.
+     */
+    public static function receivedAt(mixed $requestTime): PaidGrantRequestInstant
+    {
+        return PaidGrantRequestInstant::capture($requestTime);
+    }
+
+    /** @param  ?Closure():int  $clock  Monotonic nanoseconds for the transfer deadline; the system clock when null. */
+    public function __construct(private readonly ?Closure $clock = null) {}
+
+    /** No token or path is returned, and DB preparation status never claims continuing physical availability. */
+    public function status(string $batchId, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
+    {
+        $snapshots = [];
+
+        return (new PaidGrantCommands)->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use (&$snapshots): array {
+            $at = CarbonImmutable::now('UTC');
+            $lines = [];
+            foreach ($graph['lines'] as $line) {
+                $query = $rows->primary->prepare('SELECT * FROM '.$rows->table('paid_authorizations').' WHERE origin_id = ? ORDER BY id DESC LIMIT 20'
+                    .($rows->primary->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql' ? ' FOR UPDATE' : ''));
+                $query->execute([$line['origin']['id']]);
+                $auths = $query->fetchAll(PDO::FETCH_ASSOC);
+                $redemptions = $this->attempts((int) $line['origin']['id'], $rows);
+                $minimum = $auths === [] ? 0 : min(array_column($auths, 'id'));
+                $maximum = $auths === [] ? 0 : max(array_column($auths, 'id'));
+                $snapshots[] = ['paid_authorizations', 'origin_id = ? AND id BETWEEN ? AND ?', [$line['origin']['id'], $minimum, $maximum], 21, array_reverse($auths)];
+                $snapshots[] = $this->attemptSnapshot((int) $line['origin']['id'], $rows, $redemptions);
+                $history = [];
+                foreach ($auths as $auth) {
+                    PaidGrantException::require((int) $auth['account_id'] === (int) $graph['batch']['account_id'] && in_array($auth['target'], self::KINDS, true));
+                    $matches = array_values(array_filter($redemptions, fn (array $row): bool => (int) $row['authorization_id'] === (int) $auth['id']));
+                    $history[] = ['id' => $auth['public_id'], 'kind' => $auth['target'], 'issuedAt' => $auth['created_at'], 'expiresAt' => $auth['expires_at'],
+                        'status' => $matches !== [] ? 'attempted' : ($at->lessThan($auth['expires_at']) ? 'unused' : 'expired'), 'attemptedAt' => $matches[0]['created_at'] ?? null];
+                }
+                $work = $line['work'];
+                $lines[] = ['id' => $line['origin']['public_id'], 'attemptCount' => count($redemptions), 'maxDownloads' => $graph['payload']['delivery_policy']['max_downloads'],
+                    'historyLimit' => 20, 'history' => $history, 'renderRetryAllowed' => (int) $work['attempts'] < PaidGrantDocuments::MAX_ATTEMPTS
+                        && ($work['state'] === 'pending' || $work['state'] === 'failed' || $work['state'] === 'claimed' && $at->greaterThanOrEqualTo($work['expires_at'])),
+                    'renderRetryAfter' => $work['state'] === 'claimed' ? $work['expires_at'] : null];
+            }
+
+            return ['schemaVersion' => 1, 'originId' => $graph['batch']['public_id'], 'fulfilled' => $graph['complete'] !== null, 'lines' => $lines];
+        }, additionalSnapshots: function () use (&$snapshots): array {
+            return $snapshots;
+        }, projectionRead: $projectionRead);
+    }
+
+    public function authorize(string $batchId, string $lineId, array $input, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantProjectionRead $projectionRead = null): array
+    {
+        PaidGrantInput::uuid($lineId);
+        PaidGrantInput::keys($input, ['requestKey', 'originHash', 'kind', 'nonce']);
+        PaidGrantInput::uuid($input['requestKey']);
+        PaidGrantInput::hash($input['originHash']);
+        PaidGrantInput::hash($input['nonce']);
+        PaidGrantException::require(in_array($input['kind'], self::KINDS, true), 422);
+        $requestHash = CanonicalJson::hash($input);
+        $auth = null;
+        $deadline = PaidGrantDeadline::start(self::AUTHORIZE_BUDGET_SECONDS);
+
+        return (new PaidGrantCommands)->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($lineId, $input, $requestHash, &$auth, &$deadline): array {
+            $line = $this->line($graph, $lineId);
+            PaidGrantException::require($graph['complete'] !== null && hash_equals($line['origin']['payload_hash'], $input['originHash']), 409);
+            $auth = $rows->one('paid_authorizations', 'account_id = ? AND request_key = ?', [$graph['batch']['account_id'], $input['requestKey']]);
+            if ($auth !== []) {
+                PaidGrantException::require((int) $auth['origin_id'] === (int) $line['origin']['id'] && hash_equals($auth['request_hash'], $requestHash), 409);
+                $this->live($auth, $rows);
+            } else {
+                PaidGrantException::require(count($this->attempts((int) $line['origin']['id'], $rows)) < $graph['payload']['delivery_policy']['max_downloads'], 409);
+                $at = CarbonImmutable::now('UTC')->startOfSecond();
+                $recent = $rows->rows('paid_authorizations', 'origin_id = ? AND created_at > ?', [$line['origin']['id'], $at->subSeconds(60)->format('Y-m-d H:i:s')], 4);
+                PaidGrantException::require(count($recent) < 3, 429);
+                $id = (string) Str::uuid();
+                $target = $this->target($graph, $line, $input['kind']);
+                $token = $this->token($id, $input['nonce']);
+                $payload = ['schema_version' => 'paid-authorization-v1', 'batch_hash' => $graph['batch']['payload_hash'], 'origin_hash' => $line['origin']['payload_hash'],
+                    'fulfillment_hash' => $graph['fulfillment']['payload_hash'], 'original_hash' => $line['original']['payload_hash'], 'kind' => $input['kind'], 'target' => $target];
+                $auth = PaidGrantRecords::insert('paid_authorizations', ['public_id' => $id, 'origin_id' => (int) $line['origin']['id'], 'account_id' => (int) $graph['batch']['account_id'],
+                    'request_key' => $input['requestKey'], 'request_hash' => $requestHash, 'token_hash' => hash('sha256', $token), 'target' => $input['kind'],
+                    ...PaidGrantRecords::encode($payload), 'created_at' => $at->format('Y-m-d H:i:s'),
+                    'expires_at' => $at->addSeconds($graph['payload']['delivery_policy']['authorization_seconds'] + self::AUTHORIZE_BUDGET_SECONDS)->format('Y-m-d H:i:s')], $rows);
+            }
+            $deadline->shortenTo($this->deadline($auth));
+            $token = $this->token($auth['public_id'], $input['nonce']);
+            PaidGrantException::require(hash_equals($auth['token_hash'], hash('sha256', $token)));
+
+            return ['id' => $auth['public_id'], 'token' => $token, 'expiresAt' => $auth['expires_at'], 'kind' => $auth['target'],
+                'filename' => $this->filename($lineId, $auth['target']), 'mimeType' => $this->mime($auth['target'])];
+        }, $deadline, additionalSnapshots: function (array $graph, PaidGrantRows $rows) use (&$auth): array {
+            return $this->authSnapshots($auth, $rows);
+        }, projectionRead: $projectionRead);
+    }
+
+    /** Exact physical snapshot between two freshly authenticated producer/owner frames; one committed attempt. */
+    /**
+     * @param  PaidGrantRequestInstant|null  $receivedAt  When the server began this request, captured and validated before the
+     *                                                    identity proof (`receivedAt()`); null means now. It is not re-checked
+     *                                                    here, so a slow identity proof cannot age it out (Codex 4224939409).
+     */
+    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantRequestInstant $receivedAt = null): PaidGrantTransfer
+    {
+        PaidGrantInput::uuid($id);
+        PaidGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 403);
+        $deadline = PaidGrantDeadline::start();
+        // The authorization lifetime is the valid-to-start deadline, judged at the moment the server began this request (as
+        // Free256 does with its request time): before the identity proof and before locating, so a slow proof, locate or
+        // first frame cannot turn a redemption that started in time into an expired one (Codex 4223825193, 4224514947).
+        // Both frames and the post-frame check compare that same admitted instant, so a slow snapshot cannot either. The
+        // instant was validated against the clock when the controller captured it; it is used as captured (Codex 4224939409).
+        $admitted = $receivedAt?->at ?? CarbonImmutable::now('UTC');
+        $locator = $this->locate($id, $principal, $actor);
+        // Three budgets follow, none extendable: this 60 s observation budget bounds locating and the first frame; the
+        // snapshot gets its own `snapshot_seconds` bound from when the first frame closes; the commit frame and the
+        // before-first-byte proof get a fresh 60 s observation budget. The stream then gets a transfer deadline derived from
+        // the snapshot size (see below).
+        $inspect = function (array $graph, PaidGrantRows $rows) use ($locator, $id, $token, $admitted): array {
+            $matches = array_values(array_filter($graph['lines'], fn (array $line): bool => (int) $line['origin']['id'] === (int) $locator['origin_id']));
+            PaidGrantException::require(count($matches) === 1 && $graph['complete'] !== null, 404);
+            $line = $matches[0];
+            $auth = $rows->one('paid_authorizations', 'public_id = ? AND account_id = ?', [$id, $graph['batch']['account_id']]);
+            PaidGrantException::require($auth === $locator['auth'] && hash_equals($auth['token_hash'], hash('sha256', $token)), 403);
+            $this->live($auth, $rows, $admitted);
+            $payload = PaidGrantRecords::decode($auth);
+            PaidGrantException::require($payload['schema_version'] === 'paid-authorization-v1' && $payload['batch_hash'] === $graph['batch']['payload_hash']
+                && $payload['origin_hash'] === $line['origin']['payload_hash'] && $payload['fulfillment_hash'] === $graph['fulfillment']['payload_hash']
+                && $payload['original_hash'] === $line['original']['payload_hash'] && $payload['kind'] === $auth['target']
+                && CanonicalJson::encode($payload['target']) === CanonicalJson::encode($this->target($graph, $line, $auth['target'])), 409);
+
+            return compact('graph', 'line', 'auth', 'payload');
+        };
+        $commands = new PaidGrantCommands;
+        $before = $commands->run($locator['batch_id'], $principal, $actor, $inspect, $deadline,
+            additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($locator['auth'], $rows));
+        // Kept from the original flow: the lifetime must remain at the admitted instant and stay within the policy maximum.
+        // It does not shorten the snapshot, the commit frame or the transfer.
+        $this->deadline($before['auth'], $admitted);
+        // One held spool slot per buyer account, so one buyer's slow transfers cannot occupy every slot (refused before any
+        // attempt is recorded). The digest only names the account inside the private spool.
+        $holder = hash('sha256', 'paid-spool-holder-v1:'.$before['graph']['batch']['account_id']);
+        // Started when the first frame closes, so a slow first frame cannot leave the snapshot only its leftover seconds.
+        $snapshotDeadline = hrtime(true) + app(PaidGrantPolicy::class)->snapshotSeconds() * 1_000_000_000;
+        $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $snapshotDeadline, $holder);
+        $projectionRead = PaidGrantProjectionRead::begin();
+        try {
+            // Derived and validated before the attempt is consumed, so a refused transfer policy records nothing.
+            $seconds = app(PaidGrantPolicy::class)->transferSeconds($prepared->sizeBytes);
+            // A fresh observation budget for the commit frame and the before-first-byte proof, so time spent before the
+            // snapshot finished cannot fail the post-commit proof after the attempt is recorded. The frame re-proves
+            // everything itself: the same inspection and admitted instant, unchanged state and the attempt limit.
+            $commit = PaidGrantDeadline::start();
+            $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before): array {
+                $current = $inspect($graph, $rows);
+                PaidGrantException::require($current === $before, 409);
+                PaidGrantException::require(count($this->attempts((int) $current['line']['origin']['id'], $rows)) < $graph['payload']['delivery_policy']['max_downloads'], 409);
+                PaidGrantRecords::insert('paid_redemptions', ['authorization_id' => (int) $current['auth']['id'], 'created_at' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s')], $rows);
+
+                return [];
+            }, $commit, additionalSnapshots: fn (array $graph, PaidGrantRows $rows): array => $this->authSnapshots($before['auth'], $rows),
+                projectionRead: $projectionRead);
+
+            // Counted from the redemption commit; the first byte still needs the commit frame's observation budget (proveBeforeBytes).
+            return new PaidGrantTransfer($prepared, $this->filename($before['line']['origin']['public_id'], $before['auth']['target']), $this->mime($before['auth']['target']),
+                $projectionRead, $this->tick() + $seconds * 1_000_000_000, $this->clock);
+        } catch (Throwable $error) {
+            $prepared->close();
+            throw $error;
+        }
+    }
+
+    private function locate(string $id, ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        (new PaidGrants)->outsideTransactions();
+        app(PaidGrantPolicy::class)->capture();
+        try {
+            app(ProductionCustomerAccess::class)->current($principal, $actor);
+        } catch (IdentityException) {
+            throw new PaidGrantException(403);
+        }
+        // A short owned current-buyer frame locates metadata only, never grants download authority.
+        $receipt = null;
+        $held = null;
+        try {
+            $result = DB::transaction(function () use ($id, $principal, $actor, &$receipt, &$held): array {
+                $rows = new PaidGrantRows;
+                $held = $rows;
+                $policy = app(PaidGrantPolicy::class)->capture();
+                $access = app(ProductionCustomerAccess::class);
+                $authority = $access->lock($principal, $actor, $rows->current());
+                $auth = $rows->one('paid_authorizations', 'public_id = ? AND account_id = ?', [$id, $principal->accountId]);
+                PaidGrantException::require($auth !== [], 404);
+                $origin = $rows->one('paid_grant_origins', 'id = ?', [$auth['origin_id']]);
+                $batch = $rows->one('paid_order_origins', 'id = ? AND account_id = ?', [$origin['batch_id'] ?? 0, $principal->accountId]);
+                PaidGrantException::require($origin !== [] && $batch !== [], 404);
+                $receipt = PaidGrantReadReceipt::capture($rows, $principal, $actor, $authority, $policy,
+                    [['paid_authorizations', 'id = ?', [$auth['id']], 2, [$auth]], ['paid_grant_origins', 'id = ?', [$origin['id']], 2, [$origin]], ['paid_order_origins', 'id = ?', [$batch['id']], 2, [$batch]]]);
+                $receipt->proveLive();
+                $access->proveCurrent($principal, $actor, $rows->current(), $authority);
+                PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
+                $rows->finish();
+
+                return ['batch_id' => $batch['public_id'], 'origin_id' => $origin['id'], 'auth' => $auth];
+            });
+            $receipt->proveClosed();
+
+            return $result;
+        } catch (Throwable $error) {
+            $held?->abort();
+            if ($error instanceof IdentityException) {
+                throw new PaidGrantException(403);
+            }
+            throw $error;
+        }
+    }
+
+    private function line(array $graph, string $id): array
+    {
+        $matches = array_values(array_filter($graph['lines'], fn (array $line): bool => $line['origin']['public_id'] === $id));
+        PaidGrantException::require(count($matches) === 1, 404);
+
+        return $matches[0];
+    }
+
+    private function attempts(int $origin, PaidGrantRows $rows): array
+    {
+        return $rows->rows('paid_redemptions', 'authorization_id IN (SELECT id FROM '.$rows->table('paid_authorizations').' WHERE origin_id = ?)', [$origin], 101);
+    }
+
+    private function attemptSnapshot(int $origin, PaidGrantRows $rows, array $expected): array
+    {
+        return ['paid_redemptions', 'authorization_id IN (SELECT id FROM '.$rows->table('paid_authorizations').' WHERE origin_id = ?)', [$origin], 101, $expected];
+    }
+
+    private function authSnapshots(array $auth, PaidGrantRows $rows): array
+    {
+        $attempts = $this->attempts((int) $auth['origin_id'], $rows);
+
+        return [['paid_authorizations', 'id = ?', [$auth['id']], 2, [$auth]], $this->attemptSnapshot((int) $auth['origin_id'], $rows, $attempts)];
+    }
+
+    private function tick(): int
+    {
+        return $this->clock === null ? hrtime(true) : ($this->clock)();
+    }
+
+    private function live(array $auth, PaidGrantRows $rows, ?CarbonImmutable $at = null): void
+    {
+        PaidGrantException::require(($at ?? CarbonImmutable::now('UTC'))->lessThan($auth['expires_at']), 410);
+        PaidGrantException::require($rows->one('paid_redemptions', 'authorization_id = ?', [$auth['id']]) === [], 409);
+    }
+
+    /** Remaining lifetime from `$at` (now when null), at most the policy maximum (600 s) plus the authorize budget. */
+    private function deadline(array $auth, ?CarbonImmutable $at = null): int
+    {
+        $remaining = ($at ?? CarbonImmutable::now('UTC'))->floatDiffInSeconds(CarbonImmutable::parse($auth['expires_at'], 'UTC'), false);
+        PaidGrantException::require($remaining > 0 && $remaining <= 600 + self::AUTHORIZE_BUDGET_SECONDS, 410);
+
+        return hrtime(true) + (int) floor($remaining * 1_000_000_000);
+    }
+
+    private function target(array $graph, array $line, string $kind): array
+    {
+        if ($kind === 'contract') {
+            $artifact = $line['manifest']['artifact'];
+
+            return ['kind' => 'contract', 'sha256' => $artifact['pdf_hash']] + $artifact;
+        }
+        foreach ($line['body']['assets']['files'] as $file) {
+            if ($file['role'] === $kind) {
+                return ['kind' => $kind, 'provenance' => $graph['payload']['provenance']] + $file;
+            }
+        }
+        throw new PaidGrantException(404);
+    }
+
+    private function token(string $id, string $nonce): string
+    {
+        $key = config('app.key');
+        PaidGrantException::require(is_string($key) && $key !== '');
+
+        return rtrim(strtr(base64_encode(hash_hmac('sha256', "paid-license-token-v1\0".$id."\0".$nonce, $key, true)), '+/', '-_'), '=');
+    }
+
+    private function filename(string $id, string $kind): string
+    {
+        return 'paid-license-'.$id.'-'.$kind.match ($kind) {
+            'contract' => '.pdf', 'master_wav' => '.wav', 'download_mp3' => '.mp3', 'stems_zip' => '.zip', default => throw new PaidGrantException(404),
+        };
+    }
+
+    private function mime(string $kind): string
+    {
+        return match ($kind) {
+            'contract' => 'application/pdf', 'master_wav' => 'audio/wav', 'download_mp3' => 'audio/mpeg', 'stems_zip' => 'application/zip', default => throw new PaidGrantException(404),
+        };
+    }
+}

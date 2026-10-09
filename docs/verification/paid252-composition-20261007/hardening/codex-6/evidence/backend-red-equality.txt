@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 00:06.885, Memory: 97.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantPolicyRevisionTest::test_an_order_finalized_under_an_earlier_policy_stays_readable_and_downloadable_under_its_own_terms
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:61
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantReads.php:82
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantPolicyRevisionTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 13[0m[37;41m, Errors: 1[0m[37;41m.[0m
+rc=2

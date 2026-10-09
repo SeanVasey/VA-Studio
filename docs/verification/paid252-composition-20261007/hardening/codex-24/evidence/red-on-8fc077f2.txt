@@ -1,0 +1,293 @@
+# source 8fc077f24136e865975187e7056ade91b4debec3 (component unchanged) + new tests/frontend/paid-grant-reopen-issued.test.tsx sha256 c38a8ce3bed08f22; node v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio
+
+ ❯ tests/frontend/paid-grant-reopen-issued.test.tsx (2 tests | 2 failed) 703ms
+   ❯ reopening the order of an issued authorization (2)
+     × reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 468ms
+     × drops the reopen control once the authorization is submitted, and a denial drops it with the token 233ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-reopen-issued.test.tsx > reopening the order of an issued authorization > reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+
+Here are the accessible roles:
+
+  status:
+
+  Name "":
+  [36m<p[39m
+    [33maria-live[39m=[32m"polite"[39m
+    [33mclass[39m=[32m"paid-preparation-progress"[39m
+    [33mrole[39m=[32m"status"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  region:
+
+  Name "Paid license journey":
+  [36m<section[39m
+    [33maria-busy[39m=[32m"false"[39m
+    [33maria-label[39m=[32m"Paid license journey"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare licenses for this paid order":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Open saved order ffffffff-ffff-4fff-8fff-ffffffffffff":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  [36m<input[39m
+    [33mautocomplete[39m=[32m"off"[39m
+    [33mid[39m=[32m"paid-order-reference"[39m
+    [33mmaxlength[39m=[32m"36"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"paid-grant-journey"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"paid-preparation-status"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"paid-preparation-progress"[39m
+          [33mrole[39m=[32m"status"[39m
+          [33mtabindex[39m=[32m"-1"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33maria-busy[39m=[32m"false"[39m
+        [33maria-label[39m=[32m"Paid license journey"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mYour original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRefresh paid licenses[0m
+        [36m</button>[39m
+        [36m<form>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"paid-order-reference"[39m
+          [36m>[39m
+            [0mSaved order reference[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mautocomplete[39m=[32m"off"[39m
+            [33mid[39m=[32m"paid-order-reference"[39m
+            [33mmaxlength[39m=[32m"36"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [0mPrepare licenses for this paid order[0m
+          [36m</button>[39m
+        [36m</form>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"Saved paid licenses"[39m
+        [36m>[39m
+          [36m<p>[39m
+            [0mLatest [0m
+            [0m20[0m
+            [0m saved orders. An order reference can open an older original.[0m
+          [36m</p>[39m
+          [36m<button[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mOpen saved order [0m
+            [0mffffffff-ffff-4fff-8fff-ffffffffffff[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ button tests/frontend/paid-grant-reopen-issued.test.tsx:19:41
+     17| const authorization = { authorization: { id: authorizationId, token, e…
+     18| const olderListing = { schemaVersion: 1, originLimit: 20, origins: [{ …
+     19| const button = (name: string) => screen.getByRole('button', { name });
+       |                                         ^
+     20| const reopen = `Reopen order ${orderId} to download its authorized fil…
+     21|
+ ❯ tests/frontend/paid-grant-reopen-issued.test.tsx:55:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-reopen-issued.test.tsx > reopening the order of an issued authorization > drops the reopen control once the authorization is submitted, and a denial drops it with the token
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+
+Here are the accessible roles:
+
+  status:
+
+  Name "":
+  [36m<p[39m
+    [33maria-live[39m=[32m"polite"[39m
+    [33mclass[39m=[32m"paid-preparation-progress"[39m
+    [33mrole[39m=[32m"status"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  region:
+
+  Name "Paid license journey":
+  [36m<section[39m
+    [33maria-busy[39m=[32m"false"[39m
+    [33maria-label[39m=[32m"Paid license journey"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Open paid licenses":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare licenses for this paid order":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  [36m<input[39m
+    [33mautocomplete[39m=[32m"off"[39m
+    [33mid[39m=[32m"paid-order-reference"[39m
+    [33mmaxlength[39m=[32m"36"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"paid-grant-journey"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"paid-preparation-status"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33maria-live[39m=[32m"polite"[39m
+          [33mclass[39m=[32m"paid-preparation-progress"[39m
+          [33mrole[39m=[32m"status"[39m
+          [33mtabindex[39m=[32m"-1"[39m
+        [36m/>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33maria-busy[39m=[32m"false"[39m
+        [33maria-label[39m=[32m"Paid license journey"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mYour original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mOpen paid licenses[0m
+        [36m</button>[39m
+        [36m<form>[39m
+          [36m<label[39m
+            [33mfor[39m=[32m"paid-order-reference"[39m
+          [36m>[39m
+            [0mSaved order reference[0m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mautocomplete[39m=[32m"off"[39m
+            [33mid[39m=[32m"paid-order-reference"[39m
+            [33mmaxlength[39m=[32m"36"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<button[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mtype[39m=[32m"submit"[39m
+          [36m>[39m
+            [0mPrepare licenses for this paid order[0m
+          [36m</button>[39m
+        [36m</form>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+  [36m<iframe[39m
+    [33mhidden[39m=[32m""[39m
+    [33mname[39m=[32m"paid-grant-df5b8be6-28af-4222-bf9d-b64fd1170f6c"[39m
+    [33mreferrerpolicy[39m=[32m"no-referrer"[39m
+    [33mtitle[39m=[32m"Paid license attachment response"[39m
+  [36m/>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ button tests/frontend/paid-grant-reopen-issued.test.tsx:19:41
+     17| const authorization = { authorization: { id: authorizationId, token, e…
+     18| const olderListing = { schemaVersion: 1, originLimit: 20, origins: [{ …
+     19| const button = (name: string) => screen.getByRole('button', { name });
+       |                                         ^
+     20| const reopen = `Reopen order ${orderId} to download its authorized fil…
+     21|
+ ❯ tests/frontend/paid-grant-reopen-issued.test.tsx:86:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  08:10:36
+   Duration  2.69s (environment 52%, tests 28%, transform 11%, setup 8%, import 1%)
+
+rc=1

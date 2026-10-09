@@ -1,0 +1,9 @@
+start 11:01:08
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+zend_mm_heap corrupted
+rc=134
+wall=161s end 11:03:49

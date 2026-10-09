@@ -1,0 +1,27 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0
+app/Domain/Grants/Paid/PaidGrantDocuments.php pinned_in=0
+app/Domain/Grants/Paid/PaidGrantDownloads.php pinned_in=0
+docs/ops/paid-delivery-runtime.md pinned_in=0
+resources/js/components/PaidGrantJourney.tsx pinned_in=0
+tests/Feature/PaidGrantHeavyWorkTest.php pinned_in=0
+tests/Feature/PaidGrantPolicyRevisionTest.php pinned_in=0
+tests/Feature/PaidGrantReviewAddendum1Test.php pinned_in=0
+tests/Feature/PaidGrantReviewAdversarialTest.php pinned_in=0
+tests/frontend/paid-grant-continuation.test.tsx pinned_in=0
+tests/frontend/paid-grant-finish-completion.test.tsx pinned_in=0
+tests/frontend/paid-grant-review-addendum11.test.tsx pinned_in=0
+tests/Feature/PaidGrantAuthorizationWindowTest.php pinned_in=0
+ CHANGELOG.md                                       |  2 +-
+ app/Domain/Grants/Paid/PaidGrantDocuments.php      | 28 ++++++--
+ app/Domain/Grants/Paid/PaidGrantDownloads.php      | 44 +++++++-----
+ docs/ops/paid-delivery-runtime.md                  | 18 ++++-
+ resources/js/components/PaidGrantJourney.tsx       | 45 ++++++++----
+ tests/Feature/PaidGrantHeavyWorkTest.php           | 79 ++++++++++++++++++++++
+ tests/Feature/PaidGrantPolicyRevisionTest.php      |  3 +-
+ tests/Feature/PaidGrantReviewAddendum1Test.php     |  3 +-
+ tests/Feature/PaidGrantReviewAdversarialTest.php   |  3 +-
+ tests/frontend/paid-grant-continuation.test.tsx    | 65 +++++++++++++++++-
+ .../frontend/paid-grant-finish-completion.test.tsx |  2 +-
+ .../frontend/paid-grant-review-addendum11.test.tsx | 23 +++----
+ 12 files changed, 256 insertions(+), 59 deletions(-)

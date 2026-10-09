@@ -1,0 +1,40 @@
+# source: a7892c9b + codex-19 final working tree + mutation C12-M1-lock-ignored (scratch worktree)
+C12-M1-lock-ignored applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/phpunit.xml
+
+FF..F.F.....................                                      28 / 28 (100%)
+
+Time: 01:55.531, Memory: 223.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_a_request_that_finds_the_buyer_lock_held_returns_the_projection_without_claiming_rendering_or_hashing
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:126
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantHeavyWorkTest::test_completion_does_not_re_verify_while_the_buyer_lock_is_held
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:162
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantHeavyWorkTest::test_a_lock_left_by_a_crashed_worker_expires_and_is_reacquired
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:214
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantHeavyWorkTest::test_the_database_cache_store_provides_the_lock_from_the_migrated_table
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:255
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 28, Assertions: 735, Failures: 4.
+rc=1

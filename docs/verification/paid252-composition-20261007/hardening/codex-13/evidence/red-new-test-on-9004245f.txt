@@ -1,0 +1,61 @@
+# source: 9004245f (product unmodified) + new tests/Feature/PaidGrantSnapshotDeadlineTest.php + tests/Support/PaidGrantMonotonicClock.php
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter PaidGrantSnapshotDeadlineTest tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+EFEE.E                                                              6 / 6 (100%)
+
+Time: 00:41.698, Memory: 193.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_started_late_in_the_observation_budget_gets_its_own_bound
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:103
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:144
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_commit_frame_and_first_byte_get_a_fresh_budget_after_a_long_first_frame_and_snapshot
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:103
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:144
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:165
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_fresh_commit_budget_is_still_bounded_before_the_first_byte
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:103
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:144
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_out_of_range_snapshot_seconds_refuses_with_503_before_anything_is_recorded
+ErrorException: Undefined array key "snapshot_seconds"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:208
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_exceeding_snapshot_seconds_is_refused_with_nothing_recorded_and_the_authorization_stays_usable
+Expected a refusal.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:338
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSnapshotDeadlineTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 80, Errors: 4, Failures: 1.
+rc=2

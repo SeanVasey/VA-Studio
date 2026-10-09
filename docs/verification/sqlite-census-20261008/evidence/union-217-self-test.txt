@@ -1,0 +1,7 @@
+# source: b97a010 (merge of origin/main 86e22f1a into harness/census-normalization, union resolved); python3 -I scripts/ci/test-database-receipts.py
+..................................
+----------------------------------------------------------------------
+Ran 34 tests in 9.185s
+
+OK
+rc=0
