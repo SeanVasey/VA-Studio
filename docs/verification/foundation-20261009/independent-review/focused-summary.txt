@@ -1,0 +1,13 @@
+CustomerConsentMigrationTest: OK (20 tests, 162 assertions)  # rc=0
+CustomerConsentAdmissionTest: OK (22 tests, 48 assertions)  # rc=0
+CustomerSuppressionMigrationTest: OK (29 tests, 132 assertions)  # rc=0
+CustomerSuppressionSourceBoundaryTest: OK (7 tests, 90 assertions)  # rc=0
+CustomerSuppressionNativeAdmissionTest:  # rc=0
+CustomerIdentityMigrationTest: OK (14 tests, 141 assertions)  # rc=0
+CustomerAccountMigrationTest: OK (7 tests, 106 assertions)  # rc=0
+CustomerListeningMigrationTest: OK (9 tests, 37 assertions)  # rc=0
+ProductionFeatureMigrationTest: OK (30 tests, 427 assertions)  # rc=0
+ProductionFeatureNativeAdmissionTest:  # rc=0
+ProductionFeatureHeldFloorTest: OK (3 tests, 18 assertions)  # rc=0
+ProductionFeatureJourneyTest: OK (2 tests, 30 assertions)  # rc=0
+ProductionSuppressionMigrationTest: OK (27 tests, 248 assertions)  # rc=0

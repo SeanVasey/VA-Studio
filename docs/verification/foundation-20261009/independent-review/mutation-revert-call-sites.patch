@@ -1,0 +1,72 @@
+diff --git a/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php b/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
+index 4f7b2ce..12a0d2e 100644
+--- a/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
++++ b/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
+@@ -3,7 +3,6 @@
+ namespace App\Domain\Customers\Preferences;
+ 
+ use App\Domain\Catalog\Discovery\DiscoveryEpoch;
+-use App\Support\MigrationDefinitions;
+ use LogicException;
+ use PDO;
+ use PDOException;
+@@ -45,7 +44,7 @@ final class ConsentMigrationAdmission
+         if ((int) $this->pdo->query($this->driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
+             $this->refuse();
+         }
+-        $migration = MigrationDefinitions::load('2026_10_06_000040_customer_accounts.php');
++        $migration = require database_path('migrations/2026_10_06_000040_customer_accounts.php');
+         // Reuse the unchanged authoritative guard definitions without running up/down or DDL.
+         $guards = [];
+         foreach ((new ReflectionMethod($migration, 'guards'))->invoke($migration) as $name => $guard) {
+diff --git a/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php b/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
+index 5d70518..20c0705 100644
+--- a/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
++++ b/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
+@@ -3,7 +3,6 @@
+ namespace App\Domain\Customers\Preferences\Suppression;
+ 
+ use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
+-use App\Support\MigrationDefinitions;
+ use Illuminate\Support\Facades\DB;
+ use LogicException;
+ use PDO;
+@@ -196,7 +195,7 @@ final class SuppressionSchema
+     {
+         $admission->dependencies();
+         // Read-only exact ownership proof of the approved predecessor; never invoke its DDL.
+-        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
++        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
+         $namespace = [];
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {
+diff --git a/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php b/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
+index 17b3d1c..d196cb1 100644
+--- a/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
++++ b/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
+@@ -4,7 +4,6 @@ namespace App\Domain\Customers\ProductionFeatures;
+ 
+ use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
+ use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
+-use App\Support\MigrationDefinitions;
+ use Illuminate\Support\Facades\DB;
+ use LogicException;
+ use PDO;
+@@ -341,7 +340,7 @@ final class ProductionFeatureSchema
+ 
+     private function legacyDependencies(PDO $pdo, string $driver, string $database, ConsentMigrationAdmission $admission): void
+     {
+-        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
++        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
+         $namespace = [];
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states', 'customer_saved_tracks'] as $table) {
+@@ -362,7 +361,7 @@ final class ProductionFeatureSchema
+             $sql = $type === 'table' ? (new ReflectionMethod($prior, 'definition'))->invoke($prior, $driver, $name) : $triggers[$name]['sql'];
+             (new ReflectionMethod($prior, 'owned'))->invoke($prior, $pdo, $driver, $type, $name, $sql);
+         }
+-        $legacy = MigrationDefinitions::load('2026_10_07_242000_customer_saved_tracks.php');
++        $legacy = require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php');
+         (new ReflectionMethod($legacy, 'owned'))->invoke($legacy, $pdo, $driver);
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {
+             $statement = $pdo->prepare($driver === 'sqlite' ? "SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=? ORDER BY name" : 'SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME');

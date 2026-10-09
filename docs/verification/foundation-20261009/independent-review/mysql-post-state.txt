@@ -1,0 +1,14 @@
+EVENT_OBJECT_TABLE	triggers
+customer_accounts	3
+customer_consent_events	3
+customer_consent_policies	3
+customer_consent_states	3
+migration
+2026_10_06_000040_customer_accounts
+2026_10_07_242000_customer_saved_tracks
+2026_10_07_250000_customer_consent
+2026_10_07_251000_customer_suppression
+2026_10_07_252000_paid_grant_origins
+2026_10_07_253000_production_account_features
+2026_10_07_254000_production_suppression
+shutdown rc=0

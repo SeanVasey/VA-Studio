@@ -1,0 +1,12 @@
+# cwd=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src
+# files=tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php
+# date=2026-10-09T13:41:51Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src/phpunit.xml
+
+Time: 00:45.453, Memory: 85.00 MB
+
+[30;42mOK (30 tests, 427 assertions)[0m
+# rc=0

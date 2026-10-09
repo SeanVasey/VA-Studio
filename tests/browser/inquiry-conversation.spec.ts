@@ -161,11 +161,15 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     expect(linkedBodies).toHaveLength(1); expect(Object.keys(JSON.parse(linkedBodies[0])).sort()).toEqual(['email', 'message', 'name', 'noticeToken', 'requestKey', 'subject', 'website']);
     const replayedInquiry = page.waitForResponse(result => new URL(result.url()).pathname === orderEndpoint && result.request().method() === 'POST');
     await orderInquiry.getByRole('button', { name: 'Retry same inquiry', exact: true }).click();
-    const linkedReplay = await replayedInquiry; expect(linkedReplay.status()).toBe(200); expect(await linkedReplay.finished()).toBeNull();
+    const linkedReplay = await replayedInquiry; expect(linkedReplay.status()).toBe(200);
     expect(linkedReplay.headers()['cache-control']).toContain('no-store');
-    const linkedSaved = await linkedReplay.json(); expect(linkedSaved).toEqual({ state: 'saved', receipt: expect.stringMatching(/^[a-f0-9-]{36}$/) });
-    linkedReceipts.push(linkedSaved.receipt);
+    // The page reads this body through its bounded stream reader (privateInquiryJson). Chromium then intermittently
+    // never reports the response finished, and Playwright can no longer read its body (Foundation 37921309772 and
+    // docs/verification/foundation-20261009/). The page shows the receipt only after validating that exact
+    // { state: 'saved', receipt } JSON, and the server proof below confirms one stored inquiry for it.
     await expect(orderInquiry.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
+    linkedReceipts.push((await orderInquiry.locator('.contact-inquiry-receipt code').textContent())!);
+    expect(linkedReceipts[1]).toMatch(/^[a-f0-9-]{36}$/);
     expect(linkedBodies).toHaveLength(2); expect(linkedBodies[1]).toBe(linkedBodies[0]); expect(linkedReceipts).toEqual([linkedReceipts[0], linkedReceipts[0]]);
     const linkedReceipt = linkedReceipts[0], contextEndpoint = `/contact/inquiries/${linkedReceipt}/order-context`;
     const proof = fixtureOperation('conversation-order-verify', testInfo.project.name, linkedReceipt, 'new', linkedBodies[0]);
