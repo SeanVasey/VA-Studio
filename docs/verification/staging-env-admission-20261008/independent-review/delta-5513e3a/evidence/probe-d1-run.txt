@@ -1,0 +1,23 @@
+# source: git archive 5513e3aee07746734b708f860117252595ec2452 | tar -x -C /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src (vendor rsync'd from /home/user/rv-b2/vendor, composer dump-autoload)
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta/evidence/probes/ReviewerD1StagingProbeTest.php
+# started: 2026-10-09T10:47:14Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src/phpunit.xml
+
+
+PROBE D1 without stand-in under staging: {
+    "create quote (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409",
+    "link (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409"
+}
+.
+PROBE full D1 chain under staging: unlinked=QuoteException:INVENTORY_SCOPE_UNAVAILABLE:409 order=prepared env=staging
+.                                                                  2 / 2 (100%)
+
+Time: 00:04.179, Memory: 94.00 MB
+
+OK (2 tests, 5 assertions)
+# finished: 2026-10-09T10:47:18Z
+rc=0

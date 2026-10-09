@@ -1,0 +1,2781 @@
+commit 3b36a0ae291e9b32e92a01b90954e637e49a17a6
+Author: Claude <noreply@anthropic.com>
+Date:   Fri Oct 9 10:05:26 2026 +0000
+
+    fix(staging): rebuild the route cache on environment refresh (B2 review C1)
+    
+    The Filament panel compiles its MFA page middleware into the route cache
+    from APP_ENV. ctl refresh (a same-SHA deploy after a Forge .env change)
+    rebuilt only the configuration cache, so switching an interim local host
+    to staging that way kept serving routes without page-level MFA. Configure
+    now also runs route:cache as the app; the runbook adds a route:list check.
+    
+    Records the independent auth/payment review (APPROVE WITH CONDITIONS at
+    56efbb7a): C1 fixed here, C2 a documented follow-up.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01WQFJUv2gxYPi9grbvukUYh
+
+diff --git a/docs/ops/staging-runbook.md b/docs/ops/staging-runbook.md
+index 697d099..b64061f 100644
+--- a/docs/ops/staging-runbook.md
++++ b/docs/ops/staging-runbook.md
+@@ -63,6 +63,14 @@ page, as in production (`AdminPanelProvider`, `TestEnvironment::requiresStaffMfa
+ 3. Scan the QR code, confirm with a current code, and store the recovery codes offline.
+ 4. Sign out and back in to confirm the code is asked for.
+ 
++**After a switch from `APP_ENV=local` to `staging`**, confirm the panel pages carry the MFA middleware. The panel
++compiles it into the route cache from `APP_ENV`; a deploy or `ctl refresh` rebuilds that cache, but a route cache
++built under `local` would serve staging without page-level MFA:
++
++```sh
++art route:list --path=admin/tracks --json -v | grep -c EnsureMultiFactorAuthenticationIsEnabled   # expect 1 or more
++```
++
+ Rerun `art vasey:doctor`; the `operator` check now passes.
+ 
+ ## 3. Seller tag
+@@ -96,7 +104,7 @@ MEDIA_TAG_SHA256=<the 64 lowercase hex characters>
+ ```
+ 
+ Then click **Deploy Now**. When the served SHA is unchanged and only `.env` differs, the deploy refreshes the
+-configuration. It quiesces, installs `.env`, runs `config:cache` and resumes, so the workers pick up the tag.
++configuration. It quiesces, installs `.env`, runs `config:cache` and `route:cache` and resumes, so the workers pick up the tag.
+ Then process one real master, listen to the tagged preview and confirm the mix with Sean before publishing
+ anything.
+ 
+diff --git a/docs/verification/staging-env-admission-20261008/README.md b/docs/verification/staging-env-admission-20261008/README.md
+index 572cf07..f62ece0 100644
+--- a/docs/verification/staging-env-admission-20261008/README.md
++++ b/docs/verification/staging-env-admission-20261008/README.md
+@@ -128,12 +128,36 @@ These are unchanged:
+ - **Free256 frozen pin:** `ActivationPolicy.php` is pinned by `ProductionFreeGrantFrozenBytesTest`. Only `account()`'s
+   environment gate changed; family 256 (via `PreparedDeliveryStream` and `DeliveryAssetFiles`) uses only
+   `outsideTransactions()`, which is unchanged. The pin is updated with that note; this needs the independent reviewer's
+-  re-review against family 256.
++  re-review against family 256 (approved; see below).
+ - **Paid252 (#56):** `PaidGrantPolicy` enabled its operative lane in every environment except local/testing, so staging
+   would have admitted it when configured. `enabled()` and `provePure()` now refuse it in staging (red recorded first).
+ - **Census made exhaustive:** the source census now requires every `local`/`testing` gate in `app/` to be classified;
+   this surfaced the paid gate and `ServiceProjectAttachmentSourceV1` (kept local/testing only).
+ 
++- **Route cache across the `local` → `staging` switch (review C1):** the panel compiles its MFA page middleware into
++  the route cache from `APP_ENV`. A same-SHA deploy after a Forge `.env` change runs `ctl refresh`, whose configure step
++  rebuilt only the configuration cache, so a route cache built under `local` kept serving staging without page-level
++  MFA. `cmd_configure` now also runs `route:cache` as the app after `config:cache`; the runbook gains a host check
++  (`route:list --path=admin/tracks`). Shown with the ops fixture (red, then green) and against the real application
++  (`evidence/configure-route-cache-real.txt`).
++
++## Independent review
++
++`independent-review/DECISION.md`: **APPROVE WITH CONDITIONS** for a development merge of `56efbb7a`. It authorizes no
++production deployment, live payments or keys, Paid252 operative activation, production memberships or member grants,
++production customer identity, or DNS/cutover.
++
++- **C1 (Medium):** fixed as above.
++- **C2 (Low, follow-up, not taken here):** `PromotionAdministration` and `ManageRightsScope` writes complete for an
++  unenrolled admin when called below the panel in staging. Most production catalog writes (`PublishOffer`,
++  `PublishLicense`, `SaveTrackMetadata`, ...) rely on the panel middleware the same way; adding the domain-level
++  `AdminMultiFactor` check belongs in its own reviewed change.
++- **Inherited failure:** `ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported`
++  failed on `main` since #56 and identically at `56efbb7`; it is fixed by M-16 (#67, `af232a8`), not by B2.
++- Confirmed: exact-match helper semantics, the exhaustive gate census, staging refusals (live mode and keys, livemode
++  webhooks, production-checkout funds, production identity, verified membership/member-grant provenance, the Paid252
++  operative lane), the Free256 `ActivationPolicy` re-pin, and the D1 stand-in scanner.
++
+ ## Results
+ 
+ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
+@@ -145,6 +169,10 @@ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
+ | B2 affected selection (96 files by class reference), 3 shards | `cc4e62b` + working tree, before the validator, template, D1 and paid changes | 1,838 tests; only failure the Free256 `ActivationPolicy` pin (since re-pinned); skips are MySQL-only | see final run below |
+ | Ops kit tests (`python3 tests/ops/test_*.py`, 13 files) | after the `provision.sh` default change | 74 tests OK | — |
+ | Private-server preflight self-test | after integration | 20 tests OK | — |
++| Reviewer: affected selection, 115 files, 4 shards | `56efbb7` | 1,848 tests, 33 MySQL/POSIX skips, 1 failure (the inherited frozen-bytes one above) | `independent-review/evidence/affected-shard-*.txt` |
++| Red: configure rebuilds the route cache (C1) | `56efbb7` + updated ops test | 1 failure: only `config:cache` ran; rc 1 | `evidence/configure-route-cache-red.txt` |
++| Green: all ops kit tests after the C1 fix | working tree | 13 files, 74 tests OK | `evidence/configure-route-cache-green.txt` |
++| Real route cache across `APP_ENV` | working tree | built under `local`, served under `staging`: no MFA middleware; rebuilt under `staging`: present | `evidence/configure-route-cache-real.txt` |
+ | Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
+ 
+ ## Not tested
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-green.txt b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-green.txt
+new file mode 100644
+index 0000000..c3353c9
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-green.txt
+@@ -0,0 +1,14 @@
++# Green: configure rebuilds the route cache (review C1); source 56efbb7 + working tree
++tests/ops/test_staging_admin_defaults_custody.py: Ran 3 tests in 0.663s  OK 
++tests/ops/test_staging_backup_credential_custody.py: Ran 4 tests in 0.157s  OK 
++tests/ops/test_staging_backup_key_custody.py: Ran 9 tests in 0.464s  OK 
++tests/ops/test_staging_build_admission.py: Ran 3 tests in 0.679s  OK 
++tests/ops/test_staging_deploy_refresh.py: Ran 2 tests in 0.042s  OK 
++tests/ops/test_staging_dump_normalization.py: Ran 12 tests in 0.031s  OK 
++tests/ops/test_staging_operation_custody.py: Ran 3 tests in 0.179s  OK 
++tests/ops/test_staging_operation_lease.py: Ran 8 tests in 1.449s  OK 
++tests/ops/test_staging_pipeline_admission.py: Ran 9 tests in 1.003s  OK 
++tests/ops/test_staging_protected_configuration.py: Ran 3 tests in 0.988s  OK 
++tests/ops/test_staging_recovery_admission.py: Ran 4 tests in 0.270s  OK 
++tests/ops/test_staging_release_sealing.py: Ran 11 tests in 0.268s  OK 
++tests/ops/test_staging_runtime_directory_custody.py: Ran 3 tests in 0.569s  OK 
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-real.txt b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-real.txt
+new file mode 100644
+index 0000000..6038f52
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-real.txt
+@@ -0,0 +1,5 @@
++# Real route cache across APP_ENV (review C1); source 56efbb7 + working tree; php 8.4.26
++cache built under local, served under staging: no MFA middleware
++cache rebuilt under staging (configure now does this): ['Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
++uncached, staging: ['Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
++uncached, local: no MFA middleware
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-red.txt b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-red.txt
+new file mode 100644
+index 0000000..768e414
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/configure-route-cache-red.txt
+@@ -0,0 +1,17 @@
++# Red: configure rebuilds the route cache (review C1); source 56efbb7 + updated test only
++FAIL: test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "/home/user/wt-b2/tests/ops/test_staging_protected_configuration.py", line 107, in test_valid_configuration_installs_fresh_read_only_environment_after_real_admission
++    self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache\nroute:cache\n")
++    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++AssertionError: 'config:cache\n' != 'config:cache\nroute:cache\n'
++  config:cache
+++ route:cache
++
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.042s
++
++FAILED (failures=1)
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/DECISION.md b/docs/verification/staging-env-admission-20261008/independent-review/DECISION.md
+new file mode 100644
+index 0000000..f701854
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/DECISION.md
+@@ -0,0 +1,196 @@
++# Independent review: Lane B2, staging environment admission
++
++- **Reviewer:** independent reviewer for authentication and payment/commerce admission (Claude Code subagent). I did not write this code.
++- **Date:** 2026-10-09
++- **Subject:** branch `harness/staging-env-admission` at `56efbb7a517abc55f17ea9a8b37b29e4970a2210`. I diffed it against `main` `e5e500cadae68958293089ccc2b4a22bcdb9df66` (70 files, +1307/−108).
++- **Worktrees:** review `/home/user/rv-b2` (detached at `56efbb7`, tracked tree clean) and red baseline `/home/user/rv-b2-red` (detached at `e5e500ca` with B2's four test files copied in). I changed no product code. Everything under `independent-review/` is untracked.
++- **Runtime:** PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent. PHPUnit ran through the direct `_composer_autoload_path` invocation (`evidence/pu.sh`).
++
++## Verdict
++
++**APPROVE WITH CONDITIONS** for a development merge of `56efbb7`.
++
++- No finding blocks the code merge.
++- The conditions below apply before anyone relies on staging staff MFA on a host. Condition C1 concerns the move from the interim `local` profile to `staging`.
++
++**What this approval does not authorize:**
++
++- production deployment or a production `APP_ENV`
++- live payments, live Stripe mode or keys, or real money
++- paid-grant (Paid252) operative activation
++- production or verified membership, member-grant or membership-billing activation
++- production customer identity
++- DNS or cutover
++
++Each of these still needs Sean's separate authorization under AGENTS.md "Release boundary". This approval covers only the reviewed commit `56efbb7`. Any later commit needs its own review of the delta.
++
++## Conditions
++
++- **C1 (Medium, ops; required before staging MFA is relied on).** The Filament MFA-required page middleware is compiled into the route cache when the cache is built.
++  - My probe (`evidence/probe-route-cache-mfa.txt`) built `route:cache` under `APP_ENV=local` and served it under `APP_ENV=staging`. In that state, `/admin/tracks` lost `EnsureMultiFactorAuthenticationIsEnabled`, while `isMultiFactorAuthenticationRequired()` still returned `true`.
++  - `ops/staging/forge-deploy.sh` handles a deploy of the already-served SHA after a Forge `.env` change with `ctl refresh`, and `refresh` → `cmd_configure` runs only `config:cache`.
++  - So the documented switch ("change `APP_ENV` in Forge, re-run `provision.sh --app-env staging`") can leave a route cache built under `local`. Page-level MFA enforcement would then be absent in staging, even though `vasey:doctor` and the domain-level `AdminMultiFactor` checks report that MFA is required.
++  - **Required:** move from `local` to `staging` through a full release activation (`release-step.sh activate` runs `route:cache` under the new `.env`). Alternatively, make `cmd_configure` also run `route:cache` (or `route:clear`).
++  - **Then verify:** run `php artisan route:list --path=admin/tracks --json` on the host and confirm the middleware is present. B2's runbook should state this. The defect is in the ops kit and is pre-existing in kind (production never switches `APP_ENV`), but B2 introduces the transition that triggers it.
++- **C2 (Low, follow-up; not merge-blocking).** Two staff-write services that staging now admits do not call `AdminMultiFactor::satisfiedBy` at the domain level. My probe (`evidence/probe-run-1.txt`) recorded both completing for an *unenrolled* admin in staging:
++  - `PromotionAdministration` (`create`, `setAvailability`)
++  - `ManageRightsScope` (`vasey:rights-scope` writes)
++
++  This matches the production model for most catalog writes. `domain-mfa-census.txt` shows that `PublishOffer`, `PublishLicense`, `SaveTrackMetadata` and others also rely on the panel's route middleware. So it is consistent with production, and both services are refused outright in production.
++
++  The paths that reach them are:
++  - the panel, where the page middleware requires enrollment (subject to C1). Livewire snapshots are checksummed, so a page that an unenrolled user never loaded cannot be driven.
++  - an interactive host console with a password.
++
++  Recommend adding the domain check, as `TestPaymentExceptionOperations`, `FreeGrantStaff` and `CatalogDraftImporter` already do, in a separate reviewed change.
++
++## Findings by review item
++
++### 1. Admission helper and gate census
++
++- `TestEnvironment::admitsTestCommerce()` uses `in_array(app()->environment(), ['local','testing','staging'], true)`.
++- My matrix probe (`probe-run-1.txt`, `test_probe_helper_exact_match_semantics`) recorded the following. `Staging`, `STAGING`, `staging-eu`, `stage`, `" staging"`, `"staging "`, `"staging\n"`, `""` and `preview` are each refused for test commerce and for `refusesProductionOnly`. `staging` admits test commerce, requires MFA and refuses production-only paths. `production` requires MFA and refuses test commerce.
++- `testing` is admitted by the helper, as it is on `main`. On a host, the ops validators refuse it: `validate-test-commerce-profile.php` accepts only `staging|local`, and `--profile=staging` requires exactly `staging`.
++- **My own grep** (`evidence/reviewer-grep-app.txt`, 100 lines) searched `app/`, `config/`, `routes/`, `bootstrap/` and `database/seeders` for:
++  - `environment(`, `isProduction`, `isLocal`, `config('app.env'`, `env('APP_ENV'`, `runningUnitTests`
++  - quoted environment names and reversed `'testing','local'` lists
++
++  Every hit falls into one of the README's classes (a)–(d):
++  - **(a)** All 29 files route through the helper, and none keeps a local/testing literal.
++  - **(b)** Local/testing only.
++  - **Testing-only scanners and transports.** These are unaffected by staging.
++  - **(c)** `environment('production')` gates, which refuse staging, plus the changed production-only branches.
++  - **(d)** Environment values captured as evidence.
++- Nothing else admits staging. The only file that names `'staging'` is the helper (enforced by the census test).
++- **Census strength.**
++  - The census regex covers `environment('local', 'testing')`, `environment(['local','testing'])` and `in_array($x, ['local','testing'], true)`. Requiring every match in `app/` to be classified is exhaustive for that idiom. It is how the Paid252 gap was found.
++  - It does not cover environment-free operative lanes. I checked those by hand:
++    - **Free grants operative:** needs a bound `FreeGrantIdentity`, and nothing binds one.
++    - **Paid, production memberships, member grants, membership billing, production free grants and production identity:** each `enabled` value is hard-coded `false` in `config/`, with no `env()`.
++    - **Production account features, preferences, listening and suppression:** derive from `IdentityPolicy`, which staging refuses.
++  - **Pre-existing, unchanged:** any non-`production`, non-`staging` name, such as `preview` or `Staging`, gets no required MFA. Fail-closed MFA (required unless `local`/`testing`) would be stricter. This is informational, not a B2 regression.
++- **Pre-existing:** `php artisan … --env=staging` on any host switches the CLI environment, exactly as `--env=local` already could. Staging is not weaker than `local` here.
++
++### 2. Staff MFA
++
++- `AdminPanelProvider` makes MFA required when `TestEnvironment::requiresStaffMfa()` returns true. `AdminMultiFactor::satisfiedBy` evaluates the panel closure at call time.
++- Probe results (`probe-run-1.txt`):
++  - `satisfiedBy(unenrolled)` returns false in staging and in production, and true in local and testing.
++  - `satisfiedBy(enrolled)` returns true everywhere.
++- **Real staff domain action,** `TestPaymentExceptionOperations::locked`:
++  - staging, unenrolled admin → `AuthorizationException`
++  - staging, enrolled admin → passes authority and reaches the record lookup (`ModelNotFoundException` on a random ID)
++  - production → unchanged
++- **CLI (`vasey:rights-scope`):** requires an interactive console and the staff password; it does not require MFA. This matches the other staff CLI and domain paths that lack a domain MFA check (see C2). It is acceptable for development because shell access to the host is a stronger credential. It does not match production, because production refuses the command entirely.
++- **Page redirect:** B2's `StagingOperatorMfaTest` boots under `staging` and proves the redirect to MFA setup. It also proves `local` is optional and the per-environment matrix. My red reproduction showed 2 failures on `main`.
++
++### 3. Live-mode and production-only refusal
++
++**Refused in staging** (B2 tests, which I reproduced, plus my preflight probe):
++
++- **Stripe live mode or absent mode:** all 9 Stripe gates.
++- **Keys:** `sk_live_`, `rk_test_`, `rk_live_` and `pk_test_` at the SDK gateway; no transport request is sent.
++- **Webhooks:** a signed `livemode:true` event is rejected with `STRIPE_WEBHOOK_INVALID`.
++- **`ExecutionContextV1`:** live funds and test funds.
++- **`StripeCapabilityPreflight`:** `funds_mode_environment` is `blocked`.
++- **Production identity:** `IdentityPolicy` (production and rehearsal) and the `SmtpIdentitySettings` production branch.
++- **Membership provenance:** `Production\MembershipPolicy` and `MemberGrantPolicy` refuse verified-production provenance with reason `provenance`.
++- **Paid252:** `PaidGrantPolicy::enabled()` and `provePure()` (403).
++
++**No regression:**
++
++- **Production:** live funds, production identity, production membership and member grant, the operative paid lane and `provePure`, all asserted `admitted` in production.
++- **Local/testing:** rehearsal paths are unchanged.
++- **Production doctor:** output differs only by the added `profile` key, and no consumer parses keys strictly (`Doctor.php` reads `foundation_ready`).
++
++My red run of B2's admission test on `main` product code (`red-main-admission.txt`) shows that `main` admitted production identity, the operative paid lane and verified-production member provenance under `staging`. B2 closes real exposures, not hypothetical ones.
++
++### 4. Free256 frozen pin (`ActivationPolicy.php`)
++
++All evidence is in `evidence/free256-pin-review.txt`.
++
++- **The change:** the byte change is the `use TestEnvironment;` import plus the one `account()` environment condition.
++- **`outsideTransactions()`:** byte-identical to `main`.
++- **Family 256 reach:** family 256 (`app/Domain/Grants/ProductionFree/*`) does not reference `ActivationPolicy` directly. It reaches it only through `PreparedDeliveryStream` and `DeliveryAssetFiles`, which call only `outsideTransactions()`. Their pinned hashes are unchanged and equal to `main`.
++- **Imports:** PHP `use` imports do not autoload, so the new import adds no load-time dependency on the 256 paths.
++- **The new pin:** `38d51e78…6c95`, which equals the file's actual sha256 at `56efbb7`.
++- **`AdminMultiFactor.php` pin:** unchanged and passing.
++- **Ruling: the re-pin is approved against family 256.**
++
++### 5. Ops and profile
++
++- **Python tests:** all 13 `tests/ops/test_*.py` files run individually give 74 tests, all OK. The preflight self-test gives 20 tests, OK (`ops-python-tests.txt`).
++- **My independent preflight probe** (`probe-preflight.txt`, 19 cases, 0 unexpected):
++  - A valid staging file passes.
++  - Each of these is BLOCKED by the named check:
++    - `APP_ENV` set to `Staging`, `local` or `testing`
++    - `STRIPE_MODE=live`
++    - an `sk_live_` test key
++    - `rk_live_` in an unrelated variable
++    - an `rk_test_` key
++    - funds mode `live` or `test`
++    - a non-boolean switch
++    - `APP_DEBUG=true`
++  - A staging file under the default profile is blocked.
++  - The production default and an explicit production profile are unchanged.
++  - Duplicate or unknown `--profile` flags and a repeated `--runtime` are rejected as usage errors.
++- **Other ops changes:**
++  - `validate-runtime.php` accepts `local|staging`.
++  - `provision.sh` defaults to `staging` and validates `^(local|staging)$`.
++  - `InstallationReport` adds staging rows for hosted settings and test mode only. They are covered by `InstallationReportTest`, which passed in my selection.
++- **Minor inconsistency, harmless:** doctor's `staging_test_mode_only` tolerates `PRODUCTION_CHECKOUT_FUNDS_MODE=test`, while the preflight requires it blank. `ExecutionContextV1` refuses it either way.
++
++### 6. D1 and `PrepareOrder` under staging (ClamAV stand-in)
++
++The stand-in hides nothing material. My `probe-d1-run-1.txt` showed:
++
++- **Without the stand-in,** staging refuses the test-only scan evidence. Both `CreateQuote` and the rights-scope link fail with `SELECTION_CHANGED` (409). Staging does not silently accept the synthetic scanner.
++- **With the stand-in,** the whole chain runs under `staging`: `CreateQuote`, `PriceQuote`, the unlinked `PrepareOrder` (refused with `INVENTORY_SCOPE_UNAVAILABLE` 409), register, link, and `PrepareOrder` (prepared). This includes quote creation and pricing. B2's own variant runs those two under `testing`, which is a small coverage gap.
++
++The stand-in replaces only the scanner's output at fixture time. Staging admission depends on the engine name, exactly as production does. Real ClamAV execution is outside this lane.
++
++### 7. Red and green reproduction, and affected suites
++
++See the runs table. The recorded red reproduces exactly on `main` (same failures and counts). B2's tests are green at `56efbb7`.
++
++## Other observations (informational)
++
++- B2's README does not record the inherited `main` failure in `ProductionFreeGrantFrozenBytesTest` (see Runs).
++- The README's results table still has `FINAL_PLACEHOLDER` for the final affected selection, and `evidence/final-*.txt` does not exist. The author should fill it in or point it at this review's runs before merge.
++- Historical evidence hash records under `docs/verification/*/` (for example `native-fixture-independent-20261007/reviewed-source-hashes.json`) list files that B2 changes. No script, CI job or test enforces them, and they bind to their own recorded commits, so they are historical and not contradicted.
++- `StagingTestCommerceProfileJourneyTest` runs its chain under `testing`, with `APP_ENV=staging` only in the profile file. Staging-specific admission is proven by `StagingEnvironmentAdmissionTest`, my D1 probe and the profile validator.
++
++## Runs
++
++All of these runs are SQLite in memory, `public/build` absent, PHPUnit 12.5.34. Raw output, the command, the source SHA and `rc` for each run are in `evidence/`.
++
++| # | Run | Source | Result | rc | Evidence |
++| --- | --- | --- | --- | --- | --- |
++| 1 | Red: `StagingOperatorMfaTest` | `main` `e5e500ca` + B2 tests | 3 tests, 2 failures (same as recorded) | 1 | `red-main-mfa.txt` |
++| 2 | Red: D1 `--filter staging_admits` | same | 1 failure, `ORDER_POLICY_UNAVAILABLE` (same as recorded) | 1 | `red-main-d1.txt` |
++| 3 | Red: profile `--filter staging_profile_passes` | same | 1 failure (same as recorded) | 1 | `red-main-profile.txt` |
++| 4 | Red: `StagingEnvironmentAdmissionTest` | same | 15 tests, 1 error (helper absent), 6 failures; `main` admits production identity, the operative paid lane and verified member provenance in staging | 2 | `red-main-admission.txt` |
++| 5 | Green: `StagingEnvironmentAdmissionTest` + `StagingOperatorMfaTest` | `56efbb7` | OK, 18 tests, 229 assertions | 0 | `green-b2-own-tests.txt` |
++| 6 | Reviewer probes: helper, MFA and staff writes | `56efbb7` | OK, 4 tests, 35 assertions; outcomes recorded (C2) | 0 | `probe-run-1.txt`, `probes/ReviewerStagingProbeTest.php` |
++| 7 | Reviewer probe: D1 under staging | `56efbb7` | OK, 2 tests, 5 assertions | 0 | `probe-d1-run-1.txt`, `probes/ReviewerD1StagingProbeTest.php` |
++| 8 | Reviewer probe: preflight, 19 near-miss files | `56efbb7` | 0 unexpected | 0 | `probe-preflight.txt`, `probes/reviewer_preflight_probe.py` |
++| 9 | Reviewer probe: route cache vs MFA middleware | `56efbb7` | middleware absent when the cache is built under `local` (C1); cache cleared afterwards | 0 | `probe-route-cache-mfa.txt` |
++| 10 | Ops: `tests/ops/test_*.py` (13 files, each run separately) + preflight self-test | `56efbb7` | 74 + 20 tests OK | 0 | `ops-python-tests.txt` |
++| 11 | Affected selection (115 files that reference any changed `app/` class, plus the staging, MFA, checkout, order-prep, webhook and frozen-bytes files), 4 shards | `56efbb7` | 1,848 tests, 16,598 assertions; 33 skips (native MySQL, isolated DB or POSIX only); **1 failure** (see below) | 1/0/0/0 | `affected-shard-{1..4}.txt`, `affected-selection.txt`, `shard-configs/` |
++| 12 | `ProductionFreeGrantFrozenBytesTest` on `main` | `e5e500ca` | 3 tests, 1 failure, the same `app/Domain/Grants/Paid` directory assertion | 1 | `main-baseline-frozen-bytes.txt` |
++| 13 | `ProductionFreeGrantFrozenBytesTest` at B2 | `56efbb7` | 3 tests, 1 failure (same); the re-pinned bytes test passes | 1 | `green-frozen-bytes.txt` |
++| — | Aborted attempt 1 of run 11 | `56efbb7` | **Not counted.** My route-cache probe briefly wrote `bootstrap/cache/routes-v7.php` in the same worktree while it ran. | — | `failed-harness-attempts/` |
++
++**The one failure in run 11 was already on `main`.**
++
++- It is `ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported`, which asserts that `app/Domain/Grants/Paid` does not exist.
++- That directory arrived on `main` with #56 (Paid252). Run 12 shows the identical failure on `e5e500ca`, so B2 neither causes nor fixes it.
++- B2's README results row ("only failure the Free256 `ActivationPolicy` pin") predates its #56 integration and does not mention this. The README should record it as an inherited `main` failure that belongs to the Free256/Paid252 owners. This is a documentation gap, not a B2 defect.
++
++
++## Not tested
++
++- MySQL: race and native cases skip on SQLite by design. CI, or a private native `mysqld`, is the evidence for those.
++- Browser specs.
++- A real staging host, including its actual route cache (see C1).
++- Real Stripe, and real ClamAV.
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-selection.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-selection.txt
+new file mode 100644
+index 0000000..f76a314
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-selection.txt
+@@ -0,0 +1,115 @@
++tests/Feature/CommerceAuditActorTest.php
++tests/Feature/CustomerAccountCommerceTest.php
++tests/Feature/CustomerConsentAdmissionTest.php
++tests/Feature/CustomerConsentPreferencesTest.php
++tests/Feature/CustomerListeningCompatibilityTest.php
++tests/Feature/CustomerPurchaseClaimTest.php
++tests/Feature/CustomerRefundResolutionTest.php
++tests/Feature/ExclusiveSelectionTest.php
++tests/Feature/FreeGrantAdministrationTest.php
++tests/Feature/FreeGrantAuthorityTest.php
++tests/Feature/FreeGrantDefinitionsTest.php
++tests/Feature/FreeGrantDownloadsTest.php
++tests/Feature/FreeGrantJourneyTest.php
++tests/Feature/HostedCheckoutTest.php
++tests/Feature/InstallationReportTest.php
++tests/Feature/MembershipCustomerLibraryCapabilityTest.php
++tests/Feature/OperatorMfaTest.php
++tests/Feature/OrderInquiryConcurrencyTest.php
++tests/Feature/OrderInquiryMigrationTest.php
++tests/Feature/OrderInquiryStaffContextTest.php
++tests/Feature/OrderInquiryTest.php
++tests/Feature/OrderPreparationTest.php
++tests/Feature/PaidGrantAuthorizationWindowTest.php
++tests/Feature/PaidGrantCommitCapsuleTest.php
++tests/Feature/PaidGrantCommittingAdmissionTest.php
++tests/Feature/PaidGrantCompletionBudgetTest.php
++tests/Feature/PaidGrantDocumentJourneyTest.php
++tests/Feature/PaidGrantDownloadJourneyTest.php
++tests/Feature/PaidGrantHeavyWorkTest.php
++tests/Feature/PaidGrantHttpJourneyTest.php
++tests/Feature/PaidGrantPolicyRevisionTest.php
++tests/Feature/PaidGrantPreparationBudgetTest.php
++tests/Feature/PaidGrantRedeemFrameConjunctTest.php
++tests/Feature/PaidGrantRefusedFrameCallbackTest.php
++tests/Feature/PaidGrantRequestInstantTest.php
++tests/Feature/PaidGrantReviewAddendum1Test.php
++tests/Feature/PaidGrantReviewAddendum3Test.php
++tests/Feature/PaidGrantReviewAdversarialTest.php
++tests/Feature/PaidGrantSnapshotDeadlineTest.php
++tests/Feature/PaidGrantSourceJourneyTest.php
++tests/Feature/PaidGrantTransferDeadlineTest.php
++tests/Feature/PricingSettlementTest.php
++tests/Feature/ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php
++tests/Feature/ProductionCheckoutCommittedReceiptTest.php
++tests/Feature/ProductionCheckoutFreshPolicyTest.php
++tests/Feature/ProductionCheckoutJourneyTest.php
++tests/Feature/ProductionCheckoutNativeRaceTest.php
++tests/Feature/ProductionCheckoutObserverExclusionTest.php
++tests/Feature/ProductionCheckoutReceiptParentTest.php
++tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php
++tests/Feature/ProductionCheckoutSourceTransactionTest.php
++tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
++tests/Feature/ProductionCheckoutWriteCommitTest.php
++tests/Feature/ProductionCommerceReadinessTest.php
++tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
++tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php
++tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php
++tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationNativeRaceTest.php
++tests/Feature/ProductionIdentityAdapters/ConfiguredIdentitySmtpTest.php
++tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php
++tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php
++tests/Feature/ProductionIdentitySmtpBindingTest.php
++tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php
++tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php
++tests/Feature/ProductionMembership/MembershipPreparationTest.php
++tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php
++tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php
++tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php
++tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php
++tests/Feature/PromotionAdminHttpTest.php
++tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php
++tests/Feature/PromotionAdministrationSettlementTest.php
++tests/Feature/PromotionAdministrationTest.php
++tests/Feature/PromotionConcurrencyTest.php
++tests/Feature/PromotionPricingTest.php
++tests/Feature/PublicCatalogRelatedLinksTest.php
++tests/Feature/ReservePricedQuoteTest.php
++tests/Feature/RightsScopeCommandTest.php
++tests/Feature/RightsScopeCommandUnknownOutcomeTest.php
++tests/Feature/ServiceProjectAttachmentAuthorityTest.php
++tests/Feature/ServiceSupportAttachmentsTest.php
++tests/Feature/SharedInventoryTest.php
++tests/Feature/SiteImageReleaseDamageTest.php
++tests/Feature/SiteImageReleaseTest.php
++tests/Feature/SiteRelatedTrackContentTest.php
++tests/Feature/SiteScheduleTest.php
++tests/Feature/StagingEnvironmentAdmissionTest.php
++tests/Feature/StagingOperatorMfaTest.php
++tests/Feature/StagingTestCommerceProfileJourneyTest.php
++tests/Feature/StripeCapabilityPreflightTest.php
++tests/Feature/StripeWebhookTest.php
++tests/Feature/TestContractProfileSuccessorTest.php
++tests/Feature/TestContractSuccessorActivationTest.php
++tests/Feature/TestFinalizedInventoryTest.php
++tests/Feature/TestOwnerDeliveryHttpTest.php
++tests/Feature/TestOwnerDeliveryProjectionTest.php
++tests/Feature/TestOwnerDeliveryTest.php
++tests/Feature/TestPaymentExceptionInspectionTest.php
++tests/Feature/TestPaymentExceptionOperationsTest.php
++tests/Feature/TestPaymentFinancialObservationTest.php
++tests/Feature/TestPreparedDeliveryStreamTest.php
++tests/Feature/TestRefundResolutionMigrationTest.php
++tests/Unit/ContractRenderProfileRegistryTest.php
++tests/Unit/PricingPolicyTest.php
++tests/Unit/ProductionCheckoutProviderTest.php
++tests/Unit/PromotionPolicyTest.php
++tests/Unit/StagingRuntimeValidatorTest.php
++tests/Unit/StripeCheckoutGatewayTest.php
++tests/Unit/StripeFinancialInspectionGatewayTest.php
++tests/Unit/StripePaymentGatewayTest.php
++tests/Unit/TestCommerceProfileValidatorTest.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1-files.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1-files.txt
+new file mode 100644
+index 0000000..6604dcc
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1-files.txt
+@@ -0,0 +1,29 @@
++tests/Feature/CommerceAuditActorTest.php
++tests/Feature/CustomerConsentAdmissionTest.php
++tests/Feature/ExclusiveSelectionTest.php
++tests/Feature/FreeGrantDownloadsTest.php
++tests/Feature/MembershipCustomerLibraryCapabilityTest.php
++tests/Feature/OrderInquiryTest.php
++tests/Feature/PaidGrantAuthorizationWindowTest.php
++tests/Feature/PaidGrantRedeemFrameConjunctTest.php
++tests/Feature/PaidGrantReviewAdversarialTest.php
++tests/Feature/PaidGrantSnapshotDeadlineTest.php
++tests/Feature/PaidGrantTransferDeadlineTest.php
++tests/Feature/ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php
++tests/Feature/ProductionCheckoutCommittedReceiptTest.php
++tests/Feature/ProductionCheckoutObserverExclusionTest.php
++tests/Feature/ProductionCommerceReadinessTest.php
++tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
++tests/Feature/ProductionIdentityAdapters/ConfiguredIdentitySmtpTest.php
++tests/Feature/ProductionIdentitySmtpBindingTest.php
++tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php
++tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php
++tests/Feature/PromotionAdministrationSettlementTest.php
++tests/Feature/RightsScopeCommandTest.php
++tests/Feature/TestOwnerDeliveryHttpTest.php
++tests/Feature/TestOwnerDeliveryTest.php
++tests/Unit/PricingPolicyTest.php
++tests/Unit/StripeCheckoutGatewayTest.php
++tests/Unit/StripeFinancialInspectionGatewayTest.php
++tests/Unit/TestCommerceProfileValidatorTest.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1.txt
+new file mode 100644
+index 0000000..e47c59a
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-1.txt
+@@ -0,0 +1,34 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-1.xml
++# started: 2026-10-09T09:35:40Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-1.xml
++
++...............................................................  63 / 577 ( 10%)
++............................................................... 126 / 577 ( 21%)
++............................................................... 189 / 577 ( 32%)
++.....................................................F......... 252 / 577 ( 43%)
++............................................................... 315 / 577 ( 54%)
++............................................................... 378 / 577 ( 65%)
++............................................................... 441 / 577 ( 76%)
++............................................................... 504 / 577 ( 87%)
++............................................................... 567 / 577 ( 98%)
++..........                                                      577 / 577 (100%)
++
++Time: 27:01.742, Memory: 397.02 MB
++
++There was 1 failure:
++
++1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported
++Failed asserting that directory "/home/user/rv-b2/app/Domain/Grants/Paid" does not exist.
++
++/home/user/rv-b2/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:68
++/home/user/rv-b2/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 577, Assertions: 6372, Failures: 1.
++# finished: 2026-10-09T10:02:43Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2-files.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2-files.txt
+new file mode 100644
+index 0000000..86a7ca8
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2-files.txt
+@@ -0,0 +1,29 @@
++tests/Feature/CustomerAccountCommerceTest.php
++tests/Feature/CustomerPurchaseClaimTest.php
++tests/Feature/FreeGrantAdministrationTest.php
++tests/Feature/FreeGrantDefinitionsTest.php
++tests/Feature/FreeGrantJourneyTest.php
++tests/Feature/InstallationReportTest.php
++tests/Feature/OrderPreparationTest.php
++tests/Feature/PaidGrantCompletionBudgetTest.php
++tests/Feature/PaidGrantHeavyWorkTest.php
++tests/Feature/PaidGrantRequestInstantTest.php
++tests/Feature/PaidGrantSourceJourneyTest.php
++tests/Feature/ProductionCheckoutNativeRaceTest.php
++tests/Feature/ProductionCheckoutSourceTransactionTest.php
++tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php
++tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php
++tests/Feature/ProductionMembership/MembershipPreparationTest.php
++tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php
++tests/Feature/PromotionConcurrencyTest.php
++tests/Feature/PromotionPricingTest.php
++tests/Feature/PublicCatalogRelatedLinksTest.php
++tests/Feature/RightsScopeCommandUnknownOutcomeTest.php
++tests/Feature/ServiceSupportAttachmentsTest.php
++tests/Feature/SharedInventoryTest.php
++tests/Feature/SiteImageReleaseDamageTest.php
++tests/Feature/TestContractProfileSuccessorTest.php
++tests/Feature/TestContractSuccessorActivationTest.php
++tests/Unit/ProductionCheckoutProviderTest.php
++tests/Unit/StagingRuntimeValidatorTest.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2.txt
+new file mode 100644
+index 0000000..6e90e9e
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-2.txt
+@@ -0,0 +1,23 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-2.xml
++# started: 2026-10-09T09:35:40Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-2.xml
++
++...............................................................  63 / 390 ( 16%)
++............................................................... 126 / 390 ( 32%)
++................................SS............................. 189 / 390 ( 48%)
++....S...................................SSSSSSSS............... 252 / 390 ( 64%)
++............................................................... 315 / 390 ( 80%)
++............................................................... 378 / 390 ( 96%)
++............                                                    390 / 390 (100%)
++
++Time: 21:33.846, Memory: 307.00 MB
++
++OK, but some tests were skipped!
++Tests: 390, Assertions: 2987, Skipped: 11.
++# finished: 2026-10-09T09:57:15Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3-files.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3-files.txt
+new file mode 100644
+index 0000000..1285f26
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3-files.txt
+@@ -0,0 +1,28 @@
++tests/Feature/CustomerConsentPreferencesTest.php
++tests/Feature/CustomerListeningCompatibilityTest.php
++tests/Feature/FreeGrantAuthorityTest.php
++tests/Feature/HostedCheckoutTest.php
++tests/Feature/OperatorMfaTest.php
++tests/Feature/OrderInquiryConcurrencyTest.php
++tests/Feature/OrderInquiryMigrationTest.php
++tests/Feature/PaidGrantDownloadJourneyTest.php
++tests/Feature/PaidGrantHttpJourneyTest.php
++tests/Feature/PaidGrantPolicyRevisionTest.php
++tests/Feature/PaidGrantPreparationBudgetTest.php
++tests/Feature/ProductionCheckoutReceiptParentTest.php
++tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php
++tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php
++tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php
++tests/Feature/PromotionAdminHttpTest.php
++tests/Feature/ServiceProjectAttachmentAuthorityTest.php
++tests/Feature/SiteRelatedTrackContentTest.php
++tests/Feature/StagingEnvironmentAdmissionTest.php
++tests/Feature/StagingOperatorMfaTest.php
++tests/Feature/StripeCapabilityPreflightTest.php
++tests/Feature/TestOwnerDeliveryProjectionTest.php
++tests/Feature/TestPaymentExceptionOperationsTest.php
++tests/Feature/TestPaymentFinancialObservationTest.php
++tests/Feature/TestRefundResolutionMigrationTest.php
++tests/Unit/ContractRenderProfileRegistryTest.php
++tests/Unit/StripePaymentGatewayTest.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3.txt
+new file mode 100644
+index 0000000..35b69e7
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-3.txt
+@@ -0,0 +1,25 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-3.xml
++# started: 2026-10-09T09:35:40Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-3.xml
++
++...............................................................  63 / 516 ( 12%)
++..........S...............................................SSSSS 126 / 516 ( 24%)
++SSSSSS......................................................... 189 / 516 ( 36%)
++............................................................... 252 / 516 ( 48%)
++............................................................... 315 / 516 ( 61%)
++............................................................... 378 / 516 ( 73%)
++............................................................... 441 / 516 ( 85%)
++............................................................... 504 / 516 ( 97%)
++............                                                    516 / 516 (100%)
++
++Time: 20:27.382, Memory: 341.00 MB
++
++OK, but some tests were skipped!
++Tests: 516, Assertions: 4113, Skipped: 12.
++# finished: 2026-10-09T09:56:08Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4-files.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4-files.txt
+new file mode 100644
+index 0000000..fe52982
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4-files.txt
+@@ -0,0 +1,29 @@
++tests/Feature/CustomerRefundResolutionTest.php
++tests/Feature/OrderInquiryStaffContextTest.php
++tests/Feature/PaidGrantCommitCapsuleTest.php
++tests/Feature/PaidGrantCommittingAdmissionTest.php
++tests/Feature/PaidGrantDocumentJourneyTest.php
++tests/Feature/PaidGrantRefusedFrameCallbackTest.php
++tests/Feature/PaidGrantReviewAddendum1Test.php
++tests/Feature/PaidGrantReviewAddendum3Test.php
++tests/Feature/PricingSettlementTest.php
++tests/Feature/ProductionCheckoutFreshPolicyTest.php
++tests/Feature/ProductionCheckoutJourneyTest.php
++tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php
++tests/Feature/ProductionCheckoutWriteCommitTest.php
++tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php
++tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationNativeRaceTest.php
++tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php
++tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php
++tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php
++tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php
++tests/Feature/PromotionAdministrationTest.php
++tests/Feature/ReservePricedQuoteTest.php
++tests/Feature/SiteImageReleaseTest.php
++tests/Feature/SiteScheduleTest.php
++tests/Feature/StagingTestCommerceProfileJourneyTest.php
++tests/Feature/StripeWebhookTest.php
++tests/Feature/TestFinalizedInventoryTest.php
++tests/Feature/TestPaymentExceptionInspectionTest.php
++tests/Feature/TestPreparedDeliveryStreamTest.php
++tests/Unit/PromotionPolicyTest.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4.txt
+new file mode 100644
+index 0000000..198caf7
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/affected-shard-4.txt
+@@ -0,0 +1,22 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-4.xml
++# started: 2026-10-09T09:35:40Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-4.xml
++
++...............................................................  63 / 365 ( 17%)
++..............................................SSS.............. 126 / 365 ( 34%)
++.SSSSSSS....................................................... 189 / 365 ( 51%)
++............................................................... 252 / 365 ( 69%)
++............................................................... 315 / 365 ( 86%)
++..................................................              365 / 365 (100%)
++
++Time: 20:30.029, Memory: 271.00 MB
++
++OK, but some tests were skipped!
++Tests: 365, Assertions: 3126, Skipped: 10.
++# finished: 2026-10-09T09:56:11Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/domain-mfa-census.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/domain-mfa-census.txt
+new file mode 100644
+index 0000000..87807f3
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/domain-mfa-census.txt
+@@ -0,0 +1,95 @@
++NO-MFA app/Application/Media/IngestMediaUpload.php
++MFA app/Application/SiteBuilder/IngestSiteImage.php
++MFA app/Application/SiteBuilder/RetrySiteImage.php
++NO-MFA app/Console/Commands/CreateAdmin.php
++NO-MFA app/Domain/Catalog/ActivateExclusiveOffer.php
++MFA app/Domain/Catalog/BulkAddTrackTags.php
++MFA app/Domain/Catalog/BulkUpdateTrackMetadata.php
++NO-MFA app/Domain/Catalog/DeactivateOffer.php
++NO-MFA app/Domain/Catalog/PrepareExclusiveOffer.php
++MFA app/Domain/Catalog/ProductDrafts.php
++NO-MFA app/Domain/Catalog/PublishOffer.php
++MFA app/Domain/Catalog/PublishTrack.php
++MFA app/Domain/Catalog/ReadPrivateTrackReview.php
++MFA app/Domain/Catalog/ReadTrackPublicationManifest.php
++MFA app/Domain/Catalog/ReviewedOfferDraft.php
++NO-MFA app/Domain/Catalog/SaveOfferDraft.php
++NO-MFA app/Domain/Catalog/SaveTrackMetadata.php
++MFA app/Domain/Catalog/TrackMetadataPresets.php
++NO-MFA app/Domain/Commerce/Inventory/ManageRightsScope.php
++MFA app/Domain/Commerce/Operations/InspectRetainedTestPaymentException.php
++NO-MFA app/Domain/Commerce/Operations/ReadTestCommerceOperations.php
++MFA app/Domain/Commerce/Operations/TestPaymentExceptionOperations.php
++MFA app/Domain/Commerce/Policy/ProductionTrackPolicyAuthoring.php
++NO-MFA app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php
++MFA app/Domain/Commerce/ProductionCheckout/StaffProof.php
++MFA app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php
++MFA app/Domain/Commerce/ProductionPreparation/PacketAuthority.php
++NO-MFA app/Domain/Commerce/PromotionAdministration.php
++MFA app/Domain/Commerce/RefundResolution/ResolveRefundedTestException.php
++MFA app/Domain/Commerce/UnpaidRelease/ReleaseTestOrderResources.php
++NO-MFA app/Domain/Customers/CustomerAccess.php
++NO-MFA app/Domain/Customers/CustomerAccounts.php
++NO-MFA app/Domain/Customers/CustomerIdentityChallenges.php
++NO-MFA app/Domain/Customers/Listening/ListeningEvidence.php
++NO-MFA app/Domain/Customers/Preferences/ConsentEvidence.php
++NO-MFA app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
++NO-MFA app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
++NO-MFA app/Domain/Customers/ProductionCustomerAccess.php
++NO-MFA app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
++NO-MFA app/Domain/Customers/ProductionIdentity/CompleteIdentity.php
++NO-MFA app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++NO-MFA app/Domain/Customers/ProductionIdentity/IdentityRequests.php
++NO-MFA app/Domain/Customers/ProductionIdentity/IdentitySchema.php
++NO-MFA app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php
++MFA app/Domain/Grants/Free/FreeGrantStaff.php
++NO-MFA app/Domain/Grants/Free/TestFreeGrantIdentity.php
++NO-MFA app/Domain/Grants/Member/MemberGrantSchema.php
++NO-MFA app/Domain/Grants/ProductionFree/ProductionFreeGrantSchema.php
++MFA app/Domain/Grants/ProductionFree/ProductionFreeGrantStaff.php
++MFA app/Domain/Inquiries/InquiryAdministration.php
++MFA app/Domain/Inquiries/InquiryPolicy.php
++MFA app/Domain/Inquiries/Notifications/InquiryNotificationWork.php
++NO-MFA app/Domain/Media/MediaWriterActor.php
++NO-MFA app/Domain/Memberships/Billing/BillingSchema.php
++MFA app/Domain/Memberships/MembershipAdministration.php
++MFA app/Domain/Memberships/MembershipEvidence.php
++NO-MFA app/Domain/Memberships/Production/MembershipSchema.php
++MFA app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php
++NO-MFA app/Domain/Notifications/TestTransactionalNotifications.php
++MFA app/Domain/ProductAuthoring/ReviewedPrivateDrafts.php
++MFA app/Domain/Rights/BulkReplaceLicenseDraftSource.php
++NO-MFA app/Domain/Rights/CreateLicenseDraft.php
++NO-MFA app/Domain/Rights/PublishLicense.php
++NO-MFA app/Domain/Rights/ReviewLicense.php
++MFA app/Domain/Rights/ReviewedLicenseDraft.php
++MFA app/Domain/Rights/RightsDeclarationBoundary.php
++MFA app/Domain/Rights/SaveLicenseTemplate.php
++NO-MFA app/Domain/Rights/UpdateLicenseDraft.php
++MFA app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php
++MFA app/Domain/Services/Projects/ServiceProjects.php
++MFA app/Domain/SiteBuilder/SiteContent.php
++MFA app/Domain/SoundKits/SoundKitDrafts.php
++MFA app/Filament/Resources/LicenseTemplateResource/Pages/ManageLicenseTemplates.php
++MFA app/Filament/Resources/LicenseVersionResource/Pages/ManageLicenseVersions.php
++MFA app/Filament/Resources/MediaAssetResource/Pages/UploadMedia.php
++NO-MFA app/Filament/Resources/MembershipCreditResource.php
++MFA app/Filament/Resources/OfferResource/Pages/ManageOffers.php
++NO-MFA app/Filament/Resources/OperatorResource.php
++MFA app/Filament/Resources/PrivateProductDraftResource.php
++MFA app/Filament/Resources/ProductDraftResource.php
++NO-MFA app/Filament/Resources/ReadOnlyCommerceResource.php
++NO-MFA app/Filament/Resources/ReadOnlyCommerceResource/Pages/ListTestCommerceRecords.php
++MFA app/Filament/Resources/RightsDeclarationResource/Pages/ManageRightsDeclarations.php
++NO-MFA app/Filament/Resources/SiteImageResource.php
++NO-MFA app/Filament/Resources/SiteReleaseResource.php
++MFA app/Filament/Resources/SoundKitDraftResource.php
++NO-MFA app/Filament/Resources/TestPromotionResource.php
++MFA app/Filament/Resources/TrackMetadataPresetResource.php
++MFA app/Filament/Resources/TrackResource/Pages/ManageTracks.php
++MFA app/Http/Controllers/ResumableMediaUploadController.php
++MFA app/Http/Controllers/SoundKitUploadController.php
++NO-MFA app/Models/User.php
++NO-MFA app/Providers/AppServiceProvider.php
++NO-MFA app/Providers/Filament/AdminPanelProvider.php
++NO-MFA app/Support/Diagnostics/InstallationReport.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/NOTE.md b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/NOTE.md
+new file mode 100644
+index 0000000..c7e426a
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/NOTE.md
+@@ -0,0 +1,5 @@
++Attempt 1 of the affected-selection shards (started ~09:29Z) was aborted by the reviewer at ~09:35Z, unfinished.
++Reason: the reviewer's route-cache probe (probe-route-cache-mfa.txt) briefly created bootstrap/cache/routes-v7.php
++in the same worktree (~09:34:55Z-09:35:07Z) while the shards were running; tests booting in that window could load
++cached routes compiled under APP_ENV=local. The partial outputs are retained here and are not counted as evidence.
++The selection was re-run from scratch after `route:clear` (bootstrap/cache holds only packages.php and services.php).
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-1.attempt1-aborted.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-1.attempt1-aborted.txt
+new file mode 100644
+index 0000000..70e16b4
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-1.attempt1-aborted.txt
+@@ -0,0 +1,10 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-1.xml
++# started: 2026-10-09T09:32:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-1.xml
++
++...........................
+\ No newline at end of file
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-2.attempt1-aborted.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-2.attempt1-aborted.txt
+new file mode 100644
+index 0000000..ec391ea
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-2.attempt1-aborted.txt
+@@ -0,0 +1,10 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-2.xml
++# started: 2026-10-09T09:32:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-2.xml
++
++...................
+\ No newline at end of file
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-3.attempt1-aborted.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-3.attempt1-aborted.txt
+new file mode 100644
+index 0000000..39c148b
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-3.attempt1-aborted.txt
+@@ -0,0 +1,11 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-3.xml
++# started: 2026-10-09T09:32:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-3.xml
++
++...............................................................  63 / 516 ( 12%)
++..........S......
+\ No newline at end of file
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-4.attempt1-aborted.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-4.attempt1-aborted.txt
+new file mode 100644
+index 0000000..8114876
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/failed-harness-attempts/affected-shard-4.attempt1-aborted.txt
+@@ -0,0 +1,10 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-4.xml
++# started: 2026-10-09T09:32:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/reviewer-sel-4.xml
++
++...................
+\ No newline at end of file
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/free256-pin-review.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/free256-pin-review.txt
+new file mode 100644
+index 0000000..1b8f1ae
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/free256-pin-review.txt
+@@ -0,0 +1,143 @@
++# sha256 at 56efbb7 (worktree) and main e5e500ca
++38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95  app/Domain/Delivery/ActivationPolicy.php
++23253c453e7edefcf877eb191a07b0fba69f877a48fdfc91b8cfd36bbdaa7086  -
++# diff
++diff --git a/app/Domain/Delivery/ActivationPolicy.php b/app/Domain/Delivery/ActivationPolicy.php
++index 4d37b72..e220bbd 100644
++--- a/app/Domain/Delivery/ActivationPolicy.php
+++++ b/app/Domain/Delivery/ActivationPolicy.php
++@@ -3,6 +3,7 @@
++ namespace App\Domain\Delivery;
++ 
++ use App\Support\CanonicalJson;
+++use App\Support\Environment\TestEnvironment;
++ use Illuminate\Support\Facades\DB;
++ use Throwable;
++ 
++@@ -18,7 +19,7 @@ final class ActivationPolicy
++     public function account(): string
++     {
++         $account = config('payments.stripe.account_id');
++-        if (config('delivery.test_activation_enabled') !== true || ! app()->environment('local', 'testing')
+++        if (config('delivery.test_activation_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
++             || config('payments.stripe.mode') !== 'test' || ! is_string($account)
++             || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account)) {
++             throw new DeliveryException('unavailable');
++# every ActivationPolicy reference in app/
++app/Domain/Notifications/TestTransactionalNotifications.php:14:use App\Domain\Delivery\ActivationPolicy;
++app/Domain/Notifications/TestTransactionalNotifications.php:360:        $activationAccount = app(ActivationPolicy::class)->account();
++app/Domain/Notifications/TestTransactionalNotifications.php:362:        app(ActivationPolicy::class)->current();
++app/Domain/Notifications/TestTransactionalNotifications.php:468:        app(DeliveryAccessEvidence::class)->source($context['order'], app(ActivationPolicy::class)->account());
++app/Domain/Notifications/TestTransactionalNotifications.php:469:        app(ActivationPolicy::class)->current();
++app/Domain/Notifications/TestTransactionalNotifications.php:483:        if (! hash_equals($context['activationAccount'], app(ActivationPolicy::class)->account())) {
++app/Domain/Notifications/TestTransactionalNotifications.php:486:        app(ActivationPolicy::class)->current();
++app/Domain/Commerce/Readiness/ProductionCommerceReadiness.php:21:        'production_entitlements_and_delivery' => [['app/Domain/Delivery/ActivationPolicy.php', 'app/Domain/Delivery/TestAccessPolicy.php', 'database/migrations/2026_09_26_000023_test_owner_delivery.php'], 'Implement production entitlement/access policy and compatible persistence; current activation/access and SQL parent guards are test-only.'],
++app/Domain/Delivery/ActivationEvidence.php:99:        ActivationPolicy::validate($policy);
++app/Domain/Delivery/ActivationEvidence.php:140:                || $activation->policy_version !== ActivationPolicy::CONTRACT['version']) { throw new DeliveryException('changed'); }
++app/Domain/Delivery/ActivationEvidence.php:141:            $expected = $this->capture($source, $activation->public_id, ActivationPolicy::validate($decoded['policy'] ?? []),
++app/Domain/Delivery/DeliveryAssets.php:92:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/PreparedDeliveryStream.php:20:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/PreparedDeliveryStream.php:29:            ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/ManageTestDeliveryControl.php:17:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/ActivateTestFulfillment.php:25:            $policies = app(ActivationPolicy::class); $policy = $policies->current(); $account = $policies->account();
++app/Domain/Delivery/ActivateTestFulfillment.php:26:            ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/PrepareTestDeliveryStream.php:18:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/RedeemTestDelivery.php:27:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/DeliveryAssetFiles.php:28:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/DeliveryAssetFiles.php:35:        ActivationPolicy::outsideTransactions();
++app/Domain/Delivery/IssueTestDelivery.php:24:        ActivationPolicy::outsideTransactions();
++app/Domain/Grants/Paid/PaidGrantPrepareStream.php:5:use App\Domain\Delivery\ActivationPolicy;
++app/Domain/Grants/Paid/PaidGrantPrepareStream.php:41:        ActivationPolicy::outsideTransactions();
++app/Console/Commands/ActivateTestFulfillment.php:8:use App\Domain\Delivery\ActivationPolicy;
++app/Console/Commands/ActivateTestFulfillment.php:20:            $policy = app(ActivationPolicy::class); $policy->current(); $account = $policy->account();
++app/Console/Commands/ActivateTestFulfillment.php:21:            ActivationPolicy::outsideTransactions();
++# ActivationPolicy method list
++19:    public function account(): string
++30:    public function current(): array
++39:    public static function validate(array $policy): array
++45:    public static function outsideTransactions(): void
++# frozen-pin family 256 file list
++<?php
++
++namespace Tests\Feature\ProductionFreeGrants;
++
++use App\Domain\Grants\ProductionFree\ProductionFreeGrantRenderProfile;
++use Tests\TestCase;
++
++/**
++ * Family 256 composes main-resident substrate by reference, never by copy. Any change to these exact bytes
++ * (fad3ab44 blobs) must be re-reviewed against 256 before this test is updated.
++ */
++final class ProductionFreeGrantFrozenBytesTest extends TestCase
++{
++    private const MAIN = [
++        'app/Domain/Contracts/ContractRenderProfileRegistry.php' => 'd6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7',
++        'app/Domain/Contracts/ContractRenderProfile.php' => '8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40',
++        'app/Domain/Contracts/ContractRenderer.php' => '4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a',
++        'app/Domain/Contracts/RenderedContract.php' => 'b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f',
++        'app/Domain/Contracts/ContractRenderWorkspace.php' => '61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad',
++        'app/Domain/Contracts/ContractFiles.php' => '3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c',
++        'app/Domain/Contracts/ContractIo.php' => '245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8',
++        'app/Domain/Contracts/ContractIssuanceException.php' => '9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be',
++        'scripts/contract-renderer-autoload.php' => '09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01',
++        'app/Domain/Delivery/DeliveryAssetFiles.php' => '3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c',
++        'app/Domain/Delivery/PreparedDeliveryStream.php' => 'e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13',
++        'app/Domain/Delivery/ActivationPolicy.php' => '38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95', // B2: account()'s environment gate only; outsideTransactions() unchanged
++        'app/Domain/Delivery/DeliveryException.php' => 'a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc',
++        'app/Domain/Customers/ProductionCustomerAccess.php' => 'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7',
++        'app/Domain/Customers/ProductionCustomerPrincipal.php' => 'd49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b',
++        'app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php' => '73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6',
++        'app/Domain/Customers/ProductionIdentity/IdentityException.php' => '91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563',
++        'app/Domain/Commerce/ProductionPolicy/CurrentRows.php' => 'a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e',
++        'app/Support/CanonicalJson.php' => '6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89',
++        'app/Support/Access/AdminMultiFactor.php' => 'dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710',
++    ];
++
++    public function test_main_resident_dependencies_are_the_exact_reviewed_bytes(): void
++    {
++        foreach (self::MAIN as $path => $sha256) {
++            $this->assertSame($sha256, hash_file('sha256', base_path($path)), $path);
++        }
++    }
++
++    public function test_sealed_profile_manifest_binds_every_renderer_implementation_file(): void
++    {
++        $manifest = json_decode(file_get_contents(base_path('resources/contracts/production-free-v1/profile-assets.json')), true, 16, JSON_THROW_ON_ERROR);
++        $this->assertSame('production-free-grant-pdf-v1', $manifest['version']);
++        foreach ($manifest['files'] as $path => $sha256) {
++            $this->assertSame($sha256, hash_file('sha256', base_path($path)), $path);
++        }
++        $this->assertSame(['app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php', 'app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php',
++            'app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php', 'app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php',
++            'scripts/render-production-free-grant.php'], $this->sorted(array_keys($manifest['files'])));
++        $profile = ProductionFreeGrantRenderProfile::current('synthetic_rehearsal');
++        ProductionFreeGrantRenderProfile::verifyRuntime($profile);
++        $this->assertSame('production-free-grant-pdf-v1', $profile['version']);
++        $this->assertSame('test-buyer-pdf-v2', $profile['base']['version']);
++        $this->assertNotSame('test-free-grant-pdf-v1', $profile['version']);
++    }
++
++# Family 256 (app/Domain/Grants/ProductionFree + its controller/commands) references to App\Domain\Delivery
++app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php:7:use App\Domain\Delivery\DeliveryAssetFiles;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantFiles.php:162:        return (new DeliveryAssetFiles)->privateRoot();
++app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:5:use App\Domain\Delivery\DeliveryAssetFiles;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantDefinitions.php:22:    public const MAX_ASSET_BYTES = DeliveryAssetFiles::MAX_BYTES;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:5:use App\Domain\Delivery\PreparedDeliveryStream;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:11: * `slots` x `DeliveryAssetFiles::MAX_BYTES`), free space above the size plus a reserve after subtracting what every
++app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:23:    public function prepare(string $directory, int $slots, int $reserveBytes, string $sha256, int $bytes, int $deadline, callable $fill): PreparedDeliveryStream
++app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php:75:            $prepared = new PreparedDeliveryStream($reader, $sha256, $bytes, $lease);
++app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php:5:use App\Domain\Delivery\PreparedDeliveryStream;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php:16:    public function __construct(public readonly PreparedDeliveryStream $stream, public readonly string $filename,
++app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:7:use App\Domain\Delivery\PreparedDeliveryStream;
++app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php:153:    private function snapshot(array $before, int $deadline): PreparedDeliveryStream
++# sha256 of other pinned delivery files unchanged vs main?
++app/Domain/Delivery/PreparedDeliveryStream.php e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13 main=e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13
++app/Domain/Delivery/DeliveryAssetFiles.php 3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c main=3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c
++# outsideTransactions body identical (main vs B2)
++IDENTICAL
++    public static function outsideTransactions(): void
++    {
++        foreach (DB::getConnections() as $connection) {
++            if ($connection->transactionLevel() !== 0) { throw new DeliveryException('unavailable'); }
++        }
++    }
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-b2-own-tests.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-b2-own-tests.txt
+new file mode 100644
+index 0000000..b9d9514
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-b2-own-tests.txt
+@@ -0,0 +1,16 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingEnvironmentAdmissionTest.php tests/Feature/StagingOperatorMfaTest.php
++# started: 2026-10-09T09:28:19Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/phpunit.xml
++
++..................                                                18 / 18 (100%)
++
++Time: 00:23.692, Memory: 105.00 MB
++
++OK (18 tests, 229 assertions)
++# finished: 2026-10-09T09:28:43Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-frozen-bytes.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-frozen-bytes.txt
+new file mode 100644
+index 0000000..e252329
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/green-frozen-bytes.txt
+@@ -0,0 +1,25 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
++# started: 2026-10-09T10:03:01Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/phpunit.xml
++
++..F                                                                 3 / 3 (100%)
++
++Time: 00:00.325, Memory: 59.00 MB
++
++There was 1 failure:
++
++1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported
++Failed asserting that directory "/home/user/rv-b2/app/Domain/Grants/Paid" does not exist.
++
++/home/user/rv-b2/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:68
++/home/user/rv-b2/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 3, Assertions: 79, Failures: 1.
++# finished: 2026-10-09T10:03:01Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/main-baseline-frozen-bytes.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/main-baseline-frozen-bytes.txt
+new file mode 100644
+index 0000000..f8d5593
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/main-baseline-frozen-bytes.txt
+@@ -0,0 +1,25 @@
++# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
++# started: 2026-10-09T10:03:00Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2-red/phpunit.xml
++
++..F                                                                 3 / 3 (100%)
++
++Time: 00:00.367, Memory: 59.00 MB
++
++There was 1 failure:
++
++1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported
++Failed asserting that directory "/home/user/rv-b2-red/app/Domain/Grants/Paid" does not exist.
++
++/home/user/rv-b2-red/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:68
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 3, Assertions: 79, Failures: 1.
++# finished: 2026-10-09T10:03:01Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/ops-python-tests.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/ops-python-tests.txt
+new file mode 100644
+index 0000000..7d16568
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/ops-python-tests.txt
+@@ -0,0 +1,173 @@
++## python3 tests/ops/test_staging_admin_defaults_custody.py
++test_default_socket_path_does_not_require_a_defaults_file (__main__.AdminDefaultsCustodyTest.test_default_socket_path_does_not_require_a_defaults_file) ... ok
++test_protected_admin_defaults_reach_the_first_query (__main__.AdminDefaultsCustodyTest.test_protected_admin_defaults_reach_the_first_query) ... ok
++test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) ... ok
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.740s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_backup_credential_custody.py
++test_existing_backup_account_refuses_incomplete_or_unsafe_profile_before_grants (__main__.BackupCredentialCustodyTest.test_existing_backup_account_refuses_incomplete_or_unsafe_profile_before_grants) ... ok
++test_missing_database_account_never_overwrites_orphan_backup_profile (__main__.BackupCredentialCustodyTest.test_missing_database_account_never_overwrites_orphan_backup_profile) ... ok
++test_new_backup_account_persists_private_profile_before_authentication (__main__.BackupCredentialCustodyTest.test_new_backup_account_persists_private_profile_before_authentication) ... ok
++test_valid_looking_but_non_authenticating_profile_refuses_before_grants (__main__.BackupCredentialCustodyTest.test_valid_looking_but_non_authenticating_profile_refuses_before_grants) ... ok
++
++----------------------------------------------------------------------
++Ran 4 tests in 0.390s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_backup_key_custody.py
++test_absent_or_ambiguous_manifest_refuses (__main__.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses) ... ok
++test_dangling_outside_and_non_symlink_current_cannot_become_first_install (__main__.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install) ... ok
++test_genuine_first_install_admission_is_explicit (__main__.BackupKeyCustodyTest.test_genuine_first_install_admission_is_explicit) ... ok
++test_genuine_no_current_snapshot_records_none (__main__.BackupKeyCustodyTest.test_genuine_no_current_snapshot_records_none) ... ok
++test_key_looking_lines_inside_multiline_values_are_not_admitted (__main__.BackupKeyCustodyTest.test_key_looking_lines_inside_multiline_values_are_not_admitted) ... ok
++test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) ... ok
++test_served_release_missing_env_refuses_before_publishing_any_snapshot (__main__.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot) ... ok
++test_served_restore_requires_the_exact_environment_hash_record (__main__.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) ... ok
++test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse (__main__.BackupKeyCustodyTest.test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse) ... ok
++
++----------------------------------------------------------------------
++Ran 9 tests in 0.908s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_build_admission.py
++test_composer_hooks_receive_frozen_environment_before_bootstrap (__main__.BuildAdmissionTest.test_composer_hooks_receive_frozen_environment_before_bootstrap)
++Run the actual helper; Composer/npm/runtime effects are bounded fixtures. ... ok
++test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... ok
++test_running_application_cannot_inject_ignored_vendor_before_sealing (__main__.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.229s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_deploy_refresh.py
++test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate) ... ok
++test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) ... ok
++
++----------------------------------------------------------------------
++Ran 2 tests in 0.103s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_dump_normalization.py
++test_binary_row_bytes_and_unknown_layout_remain_exact (__main__.DumpNormalizationTest.test_binary_row_bytes_and_unknown_layout_remain_exact) ... ok
++test_changed_insert_rows_remain_different (__main__.DumpNormalizationTest.test_changed_insert_rows_remain_different) ... ok
++test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump (__main__.DumpNormalizationTest.test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump) ... ok
++test_defaults_comments_and_escaped_identifiers_remain_exact (__main__.DumpNormalizationTest.test_defaults_comments_and_escaped_identifiers_remain_exact) ... ok
++test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset (__main__.DumpNormalizationTest.test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset) ... ok
++test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) ... ok
++test_enum_strings_remain_exact_while_real_attribute_is_normalized (__main__.DumpNormalizationTest.test_enum_strings_remain_exact_while_real_attribute_is_normalized) ... ok
++test_first_generation_and_redump_string_columns_match (__main__.DumpNormalizationTest.test_first_generation_and_redump_string_columns_match) ... ok
++test_native_saved_charset_setting_alignment_is_supported (__main__.DumpNormalizationTest.test_native_saved_charset_setting_alignment_is_supported) ... ok
++test_other_charsets_malformed_types_and_later_attributes_remain_exact (__main__.DumpNormalizationTest.test_other_charsets_malformed_types_and_later_attributes_remain_exact) ... ok
++test_routine_ddl_and_nonmatching_table_names_are_not_normalized (__main__.DumpNormalizationTest.test_routine_ddl_and_nonmatching_table_names_are_not_normalized) ... ok
++test_unknown_dump_escape_mode_refuses_instead_of_guessing_literal_boundaries (__main__.DumpNormalizationTest.test_unknown_dump_escape_mode_refuses_instead_of_guessing_literal_boundaries) ... ok
++
++----------------------------------------------------------------------
++Ran 12 tests in 0.049s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_operation_custody.py
++test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (__main__.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) ... ok
++test_existing_database_identity_requires_private_complete_credential_custody (__main__.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ... ok
++test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (__main__.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... ok
++
++----------------------------------------------------------------------
++Ran 3 tests in 0.401s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_operation_lease.py
++test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (__main__.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries) ... ok
++test_fresh_activation_can_requiesce_an_already_stopped_served_release (__main__.OperationLeaseTest.test_fresh_activation_can_requiesce_an_already_stopped_served_release) ... ok
++test_killed_root_parent_blocks_resume_while_migration_child_survives (__main__.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives) ... ok
++test_migration_holds_control_and_writer_locks_until_switch_and_resume (__main__.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume) ... ok
++test_prepare_retains_control_lease_until_writable_build_child_is_reaped (__main__.OperationLeaseTest.test_prepare_retains_control_lease_until_writable_build_child_is_reaped) ... ok
++test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (__main__.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) ... ok
++test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume (__main__.OperationLeaseTest.test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume) ... ok
++test_resume_refuses_an_open_gate_without_poisoning_recovery_custody (__main__.OperationLeaseTest.test_resume_refuses_an_open_gate_without_poisoning_recovery_custody) ... ok
++
++----------------------------------------------------------------------
++Ran 8 tests in 2.787s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_pipeline_admission.py
++test_closed_gate_blocks_repeated_future_sweeps (__main__.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps) ... ok
++test_exclusive_root_lock_blocks_an_open_gate_sweep (__main__.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep) ... ok
++test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) ... ok
++test_open_gate_runs_all_five_stages (__main__.PipelineAdmissionTest.test_open_gate_runs_all_five_stages) ... ok
++test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (__main__.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness) ... ok
++test_quiesce_leaves_future_invocations_closed_after_helper_exits (__main__.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits) ... ok
++test_snapshot_does_not_cross_an_already_admitted_shared_writer (__main__.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer) ... ok
++test_snapshot_requires_the_durable_closed_gate (__main__.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate) ... ok
++test_writer_lock_survives_runner_death_until_its_child_finishes (__main__.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes) ... ok
++
++----------------------------------------------------------------------
++Ran 9 tests in 1.999s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_protected_configuration.py
++test_open_admission_or_active_writer_refuses_before_environment_changes (__main__.ProtectedConfigurationTest.test_open_admission_or_active_writer_refuses_before_environment_changes) ... ok
++test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache (__main__.ProtectedConfigurationTest.test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache) ... ok
++test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission) ... ok
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.366s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_recovery_admission.py
++test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication (__main__.RecoveryAdmissionTest.test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication) ... ok
++test_first_install_also_takes_the_pre_migration_snapshot (__main__.RecoveryAdmissionTest.test_first_install_also_takes_the_pre_migration_snapshot) ... ok
++test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair (__main__.RecoveryAdmissionTest.test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair) ... ok
++test_served_release_propagates_a_failed_sealing_check_inside_command_substitution (__main__.RecoveryAdmissionTest.test_served_release_propagates_a_failed_sealing_check_inside_command_substitution) ... ok
++
++----------------------------------------------------------------------
++Ran 4 tests in 0.703s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_release_sealing.py
++test_environment_capture_refuses_links_escapes_and_writable_ancestry (__main__.ReleaseSealingTest.test_environment_capture_refuses_links_escapes_and_writable_ancestry) ... ok
++test_external_and_runtime_code_symlinks_refuse (__main__.ReleaseSealingTest.test_external_and_runtime_code_symlinks_refuse) ... ok
++test_hard_links_refuse_without_mutating_the_external_inode (__main__.ReleaseSealingTest.test_hard_links_refuse_without_mutating_the_external_inode) ... ok
++test_internal_code_symlinks_and_executable_bits_are_preserved (__main__.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved) ... ok
++test_old_open_writer_cannot_change_the_published_inode (__main__.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode) ... ok
++test_post_seal_revision_check_detects_source_changed_during_build (__main__.ReleaseSealingTest.test_post_seal_revision_check_detects_source_changed_during_build) ... ok
++test_privileged_cli_refuses_root_as_the_application_account (__main__.ReleaseSealingTest.test_privileged_cli_refuses_root_as_the_application_account) ... ok
++test_public_asset_aliases_stay_inside_the_public_tree (__main__.ReleaseSealingTest.test_public_asset_aliases_stay_inside_the_public_tree) ... ok
++test_public_symlinks_cannot_expose_private_release_paths (__main__.ReleaseSealingTest.test_public_symlinks_cannot_expose_private_release_paths) ... ok
++test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (__main__.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable) ... ok
++test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer (__main__.ReleaseSealingTest.test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer) ... ok
++
++----------------------------------------------------------------------
++Ran 11 tests in 0.839s
++
++OK
++rc=0
++## python3 tests/ops/test_staging_runtime_directory_custody.py
++test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) ... ok
++test_regular_runtime_directories_and_existing_gitignore_are_preserved (__main__.RuntimeDirectoryCustodyTest.test_regular_runtime_directories_and_existing_gitignore_are_preserved) ... ok
++test_replacement_after_open_cannot_redirect_descriptor_metadata_changes (__main__.RuntimeDirectoryCustodyTest.test_replacement_after_open_cannot_redirect_descriptor_metadata_changes) ... ok
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.459s
++
++OK
++rc=0
++## python3 scripts/ops/test-private-server-preflight.py
++....................
++----------------------------------------------------------------------
++Ran 20 tests in 4.725s
++
++OK
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-d1-run-1.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-d1-run-1.txt
+new file mode 100644
+index 0000000..a5b56c2
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-d1-run-1.txt
+@@ -0,0 +1,23 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /home/user/rv-b2/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerD1StagingProbeTest.php
++# started: 2026-10-09T09:33:15Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/phpunit.xml
++
++
++PROBE D1 without stand-in under staging: {
++    "create quote (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409",
++    "link (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409"
++}
++.
++PROBE full D1 chain under staging: unlinked=QuoteException:INVENTORY_SCOPE_UNAVAILABLE:409 order=prepared env=staging
++.                                                                  2 / 2 (100%)
++
++Time: 00:05.249, Memory: 92.00 MB
++
++OK (2 tests, 5 assertions)
++# finished: 2026-10-09T09:33:21Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-preflight.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-preflight.txt
+new file mode 100644
+index 0000000..c9e68bb
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-preflight.txt
+@@ -0,0 +1,162 @@
++{
++ "staging valid": {
++  "rc": 0,
++  "result": "FILE_CHECKS_PASSED",
++  "profile": "staging",
++  "blocked": []
++ },
++ "staging APP_ENV=Staging": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "baseline_app_env"
++  ]
++ },
++ "staging APP_ENV=local": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "baseline_app_env"
++  ]
++ },
++ "staging APP_ENV=testing": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "baseline_app_env"
++  ]
++ },
++ "staging STRIPE_MODE=live": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "baseline_stripe_mode"
++  ]
++ },
++ "staging sk_live_ test key": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_no_live_provider_credential",
++   "staging_stripe_test_secret_key_shape"
++  ]
++ },
++ "staging rk_live_ in unrelated var": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_no_live_provider_credential"
++  ]
++ },
++ "staging rk_test_ as test key": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_stripe_test_secret_key_shape"
++  ]
++ },
++ "staging funds mode live": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_no_production_funds_mode"
++  ]
++ },
++ "staging funds mode test": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_no_production_funds_mode"
++  ]
++ },
++ "staging switch yes": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "staging_boolean_stripe_test_checkout_enabled"
++  ]
++ },
++ "staging debug true": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "staging",
++  "blocked": [
++   "baseline_app_debug"
++  ]
++ },
++ "staging file under production profile": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "production",
++  "blocked": [
++   "baseline_app_env",
++   "baseline_stripe_test_checkout_enabled",
++   "baseline_stripe_test_finalization_enabled",
++   "baseline_stripe_test_payment_processing_enabled",
++   "baseline_stripe_webhook_enabled",
++   "baseline_vasey_test_contract_issuance_enabled",
++   "baseline_vasey_test_delivery_access_enabled",
++   "baseline_vasey_test_fulfillment_activation_enabled",
++   "inactive_stripe_account_id",
++   "inactive_stripe_test_secret_key",
++   "inactive_stripe_webhook_secret",
++   "inactive_vasey_test_checkout_policy"
++  ]
++ },
++ "production valid (default)": {
++  "rc": 0,
++  "result": "FILE_CHECKS_PASSED",
++  "profile": "production",
++  "blocked": []
++ },
++ "production valid explicit": {
++  "rc": 0,
++  "result": "FILE_CHECKS_PASSED",
++  "profile": "production",
++  "blocked": []
++ },
++ "production with test switch on": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "production",
++  "blocked": [
++   "baseline_stripe_test_checkout_enabled"
++  ]
++ },
++ "duplicate profile flags": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "production",
++  "blocked": [
++   "usage_template_or_absolute_env_file_with_optional_runtime"
++  ]
++ },
++ "repeated runtime flag": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "production",
++  "blocked": [
++   "usage_template_or_absolute_env_file_with_optional_runtime"
++  ]
++ },
++ "unknown profile": {
++  "rc": 1,
++  "result": "BLOCKED",
++  "profile": "production",
++  "blocked": [
++   "usage_template_or_absolute_env_file_with_optional_runtime"
++  ]
++ }
++}
++UNEXPECTED: []
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-route-cache-mfa.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-route-cache-mfa.txt
+new file mode 100644
+index 0000000..b716cbc
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-route-cache-mfa.txt
+@@ -0,0 +1,24 @@
++# Probe: Filament page MFA middleware is compiled into the route cache (rv-b2 @ 56efbb7a517abc55f17ea9a8b37b29e4970a2210)
++## 1. no route cache, APP_ENV=staging: middleware on admin/tracks
++admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent', 'Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
++## 2. route:cache built with APP_ENV=local, then served with APP_ENV=staging
++
++ INFO Routes cached successfully. 
++
++rc=0
++admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent']
++## 2b. same cache: does the panel still say MFA is required at runtime under staging?
++{"env":"staging","panelRequired":true}
++
++## 3. route:cache built with APP_ENV=staging
++
++ INFO Routes cached successfully. 
++
++rc=0
++admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent', 'Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
++
++ INFO Route cache cleared successfully. 
++
++rc=0
++packages.php
++services.php
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-run-1.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-run-1.txt
+new file mode 100644
+index 0000000..d1b49da
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probe-run-1.txt
+@@ -0,0 +1,110 @@
++# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /home/user/rv-b2/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerStagingProbeTest.php
++# started: 2026-10-09T09:31:19Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2/phpunit.xml
++
++
++PROBE helper matrix: {
++    "\"staging\"": {
++        "admitsTestCommerce": true,
++        "requiresStaffMfa": true,
++        "refusesProductionOnly": true,
++        "panelMfaRequired": true
++    },
++    "\"Staging\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"STAGING\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"staging-eu\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"stage\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\" staging\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"staging \"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"staging\\n\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"testing\"": {
++        "admitsTestCommerce": true,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"local\"": {
++        "admitsTestCommerce": true,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    },
++    "\"production\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": true,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": true
++    },
++    "\"preview\"": {
++        "admitsTestCommerce": false,
++        "requiresStaffMfa": false,
++        "refusesProductionOnly": false,
++        "panelMfaRequired": false
++    }
++}
++.
++PROBE AdminMultiFactor::satisfiedBy: {"staging":{"unenrolled":false,"enrolled":true},"production":{"unenrolled":false,"enrolled":true},"local":{"unenrolled":true,"enrolled":true},"testing":{"unenrolled":true,"enrolled":true}}
++.
++PROBE TestPaymentExceptionOperations::locked: {"staging unenrolled":"AuthorizationException","staging enrolled":"ModelNotFoundException","production unenrolled":"AuthorizationException","production enrolled":"ModelNotFoundException","local unenrolled":"ModelNotFoundException"}
++.
++PROBE staff writes by an UNENROLLED admin: {
++    "promotion.create staging": "completed:PromotionCampaign",
++    "rights-scope.register staging": "completed:RightsScope",
++    "promotion.create production": "AuthorizationException",
++    "rights-scope.register production": "QuoteException:INVENTORY_UNAVAILABLE:503",
++    "promotion.create preview": "AuthorizationException",
++    "rights-scope.register preview": "QuoteException:INVENTORY_UNAVAILABLE:503"
++}
++.                                                                4 / 4 (100%)
++
++Time: 00:01.945, Memory: 81.00 MB
++
++OK (4 tests, 35 assertions)
++# finished: 2026-10-09T09:31:21Z
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerD1StagingProbeTest.php b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerD1StagingProbeTest.php
+new file mode 100644
+index 0000000..f39827c
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerD1StagingProbeTest.php
+@@ -0,0 +1,102 @@
++<?php
++
++namespace Tests\Feature;
++
++use App\Domain\Commerce\CreateQuote;
++use App\Domain\Commerce\Inventory\ManageRightsScope;
++use App\Domain\Commerce\Orders\PrepareOrder;
++use App\Domain\Commerce\PriceQuote;
++use App\Domain\Commerce\QuoteException;
++use App\Domain\Media\MalwareScanner;
++use Illuminate\Foundation\Testing\RefreshDatabase;
++use Illuminate\Support\Str;
++use Tests\Support\InventoryFixtures;
++use Tests\Support\OrderFixtures;
++use Tests\Support\QuoteFixtures;
++use Tests\TestCase;
++use Throwable;
++
++/**
++ * Independent reviewer probes for B2's D1 staging variant (not part of the branch).
++ * (1) Without the ClamAV-engine stand-in, staging must refuse the test-only scan evidence (not silently admit it).
++ * (2) With the stand-in, quote creation and pricing also run under staging (B2's variant runs them under testing).
++ */
++class ReviewerD1StagingProbeTest extends TestCase
++{
++    use RefreshDatabase;
++
++    protected function setUp(): void
++    {
++        parent::setUp();
++        $this->withoutVite();
++        $this->fakePrivateMediaStorage();
++        $this->travelTo(now()->startOfSecond());
++        OrderFixtures::configure();
++    }
++
++    private static function standIn(): MalwareScanner
++    {
++        return new class extends MalwareScanner
++        {
++            public function scan(string $path): array
++            {
++                return ['engine' => 'clamav', 'version' => 'reviewer-stand-in', 'status' => 'clean', 'sha256' => hash_file('sha256', $path)];
++            }
++        };
++    }
++
++    private static function outcome(callable $operation): string
++    {
++        try {
++            $result = $operation();
++
++            return 'completed'.(is_object($result) ? ':'.class_basename($result) : '');
++        } catch (QuoteException $error) {
++            return 'QuoteException:'.$error->errorCode.':'.$error->status;
++        } catch (Throwable $error) {
++            return class_basename($error).':'.$error->getMessage();
++        }
++    }
++
++    public function test_probe_staging_refuses_test_only_scan_evidence_in_the_d1_chain(): void
++    {
++        $f = QuoteFixtures::selection();
++        $this->app['env'] = 'staging';
++        try {
++            $rows = [
++                'create quote (test-only scan) staging' => self::outcome(fn () => app(CreateQuote::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), $f['items'])),
++                'link (test-only scan) staging' => self::outcome(function () use ($f) {
++                    $scope = app(ManageRightsScope::class)->register('probe-scope', 'probe-reference', $f['actor']);
++
++                    return app(ManageRightsScope::class)->link($scope->id, $f['revision']->id, 'probe-link', $f['actor']);
++                }),
++            ];
++        } finally {
++            $this->app['env'] = 'testing';
++        }
++        fwrite(STDERR, "\nPROBE D1 without stand-in under staging: ".json_encode($rows, JSON_PRETTY_PRINT)."\n");
++        $this->assertStringStartsWith('QuoteException', $rows['create quote (test-only scan) staging']);
++        $this->assertStringStartsWith('QuoteException', $rows['link (test-only scan) staging']);
++    }
++
++    public function test_probe_full_d1_chain_including_quote_and_pricing_under_staging(): void
++    {
++        $f = QuoteFixtures::selection(scanner: self::standIn());
++        $this->app['env'] = 'staging';
++        try {
++            $quote = app(CreateQuote::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), $f['items']);
++            app(PriceQuote::class)->create($quote->public_id, InventoryFixtures::OWNER);
++            $unlinked = self::outcome(fn () => app(PrepareOrder::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), OrderFixtures::request($quote)));
++            $scope = app(ManageRightsScope::class)->register('probe-scope', 'probe-reference', $f['actor']);
++            app(ManageRightsScope::class)->link($scope->id, $f['revision']->id, 'probe-link', $f['actor']);
++            $order = app(PrepareOrder::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), OrderFixtures::request($quote));
++            $env = app()->environment();
++        } finally {
++            $this->app['env'] = 'testing';
++        }
++        fwrite(STDERR, "\nPROBE full D1 chain under staging: unlinked=".$unlinked.' order='.($order->exists ? 'prepared' : 'absent').' env='.$env."\n");
++        $this->assertSame('QuoteException:INVENTORY_SCOPE_UNAVAILABLE:409', $unlinked);
++        $this->assertTrue($order->exists);
++        $this->assertSame('staging', $env);
++    }
++}
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerStagingProbeTest.php b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerStagingProbeTest.php
+new file mode 100644
+index 0000000..54b65af
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerStagingProbeTest.php
+@@ -0,0 +1,151 @@
++<?php
++
++namespace Tests\Feature;
++
++use App\Domain\Commerce\Inventory\ManageRightsScope;
++use App\Domain\Commerce\Operations\TestPaymentExceptionOperations;
++use App\Domain\Commerce\PromotionAdministration;
++use App\Domain\Commerce\QuoteException;
++use App\Models\User;
++use App\Support\Access\AdminMultiFactor;
++use App\Support\Environment\TestEnvironment;
++use Closure;
++use Filament\Facades\Filament;
++use Illuminate\Auth\Access\AuthorizationException;
++use Illuminate\Database\Eloquent\ModelNotFoundException;
++use Illuminate\Foundation\Testing\RefreshDatabase;
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Str;
++use ReflectionMethod;
++use Tests\Support\InventoryFixtures;
++use Tests\Support\LicenseFixtures;
++use Tests\Support\PromotionFixtures;
++use Tests\TestCase;
++use Throwable;
++
++/**
++ * Independent reviewer probes for lane B2 (not part of the branch). Each probe records an outcome string
++ * so the evidence shows what actually happened under each environment, not only pass/fail.
++ */
++class ReviewerStagingProbeTest extends TestCase
++{
++    use RefreshDatabase;
++
++    private function in(string $environment, Closure $probe): mixed
++    {
++        $this->app->detectEnvironment(fn () => $environment);
++        try {
++            return $probe();
++        } finally {
++            $this->app->detectEnvironment(fn () => 'testing');
++        }
++    }
++
++    private static function outcome(Closure $operation): string
++    {
++        try {
++            $result = $operation();
++
++            return 'completed'.(is_object($result) ? ':'.class_basename($result) : '');
++        } catch (QuoteException $error) {
++            return 'QuoteException:'.$error->errorCode.':'.$error->status;
++        } catch (Throwable $error) {
++            return class_basename($error);
++        }
++    }
++
++    private function enrolled(): User
++    {
++        $admin = LicenseFixtures::admin();
++        $provider = Filament::getPanel('admin')->getMultiFactorAuthenticationProviders()['app'];
++        $admin->saveAppAuthenticationSecret($provider->generateSecret());
++
++        return $admin->fresh();
++    }
++
++    public function test_probe_helper_exact_match_semantics(): void
++    {
++        $rows = [];
++        foreach (['staging', 'Staging', 'STAGING', 'staging-eu', 'stage', ' staging', 'staging ', "staging\n", '', 'testing', 'local', 'production', 'preview'] as $env) {
++            $rows[json_encode($env)] = $this->in($env, fn () => [
++                'admitsTestCommerce' => TestEnvironment::admitsTestCommerce(),
++                'requiresStaffMfa' => TestEnvironment::requiresStaffMfa(),
++                'refusesProductionOnly' => TestEnvironment::refusesProductionOnly(),
++                'panelMfaRequired' => Filament::getPanel('admin')->isMultiFactorAuthenticationRequired(),
++            ]);
++        }
++        fwrite(STDERR, "\nPROBE helper matrix: ".json_encode($rows, JSON_PRETTY_PRINT)."\n");
++        $this->assertTrue($rows['"staging"']['admitsTestCommerce']);
++        $this->assertTrue($rows['"staging"']['requiresStaffMfa']);
++        foreach (['"Staging"', '"STAGING"', '"staging-eu"', '"stage"', '" staging"', '"staging "', '"staging\n"', '""', '"preview"'] as $near) {
++            $this->assertFalse($rows[$near]['admitsTestCommerce'], $near);
++            $this->assertFalse($rows[$near]['refusesProductionOnly'], $near);
++        }
++        $this->assertTrue($rows['"production"']['panelMfaRequired']);
++        $this->assertFalse($rows['"production"']['admitsTestCommerce']);
++    }
++
++    public function test_probe_mfa_rule_by_environment_for_unenrolled_and_enrolled_admins(): void
++    {
++        $unenrolled = LicenseFixtures::admin();
++        $enrolled = $this->enrolled();
++        $rows = [];
++        foreach (['staging', 'production', 'local', 'testing'] as $env) {
++            $rows[$env] = $this->in($env, fn () => [
++                'unenrolled' => AdminMultiFactor::satisfiedBy($unenrolled),
++                'enrolled' => AdminMultiFactor::satisfiedBy($enrolled),
++            ]);
++        }
++        fwrite(STDERR, "\nPROBE AdminMultiFactor::satisfiedBy: ".json_encode($rows)."\n");
++        $this->assertFalse($rows['staging']['unenrolled']);
++        $this->assertTrue($rows['staging']['enrolled']);
++        $this->assertFalse($rows['production']['unenrolled']);
++        $this->assertTrue($rows['local']['unenrolled']);
++    }
++
++    public function test_probe_mfa_gated_staff_domain_action_refuses_unenrolled_admin_in_staging(): void
++    {
++        $unenrolled = LicenseFixtures::admin();
++        $enrolled = $this->enrolled();
++        $locked = function (User $actor): string {
++            return self::outcome(fn () => DB::transaction(fn () => (new ReflectionMethod(TestPaymentExceptionOperations::class, 'locked'))
++                ->invoke(app(TestPaymentExceptionOperations::class), (string) Str::uuid(), $actor)));
++        };
++        $rows = [
++            'staging unenrolled' => $this->in('staging', fn () => $locked($unenrolled)),
++            'staging enrolled' => $this->in('staging', fn () => $locked($enrolled)),
++            'production unenrolled' => $this->in('production', fn () => $locked($unenrolled)),
++            'production enrolled' => $this->in('production', fn () => $locked($enrolled)),
++            'local unenrolled' => $this->in('local', fn () => $locked($unenrolled)),
++        ];
++        fwrite(STDERR, "\nPROBE TestPaymentExceptionOperations::locked: ".json_encode($rows)."\n");
++        $this->assertSame('AuthorizationException', $rows['staging unenrolled']);
++        // Enrolled staff passes authority and reaches the (empty) record lookup.
++        $this->assertSame('ModelNotFoundException', $rows['staging enrolled']);
++        $this->assertSame('AuthorizationException', $rows['production unenrolled']);
++        $this->assertSame('ModelNotFoundException', $rows['production enrolled'], 'production refuses after authority by not finding');
++        $this->assertSame('ModelNotFoundException', $rows['local unenrolled']);
++    }
++
++    public function test_probe_staff_writes_without_domain_mfa_check_in_staging(): void
++    {
++        // Observation probe: records whether admitted staff writes that do not call AdminMultiFactor accept an
++        // unenrolled admin when invoked below the panel (the panel middleware itself requires enrollment).
++        config(['commerce.test_promotions' => null, 'commerce.test_pricing_policy' => null]);
++        InventoryFixtures::configure();
++        $unenrolled = LicenseFixtures::admin();
++        $rows = [];
++        foreach (['staging', 'production', 'preview'] as $env) {
++            $rows['promotion.create '.$env] = $this->in($env, fn () => self::outcome(fn () => app(PromotionAdministration::class)
++                ->create(PromotionFixtures::policy(['key' => 'probe-'.$env, 'code' => 'PROBE'.strtoupper(substr(md5($env), 0, 6))]), $unenrolled)));
++            $rows['rights-scope.register '.$env] = $this->in($env, fn () => self::outcome(fn () => app(ManageRightsScope::class)
++                ->register('probe.'.$env, 'reviewer-probe-reference', $unenrolled)));
++        }
++        fwrite(STDERR, "\nPROBE staff writes by an UNENROLLED admin: ".json_encode($rows, JSON_PRETTY_PRINT)."\n");
++        $this->assertSame('AuthorizationException', $rows['promotion.create production']);
++        $this->assertSame('QuoteException:INVENTORY_UNAVAILABLE:503', $rows['rights-scope.register production']);
++        $this->assertSame('AuthorizationException', $rows['promotion.create preview']);
++        // Recorded, not asserted as desired behaviour: see DECISION.md finding on domain-level MFA.
++        $this->addToAssertionCount(1);
++    }
++}
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/reviewer_preflight_probe.py b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/reviewer_preflight_probe.py
+new file mode 100644
+index 0000000..38da2eb
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/reviewer_preflight_probe.py
+@@ -0,0 +1,48 @@
++#!/usr/bin/env python3
++"""Reviewer probe: run the real preflight against near-miss staging files (independent of the branch self-test)."""
++import importlib.util, json, os, subprocess, sys, tempfile
++from pathlib import Path
++ROOT = Path(sys.argv[1]).resolve()
++spec = importlib.util.spec_from_file_location("st", ROOT / "scripts/ops/test-private-server-preflight.py")
++st = importlib.util.module_from_spec(spec); spec.loader.exec_module(st)
++SCRIPT = ROOT / "scripts/ops/private-server-preflight.php"
++
++def run(source, *options):
++    with tempfile.TemporaryDirectory(prefix="rv-preflight-") as d:
++        p = Path(d) / "cfg"; p.write_text(source); os.chmod(p, 0o600)
++        r = subprocess.run(["php", str(SCRIPT), "--env-file", str(p), *options], capture_output=True, text=True)
++        try:
++            out = json.loads(r.stdout)
++        except Exception:
++            return {"rc": r.returncode, "raw": r.stdout[:300]}
++        return {"rc": r.returncode, "result": out["result"], "profile": out.get("profile"),
++                "blocked": sorted(c["id"] for c in out["checks"] if c["status"] == "blocked")}
++
++S = st.staging()
++cases = {
++    "staging valid": (S, "--profile=staging"),
++    "staging APP_ENV=Staging": (st.replace(S, "APP_ENV", "Staging"), "--profile=staging"),
++    "staging APP_ENV=local": (st.replace(S, "APP_ENV", "local"), "--profile=staging"),
++    "staging APP_ENV=testing": (st.replace(S, "APP_ENV", "testing"), "--profile=staging"),
++    "staging STRIPE_MODE=live": (st.replace(S, "STRIPE_MODE", "live"), "--profile=staging"),
++    "staging sk_live_ test key": (st.replace(S, "STRIPE_TEST_SECRET_KEY", "sk_" + "live_SYNTHETICONLY1234"), "--profile=staging"),
++    "staging rk_live_ in unrelated var": (st.replace(S, "MAIL_PASSWORD", "rk_" + "live_SYNTHETICONLY1234"), "--profile=staging"),
++    "staging rk_test_ as test key": (st.replace(S, "STRIPE_TEST_SECRET_KEY", "rk_" + "test_SYNTHETICONLY1234"), "--profile=staging"),
++    "staging funds mode live": (st.replace(S, "PRODUCTION_CHECKOUT_FUNDS_MODE", "live"), "--profile=staging"),
++    "staging funds mode test": (st.replace(S, "PRODUCTION_CHECKOUT_FUNDS_MODE", "test"), "--profile=staging"),
++    "staging switch yes": (st.replace(S, "STRIPE_TEST_CHECKOUT_ENABLED", "yes"), "--profile=staging"),
++    "staging debug true": (st.replace(S, "APP_DEBUG", "true"), "--profile=staging"),
++    "staging file under production profile": (S,),
++    "production valid (default)": (st.configured(),),
++    "production valid explicit": (st.configured(), "--profile=production"),
++    "production with test switch on": (st.replace(st.configured(), "STRIPE_TEST_CHECKOUT_ENABLED", "true"),),
++    "duplicate profile flags": (S, "--profile=staging", "--profile=production"),
++    "repeated runtime flag": (S, "--runtime", "--runtime"),
++    "unknown profile": (S, "--profile=stage"),
++}
++res = {k: run(*v) for k, v in cases.items()}
++print(json.dumps(res, indent=1))
++expect_pass = {"staging valid", "production valid (default)", "production valid explicit"}
++bad = [k for k, v in res.items() if (v.get("result") == "FILE_CHECKS_PASSED") != (k in expect_pass)]
++print("UNEXPECTED:", bad)
++sys.exit(1 if bad else 0)
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/pu.sh b/docs/verification/staging-env-admission-20261008/independent-review/evidence/pu.sh
+new file mode 100755
+index 0000000..e09d78e
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/pu.sh
+@@ -0,0 +1,15 @@
++#!/bin/bash
++# usage: pu.sh <worktree> <outfile> <phpunit args...>
++wt="$1"; out="$2"; shift 2
++cd "$wt" || exit 9
++{
++  echo "# cwd: $wt  HEAD: $(git rev-parse HEAD)  status-dirty-tracked: $(git status --porcelain --untracked-files=no | wc -l)"
++  echo "# public/build present: $([ -e public/build ] && echo yes || echo no)"
++  echo "# command: php -r '\$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";' -- --colors=never --do-not-cache-result $*"
++  echo "# started: $(date -u +%FT%TZ)"
++  php -d memory_limit=2G -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result "$@" 2>&1
++  rc=$?
++  echo "# finished: $(date -u +%FT%TZ)"
++  echo "rc=$rc"
++} > "$out"
++tail -3 "$out"
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-admission.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-admission.txt
+new file mode 100644
+index 0000000..18f3744
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-admission.txt
+@@ -0,0 +1,171 @@
++# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingEnvironmentAdmissionTest.php
++# started: 2026-10-09T09:29:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2-red/phpunit.xml
++
++..F....F.FFF.EF                                                   15 / 15 (100%)
++
++Time: 00:25.037, Memory: 103.00 MB
++
++There was 1 error:
++
++1) Tests\Feature\StagingEnvironmentAdmissionTest::test_the_helper_names_exactly_three_test_commerce_environments_and_two_mfa_environments
++Error: Class "App\Support\Environment\TestEnvironment" not found
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:513
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++--
++
++There were 6 failures:
++
++1) Tests\Feature\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging@staging with data ('staging')
++Gates refusing staging
++Failed asserting that two arrays are identical.
++--- Expected
+++++ Actual
++@@ @@
++-Array &0 []
+++Array &0 [
+++    0 => 'checkout policy',
+++    1 => 'checkout account',
+++    2 => 'order policy',
+++    3 => 'pricing policy',
+++    4 => 'inventory policy',
+++    5 => 'payment processing',
+++    6 => 'checkout gateway reaches the provider transport',
+++    7 => 'finalization',
+++    8 => 'contract issuance',
+++    9 => 'fulfillment activation',
+++    10 => 'owner delivery access',
+++    11 => 'owner delivery stream',
+++    12 => 'test customer accounts',
+++    13 => 'test customer consent grants',
+++    14 => 'test transactional notifications',
+++    15 => 'test order inquiries',
+++    16 => 'test service projects',
+++    17 => 'synthetic memberships',
+++    18 => 'test free grants',
+++    19 => 'test free grant definitions',
+++    20 => 'test free grant identity',
+++    21 => 'test free grant authoring',
+++    22 => 'pricing settlement comparison',
+++    23 => 'test promotions',
+++    24 => 'test promotion usage',
+++    25 => 'test promotion administration',
+++    26 => 'test promotion resource',
+++    27 => 'test unpaid release',
+++]
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:336
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++2) Tests\Feature\StagingEnvironmentAdmissionTest::test_test_payment_exception_operations_reach_their_record_lookup_only_in_admitted_environments
++Failed asserting that 0 is greater than 0.
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:365
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++3) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_admits_production_identity_or_production_live_funds
++Failed asserting that true is false.
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:410
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++4) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_enables_the_operative_paid_grant_lane
++Failed asserting that true is false.
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:438
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++5) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_admits_verified_production_membership_or_member_grant_provenance
++Failed asserting that two strings are identical.
++--- Expected
+++++ Actual
++@@ @@
++-'provenance'
+++'admitted'
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:474
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++6) Tests\Feature\StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit
++app/Domain/Commerce/Checkout/CheckoutPolicy.php
++Failed asserting that '<?php\n
++\n
++namespace App\Domain\Commerce\Checkout;\n
++\n
++use App\Domain\Commerce\QuoteException;\n
++use Throwable;\n
++\n
++final class CheckoutPolicy\n
++{\n
++    public const API_VERSION = '2026-08-26.dahlia';\n
++\n
++    public function current(): array\n
++    {\n
++        if (! app()->environment('local', 'testing') || config('payments.stripe.checkout_enabled') !== true) {\n
++            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
++        }\n
++        try {\n
++            $raw = config('commerce.test_checkout_policy');\n
++            if (! is_string($raw) || strlen($raw) > 4096) { throw new \UnexpectedValueException; }\n
++\n
++            return $this->validate(json_decode($raw, true, 16, JSON_THROW_ON_ERROR));\n
++        } catch (Throwable) {\n
++            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
++        }\n
++    }\n
++\n
++    public function enabled(): bool\n
++    {\n
++        try { $this->current(); $this->account(); return true; } catch (Throwable) { return false; }\n
++    }\n
++\n
++    public function account(): string\n
++    {\n
++        $account = config('payments.stripe.account_id');\n
++        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test' ||\n
++            ! is_string($account) || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account)) {\n
++            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
++        }\n
++\n
++        return $account;\n
++    }\n
++\n
++    public function validate(mixed $policy): array\n
++    {\n
++        $keys = ['schema_version', 'purpose', 'version', 'provider_lifetime_seconds', 'retry_seconds', 'pending_resources', 'tax', 'return_origin'];\n
++        if (! is_array($policy) || count($policy) !== count($keys) || array_diff($keys, array_keys($policy)) ||\n
++            $policy['schema_version'] !== 1 || $policy['purpose'] !== 'test_hosted_checkout' ||\n
++            ! is_string($policy['version']) || ! preg_match('/\A[A-Za-z0-9._-]{1,80}\z/', $policy['version']) ||\n
++            $policy['provider_lifetime_seconds'] !== 3600 || $policy['retry_seconds'] !== 900 ||\n
++            $policy['pending_resources'] !== 'retain_until_authoritative_finalization' || $policy['tax'] !== 'fixed_test_zero' ||\n
++            ! $this->origin($policy['return_origin'])) { throw new \UnexpectedValueException('Invalid test checkout policy.'); }\n
++\n
++        return $policy;\n
++    }\n
++\n
++    private function origin(mixed $value): bool\n
++    {\n
++        if (! is_string($value) || strlen($value) > 255 || preg_match('/[\x00-\x20\x7f\\\\]/', $value)) { return false; }\n
++        $parts = parse_url($value);\n
++        if (! is_array($parts) || ! isset($parts['scheme'], $parts['host']) ||\n
++            array_diff(array_keys($parts), ['scheme', 'host', 'port']) || str_ends_with($value, '/')) { return false; }\n
++\n
++        return $parts['scheme'] === 'https' || ($parts['scheme'] === 'http' && in_array($parts['host'], ['localhost', '127.0.0.1', '[::1]'], true));\n
++    }\n
++}\n
++' [ASCII](length: 2832) contains "TestEnvironment::admitsTestCommerce()" [ASCII](length: 37).
++
++/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:529
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++ERRORS!
++Tests: 15, Assertions: 80, Errors: 1, Failures: 6.
++# finished: 2026-10-09T09:29:33Z
++rc=2
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-d1.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-d1.txt
+new file mode 100644
+index 0000000..c7ddbed
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-d1.txt
+@@ -0,0 +1,31 @@
++# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --filter staging_admits tests/Feature/RightsScopeCommandTest.php
++# started: 2026-10-09T09:29:04Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2-red/phpunit.xml
++
++F                                                                   1 / 1 (100%)
++
++Time: 00:03.203, Memory: 88.00 MB
++
++There was 1 failure:
++
++1) Tests\Feature\RightsScopeCommandTest::test_staging_admits_the_same_link_and_order_preparation
++Failed asserting that two strings are identical.
++--- Expected
+++++ Actual
++@@ @@
++-'INVENTORY_SCOPE_UNAVAILABLE'
+++'ORDER_POLICY_UNAVAILABLE'
++
++/home/user/rv-b2-red/tests/Feature/RightsScopeCommandTest.php:122
++/home/user/rv-b2-red/tests/Feature/RightsScopeCommandTest.php:102
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 1, Assertions: 1, Failures: 1.
++# finished: 2026-10-09T09:29:07Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-mfa.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-mfa.txt
+new file mode 100644
+index 0000000..63e49eb
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-mfa.txt
+@@ -0,0 +1,32 @@
++# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingOperatorMfaTest.php
++# started: 2026-10-09T09:29:02Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2-red/phpunit.xml
++
++F.F                                                                 3 / 3 (100%)
++
++Time: 00:01.790, Memory: 81.00 MB
++
++There were 2 failures:
++
++1) Tests\Feature\StagingOperatorMfaTest::test_staging_panel_requires_enrollment_before_protected_catalog_access
++Failed asserting that false is true.
++
++/home/user/rv-b2-red/tests/Feature/StagingOperatorMfaTest.php:63
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++2) Tests\Feature\StagingOperatorMfaTest::test_requirement_follows_the_current_environment
++staging
++Failed asserting that false is identical to true.
++
++/home/user/rv-b2-red/tests/Feature/StagingOperatorMfaTest.php:86
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 3, Assertions: 7, Failures: 2.
++# finished: 2026-10-09T09:29:04Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-profile.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-profile.txt
+new file mode 100644
+index 0000000..5578787
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/red-main-profile.txt
+@@ -0,0 +1,63 @@
++# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
++# public/build present: no
++# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --filter staging_profile_passes tests/Unit/TestCommerceProfileValidatorTest.php
++# started: 2026-10-09T09:29:08Z
++PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
++
++Runtime:       PHP 8.4.26
++Configuration: /home/user/rv-b2-red/phpunit.xml
++
++F                                                                   1 / 1 (100%)
++
++Time: 00:00.367, Memory: 24.50 MB
++
++There was 1 failure:
++
++1) Tests\Unit\TestCommerceProfileValidatorTest::test_a_staging_profile_passes_and_near_miss_environment_names_are_refused
++PASS profile.parse - The file parses as dotenv.
++PASS profile.unique_keys - Every key appears once.
++PASS profile.placeholders_replaced - No <PLACEHOLDER> remains.
++PASS profile.no_live_keys - No live-mode key appears in the parsed configuration values.
++PASS runtime.boot - The application booted with this file only (no host .env, no cached config).
++FAIL runtime.app_env_local - APP_ENV is exactly local (every test-commerce gate requires local or testing; hosts never run testing).
++PASS runtime.app_debug_off - APP_DEBUG is false.
++PASS runtime.app_url_equals_return_origin - APP_URL is an HTTPS origin equal to the checkout return_origin.
++PASS runtime.queue_database - QUEUE_CONNECTION is database (receipt, finalization and contract jobs need an asynchronous queue).
++PASS runtime.session_secure_cookie - SESSION_SECURE_COOKIE is true.
++PASS runtime.session_http_only - SESSION_HTTP_ONLY is true (the guest session owns order and download access).
++PASS stripe.mode_test - STRIPE_MODE is test.
++FAIL stripe.account - STRIPE_ACCOUNT_ID is an own-account acct_ identifier (CheckoutPolicy::account).
++PASS stripe.secret_key_test - STRIPE_TEST_SECRET_KEY is a standard sk_test_ key (same rule as StripeSdkCheckoutGateway).
++PASS stripe.webhook_receiver - A synthetic event signed with STRIPE_WEBHOOK_SECRET passes the real VerifyStripeWebhook, and a wrongly signed one is refused.
++FAIL commerce.pricing - VASEY_TEST_PRICING_POLICY passes PricingPolicy::current() and is in its effective window now.
++FAIL commerce.pricing_zero_test_tax - Pricing tax is fixed_test at 0 bps for provider stripe and the configured account (CheckoutEvidence::request).
++FAIL commerce.pricing_window_margin - The pricing window stays open for at least 14 more days.
++PASS commerce.promotions - VASEY_TEST_PROMOTIONS is empty, or every campaign passes PromotionPolicy.
++FAIL commerce.inventory - VASEY_TEST_INVENTORY_POLICY passes InventoryPolicy::current().
++FAIL commerce.inventory_ttl_covers_quote - Inventory ttl_seconds is at least the 900-second quote lifetime.
++PASS commerce.exclusive_selection_off - VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty (exclusive test activation is outside this profile).
++FAIL commerce.order - VASEY_TEST_ORDER_POLICY passes OrderPolicy::current().
++FAIL commerce.checkout - VASEY_TEST_CHECKOUT_POLICY passes CheckoutPolicy::current() and checkout is enabled.
++FAIL commerce.checkout_https_origin - The checkout return_origin is HTTPS (the loopback HTTP allowance is for local development only).
++FAIL payments.processing - Payment processing is enabled for the configured test account (PaymentProcessingPolicy::account).
++FAIL payments.finalization - STRIPE_TEST_FINALIZATION_POLICY equals FinalizationPolicy::CONTRACT and finalization is enabled.
++FAIL contracts.issuance_v2 - VASEY_TEST_CONTRACT_ISSUANCE_POLICY equals the v2 contract and issuance is enabled.
++PASS contracts.renderer_runtime - The pinned test-buyer-pdf-v2 renderer runtime, packages and font assets verify on this PHP.
++FAIL delivery.activation - VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY equals ActivationPolicy::CONTRACT and activation is enabled.
++FAIL delivery.access - VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT and owner delivery is enabled.
++FAIL customer.accounts - Test customer accounts are enabled (CustomerAccessPolicy).
++FAIL customer.identity_private_capture - Test identity uses private_capture: no email is sent (CustomerIdentityPolicy).
++FAIL customer.purchase_claims - Guest purchase claims are enabled (CustomerPurchaseClaimPolicy).
++PASS boundary.out_of_profile_families_off - Production checkout, production tax checkout and the other test families are off.
++PASS boundary.no_production_checkout_key - No production checkout key or funds mode is configured.
++RESULT: FAIL (18 of 36 checks failed; no Stripe request made)
++
++Failed asserting that 1 is identical to 0.
++
++/home/user/rv-b2-red/tests/Unit/TestCommerceProfileValidatorTest.php:141
++/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
++
++FAILURES!
++Tests: 1, Assertions: 1, Failures: 1.
++# finished: 2026-10-09T09:29:08Z
++rc=1
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/reviewer-grep-app.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/reviewer-grep-app.txt
+new file mode 100644
+index 0000000..5b45809
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/reviewer-grep-app.txt
+@@ -0,0 +1,100 @@
++app/Support/Diagnostics/InstallationReport.php:84:        $hosted = app()->isProduction() || TestEnvironment::refusesProductionOnly();
++app/Support/Diagnostics/InstallationReport.php:87:        if (TestEnvironment::refusesProductionOnly()) {
++app/Support/Diagnostics/InstallationReport.php:158:            app()->isProduction() => 'production',
++app/Support/Diagnostics/InstallationReport.php:159:            TestEnvironment::refusesProductionOnly() => TestEnvironment::STAGING,
++app/Support/SupportAttachmentUi.php:10:        return app()->environment('local', 'testing') && config('support-attachments.fixture_enabled') === true;
++app/Support/StorefrontMetadata.php:52:            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
++app/Support/StorefrontMetadata.php:69:            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
++app/Filament/Resources/TestPromotionResource.php:39:        abort_unless($actor instanceof User && TestEnvironment::admitsTestCommerce(), 403);
++app/Filament/Resources/TestPromotionResource.php:49:        return TestEnvironment::admitsTestCommerce() && $actor instanceof User && Gate::forUser($actor)->allows('administer-catalog');
++app/Providers/Filament/AdminPanelProvider.php:78:            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()], isRequired: fn () => TestEnvironment::requiresStaffMfa())
++app/Domain/Contracts/ContractIssuancePolicy.php:36:        if (config('contracts.test_issuance_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
++app/Domain/Inquiries/OrderInquiry.php:197:        if (! TestEnvironment::admitsTestCommerce()) {
++app/Domain/Memberships/Production/MembershipPolicy.php:43:            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
++app/Domain/Memberships/Production/MembershipPolicy.php:45:            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment']))
++app/Domain/Memberships/Production/MembershipPolicy.php:75:        $environment = $this->environment($instances);
++app/Domain/Memberships/Production/MembershipPolicy.php:97:    private function environment(array $instances): mixed
++app/Domain/Memberships/MembershipPolicy.php:28:        return TestEnvironment::admitsTestCommerce() && config('memberships.test_mode_enabled') === true;
++app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:33:        BillingException::require($this->fixtureTransport === null || ($configuration['mode'] === 'test' && app()->environment('testing')), 'provider_transport');
++app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:129:        BillingException::require($this->fixtureTransport === null || ($configuration['mode'] === 'test' && app()->environment('testing')), 'provider_transport');
++app/Domain/Memberships/Billing/BillingPolicy.php:41:            && in_array($configuration['environment'], ['local', 'testing'], true), 'provenance');
++app/Domain/Memberships/Billing/BillingPolicy.php:84:        $environment = $this->environment();
++app/Domain/Memberships/Billing/BillingPolicy.php:107:    private function environment(): ?string
++app/Domain/Notifications/TransactionalNotificationPolicy.php:23:        if (! TestEnvironment::admitsTestCommerce() || ! app(CustomerAccessPolicy::class)->enabled()
++app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:251:        return CanonicalJson::hash(['environment' => app()->environment(), 'media' => config('media'), 'commerce' => config('commerce'),
++app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php:25:            'generation_seconds' => self::GENERATION_SECONDS, 'environment' => app()->environment(),
++app/Domain/Customers/Preferences/LocalConsentRuntime.php:11:        return TestEnvironment::admitsTestCommerce() && config('customer-preferences.test_grants_enabled') === true;
++app/Domain/Customers/CustomerAccessPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('customer.test_accounts_enabled') === true;
++app/Domain/Customers/Listening/ListeningEvidence.php:123:        $proof = ['configuration' => [app()->environment(), config('app.timezone'), config('media'), config('commerce'), config('filesystems.disks.local')],
++app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:51:        if (! app()->environment('local', 'testing') || $port < 1024 || ! str_starts_with($caFile, '/')
++app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:68:        $rehearsalEnvironment = app()->environment('local', 'testing');
++app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:70:            : $provenance === IdentityPolicy::PRODUCTION && ! TestEnvironment::refusesProductionOnly();
++app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php:34:        if (! app()->environment('local', 'testing') || $mail->provenance !== IdentityPolicy::REHEARSAL
++app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:31:            && (app()->environment('local', 'testing') ? $scope === self::REHEARSAL
++app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:32:                : $scope === self::PRODUCTION && ! TestEnvironment::refusesProductionOnly());
++app/Domain/Commerce/PromotionPolicy.php:21:        if (! TestEnvironment::admitsTestCommerce()) {
++app/Domain/Commerce/PricingPolicy.php:21:            if (! TestEnvironment::admitsTestCommerce() || ! is_string($json) || strlen($json) > 8192) {
++app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php:22:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
++app/Domain/Commerce/Payments/VerifyStripeWebhook.php:21:            || ! TestEnvironment::admitsTestCommerce()
++app/Domain/Commerce/Payments/PaymentProcessingPolicy.php:13:        if (config('payments.stripe.processing_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
++app/Domain/Commerce/Payments/StripeSdkCheckoutGateway.php:132:            if (! TestEnvironment::admitsTestCommerce()
++app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php:24:        CheckoutException::require($this->fixtureTransport === null || ($context->fundsMode === 'test' && app()->environment('testing')), 'provider', 503);
++app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php:60:        CheckoutException::require($mode !== 'test' || app()->environment(['local', 'testing']), 'unsupported');
++app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php:62:        CheckoutException::require($mode !== 'live' || ! TestEnvironment::refusesProductionOnly(), 'unsupported');
++app/Domain/Commerce/PromotionUsage.php:166:        if (! TestEnvironment::admitsTestCommerce()) {
++app/Domain/Commerce/Orders/OrderPolicy.php:14:        if (! TestEnvironment::admitsTestCommerce()) {
++app/Domain/Commerce/Readiness/StripeCapabilityProbe.php:50:                && ($this->fixtureTransport === null) !== app()->environment('testing')
++app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:60:        $modeEnvironment = $modeValid && ($mode !== 'test' || app()->environment(['local', 'testing']))
++app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:61:            && ($mode !== 'live' || ! TestEnvironment::refusesProductionOnly());
++app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:101:                app()->environment('testing') && ! $this->probe->usesFixture() => 'fixture_transport_required_in_testing',
++app/Domain/Commerce/Readiness/ProductionCommerceReadiness.php:63:            'production_environment' => [app()->environment('production'), 'Run the future production candidate in the production environment.'],
++app/Domain/Commerce/ProductionTaxCheckout/TaxExecutionContext.php:56:        CheckoutException::require($mode === 'test' && app()->environment('local', 'testing')
++app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php:22:        return app()->environment('local', 'testing') && config('production-tax-checkout.enabled') === true;
++app/Domain/Commerce/Operations/TestPaymentExceptionOperations.php:172:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
++app/Domain/Commerce/Finalization/FinalizationPolicy.php:20:        if (config('payments.stripe.finalization_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
++app/Domain/Commerce/Checkout/CheckoutPolicy.php:15:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.checkout_enabled') !== true) {
++app/Domain/Commerce/Checkout/CheckoutPolicy.php:36:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test' ||
++app/Domain/Commerce/PromotionAdministration.php:174:        if (! TestEnvironment::admitsTestCommerce()) { throw new AuthorizationException; }
++app/Domain/Commerce/ComparePricingSettlement.php:52:        $this->assertMatch(TestEnvironment::admitsTestCommerce() && $policy['scope'] === 'test', 'test_scope_required');
++app/Domain/Commerce/Inventory/InventoryPolicy.php:13:        if (! TestEnvironment::admitsTestCommerce()) { throw new QuoteException('INVENTORY_UNAVAILABLE', 503); }
++app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:148:        $environment = $application->environment();
++app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:183:            $currentEnvironment = $application->environment();
++app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:237:            AttachmentException::require($currentEnvironment === $environment && in_array($currentEnvironment, ['local', 'testing'], true)
++app/Domain/Services/Projects/ServiceProjectPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('services-projects.test_enabled') === true;
++app/Domain/SupportAttachments/FixtureAttachmentPolicy.php:20:        AttachmentException::require(app()->environment(['local', 'testing']) && config('support-attachments.fixture_enabled') === true
++app/Domain/SupportAttachments/FixtureAttachmentPolicy.php:46:        return $engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing'));
++app/Domain/Delivery/ActivationPolicy.php:22:        if (config('delivery.test_activation_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
++app/Domain/Delivery/DeliveryAssets.php:97:                || ($entry['scan_scope'] === 'test-only' && ! app()->environment('testing'))) { throw new DeliveryException('asset_unavailable'); }
++app/Domain/Delivery/PrepareTestDeliveryStream.php:19:        if (! TestEnvironment::admitsTestCommerce() || DIRECTORY_SEPARATOR !== '/') { throw new DeliveryException('unavailable'); }
++app/Domain/Delivery/PrepareTestDeliveryStream.php:85:            || ($target['scan_scope'] === 'test-only' && ! app()->environment('testing')))) { throw new \UnexpectedValueException; }
++app/Domain/Delivery/TestAccessPolicy.php:24:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
++app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php:32:        ProductionFreeGrantException::require(in_array($configuration['environment'], ['local', 'testing'], true), 'environment');
++app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php:64:        $environment = App::environment();
++app/Domain/Grants/Member/MemberGrantPolicy.php:39:            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
++app/Domain/Grants/Member/MemberGrantPolicy.php:41:            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment'])), 'provenance');
++app/Domain/Grants/Member/MemberGrantPolicy.php:68:        $environment = $this->environment($instances);
++app/Domain/Grants/Member/MemberGrantPolicy.php:87:    private function environment(array $instances): mixed
++app/Domain/Grants/Paid/PaidGrantPolicy.php:15:        return app()->environment('local', 'testing') && config('paid-grants.rehearsal_enabled') === true
++app/Domain/Grants/Paid/PaidGrantPolicy.php:16:            || ! app()->environment('local', 'testing') && ! TestEnvironment::refusesProductionOnly()
++app/Domain/Grants/Paid/PaidGrantPolicy.php:95:        $rehearsal = in_array($environment, ['local', 'testing'], true);
++app/Domain/Grants/Paid/PaidGrantPolicy.php:99:                : ! TestEnvironment::isStaging($environment)
++app/Domain/Grants/Paid/PaidGrantPrepareStream.php:151:            || ($target['scan_scope'] === 'test-only' && ! app()->environment('testing')))) {
++app/Domain/Grants/Paid/PaidGrantRows.php:107:        $this->environment = $this->application->environment();
++app/Domain/Grants/Paid/PaidGrantRows.php:131:            && app('config') === $this->configuration && app()->environment() === $this->environment);
++app/Domain/Grants/Paid/PaidGrantRows.php:138:            && app('config') === $this->configuration && app()->environment() === $this->environment);
++app/Domain/Grants/Paid/PaidGrantAssets.php:49:            PaidGrantException::require(! $test || $line['provenance'] === 'synthetic_rehearsal' && app()->environment('testing'), 409);
++app/Domain/Grants/Paid/PaidGrantAssets.php:144:                && ($file['scan_scope'] !== 'test-only' || app()->environment('testing')));
++app/Domain/Grants/Free/FreeGrantPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true
++app/Domain/Grants/Free/FreeGrantPolicy.php:32:            FreeGrantException::require(TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true, 404);
++app/Domain/Grants/Free/TestFreeGrantIdentity.php:78:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
++app/Domain/Grants/Free/FreeGrantDefinitions.php:19:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
++app/Domain/Grants/Free/FreeGrantSources.php:38:            FreeGrantException::require(! $testScan || app()->environment('testing'), 409);
++app/Domain/SiteBuilder/PublicPagesSitemap.php:12:        if (app()->environment('production')) {
++app/Domain/Media/ScanEngines.php:11:        return $engine === 'clamav' || ($engine === 'test-only' && ($historical || app()->environment('testing')));
++app/Http/Controllers/PublicDiscoveryController.php:16:        if (app()->environment('production') && config('discovery-sitemap.enabled') === true) {
++app/Http/Controllers/PublicDiscoveryController.php:30:        if (app()->environment('production')) {
++app/Http/Controllers/PublicDiscoveryController.php:42:        if (app()->environment('production')) {
++app/Http/Controllers/PublicDiscoveryController.php:67:            'X-Robots-Tag' => app()->environment('production') ? 'noindex, follow' : 'noindex, nofollow',
++app/Http/Controllers/PublicPagesSitemapController.php:21:            'X-Robots-Tag' => app()->environment('production') ? 'noindex, follow' : 'noindex, nofollow',
++app/Http/Controllers/DiscoveryTrackSitemapController.php:19:        if (! app()->environment('production')) {
++app/Http/Controllers/FreeGrantController.php:147:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 403);
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-1.xml b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-1.xml
+new file mode 100644
+index 0000000..b986e2b
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-1.xml
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         colors="true"
++>
++    <testsuites>
++        <testsuite name="reviewer-1">
++            <file>tests/Feature/CommerceAuditActorTest.php</file>
++            <file>tests/Feature/CustomerConsentAdmissionTest.php</file>
++            <file>tests/Feature/ExclusiveSelectionTest.php</file>
++            <file>tests/Feature/FreeGrantDownloadsTest.php</file>
++            <file>tests/Feature/MembershipCustomerLibraryCapabilityTest.php</file>
++            <file>tests/Feature/OrderInquiryTest.php</file>
++            <file>tests/Feature/PaidGrantAuthorizationWindowTest.php</file>
++            <file>tests/Feature/PaidGrantRedeemFrameConjunctTest.php</file>
++            <file>tests/Feature/PaidGrantReviewAdversarialTest.php</file>
++            <file>tests/Feature/PaidGrantSnapshotDeadlineTest.php</file>
++            <file>tests/Feature/PaidGrantTransferDeadlineTest.php</file>
++            <file>tests/Feature/ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php</file>
++            <file>tests/Feature/ProductionCheckoutCommittedReceiptTest.php</file>
++            <file>tests/Feature/ProductionCheckoutObserverExclusionTest.php</file>
++            <file>tests/Feature/ProductionCommerceReadinessTest.php</file>
++            <file>tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php</file>
++            <file>tests/Feature/ProductionIdentityAdapters/ConfiguredIdentitySmtpTest.php</file>
++            <file>tests/Feature/ProductionIdentitySmtpBindingTest.php</file>
++            <file>tests/Feature/ProductionMembership/MembershipPolicyEnvironmentTest.php</file>
++            <file>tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php</file>
++            <file>tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php</file>
++            <file>tests/Feature/PromotionAdministrationSettlementTest.php</file>
++            <file>tests/Feature/RightsScopeCommandTest.php</file>
++            <file>tests/Feature/TestOwnerDeliveryHttpTest.php</file>
++            <file>tests/Feature/TestOwnerDeliveryTest.php</file>
++            <file>tests/Unit/PricingPolicyTest.php</file>
++            <file>tests/Unit/StripeCheckoutGatewayTest.php</file>
++            <file>tests/Unit/StripeFinancialInspectionGatewayTest.php</file>
++            <file>tests/Unit/TestCommerceProfileValidatorTest.php</file>
++        </testsuite>
++    </testsuites>
++    <source>
++        <include>
++            <directory>app</directory>
++        </include>
++    </source>
++    <php>
++        <env name="APP_ENV" value="testing"/>
++        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
++        <env name="BCRYPT_ROUNDS" value="4"/>
++        <env name="BROADCAST_CONNECTION" value="null"/>
++        <env name="CACHE_STORE" value="array"/>
++        <env name="DB_CONNECTION" value="sqlite"/>
++        <env name="DB_DATABASE" value=":memory:"/>
++        <env name="DB_URL" value=""/>
++        <env name="MAIL_MAILER" value="array"/>
++        <env name="QUEUE_CONNECTION" value="sync"/>
++        <env name="SESSION_DRIVER" value="array"/>
++        <env name="PULSE_ENABLED" value="false"/>
++        <env name="TELESCOPE_ENABLED" value="false"/>
++        <env name="NIGHTWATCH_ENABLED" value="false"/>
++    </php>
++</phpunit>
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-2.xml b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-2.xml
+new file mode 100644
+index 0000000..a27284e
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-2.xml
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         colors="true"
++>
++    <testsuites>
++        <testsuite name="reviewer-2">
++            <file>tests/Feature/CustomerAccountCommerceTest.php</file>
++            <file>tests/Feature/CustomerPurchaseClaimTest.php</file>
++            <file>tests/Feature/FreeGrantAdministrationTest.php</file>
++            <file>tests/Feature/FreeGrantDefinitionsTest.php</file>
++            <file>tests/Feature/FreeGrantJourneyTest.php</file>
++            <file>tests/Feature/InstallationReportTest.php</file>
++            <file>tests/Feature/OrderPreparationTest.php</file>
++            <file>tests/Feature/PaidGrantCompletionBudgetTest.php</file>
++            <file>tests/Feature/PaidGrantHeavyWorkTest.php</file>
++            <file>tests/Feature/PaidGrantRequestInstantTest.php</file>
++            <file>tests/Feature/PaidGrantSourceJourneyTest.php</file>
++            <file>tests/Feature/ProductionCheckoutNativeRaceTest.php</file>
++            <file>tests/Feature/ProductionCheckoutSourceTransactionTest.php</file>
++            <file>tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php</file>
++            <file>tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php</file>
++            <file>tests/Feature/ProductionMembership/MembershipPreparationTest.php</file>
++            <file>tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php</file>
++            <file>tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php</file>
++            <file>tests/Feature/PromotionConcurrencyTest.php</file>
++            <file>tests/Feature/PromotionPricingTest.php</file>
++            <file>tests/Feature/PublicCatalogRelatedLinksTest.php</file>
++            <file>tests/Feature/RightsScopeCommandUnknownOutcomeTest.php</file>
++            <file>tests/Feature/ServiceSupportAttachmentsTest.php</file>
++            <file>tests/Feature/SharedInventoryTest.php</file>
++            <file>tests/Feature/SiteImageReleaseDamageTest.php</file>
++            <file>tests/Feature/TestContractProfileSuccessorTest.php</file>
++            <file>tests/Feature/TestContractSuccessorActivationTest.php</file>
++            <file>tests/Unit/ProductionCheckoutProviderTest.php</file>
++            <file>tests/Unit/StagingRuntimeValidatorTest.php</file>
++        </testsuite>
++    </testsuites>
++    <source>
++        <include>
++            <directory>app</directory>
++        </include>
++    </source>
++    <php>
++        <env name="APP_ENV" value="testing"/>
++        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
++        <env name="BCRYPT_ROUNDS" value="4"/>
++        <env name="BROADCAST_CONNECTION" value="null"/>
++        <env name="CACHE_STORE" value="array"/>
++        <env name="DB_CONNECTION" value="sqlite"/>
++        <env name="DB_DATABASE" value=":memory:"/>
++        <env name="DB_URL" value=""/>
++        <env name="MAIL_MAILER" value="array"/>
++        <env name="QUEUE_CONNECTION" value="sync"/>
++        <env name="SESSION_DRIVER" value="array"/>
++        <env name="PULSE_ENABLED" value="false"/>
++        <env name="TELESCOPE_ENABLED" value="false"/>
++        <env name="NIGHTWATCH_ENABLED" value="false"/>
++    </php>
++</phpunit>
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-3.xml b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-3.xml
+new file mode 100644
+index 0000000..133ac42
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-3.xml
+@@ -0,0 +1,60 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         colors="true"
++>
++    <testsuites>
++        <testsuite name="reviewer-3">
++            <file>tests/Feature/CustomerConsentPreferencesTest.php</file>
++            <file>tests/Feature/CustomerListeningCompatibilityTest.php</file>
++            <file>tests/Feature/FreeGrantAuthorityTest.php</file>
++            <file>tests/Feature/HostedCheckoutTest.php</file>
++            <file>tests/Feature/OperatorMfaTest.php</file>
++            <file>tests/Feature/OrderInquiryConcurrencyTest.php</file>
++            <file>tests/Feature/OrderInquiryMigrationTest.php</file>
++            <file>tests/Feature/PaidGrantDownloadJourneyTest.php</file>
++            <file>tests/Feature/PaidGrantHttpJourneyTest.php</file>
++            <file>tests/Feature/PaidGrantPolicyRevisionTest.php</file>
++            <file>tests/Feature/PaidGrantPreparationBudgetTest.php</file>
++            <file>tests/Feature/ProductionCheckoutReceiptParentTest.php</file>
++            <file>tests/Feature/ProductionCheckoutRefusedFrameCallbackTest.php</file>
++            <file>tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php</file>
++            <file>tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php</file>
++            <file>tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php</file>
++            <file>tests/Feature/PromotionAdminHttpTest.php</file>
++            <file>tests/Feature/ServiceProjectAttachmentAuthorityTest.php</file>
++            <file>tests/Feature/SiteRelatedTrackContentTest.php</file>
++            <file>tests/Feature/StagingEnvironmentAdmissionTest.php</file>
++            <file>tests/Feature/StagingOperatorMfaTest.php</file>
++            <file>tests/Feature/StripeCapabilityPreflightTest.php</file>
++            <file>tests/Feature/TestOwnerDeliveryProjectionTest.php</file>
++            <file>tests/Feature/TestPaymentExceptionOperationsTest.php</file>
++            <file>tests/Feature/TestPaymentFinancialObservationTest.php</file>
++            <file>tests/Feature/TestRefundResolutionMigrationTest.php</file>
++            <file>tests/Unit/ContractRenderProfileRegistryTest.php</file>
++            <file>tests/Unit/StripePaymentGatewayTest.php</file>
++        </testsuite>
++    </testsuites>
++    <source>
++        <include>
++            <directory>app</directory>
++        </include>
++    </source>
++    <php>
++        <env name="APP_ENV" value="testing"/>
++        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
++        <env name="BCRYPT_ROUNDS" value="4"/>
++        <env name="BROADCAST_CONNECTION" value="null"/>
++        <env name="CACHE_STORE" value="array"/>
++        <env name="DB_CONNECTION" value="sqlite"/>
++        <env name="DB_DATABASE" value=":memory:"/>
++        <env name="DB_URL" value=""/>
++        <env name="MAIL_MAILER" value="array"/>
++        <env name="QUEUE_CONNECTION" value="sync"/>
++        <env name="SESSION_DRIVER" value="array"/>
++        <env name="PULSE_ENABLED" value="false"/>
++        <env name="TELESCOPE_ENABLED" value="false"/>
++        <env name="NIGHTWATCH_ENABLED" value="false"/>
++    </php>
++</phpunit>
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-4.xml b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-4.xml
+new file mode 100644
+index 0000000..3e2d022
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/shard-configs/reviewer-sel-4.xml
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
++         bootstrap="vendor/autoload.php"
++         colors="true"
++>
++    <testsuites>
++        <testsuite name="reviewer-4">
++            <file>tests/Feature/CustomerRefundResolutionTest.php</file>
++            <file>tests/Feature/OrderInquiryStaffContextTest.php</file>
++            <file>tests/Feature/PaidGrantCommitCapsuleTest.php</file>
++            <file>tests/Feature/PaidGrantCommittingAdmissionTest.php</file>
++            <file>tests/Feature/PaidGrantDocumentJourneyTest.php</file>
++            <file>tests/Feature/PaidGrantRefusedFrameCallbackTest.php</file>
++            <file>tests/Feature/PaidGrantReviewAddendum1Test.php</file>
++            <file>tests/Feature/PaidGrantReviewAddendum3Test.php</file>
++            <file>tests/Feature/PricingSettlementTest.php</file>
++            <file>tests/Feature/ProductionCheckoutFreshPolicyTest.php</file>
++            <file>tests/Feature/ProductionCheckoutJourneyTest.php</file>
++            <file>tests/Feature/ProductionCheckoutWriteAdmissionAllTest.php</file>
++            <file>tests/Feature/ProductionCheckoutWriteCommitTest.php</file>
++            <file>tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php</file>
++            <file>tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationNativeRaceTest.php</file>
++            <file>tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php</file>
++            <file>tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php</file>
++            <file>tests/Feature/ProductionMembership/MembershipRawConfigurationClosureTest.php</file>
++            <file>tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php</file>
++            <file>tests/Feature/PromotionAdministrationTest.php</file>
++            <file>tests/Feature/ReservePricedQuoteTest.php</file>
++            <file>tests/Feature/SiteImageReleaseTest.php</file>
++            <file>tests/Feature/SiteScheduleTest.php</file>
++            <file>tests/Feature/StagingTestCommerceProfileJourneyTest.php</file>
++            <file>tests/Feature/StripeWebhookTest.php</file>
++            <file>tests/Feature/TestFinalizedInventoryTest.php</file>
++            <file>tests/Feature/TestPaymentExceptionInspectionTest.php</file>
++            <file>tests/Feature/TestPreparedDeliveryStreamTest.php</file>
++            <file>tests/Unit/PromotionPolicyTest.php</file>
++        </testsuite>
++    </testsuites>
++    <source>
++        <include>
++            <directory>app</directory>
++        </include>
++    </source>
++    <php>
++        <env name="APP_ENV" value="testing"/>
++        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
++        <env name="BCRYPT_ROUNDS" value="4"/>
++        <env name="BROADCAST_CONNECTION" value="null"/>
++        <env name="CACHE_STORE" value="array"/>
++        <env name="DB_CONNECTION" value="sqlite"/>
++        <env name="DB_DATABASE" value=":memory:"/>
++        <env name="DB_URL" value=""/>
++        <env name="MAIL_MAILER" value="array"/>
++        <env name="QUEUE_CONNECTION" value="sync"/>
++        <env name="SESSION_DRIVER" value="array"/>
++        <env name="PULSE_ENABLED" value="false"/>
++        <env name="TELESCOPE_ENABLED" value="false"/>
++        <env name="NIGHTWATCH_ENABLED" value="false"/>
++    </php>
++</phpunit>
+diff --git a/docs/verification/staging-env-admission-20261008/independent-review/evidence/skip-reasons-static.txt b/docs/verification/staging-env-admission-20261008/independent-review/evidence/skip-reasons-static.txt
+new file mode 100644
+index 0000000..0943762
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/independent-review/evidence/skip-reasons-static.txt
+@@ -0,0 +1,9 @@
++      1 markTestSkipped('Requires the dedicated attachment-author database and explicit isolated-test marker.')
++      1 markTestSkipped('Read-only READ COMMITTED visibility requires native MySQL.')
++      1 markTestSkipped('Physical short-write injection requires POSIX resource limits and signals.')
++      1 markTestSkipped('Order inquiry contention requires independent native MySQL processes.')
++      1 markTestSkipped('Independent-process promotion capacity requires MySQL.')
++      1 markTestSkipped('Independent promotion administration locking is verified on MySQL, not SQLite.')
++      1 markTestSkipped('Independent native MySQL sessions and exact InnoDB record waits required.')
++      1 markTestSkipped('Independent durable-intent visibility requires MySQL.')
++      1 markTestSkipped('Actual independent MySQL connections and InnoDB row waits required.')
+diff --git a/ops/staging/README.md b/ops/staging/README.md
+index 399cd97..4b209fe 100644
+--- a/ops/staging/README.md
++++ b/ops/staging/README.md
+@@ -247,7 +247,8 @@ outside the controlled census must be stopped separately. This does not attest a
+ Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
+ real admission and unchanged key, then one `ctl refresh` invocation holds quiesce, snapshot and restore proof, protected capture of the private
+ evidence file through anchored no-follow descriptors, revalidates it against real Laravel configuration,
+-atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
++atomically installs root:app-group 0440 `.env`, then builds the runtime configuration and route caches as the app. The route
++cache is rebuilt because the panel's MFA page middleware is compiled into it from `APP_ENV`.
+ A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
+ `ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
+ 
+diff --git a/ops/staging/bin/vasey-staging-ctl b/ops/staging/bin/vasey-staging-ctl
+index 53c7634..97d26a0 100755
+--- a/ops/staging/bin/vasey-staging-ctl
++++ b/ops/staging/bin/vasey-staging-ctl
+@@ -383,6 +383,10 @@ cmd_configure() {
+   mv -T -- "$ENV_CANDIDATE" "$cur/.env" || die "cannot install protected environment"
+   as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" config:cache \
+     --no-interaction --no-ansi >/dev/null 2>&1 || die "configuration cache failed; remain quiesced and restore the snapshot"
++  # The panel's MFA page middleware is compiled into the route cache from APP_ENV, so a changed environment
++  # (the local -> staging switch) must not keep serving routes cached under the previous one.
++  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" route:cache \
++    --no-interaction --no-ansi >/dev/null 2>&1 || die "route cache failed; remain quiesced and restore the snapshot"
+   sealed_release "$sha"
+   echo "configured $sha; admission remains closed until healthy resume"
+ }
+diff --git a/tests/ops/test_staging_protected_configuration.py b/tests/ops/test_staging_protected_configuration.py
+index 322bfd8..d7d7d3d 100644
+--- a/tests/ops/test_staging_protected_configuration.py
++++ b/tests/ops/test_staging_protected_configuration.py
+@@ -41,7 +41,7 @@ class ProtectedConfigurationTest(unittest.TestCase):
+         validator = "<?php require " + json.dumps(str(REPO / "ops/staging/validate-runtime.php")) + ";"
+         (self.release / "ops/staging/validate-runtime.php").write_text(validator)
+         (self.release / "artisan").write_text("""<?php
+-file_put_contents(__DIR__.'/storage/framework/cache-command', 'config:cache');
++file_put_contents(__DIR__.'/storage/framework/cache-command', $argv[1].PHP_EOL, FILE_APPEND);
+ """)
+         spec = importlib.util.spec_from_file_location("configuration_sealer", REPO / "ops/staging/seal-release.py")
+         self.module = importlib.util.module_from_spec(spec)
+@@ -102,7 +102,9 @@ as_app() { "$@"; }
+         self.assertEqual((self.release / ".env").read_text(), candidate)
+         self.assertEqual((self.release / ".env").stat().st_mode & 0o777, 0o440)
+         self.assertNotEqual((self.release / ".env").stat().st_ino, original_inode)
+-        self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache")
++        # Routes are cached too: the panel's MFA page middleware is compiled into the route cache, so a refresh that
++        # changes APP_ENV (local -> staging) must not serve routes built under the old environment (B2 review C1).
++        self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache\nroute:cache\n")
+ 
+     def test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache(self):
+         for body in (self.previous + "APP_DEBUG=true\n",

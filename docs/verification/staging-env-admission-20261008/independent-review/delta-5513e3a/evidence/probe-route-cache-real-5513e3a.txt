@@ -1,0 +1,13 @@
+# real application (export of 5513e3a), no concurrent test runs; reproduces the configure sequence's cache steps
+## 1. stale cache: route:cache under APP_ENV=local, served under staging
+rc=0
+['MFA-middleware-ABSENT']
+## 2. the C1 configure sequence under APP_ENV=staging: config:cache then route:cache
+rc=0
+rc=0
+['MFA-middleware-present']
+## 2b. runbook host check command (art = php artisan)
+1
+## cleanup
+packages.php
+services.php

@@ -1,0 +1,19 @@
+# files changed in app/ by the delta 56efbb7..5513e3a
+app/Domain/Contracts/IsolatedContractRenderer.php
+app/Providers/AppServiceProvider.php
+app/Support/PhpCliBinary.php
+app/Support/PhpCliBinaryUnavailable.php
+app/Support/PhpCliProcess.php
+config/app.php
+# files changed in app/ by main e5e500ca..b9cb7b67
+app/Domain/Contracts/IsolatedContractRenderer.php
+app/Providers/AppServiceProvider.php
+app/Support/PhpCliBinary.php
+app/Support/PhpCliBinaryUnavailable.php
+app/Support/PhpCliProcess.php
+config/app.php
+# overlap with B2's own app/ changes (e5e500ca..56efbb7)
+# byte comparison: delta diff vs main diff for the non-B2 code paths
+IDENTICAL: the delta's product-code diff equals main's #67 diff byte for byte
+# B2 app files unchanged by the delta (sha256 at 56efbb7 vs 5513e3a)
+     40 same app/Console/Commands/ManageRightsScopes.php

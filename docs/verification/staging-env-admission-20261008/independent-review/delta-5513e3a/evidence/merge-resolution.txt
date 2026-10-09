@@ -1,0 +1,125 @@
+# git merge-tree --write-tree 3b36a0a b9cb7b67 (reviewer recomputation)
+d79c9121a266b8c9708ac6c0cbf680c8045371ad
+ops/staging/env.staging.example
+
+Auto-merging CHANGELOG.md
+Auto-merging docs/ops/staging-runbook.md
+Auto-merging ops/staging/env.staging.example
+CONFLICT (content): Merge conflict in ops/staging/env.staging.example
+Auto-merging tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+rc=1
+# 293cd4d tree: 22965b4669b2a888ed1c8940f28941ee24cebb35
+# paths where the recorded merge differs from main or from 3b36a0a in both directions:
+differs-from-main: CHANGELOG.md
+differs-from-main: docs/ops/staging-runbook.md
+differs-from-main: ops/staging/env.staging.example
+differs-from-main: tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+# ops/staging/env.staging.example: merge vs 3b36a0a (B2 side)
+diff --git a/ops/staging/env.staging.example b/ops/staging/env.staging.example
+index aac9431..aea933b 100644
+--- a/ops/staging/env.staging.example
++++ b/ops/staging/env.staging.example
+@@ -19,6 +19,9 @@ APP_ENV=staging
+ APP_KEY=<base64:... from php artisan key:generate --show>
+ APP_DEBUG=false
+ APP_URL=https://<STAGING_HOST>
++# The CLI PHP that contract and grant renderer children run when a request is served by PHP-FPM (whose PHP_BINARY is
++# the FPM daemon). The exact running version, not the /usr/bin/php alternatives link; validate-runtime.php probes it.
++VASEY_PHP_CLI_BINARY=/usr/bin/php8.4
+ 
+ # Optional synthetic membership plan/credit preparation. Refused in production. Off for Monday.
+ VASEY_TEST_MEMBERSHIPS_ENABLED=false
+@@ -164,8 +167,8 @@ VASEY_TEST_DELIVERY_ACCESS_POLICY=
+ # PRODUCTION_CHECKOUT_RETURN_ORIGIN=
+ # PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS=
+ # Synthetic test-only customer, notice, free-grant, refund and unpaid-release families (Lane B decides).
+-# Free grants render a PDF inside the web request and fail under PHP-FPM until the renderer binary fix lands
+-# (docs/ops/staging-runbook.md, "Known blocker: free-grant documents"). Keep them off.
++# Free grants render a PDF inside the web request; under PHP-FPM the child runs VASEY_PHP_CLI_BINARY (M-16,
++# docs/ops/staging-runbook.md §7). Keep them off unless Lane B enables them and §7's FPM render check passes.
+ # VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED=false
+ # VASEY_TEST_CUSTOMER_IDENTITY_ENABLED=false
+ # VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT=
+# vs main side
+diff --git a/ops/staging/env.staging.example b/ops/staging/env.staging.example
+index 68943d6..aea933b 100644
+--- a/ops/staging/env.staging.example
++++ b/ops/staging/env.staging.example
+@@ -4,15 +4,16 @@
+ # checkout's .env; ops/staging/forge-deploy.sh validates it and installs it 0600 into each release. Never commit
+ # a filled copy. Covers every variable in .env.example, plus the server, cookie and logging keys staging needs.
+ #
+-# Interim profile accepted by Sean: APP_ENV=local with APP_DEBUG=false. Every test-commerce policy admits only
+-# `local` or `testing` (docs/hosted-test-checkout.md "Explicit test boundary"), so a `staging` value would
+-# switch them all off. Side effects of `local`: staff MFA is optional (enroll it anyway, see the runbook);
+-# robots.txt answers `Disallow: /` and pages carry `noindex, nofollow` (non-production behaviour, wanted here).
+-# APP_ENV is the one switch: when a reviewed `staging` admission lands, change it here and re-run
+-# provision.sh with --app-env staging so the deploy checks agree.
++# Profile: APP_ENV=staging with APP_DEBUG=false. `staging` admits the Stripe-test commerce chain and the synthetic
++# test capabilities exactly as `local` does (App\Support\Environment\TestEnvironment), requires staff TOTP MFA
++# before protected admin access, and refuses Stripe live mode and live keys, live production-checkout funds,
++# production customer identity and verified-production membership provenance. robots.txt answers `Disallow: /`
++# and pages carry `noindex, nofollow` (non-production behaviour, wanted here). Run provision.sh with the default
++# --app-env staging so the deploy checks agree. The earlier interim profile (APP_ENV=local, accepted by Sean on
++# 2026-10-08) still deploys with --app-env local, but leaves staff MFA optional.
+ 
+ APP_NAME="VASEY.AUDIO"
+-APP_ENV=local
++APP_ENV=staging
+ # Generate on the server once (php artisan key:generate --show) and keep it: encrypted columns need this exact key,
+ # and backups carry it. Never rotate blindly.
+ APP_KEY=<base64:... from php artisan key:generate --show>
+@@ -125,15 +126,15 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
+ VITE_APP_NAME="${APP_NAME}"
+ 
+ # ---- Test-commerce policies: blank and off here. Lane B's overlay fills them for the rehearsal. ----
+-# Optional explicit JSON test policy; accepted only in local/testing. See docs/quote-pricing.md.
++# Optional explicit JSON test policy; accepted only in local, testing or staging. See docs/quote-pricing.md.
+ VASEY_TEST_PRICING_POLICY=
+ # Optional JSON list of explicit test campaigns; see docs/promotion-pricing.md.
+ VASEY_TEST_PROMOTIONS=
+ # Internal test inventory policy; no default or production policy. See docs/shared-rights-inventory.md.
+ VASEY_TEST_INVENTORY_POLICY=
+-# Explicit local/testing exclusive selection policy; no production terms or default. See docs/exclusive-selection.md.
++# Explicit test-only (local, testing or staging) exclusive selection policy; no production terms or default. See docs/exclusive-selection.md.
+ VASEY_TEST_EXCLUSIVE_SELECTION_POLICY=
+-# Explicit local/testing order preparation policy; see docs/order-preparation.md.
++# Explicit test-only (local, testing or staging) order preparation policy; see docs/order-preparation.md.
+ VASEY_TEST_ORDER_POLICY=
+ # Explicit hosted Stripe test policy (its return_origin must equal APP_URL).
+ VASEY_TEST_CHECKOUT_POLICY=
+@@ -145,7 +146,7 @@ VASEY_TEST_CONTRACT_ISSUANCE_ENABLED=false
+ VASEY_TEST_CONTRACT_ISSUANCE_POLICY=
+ # sk_test_ only; restricted rk_ keys are refused. Never a live key.
+ STRIPE_TEST_SECRET_KEY=
+-# Separate local/testing complete-order activation proof. Does not authorize downloads.
++# Separate test-only complete-order activation proof. Does not authorize downloads.
+ VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED=false
+ VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY=
+ 
+@@ -165,7 +166,7 @@ VASEY_TEST_DELIVERY_ACCESS_POLICY=
+ # PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY=
+ # PRODUCTION_CHECKOUT_RETURN_ORIGIN=
+ # PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS=
+-# Synthetic local/testing customer, notice, free-grant, refund and unpaid-release families (Lane B decides).
++# Synthetic test-only customer, notice, free-grant, refund and unpaid-release families (Lane B decides).
+ # Free grants render a PDF inside the web request; under PHP-FPM the child runs VASEY_PHP_CLI_BINARY (M-16,
+ # docs/ops/staging-runbook.md §7). Keep them off unless Lane B enables them and §7's FPM render check passes.
+ # VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED=false
+# recorded merge 293cd4d vs reviewer merge-tree d79c912 (conflict markers only in env.staging.example expected)
+ ops/staging/env.staging.example | 6 ------
+ 1 file changed, 6 deletions(-)
+# FrozenBytesTest at merge vs main and vs B2
+diff --git a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+index df3453a..cc67cff 100644
+--- a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
++++ b/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+@@ -23,7 +23,7 @@ final class ProductionFreeGrantFrozenBytesTest extends TestCase
+         'scripts/contract-renderer-autoload.php' => '09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01',
+         'app/Domain/Delivery/DeliveryAssetFiles.php' => '3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c',
+         'app/Domain/Delivery/PreparedDeliveryStream.php' => 'e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13',
+-        'app/Domain/Delivery/ActivationPolicy.php' => '23253c453e7edefcf877eb191a07b0fba69f877a48fdfc91b8cfd36bbdaa7086',
++        'app/Domain/Delivery/ActivationPolicy.php' => '38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95', // B2: account()'s environment gate only; outsideTransactions() unchanged
+         'app/Domain/Delivery/DeliveryException.php' => 'a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc',
+         'app/Domain/Customers/ProductionCustomerAccess.php' => 'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7',
+         'app/Domain/Customers/ProductionCustomerPrincipal.php' => 'd49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b',

@@ -1,0 +1,27 @@
+# command: python3 probes/reviewer_c1_configure_probe.py /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src
+test_probe_config_cache_failure_does_not_attempt_route_cache (__main__.Probe.test_probe_config_cache_failure_does_not_attempt_route_cache) ... 
+PROBE config:cache failure: rc=1 stderr='configuration cache failed; remain quiesced and restore the snapshot'
+ok
+test_probe_mutant_without_route_cache_is_caught (__main__.Probe.test_probe_mutant_without_route_cache_is_caught) ... 
+PROBE mutant (route:cache removed): rc=0 cache-commands='config:cache\n'
+ok
+test_probe_route_cache_failure_keeps_admission_closed (__main__.Probe.test_probe_route_cache_failure_keeps_admission_closed) ... 
+PROBE route:cache failure: rc=1 stdout='' stderr='route cache failed; remain quiesced and restore the snapshot'
+ok
+test_probe_seal_verified_after_successful_configure (__main__.Probe.test_probe_seal_verified_after_successful_configure) ... 
+PROBE seal operations: rc=0 calls='stage-env\nverify\n' stdout='configured aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; admission remains closed until healthy resume'
+ok
+test_probe_validator_reasons_and_cli_binary_still_enforced (__main__.Probe.test_probe_validator_reasons_and_cli_binary_still_enforced) ... PROBE validator fixture previous (valid)             rc=0 fails=[]
+PROBE validator APP_DEBUG=true                       rc=1 fails=['runtime.unique_keys']
+PROBE validator PRODUCTION_CHECKOUT_ENABLED          rc=1 fails=['runtime.production_fresh_checkout_enabled']
+PROBE validator APP_KEY rotation                     rc=1 fails=['runtime.key_custody']
+PROBE validator no VASEY_PHP_CLI_BINARY              rc=1 fails=['runtime.php_cli_binary']
+PROBE validator VASEY_PHP_CLI_BINARY=/bin/true       rc=1 fails=['runtime.php_cli_binary']
+PROBE validator VASEY_PHP_CLI_BINARY=relative        rc=1 fails=['runtime.php_cli_binary']
+ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 3.293s
+
+OK
+rc=0
