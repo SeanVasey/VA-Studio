@@ -24,6 +24,11 @@ def checked_link(root, relative):
         resolved = target.relative_to(root).as_posix()
     except ValueError as error:
         raise ValueError("code symlink leaves the release") from error
+    if resolved == ".env":
+        raise ValueError("code symlink points to the protected environment")
+    if (relative == "public" or relative.startswith("public/")) and not (
+            resolved == "public" or resolved.startswith("public/")):
+        raise ValueError("public symlink leaves the public tree")
     if runtime_path(resolved):
         raise ValueError("code symlink points into writable runtime storage")
 

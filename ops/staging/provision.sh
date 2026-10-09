@@ -274,14 +274,43 @@ mysql_q "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFER
 
 # Backup-only account (docs/ops/backup-restore-proof.md): read, triggers, events, routines; no writes.
 BACKUP_CNF=/etc/vasey-staging/backup.my.cnf
+backup_credential_custody() {
+  local -a credential
+  [ -f "$BACKUP_CNF" ] && [ ! -L "$BACKUP_CNF" ] && [ "$(stat -c '%u %a %h' "$BACKUP_CNF")" = '0 600 1' ] \
+    && [ "$(stat -c %s "$BACKUP_CNF")" -le 256 ] \
+    || die "backup credential file missing or untrusted; restore it privately or perform an explicit account rotation"
+  mapfile -t credential < "$BACKUP_CNF"
+  [ "${#credential[@]}" = 5 ] && [ "${credential[0]}" = '[client]' ] \
+    && [ "${credential[1]}" = host=127.0.0.1 ] && [ "${credential[2]}" = port=3306 ] \
+    && [ "${credential[3]}" = user=vasey_backup ] && [[ "${credential[4]}" =~ ^password=[A-Za-z0-9]{20,40}$ ]] \
+    && cmp -s -- "$BACKUP_CNF" <(printf '%s\n' "${credential[@]}") \
+    || die "backup credential file incomplete; restore it privately or perform an explicit account rotation"
+  unset credential
+}
+
+backup_credential_authentication() {
+  local backup_client identity
+  backup_client=$(command -v mysql) || die "MySQL client unavailable"
+  identity=$(env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$backup_client" \
+    --defaults-file="$BACKUP_CNF" --no-login-paths --protocol=TCP --connect-timeout=5 \
+    --batch --skip-column-names -e 'SELECT CURRENT_USER()' 2>/dev/null) \
+    || die "backup credential does not authenticate; restore it privately or perform an explicit account rotation"
+  [ "$identity" = 'vasey_backup@127.0.0.1' ] \
+    || die "backup credential authenticated an unexpected identity; recover explicitly"
+}
+
 if ! user_exists vasey_backup; then
+  [ ! -e "$BACKUP_CNF" ] && [ ! -L "$BACKUP_CNF" ] \
+    || die "backup credential file exists without its database account; inspect privately and recover explicitly"
   pw=$(new_secret)
+  [[ "$pw" =~ ^[A-Za-z0-9]{20,40}$ ]] || die "backup credential generation failed"
   mysql_q "CREATE USER 'vasey_backup'@'127.0.0.1' IDENTIFIED BY '$pw'"
-  umask 077; printf '[client]\nhost=127.0.0.1\nport=3306\nuser=vasey_backup\npassword=%s\n' "$pw" > "$BACKUP_CNF"; umask 022
+  (umask 077; set -C; printf '[client]\nhost=127.0.0.1\nport=3306\nuser=vasey_backup\npassword=%s\n' "$pw" > "$BACKUP_CNF") \
+    || die "backup credential persistence failed; recover the database identity explicitly"
   unset pw
 fi
-[ -f "$BACKUP_CNF" ] || die "vasey_backup exists but $BACKUP_CNF is missing; recreate the account or restore the file"
-chown root:root "$BACKUP_CNF"; chmod 0600 "$BACKUP_CNF"
+backup_credential_custody
+backup_credential_authentication
 mysql_q "GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT ON \`$DB_NAME\`.* TO 'vasey_backup'@'127.0.0.1'"
 mysql_q "GRANT SHOW_ROUTINE ON *.* TO 'vasey_backup'@'127.0.0.1'"
 

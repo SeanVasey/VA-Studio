@@ -94,6 +94,29 @@ stat() {
                 self.seal()
             link.unlink()
 
+    def test_public_symlinks_cannot_expose_private_release_paths(self):
+        for relative, target in (("public/env-download", "../.env"),
+                                 ("public/source-download", "../app/source.php"),
+                                 ("public/source-directory", "../app"),
+                                 ("app/env-alias", "../.env")):
+            with self.subTest(relative=relative, target=target):
+                link = self.release / relative
+                link.symlink_to(target)
+                with self.assertRaises((RuntimeError, ValueError, OSError)):
+                    self.seal()
+                link.unlink()
+
+    def test_public_asset_aliases_stay_inside_the_public_tree(self):
+        asset = self.release / "public/build/asset.js"
+        asset.write_text("approved public asset")
+        alias = self.release / "public/asset.js"
+        alias.symlink_to("build/asset.js")
+        directory = self.release / "public/assets"
+        directory.symlink_to("build")
+        self.seal()
+        self.assertEqual(alias.read_text(), "approved public asset")
+        self.assertEqual(directory.resolve(), self.release / "public/build")
+
     def test_internal_code_symlinks_and_executable_bits_are_preserved(self):
         executable = self.release / "vendor/tool"
         executable.write_text("synthetic executable")

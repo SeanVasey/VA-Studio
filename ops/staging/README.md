@@ -78,6 +78,8 @@ Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `s
 maintenance files remain application writable. This protects deployed source/vendor/build/environment
 bytes after sealing; it does not certify an uncompromised builder or immutable runtime PHP execution.
 Private bind-mounted contents are never traversed or changed by sealing.
+Links to the protected `.env` refuse, and every link in `public` must resolve inside
+`public`; friendly static aliases cannot expose private release files or directories.
 Only the root helper switches `current`. Custom roots must have canonical, root-owned ancestry without
 group/world write permission before provisioning; nonexistent descendants are created only under that
 protected prefix. App-owned ancestors, symlinks and noncanonical components refuse before host changes.
@@ -166,6 +168,10 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    format. Missing, linked, writable or incomplete custody refuses with private recovery instructions.
    If the account is absent but its credential file exists, provisioning refuses rather than overwriting
    it or following a link. Do not paste credential contents into chat or the repository.
+   The backup account likewise requires a finite root-owned0600 single-link literal generated
+   `backup.my.cnf` profile. Before grants, a scrubbed client with login paths disabled must authenticate
+   exactly `vasey_backup@127.0.0.1`. Missing, truncated, unsafe or stale credentials require private
+   restore or explicit account rotation; an orphan profile is never overwritten automatically.
 4. **Host files:** the two FPM pools (it runs `php-fpm8.4 -t` and reloads), the supervisor programs, the `vasey-staging-ctl` and `vasey-staging-backup` helpers, `/etc/sudoers.d/vasey-staging` (checked with `visudo -c`), the backup cron (03:17 UTC) and logrotate.
 5. **Access:** the basic-auth file (SHA-512 crypt) and a root-only netrc that the quiesce and resume probes use. It also renders the nginx site.
 
