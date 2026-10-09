@@ -1,0 +1,23 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-rights-red/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.255, Memory: 88.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\RightsScopeCommandTest::test_command_link_turns_an_unlinked_revision_order_failure_into_a_prepared_order
+Symfony\Component\Console\Exception\CommandNotFoundException: The command "vasey:rights-scope" does not exist.
+
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/workspace/VA-Studio-rights-red/tests/Feature/RightsScopeCommandTest.php:97
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 4[0m[37;41m, Errors: 1[0m[37;41m.[0m

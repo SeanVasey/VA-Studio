@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- `vasey:rights-scope` lists unlinked published offer revisions and lets verified catalog staff register scopes and link exact revisions through the audited inventory service. Writes require a hidden password confirmation in a trusted interactive console; immutable references and links retain their existing guards. This supplies the missing operator step before test order preparation.
+
 - Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
 
 - Reviewed manual track publication guards: publish/unpublish confirmations bind exact current metadata and monotonic publication revisions, use fresh persisted authority/MFA and consume stale confirmations before atomic publication/audit writes. The additive counter migration retains history and guards on rollback; scheduling remains separate.

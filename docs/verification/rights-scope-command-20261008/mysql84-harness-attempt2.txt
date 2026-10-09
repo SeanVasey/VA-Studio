@@ -1,0 +1,7 @@
+mysqld: Error on realpath() on '/var/lib/mysql-files' (Error 2 - No such file or directory)
+Disposable MySQL startup did not become ready.
+2026-10-08T23:49:52.799611Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-08T23:49:52.972681Z 0 [ERROR] [MY-010095] [Server] Failed to access directory for --secure-file-priv. Please make sure that directory exists and is accessible by MySQL Server. Supplied value : /var/lib/mysql-files
+2026-10-08T23:49:52.972810Z 0 [ERROR] [MY-010119] [Server] Aborting
+2026-10-08T23:49:52.973005Z 0 [System] [MY-010910] [Server] /workspace/.va-studio-toolchain/mysql84/bin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-08T23:49:52.973008Z 0 [System] [MY-015016] [Server] MySQL Server - end.
