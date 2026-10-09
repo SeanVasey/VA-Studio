@@ -51,6 +51,7 @@ Merges since the handoff are reviewed development merges with activation conditi
 | Date | Decision | By |
 | --- | --- | --- |
 | 2026-10-08 | Staging host: Laravel Forge managing a VPS | Sean |
+| 2026-10-09 | Reconfirmed Laravel Forge + VPS after considering a plain VPS; DigitalOcean was selected earlier in the same session. Access is expected tomorrow (2026-10-10); no host/account/SSH access supplied yet. | Sean |
 | 2026-10-08 | Conditions C11–C13 for paid downloads: runtime requirements doc, per-buyer heavy-work lock, page-driven continuation | Claude (delegated by Sean) |
 | 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admits only `local`/`testing` today. | Claude; **confirmed by Sean** (S-1) |
 | 2026-10-08 | Access: staging subdomain with TLS and basic auth (the Stripe webhook route is signature-checked and exempt from basic auth) | Sean |
@@ -80,6 +81,7 @@ The lanes are separate worktrees with no overlapping files. "Review" means an in
 | M-16 | FPM render risk: renderers spawn `PHP_BINARY` inside web requests, which may be the FPM binary under FPM. Lane A reports the exact fix, then a separate fix and review. | A then fix lane | S | — | licensing | investigating |
 | M-17 | Census normalization (SQLite skip list) | integrator | S | census run | — | PR #60: 33 native-only pairs added (183 → 216); merges after #56. Order-dependent `PublicTrackEmbedTest` failure under investigation |
 | M-18 | Doc reconciliation: CLAUDE-PLAN status column, Free256 README status, Project Notes contradictions (MySQL version, shard count) | D | S | — | — | done in the follow-up tracker PR (CLAUDE.md shard count and native MySQL availability, CLAUDE-PLAN C1b/D1/A2 cells; C2 kept outstanding, Free256 status line) |
+| M-19 | D1 operator command: register rights scopes, link current offer revisions and list unlinked offers | `harness/rights-scope-command` | S | publication and explicit rights references | **rights/auth** | merged #65 at `c8d51000`; SQLite/MySQL command suites each 11/236, independent APPROVE; operators still need to link their real offers |
 
 **Critical path, after Sean grants host access (H0):**
 
@@ -99,7 +101,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 | ID | Input | Unblocks | Status |
 | --- | --- | --- | --- |
 | S-1 | Accept the interim `APP_ENV=local` staging (private access only) until the `staging` environment lands | M-01–M-07 | **done: accepted** |
-| S-2 | Forge account and VPS (Hetzner or DigitalOcean, at least 4 GB RAM), and SSH access for deploys | M-01 | needed Friday |
+| S-2 | Forge account and DigitalOcean VPS (at least 4 GB RAM), and SSH access for deploys | M-01 | **blocking:** Forge + VPS reconfirmed; Sean expects access tomorrow, 2026-10-10 |
 | S-3 | Access path: **chosen: a staging subdomain with TLS plus basic auth**. Still needed: the exact hostname and one DNS A record pointing at the VPS, added or authorized by Sean. | M-02, M-05 | choice done; DNS record needed Friday |
 | S-4 | Stripe **test** account ID, `sk_test_` key, and the webhook secret (`whsec_`) or a Stripe CLI login on the host, through a secret channel and never in chat or the repo | M-03–M-05 | needed Friday |
 | S-5 | A second staff person or account: license approval must come from a different staff account than the contributor | M-11 | needed Saturday |
@@ -136,6 +138,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 
 | Time (UTC) | Update |
 | --- | --- |
+| 2026-10-09 00:16 | #65 merged at `c8d51000`, expected head `8453909e`: D1 operator command, current SQLite/MySQL 8.4.11 suites each 11/236, independent APPROVE, preflight success, Codex P2 fixed/resolved. Forge + VPS reconfirmed; access tomorrow. Next #62/#63 reviews. S-2–S-4 still block host/Stripe rehearsal; S-5–S-10 still needed for content, export and backup. |
 | 2026-10-08 23:30 | Claude handoff to Codex: see `CODEX-HANDOFF.md`. Open: #56 (addendum 15), #60, #62, #63; WIP branches for D1, M-16, B2 and the embed fix. |
 | 2026-10-08 23:00 | PR #44 merged (`672f5826`). PR #56 round 22 pushed, addendum 14 APPROVE WITH CONDITIONS. Census run complete: PR #60 opened. M-18 done. |
 | 2026-10-08 22:45 | Sean confirmed S-1 (interim local mode, locked down) and chose a staging subdomain for S-3. |
