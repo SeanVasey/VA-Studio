@@ -60,12 +60,19 @@ final class ProductionFreeGrantFrozenBytesTest extends TestCase
 
     public function test_no_paid_lane_or_old_free_family_file_is_copied_or_imported(): void
     {
+        // The paid lane (Paid252, PR #56) is now composed on main beside this family. Family 256 still must not import
+        // it or the old free family, and none of its files may be a byte copy of one of theirs.
+        $foreign = [];
+        foreach ([...glob(base_path('app/Domain/Grants/Paid/*.php')), ...glob(base_path('app/Domain/Grants/Free/*.php'))] as $file) {
+            $foreign[hash_file('sha256', $file)] = $file;
+        }
+        $this->assertNotEmpty($foreign);
         foreach (glob(base_path('app/Domain/Grants/ProductionFree/*.php')) as $file) {
             $source = file_get_contents($file);
             $this->assertStringNotContainsString('App\\Domain\\Grants\\Paid', $source, $file);
             $this->assertStringNotContainsString('App\\Domain\\Grants\\Free\\', $source, $file);
+            $this->assertArrayNotHasKey(hash('sha256', $source), $foreign, $file);
         }
-        $this->assertDirectoryDoesNotExist(base_path('app/Domain/Grants/Paid'));
     }
 
     private function sorted(array $paths): array
