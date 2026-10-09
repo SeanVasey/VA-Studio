@@ -95,6 +95,26 @@ describe('reopening the order of an issued authorization', () => {
     expect(document.body.innerHTML).not.toContain(token);
   });
 
+  it('shows the reopen control as soon as a hidden download frame reports its refusal, without another render', async () => {
+    // Codex 4228172320: the hidden tab clears the page (a render) before the frame answers; the refusal itself must render.
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(authorization));
+    render(<PaidGrantJourney />);
+    fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: orderId } });
+    fireEvent.click(button('Prepare licenses for this paid order'));
+    await screen.findByLabelText('Retained paid order');
+    fireEvent.click(button('Authorize master_wav for Original synthetic recording'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
+    await hideAndShow();
+    expect(screen.queryByRole('button', { name: reopen })).not.toBeInTheDocument();
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    Object.defineProperty(frame, 'contentDocument', { configurable: true, value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' },
+      body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { frame.dispatchEvent(new Event('load')); });
+    expect(button(reopen)).toBeEnabled();
+    expect(document.body.innerHTML).not.toContain(token);
+  });
+
   it('drops the reopen control once the authorization is submitted, and a denial drops it with the token', async () => {
     vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(authorization))

@@ -113,6 +113,9 @@ export function PaidGrantJourney() {
   // A continuing preparation: its run number (bumped to stop it), whether it is running, and the last document POST time.
   const runs = useRef(0), auto = useRef(false), lastDocument = useRef(Number.NEGATIVE_INFINITY), timers = useRef(new Set<number>());
   const [continuing, setContinuing] = useState(false), progressLine = useRef<HTMLParagraphElement>(null);
+  // Bumped whenever a kept download is marked refused, so a refusal reported after the page last rendered (a hidden tab or a
+  // later request) shows its reopen and retry controls at once (Codex 4228172320).
+  const [, setRefusals] = useState(0);
   function stopContinuing() { runs.current++; auto.current = false; setContinuing(false); timers.current.forEach(t => window.clearTimeout(t)); timers.current.clear(); }
   // Ends a continuation the way a hidden tab does (its run, timers and in-flight request), but keeps the page shown. A request
   // already sent may still finish on the server; the next click continues from what it achieved.
@@ -282,7 +285,7 @@ export function PaidGrantJourney() {
       const doc = frame.contentDocument; if (!doc || doc.location.href === 'about:blank') return; const raw = doc.body?.textContent ?? ''; if (raw.length > 4096) throw new Error(); const failure = JSON.parse(raw);
       // Only this submission's frame is removed: another download still waiting for its response keeps its frame, and an
       // unrelated uncertain authorize keeps its exact replay (a refusal body cannot say whether that authorize committed).
-      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; frame.remove(); frames.current = frames.current.filter(f => f !== frame);
+      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; setRefusals(n => n + 1); frame.remove(); frames.current = frames.current.filter(f => f !== frame);
         if (current) { clear(true, true); setMessage('The download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.'); } } else throw new Error();
     } catch { if (current) setMessage('The attachment result could not be confirmed. Check browser downloads and refresh saved status.'); } });
     document.body.append(frame); frames.current.push(frame);

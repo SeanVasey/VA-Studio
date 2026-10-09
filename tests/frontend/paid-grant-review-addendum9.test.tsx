@@ -56,9 +56,9 @@ describe('review addendum 9: refusals recorded independently of the request gene
     await act(async () => { answer(frame, JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' })); });
     expect(frame.isConnected).toBe(false);
     expect(screen.queryByText(/download was refused/)).not.toBeInTheDocument();
-    // A9-I4: a non-current refusal changes only refs, so nothing re-renders and the retry is not shown yet.
-    expect(retry()).not.toBeInTheDocument();
-    // The next render for any reason (here a plain re-render, no fetch) offers it from the pre-refusal read.
+    // A9-I4, now fixed (Codex 4228172320): the refusal itself renders, so the retry is offered at once from the pre-refusal
+    // read, and a later render keeps it.
+    expect(retry()).toBeInTheDocument();
     view.rerender(<PaidGrantJourney />);
     expect(retry()).toBeInTheDocument();
     expect(fetcher).toHaveBeenCalledTimes(4);
