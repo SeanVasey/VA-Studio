@@ -203,7 +203,8 @@ class ParsingTests(unittest.TestCase):
         suite = next(item for item in root if item[0].find("skipped") is not None)
         suite.set("assertions", "1"); suite[0].set("assertions", "1")
         self.assertEqual(1, receipt.junit(ET.tostring(root), expected, ROOT, "sqlite", {SKIP})["skipped_cases"])
-        ET.SubElement(suite[0], "skipped"); suite.set("skipped", "2")
+        # The suite counter counts cases, so it stays 1: only the duplicate-node rule can refuse this.
+        ET.SubElement(suite[0], "skipped")
         with self.assertRaises(receipt.ReceiptError):
             receipt.junit(ET.tostring(root), expected, ROOT, "sqlite", {SKIP})
         with self.assertRaises(receipt.ReceiptError):

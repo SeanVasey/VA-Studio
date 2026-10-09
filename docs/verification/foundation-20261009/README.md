@@ -105,9 +105,10 @@ after A. No Foundation run reached that step on this tree (the shards ran out of
 
 The verifier now accepts setUp assertions on a skipped case and still refuses duplicate skip nodes. Which cases may skip is
 unchanged: the skipped identities must equal the reviewed SQLite skip census exactly, and the collector still requires every
-SQLite skip to have executed on MySQL. A self-test covers both. The real verifier rejects the local JUnit before the change and
-accepts both shards after it (`evidence/sqlite-receipt-junit-check.txt`). The same applies to MySQL once a reviewed MySQL skip
-census exists (the native-selection change).
+SQLite skip to have executed on MySQL. A self-test accepts a reviewed skip with a setUp assertion and refuses a case with
+two skip nodes; removing either rule fails it. The real verifier rejects the local JUnit before the change and accepts both
+shards after it (`evidence/sqlite-receipt-junit-check.txt`). Local evidence only: no Foundation run has produced accepted
+SQLite receipts on this tree yet. MySQL still allows no skips at all; a reviewed MySQL skip census is separate, unmerged work.
 
 ## Results
 

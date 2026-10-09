@@ -3,7 +3,8 @@
 ## Before the verifier change (dcf983e):
 shard 1: REJECTED: Skipped case has assertions or duplicate result nodes
 shard 2: REJECTED: Skipped case has assertions or duplicate result nodes
-## Same verifier with only the zero-assertion clause removed in memory: both accepted (388 and 235 skips, exactly the reviewed census).
+## (An in-memory copy of the old verifier with only that clause removed also accepted both, the same as the result below;
+##  that intermediate harness is not reproduced here.)
 ## After the verifier change (this commit):
 shard 1: accepted {'reported_cases': 3924, 'executed_cases': 3536, 'skipped_cases': 388}
 shard 2: accepted {'reported_cases': 3710, 'executed_cases': 3475, 'skipped_cases': 235}
