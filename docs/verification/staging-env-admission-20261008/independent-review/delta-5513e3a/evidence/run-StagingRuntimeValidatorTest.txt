@@ -1,0 +1,16 @@
+# source: git archive 5513e3aee07746734b708f860117252595ec2452 | tar -x -C /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src (vendor rsync'd from /home/user/rv-b2/vendor, composer dump-autoload)
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Unit/StagingRuntimeValidatorTest.php
+# started: 2026-10-09T10:46:59Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src/phpunit.xml
+
+.................                                                 17 / 17 (100%)
+
+Time: 00:04.475, Memory: 26.50 MB
+
+OK (17 tests, 79 assertions)
+# finished: 2026-10-09T10:47:04Z
+rc=0

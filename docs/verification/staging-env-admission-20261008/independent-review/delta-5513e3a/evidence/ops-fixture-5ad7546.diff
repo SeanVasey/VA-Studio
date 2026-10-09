@@ -1,0 +1,133 @@
+commit 5ad75467c1c311edc8087aca6eba417f5a53ef8f
+Author: Claude <noreply@anthropic.com>
+Date:   Fri Oct 9 10:25:25 2026 +0000
+
+    test(ops): give the protected-configuration fixture a CLI PHP binary
+    
+    #67 (M-16) made validate-runtime.php require a probe-proven
+    VASEY_PHP_CLI_BINARY (runtime.php_cli_binary). The configure fixture's
+    candidate environment had none, so main has failed
+    test_valid_configuration_installs_fresh_read_only_environment_after_real_admission
+    since b9cb7b67 (preflight does not run tests/ops). The fixture now sets
+    the running CLI PHP; red on #67's head and green recorded.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01WQFJUv2gxYPi9grbvukUYh
+
+diff --git a/docs/handoff/2026-10-07/CLAUDE-PLAN.md b/docs/handoff/2026-10-07/CLAUDE-PLAN.md
+index 2e4b024..fea3d2f 100644
+--- a/docs/handoff/2026-10-07/CLAUDE-PLAN.md
++++ b/docs/handoff/2026-10-07/CLAUDE-PLAN.md
+@@ -148,4 +148,4 @@ geometry (not to be recreated). Each is listed again in the activation packets
+ | 2026-10-09 | Paid252 composed paid grant family merged (default-off, unmounted) | PR #56 merged at `86e22f1add4e3b0cf05e79af4946e9bcfa4d9afe`, expected head `6dca2379706b6960380cd9659126e234c00ab167`; last product source `fe8cdcb0` (round 25), evidence-only successor product diff empty; integration with main `49489697` + handoff ledger at `b99b5dd4` | integrated paid family SQLite 136 tests / 4,954 assertions, 1 pre-existing native-only skip (PHP 8.4.26, `b99b5dd4`); request-instant file 7/129; round 23 retained red 6 tests/1 failure/1 error reproduced independently; rounds 24 (Codex 4228014577), A16-L1 and 25 (Codex 4228172320) each red first, frontend 1,130/1,130 and tsc clean at `fe8cdcb0`; independent Addenda 15-18 APPROVE WITH CONDITIONS (15: `55976099..27a151b6` + `b99b5dd`, 0-byte paid-path diff; A15-L1 C11 (k) doc corrected; 16: `915ca2c9`; 17: `e4f9997e`; 18: `fe8cdcb0`); Codex code review on `fe8cdcb0` no major issues; preflight 37906390268 success. No native MySQL at this head; slow-identity test moves the test clock only | conditions C2, C4-C8 open; C11 open for pre-mount host verification incl. new (k) identity-proof budget; C1/C3/C9/C10 resolved or met; C12/C13 met. Codex thread PRRT_kwDOU5febs6qfw0X (PaidGrantTransfer spool slots) deliberately open under C11. Family stays unmounted; no live activation, membership CP-2/CP-3/P1B-1 or operative credit writer. Info A15-I1/I2 left for follow-up. Next: #60 census union (217), embed #66, M-16, B2. |
+ | 2026-10-09 | SQLite skip census union merged | PR #60 merged at `3b3a36546859b14f9461aab312745eba08531721`, expected head `bcbf72d9c27c83b5c2720ac3500a6cf0049fd012`; union at `b97a010` (merge of `86e22f1a`) | `database-sqlite-skips.json` append-order union: main 184 (incl. #56's PaidGrantSchemaRecovery pair) + 33 = 217 unique, diff vs branch side exactly #56's pair; `python3 -I scripts/ci/test-database-receipts.py` 34 OK; original census run at `d3e1c39a` 211 skipped pairs, 0 listed-not-skipped; preflight 37906764900 success; Codex code review on exact head no major issues; earlier two threads resolved | CI data/docs only; no SQLite census run of the integrated tree and no MySQL/Foundation run; final Foundation will check the census. Also carried the #56 ledger/status rows. Next: #66 embed leak, M-16, B2. |
+ | 2026-10-09 | Embed order leak fix merged (test-only) | PR #66 merged at `e5e500cadae68958293089ccc2b4a22bcdb9df66`, expected head `93c5ace14ae9e60efe92be499a5f840115e9628d`; functional `875b7edc`/`90d39bf0`, integrated `fd26aabb` | ordered `MembershipAdministrationActionTest` then `PublicTrackEmbedTest` without the flush: 42 tests, 4 failures (the reported cases); with `Livewire::flushState()` in `TestCase::setUp()`: 42/1,456 OK, repeated on integrated `fd26aabb`; new `LivewireStateIsolationTest` red 1 failure / green 2/3; trigger traced to an HTTP-rendered Filament page (Livewire::test flushes itself); preflight 37907552970 success (superseded run 37907532445 cancelled by concurrency); Codex code and security review no findings | test-only; full-suite ordering not run (final Foundation covers it); pre-existing Pint ordered_imports on TestCase left (scope). Carried the #60 rows. Next: M-16 (#67), B2. |
+-| 2026-10-09 | M-16 PHP CLI resolver merged (renderer children under PHP-FPM) | PR #67 merged at `b9cb7b67800040ef50c3f3dfc607d0c60be99eb5`, expected head `e07da62f91bcd46685a7ff997dafabf22147ef3c`; integrated suites at `214256a4` | genuine php-fpm 8.4.26: main red (`PHP_BINARY`=php-fpm, exit 64, all families `render_failed`); branch with `VASEY_PHP_CLI_BINARY=/usr/bin/php8.4` renders free/paid/generic/composed production-free byte-identical to CLI (at `e07da62`: free `c4e812cf`, paid `20841190`, production-free `024b4fc9`, generic `790fd796`), unset/8.3/FPM binary fail closed; affected selection 103 files 1,165 tests 0 failures at `214256a4`; cli-server, probe loader path and generic child loader path (Codex P2s 4228948830, 4228998422) each red first; focused 12 files/150 tests; preflight 37916677344 success; Codex no major issues on `e07da62`; independent licensing review APPROVE WITH CONDITIONS at `214256a4` (H-1 family-256 binding fixed), delta APPROVE WITH CONDITIONS to `11d90702`, re-check APPROVE at `e07da62` | frozen `resources/contracts` untouched; family 256 ships unbound, its composition must add the `PhpCliProcess` binding; also repaired main's Free256 frozen-bytes guard red since #56 (`af232a8`). Open info: I-2/I-D2 cache key, I-D1 `:` in install path, I-1 wording. No Forge host, MySQL or Foundation. Carried the #66 rows. Next: B2 (staging env admission), then final Foundation. |
++| 2026-10-09 | M-16 PHP CLI resolver merged (renderer children under PHP-FPM) | PR #67 merged at `b9cb7b67800040ef50c3f3dfc607d0c60be99eb5`, expected head `e07da62f91bcd46685a7ff997dafabf22147ef3c`; integrated suites at `214256a4` | genuine php-fpm 8.4.26: main red (`PHP_BINARY`=php-fpm, exit 64, all families `render_failed`); branch with `VASEY_PHP_CLI_BINARY=/usr/bin/php8.4` renders free/paid/generic/composed production-free byte-identical to CLI (at `e07da62`: free `c4e812cf`, paid `20841190`, production-free `024b4fc9`, generic `790fd796`), unset/8.3/FPM binary fail closed; affected selection 103 files 1,165 tests 0 failures at `214256a4`; cli-server, probe loader path and generic child loader path (Codex P2s 4228948830, 4228998422) each red first; focused 12 files/150 tests; preflight 37916677344 success; Codex no major issues on `e07da62`; independent licensing review APPROVE WITH CONDITIONS at `214256a4` (H-1 family-256 binding fixed), delta APPROVE WITH CONDITIONS to `11d90702`, re-check APPROVE at `e07da62` | frozen `resources/contracts` untouched; family 256 ships unbound, its composition must add the `PhpCliProcess` binding; also repaired main's Free256 frozen-bytes guard red since #56 (`af232a8`). Open info: I-2/I-D2 cache key, I-D1 `:` in install path, I-1 wording. **Regression:** #67 left `tests/ops/test_staging_protected_configuration.py` red on main (its candidate env lacked the newly required `VASEY_PHP_CLI_BINARY`; preflight does not run `tests/ops`, and M-16's focused runs omitted it); fixed by the B2 PR. No Forge host, MySQL or Foundation. Carried the #66 rows. Next: B2 (staging env admission), then final Foundation. |
+diff --git a/docs/verification/staging-env-admission-20261008/README.md b/docs/verification/staging-env-admission-20261008/README.md
+index f62ece0..7914cf5 100644
+--- a/docs/verification/staging-env-admission-20261008/README.md
++++ b/docs/verification/staging-env-admission-20261008/README.md
+@@ -173,6 +173,9 @@ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
+ | Red: configure rebuilds the route cache (C1) | `56efbb7` + updated ops test | 1 failure: only `config:cache` ran; rc 1 | `evidence/configure-route-cache-red.txt` |
+ | Green: all ops kit tests after the C1 fix | working tree | 13 files, 74 tests OK | `evidence/configure-route-cache-green.txt` |
+ | Real route cache across `APP_ENV` | working tree | built under `local`, served under `staging`: no MFA middleware; rebuilt under `staging`: present | `evidence/configure-route-cache-real.txt` |
++| Ops fixture after merging main `b9cb7b67` (#67): `test_staging_protected_configuration` red on main, its candidate env lacking the newly required `VASEY_PHP_CLI_BINARY` | `e07da62` (#67 head) | 1 failure, rc 1 | `evidence/ops-protected-configuration-red-main.txt` |
++| Same with the fixture supplying the running CLI PHP | integrated head + fix | 3 tests OK | `evidence/ops-protected-configuration-green.txt` |
++| All ops kit tests + private-server preflight self-test | integrated head + fix | 13 files, 74 tests OK; preflight 20 OK | `evidence/final-ops-tests.txt` |
+ | Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
+ 
+ ## Not tested
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/final-ops-tests.txt b/docs/verification/staging-env-admission-20261008/evidence/final-ops-tests.txt
+new file mode 100644
+index 0000000..bc397fb
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/final-ops-tests.txt
+@@ -0,0 +1,16 @@
++# Ops kit tests at 0b88d78 + ops fixture fix (main b9cb7b67 merged)
++tests/ops/test_staging_admin_defaults_custody.py: Ran 3 tests in 0.838s  OK 
++tests/ops/test_staging_backup_credential_custody.py: Ran 4 tests in 0.331s  OK 
++tests/ops/test_staging_backup_key_custody.py: Ran 9 tests in 0.887s  OK 
++tests/ops/test_staging_build_admission.py: Ran 3 tests in 0.992s  OK 
++tests/ops/test_staging_deploy_refresh.py: Ran 2 tests in 0.073s  OK 
++tests/ops/test_staging_dump_normalization.py: Ran 12 tests in 0.035s  OK 
++tests/ops/test_staging_operation_custody.py: Ran 3 tests in 0.343s  OK 
++tests/ops/test_staging_operation_lease.py: Ran 8 tests in 2.350s  OK 
++tests/ops/test_staging_pipeline_admission.py: Ran 9 tests in 1.672s  OK 
++tests/ops/test_staging_protected_configuration.py: Ran 3 tests in 1.415s  OK 
++tests/ops/test_staging_recovery_admission.py: Ran 4 tests in 0.569s  OK 
++tests/ops/test_staging_release_sealing.py: Ran 11 tests in 0.865s  OK 
++tests/ops/test_staging_runtime_directory_custody.py: Ran 3 tests in 1.170s  OK 
++## scripts/ops/test-private-server-preflight.py
++Ran 20 tests in 5.429s  OK 
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/final-shard-0.txt b/docs/verification/staging-env-admission-20261008/evidence/final-shard-0.txt
+new file mode 100644
+index 0000000..3bb68f9
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/final-shard-0.txt
+@@ -0,0 +1 @@
++# B2 final affected selection shard 0 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/final-shard-1.txt b/docs/verification/staging-env-admission-20261008/evidence/final-shard-1.txt
+new file mode 100644
+index 0000000..dcfd9bf
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/final-shard-1.txt
+@@ -0,0 +1 @@
++# B2 final affected selection shard 1 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/final-shard-2.txt b/docs/verification/staging-env-admission-20261008/evidence/final-shard-2.txt
+new file mode 100644
+index 0000000..b254ed9
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/final-shard-2.txt
+@@ -0,0 +1 @@
++# B2 final affected selection shard 2 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/final-shard-3.txt b/docs/verification/staging-env-admission-20261008/evidence/final-shard-3.txt
+new file mode 100644
+index 0000000..a4e7024
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/final-shard-3.txt
+@@ -0,0 +1 @@
++# B2 final affected selection shard 3 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-green.txt b/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-green.txt
+new file mode 100644
+index 0000000..c9cefb5
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-green.txt
+@@ -0,0 +1,6 @@
++# Green: protected configuration fixture supplies VASEY_PHP_CLI_BINARY; 0b88d78 + working tree
++----------------------------------------------------------------------
++Ran 3 tests in 1.443s
++
++OK
++rc=0
+diff --git a/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-red-main.txt b/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-red-main.txt
+new file mode 100644
+index 0000000..bba95bb
+--- /dev/null
++++ b/docs/verification/staging-env-admission-20261008/evidence/ops-protected-configuration-red-main.txt
+@@ -0,0 +1,10 @@
++# tests/ops/test_staging_protected_configuration.py at e07da62 (= #67 head, main b9cb7b67 product)
++    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++AssertionError: 1 != 0 : protected runtime profile refused; original environment retained
++
++
++----------------------------------------------------------------------
++Ran 3 tests in 1.546s
++
++FAILED (failures=1)
++rc=1
+diff --git a/tests/ops/test_staging_protected_configuration.py b/tests/ops/test_staging_protected_configuration.py
+index d7d7d3d..1a8262d 100644
+--- a/tests/ops/test_staging_protected_configuration.py
++++ b/tests/ops/test_staging_protected_configuration.py
+@@ -32,7 +32,9 @@ class ProtectedConfigurationTest(unittest.TestCase):
+             "CACHE_STORE=database", "QUEUE_CONNECTION=database", "DB_QUEUE_RETRY_AFTER=1200",
+             "DB_CONNECTION=mysql", "DB_HOST=127.0.0.1", "DB_DATABASE=vasey_staging",
+             "DB_USERNAME=vasey_app", "DB_PASSWORD=SyntheticPrivateRuntimeMarker",
+-            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test", "",
++            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test",
++            # The validator requires a probe-proven CLI PHP for FPM renderer children (M-16, runtime.php_cli_binary).
++            "VASEY_PHP_CLI_BINARY=" + os.path.realpath(PHP), "",
+         ])
+         (self.release / ".env").write_text(self.previous)
+         (self.release / ".env").chmod(0o600)

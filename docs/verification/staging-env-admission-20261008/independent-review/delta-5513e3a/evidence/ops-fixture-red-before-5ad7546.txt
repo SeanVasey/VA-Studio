@@ -1,0 +1,17 @@
+# red: tests/ops/test_staging_protected_configuration.py as of 0b88d78 (before 5ad7546), run against the 5513e3a export (validate-runtime.php from #67)
+
+======================================================================
+FAIL: test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src/tests/ops/reviewer_red_protected_configuration_0b88d78.py", line 101, in test_valid_configuration_installs_fresh_read_only_environment_after_real_admission
+    self.assertEqual(run.returncode, 0, run.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : protected runtime profile refused; original environment retained
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.878s
+
+FAILED (failures=1)
+rc=1

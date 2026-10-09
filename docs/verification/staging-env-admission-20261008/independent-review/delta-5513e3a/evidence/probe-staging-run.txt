@@ -1,0 +1,110 @@
+# source: git archive 5513e3aee07746734b708f860117252595ec2452 | tar -x -C /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src (vendor rsync'd from /home/user/rv-b2/vendor, composer dump-autoload)
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta/evidence/probes/ReviewerStagingProbeTest.php
+# started: 2026-10-09T10:47:12Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/b2-delta-src/phpunit.xml
+
+
+PROBE helper matrix: {
+    "\"staging\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": true,
+        "refusesProductionOnly": true,
+        "panelMfaRequired": true
+    },
+    "\"Staging\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"STAGING\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging-eu\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"stage\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\" staging\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging \"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging\\n\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"testing\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"local\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"production\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": true,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": true
+    },
+    "\"preview\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    }
+}
+.
+PROBE AdminMultiFactor::satisfiedBy: {"staging":{"unenrolled":false,"enrolled":true},"production":{"unenrolled":false,"enrolled":true},"local":{"unenrolled":true,"enrolled":true},"testing":{"unenrolled":true,"enrolled":true}}
+.
+PROBE TestPaymentExceptionOperations::locked: {"staging unenrolled":"AuthorizationException","staging enrolled":"ModelNotFoundException","production unenrolled":"AuthorizationException","production enrolled":"ModelNotFoundException","local unenrolled":"ModelNotFoundException"}
+.
+PROBE staff writes by an UNENROLLED admin: {
+    "promotion.create staging": "completed:PromotionCampaign",
+    "rights-scope.register staging": "completed:RightsScope",
+    "promotion.create production": "AuthorizationException",
+    "rights-scope.register production": "QuoteException:INVENTORY_UNAVAILABLE:503",
+    "promotion.create preview": "AuthorizationException",
+    "rights-scope.register preview": "QuoteException:INVENTORY_UNAVAILABLE:503"
+}
+.                                                                4 / 4 (100%)
+
+Time: 00:01.767, Memory: 83.00 MB
+
+OK (4 tests, 35 assertions)
+# finished: 2026-10-09T10:47:14Z
+rc=0

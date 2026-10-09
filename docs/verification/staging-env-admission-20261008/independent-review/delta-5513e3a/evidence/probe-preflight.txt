@@ -1,0 +1,162 @@
+{
+ "staging valid": {
+  "rc": 0,
+  "result": "FILE_CHECKS_PASSED",
+  "profile": "staging",
+  "blocked": []
+ },
+ "staging APP_ENV=Staging": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "baseline_app_env"
+  ]
+ },
+ "staging APP_ENV=local": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "baseline_app_env"
+  ]
+ },
+ "staging APP_ENV=testing": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "baseline_app_env"
+  ]
+ },
+ "staging STRIPE_MODE=live": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "baseline_stripe_mode"
+  ]
+ },
+ "staging sk_live_ test key": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_no_live_provider_credential",
+   "staging_stripe_test_secret_key_shape"
+  ]
+ },
+ "staging rk_live_ in unrelated var": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_no_live_provider_credential"
+  ]
+ },
+ "staging rk_test_ as test key": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_stripe_test_secret_key_shape"
+  ]
+ },
+ "staging funds mode live": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_no_production_funds_mode"
+  ]
+ },
+ "staging funds mode test": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_no_production_funds_mode"
+  ]
+ },
+ "staging switch yes": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "staging_boolean_stripe_test_checkout_enabled"
+  ]
+ },
+ "staging debug true": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "staging",
+  "blocked": [
+   "baseline_app_debug"
+  ]
+ },
+ "staging file under production profile": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "production",
+  "blocked": [
+   "baseline_app_env",
+   "baseline_stripe_test_checkout_enabled",
+   "baseline_stripe_test_finalization_enabled",
+   "baseline_stripe_test_payment_processing_enabled",
+   "baseline_stripe_webhook_enabled",
+   "baseline_vasey_test_contract_issuance_enabled",
+   "baseline_vasey_test_delivery_access_enabled",
+   "baseline_vasey_test_fulfillment_activation_enabled",
+   "inactive_stripe_account_id",
+   "inactive_stripe_test_secret_key",
+   "inactive_stripe_webhook_secret",
+   "inactive_vasey_test_checkout_policy"
+  ]
+ },
+ "production valid (default)": {
+  "rc": 0,
+  "result": "FILE_CHECKS_PASSED",
+  "profile": "production",
+  "blocked": []
+ },
+ "production valid explicit": {
+  "rc": 0,
+  "result": "FILE_CHECKS_PASSED",
+  "profile": "production",
+  "blocked": []
+ },
+ "production with test switch on": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "production",
+  "blocked": [
+   "baseline_stripe_test_checkout_enabled"
+  ]
+ },
+ "duplicate profile flags": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "production",
+  "blocked": [
+   "usage_template_or_absolute_env_file_with_optional_runtime"
+  ]
+ },
+ "repeated runtime flag": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "production",
+  "blocked": [
+   "usage_template_or_absolute_env_file_with_optional_runtime"
+  ]
+ },
+ "unknown profile": {
+  "rc": 1,
+  "result": "BLOCKED",
+  "profile": "production",
+  "blocked": [
+   "usage_template_or_absolute_env_file_with_optional_runtime"
+  ]
+ }
+}
+UNEXPECTED: []
+rc=0

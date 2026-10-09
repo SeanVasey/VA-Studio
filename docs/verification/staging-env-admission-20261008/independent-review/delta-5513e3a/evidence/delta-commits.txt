@@ -1,0 +1,5 @@
+5513e3aee07746734b708f860117252595ec2452 5ad75467c1c311edc8087aca6eba417f5a53ef8f docs(verification): record B2's final affected selection on the integrated head
+5ad75467c1c311edc8087aca6eba417f5a53ef8f 0b88d7819fed8ac95b83cea601c24c80bc2d621f test(ops): give the protected-configuration fixture a CLI PHP binary
+0b88d7819fed8ac95b83cea601c24c80bc2d621f 293cd4d5ac8a0990b6af875f87c6043af6eed164 docs(handoff): record the #67 merge and its re-check; note the route-cache refresh
+293cd4d5ac8a0990b6af875f87c6043af6eed164 3b36a0ae291e9b32e92a01b90954e637e49a17a6 b9cb7b67800040ef50c3f3dfc607d0c60be99eb5 Merge branch 'main' (b9cb7b67, #67 M-16) into harness/staging-env-admission
+3b36a0ae291e9b32e92a01b90954e637e49a17a6 56efbb7a517abc55f17ea9a8b37b29e4970a2210 fix(staging): rebuild the route cache on environment refresh (B2 review C1)
