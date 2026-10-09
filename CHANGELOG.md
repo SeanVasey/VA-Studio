@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Private Laravel Forge staging kit with protected release activation, isolated runtime admission, test-only nginx/FPM/workers, least-privilege MySQL provisioning and recoverable database/private-file/environment backups. Hosting credentials, real content and the first Stripe TEST purchase remain operator inputs.
+
 - `vasey:rights-scope` lists unlinked published offer revisions and lets verified catalog staff register scopes and link exact revisions through the audited inventory service. Writes require a hidden password confirmation in a trusted interactive console; immutable references and links retain their existing guards. This supplies the missing operator step before test order preparation.
 
 - Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
@@ -66,6 +68,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
 
 ### Security
+
+- Staging control seals privileged release ancestry before bind/unbind and reserves atomic activation for the root helper. Restore proof normalizes only table column charset rendering, invalidates stale success markers and publishes after verification/cleanup. Same-SHA refresh freezes one admitted environment, preserves the existing key and takes a recoverable pre-change snapshot; recovery never infers stopped writers from a phase flag.
 
 - The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any upload field in the application does not refuse stored paths, or if any code turns that guard off.
 

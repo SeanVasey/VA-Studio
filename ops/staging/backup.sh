@@ -36,6 +36,7 @@ log() { echo "vasey-staging-backup: $(date -u +%FT%TZ) $*"; }
 
 PRIVATE=$VASEY_ROOT/private
 CTL=/usr/local/sbin/vasey-staging-ctl
+NORMALIZER=/usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 DUMP_FLAGS=(--single-transaction --quick --routines --triggers --events --hex-blob --no-tablespaces
             --set-gtid-purged=OFF --skip-dump-date --skip-comments --databases "$VASEY_DB_NAME")
 
@@ -92,14 +93,18 @@ cleanup_restore() {
   if [ -n "$RC_PID" ] && kill -0 "$RC_PID" 2>/dev/null; then
     mysqladmin --no-defaults --socket="$RC_SOCK" -uroot shutdown >/dev/null 2>&1 || kill "$RC_PID" 2>/dev/null || true
     for _ in $(seq 1 60); do kill -0 "$RC_PID" 2>/dev/null || break; sleep 1; done
+    ! kill -0 "$RC_PID" 2>/dev/null || return 1
   fi
-  if [ -n "$RC_WORK" ] && [ -d "$RC_WORK" ]; then rm -rf --one-file-system -- "$RC_WORK"; fi
+  if [ -n "$RC_WORK" ] && [ -d "$RC_WORK" ]; then rm -rf --one-file-system -- "$RC_WORK" || return 1; fi
   RC_PID=""; RC_WORK=""
 }
 
 # ---- restore-check: docs/ops/backup-restore-proof.md steps 3-4 against isolated targets ----
 restore_check() {
   local bk=${1:?backup directory}
+  [ -d "$bk" ] && [ ! -L "$bk" ] || die "not a backup directory"
+  # A success marker describes this proof attempt, never an earlier attempt that now fails.
+  rm -f -- "$bk/RESTORE_CHECK" || die "cannot invalidate previous restore proof"
   [ -d "$bk" ] && [ -f "$bk/database.sql" ] && [ -f "$bk/private.tar" ] || die "not a backup directory"
   (cd "$bk" && sha256sum --check --quiet database.sql.sha256 private.tar.sha256) || die "backup files do not match their recorded hashes"
   [ ! -f "$bk/env.backup.sha256" ] || (cd "$bk" && sha256sum --check --quiet env.backup.sha256) || die "env.backup hash mismatch"
@@ -158,33 +163,47 @@ restore_check() {
   # other byte, all row data included, must still be identical.
   local redump_result=identical
   if ! diff -q "$bk/redump.sql" "$bk/database.sql" >/dev/null; then
-    local norm='s/ CHARACTER SET utf8mb4 COLLATE utf8mb4_/ COLLATE utf8mb4_/g'
-    if diff -q <(sed "$norm" "$bk/redump.sql") <(sed "$norm" "$bk/database.sql") >/dev/null; then
+    local original_normalized redump_normalized
+    original_normalized=$(mktemp "$bk/.original-normalized.XXXXXXXX")
+    redump_normalized=$(mktemp "$bk/.redump-normalized.XXXXXXXX")
+    if ! python3 -I "$NORMALIZER" "$bk/database.sql" > "$original_normalized" 2>/dev/null \
+       || ! python3 -I "$NORMALIZER" "$bk/redump.sql" > "$redump_normalized" 2>/dev/null; then
+      rm -f -- "$original_normalized" "$redump_normalized"
+      die "schema rendering normalization failed; no restore proof published"
+    fi
+    if diff -q "$redump_normalized" "$original_normalized" >/dev/null; then
       redump_result="identical_except_column_charset_rendering"
     else
+      rm -f -- "$original_normalized" "$redump_normalized"
       mv -f -- "$bk/redump.sql" "$bk/redump.sql.FAILED"
       die "re-dump differs from the backup (kept redump.sql.FAILED, 0600, for diff)"
     fi
+    rm -f -- "$original_normalized" "$redump_normalized"
   fi
   rm -f -- "$bk/redump.sql"
   local tables triggers
   tables=$(mysql "${R[@]}" -N -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='$VASEY_DB_NAME'")
   triggers=$(mysql "${R[@]}" -N -e "SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA='$VASEY_DB_NAME'")
 
-  {
-    echo "restore_checked_utc=$(date -u +%FT%TZ)"
-    echo "result=RESTORE_VERIFIED"
-    echo "database_redump=$redump_result"
-    echo "restored_tables=$tables"
-    echo "restored_triggers=$triggers"
-    echo "private_files_verified=$(grep -c . "$bk/private.sha256" || true)"
-    echo "private_dirs_verified=$(grep -c . "$bk/private.dirs" || true)"
-    echo "modes_and_ownership=$mode_result"
-    echo "app_key_present=$([ -f "$bk/env.backup" ] && echo yes || echo no)"
-  } > "$bk/RESTORE_CHECK"
-  log "restore check passed for $(basename "$bk"): $tables tables, $triggers triggers"
+  cleanup_restore || die "disposable restore cleanup failed; no restore proof published"
   trap - EXIT
-  cleanup_restore
+  local marker
+  marker=$(mktemp "$bk/.RESTORE_CHECK.XXXXXXXX")
+  if ! printf '%s\n' \
+    "restore_checked_utc=$(date -u +%FT%TZ)" \
+    "result=RESTORE_VERIFIED" \
+    "database_redump=$redump_result" \
+    "restored_tables=$tables" \
+    "restored_triggers=$triggers" \
+    "private_files_verified=$(grep -c . "$bk/private.sha256" || true)" \
+    "private_dirs_verified=$(grep -c . "$bk/private.dirs" || true)" \
+    "modes_and_ownership=$mode_result" \
+    "app_key_present=$([ -f "$bk/env.backup" ] && echo yes || echo no)" \
+    > "$marker" || ! mv -T -- "$marker" "$bk/RESTORE_CHECK"; then
+    rm -f -- "$marker"
+    die "cannot publish restore proof"
+  fi
+  log "restore check passed for $(basename "$bk"): $tables tables, $triggers triggers"
 }
 
 ship() {

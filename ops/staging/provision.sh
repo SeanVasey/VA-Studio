@@ -64,7 +64,7 @@ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
 MIRROR=${MIRROR:-$APP_HOME/$HOST}
 KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-delivery.conf \
-         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh; do
+         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py validate-runtime.php; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 
@@ -94,7 +94,7 @@ if [ "$SKIP_PACKAGES" = 0 ]; then
   apt-get update -q
   apt-get install -y -q --no-install-recommends \
     "php$PHPV-cli" "php$PHPV-fpm" "php$PHPV-mysql" "php$PHPV-sqlite3" "php$PHPV-mbstring" "php$PHPV-intl" \
-    "php$PHPV-bcmath" "php$PHPV-gd" "php$PHPV-zip" "php$PHPV-curl" "php$PHPV-xml" \
+    "php$PHPV-bcmath" "php$PHPV-gd" "php$PHPV-zip" "php$PHPV-curl" "php$PHPV-xml" python3 \
     ffmpeg clamav clamav-freshclam qpdf poppler-utils util-linux supervisor rsync curl ca-certificates gnupg openssl
 
   node_ok=0
@@ -119,6 +119,7 @@ nv=$(node -v 2>/dev/null | sed 's/^v//') || die "node is not installed"
 [[ "$nv" =~ ^24\.([0-9]+)\. ]] && [ "${BASH_REMATCH[1]}" -ge 15 ] || die "node $nv does not satisfy >=24.15.0 <25"
 command -v npm >/dev/null || die "npm missing"
 command -v composer >/dev/null || die "composer missing (Forge installs Composer 2)"
+command -v python3 >/dev/null || die "python3 missing (restore schema comparison requires it)"
 [ -x "$PHP_BIN" ] && [ -x "$FPM_BIN" ] || die "PHP $PHPV CLI or FPM missing"
 
 # Extensions vasey:doctor requires (php_runtime) plus what CI installs (final-verification.yml) and the workers need.
@@ -163,7 +164,7 @@ runuser -u "$APP_USER" -- test -r /var/lib/clamav/daily.cvd -o -r /var/lib/clama
 
 # ---------------------------------------------------------------- 4. directories and modes
 install -d -m 0755 -o root -g root "$ROOT"
-install -d -m 0755 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/releases"
+install -d -m 0755 -o root -g root "$ROOT/releases"
 install -d -m 0750 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/evidence"
 install -d -m 0700 -o root -g root "$ROOT/backups"
 install -d -m 0700 -o "$APP_USER" -g "$APP_GROUP" "$ROOT/tmp" "$ROOT/tmp/php-upload" "$ROOT/tmp/php-sys"
@@ -281,6 +282,8 @@ chmod 0644 /etc/vasey-staging/staging.conf.tmp; mv -f /etc/vasey-staging/staging
 
 install -m 0755 -o root -g root "$KIT/bin/vasey-staging-ctl" /usr/local/sbin/vasey-staging-ctl
 install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-backup
+install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
+install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644

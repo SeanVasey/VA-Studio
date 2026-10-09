@@ -11,10 +11,12 @@
 # restore proof, and release pruning.
 #
 # Usage:
+#   vasey-staging-ctl allocate <40-hex SHA>   create an app-writable checkout slot under protected releases/
 #   vasey-staging-ctl attach <40-hex SHA>     bind-mount <ROOT>/private onto releases/<SHA>/storage/app/private
 #   vasey-staging-ctl detach <40-hex SHA>     undo attach (unmount and drop the fstab line)
 #   vasey-staging-ctl quiesce                 maintenance in the served release, stop every writer, prove it
 #   vasey-staging-ctl resume                  start PHP-FPM and workers on `current`, prove it, leave maintenance
+#   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
 #   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof (requires quiesce first)
 #   vasey-staging-ctl prune                   detach and delete releases beyond VASEY_KEEP_RELEASES
 #   vasey-staging-ctl status                  print service, worker and release state
@@ -50,6 +52,58 @@ BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
 
 valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
 
+# Every ancestor of a privileged path must remain outside the application's rename authority.
+# The default /srv/vasey-staging ancestry is root-owned; custom roots must meet the same boundary.
+protected_dir() {
+  local path=$1 mode
+  [ -d "$path" ] && [ ! -L "$path" ] && [ "$(readlink -f -- "$path")" = "$path" ] \
+    || die "privileged directory is missing or contains a symlink"
+  while :; do
+    [ "$(stat -c %u -- "$path")" = 0 ] || die "privileged directory ancestry must be root-owned"
+    mode=$(stat -c %a -- "$path")
+    (( (8#$mode & 8#022) == 0 )) || die "privileged directory ancestry must not be group/world writable"
+    [ "$path" = / ] && break
+    path=$(dirname -- "$path")
+  done
+}
+
+sealed_release() {
+  local sha=$1 rel=$RELEASES/$1
+  valid_sha "$sha" || die "release needs a 40-hex SHA"
+  protected_dir "$RELEASES"
+  protected_dir "$rel/storage/app"
+  [ -d "$rel/storage/app/private" ] && [ ! -L "$rel/storage/app/private" ] \
+    && [ "$(readlink -f -- "$rel/storage/app/private")" = "$rel/storage/app/private" ] \
+    || die "private mount target is missing or contains a symlink"
+}
+
+cmd_allocate() {
+  local sha=${1:-}; valid_sha "$sha" || die "allocate needs a 40-hex SHA"
+  protected_dir "$RELEASES"
+  [ ! -e "$RELEASES/$sha" ] && [ ! -L "$RELEASES/$sha" ] || die "release slot already exists"
+  install -d -m 0755 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$RELEASES/$sha"
+  echo "allocated $sha"
+}
+
+seal_release() {
+  local sha=$1 expected=$RELEASES/$1 part
+  protected_dir "$RELEASES"
+  # The protected releases parent prevents the app from renaming the release itself. Seal each
+  # directory before following its child, so the app cannot swap the next component after checking.
+  cd -P -- "$expected" 2>/dev/null || die "release not found"
+  for part in release storage app; do
+    [ "$(pwd -P)" = "$expected" ] || die "release ancestry contains a symlink"
+    case "$(stat -c %U .)" in "$VASEY_APP_USER"|root) ;; *) die "release ancestry has an unexpected owner" ;; esac
+    chown root:root .; chmod 0755 .
+    case "$part" in
+      release) expected=$expected/storage; cd -P -- storage 2>/dev/null || die "release storage missing" ;;
+      storage) expected=$expected/app; cd -P -- app 2>/dev/null || die "release storage/app missing" ;;
+    esac
+  done
+  cd /
+  sealed_release "$sha"
+}
+
 # HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
 # nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
 # credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
@@ -64,8 +118,9 @@ served_release() {
   [ -L "$CURRENT" ] || return 1
   local target
   target=$(readlink -f "$CURRENT") || return 1
-  [[ "$target" == "$RELEASES"/* ]] || die "current points outside $RELEASES"
   valid_sha "$(basename "$target")" || die "current does not point at a SHA-named release"
+  [ "$target" = "$RELEASES/$(basename "$target")" ] || die "current points outside the release container"
+  sealed_release "$(basename "$target")"
   printf '%s\n' "$target"
 }
 
@@ -91,15 +146,15 @@ web_stopped() {
 cmd_attach() {
   local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
   local rel=$RELEASES/$sha target=$RELEASES/$sha/storage/app/private
+  seal_release "$sha"
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "persistent private root missing"
   [ "$(stat -c '%U %a' "$PRIVATE")" = "$VASEY_APP_USER 700" ] || die "persistent private root must be $VASEY_APP_USER 0700"
   if mountpoint -q "$target"; then
     [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "$target is mounted from something else"
     echo "attached (already) $sha"; return 0
   fi
-  # Pin the target directory before checking it. The release tree belongs to the application user, who could
-  # otherwise swap a path component for a symlink between the check and the mount. mount(8) is told not to
-  # canonicalize, so the kernel resolves /proc/self/cwd to the pinned directory itself.
+  # The sealed parent ancestry prevents app renames. Pin the private leaf as an additional boundary:
+  # mount(8) does not canonicalize, so the kernel resolves /proc/self/cwd to the checked directory itself.
   [ -d "$rel" ] && [ ! -L "$rel" ] || die "release $sha not found"
   cd -P -- "$target" 2>/dev/null || die "release has no storage/app/private directory"
   [ "$(pwd -P)" = "$target" ] || die "storage/app/private path contains a symlink"
@@ -116,10 +171,15 @@ cmd_attach() {
 
 cmd_detach() {
   local sha=${1:-}; valid_sha "$sha" || die "detach needs a 40-hex SHA"
+  sealed_release "$sha"
   local target=$RELEASES/$sha/storage/app/private
-  local cur; cur=$(served_release 2>/dev/null || true)
+  local cur=''
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
   [ "$cur" != "$RELEASES/$sha" ] || die "refusing to detach the served release"
-  while mountpoint -q "$target" 2>/dev/null; do umount -- "$target"; done
+  while mountpoint -q "$target" 2>/dev/null; do
+    [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "refusing to detach an unrelated mount"
+    umount --no-canonicalize -- "$target"
+  done
   local line="$PRIVATE $target none bind 0 0" tmp
   if grep -qxF -- "$line" /etc/fstab; then
     tmp=$(mktemp /etc/fstab.vasey.XXXXXX)
@@ -131,11 +191,15 @@ cmd_detach() {
 
 cmd_quiesce() {
   local cur
-  if ! cur=$(served_release); then
+  if [ ! -e "$CURRENT" ] && [ ! -L "$CURRENT" ]; then
     echo "no served release; nothing to quiesce"
-    workers_stopped || supervisorctl stop 'vasey-staging:*' >/dev/null || true
+    if ! workers_stopped; then supervisorctl stop 'vasey-staging:*' >/dev/null || die "supervisorctl stop failed"; fi
+    workers_stopped || die "a worker or the scheduler is still running"
+    systemctl stop "$VASEY_PHP_FPM_SERVICE" || die "could not stop $VASEY_PHP_FPM_SERVICE"
+    web_stopped || die "PHP processes still serving"
     return 0
   fi
+  cur=$(served_release) || die "served release is invalid; refusing a first-install fallback"
   # 1. New requests: maintenance in the release that actually serves traffic, proven by marker and exact 503.
   as_app "$VASEY_PHP" "$cur/artisan" down --no-interaction >/dev/null || die "artisan down failed; nothing stopped"
   [ -f "$cur/storage/framework/maintenance.php" ] || die "no maintenance marker after artisan down"
@@ -148,6 +212,23 @@ cmd_quiesce() {
   systemctl stop "$VASEY_PHP_FPM_SERVICE" || die "could not stop $VASEY_PHP_FPM_SERVICE"
   web_stopped || die "PHP processes still serving"
   echo "quiesced $(basename "$cur")"
+}
+
+cmd_switch() {
+  local sha=${1:-}; valid_sha "$sha" || die "switch needs a 40-hex SHA"
+  sealed_release "$sha"
+  workers_stopped && web_stopped || die "switch requires a quiesced host"
+  local rel=$RELEASES/$sha scratch
+  [ -f "$rel/storage/framework/maintenance.php" ] || die "new release is not in maintenance"
+  [ "$(stat -c %d:%i "$rel/storage/app/private")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "new release private storage is not attached"
+  [ ! -e "$CURRENT" ] || [ -L "$CURRENT" ] || die "current is not a release symlink"
+  scratch=$(mktemp -d "$ROOT/.activate.XXXXXXXX")
+  if ! { ln -s -- "$rel" "$scratch/current" && mv -T -- "$scratch/current" "$CURRENT"; }; then
+    rm -f -- "$scratch/current"; rmdir -- "$scratch"; die "release switch is unconfirmed"
+  fi
+  rmdir -- "$scratch"
+  [ "$(served_release)" = "$rel" ] || die "release switch is unconfirmed"
+  echo "switched $sha"
 }
 
 cmd_resume() {
@@ -188,14 +269,17 @@ cmd_snapshot() {
 }
 
 cmd_prune() {
-  local cur; cur=$(served_release 2>/dev/null || true)
+  local cur=''
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
   local keep=$VASEY_KEEP_RELEASES n=0 d sha
+  protected_dir "$RELEASES"
   # Newest first by directory mtime; always keep `current`.
   while IFS= read -r d; do
     sha=$(basename "$d"); valid_sha "$sha" || continue
     [ "$d" = "$cur" ] && continue
     n=$((n + 1))
     [ "$n" -lt "$keep" ] && continue
+    sealed_release "$sha"
     cmd_detach "$sha"
     mountpoint -q "$d/storage/app/private" && die "refusing to delete $sha: still mounted"
     [ "$(stat -c %d:%i "$d/storage/app/private" 2>/dev/null || echo none)" != "$(stat -c %d:%i "$PRIVATE")" ] \
@@ -214,12 +298,18 @@ cmd_status() {
 }
 
 case "${1:-}" in
+  allocate|attach|detach|switch) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
+  quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+esac
+case "${1:-}" in
+  allocate) cmd_allocate "${2:-}" ;;
   attach)   cmd_attach "${2:-}" ;;
   detach)   cmd_detach "${2:-}" ;;
   quiesce)  cmd_quiesce ;;
   resume)   cmd_resume ;;
+  switch)   cmd_switch "${2:-}" ;;
   snapshot) cmd_snapshot ;;
   prune)    cmd_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl attach|detach <sha> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch <sha> | quiesce | resume | snapshot | prune | status" ;;
 esac

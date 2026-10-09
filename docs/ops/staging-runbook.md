@@ -270,37 +270,48 @@ the host keeps 7 sets.
 Two observations from the proof run on MySQL 8.4.11:
 - **Collation rendering.** A first-generation dump and its re-dump differ only in collation rendering: 328
   columns print `CHARACTER SET utf8mb4 COLLATE …` after a reload instead of `COLLATE …`. The proof accepts
-  exactly that normalization and reports `database_redump=identical_except_column_charset_rendering`. Every
-  other byte, all rows included, must match.
-- **Doc impact.** The literal `diff` in `docs/ops/backup-restore-proof.md` step 4 will therefore always report
-  a difference on this schema. That document needs the same normalization.
+  only the immediate charset attribute of string columns inside matching dump table definitions and reports
+  `database_redump=identical_except_column_charset_rendering`. Every other byte, including rows, enum values,
+  defaults, comments and routines, must match. The parser and checked commands are in
+  `docs/ops/backup-restore-proof.md` step 4; global text substitution is unsafe.
+
+A reproof invalidates the earlier `RESTORE_CHECK` first. A new `RESTORE_VERIFIED` marker appears only after
+all checks and disposable-server cleanup succeed. A failed reproof cannot retain an earlier success claim.
 
 ## 9. Rollback
 
 Decide which case applies by comparing `migrate-status-before.txt` and `migrate-status-after.txt` in the
 failed deploy's evidence directory.
 
-**A. The deploy failed before the switch.** `current` still points at the previous release. The deploy has
-left it in maintenance with the writers stopped, and nothing was migrated (or the migration failed, see B).
+**A. The deploy failed before migration and before replacing the served configuration.** Confirm `current`
+still points at the previous release and its environment is unchanged. A failed quiesce or partial resume
+does not prove stopped writers. Inspect `ctl status` and establish quiesce before resuming. If any migration
+ran, use B; if same-SHA configuration replacement began, use D.
 
 ```sh
 cd "$(readlink -f /srv/vasey-staging/current)"
+sudo -n /usr/local/sbin/vasey-staging-ctl status
+sudo -n /usr/local/sbin/vasey-staging-ctl quiesce
 sudo -n /usr/local/sbin/vasey-staging-ctl resume       # starts PHP-FPM and workers on it, proves 503, then up, proves 200
 ```
 
 **B. Migrations ran (or partly ran), or the new release misbehaves after the switch.** Restore the pre-deploy
-backup, which is the newest set taken before the deploy. Its `RESTORE_CHECK` must say `RESTORE_VERIFIED`. Then
+backup, which is the newest set taken before the deploy. Re-prove it successfully now; its new
+`RESTORE_CHECK` must say `RESTORE_VERIFIED` and its `env.backup` hash must match. Then
 return to the previous release. This follows `docs/ops/production-activation-packet.md` §4 "Rollback".
 
-Run this as root in a `sudo bash -eu` shell, so that any failed step stops the sequence. Use the MySQL admin account Forge created (root over the local socket, or the
+Run this as root in a `sudo bash -euo pipefail` shell, so that any failed step stops the sequence. Use the MySQL admin account Forge created (root over the local socket, or the
 database password Forge showed at server creation).
 
 ```sh
 PREV=<40-hex SHA of the previous release>      # ls -t /srv/vasey-staging/releases
 SET=/srv/vasey-staging/backups/<pre-deploy set>
-APP() { runuser -u forge -- "$@"; }
+APP() { runuser -u forge -- env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$@"; }
 # 1. Writers stopped, maintenance proven (503), PHP-FPM stopped:
 /usr/local/sbin/vasey-staging-ctl quiesce
+/usr/local/sbin/vasey-staging-backup restore-check "$SET"
+grep -qx 'result=RESTORE_VERIFIED' "$SET/RESTORE_CHECK" || exit 1
+(cd "$SET" && sha256sum --check --quiet --strict env.backup.sha256) || exit 1
 # 2. Database: drop and recreate the staging schema (a plain load would leave tables the failed migration made),
 #    then load the verified dump.
 (cd "$SET" && sha256sum --check --quiet --strict database.sql.sha256 private.tar.sha256) || exit 1
@@ -313,11 +324,14 @@ install -d -m 0700 -o forge -g forge "/srv/vasey-staging/private.pre-rollback-$S
 APP bash -c 'shopt -s dotglob nullglob; for e in /srv/vasey-staging/private/*; do mv -- "$e" "$1/"; done' _ "/srv/vasey-staging/private.pre-rollback-$STAMP"
 APP tar --extract --file=- --directory=/srv/vasey-staging/private --no-same-owner --preserve-permissions < "$SET/private.tar" || exit 1
 (cd /srv/vasey-staging/private && sha256sum --check --strict --quiet "$SET/private.sha256") || exit 1
-# 4. Maintenance in the previous release BEFORE pointing current at it, then switch and resume:
+# 4. Recheck/seal its attachment and restore the verified environment/key into its existing app-owned file.
+/usr/local/sbin/vasey-staging-ctl attach "$PREV"
+cat "$SET/env.backup" | APP bash -eu -c '[ -f "$1/.env" ] && [ ! -L "$1/.env" ]; cat > "$1/.env"; chmod 0600 "$1/.env"' _ "/srv/vasey-staging/releases/$PREV"
+cmp -s "$SET/env.backup" "/srv/vasey-staging/releases/$PREV/.env" || exit 1
+# 5. Maintenance in the previous release BEFORE pointing current at it, then switch and resume:
 APP php8.4 "/srv/vasey-staging/releases/$PREV/artisan" down
 APP php8.4 "/srv/vasey-staging/releases/$PREV/artisan" config:cache
-APP ln -sfn "/srv/vasey-staging/releases/$PREV" /srv/vasey-staging/current.next
-APP mv -T /srv/vasey-staging/current.next /srv/vasey-staging/current
+/usr/local/sbin/vasey-staging-ctl switch "$PREV"
 /usr/local/sbin/vasey-staging-ctl resume
 ```
 
@@ -328,6 +342,13 @@ Then:
 
 Never check another SHA out inside an existing release directory: it would keep that release's
 `public/build` and serve the wrong Vite manifest.
+
+**D. Same-SHA environment refresh failed after replacement.** Its pre-change snapshot includes the served
+environment and key. As root in a `sudo bash -euo pipefail` shell, select that exact pre-refresh set and current
+SHA; establish quiesce, re-prove the set and verify `env.backup.sha256` as in B. Use B's existing-file environment
+restore, compare, `artisan down` and `config:cache` commands, then `ctl resume`; `current` stays on the same SHA.
+Inspect application behavior before deciding whether a database/private-file restore is also needed. Do not
+generate a new `APP_KEY` or overwrite the saved environment to make a failed refresh appear successful.
 
 **C. Remove staging entirely** (only when Sean asks):
 1. Stop the services with `vasey-staging-ctl quiesce`.

@@ -35,8 +35,10 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `php-fpm/vasey-staging.conf` | Default pool (300 s, 200 MiB uploads) | `/etc/php/8.4/fpm/pool.d/` |
 | `php-fpm/vasey-paid-delivery.conf` | Dedicated paid-delivery pool (7,800 s, no CPU cap), per `docs/ops/paid-delivery-runtime.md` | `/etc/php/8.4/fpm/pool.d/` |
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
-| `bin/vasey-staging-ctl` | Root helper: attach storage, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
+| `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
 | `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
+| `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
+| `validate-runtime.php` | Isolated real Laravel configuration admission before quiesce; rejects key changes | run from the built release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
 | `env.staging.example` | Every `.env.example` variable with staging-safe values and placeholders | pasted into Forge |
 
@@ -59,6 +61,13 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 
 One OS user, Forge's `forge`, runs PHP-FPM, every worker and the scheduler. It also owns
 `private/`. `vasey:doctor` and every private-file adapter require this.
+
+The root and `releases/` parents remain root-owned and unwritable by the app. `ctl allocate` creates a
+checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
+before mounting. Framework/cache/log subdirectories and the private leaf remain writable by the app.
+Only the root helper switches `current`. Custom roots must have canonical, root-owned ancestry without
+group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
+use a fresh reviewed release and prove sealing/attachment before activation.
 
 ## Provisioning, step by step
 
@@ -92,7 +101,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 | util-linux `prlimit` | must apply 3 GiB/180 s scanner and 2 GiB/90 s media limits | `config/media.php` |
 | ClamAV `clamscan` + `freshclam` | signatures under 48 h old; `clamav-daemon` disabled | `config/media.php` `max_signature_age_seconds`; `clamscan` is the configured engine |
 | qpdf, poppler-utils | present | contract PDF checks (`scripts/contract-profile-smoke.php`) |
-| supervisor, rsync, openssl, curl | present | workers, off-host backups, credentials, probes |
+| supervisor, rsync, openssl, curl, Python 3 | present | workers, off-host backups, credentials, probes, schema-only dump comparison |
 
 ### What provision.sh does
 
@@ -128,13 +137,17 @@ renaming that account breaks every guarded write.
 
 `forge-deploy.sh` runs as `forge` and follows `docs/ops/production-activation-packet.md` §4 (S1):
 
-1. It validates the Forge `.env` against the staging profile without printing values:
+1. It freezes one private copy of the Forge `.env` and validates that candidate without printing values:
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
    - database cache, queue and sessions; `DB_HOST=127.0.0.1`; not `root`;
    - `MAIL_MAILER=log`; `STRIPE_MODE=test`; no live Stripe key; no production checkout flag.
+   The built release then admits the same copy through real Laravel configuration with inherited application
+   settings and foreign configuration caches excluded. Duplicate keys, DB URL/socket overrides, production
+   credentials and an `APP_KEY` change from the served release refuse before quiesce. The temporary copy is
+   removed on exit; a later Forge edit waits for the next deploy attempt.
 2. It makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves it clean (status and tree hash).
 3. It runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, then `npm ci && npm run build`. The Vite manifest must exist.
-4. `vasey-staging-ctl attach` bind-mounts private storage. Each `.env` is installed `0600`.
+4. The validated `.env` is installed `0600`; `vasey-staging-ctl attach` seals privileged ancestry and bind-mounts private storage.
 5. If a release is serving, `vasey-staging-ctl quiesce`:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
@@ -144,7 +157,7 @@ renaming that account breaks every guarded write.
    - `artisan down`, then `migrate --pretend` (evidence only; see the runbook), then `migrate --force`;
    - `config:cache`, `route:cache`, `view:cache`, `event:cache` (all verified to work with this codebase);
    - `vasey:doctor`, plus redacted `commerce-readiness` and `stripe-preflight` JSON.
-8. It switches `current` atomically. `vasey-staging-ctl resume` then:
+8. `vasey-staging-ctl switch` requires stopped web/workers, maintenance and attached private storage, then switches `current` atomically. `vasey-staging-ctl resume` then:
    - starts PHP-FPM and proves a 503;
    - starts the workers and proves each one runs in the new release (`/proc/<pid>/cwd`);
    - runs `artisan up` and requires `GET /` to answer 200, or re-enters maintenance.
@@ -152,7 +165,9 @@ renaming that account breaks every guarded write.
    attached, its `storage/app/private` *is* the persistent store.
 
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
-quiesce, install `.env`, `config:cache`, resume.
+real admission and unchanged key, quiesce, snapshot and restore proof, install the exact validated `.env`,
+`config:cache`, resume. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
+`ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
 
 `storage:link` is not run: no code uses the public disk. Previews, artwork and site images stream through
 controllers from private storage. `queue:restart` is issued by the quiesce. The workers are then stopped
@@ -204,6 +219,9 @@ There is no global CSP: the application sets CSP on the responses that need one.
 3. Resumes the site.
 4. Proves the restore. A disposable `mysqld` on a private socket loads the dump and re-dumps it, the archive is
    extracted as `forge` into a fresh directory, and hashes, names, directories, modes and ownership are checked.
+   Only the immediate charset attribute of a string column in the dump's matching table-definition block
+   may be normalized. All row/default/comment/routine bytes remain exact. Reproof invalidates an old success
+   marker before checking hashes; a new marker is published atomically after verification and cleanup.
 5. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.

@@ -23,8 +23,8 @@
 # No storage:link: nothing uses the public disk (previews, artwork and site images stream through controllers).
 # No separate queue:restart: the quiesce signals it and then stops every worker; they start on the new release.
 #
-# A failure after step 5 leaves the site in maintenance with writers stopped (fail safe). Follow
-# docs/ops/staging-runbook.md "Rollback". Privileged steps go through `sudo -n /usr/local/sbin/vasey-staging-ctl`.
+# A failed quiesce or partial resume leaves service/writer state unconfirmed. Inspect ctl status and
+# establish quiesce before recovery in docs/ops/staging-runbook.md "Rollback". Privileged steps use ctl.
 set -Eeuo pipefail
 umask 022   # code and build output must be readable by nginx; .env and evidence get explicit modes
 export LC_ALL=C
@@ -55,16 +55,47 @@ COMPOSER_BIN=$(command -v composer) || die "composer not found"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 EVIDENCE=$ROOT/evidence/$STAMP-${SHA:0:12}
 QUIESCED=0
+ENV_SNAPSHOT=''
+
+# Composer's artisan hooks and every cache/migration command must use the candidate .env, not
+# application settings inherited from Forge's deployment shell. Preserve ordinary OS/tool state.
+while IFS= read -r name; do
+  case "$name" in
+    APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
+  esac
+done < <(compgen -e)
+
+runtime_gate() {
+  local release=$1 env_file=$2 previous=''
+  local args=("$env_file" "$VASEY_EXPECTED_APP_ENV" "$VASEY_STAGING_HOST" "$VASEY_DB_NAME")
+  if [ -L "$CURRENT" ]; then
+    previous=$(readlink -f "$CURRENT")
+    args+=("$previous/.env")
+  fi
+  env -i PATH="$PATH" LC_ALL=C "$PHP" "$release/ops/staging/validate-runtime.php" "${args[@]}" \
+    || die "runtime profile refused before quiesce"
+}
+
+art() { (cd "$REL" && env -i PATH="$PATH" LC_ALL=C "$PHP" artisan "$@" --no-interaction --no-ansi); }
+
+freeze_runtime_environment() {
+  # Forge may edit its mirror .env while a build or snapshot runs. Admit and install one private copy.
+  ENV_SNAPSHOT=$(mktemp "$ROOT/evidence/.candidate-env.XXXXXXXX") || die "cannot stage candidate environment"
+  cat -- "$RUNTIME_ENV" > "$ENV_SNAPSHOT" || die "cannot stage candidate environment"
+  chmod 0600 "$ENV_SNAPSHOT"
+  RUNTIME_ENV=$ENV_SNAPSHOT
+}
 
 exec 9>>"$ROOT/.deploy.lock"
 flock -n 9 || die "another deploy or the nightly backup is running"
 
 on_exit() {
   local code=$?
+  [ -z "$ENV_SNAPSHOT" ] || rm -f -- "$ENV_SNAPSHOT"
   [ "$code" = 0 ] && return 0
   if [ "$QUIESCED" = 1 ]; then
-    echo "forge-deploy: FAILED (exit $code) after the quiesce: the site is in maintenance and writers are stopped." >&2
-    echo "forge-deploy: fix and redeploy, or roll back: docs/ops/staging-runbook.md#rollback" >&2
+    echo "forge-deploy: FAILED (exit $code) during an activation/configuration attempt; service and writer state is unconfirmed." >&2
+    echo "forge-deploy: inspect ctl status and establish quiesce before recovery: docs/ops/staging-runbook.md#rollback" >&2
   else
     echo "forge-deploy: FAILED (exit $code) before the quiesce: the served release was not touched." >&2
   fi
@@ -74,6 +105,7 @@ trap on_exit EXIT
 # ---------------------------------------------------------------- 0. runtime .env checks (values never printed)
 [ -f "$RUNTIME_ENV" ] && [ ! -L "$RUNTIME_ENV" ] || die "Forge .env missing at $RUNTIME_ENV (Forge > Site > Environment)"
 chmod 0600 "$RUNTIME_ENV"
+freeze_runtime_environment
 envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
 need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
 need APP_ENV "$VASEY_EXPECTED_APP_ENV"
@@ -96,6 +128,11 @@ need APP_MAINTENANCE_DRIVER file
 [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
 ! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
 ! grep -Eq '^PRODUCTION_CHECKOUT_[A-Z_]*ENABLED=(true|1)' "$RUNTIME_ENV" || die ".env enables production checkout; staging must not"
+# Fail closed on ambiguous encodings during the cheap pre-build check. The real dotenv/configuration
+# gate below repeats validation on the built candidate before any quiesce or key/config replacement.
+while IFS= read -r flag; do
+  case "$(envget "$flag")" in false|'(false)'|'') ;; *) die ".env production checkout flags must be false or unset" ;; esac
+done < <(sed -n 's/^\(PRODUCTION_CHECKOUT_[A-Z_]*ENABLED\)=.*/\1/p' "$RUNTIME_ENV")
 step "runtime .env passes the staging profile checks (APP_ENV=$VASEY_EXPECTED_APP_ENV, APP_DEBUG=false)"
 
 # ---------------------------------------------------------------- 1. fresh immutable checkout
@@ -107,11 +144,18 @@ if [ -e "$REL" ]; then
     # Environment-only change (for example the seller tag or Lane B's test-commerce values): the release stays
     # immutable, its .env and cached configuration are replaced while every writer is stopped.
     step "$SHA is the served release; the Forge .env changed: refreshing configuration"
+    runtime_gate "$REL" "$RUNTIME_ENV"
+    [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
+      || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
     QUIESCED=1
     "${CTL[@]}" quiesce
-    install -m 0600 "$RUNTIME_ENV" "$REL/.env"
+    "${CTL[@]}" snapshot
+    [ -f "$REL/.env" ] && [ ! -L "$REL/.env" ] || die "served .env must be a regular file"
+    # Parent ancestry is sealed by ctl; truncate the existing app-owned file while writers are stopped.
+    cat -- "$RUNTIME_ENV" > "$REL/.env"
+    chmod 0600 "$REL/.env"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
-    (cd "$REL" && "$PHP" artisan config:cache --no-interaction --no-ansi >/dev/null)
+    art config:cache >/dev/null
     "${CTL[@]}" resume
     QUIESCED=0
     step "configuration refreshed on $SHA"; exit 0
@@ -120,6 +164,7 @@ if [ -e "$REL" ]; then
 fi
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
 step "checkout $SHA"
+"${CTL[@]}" allocate "$SHA"
 git clone --quiet --no-checkout --no-hardlinks -- "$VASEY_MIRROR" "$REL"
 git -C "$REL" -c advice.detachedHead=false checkout --quiet --detach "$SHA"
 [ "$(git -C "$REL" rev-parse HEAD)" = "$SHA" ] || die "checkout is not $SHA"
@@ -137,15 +182,16 @@ step "npm ci && npm run build"
 [ -f "$REL/public/build/manifest.json" ] || die "no Vite manifest"
 sha256sum "$REL/composer.lock" "$REL/package-lock.json" "$REL/public/build/manifest.json" | sed "s#$REL/##" > "$EVIDENCE/build.sha256"
 
-# ---------------------------------------------------------------- 3. attach persistent private storage
+# ---------------------------------------------------------------- 3. install environment before ctl seals release ancestry
+install -m 0600 "$RUNTIME_ENV" "$REL/.env"
+cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
+runtime_gate "$REL" "$REL/.env"
+
+# ---------------------------------------------------------------- 4. attach persistent private storage
 step "attach private storage (bind mount)"
 "${CTL[@]}" attach "$SHA"
 [ "$(stat -c %d:%i "$REL/storage/app/private")" = "$(stat -c %d:%i "$ROOT/private")" ] && [ ! -L "$REL/storage/app/private" ] \
   || die "private storage not attached"
-
-# ---------------------------------------------------------------- 4. install the validated .env
-install -m 0600 "$RUNTIME_ENV" "$REL/.env"
-cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
 
 # ---------------------------------------------------------------- 5-6. quiesce, back up, prove the restore
 FIRST_INSTALL=1
@@ -157,9 +203,12 @@ if [ -L "$CURRENT" ]; then
   step "backup and isolated restore proof before migrating"
   "${CTL[@]}" snapshot
 fi
+if [ "$FIRST_INSTALL" = 1 ]; then
+  QUIESCED=1
+  "${CTL[@]}" quiesce
+fi
 
 # ---------------------------------------------------------------- 7. migrate and cache in the new release
-art() { (cd "$REL" && "$PHP" artisan "$@" --no-interaction --no-ansi); }
 art down >/dev/null
 QUIESCED=1
 art migrate:status > "$EVIDENCE/migrate-status-before.txt" 2>&1 || true   # a first install has no migrations table yet
@@ -196,8 +245,7 @@ art vasey:stripe-preflight --json > "$EVIDENCE/stripe-preflight.json" 2>/dev/nul
 
 # ---------------------------------------------------------------- 8. switch, start, prove, leave maintenance
 step "switch current -> $SHA"
-ln -sfn "$REL" "$CURRENT.next"
-mv -T "$CURRENT.next" "$CURRENT"
+"${CTL[@]}" switch "$SHA"
 [ "$(readlink -f "$CURRENT")" = "$REL" ] || die "current does not point at $SHA"
 "${CTL[@]}" resume
 QUIESCED=0
