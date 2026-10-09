@@ -241,6 +241,8 @@ cmd_attach() { echo attach >> "$TRACE"; }
             if resume is not None: self.cleanup_process(resume)
 
     def test_public_stop_and_start_keep_recovery_marker_after_root_parent_death(self):
+        (self.root / "current").symlink_to(self.release)
+        (self.release / "storage/framework/maintenance.php").touch()
         child = self.root / "service-child"
         child.write_text('#!/bin/bash\necho $$ > ' + repr(str(self.entered)) + '\nwhile [ ! -e ' + repr(str(self.finish)) + ' ]; do sleep 0.01; done\n')
         fixture = '\ncmd_quiesce() { writer_gate_write closed; writer_barrier; as_app /bin/bash ' + repr(str(child)) + '; }\ncmd_resume() { as_app /bin/bash ' + repr(str(child)) + '; writer_gate_write open; }\n'
@@ -273,6 +275,17 @@ cmd_attach() { echo attach >> "$TRACE"; }
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertTrue((self.release / "storage/framework/maintenance.php").exists())
         self.assertEqual((self.conf / "writer-admission").read_text(), "closed\n")
+
+    def test_resume_refuses_an_open_gate_without_poisoning_recovery_custody(self):
+        source = self.source.read_text()
+        actual = source[source.index('cmd_resume()'):source.index('cmd_healthy()')]
+        self.control.write_text(self.control.read_text().replace('# The sudo entry point', actual + '\n# The sudo entry point'))
+        (self.conf / "writer-admission").write_text("open\n")
+        run = subprocess.run(["bash", str(self.control), "resume"], env=self.environment,
+                             capture_output=True, text=True, timeout=3)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertFalse(self.operation.exists(), "readonly resume refusal poisoned a healthy operation boundary")
+        self.assertEqual((self.conf / "writer-admission").read_text(), "open\n")
 
 
 if __name__ == "__main__": unittest.main(verbosity=2)

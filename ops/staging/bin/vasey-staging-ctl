@@ -475,6 +475,11 @@ public_quiesce() {
 }
 
 public_resume() {
+  # Queued or mistaken resume on a healthy host must refuse before creating recovery state.
+  # These readonly preconditions run under ctl.lock, before any application child can start.
+  writer_barrier
+  local cur; cur=$(served_release) || die "no served release to resume"
+  [ -f "$cur/storage/framework/maintenance.php" ] || die "served release is not in maintenance"
   operation_begin resume none
   cmd_resume
   operation_finish
