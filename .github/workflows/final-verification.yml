@@ -151,8 +151,9 @@ jobs:
     # SQLite-skipped methods plus migration test files, 1434 of 7633 cases at 0f9b39c. Run 37921309772 showed
     # the complete suite cannot finish in 8 x 90 minutes (about 35 s per migrate:fresh test). The selection's
     # duration on hosted MySQL is unmeasured: 1095 selected cases use FinalizationDatabaseMigrations (98 to 170
-    # per shard), so a shard may still approach this limit. A hung test must not hold a runner for 6 hours.
-    timeout-minutes: 90
+    # per shard), about 57 to 99 minutes at 35 s each, so the limit is 150 minutes until fresh MySQL timings exist.
+    # A hung test still cannot hold a runner for the 6-hour default.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:

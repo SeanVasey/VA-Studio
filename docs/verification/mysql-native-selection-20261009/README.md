@@ -132,9 +132,9 @@ It also lacks 63 of the 146 selected files (656 cases), which take the 3,830 ms 
 timings were not regenerated. Of the 1,434 selected cases, 1,095 are in files that use
 `FinalizationDatabaseMigrations`, with 136, 154, 126, 170, 131, 98, 135 and 145 such cases in shards
 1 to 8. At about 35 s each, those cases alone would take about 57 to 99 minutes per shard. The busiest
-shard could therefore exceed the 90-minute job timeout. Refreshing MySQL timings from actual
-selected-run JUnit, or another reviewed balance or timeout change, may be needed after the first
-hosted run.
+shard could therefore exceed a 90-minute job timeout, so the MySQL job limit is raised to 150 minutes
+(still far below GitHub's 6-hour default for a hung test; total compute is unchanged). Refreshing MySQL
+timings from actual selected-run JUnit after the first hosted run should replace this estimate.
 
 ## Self-tests
 
