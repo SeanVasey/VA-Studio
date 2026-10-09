@@ -1,0 +1,19 @@
+bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by bash)
+
+Warning: PHP Startup: Unable to load dynamic library 'gd.so' (tried: /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so (/workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /lib/x86_64-linux-gnu/libheif.so.1)), /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so.so (/workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'intl.so' (tried: /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so (/workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /lib/x86_64-linux-gnu/libicuio.so.76)), /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so.so (/workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'gd.so' (tried: /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so (/workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /lib/x86_64-linux-gnu/libheif.so.1)), /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so.so (/workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+
+Warning: PHP Startup: Unable to load dynamic library 'intl.so' (tried: /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so (/workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libstdc++.so.6: version `GLIBCXX_3.4.32' not found (required by /lib/x86_64-linux-gnu/libicuio.so.76)), /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so.so (/workspace/.va-studio-toolchain/root/usr/lib/php/20240924/intl.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+Disposable MySQL startup did not become ready.
+2026-10-09T01:02:55.189194Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-09T01:02:55.490422Z 0 [System] [MY-010116] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 50121
+2026-10-09T01:02:55.508082Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-09T01:02:55.784044Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-09T01:02:56.112821Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-09T01:02:56.112844Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-09T01:02:56.113647Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-10-09T01:02:56.136983Z 6 [ERROR] [MY-000061] [Server] 1064  You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'gd.so' (tried: /workspace/.va-studio-toolchain/root/usr/lib/php/20240924/gd.so (' at line 2.
+2026-10-09T01:02:56.137440Z 0 [System] [MY-010931] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld: ready for connections. Version: '8.4.11'  socket: ''  port: 33070  MySQL Community Server - GPL.

@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-rights/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.976, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\RightsScopeCommandTest::test_staff_password_prompt_disables_visible_fallback_and_refuses_when_hiding_fails
+Unsupported hidden input must never fall back to visible password entry.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'hidden' => true,
+-    'fallback' => false,
++    'fallback' => true,
+ ]
+
+/workspace/VA-Studio-rights/tests/Feature/RightsScopeCommandTest.php:238
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

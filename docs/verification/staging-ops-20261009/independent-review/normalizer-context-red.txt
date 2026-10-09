@@ -1,0 +1,24 @@
+test_mysql_dump_procedure_body_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_procedure_body_remains_byte_exact) ... FAIL
+test_mysql_dump_routine_literal_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_routine_literal_remains_byte_exact) ... FAIL
+test_top_level_schema_attribute_can_normalize (__main__.DumpContextProbe.test_top_level_schema_attribute_can_normalize) ... ok
+
+======================================================================
+FAIL: test_mysql_dump_procedure_body_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_procedure_body_remains_byte_exact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/normalizer-context-probe.py", line 30, in test_mysql_dump_procedure_body_remains_byte_exact
+    self.assertEqual(normalize(data), data, "matching DROP/CREATE inside a procedure body was normalized")
+AssertionError: b'DEL[186 chars]ext COLLATE utf8mb4_unicode_ci\n);\nEND */;;\nDELIMITER ;\n' != b'DEL[186 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[31 chars] ;\n' : matching DROP/CREATE inside a procedure body was normalized
+
+======================================================================
+FAIL: test_mysql_dump_routine_literal_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_routine_literal_remains_byte_exact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/normalizer-context-probe.py", line 35, in test_mysql_dump_routine_literal_remains_byte_exact
+    self.assertEqual(normalize(data), data, "SQL-looking bytes inside a routine literal were normalized")
+AssertionError: b"DEL[137 chars]ext COLLATE utf8mb4_unicode_ci\n);\n';\nEND$$\nDELIMITER ;\n" != b"DEL[137 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[32 chars] ;\n" : SQL-looking bytes inside a routine literal were normalized
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=2)

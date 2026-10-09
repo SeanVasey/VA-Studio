@@ -1,0 +1,42 @@
+test_absent_or_ambiguous_manifest_refuses (test_staging_backup_key_custody.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses) ... ok
+test_dangling_outside_and_non_symlink_current_cannot_become_first_install (test_staging_backup_key_custody.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install) ... ok
+test_genuine_first_install_admission_is_explicit (test_staging_backup_key_custody.BackupKeyCustodyTest.test_genuine_first_install_admission_is_explicit) ... ok
+test_genuine_no_current_snapshot_records_none (test_staging_backup_key_custody.BackupKeyCustodyTest.test_genuine_no_current_snapshot_records_none) ... ok
+test_key_looking_lines_inside_multiline_values_are_not_admitted (test_staging_backup_key_custody.BackupKeyCustodyTest.test_key_looking_lines_inside_multiline_values_are_not_admitted) ... FAIL
+test_served_backup_requires_env_and_its_hash (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) ... ok
+test_served_release_missing_env_refuses_before_publishing_any_snapshot (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot) ... ok
+test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) ...
+  test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) (manifest='b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2  database.sql\n') ... FAIL
+  test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) (manifest='487551b7b49626bc212d76c0c9a0b91c2902aec44e3fc6c9f16d76529ded3cc1  env.backup\nb3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2  database.sql\n') ... FAIL
+test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse (test_staging_backup_key_custody.BackupKeyCustodyTest.test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse) ... ok
+
+======================================================================
+FAIL: test_key_looking_lines_inside_multiline_values_are_not_admitted (test_staging_backup_key_custody.BackupKeyCustodyTest.test_key_looking_lines_inside_multiline_values_are_not_admitted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 125, in test_key_looking_lines_inside_multiline_values_are_not_admitted
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 :
+
+======================================================================
+FAIL: test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) (manifest='b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2  database.sql\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 116, in test_served_restore_requires_the_exact_environment_hash_record
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : ACCEPTED
+
+
+======================================================================
+FAIL: test_served_restore_requires_the_exact_environment_hash_record (test_staging_backup_key_custody.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) (manifest='487551b7b49626bc212d76c0c9a0b91c2902aec44e3fc6c9f16d76529ded3cc1  env.backup\nb3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2  database.sql\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 116, in test_served_restore_requires_the_exact_environment_hash_record
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : ACCEPTED
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.281s
+
+FAILED (failures=3)

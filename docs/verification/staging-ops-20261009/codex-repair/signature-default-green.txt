@@ -1,0 +1,32 @@
+nginx version: nginx/1.26.3
+PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 17:16:18) (NTS)
+scope=owned prefix; transport=loopback TLS; app=synthetic FastCGI responder; no Forge activation or provider I/O
+PASS unauthenticated POST / stays behind basic auth
+PASS unauthenticated POST /admin stays behind basic auth
+PASS unauthenticated POST /build/probe.txt stays behind basic auth
+PASS unauthenticated POST /webhooks/stripe/ stays behind basic auth
+PASS unauthenticated POST /index.php/webhooks/stripe stays behind basic auth
+PASS unauthenticated POST /webhooks%252fstripe stays behind basic auth
+PASS unauthenticated POST /admin?next=/webhooks/stripe stays behind basic auth
+PASS webhook method GET refused
+PASS webhook method HEAD refused
+PASS webhook method PUT refused
+PASS webhook method PATCH refused
+PASS webhook method DELETE refused
+PASS webhook method OPTIONS refused
+PASS normalized webhook /webhooks/stripe is pinned to sole route
+PASS normalized webhook /webhooks/stripe?next=/admin is pinned to sole route
+PASS normalized webhook /admin/../webhooks/stripe is pinned to sole route
+PASS normalized webhook //webhooks//stripe is pinned to sole route
+PASS normalized webhook /webhooks/%73tripe is pinned to sole route
+PASS encoded query delimiter /webhooks/stripe%3fnext=/admin stays behind auth
+PASS authenticated /.env never serves private/static PHP content
+PASS authenticated /other.php never serves private/static PHP content
+PASS authenticated /build/../.env never serves private/static PHP content
+PASS authenticated /index.php never serves private/static PHP content
+PASS authenticated request reaches FPM 8.4 CLI-independent responder
+PASS upstream no-referrer preserved without weaker appended header
+PASS oversize unauthenticated webhook body refused before application
+PASS exact Stripe-Signature reaches genuine FPM
+PASS signed raw body remains exact and URI/query stay pinned
+RESULT: 28 checks passed; inherited_headers_off=False

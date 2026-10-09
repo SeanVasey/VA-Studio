@@ -1,0 +1,11 @@
+{"version":"8.4.11","performance_schema":1,"socket":"","bind_address":"127.0.0.1","isolation":"REPEATABLE-READ"}
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-rights/phpunit.xml
+
+...........                                                       11 / 11 (100%)
+
+Time: 03:04.626, Memory: 100.00 MB
+
+[30;42mOK (11 tests, 236 assertions)[0m

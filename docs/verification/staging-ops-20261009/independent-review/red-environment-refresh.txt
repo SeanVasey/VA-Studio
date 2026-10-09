@@ -1,0 +1,14 @@
+test_environment_refresh_saves_old_environment_before_replacement (__main__.IndependentStagingOpsProbes.test_environment_refresh_saves_old_environment_before_replacement) ... FAIL
+
+======================================================================
+FAIL: test_environment_refresh_saves_old_environment_before_replacement (__main__.IndependentStagingOpsProbes.test_environment_refresh_saves_old_environment_before_replacement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 157, in test_environment_refresh_saves_old_environment_before_replacement
+    self.assertIn("snapshot:" + previous.strip(), trace.read_text(),
+AssertionError: 'snapshot:APP_KEY=synthetic-old-review-key' not found in 'quiesce:APP_KEY=synthetic-old-review-key\nresume:APP_KEY=synthetic-new-review-key\n' : environment-only refresh overwrites the served key/configuration without a recoverable pre-change snapshot
+
+----------------------------------------------------------------------
+Ran 1 test in 0.012s
+
+FAILED (failures=1)

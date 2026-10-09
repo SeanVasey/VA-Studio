@@ -1,0 +1,15 @@
+Exact assessed source: 11248aa3ee924cb3d4f3d1f8fe48bda39089cc2a
+test_code_changed_during_capture_refuses_before_installing_a_staged_file (__main__.CodexBoundaryProbes.test_code_changed_during_capture_refuses_before_installing_a_staged_file) ... ok
+test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery (__main__.CodexBoundaryProbes.test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery) ... ok
+test_environment_changed_during_capture_keeps_the_protected_target (__main__.CodexBoundaryProbes.test_environment_changed_during_capture_keeps_the_protected_target) ... ok
+test_environment_hash_must_cover_environment_not_another_valid_file (__main__.CodexBoundaryProbes.test_environment_hash_must_cover_environment_not_another_valid_file) ... ok
+test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) ... ok
+test_old_source_and_environment_descriptors_cannot_change_fresh_inodes (__main__.CodexBoundaryProbes.test_old_source_and_environment_descriptors_cannot_change_fresh_inodes) ... ok
+test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) ... ok
+test_runtime_file_bytes_inodes_and_modes_are_not_traversed_by_sealing (__main__.CodexBoundaryProbes.test_runtime_file_bytes_inodes_and_modes_are_not_traversed_by_sealing) ... ok
+test_special_candidate_is_refused_without_blocking_on_fifo_open (__main__.CodexBoundaryProbes.test_special_candidate_is_refused_without_blocking_on_fifo_open) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.498s
+
+OK

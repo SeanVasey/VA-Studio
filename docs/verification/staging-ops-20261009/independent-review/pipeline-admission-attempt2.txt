@@ -1,0 +1,16 @@
+Assessed source: ca7e3ae46b312e1673a2067bb5d122e8aa9bc11e
+test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry (__main__.AdmissionProbe.test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry) ... ok
+test_gate_requires_exact_bytes_and_snapshot_refuses_open_or_malformed (__main__.AdmissionProbe.test_gate_requires_exact_bytes_and_snapshot_refuses_open_or_malformed) ... ok
+test_manual_pipeline_command_is_caught_by_actual_process_scan (__main__.AdmissionProbe.test_manual_pipeline_command_is_caught_by_actual_process_scan) ... ok
+test_only_completed_healthy_resume_opens_gate_and_releases_shared_sweep (__main__.AdmissionProbe.test_only_completed_healthy_resume_opens_gate_and_releases_shared_sweep) ... ok
+test_orphan_artisan_child_retains_admission_until_it_finishes (__main__.AdmissionProbe.test_orphan_artisan_child_retains_admission_until_it_finishes) ... ok
+test_provision_initializes_closed_once_and_preserves_lock_inode_and_gate_state (__main__.AdmissionProbe.test_provision_initializes_closed_once_and_preserves_lock_inode_and_gate_state) ... ok
+test_resume_keeps_gate_closed_on_each_failure_and_wrong_worker_release (__main__.AdmissionProbe.test_resume_keeps_gate_closed_on_each_failure_and_wrong_worker_release) ... ok
+test_root_application_and_disposable_children_close_both_control_descriptors (__main__.AdmissionProbe.test_root_application_and_disposable_children_close_both_control_descriptors) ... ok
+test_snapshot_excludes_future_sweep_and_serializes_resume (__main__.AdmissionProbe.test_snapshot_excludes_future_sweep_and_serializes_resume) ... ok
+test_untrusted_files_and_ancestry_refuse_even_with_alternate_state_directory (__main__.AdmissionProbe.test_untrusted_files_and_ancestry_refuse_even_with_alternate_state_directory) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 4.660s
+
+OK

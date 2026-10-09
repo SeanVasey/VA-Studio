@@ -1,0 +1,14 @@
+test_failed_reproof_invalidates_previous_success_marker (__main__.IndependentStagingOpsProbes.test_failed_reproof_invalidates_previous_success_marker) ... FAIL
+
+======================================================================
+FAIL: test_failed_reproof_invalidates_previous_success_marker (__main__.IndependentStagingOpsProbes.test_failed_reproof_invalidates_previous_success_marker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 124, in test_failed_reproof_invalidates_previous_success_marker
+    self.assertFalse(marker.exists() and "RESTORE_VERIFIED" in marker.read_text(),
+AssertionError: True is not false : failed integrity reproof leaves the stale RESTORE_VERIFIED marker intact
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+FAILED (failures=1)

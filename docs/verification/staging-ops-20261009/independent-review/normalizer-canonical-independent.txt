@@ -1,0 +1,13 @@
+test_binary_row_bytes_and_unknown_layout_remain_exact (__main__.DumpNormalizationTest.test_binary_row_bytes_and_unknown_layout_remain_exact) ... ok
+test_changed_insert_rows_remain_different (__main__.DumpNormalizationTest.test_changed_insert_rows_remain_different) ... ok
+test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump (__main__.DumpNormalizationTest.test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump) ... ok
+test_defaults_comments_and_escaped_identifiers_remain_exact (__main__.DumpNormalizationTest.test_defaults_comments_and_escaped_identifiers_remain_exact) ... ok
+test_enum_strings_remain_exact_while_real_attribute_is_normalized (__main__.DumpNormalizationTest.test_enum_strings_remain_exact_while_real_attribute_is_normalized) ... ok
+test_first_generation_and_redump_string_columns_match (__main__.DumpNormalizationTest.test_first_generation_and_redump_string_columns_match) ... ok
+test_other_charsets_malformed_types_and_later_attributes_remain_exact (__main__.DumpNormalizationTest.test_other_charsets_malformed_types_and_later_attributes_remain_exact) ... ok
+test_routine_ddl_and_nonmatching_table_names_are_not_normalized (__main__.DumpNormalizationTest.test_routine_ddl_and_nonmatching_table_names_are_not_normalized) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.023s
+
+OK

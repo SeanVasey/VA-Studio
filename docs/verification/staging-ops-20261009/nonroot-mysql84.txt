@@ -1,0 +1,7 @@
+{"version":"8.4.11","performance_schema":1,"socket":"","bind_address":"127.0.0.1","isolation":"REPEATABLE-READ"}
+{"version":"8.4.11","binlog":1}
+PASS: native non-SUPER trigger creation refused with 1419 while trust is OFF.
+PASS: same schema-scoped account creates a trigger after trust is ON.
+PASS: nonroot migration run 1 exited 0.
+PASS: nonroot migration run 2 exited 0 (Nothing to migrate).
+{"authenticated_account":"vasey_app@127.0.0.1","migrations":79,"tables":184,"triggers":567}

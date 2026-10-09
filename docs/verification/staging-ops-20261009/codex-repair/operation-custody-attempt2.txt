@@ -1,0 +1,43 @@
+test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ... ok
+test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (test_staging_operation_custody.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... ok
+test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (test_staging_operation_lease.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries) ... FAIL
+test_killed_root_parent_blocks_resume_while_migration_child_survives (test_staging_operation_lease.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives) ... FAIL
+test_migration_holds_control_and_writer_locks_until_switch_and_resume (test_staging_operation_lease.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume) ... FAIL
+
+======================================================================
+FAIL: test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (test_staging_operation_lease.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 149, in test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries
+    self.wait_entered(activation)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 95, in wait_entered
+    self.fail("migration child did not enter: " + out + err)
+AssertionError: migration child did not enter: missing or untrusted staging writer admission
+
+
+======================================================================
+FAIL: test_killed_root_parent_blocks_resume_while_migration_child_survives (test_staging_operation_lease.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 132, in test_killed_root_parent_blocks_resume_while_migration_child_survives
+    self.wait_entered(activation)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 95, in wait_entered
+    self.fail("migration child did not enter: " + out + err)
+AssertionError: migration child did not enter: missing or untrusted staging writer admission
+
+
+======================================================================
+FAIL: test_migration_holds_control_and_writer_locks_until_switch_and_resume (test_staging_operation_lease.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 107, in test_migration_holds_control_and_writer_locks_until_switch_and_resume
+    self.wait_entered(activation)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 95, in wait_entered
+    self.fail("migration child did not enter: " + out + err)
+AssertionError: migration child did not enter: missing or untrusted staging writer admission
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.113s
+
+FAILED (failures=3)

@@ -1,0 +1,81 @@
+Exact assessed source: 0e0df68d7eca40c892eb8cfc959264f240ffd04c
+test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) ...
+  test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) (action='quiesce') ... FAIL
+  test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) (action='resume') ... FAIL
+test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) ...
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='cold-stopped') ... FAIL
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='cold-unmanaged-web') ... FAIL
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='warm-wrong-http') ... FAIL
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='unmanaged-worker') ... FAIL
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='worker-stop-fails') ... FAIL
+  test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='web-survives-stop') ... FAIL
+
+======================================================================
+FAIL: test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) (action='quiesce')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 292, in test_actual_public_operations_keep_marker_when_application_child_survives
+    self.assertTrue(fixture.operation.is_file(), "public operation never acquired recovery custody")
+AssertionError: False is not true : public operation never acquired recovery custody
+
+======================================================================
+FAIL: test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) (action='resume')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 292, in test_actual_public_operations_keep_marker_when_application_child_survives
+    self.assertTrue(fixture.operation.is_file(), "public operation never acquired recovery custody")
+AssertionError: False is not true : public operation never acquired recovery custody
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='cold-stopped')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 369, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(result.returncode == 0, admitted, result.stdout + result.stderr)
+AssertionError: False != True : served release is not answering 503 after artisan down
+
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='cold-unmanaged-web')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 371, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(fixture.operation.exists(), not admitted)
+AssertionError: False != True
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='warm-wrong-http')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 371, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(fixture.operation.exists(), not admitted)
+AssertionError: False != True
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='unmanaged-worker')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 371, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(fixture.operation.exists(), not admitted)
+AssertionError: False != True
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='worker-stop-fails')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 371, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(fixture.operation.exists(), not admitted)
+AssertionError: False != True
+
+======================================================================
+FAIL: test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) (case='web-survives-stop')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 371, in test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state
+    self.assertEqual(fixture.operation.exists(), not admitted)
+AssertionError: False != True
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.313s
+
+FAILED (failures=8)

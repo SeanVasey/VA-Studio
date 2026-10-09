@@ -1,0 +1,92 @@
+Exact assessed source: 3b7d1b9c2b763847a5922ca558610638eaaf0308
+test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) ...
+  test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) (first_install='1', snapshot_refused='0') ... FAIL
+  test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) (first_install='1', snapshot_refused='1') ... FAIL
+test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) ...
+  test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) (retry=0) ... FAIL
+  test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) (retry=1) ... FAIL
+test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) ... FAIL
+test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) ...
+  test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) (healthy='0') ... FAIL
+  test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) (healthy='1') ... FAIL
+
+======================================================================
+FAIL: test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) (first_install='1', snapshot_refused='0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 74, in test_initial_and_existing_deploy_require_snapshot_before_migration
+    self.assertEqual(run.stdout.splitlines(), ["snapshot"] if refused == "1" else ["snapshot", "migration-boundary-reached"])
+AssertionError: Lists differ: ['migration-boundary-reached'] != ['snapshot', 'migration-boundary-reached']
+
+First differing element 0:
+'migration-boundary-reached'
+'snapshot'
+
+Second list contains 1 additional elements.
+First extra element 1:
+'migration-boundary-reached'
+
+- ['migration-boundary-reached']
++ ['snapshot', 'migration-boundary-reached']
+?  ++++++++++++
+
+
+======================================================================
+FAIL: test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) (first_install='1', snapshot_refused='1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 73, in test_initial_and_existing_deploy_require_snapshot_before_migration
+    self.assertEqual(run.returncode, 64 if refused == "1" else 0, run.stderr)
+AssertionError: 0 != 64 :
+
+======================================================================
+FAIL: test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) (retry=0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 115, in test_interrupted_mounted_attach_persists_exact_entry_or_refuses
+    self.assertEqual(fstab.read_text().splitlines().count(expected), 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) (retry=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 115, in test_interrupted_mounted_attach_persists_exact_entry_or_refuses
+    self.assertEqual(fstab.read_text().splitlines().count(expected), 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 127, in test_interrupted_mounted_attach_persists_exact_entry_or_refuses
+    self.assertNotEqual(refused.returncode, 0, "mounted attach reported success despite persistence failure")
+AssertionError: 0 == 0 : mounted attach reported success despite persistence failure
+
+======================================================================
+FAIL: test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) (healthy='0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 54, in test_same_sha_equal_environment_requires_health_without_repair
+    self.assertEqual(run.returncode == 0, healthy == "1", run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) (healthy='1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/recovery-admission-probe.py", line 55, in test_same_sha_equal_environment_requires_health_without_repair
+    self.assertEqual(trace.read_text().splitlines() if trace.exists() else [], ["healthy " + sha])
+AssertionError: Lists differ: [] != ['healthy aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'healthy aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+- []
++ ['healthy aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa']
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.036s
+
+FAILED (failures=7)

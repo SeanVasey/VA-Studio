@@ -4,7 +4,7 @@
 - Specification: `docs/handoff/2026-10-07/owners/free-content.md` (section "Resume 256 as one useful implementation batch").
 - Preparation input (read only, not composed): `codex/production-free-family-20261007` at `5bfdd4f00dd4e1c2d989625a810a81ddf4bad152`
   (14-table parent column metadata; the `users` and `customer_accounts` observations shape the parent floor below).
-- Status: **implemented as a default-off synthetic-rehearsal batch; not registered, mounted or independently reviewed.**
+- Status: **merged to `main` as PR #53 (`f7224ed3`) as a default-off synthetic-rehearsal batch; independently reviewed (APPROVE WITH CONDITIONS, see "Independent review" below); not registered or mounted.**
   The plan below was written before code; corrections made during implementation are listed under
   "Plan corrections". Evidence follows the plan.
 

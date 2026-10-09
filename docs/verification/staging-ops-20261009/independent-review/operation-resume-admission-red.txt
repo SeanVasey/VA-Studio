@@ -1,0 +1,52 @@
+Exact assessed source: a7cf5d55e6f89da367cf59181c05ef9efa7a8d10
+test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) ...
+  test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='open') ... FAIL
+  test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='not-maintenance') ... FAIL
+  test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='dangling') ... FAIL
+  test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='missing-current') ... FAIL
+  test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='active-writer') ... FAIL
+
+======================================================================
+FAIL: test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='open')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 405, in test_resume_readonly_refusal_never_creates_operation_custody
+    self.assertFalse(fixture.operation.exists(), "readonly refusal published false interrupted state")
+AssertionError: True is not false : readonly refusal published false interrupted state
+
+======================================================================
+FAIL: test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='not-maintenance')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 405, in test_resume_readonly_refusal_never_creates_operation_custody
+    self.assertFalse(fixture.operation.exists(), "readonly refusal published false interrupted state")
+AssertionError: True is not false : readonly refusal published false interrupted state
+
+======================================================================
+FAIL: test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='dangling')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 405, in test_resume_readonly_refusal_never_creates_operation_custody
+    self.assertFalse(fixture.operation.exists(), "readonly refusal published false interrupted state")
+AssertionError: True is not false : readonly refusal published false interrupted state
+
+======================================================================
+FAIL: test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='missing-current')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 405, in test_resume_readonly_refusal_never_creates_operation_custody
+    self.assertFalse(fixture.operation.exists(), "readonly refusal published false interrupted state")
+AssertionError: True is not false : readonly refusal published false interrupted state
+
+======================================================================
+FAIL: test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) (case='active-writer')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 405, in test_resume_readonly_refusal_never_creates_operation_custody
+    self.assertFalse(fixture.operation.exists(), "readonly refusal published false interrupted state")
+AssertionError: True is not false : readonly refusal published false interrupted state
+
+----------------------------------------------------------------------
+Ran 1 test in 0.113s
+
+FAILED (failures=5)

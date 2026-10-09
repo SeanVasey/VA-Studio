@@ -1,0 +1,36 @@
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (test_staging_build_admission.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... ok
+test_running_application_cannot_inject_ignored_vendor_before_sealing (test_staging_build_admission.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
+test_closed_gate_blocks_repeated_future_sweeps (test_staging_pipeline_admission.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps) ... ok
+test_exclusive_root_lock_blocks_an_open_gate_sweep (test_staging_pipeline_admission.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep) ... ok
+test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (test_staging_pipeline_admission.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) ... ok
+test_open_gate_runs_all_five_stages (test_staging_pipeline_admission.PipelineAdmissionTest.test_open_gate_runs_all_five_stages) ... ok
+test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (test_staging_pipeline_admission.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness) ... ok
+test_quiesce_leaves_future_invocations_closed_after_helper_exits (test_staging_pipeline_admission.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits) ... ok
+test_snapshot_does_not_cross_an_already_admitted_shared_writer (test_staging_pipeline_admission.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer) ... ok
+test_snapshot_requires_the_durable_closed_gate (test_staging_pipeline_admission.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate) ... ok
+test_writer_lock_survives_runner_death_until_its_child_finishes (test_staging_pipeline_admission.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes) ... ok
+test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication (test_staging_recovery_admission.RecoveryAdmissionTest.test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication) ... FAIL
+test_first_install_also_takes_the_pre_migration_snapshot (test_staging_recovery_admission.RecoveryAdmissionTest.test_first_install_also_takes_the_pre_migration_snapshot) ... FAIL
+
+======================================================================
+FAIL: test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication (test_staging_recovery_admission.RecoveryAdmissionTest.test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_recovery_admission.py", line 45, in test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication
+    self.assertEqual(fstab.read_text().splitlines().count(expected), 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_first_install_also_takes_the_pre_migration_snapshot (test_staging_recovery_admission.RecoveryAdmissionTest.test_first_install_also_takes_the_pre_migration_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_recovery_admission.py", line 19, in test_first_install_also_takes_the_pre_migration_snapshot
+    self.assertEqual(run.stdout.strip(), "snapshot")
+AssertionError: '' != 'snapshot'
++ snapshot
+
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.843s
+
+FAILED (failures=2)
