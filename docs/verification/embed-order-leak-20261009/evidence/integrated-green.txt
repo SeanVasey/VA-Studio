@@ -1,0 +1,8 @@
+# source fd26aabbb5339c7c0a8086ba68dca6b523bdaf06 (integrated with main 3b3a3654); same ordered config
+Time: 01:29.883, Memory: 152.00 MB
+
+OK (42 tests, 1456 assertions)
+rc=0
+# regression test
+OK (2 tests, 3 assertions)
+rc=0
