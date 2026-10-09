@@ -1,0 +1,92 @@
+# source: a5354220 (product unmodified) + new/changed tests
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter 'PaidGrantAuthorizationWindowTest|PaidGrantHeavyWorkTest::test_the_lock_outlasts|PaidGrantPolicyRevisionTest|PaidGrantReviewAddendum1Test|PaidGrantReviewAdversarialTest' tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+EE.FFE.....E...E.                                                 17 / 17 (100%)
+
+Time: 02:12.758, Memory: 206.00 MB
+
+There were 5 errors:
+
+1) Tests\Feature\PaidGrantAuthorizationWindowTest::test_a_redeem_soon_after_a_slow_authorize_is_admitted_for_the_whole_lifetime_from_token_receipt
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:253
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:128
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:138
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantAuthorizationWindowTest.php:181
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantAuthorizationWindowTest.php:106
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantAuthorizationWindowTest::test_a_redeem_started_before_expiry_whose_locate_and_first_frame_cross_it_is_admitted
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:253
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:128
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:138
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantAuthorizationWindowTest.php:181
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantAuthorizationWindowTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantPolicyRevisionTest::test_an_order_finalized_under_an_earlier_policy_stays_readable_and_downloadable_under_its_own_terms
+Error: Undefined constant App\Domain\Grants\Paid\PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantPolicyRevisionTest.php:149
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantReviewAddendum1Test::test_a_downward_policy_revision_keeps_the_retained_limit_lifetime_and_idempotent_replay_and_refinalize_does_not_reseal
+Error: Undefined constant App\Domain\Grants\Paid\PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php:254
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\PaidGrantReviewAdversarialTest::test_expiry_refuses_without_consuming_and_a_spent_authorization_replayed_after_expiry_reports_expiry_before_consumption
+Error: Undefined constant App\Domain\Grants\Paid\PaidGrantDownloads::AUTHORIZE_BUDGET_SECONDS
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php:190
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\PaidGrantAuthorizationWindowTest::test_the_added_constant_is_the_authorize_budget_and_the_idempotent_replay_keeps_the_same_expiry
+Failed asserting that 60 is identical to 120.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantAuthorizationWindowTest.php:144
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantHeavyWorkTest::test_the_lock_outlasts_a_slow_claim_frame_followed_by_a_long_line
+The buyer lock must still be held at the end of the render and at the line's record frame.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => true,
+-    1 => true,
++    0 => false,
++    1 => false,
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:258
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 17, Assertions: 309, Errors: 5, Failures: 2.
+rc=2

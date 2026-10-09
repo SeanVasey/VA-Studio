@@ -1,0 +1,3 @@
+cmd: npx tsc --noEmit
+head: 94d325185d57eea57011d7466934a9b854c9d448
+rc=0

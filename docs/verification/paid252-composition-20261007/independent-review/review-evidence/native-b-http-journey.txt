@@ -1,0 +1,31 @@
+cmd: (env: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3761 DB_DATABASE=vaseyaudio_review_paid252 DB_USERNAME=root DB_PASSWORD= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync APP_ENV=testing) php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/native-b-http-journey.xml tests/Feature/PaidGrantHttpJourneyTest.php
+head: 4a4a423022759ec706e7e235649552d0d2930128
+server: 8.4.11
+start: 2026-10-08T12:42:50Z
+uptime_start:  12:42:50 up  1:51,  0 user,  load average: 7.29, 6.98, 5.53
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 06:41.353, Memory: 101.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantHttpJourneyTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Expected response status code [409] but received 410.
+Failed asserting that 410 is identical to 409.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantHttpJourneyTest.php:125
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 48, Failures: 1.
+rc=1
+wall_s=402
+uptime_end:  12:49:32 up  1:57,  0 user,  load average: 5.91, 6.31, 5.77
+end: 2026-10-08T12:49:32Z

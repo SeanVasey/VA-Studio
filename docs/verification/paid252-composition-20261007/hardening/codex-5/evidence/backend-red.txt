@@ -1,0 +1,32 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                                 3 / 3 (100%)
+
+Time: 00:00.229, Memory: 61.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\PaidGrantSpoolReservationTest::test_two_snapshots_that_fit_alone_but_not_together_are_refused_and_admitted_after_release
+Failed asserting that null is identical to 'target_unavailable'.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReservationTest.php:46
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSpoolReservationTest::test_snapshots_that_fit_together_are_admitted_and_a_failed_copy_releases_its_reservation
+Failed asserting that null is identical to 'target_unavailable'.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReservationTest.php:88
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSpoolReservationTest::test_a_malformed_reservation_sidecar_is_never_repaired_and_its_slot_is_skipped
+Failed asserting that file "/home/user/VA-Studio-paid252/storage/framework/testing/disks/local-ff2108a4-2357-4d9a-a91e-f639ef81fe98/delivery/paid-spool/slot-1.reserve" exists.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReservationTest.php:106
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 3[0m[37;41m, Assertions: 6[0m[37;41m, Failures: 3[0m[37;41m.[0m
+rc=1

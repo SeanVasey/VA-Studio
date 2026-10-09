@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbeAddendum9Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum9Test.php" tests="3" assertions="52" errors="0" failures="0" skipped="0" time="28.744573">
+    <testcase name="test_a_redemption_admitted_in_time_commits_after_a_long_snapshot_far_past_expiry" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum9Test.php" line="110" class="Tests\Feature\ReviewProbeAddendum9Test" classname="Tests.Feature.ReviewProbeAddendum9Test" assertions="18" time="9.925560"/>
+    <testcase name="test_disabling_or_switching_provenance_during_a_long_snapshot_refuses_the_commit_frame" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum9Test.php" line="129" class="Tests\Feature\ReviewProbeAddendum9Test" classname="Tests.Feature.ReviewProbeAddendum9Test" assertions="19" time="10.256560"/>
+    <testcase name="test_a_redemption_row_committed_during_the_snapshot_refuses_the_commit_frame_with_409" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum9Test.php" line="154" class="Tests\Feature\ReviewProbeAddendum9Test" classname="Tests.Feature.ReviewProbeAddendum9Test" assertions="15" time="8.562453"/>
+  </testsuite>
+</testsuites>

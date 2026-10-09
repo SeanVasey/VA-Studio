@@ -1,0 +1,38 @@
+# source: afd9cd94 + codex-18 working tree + mutation M1-render-checks-on-call-budget (scratch worktree)
+M1-render-checks-on-call-budget applied
++            $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+-                $deadline->proveCurrent();
++                $budget->proveCurrent();
+-                }, $deadline);
++                }, $budget);
+-                    }, $deadline);
++                    }, $budget);
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18/phpunit.xml
+
+F..                                                                 3 / 3 (100%)
+
+Time: 00:27.431, Memory: 197.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantPreparationBudgetTest::test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'complete',
+     1 => 'complete',
+-    2 => 'complete',
++    2 => 'failed',
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18/tests/Feature/PaidGrantPreparationBudgetTest.php:113
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 60, Failures: 1.
+rc=1

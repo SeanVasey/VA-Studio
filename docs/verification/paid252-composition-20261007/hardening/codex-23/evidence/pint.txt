@@ -1,0 +1,3 @@
+# source: 55976099 + final working tree
+# command: /home/user/VA-Studio/vendor/bin/pint --test <4 files>
+{"tool":"pint","result":"passed"}rc=0

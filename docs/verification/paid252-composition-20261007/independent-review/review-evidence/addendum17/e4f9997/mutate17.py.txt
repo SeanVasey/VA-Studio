@@ -1,0 +1,13 @@
+import sys
+path, name = sys.argv[1], sys.argv[2]
+src = open(path).read()
+M = {
+ 'K1': ("[...issued, ...kept.current.filter(m => m.refused)]", "[...issued, ...kept.current]"),
+ 'K2': ("[...issued, ...kept.current.filter(m => m.refused)]", "[...issued]"),
+ 'K3': ("originId: origin.id, orderId: origin.orderId }", "originId: origin.id, orderId: '' }"),
+ 'K4': ("originId: origin.id, orderId: origin.orderId }", "originId: '', orderId: origin.orderId }"),
+}
+old, new = M[name]
+assert src.count(old) == 1, (name, src.count(old))
+open(path, 'w').write(src.replace(old, new))
+print(f"applied {name}: {old!r} -> {new!r}")

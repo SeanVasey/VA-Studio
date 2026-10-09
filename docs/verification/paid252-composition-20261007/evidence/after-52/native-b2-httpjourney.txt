@@ -1,0 +1,25 @@
+start 11:58:24
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 05:53.046, Memory: 99.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantHttpJourneyTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Expected response status code [409] but received 410.
+Failed asserting that 410 is identical to 409.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHttpJourneyTest.php:125
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 48[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1
+wall=354s end 12:04:18

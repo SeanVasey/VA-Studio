@@ -1,0 +1,356 @@
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { PaidGrantJourney, type PaidOrigin } from '../../resources/js/components/PaidGrantJourney';
+
+// Independent review addendum 17 probe (untracked): the Addendum 16 cases A-G unchanged, H inverted to the fixed behaviour
+// (A16-L1, e4f9997), and new cases I-M for refused kept entries. Synthetic fixtures only.
+const batchId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', orderId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', lineId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+const otherBatch = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee', otherOrder = 'ffffffff-ffff-4fff-8fff-ffffffffffff', foreignOrder = '99999999-9999-4999-8999-999999999999';
+const indexOnlyBatch = '12345678-1234-4234-8234-123456789abc', indexOnlyOrder = '87654321-4321-4321-8321-cba987654321';
+const authX1 = '11111111-1111-4111-8111-111111111111', authX2 = '22222222-2222-4222-8222-222222222222', authY = '33333333-3333-4333-8333-333333333333', authY2 = '44444444-4444-4444-8444-444444444444';
+const complete: PaidOrigin = { id: batchId, orderId, purpose: 'paid-license-grant', provenance: 'synthetic_rehearsal', fulfilled: true, lines: [{ id: lineId, originHash: 'a'.repeat(64), position: 1,
+  title: 'Original synthetic recording', license: { licenseVersionId: '1', name: 'Explicit synthetic license', version: 1, type: 'non-exclusive', features: ['WAV'], deliverableRoles: ['master_wav'], termsText: 'SYNTHETIC TERMS' },
+  declaredName: 'Synthetic buyer', assentedAt: '2026-10-07T01:02:03Z', currency: 'USD', lineAmountMinor: 4999, lineTaxMinor: 0, documentStatus: 'complete', attempts: 1,
+  files: [{ kind: 'master_wav', sha256: 'b'.repeat(64), sizeBytes: 1024 }, { kind: 'contract', sha256: 'c'.repeat(64), sizeBytes: 2048 }] }] };
+const other: PaidOrigin = { ...complete, id: otherBatch, orderId: otherOrder };
+const indexOnly: PaidOrigin = { ...complete, id: indexOnlyBatch, orderId: indexOnlyOrder };
+const tokenOf = (id: string) => `TOKEN_${id.slice(0, 8)}`.padEnd(43, 'z');
+const auth = (id: string, k: 'master_wav' | 'contract') => ({ authorization: { id, token: tokenOf(id), expiresAt: '2026-10-07 01:03:03', kind: k,
+  filename: `paid-license-${lineId}-${k}${k === 'contract' ? '.pdf' : '.wav'}`, mimeType: k === 'contract' ? 'application/pdf' : 'audio/wav' } });
+const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+// The bounded index lists neither X (batchId) nor Y (otherBatch): both are older than the 20 newest.
+const listing = { schemaVersion: 1, originLimit: 20, origins: [{ id: indexOnlyBatch, orderId: indexOnlyOrder, createdAt: '2026-10-07 02:02:03', provenance: 'synthetic_rehearsal' }] };
+const unusedStatus = (id: string) => ({ status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null,
+  history: [{ id, kind: 'master_wav', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: 'unused', attemptedAt: null }] }] } });
+const button = (name: string) => screen.getByRole('button', { name });
+const query = (name: string) => screen.queryByRole('button', { name });
+const reopenFor = (o: string) => `Reopen order ${o} to download its authorized file`;
+const reopens = () => screen.queryAllByRole('button', { name: /^Reopen order .* to download its authorized file$/ });
+const downloads = () => screen.queryAllByRole('button', { name: 'Download authorized file' });
+const idle = () => waitFor(() => expect(screen.getByLabelText('Paid license journey')).not.toHaveAttribute('aria-busy', 'true'));
+
+beforeEach(() => { document.head.insertAdjacentHTML('beforeend', `<meta data-paid-csrf name="csrf-token" content="${'c'.repeat(40)}">`); });
+afterEach(() => { vi.restoreAllMocks(); document.head.querySelectorAll('[data-paid-csrf]').forEach(e => e.remove());
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' }); });
+
+type Route = (init?: RequestInit) => Promise<Response>;
+/** Per-path queues; the last answer repeats. Records method and body of every call. */
+function server(routes: Record<string, Route[]>) {
+  const calls: { path: string; method: string; body: unknown }[] = [];
+  vi.spyOn(globalThis, 'fetch').mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
+    const path = String(input); calls.push({ path, method: init?.method ?? 'GET', body: init?.body ? JSON.parse(String(init.body)) : null });
+    const queue = routes[path]; if (!queue?.length) throw new Error(`unexpected ${path}`);
+    return (queue.length > 1 ? queue.shift()! : queue[0])(init);
+  });
+  return calls;
+}
+const ok = (body: unknown): Route => () => Promise.resolve(response(body));
+const status = (code: number): Route => () => Promise.resolve(new Response('', { status: code }));
+const lost: Route = () => Promise.reject(new TypeError('network'));
+const finalizePath = (o: string) => `/paid-grants/orders/${o}/finalize`;
+const authorizePath = (b: string) => `/paid-grants/origins/${b}/lines/${lineId}/authorize`;
+
+async function hideAndShow() {
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'hidden' });
+  await act(async () => { document.dispatchEvent(new Event('visibilitychange')); });
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: 'visible' });
+  await act(async () => { document.dispatchEvent(new Event('visibilitychange')); });
+}
+async function byReference(o: string) {
+  fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: o } });
+  fireEvent.click(button('Prepare licenses for this paid order'));
+  await screen.findByText(`Order ${o}`); await idle();
+}
+async function authorizeKind(k: 'master_wav' | 'contract', expected: number) {
+  fireEvent.click(button(`Authorize ${k} for Original synthetic recording`));
+  await waitFor(() => expect(downloads()).toHaveLength(expected)); await idle();
+}
+/** Every attribute value and text in the document, to check no secret reached the DOM. */
+const dom = () => document.documentElement.outerHTML;
+function refuseFrame(frame: HTMLIFrameElement) {
+  Object.defineProperty(frame, 'contentDocument', { configurable: true, value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' }, body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+  frame.dispatchEvent(new Event('load'));
+}
+
+describe('review addendum 17: reopening an issued or refused-kept authorization order', () => {
+  it('A: two issued authorizations on one order give one button, and reopening brings back both Download buttons', async () => {
+    const calls = server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav')), ok(auth(authX2, 'contract'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId);
+    await authorizeKind('master_wav', 1); await authorizeKind('contract', 2);
+    expect(reopens()).toHaveLength(0);
+    await hideAndShow();
+    expect(downloads()).toHaveLength(0);
+    expect(reopens()).toHaveLength(1);
+    const before = calls.length;
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(calls.slice(before).map(c => `${c.method} ${c.path} ${JSON.stringify(c.body)}`)).toEqual([`GET /paid-grants/origins/${batchId} null`]);
+    expect(downloads()).toHaveLength(2);
+    expect(reopens()).toHaveLength(0);
+    for (const t of [tokenOf(authX1), tokenOf(authX2)]) expect(dom()).not.toContain(t);
+  });
+
+  it('B: issued on two orders gives two buttons; the shown order never has one', async () => {
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [finalizePath(otherOrder)]: [ok({ origin: other })],
+      [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))], [authorizePath(otherBatch)]: [ok(auth(authY, 'master_wav'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })], [`/paid-grants/origins/${otherBatch}`]: [ok({ origin: other })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    // Opening another order (no request pending, so the reference form is open) leaves X's issued entry unshown.
+    await byReference(otherOrder);
+    expect(downloads()).toHaveLength(0);
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    await authorizeKind('master_wav', 1);
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    await hideAndShow();
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId), reopenFor(otherOrder)]);
+    fireEvent.click(button(reopenFor(otherOrder)));
+    await screen.findByText(`Order ${otherOrder}`); await idle();
+    expect(downloads()).toHaveLength(1);
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(downloads()).toHaveLength(1);
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(otherOrder)]);
+    for (const t of [tokenOf(authX1), tokenOf(authY)]) expect(dom()).not.toContain(t);
+  });
+
+  it('C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial that drops it', async () => {
+    const calls = server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: { ...complete, orderId: foreignOrder } }), ok({ origin: { ...complete, id: otherBatch } }), status(404)] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    await hideAndShow();
+    for (let n = 0; n < 2; n++) {
+      fireEvent.click(button(reopenFor(orderId)));
+      expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed'); await idle();
+      expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument();
+      expect(downloads()).toHaveLength(0);
+      expect(button(reopenFor(orderId))).toBeEnabled();
+    }
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByRole('link', { name: 'Open a fresh sign-in page' });
+    expect(reopens()).toHaveLength(0);
+    expect(calls.filter(c => c.path === `/paid-grants/origins/${batchId}`).map(c => c.method)).toEqual(['GET', 'GET', 'GET']);
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+
+  it('D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without disturbing the replay', async () => {
+    const submit = vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    const calls = server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))],
+      '/paid-grants/index': [ok(listing)], [`/paid-grants/origins/${indexOnlyBatch}`]: [ok({ origin: indexOnly })],
+      [`/paid-grants/origins/${indexOnlyBatch}/lines/${lineId}/authorize`]: [lost, ok(auth(authY2, 'master_wav'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    await hideAndShow();
+    fireEvent.click(button('Open paid licenses'));
+    fireEvent.click(await screen.findByRole('button', { name: `Open saved order ${indexOnlyOrder}` }));
+    await screen.findByText(`Order ${indexOnlyOrder}`); await idle();
+    fireEvent.click(button('Authorize master_wav for Original synthetic recording'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed'); await idle();
+    // Pending: the reference form is closed and the index does not list X.
+    expect(screen.getByLabelText('Saved order reference')).toBeDisabled();
+    expect(button('Prepare licenses for this paid order')).toBeDisabled();
+    expect(query(`Open saved order ${orderId}`)).not.toBeInTheDocument();
+    const sent = calls.find(c => c.path.endsWith(`${indexOnlyBatch}/lines/${lineId}/authorize`))!.body as Record<string, string>;
+    // The round 24 control is the only way back to X here (fails on 8fc077f).
+    const before = calls.length;
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(calls.slice(before).map(c => `${c.method} ${c.path}`)).toEqual([`GET /paid-grants/origins/${batchId}`]);
+    expect(button('Reopen this order')).toBeEnabled();
+    expect(reopens()).toHaveLength(0);
+    for (const s of [tokenOf(authX1), sent.requestKey, sent.nonce]) expect(dom()).not.toContain(s);
+    fireEvent.click(button('Download authorized file'));
+    expect(submit).toHaveBeenCalledTimes(1);
+    expect(reopens()).toHaveLength(0);
+    // The exact retry still sends the identical body once saved licenses were reviewed.
+    fireEvent.click(button('Refresh paid licenses')); await idle();
+    fireEvent.click(button('Retry the exact request'));
+    await screen.findByText(`Order ${indexOnlyOrder}`); await idle();
+    const retries = calls.filter(c => c.path.endsWith(`${indexOnlyBatch}/lines/${lineId}/authorize`));
+    expect(retries).toHaveLength(2); expect(retries[1].body).toEqual(retries[0].body);
+    expect(downloads()).toHaveLength(1);
+    expect(dom()).not.toContain(tokenOf(authY2));
+  });
+
+  it('E: with nothing pending the reference form already reopens X and its Download returns (the finding is narrower than stated)', async () => {
+    const calls = server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    await hideAndShow();
+    expect(downloads()).toHaveLength(0);
+    expect(screen.getByLabelText('Saved order reference')).toBeEnabled();
+    await byReference(orderId);
+    expect(downloads()).toHaveLength(1);
+    // That path is an idempotent finalize POST; the round 24 control is a GET.
+    expect(calls.filter(c => c.path === finalizePath(orderId)).map(c => c.method)).toEqual(['POST', 'POST']);
+  });
+
+  it('F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries', async () => {
+    let release!: (r: Response) => void;
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [finalizePath(otherOrder)]: [ok({ origin: other })],
+      [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))], [authorizePath(otherBatch)]: [ok(auth(authY, 'master_wav'))],
+      [`/paid-grants/origins/${batchId}`]: [(init) => new Promise<Response>((resolve, reject) => { release = resolve; init?.signal?.addEventListener('abort', () => reject(new Error('aborted'))); }), ok({ origin: complete })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    await byReference(otherOrder); await authorizeKind('master_wav', 1);
+    await hideAndShow();
+    fireEvent.click(button(reopenFor(orderId)));
+    await waitFor(() => expect(screen.getByLabelText('Paid license journey')).toHaveAttribute('aria-busy', 'true'));
+    expect(reopens()).toHaveLength(2);
+    for (const b of reopens()) expect(b).toBeDisabled();
+    await hideAndShow();
+    expect(release).toBeTypeOf('function');
+    await idle();
+    expect(reopens()).toHaveLength(2);
+    for (const b of reopens()) expect(b).toBeEnabled();
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(downloads()).toHaveLength(1);
+  });
+
+  it('G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same order (Info: redundant, same action)', async () => {
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav')), lost],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Authorize contract for Original synthetic recording'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not be confirmed'); await idle();
+    await hideAndShow();
+    expect(button('Reopen this order')).toBeEnabled();
+    expect(button(reopenFor(orderId))).toBeEnabled();
+  });
+
+
+  it('H (fixed, A16-L1): a refused download kept for retry offers to reopen its order; the retry still needs a saved status read', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    const calls = server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))],
+      '/paid-grants/index': [ok(listing)], [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })], [`/paid-grants/origins/${batchId}/downloads`]: [ok(unusedStatus(authX1))] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Download authorized file'));
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    await act(async () => { refuseFrame(frame); });
+    expect(screen.getByRole('alert')).toHaveTextContent('The download was refused');
+    expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument();
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    fireEvent.click(button('Open paid licenses'));
+    await screen.findByRole('button', { name: `Open saved order ${indexOnlyOrder}` });
+    expect(query(`Open saved order ${orderId}`)).not.toBeInTheDocument();
+    const before = calls.length;
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(calls.slice(before).map(c => `${c.method} ${c.path} ${JSON.stringify(c.body)}`)).toEqual([`GET /paid-grants/origins/${batchId} null`]);
+    expect(reopens()).toHaveLength(0);
+    // Reopening alone offers nothing: the retry still needs a saved status read showing that exact authorization unused.
+    expect(query('Retry the authorized download')).not.toBeInTheDocument();
+    expect(downloads()).toHaveLength(0);
+    fireEvent.click(button('Refresh preparation and download status')); await idle();
+    const retry = button('Retry the authorized download');
+    expect(within(screen.getByLabelText('Retained paid order')).getByRole('button', { name: 'Retry the authorized download' })).toBe(retry);
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+
+  it('I: a refused kept entry of X while Y is shown gives X a control (after the next render) and never Y', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [finalizePath(otherOrder)]: [ok({ origin: other })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))],
+      [`/paid-grants/origins/${otherBatch}/downloads`]: [ok({ status: { ...unusedStatus(authY).status, originId: otherBatch } })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Download authorized file'));
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    // A later request (Y by reference) starts before X's frame answers; an unanswered download gives no control.
+    await byReference(otherOrder);
+    expect(reopens()).toHaveLength(0);
+    await act(async () => { refuseFrame(frame); });
+    // A refusal after a later request changes no state, so nothing re-renders yet: the page stays on Y with no message.
+    const immediately = reopens().length;
+    expect(screen.getByText(`Order ${otherOrder}`)).toBeInTheDocument();
+    fireEvent.click(button('Refresh preparation and download status')); await idle();
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    expect(query(reopenFor(otherOrder))).not.toBeInTheDocument();
+    expect(query('Retry the authorized download')).not.toBeInTheDocument();
+    expect(immediately).toBe(0);
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+
+  it('J: a refusal then a denial drops the control, the kept entry and any retry', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))], '/paid-grants/index': [status(403)] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Download authorized file'));
+    await act(async () => { refuseFrame(document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!); });
+    expect(button(reopenFor(orderId))).toBeEnabled();
+    fireEvent.click(button('Open paid licenses'));
+    await screen.findByRole('link', { name: 'Open a fresh sign-in page' });
+    expect(reopens()).toHaveLength(0);
+    expect(query('Retry the authorized download')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Saved order reference')).not.toBeInTheDocument();
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+
+  it('K: after reopening, the retry is offered only for a saved read showing that exact authorization unused', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    const hist = (id: string, s: 'unused' | 'expired' | 'attempted', k: 'master_wav' | 'contract' = 'master_wav') => ({ status: { ...unusedStatus(id).status,
+      lines: [{ ...unusedStatus(id).status.lines[0], attemptCount: s === 'attempted' ? 1 : 0, history: [{ id, kind: k, issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: s, attemptedAt: s === 'attempted' ? '2026-10-07 01:02:30' : null }] }] } });
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))], [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })],
+      [`/paid-grants/origins/${batchId}/downloads`]: [ok(hist(authX1, 'expired')), ok(hist(authX1, 'attempted')), ok(hist(authX2, 'unused')), ok(hist(authX1, 'unused', 'contract')), ok(hist(authX1, 'unused'))] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Download authorized file'));
+    await act(async () => { refuseFrame(document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!); });
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(query('Retry the authorized download')).not.toBeInTheDocument();
+    // expired, attempted, another id unused, the same id under another kind: no retry.
+    for (let n = 0; n < 4; n++) {
+      fireEvent.click(button('Refresh preparation and download status')); await idle();
+      expect(query('Retry the authorized download')).not.toBeInTheDocument();
+    }
+    fireEvent.click(button('Refresh preparation and download status')); await idle();
+    expect(button('Retry the authorized download')).toBeEnabled();
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+
+  it('L: an issued and a refused kept authorization on one order give one control; reopening shows the Download and drops it', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav')), ok(auth(authX2, 'contract'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1); await authorizeKind('contract', 2);
+    fireEvent.click(downloads()[0]);
+    await act(async () => { refuseFrame(document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!); });
+    expect(reopens().map(b => b.textContent)).toEqual([reopenFor(orderId)]);
+    fireEvent.click(button(reopenFor(orderId)));
+    await screen.findByText(`Order ${orderId}`); await idle();
+    expect(downloads()).toHaveLength(1);
+    expect(reopens()).toHaveLength(0);
+    for (const t of [tokenOf(authX1), tokenOf(authX2)]) expect(dom()).not.toContain(t);
+  });
+
+  it('M: a submitted download whose frame has not answered gives no control, and a retried kept entry stops giving one', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    server({ [finalizePath(orderId)]: [ok({ origin: complete })], [authorizePath(batchId)]: [ok(auth(authX1, 'master_wav'))],
+      [`/paid-grants/origins/${batchId}`]: [ok({ origin: complete })], [`/paid-grants/origins/${batchId}/downloads`]: [ok(unusedStatus(authX1))] });
+    render(<PaidGrantJourney />);
+    await byReference(orderId); await authorizeKind('master_wav', 1);
+    fireEvent.click(button('Download authorized file'));
+    await hideAndShow();
+    expect(reopens()).toHaveLength(0);
+    // Reopened by reference, then refused while X is shown (no control for the shown order), then retried: the retried
+    // entry is no longer refused, so a hidden tab leaves no control.
+    await byReference(orderId);
+    await act(async () => { refuseFrame(document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!); });
+    fireEvent.click(button('Refresh preparation and download status')); await idle();
+    expect(reopens()).toHaveLength(0);
+    fireEvent.click(button('Retry the authorized download'));
+    await hideAndShow();
+    expect(reopens()).toHaveLength(0);
+    expect(dom()).not.toContain(tokenOf(authX1));
+  });
+});

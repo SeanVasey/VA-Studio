@@ -1,0 +1,213 @@
+# source: 2f0d7ca2 (client unmodified) + new tests/frontend/paid-grant-reopen-pending.test.tsx; node v24.21.0
+# command: npx vitest run tests/frontend/paid-grant-reopen-pending.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-reopen-pending.test.tsx (3 tests | 1 failed) 394ms
+   ❯ reopening the order of a pending authorize (3)
+     × reopens an order older than the index, so an expired request can be set aside after a saved read 242ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-reopen-pending.test.tsx > reopening the order of a pending authorize > reopens an order older than the index, so an expired request can be set aside after a saved read
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen this order"
+
+Here are the accessible roles:
+
+  status:
+
+  Name "":
+  <p
+    aria-live="polite"
+    class="paid-preparation-progress"
+    role="status"
+    tabindex="-1"
+  />
+
+  --------------------------------------------------
+  region:
+
+  Name "Paid license journey":
+  <section
+    aria-busy="false"
+    aria-label="Paid license journey"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  --------------------------------------------------
+  alert:
+
+  Name "":
+  <div
+    class="customer-account-message"
+    role="alert"
+    tabindex="-1"
+  />
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  <button
+    type="button"
+  />
+
+  Name "Retry the exact request":
+  <button
+    type="button"
+  />
+
+  Name "Set aside and request a new authorization":
+  <button
+    disabled=""
+    type="button"
+  />
+
+  Name "Prepare licenses for this paid order":
+  <button
+    disabled=""
+    type="submit"
+  />
+
+  Name "Open saved order ffffffff-ffff-4fff-8fff-ffffffffffff":
+  <button
+    type="button"
+  />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  <input
+    autocomplete="off"
+    disabled=""
+    id="paid-order-reference"
+    maxlength="36"
+    value=""
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="paid-grant-journey"
+    >
+      <div
+        class="paid-preparation-status"
+      >
+        <p
+          aria-live="polite"
+          class="paid-preparation-progress"
+          role="status"
+          tabindex="-1"
+        />
+      </div>
+      <section
+        aria-busy="false"
+        aria-label="Paid license journey"
+      >
+        <p>
+          Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+        </p>
+        <div
+          class="customer-account-message"
+          role="alert"
+          tabindex="-1"
+        >
+          The result could not be confirmed. Refresh saved licenses before deliberately retrying the same request.
+        </div>
+        <button
+          type="button"
+        >
+          Refresh paid licenses
+        </button>
+        <div>
+          <p>
+            Review saved licenses before deliberately retrying this exact request.
+          </p>
+          <button
+            type="button"
+          >
+            Retry the exact request
+          </button>
+          <button
+            disabled=""
+            type="button"
+          >
+            Set aside and request a new authorization
+          </button>
+        </div>
+        <form>
+          <label
+            for="paid-order-reference"
+          >
+            Saved order reference
+          </label>
+          <input
+            autocomplete="off"
+            disabled=""
+            id="paid-order-reference"
+            maxlength="36"
+            value=""
+          />
+          <button
+            disabled=""
+            type="submit"
+          >
+            Prepare licenses for this paid order
+          </button>
+        </form>
+        <div
+          aria-label="Saved paid licenses"
+        >
+          <p>
+            Latest 
+            20
+             saved orders. An order reference can open an older original.
+          </p>
+          <button
+            type="button"
+          >
+            Open saved order 
+            ffffffff-ffff-4fff-8fff-ffffffffffff
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ button tests/frontend/paid-grant-reopen-pending.test.tsx:22:41
+     20|   history: [{ id: lostId, kind: 'master_wav', issuedAt: '2026-10-07 01…
+     21| const refused410 = () => response({ error: 'Paid grant request unavail…
+     22| const button = (name: string) => screen.getByRole('button', { name });
+       |                                         ^
+     23| const idle = () => waitFor(() => expect(screen.getByLabelText('Paid li…
+     24|
+ ❯ tests/frontend/paid-grant-reopen-pending.test.tsx:67:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  22:43:33
+   Duration  1.11s (environment 44%, tests 39%, transform 10%, setup 6%, import 1%)
+
+rc=1

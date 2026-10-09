@@ -1,0 +1,18 @@
+# source fe8cdcb088bb0f2a4922ce345019078350d6790e: what a render can and cannot do
+# every write of generation.current
+124:generation.current++;
+134:generation.current++;
+140:generation.current++;
+142:generation.current++;
+147:    const abort = new AbortController(), mine = ++generation.current; request.current = abort;
+# every useEffect and its dependency list
+132:  useEffect(() => {
+144:  useEffect(() => { if (message) alert.current?.focus(); }, [message]);
+143:  }, []);
+144:  useEffect(() => { if (message) alert.current?.focus(); }, [message]);
+# the refusal bump and the guard before it (one line)
+284:    frame.addEventListener('load', () => { if (!active.current || !frames.current.includes(frame)) return; const current = mine === generation.current; try 
+118:  const [, setRefusals] = useState(0);
+288:      if (obj(failure) && failure.code === 'PAID_GRANT_UNAVAILABLE') { mark.refused = true; setRefusals(n => n + 1); frame.remove(); frames.current = frames
+# useState counter is never read
+118:  const [, setRefusals] = useState(0);

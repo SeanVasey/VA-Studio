@@ -1,0 +1,205 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Delivery\DeliveryAssetFiles;
+use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
+use Carbon\CarbonImmutable;
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\Process\InputStream;
+use Symfony\Component\Process\Process;
+use Tests\TestCase;
+
+/** Independent review addendum 13 probe (untracked, removed after recording). Helpers copied from PaidGrantSpoolRecoveryTest. */
+final class ReviewProbeAddendum13Test extends TestCase
+{
+    private const BYTES = 1000;
+
+    private string $payload;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        config(['paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        $this->payload = str_repeat('r', self::BYTES);
+    }
+
+    /** P2: a live holder's named snapshot, already sealed 0400, is never recovered by a concurrent admission. */
+    public function test_probe_a_live_holders_sealed_0400_snapshot_survives_a_nested_admission(): void
+    {
+        $spool = $this->primed();
+        $seen = null;
+        $spool->beforeUnlink = function (string $path) use ($spool, &$seen): void {
+            clearstatcache();
+            $before = lstat($path);
+            $this->assertSame(0400, $before['mode'] & 07777, 'the outer snapshot is sealed 0400 at this point');
+            // The outer holder still holds slot 0's lock; a nested admission must take another slot and leave this file alone.
+            $this->assertSame($this->payload, $this->read($spool->handle($this->target())));
+            clearstatcache();
+            $after = lstat($path);
+            $seen = [$before['ino'], $after['ino'], $after['mode'] & 07777, basename($path)];
+        };
+        $this->assertSame($this->payload, $this->read($spool->handle($this->target())));
+        $this->assertNotNull($seen);
+        $this->assertSame($seen[0], $seen[1]);
+        $this->assertSame(0400, $seen[2]);
+        fwrite(STDERR, 'P2 outer slot file='.$seen[3]."\n");
+        $this->assertSame([], glob($this->dir().'/slot-*.snapshot'));
+    }
+
+    /** P1: receivedAt() edge inputs; a client header never reaches REQUEST_TIME_FLOAT. */
+    public function test_probe_received_at_edges_and_header_isolation(): void
+    {
+        $this->freezeTime();
+        $now = CarbonImmutable::now('UTC');
+        $results = [];
+        foreach (['nan' => NAN, 'inf' => INF, '-inf' => -INF, 'numeric-string' => (string) $now->getTimestamp(), 'bool' => true, 'null' => null,
+            '0.5s-ahead' => $now->getPreciseTimestamp(6) / 1e6 + 0.5, '2s-ahead' => $now->getTimestamp() + 2.0,
+            '59.5s-old' => $now->getPreciseTimestamp(6) / 1e6 - 59.5, '60.5s-old' => $now->getPreciseTimestamp(6) / 1e6 - 60.5, '61s-old' => $now->getTimestamp() - 61.0, 'int-30s-old' => $now->getTimestamp() - 30] as $label => $value) {
+            $got = PaidGrantDownloads::receivedAt($value);
+            $results[$label] = round($got->floatDiffInSeconds($now, false), 3);
+        }
+        fwrite(STDERR, 'P1 LARAVEL_START defined='.var_export(defined('LARAVEL_START'), true).' age(s) '.json_encode($results)."\n");
+        if (! defined('LARAVEL_START')) {
+            foreach (['nan', 'inf', '-inf', 'numeric-string', 'bool', 'null', '2s-ahead', '60.5s-old', '61s-old'] as $fallback) {
+                $this->assertSame(0.0, $results[$fallback], $fallback.' falls back to now');
+            }
+        }
+        $this->assertSame(0.0, $results['0.5s-ahead'], 'a value under 1 s ahead is clamped to now');
+        $this->assertEqualsWithDelta(59.5, $results['59.5s-old'], 0.002, 'a value under 60 s old is admitted as is');
+        // An integer timestamp drops the sub-second part, so it is up to 1 s older than its whole seconds suggest.
+        $this->assertGreaterThanOrEqual(30.0, $results['int-30s-old']);
+        $this->assertLessThan(31.0, $results['int-30s-old']);
+        $request = Request::create('/paid-grants/authorizations/x/redeem', 'POST', server: ['HTTP_REQUEST_TIME_FLOAT' => '1', 'HTTP_X_REQUEST_TIME_FLOAT' => '1']);
+        $request->headers->set('Request-Time-Float', '1');
+        $this->assertNotSame('1', $request->server('REQUEST_TIME_FLOAT'));
+        $this->assertGreaterThan(1_000_000_000, (float) $request->server('REQUEST_TIME_FLOAT'));
+    }
+
+    /** One completed snapshot creates the spool directory, the slot locks and their sidecars as the real flow does. */
+    private function primed(): PaidGrantPrepareStream
+    {
+        $spool = $this->spool();
+        $spool->free = (float) (3 * self::BYTES + PaidGrantPrepareStream::RESERVE_BYTES);
+        // Three nested snapshots touch every slot once, so each has its lock and sidecars.
+        $spool->during = function () use ($spool): void {
+            $spool->during = function () use ($spool): void {
+                $spool->during = null;
+                $spool->handle($this->target())->close();
+            };
+            $spool->handle($this->target())->close();
+        };
+        $spool->handle($this->target())->close();
+        $this->assertSame([], glob($this->dir().'/slot-*.snapshot'));
+
+        return $spool;
+    }
+
+    /** A crash leftover as the spool itself leaves it: partial snapshot of `$mode`, a live-looking reservation and holder. */
+    private function leftover(int $slot, int $mode): void
+    {
+        $path = $this->dir().'/slot-'.$slot.'.snapshot';
+        file_put_contents($path, substr($this->payload, 0, 400));
+        chmod($path, $mode);
+        file_put_contents($this->dir().'/slot-'.$slot.'.reserve', sprintf('%020d', self::BYTES));
+        file_put_contents($this->dir().'/slot-'.$slot.'.holder', $this->holder('9'));
+    }
+
+    /** A 64-hex holder digest; distinct values stand for distinct buyer accounts. */
+    private function holder(string $hex): string
+    {
+        return str_repeat($hex, 64);
+    }
+
+    /** @return array<string, array{int, int, int, int}> */
+    private function identities(): array
+    {
+        clearstatcache();
+        $result = [];
+        foreach (glob($this->dir().'/slot-*') as $path) {
+            $stat = lstat($path);
+            $result[basename($path)] = [$stat['ino'], $stat['mode'], $stat['nlink'], $stat['size']];
+        }
+
+        return $result;
+    }
+
+    private function read($prepared): string
+    {
+        $bytes = '';
+        try {
+            $prepared->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+        } finally {
+            $prepared->close();
+        }
+
+        return $bytes;
+    }
+
+    private function refusal(Closure $call): string
+    {
+        try {
+            $call();
+        } catch (DeliveryException $error) {
+            return $error->reason;
+        }
+        $this->fail('Expected a refusal.');
+    }
+
+    private function spool(): PaidGrantPrepareStream
+    {
+        return new class($this->payload) extends PaidGrantPrepareStream
+        {
+            public float $free = 0.0;
+
+            public ?Closure $during = null;
+
+            public function __construct(private readonly string $payload) {}
+
+            protected function freeBytes(string $directory): float|false
+            {
+                return $this->free;
+            }
+
+            public ?Closure $beforeUnlink = null;
+
+            protected function copyTarget(array $target, $destination, int $deadline): void
+            {
+                fwrite($destination, $this->payload);
+                if ($this->during !== null) {
+                    ($this->during)();
+                }
+            }
+
+            protected function unlinkSpool(string $path): bool
+            {
+                if ($this->beforeUnlink !== null) {
+                    $hook = $this->beforeUnlink;
+                    $this->beforeUnlink = null;
+                    $hook($path);
+                }
+
+                return parent::unlinkSpool($path);
+            }
+        };
+    }
+
+    private function target(): array
+    {
+        return ['kind' => 'contract', 'disk' => 'local', 'size_bytes' => self::BYTES, 'sha256' => hash('sha256', $this->payload), 'provenance' => 'synthetic_rehearsal'];
+    }
+
+    private function dir(): string
+    {
+        return app(DeliveryAssetFiles::class)->privateRoot().'/delivery/paid-spool';
+    }
+}

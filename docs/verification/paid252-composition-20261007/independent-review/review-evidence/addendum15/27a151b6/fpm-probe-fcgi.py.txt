@@ -1,0 +1,24 @@
+import socket, struct, sys
+def rec(t, rid, content):
+    return struct.pack('!BBHHBx', 1, t, rid, len(content), 0) + content
+def nv(k, v):
+    k, v = k.encode(), v.encode()
+    def ln(x): return struct.pack('!B', len(x)) if len(x) < 128 else struct.pack('!I', len(x) | 0x80000000)
+    return ln(k) + ln(v) + k + v
+params = {'SCRIPT_FILENAME': sys.argv[1], 'REQUEST_METHOD': 'GET', 'SERVER_PROTOCOL': 'HTTP/1.1', 'GATEWAY_INTERFACE': 'CGI/1.1',
+          'REQUEST_TIME_FLOAT': '1.5', 'REQUEST_TIME': '1',
+          'HTTP_REQUEST_TIME_FLOAT': '1.5', 'HTTP_X_REQUEST_TIME': '1.5'}
+s = socket.create_connection(('127.0.0.1', 19815))
+body = b''.join(nv(k, v) for k, v in params.items())
+s.sendall(rec(1, 1, struct.pack('!HB5x', 1, 0)) + rec(4, 1, body) + rec(4, 1, b'') + rec(5, 1, b''))
+out = b''
+while True:
+    h = s.recv(8)
+    if len(h) < 8: break
+    _, t, _, cl, pl = struct.unpack('!BBHHBx', h)
+    c = b''
+    while len(c) < cl + pl: c += s.recv(cl + pl - len(c))
+    if t == 6: out += c[:cl]
+    if t == 3: break
+print('sent FastCGI params:', params)
+print(out.decode())

@@ -1,0 +1,17 @@
+cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum1/8f751d0d/sqlite-PaidGrantReviewAddendum1Test.xml tests/Feature/PaidGrantReviewAddendum1Test.php  (SQLite, phpunit.xml defaults, public/build absent)
+head: 8f751d0d368222c310e37d623eab1e8d5f0f2956 + untracked tests/Feature/PaidGrantReviewAddendum1Test.php (PHP tree identical to 392afd6a)
+note: run 2; run 1 (…-run1-key-order-test-bug.*) failed only on the reviewer's own assertion comparing the retained policy with PHP key order instead of canonical order
+start: 2026-10-08T17:14:52Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 00:57.780, Memory: 108.00 MB
+
+[30;42mOK (6 tests, 126 assertions)[0m
+rc=0
+wall_s=58
+end: 2026-10-08T17:15:50Z

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantSpoolReviewAddendum1Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSpoolReviewAddendum1Test.php" tests="3" assertions="13" errors="0" failures="0" skipped="0" time="0.233592">
+    <testcase name="test_a_stale_reservation_of_an_unheld_slot_is_not_subtracted_and_its_next_holder_overwrites_it" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSpoolReviewAddendum1Test.php" line="30" class="Tests\Feature\PaidGrantSpoolReviewAddendum1Test" classname="Tests.Feature.PaidGrantSpoolReviewAddendum1Test" assertions="3" time="0.195370"/>
+    <testcase name="test_a_tampered_sidecar_of_a_held_slot_fails_admission_closed_instead_of_counting_zero" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSpoolReviewAddendum1Test.php" line="56" class="Tests\Feature\PaidGrantSpoolReviewAddendum1Test" classname="Tests.Feature.PaidGrantSpoolReviewAddendum1Test" assertions="3" time="0.019058"/>
+    <testcase name="test_a_symlinked_or_loose_mode_sidecar_skips_its_slot_and_is_never_repaired_or_followed" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSpoolReviewAddendum1Test.php" line="80" class="Tests\Feature\PaidGrantSpoolReviewAddendum1Test" classname="Tests.Feature.PaidGrantSpoolReviewAddendum1Test" assertions="7" time="0.019164"/>
+  </testsuite>
+</testsuites>

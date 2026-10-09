@@ -1,0 +1,3 @@
+<?php
+$GLOBALS['_composer_autoload_path'] = getcwd().'/vendor/autoload.php';
+require getcwd().'/vendor/phpunit/phpunit/phpunit';

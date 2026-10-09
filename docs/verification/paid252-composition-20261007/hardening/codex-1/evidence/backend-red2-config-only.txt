@@ -1,0 +1,64 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m.[31;1mE[0m[31;1mE[0m                                                              6 / 6 (100%)
+
+Time: 01:26.713, Memory: 101.02 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:222
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:116
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:133
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:185
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantTransferDeadlineTest::test_shipped_defaults_policy_bounds_and_derived_formula
+Error: Call to undefined method App\Domain\Grants\Paid\PaidGrantPolicy::transferSeconds()
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:211
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 3 failures:
+
+1) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes
+The transfer clock is read before the first byte and before every chunk.
+Failed asserting that 0 is identical to 4.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:120
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream
+Expected a 410 paid grant refusal.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:300
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:131
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantTransferDeadlineTest::test_the_derived_deadline_is_capped_by_the_configured_maximum
+Failed asserting that 60 is greater than 60.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 6[0m[37;41m, Assertions: 86[0m[37;41m, Errors: 2[0m[37;41m, Failures: 3[0m[37;41m.[0m
+
+real	1m26.971s
+user	0m56.317s
+sys	0m2.945s
+rc=2

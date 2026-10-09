@@ -1,0 +1,12 @@
+# source: 2c3f8cb8 + working tree (PaidGrantJourney.tsx finish control)
+# command: npx vitest run tests/frontend/paid-grant-finish-completion.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:43:18
+   Duration  1.03s (environment 47%, tests 32%, transform 12%, setup 8%, import 1%)
+
+rc=0

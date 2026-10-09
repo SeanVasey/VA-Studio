@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+..[31;1mE[0m.                                                                4 / 4 (100%)
+
+Time: 00:00.228, Memory: 61.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantSpoolReservationTest::test_only_the_unwritten_part_of_another_slot_is_subtracted
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:95
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReservationTest.php:111
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 4[0m[37;41m, Assertions: 11[0m[37;41m, Errors: 1[0m[37;41m.[0m
+rc=2

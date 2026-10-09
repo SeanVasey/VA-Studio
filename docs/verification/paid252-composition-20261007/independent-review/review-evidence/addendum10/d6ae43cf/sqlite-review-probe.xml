@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbeAddendum10Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum10Test.php" tests="2" assertions="38" errors="0" failures="0" skipped="0" time="20.552579">
+    <testcase name="test_probe_asset_verification_accepts_a_deadline_the_paid_clock_considers_expired" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum10Test.php" line="111" class="Tests\Feature\ReviewProbeAddendum10Test" classname="Tests.Feature.ReviewProbeAddendum10Test" assertions="17" time="9.319027"/>
+    <testcase name="test_probe_overlapping_completions_fulfil_once_and_the_later_one_gets_409" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum10Test.php" line="129" class="Tests\Feature\ReviewProbeAddendum10Test" classname="Tests.Feature.ReviewProbeAddendum10Test" assertions="21" time="11.233552"/>
+  </testsuite>
+</testsuites>

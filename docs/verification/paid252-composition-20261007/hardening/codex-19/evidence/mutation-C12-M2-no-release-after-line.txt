@@ -1,0 +1,88 @@
+# source: a7892c9b + codex-19 final working tree + mutation C12-M2-no-release-after-line (scratch worktree)
+C12-M2-no-release-after-line applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/phpunit.xml
+
+FFFFFFFF.................FF.                                      28 / 28 (100%)
+
+Time: 01:32.567, Memory: 218.00 MB
+
+There were 10 failures:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_a_request_that_finds_the_buyer_lock_held_returns_the_projection_without_claiming_rendering_or_hashing
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantHeavyWorkTest::test_completion_does_not_re_verify_while_the_buyer_lock_is_held
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:153
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantHeavyWorkTest::test_the_lock_is_held_during_each_heavy_step_and_released_after_success
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:188
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantHeavyWorkTest::test_the_lock_is_released_after_an_exception_inside_a_step
+Released after an exception.
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:202
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\PaidGrantHeavyWorkTest::test_a_lock_left_by_a_crashed_worker_expires_and_is_reacquired
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:218
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\PaidGrantHeavyWorkTest::test_a_live_claim_by_another_request_is_reported_busy_and_unchanged
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:241
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\PaidGrantHeavyWorkTest::test_the_database_cache_store_provides_the_lock_from_the_migrated_table
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:258
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\PaidGrantHttpJourneyTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Failed asserting that true is false.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHttpJourneyTest.php:113
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\PaidGrantPreparationBudgetTest::test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'complete',
+-    1 => 'complete',
+-    2 => 'complete',
++    1 => 'pending',
++    2 => 'pending',
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantPreparationBudgetTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\PaidGrantPreparationBudgetTest::test_a_late_line_that_fails_is_marked_failed_under_its_own_budget
+Expected a refusal.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantPreparationBudgetTest.php:285
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantPreparationBudgetTest.php:147
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 28, Assertions: 646, Failures: 10.
+rc=1

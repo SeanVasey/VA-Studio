@@ -1,0 +1,16 @@
+cmd: (env as recorded: DB_CONNECTION=mysql DB_PORT=3761 DB_DATABASE=vaseyaudio_review_paid252, private mysqld 8.4.11) php -r '...phpunit' -- --filter test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl tests/Feature/PaidGrantSchemaRecoveryTest.php
+head: 4a4a423022759ec706e7e235649552d0d2930128 + temporary test-only relaxation (item5-temporary-relaxation.diff)
+start: 2026-10-08T12:26:18Z
+server: 8.4.11
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.549, Memory: 61.00 MB
+
+[30;42mOK (1 test, 42 assertions)[0m
+rc=0
+wall_s=0

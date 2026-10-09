@@ -1,0 +1,10 @@
+# real PHP-FPM probe: PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 17:15:37) (NTS)
+# command: /usr/sbin/php-fpm8.4 -n -y fpm.conf -R ; python3 -I fcgi.py dump.php ; kill fpm
+fpm_start_rc=0
+sent FastCGI params: {'SCRIPT_FILENAME': '<scratchpad>/a15/fpm/dump.php', 'REQUEST_METHOD': 'GET', 'SERVER_PROTOCOL': 'HTTP/1.1', 'GATEWAY_INTERFACE': 'CGI/1.1', 'REQUEST_TIME_FLOAT': '1.5', 'REQUEST_TIME': '1', 'HTTP_REQUEST_TIME_FLOAT': '1.5', 'HTTP_X_REQUEST_TIME': '1.5'}
+X-Powered-By: PHP/8.4.26
+Content-Type: application/json
+
+{"REQUEST_TIME_FLOAT_type":"double","REQUEST_TIME_FLOAT":1791531848.714362,"REQUEST_TIME":1791531848,"script_start_minus_request_time_float":3.504753112792969e-5,"HTTP_REQUEST_TIME_FLOAT":"1.5","HTTP_X_REQUEST_TIME":"1.5","env_REQUEST_TIME_FLOAT":"1.5","sapi":"fpm-fcgi","php":"8.4.26"}
+client_rc=0
+fpm_stop_rc=0

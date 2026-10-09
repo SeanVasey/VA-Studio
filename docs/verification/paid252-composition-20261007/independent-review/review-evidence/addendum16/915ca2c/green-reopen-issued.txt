@@ -1,0 +1,5 @@
+# source 915ca2c9217d273ee1afa23e0486e084cae7c475, clean tracked tree (git status --porcelain --untracked-files=no: ''), review probe moved out; node v24.21.0
+# npx vitest run tests/frontend/paid-grant-reopen-issued.test.tsx
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+rc=0

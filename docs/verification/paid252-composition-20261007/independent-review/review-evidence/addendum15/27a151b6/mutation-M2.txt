@@ -1,0 +1,37 @@
+# mutation M2 (reviewer's own): public constructor
+diff --git a/app/Domain/Grants/Paid/PaidGrantRequestInstant.php b/app/Domain/Grants/Paid/PaidGrantRequestInstant.php
+index 1b9a193..26de3c4 100644
+--- a/app/Domain/Grants/Paid/PaidGrantRequestInstant.php
++++ b/app/Domain/Grants/Paid/PaidGrantRequestInstant.php
+@@ -12,7 +12,7 @@ use Carbon\CarbonImmutable;
+  */
+ final class PaidGrantRequestInstant
+ {
+-    private function __construct(public readonly CarbonImmutable $at) {}
++    public function __construct(public readonly CarbonImmutable $at) {}
+ 
+     /**
+      * The SAPI's `REQUEST_TIME_FLOAT` (never a client header), else Laravel's `LARAVEL_START` (set at the top of
+# command: php -r '...phpunit' -- --colors=never --do-not-cache-result --filter 'test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation|test_the_admission_instant_rule' tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv56-a15/phpunit.xml
+
+.F                                                                  2 / 2 (100%)
+
+Time: 00:03.136, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation
+Failed asserting that false is true.
+
+/home/user/rv56-a15/tests/Feature/PaidGrantRequestInstantTest.php:196
+/home/user/rv56-a15/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 36, Failures: 1.
+rc=1
+# restore: git checkout -- app/Domain/Grants/Paid/PaidGrantRequestInstant.php
+restore_diff_rc=0

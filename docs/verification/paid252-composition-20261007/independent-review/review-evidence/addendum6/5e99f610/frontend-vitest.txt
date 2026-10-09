@@ -1,0 +1,18 @@
+cmd: npx vitest run tests/frontend/paid-grant-journey.test.tsx tests/frontend/paid-grant-review-addendum1.test.tsx tests/frontend/paid-grant-review-addendum4.test.tsx tests/frontend/paid-grant-review-addendum5.test.tsx tests/frontend/paid-grant-review-addendum6.test.tsx (node_modules temporarily symlinked, removed after)
+head: 5e99f610db65c6d5afc8df91da8b3b96e3218705 + untracked tests/frontend/paid-grant-review-addendum6.test.tsx
+node: v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+
+ Test Files  5 passed (5)
+      Tests  35 passed (35)
+   Start at  18:03:37
+   Duration  3.66s (tests 56%, environment 34%, transform 5%, setup 4%, import 1%)
+
+Environment  jsdom was created 5 times · 3.17s total, 34% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=0
+wall_s=4

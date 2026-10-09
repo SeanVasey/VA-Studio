@@ -1,0 +1,943 @@
+# source: 9605e95c client (PaidGrantJourney.tsx at HEAD, swapped in temporarily) + final round 20 frontend tests
+# command: npx vitest run tests/frontend/paid-grant-continuation.test.tsx tests/frontend/paid-grant-review-addendum11.test.tsx tests/frontend/paid-grant-finish-completion.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-review-addendum11.test.tsx (3 tests | 2 failed) 1294ms
+   ❯ review addendum 11: continuation edges (3)
+     × keeps the progress live region outside any aria-busy="true" ancestor while continuing (fixed in round 20) 804ms
+     × no longer stalls the next document request after a backward wall-clock step (fixed in round 20) 177ms
+ ❯ tests/frontend/paid-grant-continuation.test.tsx (11 tests | 4 failed) 2183ms
+   ❯ continuing paid preparation after one click (11)
+     × keeps the progress region outside the busy subtree and offers a Stop control that ends the continuation (A11-I5) 91ms
+     × stops a request in flight when Stop is chosen and sends nothing more 153ms
+     × measures POST spacing on the monotonic clock, so a backward wall-clock step does not stall the next request (A11-I6) 78ms
+     × keeps polling while another holder may still legitimately hold the buyer lock (up to 660 s), then stops 89ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > keeps the progress region outside the busy subtree and offers a Stop control that ends the continuation (A11-I5)
+AssertionError: expected <section …(2)>…(5)</section> to be null
+
+- Expected:
+null
+
++ Received:
+<section
+  aria-busy="true"
+  aria-label="Paid license journey"
+>
+  <p>
+    Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+  </p>
+  <button
+    disabled=""
+    type="button"
+  >
+    Refresh paid licenses
+  </button>
+  <form>
+    <label
+      for="paid-order-reference"
+    >
+      Saved order reference
+    </label>
+    <input
+      autocomplete="off"
+      disabled=""
+      id="paid-order-reference"
+      maxlength="36"
+      value=""
+    />
+    <button
+      disabled=""
+      type="submit"
+    >
+      Prepare licenses for this paid order
+    </button>
+  </form>
+  <div
+    aria-label="Saved paid licenses"
+  >
+    <p>
+      Latest 
+      20
+       saved orders. An order reference can open an older original.
+    </p>
+    <button
+      disabled=""
+      type="button"
+    >
+      Open saved order 
+      bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+    </button>
+  </div>
+  <section
+    aria-label="Retained paid order"
+  >
+    <p
+      class="paid-license-reference"
+    >
+      Order 
+      bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+    </p>
+    <p>
+      Rehearsal original. No real payment or production legal facts are certified.
+    </p>
+    <p>
+      This order is waiting for complete preparation. No line can download yet.
+    </p>
+    <p
+      aria-live="polite"
+      class="paid-preparation-progress"
+      role="status"
+    >
+      Preparing your files: 1 of 3 lines ready.
+    </p>
+    <button
+      disabled=""
+      type="button"
+    >
+      Prepare original licenses and files
+    </button>
+    <button
+      disabled=""
+      type="button"
+    >
+      Refresh preparation and download status
+    </button>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 1
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        complete
+        ; preparation attempts 
+        1
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 2
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        pending
+        ; preparation attempts 
+        0
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 3
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        pending
+        ; preparation attempts 
+        0
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+  </section>
+</section>
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:153:50
+    151|     fireEvent.click(screen.getByRole('button', { name: 'Prepare origin…
+    152|     await advance(0);
+    153|     expect(live().closest('[aria-busy="true"]')).toBeNull();
+       |                                                  ^
+    154|     expect(screen.getByLabelText('Paid license journey')).toHaveAttrib…
+    155|     const stop = screen.getByRole('button', { name: 'Stop preparing' }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > stops a request in flight when Stop is chosen and sends nothing more
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Stop preparing"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Paid license journey":
+  <section
+    aria-busy="true"
+    aria-label="Paid license journey"
+  />
+
+  Name "Retained paid order":
+  <section
+    aria-label="Retained paid order"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="paid-license-reference"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  <button
+    disabled=""
+    type="button"
+  />
+
+  Name "Prepare licenses for this paid order":
+  <button
+    disabled=""
+    type="submit"
+  />
+
+  Name "Open saved order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb":
+  <button
+    disabled=""
+    type="button"
+  />
+
+  Name "Prepare original licenses and files":
+  <button
+    disabled=""
+    type="button"
+  />
+
+  Name "Refresh preparation and download status":
+  <button
+    disabled=""
+    type="button"
+  />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  <input
+    autocomplete="off"
+    disabled=""
+    id="paid-order-reference"
+    maxlength="36"
+    value=""
+  />
+
+  --------------------------------------------------
+  status:
+
+  Name "":
+  <p
+    aria-live="polite"
+    class="paid-preparation-progress"
+    role="status"
+  />
+
+  --------------------------------------------------
+  article:
+
+  Name "":
+  <article
+    class="paid-license-line"
+  />
+
+  Name "":
+  <article
+    class="paid-license-line"
+  />
+
+  Name "":
+  <article
+    class="paid-license-line"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "Synthetic recording 1":
+  <h2 />
+
+  Name "Synthetic recording 2":
+  <h2 />
+
+  Name "Synthetic recording 3":
+  <h2 />
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  <details />
+
+  Name "":
+  <details />
+
+  Name "":
+  <details />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <section
+      aria-busy="true"
+      aria-label="Paid license journey"
+    >
+      <p>
+        Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+      </p>
+      <button
+        disabled=""
+        type="button"
+      >
+        Refresh paid licenses
+      </button>
+      <form>
+        <label
+          for="paid-order-reference"
+        >
+          Saved order reference
+        </label>
+        <input
+          autocomplete="off"
+          disabled=""
+          id="paid-order-reference"
+          maxlength="36"
+          value=""
+        />
+        <button
+          disabled=""
+          type="submit"
+        >
+          Prepare licenses for this paid order
+        </button>
+      </form>
+      <div
+        aria-label="Saved paid licenses"
+      >
+        <p>
+          Latest 
+          20
+           saved orders. An order reference can open an older original.
+        </p>
+        <button
+          disabled=""
+          type="button"
+        >
+          Open saved order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </button>
+      </div>
+      <section
+        aria-label="Retained paid order"
+      >
+        <p
+          class="paid-license-reference"
+        >
+          Order 
+          bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+        </p>
+        <p>
+          Rehearsal original. No real payment or production legal facts are certified.
+        </p>
+        <p>
+          This order is waiting for complete preparation. No line can download yet.
+        </p>
+        <p
+          aria-live="polite"
+          class="paid-preparation-progress"
+          role="status"
+        >
+          Preparing your files: 0 of 3 lines ready.
+        </p>
+        <button
+          disabled=""
+          type="button"
+        >
+          Prepare original licenses and files
+        </button>
+        <button
+          disabled=""
+          type="button"
+        >
+          Refresh preparation and download status
+        </button>
+        <article
+          class="paid-license-line"
+        >
+          <h2>
+            Synthetic recording 1
+          </h2>
+          <p>
+            USD
+             
+            49.99
+             + tax 
+            0.00
+             from the original accepted order.
+          </p>
+          <p>
+            Declared name: 
+            Synthetic buyer
+          </p>
+          <p>
+            License accepted: 
+            2026-10-07T01:02:03Z
+          </p>
+          <p>
+            Original PDF: 
+            pending
+            ; preparation attempts 
+            0
+            /5.
+          </p>
+          <details>
+            <summary>
+              Explicit synthetic license
+               / retained version 
+              1
+            </summary>
+            <pre
+              class="paid-license-terms"
+            >
+              SYNTHETIC TERMS
+            </pre>
+          </details>
+        </article>
+        <article
+          class="paid-license-line"
+        >
+          <h2>
+            Synthetic recording 2
+          </h2>
+          <p>
+            USD
+             
+            49.99
+             + tax 
+            0.00
+             from the original accepted order.
+          </p>
+          <p>
+            Declared name: 
+            Synthetic buyer
+          </p>
+          <p>
+            License accepted: 
+            2026-10-07T01:02:03Z
+          </p>
+          <p>
+            Original PDF: 
+            pending
+            ; preparation attempts 
+            0
+            /5.
+          </p>
+          <details>
+            <summary>
+              Explicit synthetic license
+               / retained version 
+              1
+            </summary>
+            <pre
+              class="paid-license-terms"
+            >
+              SYNTHETIC TERMS
+            </pre>
+          </details>
+        </article>
+        <article
+          class="paid-license-line"
+        >
+          <h2>
+            Synthetic recording 3
+          </h2>
+          <p>
+            USD
+             
+            49.99
+             + tax 
+            0.00
+             from the original accepted order.
+          </p>
+          <p>
+            Declared name: 
+            Synthetic buyer
+          </p>
+          <p>
+            License accepted: 
+            2026-10-07T01:02:03Z
+          </p>
+          <p>
+            Original PDF: 
+            pending
+            ; preparation attempts 
+            0
+            /5.
+          </p>
+          <details>
+            <summary>
+              Explicit synthetic license
+               / retained version 
+              1
+            </summary>
+            <pre
+              class="paid-license-terms"
+            >
+              SYNTHETIC TERMS
+            </pre>
+          </details>
+        </article>
+      </section>
+    </section>
+  </div>
+</body>
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:173:28
+    171|     fireEvent.click(screen.getByRole('button', { name: 'Prepare origin…
+    172|     await advance(1_000);
+    173|     fireEvent.click(screen.getByRole('button', { name: 'Stop preparing…
+       |                            ^
+    174|     expect(signals[0].aborted).toBe(true);
+    175|     await advance(400_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > measures POST spacing on the monotonic clock, so a backward wall-clock step does not stall the next request (A11-I6)
+AssertionError: expected [ { …(2) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:190:23
+    188|     await act(async () => { release(json({ origin: originOf(['complete…
+    189|     await advance(9_000);
+    190|     expect(s.posts()).toHaveLength(2);
+       |                       ^
+    191|   });
+    192|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > keeps polling while another holder may still legitimately hold the buyer lock (up to 660 s), then stops
+AssertionError: expected 24 to be 40 // Object.is equality
+
+- Expected
++ Received
+
+- 40
++ 24
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:200:19
+    198|     await advance(600_000);
+    199|     const reads = s.calls.filter(c => c.path === statusPath).length;
+    200|     expect(reads).toBe(40);
+       |                   ^
+    201|     expect(live()).toHaveTextContent('checking again shortly');
+    202|     await advance(120_000);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum11.test.tsx > review addendum 11: continuation edges > keeps the progress live region outside any aria-busy="true" ancestor while continuing (fixed in round 20)
+AssertionError: expected <section …(2)>…(5)</section> to be null
+
+- Expected:
+null
+
++ Received:
+<section
+  aria-busy="true"
+  aria-label="Paid license journey"
+>
+  <p>
+    Your original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.
+  </p>
+  <button
+    disabled=""
+    type="button"
+  >
+    Refresh paid licenses
+  </button>
+  <form>
+    <label
+      for="paid-order-reference"
+    >
+      Saved order reference
+    </label>
+    <input
+      autocomplete="off"
+      disabled=""
+      id="paid-order-reference"
+      maxlength="36"
+      value=""
+    />
+    <button
+      disabled=""
+      type="submit"
+    >
+      Prepare licenses for this paid order
+    </button>
+  </form>
+  <div
+    aria-label="Saved paid licenses"
+  >
+    <p>
+      Latest 
+      20
+       saved orders. An order reference can open an older original.
+    </p>
+    <button
+      disabled=""
+      type="button"
+    >
+      Open saved order 
+      bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+    </button>
+  </div>
+  <section
+    aria-label="Retained paid order"
+  >
+    <p
+      class="paid-license-reference"
+    >
+      Order 
+      bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
+    </p>
+    <p>
+      Rehearsal original. No real payment or production legal facts are certified.
+    </p>
+    <p>
+      This order is waiting for complete preparation. No line can download yet.
+    </p>
+    <p
+      aria-live="polite"
+      class="paid-preparation-progress"
+      role="status"
+    >
+      Preparing your files: 0 of 3 lines ready.
+    </p>
+    <button
+      disabled=""
+      type="button"
+    >
+      Prepare original licenses and files
+    </button>
+    <button
+      disabled=""
+      type="button"
+    >
+      Refresh preparation and download status
+    </button>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 1
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        pending
+        ; preparation attempts 
+        0
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 2
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        pending
+        ; preparation attempts 
+        0
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+    <article
+      class="paid-license-line"
+    >
+      <h2>
+        Synthetic recording 3
+      </h2>
+      <p>
+        USD
+         
+        49.99
+         + tax 
+        0.00
+         from the original accepted order.
+      </p>
+      <p>
+        Declared name: 
+        Synthetic buyer
+      </p>
+      <p>
+        License accepted: 
+        2026-10-07T01:02:03Z
+      </p>
+      <p>
+        Original PDF: 
+        pending
+        ; preparation attempts 
+        0
+        /5.
+      </p>
+      <details>
+        <summary>
+          Explicit synthetic license
+           / retained version 
+          1
+        </summary>
+        <pre
+          class="paid-license-terms"
+        >
+          SYNTHETIC TERMS
+        </pre>
+      </details>
+    </article>
+  </section>
+</section>
+
+ ❯ tests/frontend/paid-grant-review-addendum11.test.tsx:64:50
+     62|     await advance(1_000);
+     63|     expect(live()).toHaveTextContent('Preparing your files: 0 of 3 lin…
+     64|     expect(live().closest('[aria-busy="true"]')).toBeNull();
+       |                                                  ^
+     65|   });
+     66|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum11.test.tsx > review addendum 11: continuation edges > no longer stalls the next document request after a backward wall-clock step (fixed in round 20)
+AssertionError: expected [ { …(2) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/frontend/paid-grant-review-addendum11.test.tsx:101:23
+     99|     await act(async () => { release(json({ origin: originOf(['complete…
+    100|     await advance(9_000);
+    101|     expect(s.posts()).toHaveLength(2);
+       |                       ^
+    102|   });
+    103| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  6 failed | 11 passed (17)
+   Start at  21:32:41
+   Duration  4.02s (tests 53%, environment 29%, setup 9%, transform 7%, import 1%)
+
+rc=1

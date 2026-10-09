@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantSchemaRecoveryTest" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" tests="1" assertions="42" errors="0" failures="0" skipped="0" time="0.547873">
+    <testcase name="test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="250" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="42" time="0.547873"/>
+  </testsuite>
+</testsuites>

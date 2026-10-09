@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantRefusedFrameCallbackTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRefusedFrameCallbackTest.php" tests="2" assertions="44" errors="0" failures="0" skipped="0" time="369.841388">
+    <testsuite name="Tests\Feature\PaidGrantRefusedFrameCallbackTest::test_refused_paid_frame_does_not_leak_after_commit_callbacks_into_next_unrelated_commit" tests="2" assertions="44" errors="0" failures="0" skipped="0" time="369.841388">
+      <testcase name="test_refused_paid_frame_does_not_leak_after_commit_callbacks_into_next_unrelated_commit with data set #0" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRefusedFrameCallbackTest.php" line="85" class="Tests\Feature\PaidGrantRefusedFrameCallbackTest" classname="Tests.Feature.PaidGrantRefusedFrameCallbackTest" assertions="22" time="111.653848"/>
+      <testcase name="test_refused_paid_frame_does_not_leak_after_commit_callbacks_into_next_unrelated_commit with data set #1" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRefusedFrameCallbackTest.php" line="85" class="Tests\Feature\PaidGrantRefusedFrameCallbackTest" classname="Tests.Feature.PaidGrantRefusedFrameCallbackTest" assertions="22" time="258.187540"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

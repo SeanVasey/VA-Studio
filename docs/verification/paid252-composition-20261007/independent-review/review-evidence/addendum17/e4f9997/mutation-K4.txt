@@ -1,0 +1,25 @@
+# mutation K4 on e4f9997e
+applied K4: 'originId: origin.id, orderId: origin.orderId }' -> "originId: '', orderId: origin.orderId }"
+# mutated component sha256 f2fde14f9f5314f8
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-reopen-issued.test.tsx tests/frontend/paid-grant-review-addendum17.test.tsx
+ ✓ paid-grant-review-addendum17: A: two issued authorizations on one order give one button, and reopening brings back both Download button
+ ✓ paid-grant-reopen-issued: reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded
+ ✓ paid-grant-review-addendum17: B: issued on two orders gives two buttons; the shown order never has one 284ms
+ ✓ paid-grant-review-addendum17: C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial th
+ ✓ paid-grant-review-addendum17: D: while another order has a pending authorize, the reference form is closed and the index omits X; the c
+ ✓ paid-grant-review-addendum17: E: with nothing pending the reference form already reopens X and its Download returns (the finding is nar
+ ✓ paid-grant-review-addendum17: F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 161m
+ × paid-grant-reopen-issued: reopens the order of a refused download kept for retry, so the unused authorization can be retried 1195ms
+ ✓ paid-grant-reopen-issued: drops the reopen control once the authorization is submitted, and a denial drops it with the token 148ms
+ ✓ paid-grant-review-addendum17: G: a pending authorize on X with another issued authorization on X shows both reopen controls for the sam
+ × paid-grant-review-addendum17: H (fixed, A16-L1): a refused download kept for retry offers to reopen its order; the retry still needs a s
+ ✓ paid-grant-review-addendum17: I: a refused kept entry of X while Y is shown gives X a control (after the next render) and never Y 129ms
+ ✓ paid-grant-review-addendum17: J: a refusal then a denial drops the control, the kept entry and any retry 82ms
+ × paid-grant-review-addendum17: K: after reopening, the retry is offered only for a saved read showing that exact authorization unused 110
+ × paid-grant-review-addendum17: L: an issued and a refused kept authorization on one order give one control; reopening shows the Download 
+ × paid-grant-review-addendum17: M: a submitted download whose frame has not answered gives no control, and a retried kept entry stops givi
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  2 failed (2)
+      Tests  5 failed | 11 passed (16)
+rc=1
+restored: git diff --quiet rc=0

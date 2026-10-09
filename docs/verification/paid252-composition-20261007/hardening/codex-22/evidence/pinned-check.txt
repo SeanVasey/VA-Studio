@@ -1,0 +1,7 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0
+resources/js/components/PaidGrantJourney.tsx pinned_in=0
+tests/frontend/paid-grant-reopen-pending.test.tsx pinned_in=0
+ CHANGELOG.md                                 | 2 +-
+ resources/js/components/PaidGrantJourney.tsx | 7 ++++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)

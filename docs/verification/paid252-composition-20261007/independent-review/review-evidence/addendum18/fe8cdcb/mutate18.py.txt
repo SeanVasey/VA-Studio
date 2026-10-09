@@ -1,0 +1,14 @@
+import sys
+path, name = sys.argv[1], sys.argv[2]
+src = open(path).read()
+bump = "mark.refused = true; setRefusals(n => n + 1); frame.remove();"
+M = {
+ 'R1': [("frame.addEventListener('load', () => { if (!active.current", "frame.addEventListener('load', () => { setRefusals(n => n + 1); if (!active.current")],
+ 'R2': [(bump, "mark.refused = true; frame.remove();")],
+ 'R3': [(bump, "mark.refused = true; frame.remove();"), ("if (current) { clear(true, true); setMessage('The download was refused.", "if (current) { setRefusals(n => n + 1); clear(true, true); setMessage('The download was refused.")],
+}
+for old, new in M[name]:
+    assert src.count(old) == 1, (name, old, src.count(old))
+    src = src.replace(old, new)
+    print(f"applied {name}: {old!r} -> {new!r}")
+open(path, 'w').write(src)
