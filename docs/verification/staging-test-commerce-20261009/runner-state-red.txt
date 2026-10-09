@@ -1,0 +1,114 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-commerce/phpunit.xml
+
+FFFFFFF                                                             7 / 7 (100%)
+
+Time: 00:00.358, Memory: 24.50 MB
+
+There were 7 failures:
+
+1) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@finalize write with data ('finalize', 'vasey:finalize-test-payments', 'retry', true)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize 11111111-1111-4111-8111-111111111111 retry
+2026-10-09T00:27:24Z test-commerce-pipeline finalize page bound reached items=1 pages=1; resuming after the saved cursor next sweep
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@finalize clear with data ('finalize', 'vasey:finalize-test-payments', 'retry', false)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@contracts write with data ('contracts', 'vasey:issue-test-contracts', 'retry', true)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts 11111111-1111-4111-8111-111111111111 retry
+2026-10-09T00:27:24Z test-commerce-pipeline contracts page bound reached items=1 pages=1; resuming after the saved cursor next sweep
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@contracts clear with data ('contracts', 'vasey:issue-test-contracts', 'retry', false)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@activate write with data ('activate', 'vasey:activate-test-fulfillment', 'pending_contracts', true)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate 11111111-1111-4111-8111-111111111111 pending_contracts
+2026-10-09T00:27:24Z test-commerce-pipeline activate page bound reached items=1 pages=1; resuming after the saved cursor next sweep
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Unit\TestCommercePipelineRunnerTest::test_cursor_state_failures_fail_the_sweep_without_private_paths@activate clear with data ('activate', 'vasey:activate-test-fulfillment', 'pending_contracts', false)
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:223
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Unit\TestCommercePipelineRunnerTest::test_reconcile_timestamp_failure_fails_the_sweep_without_private_paths
+2026-10-09T00:27:24Z test-commerce-pipeline sweep start
+2026-10-09T00:27:24Z test-commerce-pipeline receipts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline reconcile done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline finalize done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline contracts done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline activate done items=0 pages=1
+2026-10-09T00:27:24Z test-commerce-pipeline sweep end status=0
+
+Failed asserting that 0 is identical to 1.
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:235
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 7, Assertions: 7, Failures: 7.

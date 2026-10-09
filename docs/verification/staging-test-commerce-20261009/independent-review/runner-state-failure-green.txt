@@ -1,0 +1,7 @@
+Cursor write failure: runner exit=1
+2026-10-09T00:29:13Z test-commerce-pipeline finalize 11111111-1111-4111-8111-111111111111 retry
+2026-10-09T00:29:13Z test-commerce-pipeline finalize FAILED (cannot save cursor state)
+2026-10-09T00:29:13Z test-commerce-pipeline sweep end status=1
+Cursor remains a directory=True
+Stderr was nonempty=False
+RESULT: cursor persistence failure is observable and does not claim saved progress

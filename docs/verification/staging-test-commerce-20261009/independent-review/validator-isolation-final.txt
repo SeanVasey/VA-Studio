@@ -1,0 +1,20 @@
+filled-baseline: exit=0, checks=35, failed=
+RESULT: PASS (0 of 35 checks failed; no Stripe request made)
+exported-debug-wins: exit=1, checks=35, failed=runtime.app_debug_off
+RESULT: FAIL (1 of 35 checks failed; no Stripe request made)
+exported-production-no-probe: exit=1, checks=36, failed=runtime.app_env_local,stripe.account,stripe.webhook_receiver,commerce.pricing,commerce.pricing_zero_test_tax,commerce.pricing_window_margin,commerce.inventory,commerce.inventory_ttl_covers_quote,commerce.order,commerce.checkout,commerce.checkout_https_origin,payments.processing,payments.finalization,contracts.issuance_v2,delivery.activation,delivery.access,customer.accounts,customer.identity_private_capture,customer.purchase_claims,stripe.probe_account
+RESULT: FAIL (20 of 36 checks failed)
+exported-live-mode-no-probe: exit=1, checks=36, failed=stripe.mode_test,stripe.account,stripe.webhook_receiver,commerce.checkout,payments.processing,payments.finalization,contracts.issuance_v2,delivery.activation,delivery.access,stripe.probe_account
+RESULT: FAIL (10 of 36 checks failed)
+exported-live-key-no-probe: exit=1, checks=36, failed=stripe.secret_key_test,stripe.probe_account
+RESULT: FAIL (2 of 36 checks failed)
+exported-cache-ignored: exit=0, checks=35, failed=
+RESULT: PASS (0 of 35 checks failed; no Stripe request made)
+profile-cache-ignored: exit=0, checks=35, failed=
+RESULT: PASS (0 of 35 checks failed; no Stripe request made)
+unrelated-live-value-refused: exit=1, checks=35, failed=profile.no_live_keys
+RESULT: FAIL (1 of 35 checks failed; no Stripe request made)
+comment-live-material-observation: exit=0, checks=35, failed=
+RESULT: PASS (0 of 35 checks failed; no Stripe request made)
+OBSERVATION: live-marker comment classified as file-wide clean=True
+RESULT: 9 independent profile isolation/privacy probes passed; no provider request attempted
