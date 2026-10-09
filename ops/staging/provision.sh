@@ -10,7 +10,7 @@
 #   --root DIR                kit root (default: /srv/vasey-staging)
 #   --mirror DIR              Forge site checkout that holds the Forge-managed .env (default: /home/<app-user>/<host>)
 #   --db-name NAME            MySQL schema (default: vasey_staging)
-#   --mysql-admin-defaults F  0600 [client] option file for a MySQL admin account (default: root via the local socket)
+#   --mysql-admin-defaults F  root-owned 0600 [client] file under protected ancestry (default: root via the local socket)
 #   --app-env NAME            APP_ENV the deploy insists on (default: local; the one switch for a later `staging`)
 #   --basic-auth-user NAME    staging basic-auth user; the password is read from the terminal (never an argument)
 #   --skip-packages           do not apt-get anything (re-runs that only refresh config)
@@ -71,6 +71,15 @@ root_ancestry() {
   done
 }
 
+mysql_admin_defaults_custody() {
+  local file=$MYSQL_ADMIN_DEFAULTS
+  [[ "$file" == /* ]] && [ "$(readlink -f -- "$file")" = "$file" ] \
+    || die "--mysql-admin-defaults requires a canonical absolute path without symlinks"
+  root_ancestry "$(dirname -- "$file")"
+  [ -f "$file" ] && [ ! -L "$file" ] && [ "$(stat -c '%u %a %h' "$file")" = '0 600 1' ] \
+    || die "--mysql-admin-defaults requires a root-owned 0600 regular single-link file; recover it privately"
+}
+
 [[ "$HOST" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]] || die "--host must be a lowercase DNS name"
 [[ "$APP_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] && id "$APP_USER" >/dev/null 2>&1 || die "app user '$APP_USER' does not exist"
 [ "$(id -u "$APP_USER")" -gt 0 ] || die "application account must be nonroot"
@@ -78,6 +87,7 @@ root_ancestry() {
 [[ "$ROOT" != / && "$ROOT" != */ && "$ROOT" != *//* && "$ROOT" != */./* && "$ROOT" != */. ]] \
   || die "--root must use canonical components without a trailing slash"
 root_ancestry "$ROOT"
+[ -z "${MYSQL_ADMIN_DEFAULTS:-}" ] || mysql_admin_defaults_custody
 [[ "$DB_NAME" =~ ^[a-z][a-z0-9_]{0,40}$ ]] || die "--db-name must match ^[a-z][a-z0-9_]{0,40}$"
 [[ "$APP_ENV_EXPECTED" =~ ^(local|staging)$ ]] || die "--app-env must be local or staging"
 APP_GROUP=$(id -gn "$APP_USER")
