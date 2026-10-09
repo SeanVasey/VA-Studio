@@ -152,8 +152,8 @@ jobs:
     # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes (about 35 s per migrate:fresh
     # test). The selection's duration on hosted MySQL is unmeasured: 1372 selected cases use
     # FinalizationDatabaseMigrations (124 to 241 per shard), about 72 to 141 minutes at 35 s each, so the limit
-    # is 150 minutes until fresh MySQL timings exist. A hung test still cannot hold a runner for 6 hours.
-    timeout-minutes: 150
+    # is 210 minutes (about 50% headroom) until fresh MySQL timings exist. A hung test still cannot hold a runner for 6 hours.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:

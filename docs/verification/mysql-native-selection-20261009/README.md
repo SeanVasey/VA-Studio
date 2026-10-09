@@ -380,7 +380,7 @@ measured on GitHub:
 
 | Matrix | Finalization cases per shard | Estimated minutes at 35 s (finalization cases only) | Job limit |
 | --- | --- | --- | --- |
-| GitHub, 8 shards | 241, 166, 159, 172, 177, 173, 160, 124 | about 141, 97, 93, 100, 103, 101, 93, 72 | 150 min |
+| GitHub, 8 shards | 241, 166, 159, 172, 177, 173, 160, 124 | about 141, 97, 93, 100, 103, 101, 93, 72 | 210 min |
 | GitLab, 4 shards | 361, 333, 339, 339 | about 211, 194, 198, 198 | 240 min (was 90) |
 
 The remaining selected cases per shard are 11, 42, 50, 36, 66, 42, 58 and 87 on GitHub, and 116, 87,
@@ -392,10 +392,10 @@ GitHub shards 2 and 4.
   documents a 3-hour maximum for its hosted runners, and that cap would cancel these shards before
   they finish. I have not verified this cap for the project's runners, and GitLab speed is
   unmeasured. On hosted runners, a reviewed change to 8 GitLab MySQL shards would likely be needed.
-- **GitHub.** The busiest shard (shard 1, 241 such cases) is estimated at about 141 minutes, which
-  leaves only about 6% headroom under the 150-minute limit. The stale timing weights put it there. I
-  did not change the limit; fresh timings from the first hosted run, or a reviewed limit increase,
-  should settle it.
+- **GitHub.** The busiest shard (shard 1, 241 such cases) is estimated at about 141 minutes. The
+  stale timing weights put it there. That left about 6% headroom under 150 minutes, so the limit is
+  now 210 minutes (about 50% headroom); fresh timings from the first hosted run should replace both
+  the estimate and the limit.
 
 ## Self-tests
 
