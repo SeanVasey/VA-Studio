@@ -1,0 +1,3 @@
+# source fe8cdcb088bb0f2a4922ce345019078350d6790e, no probe
+# npx tsc --noEmit
+rc=0

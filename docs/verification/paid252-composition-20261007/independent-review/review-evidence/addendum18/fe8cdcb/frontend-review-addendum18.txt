@@ -1,0 +1,22 @@
+# source fe8cdcb088bb0f2a4922ce345019078350d6790e + untracked tests/frontend/paid-grant-review-addendum18.test.tsx (sha256 626df5d214dc080e); node v24.21.0
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-review-addendum18.test.tsx
+ ✓ paid-grant-review-addendum18: A: two issued authorizations on one order give one button, and reopening brings back both Download buttons 383ms
+ ✓ paid-grant-review-addendum18: B: issued on two orders gives two buttons; the shown order never has one 216ms
+ ✓ paid-grant-review-addendum18: C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial that drops it 121ms
+ ✓ paid-grant-review-addendum18: D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without distu
+ ✓ paid-grant-review-addendum18: E: with nothing pending the reference form already reopens X and its Download returns (the finding is narrower than stated) 103ms
+ ✓ paid-grant-review-addendum18: F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 183ms
+ ✓ paid-grant-review-addendum18: G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same order (Info: redundant, same
+ ✓ paid-grant-review-addendum18: H (fixed, A16-L1): a refused download kept for retry offers to reopen its order; the retry still needs a saved status read 131ms
+ ✓ paid-grant-review-addendum18: I (fixed, A17-I1): a refused kept entry of X while Y is shown gives X a control at once and never Y 125ms
+ ✓ paid-grant-review-addendum18: J: a refusal then a denial drops the control, the kept entry and any retry 135ms
+ ✓ paid-grant-review-addendum18: K: after reopening, the retry is offered only for a saved read showing that exact authorization unused 190ms
+ ✓ paid-grant-review-addendum18: L: an issued and a refused kept authorization on one order give one control; reopening shows the Download and drops it 123ms
+ ✓ paid-grant-review-addendum18: M: a submitted download whose frame has not answered gives no control, and a retried kept entry stops giving one 112ms
+ ✓ paid-grant-review-addendum18: N1: a refusal from a frame removed by a denial renders nothing and resurrects nothing 81ms
+ ✓ paid-grant-review-addendum18: N2: a refusal from a frame removed by pagehide renders nothing and resurrects nothing 70ms
+ ✓ paid-grant-review-addendum18: N3: a refusal from a frame removed by unmount renders nothing and reports no error 60ms
+ ✓ paid-grant-review-addendum18: N4: a non-current refusal during an in-flight read renders once, sends nothing, and the read still commits unaborted 89ms
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+rc=0

@@ -1,0 +1,55 @@
+# 8a2f91d (and fe8cdcb) vs my untracked Addendum 17 copies
+8a2f91d ADDENDUM-17.md identical
+8a2f91d addendum16-identity.txt identical
+8a2f91d addendum16-probe-on-e4f9997.txt identical
+8a2f91d frontend-review-addendum17.txt identical
+8a2f91d green-frontend-all.txt identical
+8a2f91d mutate17.py.txt identical
+8a2f91d mutation-K1.txt identical
+8a2f91d mutation-K2.txt identical
+8a2f91d mutation-K3.txt identical
+8a2f91d mutation-K4.txt identical
+8a2f91d no-php-change.txt identical
+8a2f91d paid-grant-review-addendum17.test.tsx.txt identical
+8a2f91d probe-on-915ca2c.txt identical
+8a2f91d red-on-915ca2c.txt identical
+8a2f91d static-submit-callers.txt identical
+8a2f91d tsc-with-probe.txt identical
+8a2f91d tsc.txt identical
+8a2f91d committed addendum17 files: 16; mine: 16
+fe8cdcb ADDENDUM-17.md identical
+fe8cdcb addendum16-identity.txt identical
+fe8cdcb addendum16-probe-on-e4f9997.txt identical
+fe8cdcb frontend-review-addendum17.txt identical
+fe8cdcb green-frontend-all.txt identical
+fe8cdcb mutate17.py.txt identical
+fe8cdcb mutation-K1.txt identical
+fe8cdcb mutation-K2.txt identical
+fe8cdcb mutation-K3.txt identical
+fe8cdcb mutation-K4.txt identical
+fe8cdcb no-php-change.txt identical
+fe8cdcb paid-grant-review-addendum17.test.tsx.txt identical
+fe8cdcb probe-on-915ca2c.txt identical
+fe8cdcb red-on-915ca2c.txt identical
+fe8cdcb static-submit-callers.txt identical
+fe8cdcb tsc-with-probe.txt identical
+fe8cdcb tsc.txt identical
+fe8cdcb committed addendum17 files: 16; mine: 16
+# 8a2f91d touches only docs:
+docs/verification/paid252-composition-20261007/independent-review/ADDENDUM-17.md
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/addendum16-identity.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/addendum16-probe-on-e4f9997.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/frontend-review-addendum17.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/green-frontend-all.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/mutate17.py.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/mutation-K1.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/mutation-K2.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/mutation-K3.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/mutation-K4.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/no-php-change.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/paid-grant-review-addendum17.test.tsx.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/probe-on-915ca2c.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/red-on-915ca2c.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/static-submit-callers.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/tsc-with-probe.txt
+docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum17/e4f9997/tsc.txt
