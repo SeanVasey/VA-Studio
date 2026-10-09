@@ -1,0 +1,93 @@
+# Foundation CI on the integrated handoff candidate: failures, diagnosis and fixes
+
+Development evidence from the Claude Code harness, 2026-10-09. Not Foundation acceptance.
+
+## The run
+
+Foundation CI run `37921309772`, dispatched manually on `main` with `expected_sha`
+`0f9b39ce5d59e2d579d11a8ca15153ced1f565b4` (after #67, #68 and the ledger PR #69). It is the first full matrix since the
+handoff; no earlier Foundation baseline exists for this tree.
+
+| Job | Result | Cause |
+| --- | --- | --- |
+| scope, frontend, backend-quality, related-browser | success | — |
+| backend-sqlite 1/2 and 2/2 | failure | PHP `memory_limit` 512M exhausted ~1,060 and ~1,107 tests in (A) |
+| operator-browser chromium-desktop | failure (66 passed, 2 failed, 1 skipped) | license-draft fixture refused (B); inquiry retry test timed out (C) |
+| operator-browser webkit-mobile | failure (63 passed, 4 failed, 2 skipped) | license-draft fixture refused (B); two preview `currentTime` polls stay 0; offline `page.reload` WebKit internal error (D) |
+| backend-mysql 1/8 … 8/8 | cancelled at the 90-minute job limit, each about a quarter through | per-test full migrations on MySQL (E) |
+| backend (aggregate) | failure | missing evidence from the jobs above |
+
+## A. SQLite shards: memory leak from recompiled migration files — fixed here
+
+- Reproduced locally with the CI-identical partition (`scripts/ci/phpunit-shards.py --shards=2`, same 3,882/3,751
+  split) and `memory_limit=512M`: shard 1 dies at exactly CI's test, shard 2 in the same file
+  (`evidence/sqlite-shard-{1,2}-main-512M.txt`).
+- A per-test trace (`evidence/sqlite-shard-1-memory-trace-main.tsv`) shows steady growth of about 1 MB and about 18
+  newly declared classes per feature test. The new classes are anonymous classes from three migrations
+  (`2026_10_06_000040_customer_accounts`, `2026_10_07_250000_customer_consent`, `2026_10_07_242000_customer_saved_tracks`).
+- Cause: `ConsentMigrationAdmission`, `SuppressionSchema` and `ProductionFeatureSchema` read definitions from those
+  approved migrations with a plain `require`, on every migration run. Each `require` recompiles the file and declares
+  its anonymous classes again; PHP never frees declared classes. Test suites that refresh an in-memory database for every
+  test therefore grow without bound. Production runs migrations once per process, so it is not affected in practice.
+- Fix: `App\Support\MigrationDefinitions::load()` compiles each such file at most once per process and returns a clone,
+  the same rule Laravel's migrator applies to anonymous migrations. The four call sites use it; behaviour is otherwise
+  unchanged (the objects are only read through reflection).
+- Regression test `tests/Feature/MigrationRecompilationTest.php`: red on main (36 new classes over two extra
+  `migrate:fresh` runs, `evidence/migration-recompilation-red.txt`), green with the fix
+  (`evidence/migration-recompilation-green.txt`). With the fix, `CatalogWriterAuthorityTest` declares no new classes
+  after warm-up (previously 18 per test).
+- Full SQLite shards with the fix: see Results.
+
+## B. License-draft browser fixture — fixed here (test-only)
+
+`tests/browser/prepare-license-draft.php` refuses any change to a pre-existing row while it creates a synthetic license
+draft. Since migration 240 (`7ecaa7e`, Oct 7) every license write advances `catalog_discovery_epoch.epoch` through its
+own triggers, so the fixture refused itself on both browsers ("guard-or-evidence"). The offer-draft and bulk-license
+fixtures already allow the epoch to advance; this one was missed. It now does the same: the epoch may only move forward
+(exactly unchanged for a no-op verify phase) and that row is excluded from the exact comparison.
+
+Local proof (`evidence/license-draft-fixture-local.txt`): the browser harness's own environment and `bootstrap.php`,
+without Playwright (no matching Chromium, no WebKit, and ClamAV signatures cannot be downloaded here, so bootstrap stops
+at `installation_diagnostics` after migrations, operator and catalog fixtures). Scratch copies of the fixture with only
+the harness identity checks skipped: unfixed → refused at the row check (the only changed row is the epoch); fixed →
+`prepare` succeeds and `verify prepared` reports 0 updates with originals and guards unchanged. The real browser spec
+still needs CI.
+
+## C. Chromium inquiry retry timeout — open
+
+`inquiry-conversation.spec.ts` ran 120.8 s against its 120 s budget. The report's step timeline shows the retried POST
+answered at 36.4 s with 200 and the test then waiting in `await linkedReplay.finished()` (line 164) until the timeout.
+The same test passed on WebKit in 30.8 s. The client reader (`privateInquiryJson`, Oct 6) and the spec (Oct 7) are not
+changed by this session. Not reproducible here (Playwright 1.63 wants Chromium 1243; the container has 1194).
+
+## D. WebKit preview playback and offline reload — open
+
+`public-install.spec.ts` and `test-checkout.spec.ts` poll `window.__nativePreviews[0].currentTime > 0` after Play and it
+stays 0 for 10 s; other WebKit specs that play previews passed in the same run (`player-controls`, `storefront`).
+`storefront-offline.spec.ts` fails on `page.reload()` after `context.setOffline(true)` with "WebKit encountered an
+internal error". No WebKit is available here.
+
+## E. MySQL matrix cannot finish within its budget — open, needs Sean's decision
+
+Shard 1 ran its first 126 (unit) tests in 7 s, then 63 tests in 36 minutes and 63 more in 39 minutes before the limit.
+307 test files (at least 2,036 test methods before data-provider expansion) use `FinalizationDatabaseMigrations`, which
+runs a full `migrate:fresh` before each test and `db:wipe` after it. On a private local MySQL 8.0.46 (CI uses 8.4.11) one
+`migrate:fresh` took 130–208 s wall-clock on this shared container, 63 s of it reported by the migrations themselves
+(`free_grant_origins` 13 s, `service_projects` 5 s, …; `evidence/mysql80-migrate-fresh-timing.txt`); CI measured about
+35 s per test. At that rate the MySQL matrix needs on the order of 20 compute-hours, far beyond 8 × 90 minutes. The
+timings file also lacks 322 test files, so the partition's 61-minute estimate was wrong. This is not caused by the PRs
+merged today; migrations and per-test-migrating suites have grown across the batch since the timings were last measured.
+
+## Results
+
+| Run | Source | Result | Evidence |
+| --- | --- | --- | --- |
+| Foundation `37921309772` | `0f9b39ce` | failed as above | GitHub run |
+| Local SQLite shards, CI partition, 512M | `0f9b39ce` | both fatal, same place as CI | `evidence/sqlite-shard-*-main-512M.txt` |
+| Regression test red / green | `0f9b39ce` + test / + fix | 1 failure / OK | `evidence/migration-recompilation-*.txt` |
+| License-draft fixture red / green (relaxed harness) | `0f9b39ce` / + fix | refused / prepared and verified | `evidence/license-draft-fixture-local.txt` |
+| Local SQLite shards with the fix, CI partition, 512M | this branch | FIXED_PLACEHOLDER | `evidence/sqlite-shard-*-fixed-512M.txt` |
+
+## Not tested
+
+Browser specs (CI only), MySQL matrix, a host.

@@ -3,6 +3,7 @@
 namespace App\Domain\Customers\Preferences;
 
 use App\Domain\Catalog\Discovery\DiscoveryEpoch;
+use App\Support\MigrationDefinitions;
 use LogicException;
 use PDO;
 use PDOException;
@@ -44,7 +45,7 @@ final class ConsentMigrationAdmission
         if ((int) $this->pdo->query($this->driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
             $this->refuse();
         }
-        $migration = require database_path('migrations/2026_10_06_000040_customer_accounts.php');
+        $migration = MigrationDefinitions::load('2026_10_06_000040_customer_accounts.php');
         // Reuse the unchanged authoritative guard definitions without running up/down or DDL.
         $guards = [];
         foreach ((new ReflectionMethod($migration, 'guards'))->invoke($migration) as $name => $guard) {
