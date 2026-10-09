@@ -63,7 +63,14 @@ final class ManageRightsScopes extends Command
         } catch (QuoteException $error) {
             return $this->domainRefusal($error);
         } catch (Throwable) {
-            return $this->refuse('Rights scope management is unavailable.');
+            if ($action === 'list') {
+                $this->error('Rights scope listing is unavailable.');
+            } else {
+                $this->error('Rights scope management is unavailable. The result is unconfirmed. '
+                    .'Inspect with list and retry the exact original request, preserving its scope, revision and reference.');
+            }
+
+            return self::FAILURE;
         }
     }
 

@@ -240,7 +240,7 @@ class RightsScopeCommandTest extends TestCase
             'Unsupported hidden input must never fall back to visible password entry.');
         $this->assertSame($before, $this->evidence());
         $text = $buffer->fetch();
-        $this->assertStringContainsString('Rights scope management is unavailable. No changes were made.', $text);
+        $this->assertStringContainsString('Rights scope management is unavailable. The result is unconfirmed.', $text);
         $this->assertStringNotContainsString('Unable to hide response.', $text);
     }
 

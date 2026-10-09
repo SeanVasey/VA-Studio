@@ -30,6 +30,8 @@ Writes refuse `--no-interaction`, terminals that cannot hide password input, wro
 
 ## Transactions and lifecycle
 
+If a connection or terminal error leaves the result **unconfirmed**, a write may already have committed. Inspect the current state with `list`, then repeat the **exact original request**, preserving its scope, revision and evidence reference. Do not choose a replacement reference to recover from uncertainty. The existing immutable conflict checks and idempotent retries prevent duplicate rows and audits. A nonzero exit code alone is not proof of rollback.
+
 Lock order is quote → all tracks sorted by ID → all offers sorted by ID → all scopes sorted by ID → reservation/claim occupancy. Scope/offer linkage takes track → offer → scope. Administrative blocking takes only the scope. A future combined checkout command must acquire pricing/campaign/use locks before inventory scopes and cannot call back into earlier locks afterward. Deadlocks retry the complete idempotent transaction at most five times; no provider call occurs inside it.
 
 Occupancy is read with current `FOR UPDATE` reads after the shared scope lock. The original consistent read snapshot cannot hide a competing committed claim. See [MySQL's locking-read contract](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html); actual correctness requires the independent-process tests.
