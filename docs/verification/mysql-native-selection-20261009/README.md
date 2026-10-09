@@ -3,8 +3,10 @@
 Branch `harness/mysql-native-selection` is based on main `0f9b39ce5d59e2d579d11a8ca15153ced1f565b4`.
 The earlier commits are `78f8a7b`, `23ff88e` and `6d17481`. `6d17481` applied conditions C1 to C4 from
 the independent review of `23ff88e`, whose decision was APPROVE WITH CONDITIONS. `916392d` added the
-reviewed MySQL skip census. This revision implements option A for the tests that need a dedicated
-schema: the MySQL jobs mark their disposable database, and four more files join the selection.
+reviewed MySQL skip census. `22371ae` implemented option A for the tests that need a dedicated
+schema: the MySQL jobs mark their disposable database, and four more files join the selection. The
+branch then merged main at `2f8deb8`, which brought in #70 (merged at `13409a29`) and the new
+`tests/Feature/MigrationRecompilationTest.php`; this revision updates the counts to that tree.
 
 This note records partition and self-test evidence only. No local or hosted MySQL test run has
 executed the selection, so it is not Foundation acceptance.
@@ -21,11 +23,12 @@ and to keep the complete suite on SQLite.
 
 | Engine | Scope | Cases |
 | --- | --- | --- |
-| SQLite (2 shards) | Complete suite; the 623 reviewed census cases skip | 7,641 listed, 7,018 executed |
-| MySQL (8 GitHub / 4 GitLab shards) | Native selection; only the 58 reviewed MySQL census cases skip | 1,764 listed, 1,706 executed, in 162 files |
+| SQLite (2 shards) | Complete suite; the 623 reviewed census cases skip | 7,642 listed, 7,019 executed |
+| MySQL (8 GitHub / 4 GitLab shards) | Native selection; only the 58 reviewed MySQL census cases skip | 1,765 listed, 1,707 executed, in 163 files |
 
-The suite grew from 7,633 to 7,641 cases (555 to 556 files) because this revision adds
-`tests/Unit/DisposableNativeDatabaseTest.php` (8 cases). That file runs only on SQLite.
+The suite grew from 7,633 to 7,642 cases (555 to 557 files). `tests/Unit/DisposableNativeDatabaseTest.php`
+(8 cases, option A) runs only on SQLite. `tests/Feature/MigrationRecompilationTest.php` (1 case, from
+#70) matches the migration pattern, so it is selected and also runs on MySQL.
 
 The selection is defined in `scripts/ci/database-mysql-selection.json`. It takes whole files, so every
 case in a selected file runs, including methods the census does not list. A file is selected if any
@@ -34,9 +37,9 @@ of the following holds:
 | Rule | Files | Cases |
 | --- | --- | --- |
 | Owns a (class, method) pair in `scripts/ci/database-sqlite-skips.json` (217 pairs in 101 classes) | 101 | 932, of which 623 are census cases |
-| Path matches `^tests/(?:Feature\|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$` | 49 | 589 |
+| Path matches `^tests/(?:Feature\|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$` | 50 | 590 |
 | Listed in the reviewed `include_files` (added for C1, extended for option A) | 16 | 330 |
-| All selected files (4 files match both of the first two rules) | 162 | 1,764 |
+| All selected files (4 files match both of the first two rules) | 163 | 1,765 |
 
 Entries in `include_files` must be sorted, unique repository test paths, and PHPUnit must discover
 every one of them; the sharder and both verifiers refuse anything else. The list names tests whose
@@ -124,7 +127,7 @@ MySQL in Foundation CI. None of them were added:
 | `tests/Feature/TestPaymentExceptionOperationsTest.php` | 25 |
 | `tests/Feature/TestUnpaidReleaseTest.php` | 46 |
 
-In total, 394 of the 556 files (5,877 of the 7,641 cases) no longer run on MySQL in Foundation CI.
+In total, 394 of the 557 files (5,877 of the 7,642 cases) no longer run on MySQL in Foundation CI.
 They still run on SQLite.
 
 ## MySQL skip signals (C2)
@@ -179,16 +182,15 @@ run red; it cannot hide a case.
 
 ### Blockers found earlier
 
-1. **Skipped cases that report assertions: resolved by #70's verifier change (pending merge).** The
-   verifier's `junit` check on this branch still requires a skipped case to report 0 assertions.
-   PHPUnit 12.5 counts `setUp` assertions on a skipped test (`TestRunner.php:130`). The coordinator's
+1. **Skipped cases that report assertions: resolved by #70, merged at `13409a29`.** Before #70 the
+   verifier's `junit` check required a skipped case to report 0 assertions. PHPUnit 12.5 counts `setUp` assertions on a skipped test (`TestRunner.php:130`). The coordinator's
    local SQLite shard runs found 8 SQLite-census skips carrying 1–2 `setUp` assertions, and the census skips
    in `ProductionFreeGrantSchemaTest` (39), `FreeGrantSchemaRecoveryTest` (1), `PaidGrantSchemaRecoveryTest`
    (1) and `CustomerSuppressionMigrationTest` (2) carry `setUp` assertions on MySQL: 43 of the 58 census
-   cases. The local MySQL 8.0 run below confirms it for `FreeGrantSchemaRecoveryTest`. PR #70 (commit
-   `f5fea78`, under independent review) accepts assertions on skipped cases, refuses duplicate skip
-   nodes and keeps exact census equality. This branch picks it up by merging main after #70 merges;
-   the rule is not changed here.
+   cases. The local MySQL 8.0 run below confirms it for `FreeGrantSchemaRecoveryTest`. #70 changed
+   `junit` so a skipped case may carry assertions, while duplicate skip nodes are refused and exact
+   census equality still bounds which cases skip (`scripts/ci/database-receipts.py:473-474`). This
+   branch has it since merging main at `2f8deb8`; this branch did not change the rule itself.
 2. **Dedicated-schema guard: resolved by `tests/Support/DisposableNativeDatabase.php`.** See "Option A"
    below.
 
@@ -271,8 +273,10 @@ run red; it cannot hide a case.
   | `ServiceSupportAttachmentsTest` + `CustomerListeningFreshnessTest` (`mysql80-service-and-listening.xml`) | rc 0: 25 tests, 118 assertions, 1 skip (the census method `test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`, with `assertions="0"`); 765 s + 2,015 s |
   | Guard check: `FreeGrantSchemaRecoveryTest` with `VA_CI_DISPOSABLE_MYSQL` unset (`mysql80-free-grants-guard-without-marker.xml`) | rc 1: all 8 fail in `setUp` with "A dedicated synthetic free-grant schema, or the CI job's disposable database, is required." |
 
+  | `MigrationRecompilationTest` from #70 (`mysql80-migration-recompilation.xml`), run after the merge on a fresh database, no parallel load | rc 0: 1 test, 5 assertions, 0 skips; 252 s |
+
   The only skips were the two new census methods. Each skipped exactly as the census expects. The
-  free-grant skip carries 2 `setUp` assertions, which only #70's verifier change will accept.
+  free-grant skip carries 2 `setUp` assertions, which #70's verifier change accepts.
 
   Do not use these wall times to size CI. An earlier combined run measured about 105 s per attachment
   case with no parallel load (4 cases in 7 minutes), and it was stopped for time. All of these runs are
@@ -327,20 +331,20 @@ All commands ran in `/home/user/wt-mysel` with PHP 8.4.26, doing PHPUnit discove
 ```
 python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql \
   --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection        # rc 0
-warning: 77 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; ...
-Proved 1764 selected MySQL-native tests in 162 files (of 7641 discovered tests in 556 files) across 8 nonempty shards.
-Shard 1: 252 tests; 19 complete files; estimated 19m 03s.
+warning: 78 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; ...
+Proved 1765 selected MySQL-native tests in 163 files (of 7642 discovered tests in 557 files) across 8 nonempty shards.
+Shard 1: 257 tests; 24 complete files; estimated 19m 03s.
 Shard 2: 208 tests; 19 complete files; estimated 19m 05s.
 Shard 3: 209 tests; 20 complete files; estimated 19m 06s.
 Shard 4: 208 tests; 19 complete files; estimated 19m 04s.
 Shard 5: 243 tests; 20 complete files; estimated 19m 05s.
-Shard 6: 215 tests; 25 complete files; estimated 19m 03s.
+Shard 6: 211 tests; 21 complete files; estimated 19m 06s.
 Shard 7: 218 tests; 20 complete files; estimated 19m 05s.
 Shard 8: 211 tests; 20 complete files; estimated 19m 05s.
 ```
 
-With `--shards=4` (the GitLab count) the run returned rc 0 and proved 1,764 cases across shards of
-477, 420, 429 and 438 cases, each estimated at about 38 minutes from the timings file.
+With `--shards=4` (the GitLab count) the run returned rc 0 and proved 1,765 cases across shards of
+477, 425, 429 and 434 cases, each estimated at about 38 minutes from the timings file.
 
 Both shard counts produced the same manifest `selection` block:
 
@@ -349,8 +353,8 @@ Both shard counts produced the same manifest `selection` block:
 | `policy_sha256` | `959c7709e58661ef74a09af1bbbc0576ed71cc483e29c57872ad489b93ec6801` |
 | `sqlite_skip_policy_sha256` | `9080acdabcfc425ac37dcebee23c9f9be00bcd5a6790404977ba41c6994569b0` |
 | `mysql_skip_policy_sha256` | `3f8effc254318548c3e7791b0d2b468b731469dc5f581dd43c06ed212c2a6208` |
-| `files` / `test_cases` | 162 / 1,764 |
-| `case_identity_sha256` | `def70368d3097b9fda5d6967e0d6837081b83fab961819c2dc8a37c532508a29` |
+| `files` / `test_cases` | 163 / 1,765 |
+| `case_identity_sha256` | `770ae7631854d0ea28cc7b0d71fb36291512242228257c7b1a4889d246069ab9` |
 
 **Cross-checks against the verifier.**
 
@@ -365,7 +369,7 @@ Both shard counts produced the same manifest `selection` block:
   with `MySQL skip identities differ from the reviewed SQLite-only policy`.
 
 **Unflagged output is unchanged.** Run without the flag, the new script and main's script
-(`git show 0f9b39c:scripts/ci/phpunit-shards.py`), each run on this revision's tree (7,641 tests in 556
+(`git show 0f9b39c:scripts/ci/phpunit-shards.py`), each run on the `22371ae` tree (7,641 tests in 556
 files), both returned rc 0, and `diff -r` found all 18 MySQL 8-shard files and all 6 SQLite 2-shard
 files byte-identical. `--mysql-native-selection` with
 `--prefix=phpunit-ci-sqlite` was refused with rc 1. Every generated `phpunit-ci-*` file was deleted
@@ -374,17 +378,17 @@ afterwards.
 ### Duration estimates (C3)
 
 The estimates printed from the timings file are not reliable. `phpunit-timings-mysql.json` predates
-run 37921309772 and has no entry for 77 of the 162 selected files; the timings were not regenerated.
+run 37921309772 and has no entry for 78 of the 163 selected files; the timings were not regenerated.
 Of the selected cases, 1,372 use `FinalizationDatabaseMigrations`. At the roughly 35 s per case
 measured on GitHub:
 
 | Matrix | Finalization cases per shard | Estimated minutes at 35 s (finalization cases only) | Job limit |
 | --- | --- | --- | --- |
-| GitHub, 8 shards | 241, 166, 159, 172, 177, 173, 160, 124 | about 141, 97, 93, 100, 103, 101, 93, 72 | 210 min |
-| GitLab, 4 shards | 361, 333, 339, 339 | about 211, 194, 198, 198 | 240 min (was 90) |
+| GitHub, 8 shards | 241, 166, 159, 171, 177, 174, 160, 124 | about 141, 97, 93, 100, 103, 102, 93, 72 | 210 min |
+| GitLab, 4 shards | 361, 333, 338, 340 | about 211, 194, 197, 198 | 240 min (was 90) |
 
-The remaining selected cases per shard are 11, 42, 50, 36, 66, 42, 58 and 87 on GitHub, and 116, 87,
-90 and 99 on GitLab. Their time is not included in the estimates. That includes the 36 attachment
+The remaining selected cases per shard are 16, 42, 50, 37, 66, 37, 58 and 87 on GitHub, and 116, 92,
+91 and 94 on GitLab. Their time is not included in the estimates. That includes the 36 attachment
 cases, which run `migrate:fresh` per test without using `FinalizationDatabaseMigrations`; they sit in
 GitHub shards 2 and 4.
 
@@ -392,6 +396,12 @@ GitHub shards 2 and 4.
   documents a 3-hour maximum for its hosted runners, and that cap would cancel these shards before
   they finish. I have not verified this cap for the project's runners, and GitLab speed is
   unmeasured. On hosted runners, a reviewed change to 8 GitLab MySQL shards would likely be needed.
+- **`MigrationRecompilationTest`.** Selected through the migration pattern since the merge of main. It
+  is not counted above, because it uses neither `FinalizationDatabaseMigrations` nor `RefreshDatabase`;
+  it runs `migrate:fresh` four times itself. That is about 4 × 35 s in CI. It sits in GitHub shard 1
+  and GitLab shard 2. It compares counts of declared classes, which is independent of the driver, so it
+  should hold on MySQL. It passed on local MySQL 8.0 in 252 s, about 63 s per `migrate:fresh` on that
+  machine.
 - **GitHub.** The busiest shard (shard 1, 241 such cases) is estimated at about 141 minutes. The
   stale timing weights put it there. That left about 6% headroom under 150 minutes, so the limit is
   now 210 minutes (about 50% headroom); fresh timings from the first hosted run should replace both
@@ -477,11 +487,10 @@ The option A workflow pins were checked the same way, restored with `cmp`. All 4
 
 ## Not verified
 
-- No MySQL test has executed the selection, locally or hosted, so pass/fail and real durations are
-  unknown. Only a MySQL run proves the census exact.
-- Census cases that skip after `setUp` assertions stay refused on this branch until #70 merges and is
-  merged in.
-- The local MySQL evidence used Oracle MySQL 8.0.46, not CI's 8.4, and ran only the option A files.
+- No hosted run has executed the selection, so pass/fail and real durations are unknown. Only a
+  MySQL run of the whole selection proves the census exact.
+- The local MySQL evidence used Oracle MySQL 8.0.46, not CI's 8.4. It ran only the option A files and
+  `MigrationRecompilationTest`.
 - The collectors ran only against synthetic fixtures.
 - The GitLab hosted-runner timeout cap was not checked against this project's runner settings.
 - The driver-branch and skip scans are textual. They are not execution evidence.
