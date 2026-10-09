@@ -1,0 +1,31 @@
+# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --filter staging_admits tests/Feature/RightsScopeCommandTest.php
+# started: 2026-10-09T09:29:04Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2-red/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:03.203, Memory: 88.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\RightsScopeCommandTest::test_staging_admits_the_same_link_and_order_preparation
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'INVENTORY_SCOPE_UNAVAILABLE'
++'ORDER_POLICY_UNAVAILABLE'
+
+/home/user/rv-b2-red/tests/Feature/RightsScopeCommandTest.php:122
+/home/user/rv-b2-red/tests/Feature/RightsScopeCommandTest.php:102
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+# finished: 2026-10-09T09:29:07Z
+rc=1

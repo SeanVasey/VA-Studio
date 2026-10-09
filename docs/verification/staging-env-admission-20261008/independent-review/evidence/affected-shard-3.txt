@@ -1,0 +1,25 @@
+# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --configuration=reviewer-sel-3.xml
+# started: 2026-10-09T09:35:40Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2/reviewer-sel-3.xml
+
+...............................................................  63 / 516 ( 12%)
+..........S...............................................SSSSS 126 / 516 ( 24%)
+SSSSSS......................................................... 189 / 516 ( 36%)
+............................................................... 252 / 516 ( 48%)
+............................................................... 315 / 516 ( 61%)
+............................................................... 378 / 516 ( 73%)
+............................................................... 441 / 516 ( 85%)
+............................................................... 504 / 516 ( 97%)
+............                                                    516 / 516 (100%)
+
+Time: 20:27.382, Memory: 341.00 MB
+
+OK, but some tests were skipped!
+Tests: 516, Assertions: 4113, Skipped: 12.
+# finished: 2026-10-09T09:56:08Z
+rc=0

@@ -7,6 +7,7 @@ use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
+use App\Support\Environment\TestEnvironment;
 
 /** Synthetic account provenance only. It cannot enroll, adopt or relabel an operative customer. */
 final class TestFreeGrantIdentity implements FreeGrantIdentity
@@ -74,7 +75,7 @@ final class TestFreeGrantIdentity implements FreeGrantIdentity
 
     private function enabled(): void
     {
-        FreeGrantException::require(app()->environment('local', 'testing'), 404);
+        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
         (new CustomerAccessPolicy)->requireEnabled();
         (new FreeGrantPolicy)->requireEnabled();
     }

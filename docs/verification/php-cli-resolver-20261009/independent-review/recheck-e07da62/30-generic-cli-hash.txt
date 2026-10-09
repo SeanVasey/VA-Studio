@@ -1,0 +1,5 @@
+# CLI generic render (no binding), 11d90702 export then e07da62 export
+cli App\Domain\Contracts\IsolatedContractRenderer 790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf
+rc=0
+cli App\Domain\Contracts\IsolatedContractRenderer 790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf
+rc=0

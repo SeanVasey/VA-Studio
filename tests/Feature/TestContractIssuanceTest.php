@@ -403,7 +403,7 @@ class TestContractIssuanceTest extends TestCase
 
     public static function unavailableIssuancePolicies(): array
     {
-        return [['disabled'], ['string_enabled'], ['missing_policy'], ['extra_policy'], ['live'], ['production'], ['staging']];
+        return [['disabled'], ['string_enabled'], ['missing_policy'], ['extra_policy'], ['live'], ['production'], ['preview'], ['staging_live']];
     }
 
     #[DataProvider('unavailableIssuancePolicies')]
@@ -418,7 +418,8 @@ class TestContractIssuanceTest extends TestCase
                 'missing_policy' => config(['contracts.test_issuance_policy' => null]),
                 'extra_policy' => config(['contracts.test_issuance_policy' => json_encode($policy, JSON_THROW_ON_ERROR)]),
                 'live' => config(['payments.stripe.mode' => 'live']),
-                'production', 'staging' => $this->app->detectEnvironment(fn () => $scenario),
+                'production', 'preview' => $this->app->detectEnvironment(fn () => $scenario),
+                'staging_live' => [$this->app->detectEnvironment(fn () => 'staging'), config(['payments.stripe.mode' => 'live'])],
             };
             $this->assertIssuanceRejected(fn () => app(RequestTestContract::class)->handle($f['grant']->id), 'unavailable');
             $this->assertSame($before, F::retained()); $this->assertSame([], $this->renderer->calls);

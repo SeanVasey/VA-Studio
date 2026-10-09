@@ -1,0 +1,6 @@
+# Green: protected configuration fixture supplies VASEY_PHP_CLI_BINARY; 0b88d78 + working tree
+----------------------------------------------------------------------
+Ran 3 tests in 1.443s
+
+OK
+rc=0

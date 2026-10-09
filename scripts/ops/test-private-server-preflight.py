@@ -50,6 +50,28 @@ def configured():
     return source
 
 
+def staging():
+    source = replace(configured(), "APP_ENV", "staging")
+    for key, value in {
+        "STRIPE_ACCOUNT_ID": "acct_SYNTHETICONLY",
+        "STRIPE_TEST_SECRET_KEY": "sk_test_SYNTHETICONLY1234",
+        "STRIPE_WEBHOOK_SECRET": "whsec_SYNTHETICONLY1234",
+        "STRIPE_WEBHOOK_ENABLED": "true",
+        "STRIPE_TEST_CHECKOUT_ENABLED": "true",
+        "STRIPE_TEST_PAYMENT_PROCESSING_ENABLED": "true",
+        "STRIPE_TEST_FINALIZATION_ENABLED": "true",
+        "VASEY_TEST_CONTRACT_ISSUANCE_ENABLED": "true",
+        "VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED": "true",
+        "VASEY_TEST_DELIVERY_ACCESS_ENABLED": "true",
+        "VASEY_TEST_CHECKOUT_POLICY": "'{\"schema_version\":1}'",
+    }.items():
+        source = replace(source, key, value)
+    return source
+
+
+STAGING = ["--profile=staging"]
+
+
 class PreflightTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="va-preflight-")
@@ -179,6 +201,77 @@ class PreflightTests(unittest.TestCase):
         self.assertIn({"id": "runtime_executable_media_ffmpeg", "status": "pass"}, report["checks"])
         self.assertFalse(marker.exists())
         self.assertEqual(self.path.read_bytes(), before)
+        self.assertTrue(report["runtime_inspection_requested"])
+
+    def staged(self, source, extra=None):
+        return self.run_check(source, arguments=["--env-file", str(self.path)] + STAGING + (extra or []))
+
+    def test_production_profile_is_the_default_and_refuses_a_staging_file(self):
+        report = self.run_check(configured())
+        self.assertEqual(report["profile"], "production")
+        self.assertEqual(report["result"], "FILE_CHECKS_PASSED")
+        explicit = self.run_check(configured(), arguments=["--env-file", str(self.path), "--profile=production"])
+        self.assertEqual(explicit["checks"], report["checks"])
+        default = self.run_check(staging())
+        self.blocked(default, "baseline_app_env")
+        for key in ["STRIPE_WEBHOOK_ENABLED", "STRIPE_TEST_CHECKOUT_ENABLED", "VASEY_TEST_DELIVERY_ACCESS_ENABLED"]:
+            self.assertIn({"id": "baseline_" + key.lower(), "status": "blocked"}, default["checks"])
+        self.assertIn({"id": "inactive_stripe_test_secret_key", "status": "blocked"}, default["checks"])
+
+    def test_staging_profile_admits_test_commerce_settings_only_with_staging_environment(self):
+        report = self.staged(staging())
+        self.assertEqual(report["profile"], "staging")
+        self.assertEqual(report["result"], "FILE_CHECKS_PASSED")
+        self.assertFalse(report["deployment_ready"])
+        self.assertNotIn(SENTINEL, json.dumps(report))
+        self.assertEqual(self.staged(staging(), ["--runtime"])["runtime_inspection_requested"], True)
+        self.blocked(self.staged(configured()), "baseline_app_env")
+        self.blocked(self.staged(replace(staging(), "APP_ENV", "local")), "baseline_app_env")
+        disabled = staging()
+        for key in ["STRIPE_WEBHOOK_ENABLED", "STRIPE_TEST_CHECKOUT_ENABLED", "VASEY_TEST_DELIVERY_ACCESS_ENABLED"]:
+            disabled = replace(disabled, key, "false")
+        disabled = replace(replace(disabled, "STRIPE_TEST_SECRET_KEY", ""), "STRIPE_WEBHOOK_SECRET", "")
+        self.assertEqual(self.staged(disabled)["result"], "FILE_CHECKS_PASSED")
+
+    def test_staging_profile_never_admits_live_mode_live_keys_or_production_only_settings(self):
+        for key, value, check in [
+            ("STRIPE_MODE", "live", "baseline_stripe_mode"),
+            ("STRIPE_MODE", "", "baseline_stripe_mode"),
+            ("STRIPE_TEST_SECRET_KEY", "sk_" + "live_SYNTHETICONLY1234", "staging_stripe_test_secret_key_shape"),
+            ("STRIPE_TEST_SECRET_KEY", "rk_" + "test_SYNTHETICONLY1234", "staging_stripe_test_secret_key_shape"),
+            ("STRIPE_TEST_SECRET_KEY", SENTINEL, "staging_stripe_test_secret_key_shape"),
+            ("STRIPE_ACCOUNT_ID", "acct_" + SENTINEL + "!", "staging_stripe_account_shape"),
+            ("STRIPE_WEBHOOK_SECRET", "whsec_", "staging_stripe_webhook_secret_shape"),
+            ("PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY", "sk_" + "live_SYNTHETICONLY1234", "staging_no_live_provider_credential"),
+            ("MEMBERSHIP_BILLING_STRIPE_SECRET_KEY", "rk_" + "live_SYNTHETICONLY1234", "staging_no_live_provider_credential"),
+            ("PRODUCTION_CHECKOUT_FUNDS_MODE", "live", "staging_no_production_funds_mode"),
+            ("PRODUCTION_CHECKOUT_FUNDS_MODE", "test", "staging_no_production_funds_mode"),
+            ("STRIPE_TEST_CHECKOUT_ENABLED", "1", "staging_boolean_stripe_test_checkout_enabled"),
+            ("STRIPE_WEBHOOK_ENABLED", "yes", "staging_boolean_stripe_webhook_enabled"),
+            ("APP_DEBUG", "true", "baseline_app_debug"),
+            ("CONTACT_INQUIRIES_ENABLED", "true", "baseline_contact_inquiries_enabled"),
+            ("SESSION_SECURE_COOKIE", "false", "baseline_session_secure_cookie"),
+        ]:
+            with self.subTest(key=key, value=value):
+                report = self.staged(replace(staging(), key, value))
+                self.blocked(report, check)
+                self.assertNotIn(SENTINEL, json.dumps(report))
+
+    def test_profile_arguments_are_exact(self):
+        usage = "usage_template_or_absolute_env_file_with_optional_runtime"
+        self.path.write_text(staging())
+        self.path.chmod(0o600)
+        for arguments in [
+            ["--env-file", str(self.path), "--profile=staging", "--profile=staging"],
+            ["--env-file", str(self.path), "--profile=preview"],
+            ["--env-file", str(self.path), "--profile", "staging"],
+            ["--env-file", str(self.path), "--runtime", "--runtime"],
+            ["--template", "--profile=staging"],
+        ]:
+            with self.subTest(arguments=arguments[2:] if arguments[0] == "--env-file" else arguments):
+                self.blocked(self.run_check(arguments=arguments), usage)
+        report = self.run_check(arguments=["--env-file", str(self.path), "--runtime", "--profile=staging"])
+        self.assertEqual(report["profile"], "staging")
         self.assertTrue(report["runtime_inspection_requested"])
 
     def test_invalid_arguments_and_missing_file_are_safe_failures(self):

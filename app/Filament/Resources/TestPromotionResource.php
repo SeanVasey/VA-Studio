@@ -7,6 +7,7 @@ use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\PromotionAdministration;
 use App\Filament\Resources\TestPromotionResource\Pages\ListTestPromotions;
 use App\Models\User;
+use App\Support\Environment\TestEnvironment;
 use App\Support\Money\MinorUnits;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -35,7 +36,7 @@ class TestPromotionResource extends OperatorResource
     public static function actor(): User
     {
         $actor = auth()->user()?->fresh();
-        abort_unless($actor instanceof User && app()->environment('local', 'testing'), 403);
+        abort_unless($actor instanceof User && TestEnvironment::admitsTestCommerce(), 403);
         Gate::forUser($actor)->authorize('administer-catalog');
 
         return $actor;
@@ -45,7 +46,7 @@ class TestPromotionResource extends OperatorResource
     {
         $actor = auth()->user()?->fresh();
 
-        return app()->environment('local', 'testing') && $actor instanceof User && Gate::forUser($actor)->allows('administer-catalog');
+        return TestEnvironment::admitsTestCommerce() && $actor instanceof User && Gate::forUser($actor)->allows('administer-catalog');
     }
 
     public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response

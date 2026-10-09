@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Domain\Contracts\ContractFiles;
+use App\Support\Environment\TestEnvironment;
 use Throwable;
 
 /** Test-only POSIX snapshot adapter. Three held leases bound named plus unlinked snapshots to at most 3 GiB. */
@@ -15,7 +16,7 @@ class PrepareTestDeliveryStream
     public function handle(array $target): PreparedDeliveryStream
     {
         ActivationPolicy::outsideTransactions();
-        if (! app()->environment('local', 'testing') || DIRECTORY_SEPARATOR !== '/') { throw new DeliveryException('unavailable'); }
+        if (! TestEnvironment::admitsTestCommerce() || DIRECTORY_SEPARATOR !== '/') { throw new DeliveryException('unavailable'); }
         $lease = $output = $reader = null; $path = null; $owned = null;
         try {
             $this->target($target);

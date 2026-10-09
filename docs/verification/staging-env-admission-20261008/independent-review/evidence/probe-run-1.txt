@@ -1,0 +1,110 @@
+# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /home/user/rv-b2/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerStagingProbeTest.php
+# started: 2026-10-09T09:31:19Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2/phpunit.xml
+
+
+PROBE helper matrix: {
+    "\"staging\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": true,
+        "refusesProductionOnly": true,
+        "panelMfaRequired": true
+    },
+    "\"Staging\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"STAGING\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging-eu\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"stage\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\" staging\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging \"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"staging\\n\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"testing\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"local\"": {
+        "admitsTestCommerce": true,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    },
+    "\"production\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": true,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": true
+    },
+    "\"preview\"": {
+        "admitsTestCommerce": false,
+        "requiresStaffMfa": false,
+        "refusesProductionOnly": false,
+        "panelMfaRequired": false
+    }
+}
+.
+PROBE AdminMultiFactor::satisfiedBy: {"staging":{"unenrolled":false,"enrolled":true},"production":{"unenrolled":false,"enrolled":true},"local":{"unenrolled":true,"enrolled":true},"testing":{"unenrolled":true,"enrolled":true}}
+.
+PROBE TestPaymentExceptionOperations::locked: {"staging unenrolled":"AuthorizationException","staging enrolled":"ModelNotFoundException","production unenrolled":"AuthorizationException","production enrolled":"ModelNotFoundException","local unenrolled":"ModelNotFoundException"}
+.
+PROBE staff writes by an UNENROLLED admin: {
+    "promotion.create staging": "completed:PromotionCampaign",
+    "rights-scope.register staging": "completed:RightsScope",
+    "promotion.create production": "AuthorizationException",
+    "rights-scope.register production": "QuoteException:INVENTORY_UNAVAILABLE:503",
+    "promotion.create preview": "AuthorizationException",
+    "rights-scope.register preview": "QuoteException:INVENTORY_UNAVAILABLE:503"
+}
+.                                                                4 / 4 (100%)
+
+Time: 00:01.945, Memory: 81.00 MB
+
+OK (4 tests, 35 assertions)
+# finished: 2026-10-09T09:31:21Z
+rc=0

@@ -2,10 +2,12 @@
 
 namespace App\Domain\Customers\Preferences;
 
+use App\Support\Environment\TestEnvironment;
+
 final class LocalConsentRuntime implements ConsentRuntime
 {
     public function grantsEnabled(): bool
     {
-        return app()->environment('local', 'testing') && config('customer-preferences.test_grants_enabled') === true;
+        return TestEnvironment::admitsTestCommerce() && config('customer-preferences.test_grants_enabled') === true;
     }
 }

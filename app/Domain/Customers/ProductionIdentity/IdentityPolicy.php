@@ -4,6 +4,7 @@ namespace App\Domain\Customers\ProductionIdentity;
 
 use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 use SensitiveParameter;
 
@@ -26,7 +27,9 @@ final class IdentityPolicy
 
         return config('production-customer-identity.enabled', false) === true
             && in_array($scope, [self::REHEARSAL, self::PRODUCTION], true)
-            && (app()->environment('local', 'testing') ? $scope === self::REHEARSAL : $scope === self::PRODUCTION);
+            // Rehearsal is local/testing only; staging is a test installation and never admits production identity.
+            && (app()->environment('local', 'testing') ? $scope === self::REHEARSAL
+                : $scope === self::PRODUCTION && ! TestEnvironment::refusesProductionOnly());
     }
 
     public function requireEnabled(): void

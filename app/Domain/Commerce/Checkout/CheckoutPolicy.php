@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Checkout;
 
 use App\Domain\Commerce\QuoteException;
+use App\Support\Environment\TestEnvironment;
 use Throwable;
 
 final class CheckoutPolicy
@@ -11,7 +12,7 @@ final class CheckoutPolicy
 
     public function current(): array
     {
-        if (! app()->environment('local', 'testing') || config('payments.stripe.checkout_enabled') !== true) {
+        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.checkout_enabled') !== true) {
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }
         try {
@@ -32,7 +33,7 @@ final class CheckoutPolicy
     public function account(): string
     {
         $account = config('payments.stripe.account_id');
-        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test' ||
+        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test' ||
             ! is_string($account) || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account)) {
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }

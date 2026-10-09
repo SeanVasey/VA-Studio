@@ -1,0 +1,16 @@
+# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingEnvironmentAdmissionTest.php tests/Feature/StagingOperatorMfaTest.php
+# started: 2026-10-09T09:28:19Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2/phpunit.xml
+
+..................                                                18 / 18 (100%)
+
+Time: 00:23.692, Memory: 105.00 MB
+
+OK (18 tests, 229 assertions)
+# finished: 2026-10-09T09:28:43Z
+rc=0

@@ -32,7 +32,9 @@ class ProtectedConfigurationTest(unittest.TestCase):
             "CACHE_STORE=database", "QUEUE_CONNECTION=database", "DB_QUEUE_RETRY_AFTER=1200",
             "DB_CONNECTION=mysql", "DB_HOST=127.0.0.1", "DB_DATABASE=vasey_staging",
             "DB_USERNAME=vasey_app", "DB_PASSWORD=SyntheticPrivateRuntimeMarker",
-            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test", "",
+            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test",
+            # The validator requires a probe-proven CLI PHP for FPM renderer children (M-16, runtime.php_cli_binary).
+            "VASEY_PHP_CLI_BINARY=" + os.path.realpath(PHP), "",
         ])
         (self.release / ".env").write_text(self.previous)
         (self.release / ".env").chmod(0o600)
@@ -41,7 +43,7 @@ class ProtectedConfigurationTest(unittest.TestCase):
         validator = "<?php require " + json.dumps(str(REPO / "ops/staging/validate-runtime.php")) + ";"
         (self.release / "ops/staging/validate-runtime.php").write_text(validator)
         (self.release / "artisan").write_text("""<?php
-file_put_contents(__DIR__.'/storage/framework/cache-command', 'config:cache');
+file_put_contents(__DIR__.'/storage/framework/cache-command', $argv[1].PHP_EOL, FILE_APPEND);
 """)
         spec = importlib.util.spec_from_file_location("configuration_sealer", REPO / "ops/staging/seal-release.py")
         self.module = importlib.util.module_from_spec(spec)
@@ -102,7 +104,9 @@ as_app() { "$@"; }
         self.assertEqual((self.release / ".env").read_text(), candidate)
         self.assertEqual((self.release / ".env").stat().st_mode & 0o777, 0o440)
         self.assertNotEqual((self.release / ".env").stat().st_ino, original_inode)
-        self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache")
+        # Routes are cached too: the panel's MFA page middleware is compiled into the route cache, so a refresh that
+        # changes APP_ENV (local -> staging) must not serve routes built under the old environment (B2 review C1).
+        self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache\nroute:cache\n")
 
     def test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache(self):
         for body in (self.previous + "APP_DEBUG=true\n",

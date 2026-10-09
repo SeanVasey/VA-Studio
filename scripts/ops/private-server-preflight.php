@@ -13,15 +13,18 @@ set_error_handler(static function (int $severity): never {
 $checks = [];
 $mode = 'configuration';
 $runtime = false;
+// production (the default) demands every test path off; staging admits only the Stripe-test commerce chain.
+$profile = 'production';
 $root = dirname(__DIR__, 2);
 $record = static function (string $id, bool $ok) use (&$checks): void {
     $checks[] = ['id' => $id, 'status' => $ok ? 'pass' : 'blocked'];
 };
-$finish = static function () use (&$checks, &$mode, &$runtime): never {
+$finish = static function () use (&$checks, &$mode, &$runtime, &$profile): never {
     $blocked = in_array('blocked', array_column($checks, 'status'), true);
     echo json_encode([
         'schema_version' => 1,
         'scope' => $mode === 'template' ? 'template_file' : 'configuration_file',
+        'profile' => $profile,
         'result' => $blocked ? 'BLOCKED' : ($mode === 'template' ? 'TEMPLATE_VALID' : 'FILE_CHECKS_PASSED'),
         'deployment_ready' => false,
         'runtime_inspection_requested' => $runtime,
@@ -61,9 +64,12 @@ try {
         $mode = 'template';
         $path = $root.'/ops/private-server/env.example';
     } elseif (count($arguments) >= 2 && $arguments[0] === '--env-file'
-        && (count($arguments) === 2 || (count($arguments) === 3 && $arguments[2] === '--runtime'))) {
+        && ($options = array_slice($arguments, 2)) === array_unique($options)
+        && array_diff($options, ['--runtime', '--profile=production', '--profile=staging']) === []
+        && count(preg_grep('/\A--profile=/', $options)) <= 1) {
         $path = $arguments[1];
-        $runtime = count($arguments) === 3;
+        $runtime = in_array('--runtime', $options, true);
+        $profile = in_array('--profile=staging', $options, true) ? 'staging' : 'production';
     } else {
         $record('usage_template_or_absolute_env_file_with_optional_runtime', false);
         $finish();
@@ -134,18 +140,40 @@ try {
     $value = static fn (string $key): string => (string) ($env[$key] ?? '');
     $is = static fn (string $key, string $expected): bool => array_key_exists($key, $env) && $value($key) === $expected;
 
-    foreach ([
-        'APP_ENV' => 'production', 'APP_DEBUG' => 'false', 'DB_CONNECTION' => 'mysql',
+    // Test-commerce switches: forced off in production; in staging each must still be an explicit boolean.
+    $testSwitches = ['STRIPE_WEBHOOK_ENABLED', 'STRIPE_TEST_CHECKOUT_ENABLED', 'STRIPE_TEST_PAYMENT_PROCESSING_ENABLED',
+        'STRIPE_TEST_FINALIZATION_ENABLED', 'VASEY_TEST_CONTRACT_ISSUANCE_ENABLED',
+        'VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED', 'VASEY_TEST_DELIVERY_ACCESS_ENABLED'];
+    $baseline = [
+        'APP_ENV' => $profile, 'APP_DEBUG' => 'false', 'DB_CONNECTION' => 'mysql',
         'SESSION_DRIVER' => 'database', 'SESSION_ENCRYPT' => 'true', 'SESSION_DOMAIN' => 'null',
         'SESSION_SECURE_COOKIE' => 'true', 'SESSION_HTTP_ONLY' => 'true', 'SESSION_SAME_SITE' => 'lax',
         'CACHE_STORE' => 'database', 'QUEUE_CONNECTION' => 'database', 'FILESYSTEM_DISK' => 'local',
         'LOG_CHANNEL' => 'stderr', 'LOG_LEVEL' => 'info', 'MAIL_MAILER' => 'log', 'STRIPE_MODE' => 'test',
-        'CONTACT_INQUIRIES_ENABLED' => 'false', 'STRIPE_WEBHOOK_ENABLED' => 'false',
-        'STRIPE_TEST_CHECKOUT_ENABLED' => 'false', 'STRIPE_TEST_PAYMENT_PROCESSING_ENABLED' => 'false',
-        'STRIPE_TEST_FINALIZATION_ENABLED' => 'false', 'VASEY_TEST_CONTRACT_ISSUANCE_ENABLED' => 'false',
-        'VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED' => 'false', 'VASEY_TEST_DELIVERY_ACCESS_ENABLED' => 'false',
-    ] as $key => $expected) {
+        'CONTACT_INQUIRIES_ENABLED' => 'false',
+    ];
+    if ($profile === 'production') {
+        $baseline += array_fill_keys($testSwitches, 'false');
+    }
+    foreach ($baseline as $key => $expected) {
         $record('baseline_'.strtolower($key), $is($key, $expected));
+    }
+    if ($profile === 'staging') {
+        foreach ($testSwitches as $key) {
+            $record('staging_boolean_'.strtolower($key), $is($key, 'true') || $is($key, 'false'));
+        }
+        // Shapes only, never values: a blank credential keeps its path unavailable.
+        $shape = static fn (string $key, string $pattern): bool => $value($key) === '' || preg_match($pattern, $value($key)) === 1;
+        $record('staging_stripe_test_secret_key_shape', $shape('STRIPE_TEST_SECRET_KEY', '/\Ask_test_[A-Za-z0-9]{8,200}\z/D'));
+        $record('staging_stripe_account_shape', $shape('STRIPE_ACCOUNT_ID', '/\Aacct_[A-Za-z0-9]{1,64}\z/D'));
+        $record('staging_stripe_webhook_secret_shape', $shape('STRIPE_WEBHOOK_SECRET', '/\Awhsec_[A-Za-z0-9]{8,200}\z/D'));
+        $live = false;
+        foreach ($env as $candidate) {
+            $live = $live || preg_match('/(?:sk|rk)_live_/', (string) $candidate) === 1;
+        }
+        $record('staging_no_live_provider_credential', ! $live);
+        // Production checkout refuses test funds outside local/testing and live funds in staging.
+        $record('staging_no_production_funds_mode', $value('PRODUCTION_CHECKOUT_FUNDS_MODE') === '');
     }
     $record('queue_retry_exceeds_media_timeout_and_lease', ctype_digit($value('DB_QUEUE_RETRY_AFTER'))
         && (int) $value('DB_QUEUE_RETRY_AFTER') > 960);
@@ -159,8 +187,10 @@ try {
         'STRIPE_ACCOUNT_ID', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_TEST_SECRET_KEY', 'STRIPE_TEST_FINALIZATION_POLICY',
         'VASEY_TEST_CONTRACT_ISSUANCE_POLICY', 'VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY', 'VASEY_TEST_DELIVERY_ACCESS_POLICY',
     ];
-    foreach ($reserved as $key) {
-        $record('inactive_'.strtolower($key), $value($key) === '');
+    if ($profile === 'production') {
+        foreach ($reserved as $key) {
+            $record('inactive_'.strtolower($key), $value($key) === '');
+        }
     }
     $required = ['APP_URL', 'APP_KEY', 'DB_HOST', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',
         'MEDIA_FFMPEG', 'MEDIA_FFPROBE', 'MEDIA_PRLIMIT', 'MEDIA_CLAMSCAN', 'MEDIA_TAG_PATH', 'MEDIA_TAG_SHA256'];

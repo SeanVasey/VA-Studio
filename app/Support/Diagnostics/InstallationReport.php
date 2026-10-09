@@ -2,12 +2,14 @@
 
 namespace App\Support\Diagnostics;
 
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteImageReferences;
 use App\Models\User;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -78,8 +80,15 @@ final class InstallationReport
                 && $root && $public && ! is_link($path) && is_dir($root) && is_writable($root)
                 && $root !== $public && ! str_starts_with($root, $public.DIRECTORY_SEPARATOR);
         }, 'Local media storage is unserved, writable and outside the public directory.', 'Configure a writable private local media directory outside public, without serving or symlinking it.');
-        $check('production_settings', true, fn () => ! app()->isProduction() || (! config('app.debug') && str_starts_with((string) config('app.url'), 'https://') && config('session.secure') === true),
-            'Basic environment-specific URL, debug and cookie settings pass.', 'In production use HTTPS, APP_DEBUG=false and SESSION_SECURE_COOKIE=true.');
+        // Staging is a hosted installation too, so it meets the same URL, debug and cookie baseline as production.
+        $hosted = app()->isProduction() || TestEnvironment::refusesProductionOnly();
+        $check('production_settings', true, fn () => ! $hosted || (! config('app.debug') && str_starts_with((string) config('app.url'), 'https://') && config('session.secure') === true),
+            'Basic environment-specific URL, debug and cookie settings pass.', 'In production and staging use HTTPS, APP_DEBUG=false and SESSION_SECURE_COOKIE=true.');
+        if (TestEnvironment::refusesProductionOnly()) {
+            $check('staging_test_mode_only', true, $this->stagingTestModeOnly(...),
+                'Staging is configured for Stripe test mode only, with no live key, live production-checkout funds or production customer identity.',
+                'In staging set STRIPE_MODE=test with an sk_test_ key or none, and leave production checkout live funds, live keys and production customer identity unconfigured.');
+        }
 
         $check('media_tools', false, fn () => $this->executable('media.ffmpeg') && $this->executable('media.ffprobe') && $this->executable('media.prlimit'),
             'Media executables exist; processing and worker isolation still need acceptance.', 'Install and configure ffmpeg, ffprobe and prlimit before media processing.');
@@ -145,7 +154,26 @@ final class InstallationReport
         }, 'The stored files of the active site release’s images match their recorded hashes.',
             'A stored file of an image in the active site release failed its integrity check, so visitors see its description instead. Restore `storage/app/private/site-images/` from the same backup as the database, or publish a release that uses another image.');
 
-        return ['schema_version' => 1, 'scope' => 'installation', 'foundation_ready' => ! in_array('fail', array_column($checks, 'status'), true), 'checks' => $checks];
+        $profile = match (true) {
+            app()->isProduction() => 'production',
+            TestEnvironment::refusesProductionOnly() => TestEnvironment::STAGING,
+            default => 'development',
+        };
+
+        return ['schema_version' => 1, 'scope' => 'installation', 'profile' => $profile, 'foundation_ready' => ! in_array('fail', array_column($checks, 'status'), true), 'checks' => $checks];
+    }
+
+    /** Configuration shape only: no key is used, logged or reported, and no provider is contacted. */
+    private function stagingTestModeOnly(): bool
+    {
+        $secret = config('payments.stripe.secret_key');
+        $productionSecret = config('production_checkout.secret_key');
+
+        return config('payments.stripe.mode') === 'test'
+            && ($secret === null || $secret === '' || (is_string($secret) && preg_match('/\Ask_test_[A-Za-z0-9]{8,200}\z/D', $secret) === 1))
+            && config('production_checkout.funds_mode') !== 'live'
+            && ! (is_string($productionSecret) && preg_match('/\A(?:sk|rk)_live_/', $productionSecret) === 1)
+            && config('production-customer-identity.provenance') !== IdentityPolicy::PRODUCTION;
     }
 
     /** The user this process runs as; null without the PHP posix extension, which is never the owner of anything. */

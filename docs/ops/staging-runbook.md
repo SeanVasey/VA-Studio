@@ -4,7 +4,7 @@ Prepared October 8, 2026 for the Monday staging plan (Lane A: items M-01, M-02 a
 provisioning kit in [`ops/staging/`](../../ops/staging/README.md).
 
 > **Boundary.** This is a private **test-mode** rehearsal host:
-> - `APP_ENV=local` and `APP_DEBUG=false`;
+> - `APP_ENV=staging` and `APP_DEBUG=false` (the interim `APP_ENV=local` profile is still accepted, without required MFA);
 > - Stripe test keys only;
 > - outbound mail written to the log;
 > - basic auth in front of everything except `POST /webhooks/stripe`.
@@ -54,14 +54,22 @@ php8.4 artisan vasey:create-admin      # second operator
 Each account is created with `is_admin` and a console-attested verified email, and an
 `access.operator.created` audit row is written.
 
-**MFA enrollment (both operators, now).** Under `APP_ENV=local` the panel does not *require* TOTP: it is
-required only in production (`AdminPanelProvider`, `isRequired: fn () => app()->isProduction()`). Staging is
-publicly reachable behind basic auth, so enroll anyway:
+**MFA enrollment (both operators, now).** Under `APP_ENV=staging` the panel requires TOTP before any protected
+page, as in production (`AdminPanelProvider`, `TestEnvironment::requiresStaffMfa()`). Under the interim
+`APP_ENV=local` profile it is optional, so enroll anyway:
 
 1. Sign in at `https://<HOST>/admin`. The browser asks for the staging basic-auth credentials first.
 2. Open the user menu, choose **Profile**, then set up the authenticator app.
 3. Scan the QR code, confirm with a current code, and store the recovery codes offline.
 4. Sign out and back in to confirm the code is asked for.
+
+**After a switch from `APP_ENV=local` to `staging`**, confirm the panel pages carry the MFA middleware. The panel
+compiles it into the route cache from `APP_ENV`; a deploy or `ctl refresh` rebuilds that cache, but a route cache
+built under `local` would serve staging without page-level MFA:
+
+```sh
+art route:list --path=admin/tracks --json -v | grep -c EnsureMultiFactorAuthenticationIsEnabled   # expect 1 or more
+```
 
 Rerun `art vasey:doctor`; the `operator` check now passes.
 
@@ -96,7 +104,7 @@ MEDIA_TAG_SHA256=<the 64 lowercase hex characters>
 ```
 
 Then click **Deploy Now**. When the served SHA is unchanged and only `.env` differs, the deploy refreshes the
-configuration. It quiesces, installs `.env`, runs `config:cache` and resumes, so the workers pick up the tag.
+configuration. It quiesces, installs `.env`, runs `config:cache` and `route:cache` and resumes, so the workers pick up the tag.
 Then process one real master, listen to the tagged preview and confirm the mix with Sean before publishing
 anything.
 

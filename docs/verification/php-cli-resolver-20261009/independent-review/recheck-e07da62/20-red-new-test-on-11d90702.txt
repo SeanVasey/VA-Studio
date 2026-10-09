@@ -1,0 +1,27 @@
+# red: scratch export of 11d90702 (IsolatedContractRenderer without the edit) + only e07da62's TestIsolatedContractRendererTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src/phpunit.xml
+
+Time: 00:01.963, Memory: 67.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\TestIsolatedContractRendererTest::test_simulated_fpm_child_gets_the_validated_binarys_sibling_library_path
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => '/tmp/php-cli-rootless-c49b07ea5d111c37/bin/php',
+-    1 => '/tmp/php-cli-rootless-c49b07ea5d111c37/lib/x86_64-linux-gnu',
++    1 => null,
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src/tests/Feature/TestIsolatedContractRendererTest.php:184
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 23[0m[37;41m, Assertions: 93[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1

@@ -37,6 +37,17 @@ The baseline checks include:
 
 `--runtime` additionally checks Linux, PHP 8.4, the required PHP extensions, a non-root execution identity, configured media executable availability and the checkout's canonical readable/writable `0700` private root. It only records whether the standard config-cache file exists; it never loads or clears it. Tool presence is not proof of supported versions, scanner signatures, isolation or successful processing. It does not create the private root or test writes there.
 
+## Staging profile
+
+A hosted test-mode rehearsal runs with `APP_ENV=staging`. Inspect its file with the staging profile:
+
+```sh
+php scripts/ops/private-server-preflight.php --env-file /srv/va-studio/config/staging.env --profile=staging
+php scripts/ops/private-server-preflight.php --env-file /srv/va-studio/config/staging.env --profile=staging --runtime
+```
+
+The staging profile keeps every hosted baseline above (debugging off, MySQL, encrypted secure sessions, `STRIPE_MODE=test`, inquiries off, `log` mail) and requires `APP_ENV=staging`. It differs only where staging admits the Stripe-test commerce chain: the seven test-commerce switches may be `true` or `false` (nothing else), and the test policy and credential fields may be populated. It then requires a blank or `sk_test_`-shaped `STRIPE_TEST_SECRET_KEY`, a blank or `acct_`-shaped account and `whsec_`-shaped webhook secret, no `sk_live_`/`rk_live_` value anywhere in the file, and a blank `PRODUCTION_CHECKOUT_FUNDS_MODE`. The production profile is the default and is unchanged; `--profile=production` selects it explicitly. Every report names its `profile`.
+
 ## Interpret the result
 
 | Result | Meaning | Next action |

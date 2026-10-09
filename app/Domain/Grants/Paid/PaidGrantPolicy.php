@@ -3,6 +3,7 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Config\Repository;
 
 /** Technical delivery input is explicitly authored; it does not replace original license assent. */
@@ -10,8 +11,10 @@ final class PaidGrantPolicy
 {
     public function enabled(): bool
     {
+        // Rehearsal is local/testing only; the operative lane is production-only and never runs in staging.
         return app()->environment('local', 'testing') && config('paid-grants.rehearsal_enabled') === true
-            || ! app()->environment('local', 'testing') && config('paid-grants.operative_enabled') === true;
+            || ! app()->environment('local', 'testing') && ! TestEnvironment::refusesProductionOnly()
+                && config('paid-grants.operative_enabled') === true;
     }
 
     public function capture(): array
@@ -93,7 +96,8 @@ final class PaidGrantPolicy
         $current = PaidGrantConfiguration::read($configuration, 'paid-grants.delivery_policy');
         PaidGrantException::require(is_array($current) && CanonicalJson::encode($current) === CanonicalJson::encode($policy)
             && ($rehearsal ? PaidGrantConfiguration::read($configuration, 'paid-grants.rehearsal_enabled') === true && $policy['provenance'] === 'synthetic_rehearsal'
-                : PaidGrantConfiguration::read($configuration, 'paid-grants.operative_enabled') === true && $policy['provenance'] === 'verified_production')
+                : ! TestEnvironment::isStaging($environment)
+                    && PaidGrantConfiguration::read($configuration, 'paid-grants.operative_enabled') === true && $policy['provenance'] === 'verified_production')
             && PaidGrantConfiguration::read($configuration, 'production-customer-identity.enabled') === true
             && PaidGrantConfiguration::read($configuration, 'production-customer-identity.provenance') === $policy['provenance'], 403);
     }

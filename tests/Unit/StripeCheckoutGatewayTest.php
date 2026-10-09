@@ -148,7 +148,7 @@ class StripeCheckoutGatewayTest extends TestCase
 
     public static function unavailableEnvironments(): array
     {
-        return [['production'], ['staging']];
+        return [['production'], ['preview']];
     }
 
     #[DataProvider('unavailableEnvironments')]

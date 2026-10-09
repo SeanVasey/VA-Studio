@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Orders;
 
 use App\Domain\Commerce\QuoteException;
+use App\Support\Environment\TestEnvironment;
 use JsonException;
 
 /** Explicit nonbinding development policy; never a default legal or merchant policy. */
@@ -10,7 +11,7 @@ final class OrderPolicy
 {
     public function current(): array
     {
-        if (! app()->environment('local', 'testing')) {
+        if (! TestEnvironment::admitsTestCommerce()) {
             throw new QuoteException('ORDER_POLICY_UNAVAILABLE', 503);
         }
         $raw = config('commerce.test_order_policy');

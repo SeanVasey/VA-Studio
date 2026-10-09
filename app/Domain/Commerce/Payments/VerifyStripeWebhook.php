@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Payments;
 
+use App\Support\Environment\TestEnvironment;
 use JsonException;
 use SensitiveParameter;
 use stdClass;
@@ -17,7 +18,7 @@ final class VerifyStripeWebhook
         $account = config('payments.stripe.account_id');
         $secret = config('payments.stripe.webhook_secret');
         if (config('payments.stripe.webhook_enabled') !== true
-            || ! app()->environment('local', 'testing', 'staging')
+            || ! TestEnvironment::admitsTestCommerce()
             || config('payments.stripe.mode') !== 'test'
             || ! is_string($account) || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account)
             || ! is_string($secret) || ! preg_match('/\Awhsec_[A-Za-z0-9]{8,200}\z/', $secret)) {

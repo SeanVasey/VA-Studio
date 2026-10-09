@@ -1,0 +1,171 @@
+# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingEnvironmentAdmissionTest.php
+# started: 2026-10-09T09:29:08Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2-red/phpunit.xml
+
+..F....F.FFF.EF                                                   15 / 15 (100%)
+
+Time: 00:25.037, Memory: 103.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\StagingEnvironmentAdmissionTest::test_the_helper_names_exactly_three_test_commerce_environments_and_two_mfa_environments
+Error: Class "App\Support\Environment\TestEnvironment" not found
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:513
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 6 failures:
+
+1) Tests\Feature\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging@staging with data ('staging')
+Gates refusing staging
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => 'checkout policy',
++    1 => 'checkout account',
++    2 => 'order policy',
++    3 => 'pricing policy',
++    4 => 'inventory policy',
++    5 => 'payment processing',
++    6 => 'checkout gateway reaches the provider transport',
++    7 => 'finalization',
++    8 => 'contract issuance',
++    9 => 'fulfillment activation',
++    10 => 'owner delivery access',
++    11 => 'owner delivery stream',
++    12 => 'test customer accounts',
++    13 => 'test customer consent grants',
++    14 => 'test transactional notifications',
++    15 => 'test order inquiries',
++    16 => 'test service projects',
++    17 => 'synthetic memberships',
++    18 => 'test free grants',
++    19 => 'test free grant definitions',
++    20 => 'test free grant identity',
++    21 => 'test free grant authoring',
++    22 => 'pricing settlement comparison',
++    23 => 'test promotions',
++    24 => 'test promotion usage',
++    25 => 'test promotion administration',
++    26 => 'test promotion resource',
++    27 => 'test unpaid release',
++]
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:336
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\StagingEnvironmentAdmissionTest::test_test_payment_exception_operations_reach_their_record_lookup_only_in_admitted_environments
+Failed asserting that 0 is greater than 0.
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:365
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_admits_production_identity_or_production_live_funds
+Failed asserting that true is false.
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:410
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_enables_the_operative_paid_grant_lane
+Failed asserting that true is false.
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:438
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_admits_verified_production_membership_or_member_grant_provenance
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'provenance'
++'admitted'
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:474
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit
+app/Domain/Commerce/Checkout/CheckoutPolicy.php
+Failed asserting that '<?php\n
+\n
+namespace App\Domain\Commerce\Checkout;\n
+\n
+use App\Domain\Commerce\QuoteException;\n
+use Throwable;\n
+\n
+final class CheckoutPolicy\n
+{\n
+    public const API_VERSION = '2026-08-26.dahlia';\n
+\n
+    public function current(): array\n
+    {\n
+        if (! app()->environment('local', 'testing') || config('payments.stripe.checkout_enabled') !== true) {\n
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
+        }\n
+        try {\n
+            $raw = config('commerce.test_checkout_policy');\n
+            if (! is_string($raw) || strlen($raw) > 4096) { throw new \UnexpectedValueException; }\n
+\n
+            return $this->validate(json_decode($raw, true, 16, JSON_THROW_ON_ERROR));\n
+        } catch (Throwable) {\n
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
+        }\n
+    }\n
+\n
+    public function enabled(): bool\n
+    {\n
+        try { $this->current(); $this->account(); return true; } catch (Throwable) { return false; }\n
+    }\n
+\n
+    public function account(): string\n
+    {\n
+        $account = config('payments.stripe.account_id');\n
+        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test' ||\n
+            ! is_string($account) || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account)) {\n
+            throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);\n
+        }\n
+\n
+        return $account;\n
+    }\n
+\n
+    public function validate(mixed $policy): array\n
+    {\n
+        $keys = ['schema_version', 'purpose', 'version', 'provider_lifetime_seconds', 'retry_seconds', 'pending_resources', 'tax', 'return_origin'];\n
+        if (! is_array($policy) || count($policy) !== count($keys) || array_diff($keys, array_keys($policy)) ||\n
+            $policy['schema_version'] !== 1 || $policy['purpose'] !== 'test_hosted_checkout' ||\n
+            ! is_string($policy['version']) || ! preg_match('/\A[A-Za-z0-9._-]{1,80}\z/', $policy['version']) ||\n
+            $policy['provider_lifetime_seconds'] !== 3600 || $policy['retry_seconds'] !== 900 ||\n
+            $policy['pending_resources'] !== 'retain_until_authoritative_finalization' || $policy['tax'] !== 'fixed_test_zero' ||\n
+            ! $this->origin($policy['return_origin'])) { throw new \UnexpectedValueException('Invalid test checkout policy.'); }\n
+\n
+        return $policy;\n
+    }\n
+\n
+    private function origin(mixed $value): bool\n
+    {\n
+        if (! is_string($value) || strlen($value) > 255 || preg_match('/[\x00-\x20\x7f\\\\]/', $value)) { return false; }\n
+        $parts = parse_url($value);\n
+        if (! is_array($parts) || ! isset($parts['scheme'], $parts['host']) ||\n
+            array_diff(array_keys($parts), ['scheme', 'host', 'port']) || str_ends_with($value, '/')) { return false; }\n
+\n
+        return $parts['scheme'] === 'https' || ($parts['scheme'] === 'http' && in_array($parts['host'], ['localhost', '127.0.0.1', '[::1]'], true));\n
+    }\n
+}\n
+' [ASCII](length: 2832) contains "TestEnvironment::admitsTestCommerce()" [ASCII](length: 37).
+
+/home/user/rv-b2-red/tests/Feature/StagingEnvironmentAdmissionTest.php:529
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 15, Assertions: 80, Errors: 1, Failures: 6.
+# finished: 2026-10-09T09:29:33Z
+rc=2

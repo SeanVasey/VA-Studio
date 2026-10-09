@@ -183,7 +183,7 @@ class TestOrderFinalizationTest extends TestCase
     public static function invalidConfiguration(): array
     {
         return [['disabled', false], ['string_enabled', 'true'], ['missing_policy', null], ['unknown_policy', 'unknown'],
-            ['live', 'live'], ['wrong_account', 'acct_OTHER'], ['production', 'production'], ['staging', 'staging']];
+            ['live', 'live'], ['wrong_account', 'acct_OTHER'], ['production', 'production'], ['preview', 'preview'], ['staging_live', 'live']];
     }
 
     #[DataProvider('invalidConfiguration')]
@@ -197,7 +197,8 @@ class TestOrderFinalizationTest extends TestCase
                 'missing_policy', 'unknown_policy' => config(['payments.stripe.finalization_policy' => $value]),
                 'live' => config(['payments.stripe.mode' => $value]),
                 'wrong_account' => config(['payments.stripe.account_id' => $value]),
-                'production', 'staging' => $this->app->detectEnvironment(fn () => $value),
+                'production', 'preview' => $this->app->detectEnvironment(fn () => $value),
+                'staging_live' => [$this->app->detectEnvironment(fn () => 'staging'), config(['payments.stripe.mode' => $value])],
             };
             $this->assertSame($scenario === 'wrong_account' ? 'unverified' : 'unavailable', app(FinalizeTestPayment::class)->handle($f['payment']->id));
             $this->assertSame($before, F::retained());

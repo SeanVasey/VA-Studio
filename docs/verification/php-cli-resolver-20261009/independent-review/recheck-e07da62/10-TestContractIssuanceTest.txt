@@ -1,0 +1,10 @@
+# source: git archive e07da62f91bcd46685a7ff997dafabf22147ef3c -> /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src-e07 (hardlinked vendor, .env, bootstrap/cache; storage 755); 2026-10-09T10:17:54Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src-e07/phpunit.xml
+
+Time: 03:24.525, Memory: 150.00 MB
+
+[30;42mOK (52 tests, 498 assertions)[0m
+rc=0

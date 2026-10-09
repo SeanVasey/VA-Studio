@@ -135,10 +135,22 @@ class TestCommerceProfileValidatorTest extends TestCase
         $this->assertStringNotContainsString('Synthetic Staging Seller', $output);
     }
 
+    public function test_a_staging_profile_passes_and_near_miss_environment_names_are_refused(): void
+    {
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'APP_ENV', 'staging'));
+        $this->assertSame(0, $exit, $output);
+        $this->assertNotContains(false, $checks);
+        foreach (['Staging', 'staging-eu', 'stage'] as $name) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'APP_ENV', $name));
+            $this->assertSame(1, $exit, $output);
+            $this->assertFalse($checks['runtime.app_env_admitted'], $name);
+        }
+    }
+
     public static function maskedFileValues(): array
     {
         return [
-            'environment' => ['APP_ENV', 'production', 'local', 'runtime.app_env_local'],
+            'environment' => ['APP_ENV', 'production', 'local', 'runtime.app_env_admitted'],
             'debug' => ['APP_DEBUG', 'true', 'false', 'runtime.app_debug_off'],
             'account' => ['STRIPE_ACCOUNT_ID', 'invalid-file-account', self::FILLED['<acct_ID>'], 'stripe.account'],
             'secret key' => ['STRIPE_TEST_SECRET_KEY', 'invalid-file-key', self::FILLED['<sk_test_KEY>'], 'stripe.secret_key_test'],
@@ -178,8 +190,8 @@ class TestCommerceProfileValidatorTest extends TestCase
         $set = static fn (string $key, string $value): \Closure => static fn (string $p): string => self::set($p, $key, $value);
 
         return [
-            'production environment' => [$set('APP_ENV', 'production'), 'runtime.app_env_local'],
-            'testing environment on a host' => [$set('APP_ENV', 'testing'), 'runtime.app_env_local'],
+            'production environment' => [$set('APP_ENV', 'production'), 'runtime.app_env_admitted'],
+            'testing environment on a host' => [$set('APP_ENV', 'testing'), 'runtime.app_env_admitted'],
             'debug on' => [$set('APP_DEBUG', 'true'), 'runtime.app_debug_off'],
             'app url differs from return origin' => [$set('APP_URL', 'https://other.synthetic.invalid'), 'runtime.app_url_equals_return_origin'],
             'loopback http origin' => [static fn (string $p): string => str_replace('https://staging.synthetic.invalid', 'http://localhost', $p), 'commerce.checkout_https_origin'],

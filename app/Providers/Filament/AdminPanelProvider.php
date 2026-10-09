@@ -9,6 +9,7 @@ use App\Http\Controllers\ResumableMediaUploadController;
 use App\Http\Controllers\SiteImagePreviewController;
 use App\Http\Controllers\SiteReleasePreviewController;
 use App\Http\Controllers\SoundKitUploadController;
+use App\Support\Environment\TestEnvironment;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -74,7 +75,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('VASEY.AUDIO / Studio')
             ->defaultAvatarProvider(LocalAvatarProvider::class)
             ->profile()
-            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()], isRequired: fn () => app()->isProduction())
+            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()], isRequired: fn () => TestEnvironment::requiresStaffMfa())
             ->colors([
                 'primary' => Color::hex('#00B8D9'),
             ])

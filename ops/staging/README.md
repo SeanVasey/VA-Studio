@@ -7,9 +7,10 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 
 > **Scope.** Staging runs Stripe **test mode** only. It is not production, and nothing here authorizes
 > live payments, DNS changes to the apex or `www`, customer imports or launch. The environment is
-> `APP_ENV=local` with `APP_DEBUG=false` (interim profile accepted by Sean). Every test-commerce policy only
-> admits `local` or `testing`. `APP_ENV` is a single variable: switching to `staging` later means editing the
-> Forge environment and re-running `provision.sh --app-env staging`.
+> `APP_ENV=staging` with `APP_DEBUG=false`: test commerce is admitted as in `local`, staff TOTP MFA is required,
+> and Stripe live mode, live keys, live production-checkout funds and production identity are refused. The earlier
+> interim `APP_ENV=local` profile (accepted by Sean) still deploys with `provision.sh --app-env local`, but leaves
+> staff MFA optional. `APP_ENV` is a single variable; the Forge environment and `--app-env` must agree.
 
 ## Access model
 
@@ -246,7 +247,8 @@ outside the controlled census must be stopped separately. This does not attest a
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
 real admission and unchanged key, then one `ctl refresh` invocation holds quiesce, snapshot and restore proof, protected capture of the private
 evidence file through anchored no-follow descriptors, revalidates it against real Laravel configuration,
-atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
+atomically installs root:app-group 0440 `.env`, then builds the runtime configuration and route caches as the app. The route
+cache is rebuilt because the panel's MFA page middleware is compiled into it from `APP_ENV`.
 A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
 `ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
 

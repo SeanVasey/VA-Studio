@@ -5,6 +5,7 @@ namespace App\Domain\Grants\Member;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
+use App\Support\Environment\TestEnvironment;
 use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -35,7 +36,9 @@ final class MemberGrantPolicy
         MemberGrantException::require($configuration['enabled'] === true && $configuration['version'] === 1
             && $configuration['family'] === MemberGrantIntent::FAMILY && $configuration['purpose'] === MemberGrantIntent::PURPOSE, 'disabled');
         MemberGrantException::require(in_array($configuration['provenance'], [IdentityPolicy::REHEARSAL, IdentityPolicy::PRODUCTION], true)
-            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true)), 'provenance');
+            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
+            // Staging is a test installation: verified production provenance is refused there.
+            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment'])), 'provenance');
         foreach (['approved_definition_hash', 'approved_profile_hash', 'approved_original_terms_hash'] as $key) {
             MemberGrantException::require(is_string($configuration[$key])
                 && preg_match('/\A[a-f0-9]{64}\z/D', $configuration[$key]) === 1, 'facts_absent');

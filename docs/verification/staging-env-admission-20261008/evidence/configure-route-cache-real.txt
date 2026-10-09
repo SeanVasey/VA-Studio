@@ -1,0 +1,5 @@
+# Real route cache across APP_ENV (review C1); source 56efbb7 + working tree; php 8.4.26
+cache built under local, served under staging: no MFA middleware
+cache rebuilt under staging (configure now does this): ['Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
+uncached, staging: ['Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
+uncached, local: no MFA middleware

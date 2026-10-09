@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Payments;
 
+use App\Support\Environment\TestEnvironment;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -128,7 +129,7 @@ final class StripeSdkCheckoutGateway implements StripeCheckoutGateway, StripeFin
         try {
             $account = config('payments.stripe.account_id');
             $secret = config('payments.stripe.secret_key');
-            if (! app()->environment('local', 'testing')
+            if (! TestEnvironment::admitsTestCommerce()
                 || config('payments.stripe.mode') !== 'test'
                 || ! is_string($account) || ! preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/', $account)
                 || ! is_string($secret) || ! preg_match('/\Ask_test_[A-Za-z0-9]{8,200}\z/', $secret)

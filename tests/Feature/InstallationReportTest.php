@@ -432,5 +432,48 @@ SH;
         $this->assertSame('fail', $this->statuses()['production_settings']);
         config(['app.debug' => false, 'app.url' => 'https://example.test', 'session.secure' => true]);
         $this->assertSame('pass', $this->statuses()['production_settings']);
+        $this->assertArrayNotHasKey('staging_test_mode_only', $this->statuses());
+        $this->assertSame('production', app(InstallationReport::class)->collect()['profile']);
+    }
+
+    public function test_staging_profile_requires_hosted_settings_and_only_stripe_test_mode(): void
+    {
+        $this->app->instance('env', 'staging');
+        config(['app.debug' => true, 'app.url' => 'http://example.test', 'session.secure' => false]);
+        $this->assertSame('fail', $this->statuses()['production_settings']);
+        config(['app.debug' => false, 'app.url' => 'https://example.test', 'session.secure' => true,
+            'payments.stripe.mode' => 'test', 'payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY1234']);
+        $report = app(InstallationReport::class)->collect();
+        $this->assertSame('staging', $report['profile']);
+        $this->assertSame('pass', $this->statuses()['production_settings']);
+        $this->assertSame('pass', $this->statuses()['staging_test_mode_only']);
+        config(['payments.stripe.secret_key' => null]);
+        $this->assertSame('pass', $this->statuses()['staging_test_mode_only']);
+
+        foreach ([
+            'live mode' => ['payments.stripe.mode' => 'live'],
+            'absent mode' => ['payments.stripe.mode' => null],
+            'live key' => ['payments.stripe.secret_key' => 'sk_'.'live_SYNTHETICONLY'],
+            'restricted key' => ['payments.stripe.secret_key' => 'rk_'.'test_SYNTHETICONLY'],
+            'live production checkout' => ['production_checkout.funds_mode' => 'live'],
+            'live production checkout key' => ['production_checkout.secret_key' => 'sk_'.'live_SYNTHETICONLY'],
+            'production identity' => ['production-customer-identity.provenance' => 'verified_production'],
+        ] as $label => $settings) {
+            $previous = array_map(fn (string $key) => config($key), array_combine(array_keys($settings), array_keys($settings)));
+            config($settings);
+            $statuses = $this->statuses();
+            $this->assertSame('fail', $statuses['staging_test_mode_only'], $label);
+            config($previous);
+        }
+        $this->assertSame('pass', $this->statuses()['staging_test_mode_only']);
+    }
+
+    public function test_development_profile_reports_neither_hosted_requirement(): void
+    {
+        $this->app->instance('env', 'local');
+        config(['app.debug' => true, 'app.url' => 'http://localhost', 'session.secure' => false, 'payments.stripe.mode' => 'live']);
+        $this->assertSame('pass', $this->statuses()['production_settings']);
+        $this->assertArrayNotHasKey('staging_test_mode_only', $this->statuses());
+        $this->assertSame('development', app(InstallationReport::class)->collect()['profile']);
     }
 }

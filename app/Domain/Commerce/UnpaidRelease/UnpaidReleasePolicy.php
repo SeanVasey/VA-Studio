@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\UnpaidRelease;
 
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
@@ -18,7 +19,7 @@ final class UnpaidReleasePolicy
     public function account(): string
     {
         $account = config('payments.stripe.account_id');
-        if (! app()->environment('local', 'testing') || config('payments.stripe.mode') !== 'test'
+        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
             || ! is_string($account) || preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) !== 1) {
             throw new RuntimeException('Test unpaid release unavailable.');
         }

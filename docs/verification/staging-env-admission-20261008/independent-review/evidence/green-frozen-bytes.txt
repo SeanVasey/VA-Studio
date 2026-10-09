@@ -1,0 +1,25 @@
+# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+# started: 2026-10-09T10:03:01Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2/phpunit.xml
+
+..F                                                                 3 / 3 (100%)
+
+Time: 00:00.325, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported
+Failed asserting that directory "/home/user/rv-b2/app/Domain/Grants/Paid" does not exist.
+
+/home/user/rv-b2/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:68
+/home/user/rv-b2/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 79, Failures: 1.
+# finished: 2026-10-09T10:03:01Z
+rc=1

@@ -1,0 +1,17 @@
+# Red: configure rebuilds the route cache (review C1); source 56efbb7 + updated test only
+FAIL: test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/user/wt-b2/tests/ops/test_staging_protected_configuration.py", line 107, in test_valid_configuration_installs_fresh_read_only_environment_after_real_admission
+    self.assertEqual((self.release / "storage/framework/cache-command").read_text(), "config:cache\nroute:cache\n")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'config:cache\n' != 'config:cache\nroute:cache\n'
+  config:cache
++ route:cache
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.042s
+
+FAILED (failures=1)
+rc=1

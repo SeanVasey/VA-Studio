@@ -17,6 +17,7 @@ use App\Domain\SiteBuilder\SiteContent;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 use SensitiveParameter;
@@ -193,7 +194,7 @@ final class OrderInquiry
 
     private function readable(): void
     {
-        if (! app()->environment('local', 'testing')) {
+        if (! TestEnvironment::admitsTestCommerce()) {
             throw new InquiryException(404);
         }
     }

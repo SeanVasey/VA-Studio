@@ -4,7 +4,7 @@ Status: merged in [PR #62](https://github.com/VASEYDEV/VASEYAUDIO/pull/62), 2026
 
 ## Explicit test boundary
 
-Fresh checkout requires `local` or `testing`, `STRIPE_TEST_CHECKOUT_ENABLED=true`, `STRIPE_MODE=test`, an own-account `STRIPE_ACCOUNT_ID`, and `VASEY_TEST_CHECKOUT_POLICY`. The SDK additionally requires a valid `sk_test_` credential in `STRIPE_TEST_SECRET_KEY`. Credentials remain host secrets. Staging and production cannot enable this path. A connected ChatGPT Stripe account does not configure the Laravel runtime.
+Fresh checkout requires `local`, `testing` or `staging`, `STRIPE_TEST_CHECKOUT_ENABLED=true`, `STRIPE_MODE=test`, an own-account `STRIPE_ACCOUNT_ID`, and `VASEY_TEST_CHECKOUT_POLICY`. The SDK additionally requires a valid `sk_test_` credential in `STRIPE_TEST_SECRET_KEY`. Credentials remain host secrets. Production cannot enable this path. A hosted `staging` installation runs the same Stripe-test-only chain as `local`, requires staff MFA, and refuses live mode, live keys and production identity ([staging admission evidence](verification/staging-env-admission-20261008/README.md)). A connected ChatGPT Stripe account does not configure the Laravel runtime.
 
 The policy is a strict JSON object with exactly these fields and types; this example uses a synthetic local return origin:
 
