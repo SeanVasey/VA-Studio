@@ -1,0 +1,2 @@
+# command: vendor/bin/pint --test app/Domain/Grants/Paid/PaidGrantRequestInstant.php app/Domain/Grants/Paid/PaidGrantDownloads.php app/Http/Controllers/PaidGrantController.php tests/Feature/PaidGrantRequestInstantTest.php
+{"tool":"pint","result":"passed"}rc=0

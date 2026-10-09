@@ -1,0 +1,280 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
+use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantException;
+use App\Domain\Grants\Paid\PaidGrantRequestInstant;
+use App\Domain\Grants\Paid\PaidGrants;
+use App\Http\Middleware\PaidGrantPrivacy;
+use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionMethod;
+use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+
+/**
+ * Independent review, Addendum 15 (reviewer probe, not product code). Scaffolding (setUp, fixtures, helpers) is copied
+ * verbatim from PaidGrantRequestInstantTest at 27a151b6. Synthetic rehearsal fixtures only.
+ */
+final class ReviewProbeAddendum15Test extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use ProductionCheckoutJourneyFixture;
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        $this->preparePaidDependencies();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+        $this->app->make(Kernel::class)->prependMiddleware(PaidGrantPrivacy::class);
+        $this->app->make(ExceptionHandler::class)->respondUsing(static function ($response, $error, $request) {
+            return PaidGrantPrivacy::matches($request) ? PaidGrantPrivacy::error($response->getStatusCode()) : $response;
+        });
+        Route::middleware('web')->group(base_path('routes/paid-grants.php'));
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        Queue::fake();
+    }
+
+    protected function smtp(string $mode, int $noticeId): array
+    {
+        $capture = tempnam(sys_get_temp_dir(), 'va-paid-synthetic-smtp-');
+        $process = new Process(['python3', $this->paidDependencyPath('tests/Support/production_identity_smtp_sink.py'), $mode, $capture], timeout: 20);
+        $process->start();
+        try {
+            $process->waitUntil(fn (): bool => preg_match('/\A[0-9]+\n/', $process->getOutput()) === 1);
+            app()->instance(IdentityNoticeTransport::class, new LoopbackSmtp((int) trim($process->getOutput())));
+            (new WorkIdentityNotice)->process($noticeId);
+            $process->wait();
+            $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+
+            return filesize($capture) > 0 ? json_decode(file_get_contents($capture), true, 8, JSON_THROW_ON_ERROR) : [];
+        } finally {
+            $process->stop(0);
+            unlink($capture);
+        }
+    }
+
+    private function login(array $buyer): void
+    {
+        $this->actingAs($buyer['user'], 'customer')->withSession(['_token' => str_repeat('c', 40),
+            '_production_customer_identity' => ['binding_digest' => $buyer['principal']->sessionBindingDigest()]]);
+    }
+
+    public function test_p1_client_headers_cannot_set_the_admitted_instant(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->addSeconds(3));
+        $early = $this->now() - 8;
+        // The SAPI value is the controller's own now (after expiry); every header claims a start 5 s before expiry.
+        $headers = ['REQUEST_TIME_FLOAT' => (string) $early, 'Request-Time-Float' => (string) $early, 'X-Request-Time' => (string) $early,
+            'X-Request-Start' => 't='.$early, 'Request-Time' => (string) $early];
+        $this->assertSame(410, $this->withHeaders($headers)->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->getStatusCode());
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        // The same header names injected straight into the server bag as a proxy would pass them (HTTP_*), as floats.
+        $this->assertSame(410, $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now(), 'HTTP_REQUEST_TIME_FLOAT' => $early,
+            'HTTP_X_REQUEST_TIME' => $early, 'HTTP_REQUEST_TIME' => $early])->getStatusCode());
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        // Control: only the server's own REQUEST_TIME_FLOAT moves admission.
+        $this->flushHeaders();
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $early])->assertOk();
+        $this->assertSame($this->masterBytes($f), $response->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_p2_expiry_is_valid_to_start_at_microsecond_resolution(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->addMilliseconds(500));
+        $at = (float) $expires->format('U.u');
+        $this->assertSame(410, $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $at])->getStatusCode(), 'received exactly at expiry');
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $at - 0.000001])->assertOk();
+        $this->assertSame($this->masterBytes($f), $response->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_p3a_an_old_admitted_instant_does_not_excuse_the_one_attempt_rule(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->subSeconds(10));
+        $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk()->streamedContent();
+        $this->assertDatabaseCount('paid_redemptions', 1);
+        $this->travelTo($expires->subSeconds(5));
+        $instant = PaidGrantDownloads::receivedAt($this->now());
+        $this->travelTo($expires->addSeconds(65));
+        $status = null;
+        try {
+            (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $instant);
+        } catch (PaidGrantException $error) {
+            $status = $error->status;
+        }
+        $this->assertSame(409, $status);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_p3b_an_old_admitted_instant_does_not_excuse_a_current_identity_revocation(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->subSeconds(2));
+        $instant = PaidGrantDownloads::receivedAt($this->now());
+        $account = DB::table('customer_accounts')->where('id', $f['buyer']['principal']->accountId)->first();
+        DB::table('customer_accounts')->where('id', $account->id)->update(['active' => false, 'access_version' => $account->access_version + 1, 'updated_at' => now()]);
+        $this->travel(65)->seconds();
+        $status = null;
+        try {
+            (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $instant);
+        } catch (PaidGrantException $error) {
+            $status = $error->status;
+        }
+        $this->assertSame(403, $status);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+    }
+
+    public function test_p4_the_type_can_be_forged_only_by_in_process_reflection_or_unserialize(): void
+    {
+        $class = PaidGrantRequestInstant::class;
+        $epoch = CarbonImmutable::createFromTimestamp(0, 'UTC');
+        // unserialize() fills readonly properties without the constructor or capture().
+        $forged = unserialize('O:'.strlen($class).':"'.$class.'":1:{s:2:"at";'.serialize($epoch).'}');
+        $this->assertInstanceOf($class, $forged);
+        $this->assertEquals($epoch, $forged->at);
+        // newInstanceWithoutConstructor() plus a scope-bound closure initializes the uninitialized readonly property.
+        $bare = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+        \Closure::bind(function () use ($epoch): void {
+            $this->at = $epoch;
+        }, $bare, $class)();
+        $this->assertEquals($epoch, $bare->at);
+        // An initialized instance cannot be changed, even from class scope; a clone carries the same validated value.
+        $real = PaidGrantRequestInstant::capture(null);
+        $error = null;
+        try {
+            \Closure::bind(function () use ($epoch): void {
+                $this->at = $epoch;
+            }, $real, $class)();
+        } catch (\Error $e) {
+            $error = $e->getMessage();
+        }
+        $this->assertStringContainsString('Cannot modify readonly property', (string) $error);
+        $this->assertEquals($real->at, (clone $real)->at);
+        // redeem() trusts whatever instance it is handed: a forged instant 2 s before expiry admits 120 s after expiry.
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $late = unserialize('O:'.strlen($class).':"'.$class.'":1:{s:2:"at";'.serialize($expires->subSeconds(2)).'}');
+        $this->travelTo($expires->addSeconds(120));
+        $transfer = (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $late);
+        $bytes = '';
+        $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+            $bytes .= $chunk;
+        });
+        $this->assertSame($this->masterBytes($f), $bytes);
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_p5_an_out_of_range_server_time_fails_closed_before_anything_is_recorded(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->travelTo($expires->subSeconds(10));
+        // Finite but outside Carbon's range: capture() throws instead of falling back (A15-I1). The controller maps the
+        // throwable to the generic 503 before the identity proof, and nothing is recorded.
+        foreach ([1e20, (float) PHP_INT_MAX, -1e15] as $value) {
+            $this->assertSame(503, $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $value])->getStatusCode());
+            $this->assertDatabaseCount('paid_redemptions', 0);
+        }
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk();
+        $this->assertSame($this->masterBytes($f), $response->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    private function now(): float
+    {
+        return (float) CarbonImmutable::now('UTC')->format('U.u');
+    }
+
+    /** The current-identity proof (`ProductionCustomerSessions::principal`) takes `$seconds` of wall time, once. */
+    private function slowIdentity(int $seconds): void
+    {
+        $spent = false;
+        Event::listen(TransactionCommitted::class, function () use (&$spent, $seconds): void {
+            if ($spent || DB::transactionLevel() !== 0) {
+                return;
+            }
+            $frames = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            if (array_filter($frames, fn (array $frame): bool => ($frame['class'] ?? null) === ProductionCustomerSessions::class && $frame['function'] === 'principal') === []) {
+                return;
+            }
+            $spent = true;
+            $this->travel($seconds)->seconds();
+        });
+    }
+
+    private function authorized(): array
+    {
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $f['batch'] = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['batch'] = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($f['batch']['fulfilled']);
+        $auth = (new PaidGrantDownloads)->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => 'master_wav', 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+        $this->login($f['buyer']);
+
+        return [$f, $auth];
+    }
+
+    private function redeem(array $auth, array $server)
+    {
+        $raw = http_build_query(['token' => $auth['token'], '_token' => str_repeat('c', 40)], '', '&', PHP_QUERY_RFC3986);
+        parse_str($raw, $form);
+
+        return $this->call('POST', '/paid-grants/authorizations/'.$auth['id'].'/redeem', $form, [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'] + $server, $raw);
+    }
+
+    private function masterBytes(array $f): string
+    {
+        return file_get_contents(Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path));
+    }
+}

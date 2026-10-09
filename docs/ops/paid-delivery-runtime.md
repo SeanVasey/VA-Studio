@@ -45,13 +45,17 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
    - `document`: at least the whole-request bound plus a margin: 3,900 s.
    - nginx's 60 s default is too short for both.
    - The `redeem` bound starts when PHP begins the controller, but the proxy's clock starts earlier. Before
-     `redeem()` runs there is the session-lock wait (up to 5 s) and the customer identity proof. The proof's locking
-     reads have no deadline of their own; each statement is bounded only by the database lock-wait timeout. Redemption
-     is judged at the request's start, so a slow proof no longer refuses a token that was live on arrival (Codex
-     round 23). But if the proof plus the first-byte path outlasts the proxy timeout, the server can record the attempt
-     while the customer gets a 504. Before mount, either set `innodb_lock_wait_timeout` low enough for the identity
-     proof to fit inside the margin above, or add an explicit identity-proof budget that refuses before anything is
-     recorded (condition C11 (k), open for Sean).
+     `redeem()` runs there is the session-lock wait (up to 5 s) and the customer identity proof. The proof has no
+     deadline of its own. On MySQL it issues 4 × (9 + k) `SELECT … FOR UPDATE` reads, where k is the account's
+     verification count (1 to 128): 40 to 548 locking reads. Each also runs schema checks whose metadata-lock waits
+     are bounded by `lock_wait_timeout` (MySQL default one year), not `innodb_lock_wait_timeout` (review A15-L1).
+     Redemption is judged at the request's start, so a slow proof no longer refuses a token that was live on arrival
+     (Codex round 23). But if the proof plus the first-byte path outlasts the proxy timeout, the server can record the
+     attempt while the customer gets a 504. Lowering `innodb_lock_wait_timeout` alone cannot close this: at its 1 s
+     minimum the worst case is still 548 s. Before mount, add an explicit budget measured from the captured request
+     start and checked before anything is recorded (before `locate()` and again before the commit frame inserts the
+     attempt). If database timeouts are also used, set both `lock_wait_timeout` and `innodb_lock_wait_timeout` on the
+     paid connection, sized for 4 × (9 + 128) statements (condition C11 (k), open for Sean).
 3. **Proxy response buffering on** for `redeem`, with a temp-file cap at least the largest deliverable. With nginx that
    means `fastcgi_buffering on` and `fastcgi_max_temp_file_size 1024m` (1 GiB, `DeliveryAssetFiles::MAX_BYTES`). PHP
    then finishes writing at disk speed and releases its spool slot, while the proxy serves slow clients.
@@ -144,5 +148,7 @@ Record the results in the activation packet (`docs/ops/production-activation-pac
   the long request is the page's own, the cap can end the wait earlier, about 620 s after the click. A completion longer
   than that needs a later click, so confirm it fits (review A11-I4, A12-I3).
 - The proxy temp directory is not reachable over HTTP and holds nothing after the transfers finish.
-- The identity proof's worst case on the chosen database (lock-wait timeout times its locking statements) fits inside
-  the `redeem` proxy margin, or an explicit identity budget exists (C11 (k)).
+- An explicit identity-proof budget, measured from the request start and checked before anything is recorded, keeps
+  the proof plus the first-byte path inside the `redeem` proxy timeout. Database timeouts alone do not: record
+  `lock_wait_timeout`, `innodb_lock_wait_timeout` and the 4 × (9 + k) locking-read count if they are also used (C11 (k),
+  review A15-L1).
