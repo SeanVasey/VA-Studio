@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `11248aa3ee924cb3d4f3d1f8fe48bda39089cc2a`. The kit integrates main's CI
+Current tested functional source: `7bced5ecb91593e28854297a2ca14247931c3448`. The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -116,7 +116,7 @@ Stripe header and UTF-8 body arrive at genuine FPM, **28 checks pass**. An inher
 repairs that boundary; default and inherited-off runs both pass 28. These are synthetic signed-body/header
 transport checks, not Stripe SDK verification, Laravel receipt persistence or a real provider purchase.
 
-| Current exact committed receipt (`codex-repair/`) | Actual result |
+| Historical committed receipt at11cf (`codex-repair/`) | Actual result |
 | --- | --- |
 | `committed-ops-tests.txt` | **39 methods pass**, exit 0: parser12, refresh1, admission9, sealing7, backup7, protected configure3 |
 | `committed-runtime-tests.txt` | Genuine PHP 8.4.26, **13 tests / 63 assertions**, exit 0 |
@@ -174,3 +174,29 @@ not a substitute for that decision.
 Publication formatting removes trailing whitespace from new unittest progress lines and one empty-stdout assertion line; assertions, failure details and outcomes are unchanged.
 
 Independent [Codex repair addendum](independent-review/CODEX-REPAIR-ADDENDUM.md) **APPROVES exact functional11248aa3**, explicitly carried to evidence candidate1f84d0b3 by empty product-source diff. Independent boundary9 and canonical43 pass; all four new issues are closed. Final publication is an evidence-only successor and retains the same source.
+
+## Build/ancestry admission repair at `7bced5ec`
+
+Codex review completed on c9ff1434 and raised4226283468 (live app poisoning ignored generated artifacts)
+and4226283473 (provisioning a root whose existing ancestry ctl later rejects). The actual owned Git/deploy
+flow with a separate live application-process fixture reproduced vendor injection while real tracked-source
+Git comparison accepted it. The extracted actual old lexical root check admitted an app-owned parent.
+`build-admission-red-corrected.txt` retains **2 methods /2 safety failures**; the first red's root case used
+an absent-guard stand-in, corrected to the real lexical check before repair. `root-lexical-red.txt` retains
+**2 methods /2 subcase failures** on intermediate double-slash/trailing-slash admission.
+
+New-release deploy validates the frozen candidate using the protected current release when present,
+quiesces controlled services/writers before allocation/build, then repeats built-candidate admission before
+attachment/sealing. All post-quiesce failures keep writer admission closed for recovery; downtime includes
+Composer/npm. Already running rogue/manual application-account processes outside the controlled census
+must separately be stopped. Existing builder-attestation limits remain explicit.
+
+Provision requires canonical lexical components and every existing ancestor/root to be a canonical,
+root-owned directory without group/world write permission before package/account/database/filesystem
+changes. Missing descendants are created only under that admitted prefix.
+
+Exact committed owner receipts: `final-ops-7bced5ec.txt` **45 PASS**, `final-runtime-7bced5ec.txt` **13/63 PASS**;
+Bash5 separately andShellcheck `-x` PASS. Native28 signature proof remains at11248 with empty HTTP template
+diff; it was not relabeled or rerun. The first current ops attempt lacked RELEASES in its new fixture,
+failed1 case, and is retained as `build-admission-ops-harness-attempt.txt`. Corrected intermediate45 PASS
+and the exact committed45 PASS remain separate. No privileged host operation or provider call occurred.

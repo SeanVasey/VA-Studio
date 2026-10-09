@@ -80,7 +80,7 @@ Private bind-mounted contents are never traversed or changed by sealing.
 Only the root helper switches `current`. Custom roots must have canonical, root-owned ancestry without
 group/world write permission before provisioning; nonexistent descendants are created only under that
 protected prefix. App-owned ancestors, symlinks and noncanonical components refuse before host changes.
-Group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
+Re-provisioning an existing kit does not certify its previously built releases;
 use a fresh reviewed release and prove sealing/attachment before activation.
 
 Every independently callable helper action holds a separate root-owned `/etc/vasey-staging/ctl.lock`.

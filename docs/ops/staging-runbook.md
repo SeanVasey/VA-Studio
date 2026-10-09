@@ -292,7 +292,7 @@ still points at the previous release. New-release deployments quiesce before all
 so Composer/npm failure can leave the old site in maintenance with writer admission closed. Inspect service
 state before recovery; downtime includes the build. Stop any uncontrolled manual/rogue app-account process
 separately; controlled service quiescence is not a builder attestation. Confirm the old
-still points at the previous release and its environment is unchanged. A failed quiesce or partial resume
+environment is unchanged. A failed quiesce or partial resume
 does not prove stopped writers. Inspect `ctl status` and establish quiesce before resuming. If any migration
 ran, use B; if same-SHA configuration replacement began, use D.
 
