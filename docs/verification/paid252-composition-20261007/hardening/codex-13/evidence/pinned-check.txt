@@ -1,0 +1,15 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0
+app/Domain/Grants/Paid/PaidGrantDownloads.php pinned_in=0
+app/Domain/Grants/Paid/PaidGrantPolicy.php pinned_in=0
+app/Domain/Grants/Paid/PaidGrantPrepareStream.php pinned_in=0
+config/paid-grants.php pinned_in=0
+tests/Feature/PaidGrantSnapshotDeadlineTest.php pinned_in=0
+tests/Support/PaidGrantMonotonicClock.php pinned_in=0
+# git diff --stat (tracked)
+ CHANGELOG.md                                      |  2 +-
+ app/Domain/Grants/Paid/PaidGrantDownloads.php     | 18 +++++++++++++-----
+ app/Domain/Grants/Paid/PaidGrantPolicy.php        | 13 +++++++++++++
+ app/Domain/Grants/Paid/PaidGrantPrepareStream.php | 13 +++++++++++--
+ config/paid-grants.php                            |  4 ++++
+ 5 files changed, 42 insertions(+), 8 deletions(-)

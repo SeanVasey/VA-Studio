@@ -1,0 +1,17 @@
+# source: 55976099 + final working tree (after the last comment-only edit); public/build absent
+b1d83dd96d10ea2e7c89569c326f55c5fa7eee7752c8dbb563ff7cb9328a363c  app/Domain/Grants/Paid/PaidGrantDownloads.php
+bf82b218b134c9c291bd0b61213aeb78ea7676199244fc7fa72f92ed03f40292  app/Domain/Grants/Paid/PaidGrantRequestInstant.php
+c35d12da990b72eafe7dfc20690aed9f12ab1408e520964dd92e9eb23ce97e7b  app/Http/Controllers/PaidGrantController.php
+45c2179579283ac19052519a9bd1c130a7cf781bfffb5f6eca71e92bd58b556c  tests/Feature/PaidGrantRequestInstantTest.php
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 00:50.469, Memory: 101.00 MB
+
+OK (7 tests, 129 assertions)
+rc=0

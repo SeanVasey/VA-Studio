@@ -1,0 +1,6 @@
+child locked: bool(true)
+parent while child blocked in write: false
+child state: S    poll_schedule_timeout.constprop.0
+parent after SIGKILL: true
+PHP 8.4.26 (cli) (built: Sep 24 2026 17:15:37) (NTS)
+Linux 6.18.44-fc-v80

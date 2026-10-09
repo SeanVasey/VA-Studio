@@ -1,0 +1,21 @@
+# doc ops nginx block at 55976099; command: nginx -t -p <scratch>/nginx -c <scratch>/nginx/55976099.conf
+9:location ~ ^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$ {
+18:location ~ ^/paid-grants/origins/[0-9a-f-]{36}/document$ {
+2026/10/09 07:54:15 [emerg] 3924#3924: unknown directive "36}/redeem$" in <scratch>/nginx/55976099.conf:9
+nginx: configuration file <scratch>/nginx/55976099.conf test failed
+rc=1
+
+# doc ops nginx block at 27a151b6; command: nginx -t -p <scratch>/nginx -c <scratch>/nginx/27a151b6.conf
+9:location ~ "^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$" {
+18:location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
+nginx: the configuration file <scratch>/nginx/27a151b6.conf syntax is ok
+nginx: configuration file <scratch>/nginx/27a151b6.conf test is successful
+rc=0
+
+# doc ops nginx block at b99b5dd; command: nginx -t -p <scratch>/nginx -c <scratch>/nginx/b99b5dd.conf
+9:location ~ "^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$" {
+18:location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
+nginx: the configuration file <scratch>/nginx/b99b5dd.conf syntax is ok
+nginx: configuration file <scratch>/nginx/b99b5dd.conf test is successful
+rc=0
+

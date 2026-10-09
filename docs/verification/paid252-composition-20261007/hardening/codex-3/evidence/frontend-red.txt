@@ -1,0 +1,365 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (14 tests | 1 failed) 2489ms
+   ❯ per-operation request timeouts (5)
+     × lets a lost authorize be set aside only after a later saved read shows no live authorization of that file 226ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > lets a lost authorize be set aside only after a later saved read shows no live authorization of that file
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Set aside and request a new authorization"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Paid license journey":
+  [36m<section[39m
+    [33maria-busy[39m=[32m"false"[39m
+    [33maria-label[39m=[32m"Paid license journey"[39m
+  [36m/>[39m
+
+  Name "Retained paid order":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Retained paid order"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"paid-license-reference"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  Name "":
+  [36m<p />[39m
+
+  --------------------------------------------------
+  alert:
+
+  Name "":
+  [36m<div[39m
+    [33mclass[39m=[32m"customer-account-message"[39m
+    [33mrole[39m=[32m"alert"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Refresh paid licenses":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Retry the exact request":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare licenses for this paid order":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Open saved order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Refresh preparation and download status":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Authorize master_wav for Original synthetic recording":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Authorize contract for Original synthetic recording":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  [36m<input[39m
+    [33mautocomplete[39m=[32m"off"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mid[39m=[32m"paid-order-reference"[39m
+    [33mmaxlength[39m=[32m"36"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  article:
+
+  Name "":
+  [36m<article[39m
+    [33mclass[39m=[32m"paid-license-line"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "Original synthetic recording":
+  [36m<h2 />[39m
+
+  --------------------------------------------------
+  group:
+
+  Name "":
+  [36m<details />[39m
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  [36m<ul />[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-busy[39m=[32m"false"[39m
+      [33maria-label[39m=[32m"Paid license journey"[39m
+    [36m>[39m
+      [36m<p>[39m
+        [0mYour original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"customer-account-message"[39m
+        [33mrole[39m=[32m"alert"[39m
+        [33mtabindex[39m=[32m"-1"[39m
+      [36m>[39m
+        [0mThe result could not be confirmed. Refresh saved licenses before deliberately retrying the same request.[0m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mRefresh paid licenses[0m
+      [36m</button>[39m
+      [36m<div>[39m
+        [36m<p>[39m
+          [0mReview saved licenses before deliberately retrying this exact request.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRetry the exact request[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<form>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"paid-order-reference"[39m
+        [36m>[39m
+          [0mSaved order reference[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mautocomplete[39m=[32m"off"[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mid[39m=[32m"paid-order-reference"[39m
+          [33mmaxlength[39m=[32m"36"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+        [36m<button[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtype[39m=[32m"submit"[39m
+        [36m>[39m
+          [0mPrepare licenses for this paid order[0m
+        [36m</button>[39m
+      [36m</form>[39m
+      [36m<div[39m
+        [33maria-label[39m=[32m"Saved paid licenses"[39m
+      [36m>[39m
+        [36m<p>[39m
+          [0mLatest [0m
+          [0m20[0m
+          [0m saved orders. An order reference can open an older original.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mOpen saved order [0m
+          [0mbbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Retained paid order"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"paid-license-reference"[39m
+        [36m>[39m
+          [0mOrder [0m
+          [0mbbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb[0m
+        [36m</p>[39m
+        [36m<p>[39m
+          [0mRehearsal original. No real payment or production legal facts are certified.[0m
+        [36m</p>[39m
+        [36m<p>[39m
+          [0mComplete-order preparation is recorded. Exact files are checked again for each download.[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0mRefresh preparation and download status[0m
+        [36m</button>[39m
+        [36m<article[39m
+          [33mclass[39m=[32m"paid-license-line"[39m
+        [36m>[39m
+          [36m<h2>[39m
+            [0mOriginal synthetic recording[0m
+          [36m</h2>[39m
+          [36m<p>[39m
+            [0mUSD[0m
+            [0m [0m
+            [0m49.99[0m
+            [0m + tax [0m
+            [0m0.00[0m
+            [0m from the original accepted order.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mDeclared name: [0m
+            [0mOriginal private buyer declaration[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mLicense accepted: [0m
+            [0m2026-10-07T01:02:03Z[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mOriginal PDF: [0m
+            [0mcomplete[0m
+            [0m; preparation attempts [0m
+            [0m1[0m
+            [0m/5.[0m
+          [36m</p>[39m
+          [36m<details>[39m
+            [36m<summary>[39m
+              [0mExplicit synthetic license[0m
+              [0m / retained version [0m
+              [0m1[0m
+            [36m</summary>[39m
+            [36m<pre[39m
+              [33mclass[39m=[32m"paid-license-terms"[39m
+            [36m>[39m
+              [0mRETAINED PRIVATE ORIGINAL TERMS &lt;script&gt;private()&lt;/script&gt;[0m
+            [36m</pre>[39m
+          [36m</details>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Download status for Original synthetic recording"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0m0[0m
+              [0m/[0m
+              [0m3[0m
+              [0m committed download attempts. This does not confirm file receipt.[0m
+            [36m</p>[39m
+            [36m<ul />[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<p>[39m
+              [0mmaster_wav[0m
+              [0m / [0m
+              [0m1024[0m
+              [0m bytes / SHA256 [0m
+              [0mbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAuthorize [0m
+              [0mmaster_wav[0m
+              [0m for [0m
+              [0mOriginal synthetic recording[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<p>[39m
+              [0mcontract[0m
+              [0m / [0m
+              [0m2048[0m
+              [0m bytes / SHA256 [0m
+              [0mcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mAuthorize [0m
+              [0mcontract[0m
+              [0m for [0m
+              [0mOriginal synthetic recording[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</article>[39m
+      [36m</section>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-journey.test.tsx:173:29
+    171|     await refreshStatus(3);
+    172|     fireEvent.click(authorize()); expect(await screen.findByRole('aler…
+    173|     const setAside = screen.getByRole('button', { name: 'Set aside and…
+       |                             ^
+    174|     expect(setAside).toBeDisabled(); expect(authorize()).toBeDisabled(…
+    175|     // The lost request may have committed a live authorization: only …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  16:09:49
+   Duration  4.26s (tests 61%, environment 24%, transform 9%, setup 5%)
+
+rc=1

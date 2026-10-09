@@ -1,0 +1,5 @@
+cmd: npx tsc --noEmit
+head: 5e99f610db65c6d5afc8df91da8b3b96e3218705 + untracked tests/frontend/paid-grant-review-addendum6.test.tsx
+rc=0
+wall_s=2
+symlink removed: yes

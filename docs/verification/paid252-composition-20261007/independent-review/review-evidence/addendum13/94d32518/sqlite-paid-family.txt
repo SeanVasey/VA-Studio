@@ -1,0 +1,18 @@
+cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum13/94d32518/sqlite-paid-family.xml --filter PaidGrant tests/Feature  (SQLite defaults, public/build absent: absent)
+head: 94d325185d57eea57011d7466934a9b854c9d448 (merged tree; no untracked tests)
+start: 2026-10-08T22:29:28Z load: 1.06 1.62 2.30
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+...............................................................  63 / 133 ( 47%)
+..........................[36;1mS[0m.................................... 126 / 133 ( 94%)
+.......                                                         133 / 133 (100%)
+
+Time: 10:20.645, Memory: 292.04 MB
+
+[30;42mOK, but some tests were skipped![0m
+[30;42mTests: 133[0m[30;42m, Assertions: 4698[0m[30;42m, Skipped: 1[0m[30;42m.[0m
+rc=0
+wall: 622 s; end: 2026-10-08T22:39:50Z load: 2.59 2.41 2.37

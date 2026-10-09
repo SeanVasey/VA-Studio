@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantCommittingAdmissionTest.php" tests="2" assertions="36" errors="0" failures="0" skipped="0" time="8.142640">
+    <testsuite name="Tests\Feature\PaidGrantCommittingAdmissionTest::test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin" tests="2" assertions="36" errors="0" failures="0" skipped="0" time="8.142640">
+      <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #0" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="79" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="18" time="4.312044"/>
+      <testcase name="test_genuine_last_committing_callback_cannot_withdraw_current_consumer_authority_and_commit_new_origin with data set #1" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantCommittingAdmissionTest.php" line="79" class="Tests\Feature\PaidGrantCommittingAdmissionTest" classname="Tests.Feature.PaidGrantCommittingAdmissionTest" assertions="18" time="3.830595"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,17 @@
+cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum9/d00e0fa0/sqlite-review-probe.xml tests/Feature/ReviewProbeAddendum9Test.php  (SQLite defaults, public/build absent: absent)
+head: 093f90819aa4905babfdad26923cd82b4547903d + untracked tests/Feature/ReviewProbeAddendum9Test.php (reviewer probe with P2 status echo, deleted after recording)
+start: 2026-10-08T19:01:53Z load: 4.83 4.19 4.13
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+.P2 disabled status=404
+P2 production-policy status=409
+..                                                                 3 / 3 (100%)
+
+Time: 00:28.749, Memory: 105.00 MB
+
+[30;42mOK (3 tests, 52 assertions)[0m
+rc=0
+wall: 29 s; end: 2026-10-08T19:02:22Z load: 5.26 4.35 4.18

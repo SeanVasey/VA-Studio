@@ -1,0 +1,20 @@
+# command: git diff --stat 55976099 27a151b6
+ CHANGELOG.md                                       |   2 +-
+ app/Domain/Grants/Paid/PaidGrantDownloads.php      |  45 ++-----
+ app/Domain/Grants/Paid/PaidGrantRequestInstant.php |  47 +++++++
+ app/Http/Controllers/PaidGrantController.php       |   3 +-
+ docs/ops/paid-delivery-runtime.md                  |  16 ++-
+ .../hardening/codex-23/README.md                   | 140 +++++++++++++++++++++
+ .../codex-23/evidence/census-self-test.txt         |   6 +
+ .../hardening/codex-23/evidence/family-green.txt   |  24 ++++
+ .../codex-23/evidence/green-request-instant.txt    |  17 +++
+ .../evidence/mutation-M1-second-age-check.txt      |  61 +++++++++
+ .../evidence/mutation-M2-public-constructor.txt    |  35 ++++++
+ .../hardening/codex-23/evidence/pinned-check.txt   |  12 ++
+ .../hardening/codex-23/evidence/pint.txt           |   3 +
+ .../codex-23/evidence/red-on-55976099.txt          |  45 +++++++
+ tests/Feature/PaidGrantRequestInstantTest.php      |  63 +++++++++-
+ 15 files changed, 478 insertions(+), 41 deletions(-)
+rc=0
+# command: git diff --stat 55976099 27a151b6 -- database config routes bootstrap resources composer.json composer.lock package-lock.json
+rc=0 (empty = no schema/config/route/renderer/lockfile change)

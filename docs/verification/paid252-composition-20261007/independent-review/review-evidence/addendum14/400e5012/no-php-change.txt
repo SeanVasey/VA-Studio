@@ -1,0 +1,28 @@
+cmd: git diff --stat 94d32518 400e5012 -- app config database routes
+rc=0 (empty output: no PHP, config, database or route change)
+
+cmd: git diff --stat 94d32518 400e5012
+ CHANGELOG.md                                       |   2 +-
+ .../hardening/codex-22/README.md                   |  77 ++++++++
+ .../codex-22/evidence/frontend-paid-all.txt        |  17 ++
+ .../hardening/codex-22/evidence/green-new-test.txt |  12 ++
+ .../evidence/mutation-M-no-reopen-button.txt       | 212 ++++++++++++++++++++
+ .../hardening/codex-22/evidence/pinned-check.txt   |   7 +
+ .../codex-22/evidence/red-on-2f0d7ca2.txt          | 213 +++++++++++++++++++++
+ .../hardening/codex-22/evidence/tsc.txt            |   2 +
+ .../independent-review/ADDENDUM-13.md              | 169 ++++++++++++++++
+ .../94d32518/ReviewProbeAddendum13Test.php.txt     | 205 ++++++++++++++++++++
+ .../addendum13/94d32518/census-methods-exist.txt   |   2 +
+ .../addendum13/94d32518/census-self-test.txt       |   8 +
+ .../addendum13/94d32518/frontend-vitest.txt        |  17 ++
+ .../review-evidence/addendum13/94d32518/pint.txt   |   4 +
+ .../addendum13/94d32518/sqlite-new-tests.txt       |  15 ++
+ .../addendum13/94d32518/sqlite-new-tests.xml       |  19 ++
+ .../addendum13/94d32518/sqlite-paid-family.txt     |  18 ++
+ .../addendum13/94d32518/sqlite-paid-family.xml     | 204 ++++++++++++++++++++
+ .../addendum13/94d32518/sqlite-review-probe.txt    |  17 ++
+ .../addendum13/94d32518/sqlite-review-probe.xml    |   7 +
+ .../review-evidence/addendum13/94d32518/tsc.txt    |   3 +
+ resources/js/components/PaidGrantJourney.tsx       |   7 +-
+ tests/frontend/paid-grant-reopen-pending.test.tsx  | 120 ++++++++++++
+ 23 files changed, 1355 insertions(+), 2 deletions(-)

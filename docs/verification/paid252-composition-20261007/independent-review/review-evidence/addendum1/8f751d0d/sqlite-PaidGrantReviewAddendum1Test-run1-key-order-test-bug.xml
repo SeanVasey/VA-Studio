@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantReviewAddendum1Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" tests="6" assertions="122" errors="0" failures="2" skipped="0" time="56.402854">
+    <testcase name="test_the_observation_budget_still_bounds_the_first_byte_when_the_transfer_deadline_is_far_away" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="160" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="18" time="9.006086"/>
+    <testcase name="test_the_transfer_deadline_is_derived_only_from_the_server_snapshot_size_and_policy" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="181" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="19" time="8.238708"/>
+    <testcase name="test_a_failed_redemption_admitted_before_expiry_cannot_be_restarted_after_expiry_and_records_nothing" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="201" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="17" time="8.086528"/>
+    <testcase name="test_a_transfer_policy_that_becomes_invalid_during_the_snapshot_refuses_before_the_attempt_is_recorded" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="219" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="17" time="9.200572"/>
+    <testcase name="test_a_downward_policy_revision_keeps_the_retained_limit_lifetime_and_idempotent_replay_and_refinalize_does_not_reseal" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="240" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="26" time="13.900834">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantReviewAddendum1Test::test_a_downward_policy_revision_keeps_the_retained_limit_lifetime_and_idempotent_replay_and_refinalize_does_not_reseal
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'authorization_seconds' =&gt; 60,
++    'max_downloads' =&gt; 3,
++    'provenance' =&gt; 'synthetic_rehearsal',
++    'purpose' =&gt; 'paid-original-delivery',
+     'schema_version' =&gt; 1,
+     'version' =&gt; 'explicit-synthetic-delivery-v1',
+-    'purpose' =&gt; 'paid-original-delivery',
+-    'provenance' =&gt; 'synthetic_rehearsal',
+-    'max_downloads' =&gt; 3,
+-    'authorization_seconds' =&gt; 60,
+ ]
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php:265
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_a_current_policy_of_the_other_provenance_refuses_every_retained_path_without_recording_and_restoring_it_recovers" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php" line="270" class="Tests\Feature\PaidGrantReviewAddendum1Test" classname="Tests.Feature.PaidGrantReviewAddendum1Test" assertions="25" time="7.970125">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantReviewAddendum1Test::test_a_current_policy_of_the_other_provenance_refuses_every_retained_path_without_recording_and_restoring_it_recovers
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
++    'authorization_seconds' =&gt; 60,
++    'max_downloads' =&gt; 3,
++    'provenance' =&gt; 'synthetic_rehearsal',
++    'purpose' =&gt; 'paid-original-delivery',
+     'schema_version' =&gt; 1,
+     'version' =&gt; 'explicit-synthetic-delivery-v1',
+-    'purpose' =&gt; 'paid-original-delivery',
+-    'provenance' =&gt; 'synthetic_rehearsal',
+-    'max_downloads' =&gt; 3,
+-    'authorization_seconds' =&gt; 60,
+ ]
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php:293
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

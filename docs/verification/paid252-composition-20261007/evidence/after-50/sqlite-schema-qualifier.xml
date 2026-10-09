@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\SchemaQualifierDelimiterTest" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" tests="5" assertions="26" errors="0" failures="0" skipped="0" time="0.813269">
+    <testsuite name="Tests\Unit\SchemaQualifierDelimiterTest::test_each_matcher_refuses_a_delimited_database_name_before_matching" tests="4" assertions="20" errors="0" failures="0" skipped="0" time="0.789311">
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;backtick&quot;" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.732676"/>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;double quote&quot;" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.021511"/>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;doubled backtick&quot;" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.019297"/>
+      <testcase name="test_each_matcher_refuses_a_delimited_database_name_before_matching with data set &quot;leading quote&quot;" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" line="38" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="5" time="0.015827"/>
+    </testsuite>
+    <testcase name="test_each_matcher_still_decides_plain_names_on_the_stored_body" file="/home/user/VA-Studio-paid252/tests/Unit/SchemaQualifierDelimiterTest.php" line="55" class="Tests\Unit\SchemaQualifierDelimiterTest" classname="Tests.Unit.SchemaQualifierDelimiterTest" assertions="6" time="0.023958"/>
+  </testsuite>
+</testsuites>

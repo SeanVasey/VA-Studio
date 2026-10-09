@@ -1,0 +1,2 @@
+# command: /home/user/VA-Studio/vendor/bin/pint --test <6 changed/new PHP files>
+{"tool":"pint","result":"passed"}rc=0

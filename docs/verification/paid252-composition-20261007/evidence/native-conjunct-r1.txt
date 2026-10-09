@@ -1,0 +1,5 @@
+{"tool":"phpunit","result":"failed","tests":1,"passed":0,"assertions":17,"duration_ms":657324,"failed":1,"failures":[{"test":"Tests\\Feature\\PaidGrantRedeemFrameConjunctTest::test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization","file":"/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php","line":109,"message":"Expected response status code [200] but received 403.\nFailed asserting that 403 is identical to 200.","trace":["/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46","/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php:109"]}]}
+
+real	10m57.569s
+user	0m40.965s
+sys	0m18.030s

@@ -1,0 +1,14 @@
+cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum3/3f7d295c/sqlite-redeem-one-slot.xml tests/Feature/PaidGrantReviewAddendum3Test.php  (SQLite defaults, public/build absent)
+head: 3f7d295c165bb7efef28dbcb8416de6d6dfa8b2f + untracked reviewer tests (PaidGrantSpoolReviewAddendum3Test, PaidGrantReviewAddendum3Test)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:10.156, Memory: 97.00 MB
+
+[30;42mOK (1 test, 26 assertions)[0m
+rc=0
+wall_s=10

@@ -735,6 +735,10 @@
       "test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock"
     ],
     [
+      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
+      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
+    ],
+    [
       "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
       "test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl"
     ],

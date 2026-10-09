@@ -1,0 +1,155 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Delivery\DeliveryAssetFiles;
+use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use Closure;
+use Symfony\Component\Process\InputStream;
+use Symfony\Component\Process\Process;
+use Tests\TestCase;
+
+/**
+ * Codex P2 (comment 4224514955): a worker killed while copying leaves its named `slot-N.snapshot`, which the no-repair rule
+ * then skipped for good, so three crashes made every redemption `target_unavailable`. A slot whose exclusive `flock` this
+ * process holds has no live owner, so a leftover snapshot that is exactly what this spool writes (a regular single-link file,
+ * mode 0600 or 0400, owned by this process user) is removed and the slot reused. Anything else is still skipped and never
+ * touched. Synthetic bytes only; no database is used.
+ */
+final class PaidGrantSpoolOwnerProbeTest extends TestCase
+{
+    private const BYTES = 1000;
+
+    private string $payload;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        config(['paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        $this->payload = str_repeat('r', self::BYTES);
+    }
+
+    public function test_a_leftover_owned_by_another_user_is_skipped_and_never_touched(): void
+    {
+        $this->assertSame(0, posix_geteuid(), 'This probe needs root to create a file owned by another user.');
+        $spool = $this->primed();
+        $this->leftover(0, 0600);
+        $this->assertTrue(chown($this->dir().'/slot-0.snapshot', 65534));
+        $before = $this->identities();
+        $this->assertSame($this->payload, $this->read($spool->handle($this->target())));
+        $this->assertSame($before, $this->identities());
+        clearstatcache();
+        $this->assertSame(65534, fileowner($this->dir().'/slot-0.snapshot'));
+    }
+
+    /** One completed snapshot creates the spool directory, the slot locks and their sidecars as the real flow does. */
+    private function primed(): PaidGrantPrepareStream
+    {
+        $spool = $this->spool();
+        $spool->free = (float) (3 * self::BYTES + PaidGrantPrepareStream::RESERVE_BYTES);
+        // Three nested snapshots touch every slot once, so each has its lock and sidecars.
+        $spool->during = function () use ($spool): void {
+            $spool->during = function () use ($spool): void {
+                $spool->during = null;
+                $spool->handle($this->target())->close();
+            };
+            $spool->handle($this->target())->close();
+        };
+        $spool->handle($this->target())->close();
+        $this->assertSame([], glob($this->dir().'/slot-*.snapshot'));
+
+        return $spool;
+    }
+
+    /** A crash leftover as the spool itself leaves it: partial snapshot of `$mode`, a live-looking reservation and holder. */
+    private function leftover(int $slot, int $mode): void
+    {
+        $path = $this->dir().'/slot-'.$slot.'.snapshot';
+        file_put_contents($path, substr($this->payload, 0, 400));
+        chmod($path, $mode);
+        file_put_contents($this->dir().'/slot-'.$slot.'.reserve', sprintf('%020d', self::BYTES));
+        file_put_contents($this->dir().'/slot-'.$slot.'.holder', $this->holder('9'));
+    }
+
+    /** A 64-hex holder digest; distinct values stand for distinct buyer accounts. */
+    private function holder(string $hex): string
+    {
+        return str_repeat($hex, 64);
+    }
+
+    /** @return array<string, array{int, int, int, int}> */
+    private function identities(): array
+    {
+        clearstatcache();
+        $result = [];
+        foreach (glob($this->dir().'/slot-*') as $path) {
+            $stat = lstat($path);
+            $result[basename($path)] = [$stat['ino'], $stat['mode'], $stat['nlink'], $stat['size']];
+        }
+
+        return $result;
+    }
+
+    private function read($prepared): string
+    {
+        $bytes = '';
+        try {
+            $prepared->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+        } finally {
+            $prepared->close();
+        }
+
+        return $bytes;
+    }
+
+    private function refusal(Closure $call): string
+    {
+        try {
+            $call();
+        } catch (DeliveryException $error) {
+            return $error->reason;
+        }
+        $this->fail('Expected a refusal.');
+    }
+
+    private function spool(): PaidGrantPrepareStream
+    {
+        return new class($this->payload) extends PaidGrantPrepareStream
+        {
+            public float $free = 0.0;
+
+            public ?Closure $during = null;
+
+            public function __construct(private readonly string $payload) {}
+
+            protected function freeBytes(string $directory): float|false
+            {
+                return $this->free;
+            }
+
+            protected function copyTarget(array $target, $destination, int $deadline): void
+            {
+                fwrite($destination, $this->payload);
+                if ($this->during !== null) {
+                    ($this->during)();
+                }
+            }
+        };
+    }
+
+    private function target(): array
+    {
+        return ['kind' => 'contract', 'disk' => 'local', 'size_bytes' => self::BYTES, 'sha256' => hash('sha256', $this->payload), 'provenance' => 'synthetic_rehearsal'];
+    }
+
+    private function dir(): string
+    {
+        return app(DeliveryAssetFiles::class)->privateRoot().'/delivery/paid-spool';
+    }
+}

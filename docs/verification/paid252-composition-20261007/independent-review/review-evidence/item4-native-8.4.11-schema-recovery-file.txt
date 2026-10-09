@@ -1,0 +1,16 @@
+cmd: (same native env, DB_PORT=3761) php -r '...phpunit' -- --log-junit item4-native-8.4.11-schema-recovery-file.xml tests/Feature/PaidGrantSchemaRecoveryTest.php  [with the item 5 temporary relaxation still applied]
+head: 4a4a423022759ec706e7e235649552d0d2930128
+start: 2026-10-08T12:27:08Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+.......[36;1mS[0m..                                                        10 / 10 (100%)
+
+Time: 00:24.990, Memory: 65.00 MB
+
+[30;42mOK, but some tests were skipped![0m
+[30;42mTests: 10[0m[30;42m, Assertions: 613[0m[30;42m, Skipped: 1[0m[30;42m.[0m
+rc=0
+wall_s=26

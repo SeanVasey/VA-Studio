@@ -1,0 +1,3 @@
+cmd: /home/user/VA-Studio/vendor/bin/pint --test app/Domain/Grants/Paid/PaidGrantDownloads.php app/Domain/Grants/Paid/PaidGrantPolicy.php app/Domain/Grants/Paid/PaidGrantPrepareStream.php config/paid-grants.php tests/Feature/PaidGrantSnapshotDeadlineTest.php tests/Support/PaidGrantMonotonicClock.php
+head: 093f90819aa4905babfdad26923cd82b4547903d
+{"tool":"pint","result":"passed"}rc=0

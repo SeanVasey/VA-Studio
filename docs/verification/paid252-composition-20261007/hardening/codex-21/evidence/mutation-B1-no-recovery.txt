@@ -1,0 +1,53 @@
+# source: 703674d7 + round 21 final working tree + mutation B1-no-recovery (scratch worktree)
+B1-no-recovery applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/phpunit.xml
+
+....FE...F                                                        10 / 10 (100%)
+
+Time: 00:25.558, Memory: 193.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantSpoolRecoveryTest::test_three_leftover_slots_all_recover
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:113
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantSpoolRecoveryTest.php:67
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 2 failures:
+
+1) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_crashed_holders_leftover_snapshot_is_recovered_and_the_redemption_succeeds
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/storage/framework/testing/disks/local-6b014656-3914-43b6-a3b5-18b5a73ff4ca/delivery/paid-spool/slot-0.snapshot',
++]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantSpoolRecoveryTest.php:45
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_slot_whose_lock_a_live_process_holds_is_never_recovered
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/storage/framework/testing/disks/local-96517ede-a89f-4546-b1e4-ee3fa661242b/delivery/paid-spool/slot-0.snapshot',
++]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantSpoolRecoveryTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 104, Errors: 1, Failures: 2.
+rc=2

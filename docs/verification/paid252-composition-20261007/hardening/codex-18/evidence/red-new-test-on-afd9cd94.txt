@@ -1,0 +1,46 @@
+# source: afd9cd94 (product unmodified) + new tests/Feature/PaidGrantPreparationBudgetTest.php
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter PaidGrantPreparationBudgetTest tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+FF.                                                                 3 / 3 (100%)
+
+Time: 00:21.824, Memory: 191.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\PaidGrantPreparationBudgetTest::test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'complete',
+     1 => 'complete',
+-    2 => 'complete',
++    2 => 'claimed',
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantPreparationBudgetTest.php:113
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantPreparationBudgetTest::test_a_late_line_that_fails_is_marked_failed_under_its_own_budget
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'complete',
+     1 => 'complete',
+-    2 => 'failed',
++    2 => 'claimed',
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantPreparationBudgetTest.php:135
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 55, Failures: 2.
+rc=1

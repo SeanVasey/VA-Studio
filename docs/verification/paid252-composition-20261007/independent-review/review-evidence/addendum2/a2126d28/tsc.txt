@@ -1,0 +1,5 @@
+cmd: npx tsc --noEmit
+head: a2126d28966aedcf38ffb99a47825a1b3fdc3e10
+rc=0
+wall_s=2
+symlink removed: yes

@@ -1,0 +1,61 @@
+cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/addendum1/8f751d0d/sqlite-PaidGrantReviewAddendum1Test.xml tests/Feature/PaidGrantReviewAddendum1Test.php  (SQLite, phpunit.xml defaults, public/build absent)
+head: 8f751d0d368222c310e37d623eab1e8d5f0f2956 + untracked tests/Feature/PaidGrantReviewAddendum1Test.php (PHP tree identical to 392afd6a)
+start: 2026-10-08T17:13:42Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+....[41;37mF[0m[41;37mF[0m                                                              6 / 6 (100%)
+
+Time: 00:56.404, Memory: 108.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\PaidGrantReviewAddendum1Test::test_a_downward_policy_revision_keeps_the_retained_limit_lifetime_and_idempotent_replay_and_refinalize_does_not_reseal
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
++    'authorization_seconds' => 60,
++    'max_downloads' => 3,
++    'provenance' => 'synthetic_rehearsal',
++    'purpose' => 'paid-original-delivery',
+     'schema_version' => 1,
+     'version' => 'explicit-synthetic-delivery-v1',
+-    'purpose' => 'paid-original-delivery',
+-    'provenance' => 'synthetic_rehearsal',
+-    'max_downloads' => 3,
+-    'authorization_seconds' => 60,
+ ]
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php:265
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantReviewAddendum1Test::test_a_current_policy_of_the_other_provenance_refuses_every_retained_path_without_recording_and_restoring_it_recovers
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
++    'authorization_seconds' => 60,
++    'max_downloads' => 3,
++    'provenance' => 'synthetic_rehearsal',
++    'purpose' => 'paid-original-delivery',
+     'schema_version' => 1,
+     'version' => 'explicit-synthetic-delivery-v1',
+-    'purpose' => 'paid-original-delivery',
+-    'provenance' => 'synthetic_rehearsal',
+-    'max_downloads' => 3,
+-    'authorization_seconds' => 60,
+ ]
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAddendum1Test.php:293
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 6[0m[37;41m, Assertions: 122[0m[37;41m, Failures: 2[0m[37;41m.[0m
+rc=1
+wall_s=56
+end: 2026-10-08T17:14:38Z

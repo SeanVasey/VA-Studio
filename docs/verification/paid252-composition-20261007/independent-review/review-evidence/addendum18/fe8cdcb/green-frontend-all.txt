@@ -1,0 +1,15 @@
+# source fe8cdcb088bb0f2a4922ce345019078350d6790e, clean tracked tree (''), no review probe present; node v24.21.0
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-reopen-issued.test.tsx tests/frontend/paid-grant-review-addendum9.test.tsx
+ ✓ paid-grant-reopen-issued: reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 442ms
+ ✓ paid-grant-review-addendum9: offers the retry from a read that completed before a non-current refusal arrived 563ms
+ ✓ paid-grant-reopen-issued: reopens the order of a refused download kept for retry, so the unused authorization can be retried 216ms
+ ✓ paid-grant-reopen-issued: shows the reopen control as soon as a hidden download frame reports its refusal, without another render 95ms
+ ✓ paid-grant-reopen-issued: drops the reopen control once the authorization is submitted, and a denial drops it with the token 192ms
+ ✓ paid-grant-review-addendum9: offers the retry from a read still in flight when the refusal arrived, and not when that read lists the authorization attempted 428ms
+ ✓ paid-grant-review-addendum9: records nothing for a non-refusal answer that arrives after a later request started, and shows no message 179ms
+      Tests  7 passed (7)
+rc=0
+# npx vitest run
+ Test Files  65 passed (65)
+      Tests  1130 passed (1130)
+rc=0

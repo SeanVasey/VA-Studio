@@ -1,0 +1,54 @@
+# source: 9004245f + codex-13 working tree + mutation M3-snapshot-old-budget (scratch worktree)
+M3-snapshot-old-budget applied to app/Domain/Grants/Paid/PaidGrantDownloads.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/phpunit.xml
+
+EFEE..                                                              6 / 6 (100%)
+
+Time: 00:44.957, Memory: 204.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_started_late_in_the_observation_budget_gets_its_own_bound
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:112
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:148
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_commit_frame_and_first_byte_get_a_fresh_budget_after_a_long_first_frame_and_snapshot
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:112
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:148
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:165
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_the_fresh_commit_budget_is_still_bounded_before_the_first_byte
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:112
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:148
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:183
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_exceeding_snapshot_seconds_is_refused_with_nothing_recorded_and_the_authorization_stays_usable
+Expected a refusal.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:338
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 120, Errors: 3, Failures: 1.
+rc=2

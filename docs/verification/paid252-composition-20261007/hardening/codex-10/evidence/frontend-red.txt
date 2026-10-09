@@ -1,0 +1,28 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (17 tests | 1 failed) 1487ms
+   ❯ mounted original paid-purpose journey (11)
+     × keeps a refused download retryable only after a later saved read shows that exact authorization still unused 111ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > mounted original paid-purpose journey > keeps a refused download retryable only after a later saved read shows that exact authorization still unused
+Error: [2mexpect([22m[31melement[39m[2m).toHaveTextContent()[22m
+
+Expected element to have text content:
+[32m  still unused can then be retried[39m
+Received:
+[31m  The download was refused. Refresh saved licenses before trying again.[39m
+ ❯ tests/frontend/paid-grant-journey.test.tsx:123:39
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 23 passed (24)
+   Start at  17:54:17
+   Duration  2.40s (tests 62%, environment 28%, transform 5%, setup 4%, import 1%)
+
+rc=1

@@ -1,0 +1,64 @@
+<?php
+// Addendum 15 probe (independent review): PaidGrantRequestInstant::capture() edges, run outside PHPUnit so that
+// LARAVEL_START can be defined per process. Usage: php capture-edges.php.txt <worktree> [laravel_start_offset_seconds]
+// Prints one line per case (expected = the documented rule, actual) and exits 1 on any mismatch. The last three cases are
+// expected to DIFF: they document finding A15-I1 (finite values outside Carbon's range throw instead of falling back).
+require $argv[1].'/vendor/autoload.php';
+use App\Domain\Grants\Paid\PaidGrantRequestInstant as I;
+use Carbon\CarbonImmutable;
+CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-10-08 12:00:00.250000', 'UTC'));
+$n = (float) CarbonImmutable::now('UTC')->format('U.u');
+$fmt = fn (float $t): string => CarbonImmutable::createFromTimestamp($t, 'UTC')->format('Y-m-d H:i:s.u');
+$now = $fmt($n);
+$start = null;
+if (isset($argv[2])) {
+    $start = $n + (float) $argv[2];
+    define('LARAVEL_START', $start);
+}
+// Fallback when REQUEST_TIME_FLOAT is rejected: LARAVEL_START if itself admissible (clamped to now if ahead), else now.
+$fallback = $start !== null && $start >= $n - 60 && $start <= $n + 1 ? $fmt(min($start, $n)) : $now;
+echo 'now = ', $now, '; LARAVEL_START = ', $start === null ? 'undefined' : $fmt($start), '; expected fallback = ', $fallback, PHP_EOL;
+$cases = [
+    // [label, input, expected]
+    ['+1.0 s (boundary, clamped)', $n + 1.0, $now],
+    ['+1.000001 s (just over, rejected)', $n + 1.000001, $fallback],
+    ['+1.0000004 s (float lands at +1.000001, rejected)', $n + 1.0000004, $fallback],
+    ['-60.0 s (boundary, admitted)', $n - 60.0, $fmt($n - 60.0)],
+    ['-60.000001 s (just over, rejected)', $n - 60.000001, $fallback],
+    ['-60.0000004 s (rounds to -60.000000)', $n - 60.0000004, $fmt($n - 60.0)],
+    ['int now-30 (fraction dropped)', (int) $n - 30, $fmt((float) ((int) $n - 30))],
+    ['int now+1 (0.75 s ahead, clamped)', (int) $n + 1, $now],
+    ['int now+2 (1.75 s ahead, rejected)', (int) $n + 2, $fallback],
+    ['-5.123456 s (microseconds kept)', $n - 5.123456, $fmt($n - 5.123456)],
+    ['0 (int epoch)', 0, $fallback],
+    ['0.0 (float epoch)', 0.0, $fallback],
+    ['-0.0', -0.0, $fallback],
+    ['-1.0 (negative epoch)', -1.0, $fallback],
+    ['1e12 (year 33658)', 1e12, $fallback],
+    ['NAN', NAN, $fallback],
+    ['INF', INF, $fallback],
+    ['-INF', -INF, $fallback],
+    ['numeric string now-5', (string) ($n - 5), $fallback],
+    ['false', false, $fallback],
+    ['true', true, $fallback],
+    ['null', null, $fallback],
+    ['array [now-5]', [$n - 5], $fallback],
+    ['Stringable object', new class { public function __toString(): string { return '1'; } }, $fallback],
+    // Documenting cases: finite but out of Carbon's range. Expected by the docblock: fallback. Observed: an exception.
+    ['1e20 (finite, out of Carbon range)', 1e20, $fallback],
+    ['PHP_INT_MAX', PHP_INT_MAX, $fallback],
+    ['-1e15', -1e15, $fallback],
+];
+$fail = 0;
+foreach ($cases as [$label, $input, $expected]) {
+    try {
+        $actual = I::capture($input)->at->format('Y-m-d H:i:s.u');
+    } catch (Throwable $e) {
+        $actual = 'THROWS '.$e::class;
+    }
+    $ok = $actual === $expected;
+    $fail += $ok ? 0 : 1;
+    printf("%-4s %-48s expected %-28s actual %s\n", $ok ? 'ok' : 'DIFF', $label, $expected, $actual);
+}
+echo $fail === 0 ? "all cases as expected\n" : "$fail case(s) differ from the documented rule\n";
+exit($fail === 0 ? 0 : 1);

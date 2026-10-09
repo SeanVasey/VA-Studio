@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantMarginMeasureTest" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/PaidGrantMarginMeasureTest.php" tests="1" assertions="20" errors="0" failures="0" skipped="0" time="261.029891">
+    <testcase name="test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization" file="/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/PaidGrantMarginMeasureTest.php" line="103" class="Tests\Feature\PaidGrantMarginMeasureTest" classname="Tests.Feature.PaidGrantMarginMeasureTest" assertions="20" time="261.029891"/>
+  </testsuite>
+</testsuites>

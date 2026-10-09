@@ -1,0 +1,45 @@
+# source: 55976099 product (unmodified) + new tests in tests/Feature/PaidGrantRequestInstantTest.php; public/build absent
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+.FE...                                                              6 / 6 (100%)
+
+Time: 00:46.891, Memory: 101.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:304
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:179
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:189
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRequestInstantTest.php:134
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time
+Expected response status code [200] but received 410.
+Failed asserting that 410 is identical to 200.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRequestInstantTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 107, Errors: 1, Failures: 1.
+rc=2

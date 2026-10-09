@@ -1,0 +1,30 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (22 tests | 1 failed) 2620ms
+   ❯ mounted original paid-purpose journey (16)
+     × records a download refusal that arrives while the tab is hidden, so a later saved read can still offer the exact retry 70ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > mounted original paid-purpose journey > records a download refusal that arrives while the tab is hidden, so a later saved read can still offer the exact retry
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:230:31
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 24 passed (25)
+   Start at  18:51:07
+   Duration  4.03s (tests 62%, environment 26%, transform 7%, setup 4%, import 1%)
+
+rc=1

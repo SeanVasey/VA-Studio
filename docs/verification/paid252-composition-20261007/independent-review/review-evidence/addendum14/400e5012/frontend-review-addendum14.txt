@@ -1,0 +1,12 @@
+cmd: npx vitest run tests/frontend/paid-grant-review-addendum14.test.tsx (untracked reviewer probe)
+head: 400e501280f05a79a32a44db959a6b33751464ed + untracked probe; node v24.21.0
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  22:47:11
+   Duration  1.31s (tests 47%, environment 40%, transform 6%, setup 5%, import 1%)
+
+rc=0

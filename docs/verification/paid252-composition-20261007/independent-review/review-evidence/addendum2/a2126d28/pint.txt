@@ -1,0 +1,3 @@
+cmd: /home/user/VA-Studio/vendor/bin/pint --test tests/Feature/PaidGrantSpoolReviewAddendum2Test.php
+{"tool":"pint","result":"passed"}
+rc=0

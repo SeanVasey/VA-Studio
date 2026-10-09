@@ -1,0 +1,3 @@
+cmd: vendor/bin/pint --test tests/Feature/PaidGrantReviewAddendum1Test.php
+{"tool":"pint","result":"passed"}
+rc=0

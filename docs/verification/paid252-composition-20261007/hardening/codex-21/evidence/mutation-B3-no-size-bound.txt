@@ -1,0 +1,74 @@
+# source: 703674d7 + round 21 final working tree + mutation B3-no-size-bound (scratch worktree)
+B3-no-size-bound applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/phpunit.xml
+
+.......F..                                                        10 / 10 (100%)
+
+Time: 00:25.348, Memory: 193.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_leftover_larger_than_the_largest_deliverable_is_skipped_and_never_touched
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+         2 => 1,
+         3 => 20,
+     ],
+-    'slot-0.snapshot' => Array &4 [
+-        0 => 2482744,
+-        1 => 33152,
+-        2 => 1,
+-        3 => 1073741825,
+-    ],
+-    'slot-1.holder' => Array &5 [
++    'slot-1.holder' => Array &4 [
+         0 => 2483282,
+         1 => 33152,
+         2 => 1,
+         3 => 64,
+     ],
+-    'slot-1.lock' => Array &6 [
++    'slot-1.lock' => Array &5 [
+         0 => 2483268,
+         1 => 33024,
+         2 => 1,
+         3 => 0,
+     ],
+-    'slot-1.reserve' => Array &7 [
++    'slot-1.reserve' => Array &6 [
+         0 => 2483284,
+         1 => 33152,
+         2 => 1,
+         3 => 20,
+     ],
+-    'slot-2.holder' => Array &8 [
++    'slot-2.holder' => Array &7 [
+         0 => 2483286,
+         1 => 33152,
+         2 => 1,
+         3 => 64,
+     ],
+-    'slot-2.lock' => Array &9 [
++    'slot-2.lock' => Array &8 [
+         0 => 2483273,
+         1 => 33024,
+         2 => 1,
+         3 => 0,
+     ],
+-    'slot-2.reserve' => Array &10 [
++    'slot-2.reserve' => Array &9 [
+         0 => 2483287,
+         1 => 33152,
+         2 => 1,
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantSpoolRecoveryTest.php:103
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 10, Assertions: 110, Failures: 1.
+rc=1

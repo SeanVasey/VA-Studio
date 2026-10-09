@@ -1,0 +1,24 @@
+# source: 55976099 + final working tree; public/build absent
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --filter PaidGrant tests/Feature
+# PaidGrant* feature files: 25
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+...............................................................  63 / 136 ( 46%)
+.............................S................................. 126 / 136 ( 92%)
+..........                                                      136 / 136 (100%)
+
+Time: 14:19.803, Memory: 294.04 MB
+
+OK, but some tests were skipped!
+Tests: 136, Assertions: 4540, Skipped: 1.
+
+real	14m20.758s
+user	10m18.060s
+sys	0m21.266s
+rc=0
+# note: during this run one docblock line of app/Domain/Grants/Paid/PaidGrantDownloads.php was reworded (comment only):
+#   "validated once now, at capture" -> "validated once, when captured". No code changed; the test file and mutation M1
+#   were re-run against the exact final file afterwards (green-request-instant.txt, mutation-M1-second-age-check.txt).

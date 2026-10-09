@@ -1,0 +1,75 @@
+# source: 36be2a33 product (scratch worktree) + final round 21 tests
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter 'PaidGrantRequestInstantTest|PaidGrantSpoolRecoveryTest' tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/phpunit.xml
+
+F.EEFE..F                                                           9 / 9 (100%)
+
+Time: 00:21.250, Memory: 191.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_missing_or_implausible_request_time_falls_back_to_now_and_never_widens_admission
+Error: Undefined constant App\Domain\Grants\Paid\PaidGrantDownloads::ADMISSION_MAX_AGE_SECONDS
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantRequestInstantTest.php:126
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantRequestInstantTest::test_the_admission_instant_rule
+Error: Call to undefined method App\Domain\Grants\Paid\PaidGrantDownloads::receivedAt()
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantRequestInstantTest.php:143
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSpoolRecoveryTest::test_three_leftover_slots_all_recover
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:112
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantSpoolRecoveryTest.php:63
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 3 failures:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_request_received_before_expiry_is_admitted_although_its_identity_proof_ends_after_it
+Expected response status code [200] but received 410.
+Failed asserting that 410 is identical to 200.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantRequestInstantTest.php:104
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_crashed_holders_leftover_snapshot_is_recovered_and_the_redemption_succeeds
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/storage/framework/testing/disks/local-93d0c6f6-3771-4bdb-8532-63da6bc3c08a/delivery/paid-spool/slot-0.snapshot',
++]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantSpoolRecoveryTest.php:43
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantSpoolRecoveryTest::test_a_slot_whose_lock_a_live_process_holds_is_never_recovered
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => '/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/storage/framework/testing/disks/local-7ccc9d8a-f6ea-407f-be48-575368fde59e/delivery/paid-spool/slot-0.snapshot',
++]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21/tests/Feature/PaidGrantSpoolRecoveryTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 9, Assertions: 72, Errors: 3, Failures: 3.
+rc=2

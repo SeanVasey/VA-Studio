@@ -1,0 +1,61 @@
+# source: 55976099 + final working tree + mutation M1 (the second age check after identity, as before the fix); public/build absent
+# mutation diff:
+--- /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/PaidGrantDownloads.php.final	2026-10-08 23:12:10.335373010 +0000
++++ app/Domain/Grants/Paid/PaidGrantDownloads.php	2026-10-08 23:13:01.034100394 +0000
+@@ -145,7 +145,8 @@
+         // first frame cannot turn a redemption that started in time into an expired one (Codex 4223825193, 4224514947).
+         // Both frames and the post-frame check compare that same admitted instant, so a slow snapshot cannot either. The
+         // instant was validated against the clock when the controller captured it; it is used as captured (Codex 4224939409).
+-        $admitted = $receivedAt?->at ?? CarbonImmutable::now('UTC');
++        $now = CarbonImmutable::now('UTC');
++        $admitted = $receivedAt === null || $receivedAt->at->lessThan($now->subSeconds(self::ADMISSION_MAX_AGE_SECONDS)) ? $now : $receivedAt->at;
+         $locator = $this->locate($id, $principal, $actor);
+         // Three budgets follow, none extendable: this 60 s observation budget bounds locating and the first frame; the
+         // snapshot gets its own `snapshot_seconds` bound from when the first frame closes; the commit frame and the
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+.FE....                                                             7 / 7 (100%)
+
+Time: 00:46.392, Memory: 101.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:286
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:161
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:171
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRequestInstantTest.php:137
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time
+Expected response status code [200] but received 410.
+Failed asserting that 410 is identical to 200.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRequestInstantTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 7, Assertions: 124, Errors: 1, Failures: 1.
+rc=2
+# after restoring the final file
+cmp: identical, rc=0
+b1d83dd96d10ea2e7c89569c326f55c5fa7eee7752c8dbb563ff7cb9328a363c  app/Domain/Grants/Paid/PaidGrantDownloads.php
