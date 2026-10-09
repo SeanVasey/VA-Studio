@@ -208,14 +208,16 @@ Independent [build admission addendum](independent-review/BUILD-ADMISSION-ADDEND
 Codex on3b7d1b9 added4226365351 (same-SHA unhealthy retry reports success),4226365357 (first-install
 migration skips snapshot),4226365364 (already-mounted private bind omits persistent fstab entry).
 `same-sha-health-red.txt` retains2methods/2failures; `recovery-admission-red.txt` retains13methods/2failures.
-Expanded3method red adds a real Bash failure: served-release selection swallowed failed sealer status
-when called inside conditional command substitution. `recovery-admission-expanded-red.txt` has3failures.
+Expanded3method red adds a Bash failure-return property using a substituted sealed_release(){ return1; },
+not an actual old Python-sealer defect. The independent genuine Python exit23 check confirms the old
+seal_tool already dies on such failure. `recovery-admission-expanded-red.txt` has2 product safety failures
+and1 defensive-return property failure; the explicit return guard is defense in depth.
 
 The same-SHA no-op now requires read-only root `healthy <sha>`: sealed selected current, persistent bind,
 exact open admission, no maintenance, activeFPM, every supervised PID on that release andHTTP200. Partial
 state refuses without repair. Every migration attempt now snapshots/proves first, including first-install
 retries. Mounted attach reconciles the exact fstab line before success and refuses unrelated mounts;
-served-release selection explicitly propagates failed sealing checks.
+served-release selection adds defensive propagation of a returned failure; genuine Python failures were already fatal.
 
 Exact committed current ops `final-ops-a44664f4.txt` **50 PASS**, runtime `final-runtime-a44664f4.txt`
 **13/63 PASS**. New canonical health method exercises13complete/partial states with genuine process cwd

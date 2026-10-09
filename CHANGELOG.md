@@ -77,7 +77,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
-- Staging unchanged-SHA retries require read-only root health proof; first-install retries snapshot before migration; already-mounted private binds reconcile their persistent fstab entry. Served-release selection now propagates failed sealing checks inside shell command substitution.
+- Staging unchanged-SHA retries require read-only root health proof; first-install retries snapshot before migration; already-mounted private binds reconcile their persistent fstab entry. Served-release selection adds defensive propagation of returned failure inside shell command substitution; Python helper failures were already fatal.
 - Staging deployment quiesces controlled application services and writers before candidate allocation/build, then seals generated artifacts before activation. Provisioning rejects unprotected or noncanonical root ancestry before host changes; build failure leaves admission closed for recovery.
 - Staging backup admission refuses multiline environment values and key-looking embedded lines, requires the exact environment hash record, and invalidates stale proof markers. Configuration capture refuses special files without blocking; provisioning and privileged helpers require a nonroot application account.
 - Staging control seals privileged release ancestry before bind/unbind and reserves atomic activation for the root helper. Restore proof normalizes only table column charset rendering, invalidates stale success markers and publishes after verification/cleanup. Same-SHA refresh freezes one admitted environment, preserves the existing key and takes a recoverable pre-change snapshot; recovery never infers stopped writers from a phase flag.
