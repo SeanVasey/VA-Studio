@@ -27,13 +27,14 @@ case "$MODE" in
     [ -z "$(git -C "$REL" status --porcelain --untracked-files=all --ignored)" ] || die "dirty checkout"
     [ "$(git -C "$REL" rev-parse 'HEAD^{tree}')" = "$(git -C "$REL" write-tree)" ] || die "checkout tree differs"
     chmod 0755 "$REL"
+    # Composer's Laravel hooks boot the application; admit the captured profile first.
+    install -m 0600 -- "$candidate" "$REL/.env"
     composer_bin=$(command -v composer) || die "composer not found"
     (cd "$REL" && "$PHP" "$composer_bin" install --no-dev --no-interaction --no-progress --prefer-dist --classmap-authoritative)
     [ -f "$REL/vendor/autoload.php" ] && [ -f "$REL/vendor/composer/installed.json" ] || die "composer produced no vendor"
     (cd "$REL" && npm ci --no-audit --no-fund --loglevel=error && npm run build --silent)
     [ -f "$REL/public/build/manifest.json" ] || die "no Vite manifest"
     sha256sum "$REL/composer.lock" "$REL/package-lock.json" "$REL/public/build/manifest.json" | sed "s#$REL/##" > "$EVIDENCE/build.sha256"
-    install -m 0600 -- "$candidate" "$REL/.env"
     args=("$REL/.env" "$VASEY_EXPECTED_APP_ENV" "$VASEY_STAGING_HOST" "$VASEY_DB_NAME")
     if [ -L "$VASEY_ROOT/current" ]; then args+=("$(readlink -f "$VASEY_ROOT/current")/.env"); fi
     env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$PHP" "$REL/ops/staging/validate-runtime.php" "${args[@]}" \

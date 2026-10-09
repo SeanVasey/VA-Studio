@@ -53,6 +53,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Install the captured private staging environment before Composer's Laravel hooks boot package discovery and Filament upgrade.
+
 - Seal private staging code/vendor/build/environment on protected inodes, validate root-mediated configuration refresh, require served backup key/hash custody and explicitly forward Stripe signatures. Writable Laravel runtime PHP remains an explicit trust exception.
 
 - The private TEST pipeline reconciles at a one-minute minimum by default, within the quote's 15-minute observation window. Profile validation clears inherited application inputs before boot so a safe exported value cannot mask an invalid file or authorize the optional account probe. Late observations still retain paid exceptions; no payment eligibility rule changes.

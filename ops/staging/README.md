@@ -201,7 +201,7 @@ renaming that account breaks every guarded write.
 2. `ctl prepare` holds one root lease while it quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
    app-writable candidate**. It then makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves
    it clean (status and tree hash). Downtime includes dependency installation and asset compilation.
-3. It runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, then `npm ci && npm run build`. The Vite manifest must exist.
+3. It installs the captured private environment as `.env` mode0600 before Composer can boot Laravel package discovery or Filament upgrade. It then runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, followed by `npm ci && npm run build`. The Vite manifest must exist.
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.

@@ -1,5 +1,10 @@
 """Actual deploy ordering with owned Git/files/processes; host service/mount/build tools are fixtures."""
 from pathlib import Path
+import getpass
+import hashlib
+import json
+import shlex
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -8,6 +13,68 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 class BuildAdmissionTest(unittest.TestCase):
+    def test_composer_hooks_receive_frozen_environment_before_bootstrap(self):
+        """Run the actual helper; Composer/npm/runtime effects are bounded fixtures."""
+        php = shutil.which("php")
+        self.assertIsNotNone(php, "PHP is required for the Composer hook fixture")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            mirror = root / "mirror"
+            mirror.mkdir()
+            profile = "APP_ENV=staging\nAPP_DEBUG=false\nAPP_KEY=synthetic-test-key\n"
+            for name, content in ((".gitignore", "/vendor/\n/public/build/\n.env\n"),
+                                  ("composer.lock", "{}\n"), ("package-lock.json", "{}\n")):
+                (mirror / name).write_text(content)
+            runtime = mirror / "ops/staging/validate-runtime.php"
+            runtime.parent.mkdir(parents=True)
+            runtime.write_text("<?php exit(is_file($argv[1]) ? 0 : 1);\n")
+            subprocess.run(["git", "init", "-q", str(mirror)], check=True)
+            subprocess.run(["git", "-C", str(mirror), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(mirror), "-c", "user.name=Test",
+                            "-c", "user.email=test@example.invalid", "commit", "-qm", "synthetic hooks"], check=True)
+            sha = subprocess.check_output(["git", "-C", str(mirror), "rev-parse", "HEAD"], text=True).strip()
+            release = root / "releases" / sha
+            release.parent.mkdir()
+            evidence = root / "evidence"
+            evidence.mkdir()
+            candidate = root / "candidate.env"
+            candidate.write_text(profile)
+            candidate.chmod(0o600)
+            commands = root / "bin"
+            commands.mkdir()
+            composer = commands / "composer"
+            composer.write_text("""<?php
+$profile = file_exists('.env') ? file_get_contents('.env') : '';
+if ($profile !== EXPECTED_PROFILE || (fileperms('.env') & 0777) !== 0600) {
+    fwrite(STDERR, "Composer hooks booted without the frozen private staging profile\\n");
+    exit(23);
+}
+file_put_contents('hook-profile.sha256', hash('sha256', $profile));
+mkdir('vendor/composer', 0755, true);
+file_put_contents('vendor/autoload.php', '<?php');
+file_put_contents('vendor/composer/installed.json', '{}');
+""".replace("EXPECTED_PROFILE", json.dumps(profile)))
+            composer.chmod(0o755)
+            npm = commands / "npm"
+            npm.write_text('#!/bin/bash\nset -eu\nmkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
+            npm.chmod(0o755)
+            config = root / "staging.conf"
+            config.write_text("\n".join(name + "=" + shlex.quote(value) for name, value in {
+                "VASEY_ROOT": str(root), "VASEY_MIRROR": str(mirror), "VASEY_PHP": php,
+                "VASEY_APP_USER": getpass.getuser(), "VASEY_EXPECTED_APP_ENV": "staging",
+                "VASEY_STAGING_HOST": "fixture.invalid", "VASEY_DB_NAME": "fixture_database"
+            }.items()) + "\n")
+            helper = root / "release-step.sh"
+            helper.write_text((REPO / "ops/staging/release-step.sh").read_text().replace(
+                "/etc/vasey-staging/staging.conf", str(config)))
+            run = subprocess.run(["bash", str(helper), "build", sha, str(evidence), str(candidate)],
+                                 env={"PATH": str(commands) + ":/usr/bin:/bin", "LC_ALL": "C"},
+                                 capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual((release / "hook-profile.sha256").read_text(), hashlib.sha256(profile.encode()).hexdigest())
+            self.assertEqual(candidate.read_text(), profile, "build changed the captured profile")
+            self.assertEqual((release / ".env").read_text(), profile)
+
     def test_running_application_cannot_inject_ignored_vendor_before_sealing(self):
         source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
         body = source[source.index('cmd_prepare()'):source.index('cmd_activate()')]
