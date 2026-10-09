@@ -278,6 +278,43 @@ class StagingTestCommerceProfileJourneyTest extends TestCase
         $this->assertDatabaseCount('stripe_webhook_receipts', 0);
     }
 
+    public function test_unpaid_read_just_before_payment_is_reconciled_one_minute_later_within_the_quote_window(): void
+    {
+        $order = $this->guestOrder($this->catalog())->assertOk()->json('order.id');
+        $this->startCheckout($order);
+        $pending = $this->sweep();
+        $intent = CheckoutIntent::sole();
+        $this->assertSame([$intent->public_id.' pending'], $pending['reconcile']);
+        $this->travel(30)->seconds();
+        $this->payAtStripe();
+        $this->travel(31)->seconds();
+
+        $observedAt = now()->toImmutable();
+        $paid = $this->sweep();
+        $this->assertSame([$intent->public_id.' awaiting_finalization'], $paid['reconcile']);
+        $this->assertSame([$order.' paid'], $paid['finalize']);
+        $this->assertSame([$order.' activated'], $paid['activate']);
+        $this->assertTrue(VerifiedPayment::sole()->confirmed_at->equalTo($observedAt));
+        $this->assertDatabaseCount('stripe_webhook_receipts', 0);
+        $this->assertDatabaseCount('license_grants', 1);
+    }
+
+    public function test_payment_before_expiry_observed_after_expiry_remains_a_paid_exception(): void
+    {
+        $order = $this->guestOrder($this->catalog())->assertOk()->json('order.id');
+        $this->startCheckout($order);
+        $this->travel(850)->seconds();
+        $this->payAtStripe();
+        $this->travel(51)->seconds();
+
+        $observedAt = now()->toImmutable();
+        $late = $this->sweep();
+        $this->assertSame([$order.' paid_exception'], $late['finalize']);
+        $this->assertSame([], $late['activate']);
+        $this->assertTrue(VerifiedPayment::sole()->confirmed_at->equalTo($observedAt));
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
     public function test_declined_card_leaves_the_session_open_and_nothing_is_verified_or_granted(): void
     {
         $order = $this->guestOrder($this->catalog())->assertOk()->json('order.id');

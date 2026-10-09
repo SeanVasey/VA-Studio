@@ -10,7 +10,7 @@ declare(strict_types=1);
  *   php scripts/ops/validate-test-commerce-profile.php --probe --i-understand-this-calls-stripe /path/to/.env
  *
  * The given file is the only dotenv source: the host .env and any cached configuration are not
- * read. Variables already exported in this process still win, exactly as they would for Laravel.
+ * read. Inherited application variables are cleared before boot so they cannot mask this file.
  * Output names checks and bounded reasons only; it never prints a value from the file.
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
@@ -148,6 +148,20 @@ if ($entries !== null) {
 }
 
 // ---- Boot the real application with this file as its only dotenv source.
+// getenv, $_ENV and $_SERVER are all Laravel dotenv adapters. Remove inherited inputs from all
+// three; even a syntactically valid exported value must not hide an invalid value in this file.
+// The interpreter has already loaded its extensions; PATH alone supports ordinary child tools.
+$path = getenv('PATH');
+foreach (array_unique([...array_keys((array) getenv()), ...array_keys($_ENV), ...array_keys($_SERVER)]) as $name) {
+    if (is_string($name) && $name !== '' && $name !== 'PATH') {
+        putenv($name);
+        unset($_ENV[$name], $_SERVER[$name]);
+    }
+}
+if ($path !== false) {
+    putenv('PATH='.$path);
+    $_ENV['PATH'] = $_SERVER['PATH'] = $path;
+}
 $booted = false;
 if ($entries !== null && $unreplaced !== []) {
     $record('runtime.boot', false, 'Policy checks skipped: replace every placeholder first, or use --template for a shape check.');

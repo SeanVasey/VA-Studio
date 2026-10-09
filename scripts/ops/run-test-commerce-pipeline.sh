@@ -29,7 +29,7 @@
 #   CONTRACT_PAGE_LIMIT        --limit for contract issuance, 1-100 (default 5; each renders PDFs)
 #   MAX_PAGES                  page bound per stage per sweep (default 20)
 #   COMMAND_TIMEOUT_SECONDS    wall-clock bound per command call (default 600)
-#   RECONCILE_INTERVAL_SECONDS minimum seconds between reconcile sweeps (default 900; 0 = every sweep)
+#   RECONCILE_INTERVAL_SECONDS minimum seconds between reconcile sweeps (default 60; 0 = every sweep)
 #   STATE_DIR                  lock, reconcile cursor and timestamp (default $APP_ROOT/storage/app/private/test-commerce-pipeline)
 #   LOOP_ITERATIONS            sweeps per --loop run (default 60), LOOP_SLEEP_SECONDS between them (default 60)
 # Exit codes: 0 every stage succeeded (or another sweep held the lock), 1 a stage failed, 2 usage.
@@ -44,7 +44,7 @@ PAGE_LIMIT="${PAGE_LIMIT:-25}"
 CONTRACT_PAGE_LIMIT="${CONTRACT_PAGE_LIMIT:-5}"
 MAX_PAGES="${MAX_PAGES:-20}"
 COMMAND_TIMEOUT_SECONDS="${COMMAND_TIMEOUT_SECONDS:-600}"
-RECONCILE_INTERVAL_SECONDS="${RECONCILE_INTERVAL_SECONDS:-900}"
+RECONCILE_INTERVAL_SECONDS="${RECONCILE_INTERVAL_SECONDS:-60}"
 STATE_DIR="${STATE_DIR:-$APP_ROOT/storage/app/private/test-commerce-pipeline}"
 LOOP_ITERATIONS="${LOOP_ITERATIONS:-60}"
 LOOP_SLEEP_SECONDS="${LOOP_SLEEP_SECONDS:-60}"

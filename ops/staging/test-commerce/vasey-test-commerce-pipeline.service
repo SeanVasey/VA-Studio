@@ -25,7 +25,7 @@ Environment=PAGE_LIMIT=25
 Environment=CONTRACT_PAGE_LIMIT=5
 Environment=MAX_PAGES=20
 Environment=COMMAND_TIMEOUT_SECONDS=600
-Environment=RECONCILE_INTERVAL_SECONDS=900
+Environment=RECONCILE_INTERVAL_SECONDS=60
 TimeoutStartSec=3600
 Nice=5
 NoNewPrivileges=yes

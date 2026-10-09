@@ -62,16 +62,16 @@ class TestCommerceProfileValidatorTest extends TestCase
     }
 
     /** @return array{int, string, array<string, bool>} */
-    private function validate(string $profile, array $arguments = []): array
+    private function validate(string $profile, array $arguments = [], array $exports = []): array
     {
         $file = $this->dir.'/staging.env';
         file_put_contents($file, $profile);
 
-        return $this->validateFile($file, $arguments);
+        return $this->validateFile($file, $arguments, $exports);
     }
 
     /** @return array{int, string, array<string, bool>} */
-    private function validateFile(string $file, array $arguments = []): array
+    private function validateFile(string $file, array $arguments = [], array $exports = []): array
     {
         $environment = [];
         foreach (array_unique([...array_keys((array) getenv()), ...array_keys($_ENV), ...array_keys($_SERVER)]) as $name) {
@@ -80,6 +80,7 @@ class TestCommerceProfileValidatorTest extends TestCase
             }
         }
         $environment['PATH'] = (string) getenv('PATH');
+        $environment = array_replace($environment, $exports);
         $process = new Process([PHP_BINARY, self::root().'/scripts/ops/validate-test-commerce-profile.php', ...$arguments, $file],
             self::root(), $environment);
         $process->setTimeout(120);
@@ -132,6 +133,42 @@ class TestCommerceProfileValidatorTest extends TestCase
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
         $this->assertStringNotContainsString('Synthetic Staging Seller', $output);
+    }
+
+    public static function maskedFileValues(): array
+    {
+        return [
+            'environment' => ['APP_ENV', 'production', 'local', 'runtime.app_env_local'],
+            'debug' => ['APP_DEBUG', 'true', 'false', 'runtime.app_debug_off'],
+            'account' => ['STRIPE_ACCOUNT_ID', 'invalid-file-account', self::FILLED['<acct_ID>'], 'stripe.account'],
+            'secret key' => ['STRIPE_TEST_SECRET_KEY', 'invalid-file-key', self::FILLED['<sk_test_KEY>'], 'stripe.secret_key_test'],
+            'origin' => ['APP_URL', 'https://different.synthetic.invalid', 'https://staging.synthetic.invalid', 'runtime.app_url_equals_return_origin'],
+            'production boundary' => ['PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED', 'true', 'false', 'boundary.out_of_profile_families_off'],
+        ];
+    }
+
+    #[DataProvider('maskedFileValues')]
+    public function test_exported_safe_values_cannot_mask_an_unsafe_file_or_authorize_a_probe(string $name, string $unsafe, string $exported, string $check): void
+    {
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $name, $unsafe),
+            ['--probe', '--i-understand-this-calls-stripe'], [$name => $exported]);
+
+        $this->assertSame(1, $exit, $output);
+        $this->assertFalse($checks[$check], $output);
+        $this->assertFalse($checks['stripe.probe_account']);
+        $this->assertStringContainsString('Probe not attempted', $output);
+        $this->assertNoSecretPrinted($output);
+    }
+
+    public function test_the_profile_is_the_only_application_environment_source(): void
+    {
+        [$exit, $output, $checks] = $this->validate(self::filled(), [], [
+            'APP_ENV' => 'production', 'APP_DEBUG' => 'true', 'STRIPE_MODE' => 'live',
+            'PRODUCTION_CHECKOUT_ENABLED' => 'true', 'STRIPE_ACCOUNT_ID' => 'invalid-export-account',
+        ]);
+        $this->assertSame(0, $exit, $output);
+        $this->assertNotContains(false, $checks);
+        $this->assertNoSecretPrinted($output);
     }
 
     public static function brokenProfiles(): array

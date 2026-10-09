@@ -163,6 +163,20 @@ class TestCommercePipelineRunnerTest extends TestCase
         $this->assertStringContainsString('reconcile not due (interval 900s)', $second->getOutput());
     }
 
+    public function test_default_reconciliation_rechecks_pending_sessions_well_before_the_payment_window_ends(): void
+    {
+        // A no-webhook session was read unpaid just before the buyer completed payment. One minute
+        // later there is still ample time in the 15-minute quote window to observe and finalize it.
+        file_put_contents($this->dir.'/state/reconcile.last', (string) (time() - 61));
+        $this->page('vasey:reconcile-test-payments', 'start', [self::U1.' awaiting_finalization']);
+        $this->page('vasey:finalize-test-payments', 'start', [self::U1.' paid']);
+        $process = $this->sweep(['RECONCILE_INTERVAL_SECONDS' => false]);
+
+        $this->assertSame(0, $process->getExitCode());
+        $this->assertStringContainsString('reconcile '.self::U1.' awaiting_finalization', $process->getOutput());
+        $this->assertStringContainsString('finalize '.self::U1.' paid', $process->getOutput());
+    }
+
     public static function retainedCursorStages(): array
     {
         return [

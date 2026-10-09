@@ -58,7 +58,7 @@ Both are captured into each immutable test order. Changing them later affects ne
    php scripts/ops/validate-test-commerce-profile.php .env
    ```
 
-   Expect 35 `PASS` lines and `RESULT: PASS`. Each `FAIL` names the responsible check (for example `commerce.pricing_zero_test_tax`). The script reads only the file you pass it, never prints a value from it and makes no Stripe request.
+   Expect 35 `PASS` lines and `RESULT: PASS`. Each `FAIL` names the responsible check (for example `commerce.pricing_zero_test_tax`). The script reads only the file you pass it: inherited application variables and foreign configuration caches cannot mask its values. It never prints a value and makes no Stripe request. This validates the file; deploy/cache/workers must actually use that same file without shell overrides.
 4. Optional, read-only Stripe probe. This makes one `GET /v1/account` request with the test key and confirms it belongs to `STRIPE_ACCOUNT_ID`:
 
    ```sh
@@ -86,7 +86,7 @@ Its configuration rows describe the *production* checkout family (`PRODUCTION_CH
 The runner drains five console commands in order, following each command's `NEXT_AFTER` cursor so a backlog larger than one page is fully processed:
 
 1. `vasey:process-stripe-receipts`: retained webhook receipts (missed dispatch, due retries, expired leases).
-2. `vasey:reconcile-test-payments`: sessions without a verified payment, even if no webhook arrived. Runs at most every 15 minutes (`RECONCILE_INTERVAL_SECONDS=900`), because it re-reads every unpaid session from Stripe each time.
+2. `vasey:reconcile-test-payments`: sessions without a verified payment, even if no webhook arrived. Its default minimum interval is one minute (`RECONCILE_INTERVAL_SECONDS=60`), well inside the 15-minute quote window. It re-reads unpaid sessions from Stripe; keep abandoned drill orders few and do not increase the interval to the payment window.
 3. `vasey:finalize-test-payments`
 4. `vasey:issue-test-contracts`
 5. `vasey:activate-test-fulfillment`
@@ -147,7 +147,7 @@ php artisan vasey:rights-scope list
 
 Use one browser, signed in to nothing. The guest's order ownership lives in that browser's session (idle timeout `SESSION_LIFETIME`, 120 minutes by default). Downloads work only in the same session, unless the order is claimed into a test account (see [Keeping access](#keeping-access-after-the-session)).
 
-**Timing.** A quote lives 15 minutes from the moment the cart review creates it, and the order's payment window ends with it. Complete payment within about 10 minutes of opening the review. A payment Stripe confirms after the window becomes a *paid exception*: the money is captured in test mode, but no license or download is issued (drill 5).
+**Timing.** A quote lives 15 minutes from the moment the cart review creates it, and the order's payment window ends with it. Complete payment within about 10 minutes of opening the review. Eligibility uses the application's verified observation time, so payment at Stripe before expiry can still become a *paid exception* if a missed webhook is not reconciled until after expiry. The one-minute default reduces that risk; long sweeps, backlogs and payment near the deadline can still exceed it. A paid exception retains evidence and issues no license/download (drill 5).
 
 | # | Do | Expect | Verify on the host |
 | --- | --- | --- | --- |
@@ -222,7 +222,7 @@ Run each drill on a fresh order, using a dedicated drill offer: drills 1 (if aba
    Or wait for the 60-minute session expiry.
 3. Expect a `checkout.session.expired` delivery, then `receipts <id> expired` in the runner log. The store's checkout status becomes `expired`. No payment, grant, contract or download exists.
 4. The offer revision now stays reserved: a new order for it fails with `INVENTORY_UNAVAILABLE` (setup step 5).
-5. Note: the expired intent stays in the reconcile selection. Every reconcile sweep (every 15 minutes) reads it from Stripe again and stores one more observation row. This is expected for now (see the findings in the handoff); keep drill orders few.
+5. Note: the expired intent stays in the reconcile selection. Every eligible reconcile sweep (one-minute minimum by default) reads it from Stripe again and stores one more observation row. This is expected for now (see the findings in the handoff); keep drill orders few.
 
 ### 3. Duplicate webhook
 
@@ -240,7 +240,7 @@ Run each drill on a fresh order, using a dedicated drill offer: drills 1 (if aba
 
 1. In the Dashboard, **disable** the webhook endpoint.
 2. Prepare an order and pay with `4242 4242 4242 4242`. Expect the return page to stay "not verified".
-3. Within the payment window, reconcile now instead of waiting for the 15-minute cadence:
+3. Within the payment window, reconcile now instead of waiting for the next scheduled sweep:
 
    ```sh
    php artisan vasey:reconcile-test-payments --limit=25
