@@ -815,6 +815,17 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(engine == "mysql", "--mysql-native-selection" in block)
         self.assertIn("Verify all ten current-run database receipts without enabling reuse", workflow)
 
+    def test_native_isolation_variables_are_set_only_on_the_mysql_job(self):
+        workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
+        jobs = dict(re.findall(r"(?ms)^  ([a-z][a-z-]+):\n(.*?)(?=^  [a-z][a-z-]+:\n|\Z)", workflow.split("\njobs:\n", 1)[1]))
+        self.assertIn("backend-mysql", jobs)
+        for variable in ("ATTACHMENT_NATIVE_ISOLATED", "VA_CI_DISPOSABLE_MYSQL"):
+            self.assertEqual(1, workflow.count(variable + ":"), variable)
+            self.assertIn(f"      {variable}: '1'\n", jobs["backend-mysql"].split("\n    steps:\n", 1)[0] + "\n", variable)
+            for name, block in jobs.items():
+                if name != "backend-mysql":
+                    self.assertNotIn(variable, block, name)
+
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))

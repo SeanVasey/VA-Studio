@@ -130,6 +130,11 @@ class NativeCollectorTests(unittest.TestCase):
         self.assertIn('if [ "$DB_CONNECTION" = mysql ]; then set -- --mysql-native-selection; else set --; fi', template)
         self.assertIn('--timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json" "$@"', template)
         self.assertEqual(1, workflow.count('--mysql-native-selection'))
+        # The native isolation variables are pinned to the MySQL job's own variables only.
+        mysql_block = workflow.split('backend-mysql:\n', 1)[1].split('\n\n', 1)[0]
+        for variable in ('ATTACHMENT_NATIVE_ISOLATED', 'VA_CI_DISPOSABLE_MYSQL'):
+            self.assertEqual(1, workflow.count(variable), variable)
+            self.assertIn(f"\n    {variable}: '1'\n", mysql_block.split('\n  variables:\n', 1)[1] + '\n', variable)
 
     def test_physical_write_process_control_is_required_by_both_engine_receipts(self):
         for engine in ('sqlite', 'mysql'):

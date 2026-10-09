@@ -3,6 +3,10 @@
   "purpose": "reviewed-sqlite-only-mysql-skip-methods",
   "methods": [
     [
+      "Tests\\Feature\\CustomerListeningFreshnessTest",
+      "test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main"
+    ],
+    [
       "Tests\\Feature\\CustomerListeningMigrationTest",
       "test_foreign_or_drifted_objects_are_never_adopted_or_dropped"
     ],
@@ -21,6 +25,10 @@
     [
       "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
       "test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names"
+    ],
+    [
+      "Tests\\Feature\\FreeGrantSchemaRecoveryTest",
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
     ],
     [
       "Tests\\Feature\\PaidGrantSchemaRecoveryTest",

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\CustomerFixtures;
+use Tests\Support\DisposableNativeDatabase;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FreeGrantFixtures;
 use Tests\TestCase;
@@ -20,7 +21,7 @@ final class FreeGrantConcurrencyTest extends TestCase
         if (DB::getDriverName() !== 'mysql') {
             $this->markTestSkipped('Independent InnoDB capacity contention requires native MySQL.');
         }
-        $this->assertSame('vaseyaudio_free_grants', DB::getDatabaseName());
+        $this->assertTrue(DisposableNativeDatabase::isAdmitted('vaseyaudio_free_grants'), 'A dedicated synthetic free-grant schema, or the CI job\'s disposable database, is required.');
     }
 
     public function test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity(): void

@@ -2,8 +2,9 @@
 
 Branch `harness/mysql-native-selection` is based on main `0f9b39ce5d59e2d579d11a8ca15153ced1f565b4`.
 The earlier commits are `78f8a7b`, `23ff88e` and `6d17481`. `6d17481` applied conditions C1 to C4 from
-the independent review of `23ff88e`, whose decision was APPROVE WITH CONDITIONS. This revision adds
-the reviewed MySQL skip census.
+the independent review of `23ff88e`, whose decision was APPROVE WITH CONDITIONS. `916392d` added the
+reviewed MySQL skip census. This revision implements option A for the tests that need a dedicated
+schema: the MySQL jobs mark their disposable database, and four more files join the selection.
 
 This note records partition and self-test evidence only. No local or hosted MySQL test run has
 executed the selection, so it is not Foundation acceptance.
@@ -20,8 +21,11 @@ and to keep the complete suite on SQLite.
 
 | Engine | Scope | Cases |
 | --- | --- | --- |
-| SQLite (2 shards) | Complete suite; the 623 reviewed census cases skip | 7,633 listed, 7,010 executed |
-| MySQL (8 GitHub / 4 GitLab shards) | Native selection; only the 56 reviewed MySQL census cases skip | 1,703 listed, 1,647 executed, in 158 files |
+| SQLite (2 shards) | Complete suite; the 623 reviewed census cases skip | 7,641 listed, 7,018 executed |
+| MySQL (8 GitHub / 4 GitLab shards) | Native selection; only the 58 reviewed MySQL census cases skip | 1,764 listed, 1,706 executed, in 162 files |
+
+The suite grew from 7,633 to 7,641 cases (555 to 556 files) because this revision adds
+`tests/Unit/DisposableNativeDatabaseTest.php` (8 cases). That file runs only on SQLite.
 
 The selection is defined in `scripts/ci/database-mysql-selection.json`. It takes whole files, so every
 case in a selected file runs, including methods the census does not list. A file is selected if any
@@ -31,8 +35,8 @@ of the following holds:
 | --- | --- | --- |
 | Owns a (class, method) pair in `scripts/ci/database-sqlite-skips.json` (217 pairs in 101 classes) | 101 | 932, of which 623 are census cases |
 | Path matches `^tests/(?:Feature\|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$` | 49 | 589 |
-| Listed in the reviewed `include_files` (added for C1) | 12 | 269 |
-| All selected files (4 files match both of the first two rules) | 158 | 1,703 |
+| Listed in the reviewed `include_files` (added for C1, extended for option A) | 16 | 330 |
+| All selected files (4 files match both of the first two rules) | 162 | 1,764 |
 
 Entries in `include_files` must be sorted, unique repository test paths, and PHPUnit must discover
 every one of them; the sharder and both verifiers refuse anything else. The list names tests whose
@@ -52,34 +56,28 @@ native-only proof passes on SQLite only through a fallback branch:
 | `tests/Feature/ServiceProjectSchemaTest.php` | 3 | Schema test |
 | `tests/Feature/SupportAttachmentSchemaTest.php` | 4 | Schema test |
 | `tests/Unit/SchemaQualifierDelimiterTest.php` | 5 | Schema test |
+| `tests/Feature/FreeGrantSchemaRecoveryTest.php` | 8 | MySQL migrator fault and trigger recovery; needs the disposable-database guard (option A) |
+| `tests/Feature/SupportAttachmentsTest.php` | 28 | Native attachment consumer; runs on MySQL only with `ATTACHMENT_NATIVE_ISOLATED=1` |
+| `tests/Feature/ServiceSupportAttachmentsTest.php` | 8 | Native service attachment consumer; same flag |
+| `tests/Feature/CustomerListeningFreshnessTest.php` | 17 | Native shadow-refusal branch; one SQLite-only method is in the MySQL census |
 
-A static scan found no `markTestSkipped` call in these 12 files or anywhere in `tests/Support`.
-
-**`tests/Feature/FreeGrantSchemaRecoveryTest.php` (8 cases) is still left out**, although the review
-named it and the coordinator asked for it once the MySQL skip census existed. The census would cover
-its SQLite-only method, but a second problem blocks it. Its `setUp`
-(`tests/Feature/FreeGrantSchemaRecoveryTest.php:26`) asserts on MySQL that the database is the
-dedicated `vaseyaudio_free_grants` schema, while both Foundation workflows use `vaseyaudio_test`. All 8
-cases would therefore fail on CI MySQL. The recorded native JUnit
-`docs/verification/free-grant-origins-20261007/native-schema.xml` ran against that dedicated schema.
-Selecting the file needs a reviewed CI schema or a change to the test, not only a census entry.
+A static scan found no `markTestSkipped` call in the first 12 files or anywhere in `tests/Support`. The
+four files added for option A skip only as described under "Option A" below.
 
 ## Residual risk pending Sean's decision
 
 The selection still finds MySQL-only behaviour only where SQLite skips it, where the test file is a
 migration test, or where the include list names the file. The review found 61 unselected files
-(936 cases) that branch on `getDriverName()`, `ATTR_DRIVER_NAME` or `['driver']`. Eleven of them are
-now in the include list. `SchemaQualifierDelimiterTest` is the twelfth included file and was not
+(936 cases) that branch on `getDriverName()`, `ATTR_DRIVER_NAME` or `['driver']`. Fifteen of them are
+now in the include list. `SchemaQualifierDelimiterTest` is the sixteenth included file and was not
 among the 61.
 
-**That leaves 50 files (672 cases).** They run on SQLite through a fallback branch and do not run on
-MySQL in Foundation CI. The coordinator's request said 48; the correct count is 61 − 11 = 50, and it
-includes the deliberately excluded `FreeGrantSchemaRecoveryTest`. None of the 50 were added:
+**That leaves 46 files (611 cases).** They run on SQLite through a fallback branch and do not run on
+MySQL in Foundation CI. None of them were added:
 
 | File | Cases |
 | --- | --- |
 | `tests/Feature/CustomerConsentAdmissionTest.php` | 22 |
-| `tests/Feature/CustomerListeningFreshnessTest.php` | 17 |
 | `tests/Feature/CustomerListeningNotesCapacityTest.php` | 3 |
 | `tests/Feature/CustomerSuppressionRetainedTargetTest.php` | 2 |
 | `tests/Feature/CustomerSuppressionSourceBoundaryTest.php` | 7 |
@@ -87,7 +85,6 @@ includes the deliberately excluded `FreeGrantSchemaRecoveryTest`. None of the 50
 | `tests/Feature/FinalizationDatabaseLifecycleTest.php` | 4 |
 | `tests/Feature/FreeGrantAuthorityTest.php` | 6 |
 | `tests/Feature/FreeGrantDownloadsTest.php` | 4 |
-| `tests/Feature/FreeGrantSchemaRecoveryTest.php` | 8 |
 | `tests/Feature/PrivateProductDraftTest.php` | 24 |
 | `tests/Feature/ProductionAmountInputConsistencyAccessTest.php` | 15 |
 | `tests/Feature/ProductionAmountRequirementsAccessTest.php` | 12 |
@@ -122,54 +119,47 @@ includes the deliberately excluded `FreeGrantSchemaRecoveryTest`. None of the 50
 | `tests/Feature/ServiceProjectAttachmentAuthorityTest.php` | 17 |
 | `tests/Feature/ServiceProjectCredentialResolverTest.php` | 1 |
 | `tests/Feature/ServiceProjectRecoveryTest.php` | 7 |
-| `tests/Feature/ServiceSupportAttachmentsTest.php` | 8 |
 | `tests/Feature/SiteContentDamagedPublicationTest.php` | 4 |
 | `tests/Feature/SupportAttachmentRegistrationTest.php` | 12 |
-| `tests/Feature/SupportAttachmentsTest.php` | 28 |
 | `tests/Feature/TestPaymentExceptionOperationsTest.php` | 25 |
 | `tests/Feature/TestUnpaidReleaseTest.php` | 46 |
 
-In total, 397 of the 555 files (5,930 of the 7,633 cases) no longer run on MySQL in Foundation CI.
+In total, 394 of the 556 files (5,877 of the 7,641 cases) no longer run on MySQL in Foundation CI.
 They still run on SQLite.
 
 ## MySQL skip signals (C2)
 
-### Signals the selection no longer raises
+### Attachment consumers and other MySQL skips (C2): covered by Foundation once a hosted run passes
 
-These four files skip on MySQL. All four are now unselected:
+- `tests/Feature/SupportAttachmentsTest.php` (28 cases) and `tests/Feature/ServiceSupportAttachmentsTest.php`
+  (8 cases) are now selected. Their `setUp` skips on MySQL only when `ATTACHMENT_NATIVE_ISOLATED` is not
+  `1`. The MySQL jobs (and only they) now set it, so on CI these cases run their native paths
+  instead of skipping. The flag is environment-gated, so it is deliberately not in the census: any skip
+  of these cases on CI MySQL is refused as an unlisted skip.
+- The two SQLite-only methods,
+  `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`
+  and `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`,
+  are now in the MySQL skip census, and their files are selected.
 
-- `tests/Feature/SupportAttachmentsTest.php` (28 cases) and
-  `tests/Feature/ServiceSupportAttachmentsTest.php` (8 cases). In both, `setUp` skips every case on
-  MySQL unless `ATTACHMENT_NATIVE_ISOLATED=1`, and neither workflow sets that variable.
-- `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`,
-  which runs only on SQLite and skips on MySQL.
-- `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`,
-  which also runs only on SQLite and skips on MySQL.
-
-On main, these files are part of the complete MySQL partition, and the receipts' MySQL zero-skip rule
-would have rejected their skips. No hosted run reached them, because run 37921309772 timed out first.
-With the selection they never run on MySQL, so that failure signal disappears. SQLite still executes
-these cases, so no case goes unexecuted on both engines.
-
-**Open release blocker: native attachment-consumer coverage.** Foundation CI has no executed MySQL
-evidence for the MySQL paths of `SupportAttachmentsTest` and `ServiceSupportAttachmentsTest`. Closing
-the gap needs a reviewed, isolated MySQL run with `ATTACHMENT_NATIVE_ISOLATED=1`, or a selection
-change that brings that environment with it.
+**The native attachment-consumer release blocker is closed for Foundation once a hosted MySQL run
+passes.** Until then it is unverified on MySQL 8.4; see the local MySQL 8.0 evidence below.
 
 ### MySQL skip census (`scripts/ci/database-mysql-skips.json`)
 
 The census mirrors `scripts/ci/database-sqlite-skips.json`. It holds sorted, unique
 (class, method) pairs with purpose `reviewed-sqlite-only-mysql-skip-methods`. It lists exactly the
 selected methods whose skip on MySQL is an unconditional driver check. Environment-gated skips such
-as `ATTACHMENT_NATIVE_ISOLATED` are not listed. It has 12 methods covering 56 cases.
+as `ATTACHMENT_NATIVE_ISOLATED` are not listed. It has 14 methods covering 58 cases.
 
 | Class::method | Cases | Skip site (file:line) and guard |
 | --- | --- | --- |
+| `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main` | 1 | `tests/Feature/CustomerListeningFreshnessTest.php:135`, `DB::getDriverName() !== 'sqlite'` |
 | `CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped` | 3 | `tests/Feature/CustomerListeningMigrationTest.php:85`, `DB::getDriverName() !== 'sqlite'` |
 | `CustomerListeningMigrationTest::test_temporary_shadow_is_never_adopted_or_dropped` | 1 | `tests/Feature/CustomerListeningMigrationTest.php:105`, `DB::getDriverName() !== 'sqlite'` |
 | `CustomerSuppressionMigrationTest::test_missing_identity_dependency_and_disabled_fk_enforcement_are_refused_without_installing` | 1 | `tests/Feature/CustomerSuppressionMigrationTest.php:103`, `DB::connection()->getDriverName() !== 'sqlite'` |
 | `CustomerSuppressionMigrationTest::test_sqlite_replace_cannot_delete_retained_target_or_intent` | 1 | `tests/Feature/CustomerSuppressionMigrationTest.php:200`, `DB::connection()->getDriverName() !== 'sqlite'` |
 | `DiscoverySitemapNamespaceAdmissionTest::test_sqlite_named_inline_check_and_fk_clauses_do_not_reserve_foreign_index_names` | 1 | `tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php:157`, `DB::getDriverName() !== 'sqlite'` |
+| `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target` | 1 | `tests/Feature/FreeGrantSchemaRecoveryTest.php:234`, `DB::getDriverName() !== 'sqlite'` |
 | `PaidGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target` | 1 | `tests/Feature/PaidGrantSchemaRecoveryTest.php:235`, `DB::getDriverName() !== 'sqlite'` |
 | `ProductionCheckoutMigrationTest::test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker` | 1 | `tests/Feature/ProductionCheckoutMigrationTest.php:202`, `DB::getDriverName() !== 'sqlite'` |
 | `ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema` | 37 | Calls `sqliteOnlyRecovery()` first (`tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php:43`); the helper skips at line 297 on `DB::getDriverName() !== 'sqlite'` |
@@ -187,36 +177,107 @@ selected files. Only a MySQL run proves it exact, which means proving that each 
 skips and that no other case skips on MySQL. Every mismatch is refused, so an inexact census turns a
 run red; it cannot hide a case.
 
-### Still blocking a green MySQL run (not fixed here)
+### Blockers found earlier
 
-These problems are not fixed by the census. Each needs a reviewed decision or a test change:
+1. **Skipped cases that report assertions: resolved by #70's verifier change (pending merge).** The
+   verifier's `junit` check on this branch still requires a skipped case to report 0 assertions.
+   PHPUnit 12.5 counts `setUp` assertions on a skipped test (`TestRunner.php:130`). The coordinator's
+   local SQLite shard runs found 8 SQLite-census skips carrying 1–2 `setUp` assertions, and the census skips
+   in `ProductionFreeGrantSchemaTest` (39), `FreeGrantSchemaRecoveryTest` (1), `PaidGrantSchemaRecoveryTest`
+   (1) and `CustomerSuppressionMigrationTest` (2) carry `setUp` assertions on MySQL: 43 of the 58 census
+   cases. The local MySQL 8.0 run below confirms it for `FreeGrantSchemaRecoveryTest`. PR #70 (commit
+   `f5fea78`, under independent review) accepts assertions on skipped cases, refuses duplicate skip
+   nodes and keeps exact census equality. This branch picks it up by merging main after #70 merges;
+   the rule is not changed here.
+2. **Dedicated-schema guard: resolved by `tests/Support/DisposableNativeDatabase.php`.** See "Option A"
+   below.
 
-1. **Skipped cases that report assertions.** The verifier's `junit` check requires a skipped case to
-   report 0 assertions. PHPUnit 12.5 counts assertions made in `setUp` towards a skipped test
-   (`TestRunner.php:130` adds `Assert::getCount()`). The recorded JUnit confirms it:
-   - `docs/verification/free-grant-origins-20261007/native-schema.xml` has
-     `FreeGrantSchemaRecoveryTest` skipped with `assertions="2"`.
-   - `free-256-20261007` has `ProductionFreeGrantSchemaTest` skipped with `assertions="1"`.
-   - `paid252-composition-20261007` has `PaidGrantSchemaRecoveryTest` skipped with `assertions="2"`.
+## Option A: the CI job's disposable database
 
-   The following census cases skip only after assertions in `setUp`, so they will still be refused:
-   - `ProductionFreeGrantSchemaTest` (39 cases): `setUp` calls `identitySetup()`, which runs
-     `migrate:fresh` with `assertExitCode(0)` (`tests/Support/ProductionIdentityFixture.php:27`).
-   - `PaidGrantSchemaRecoveryTest` (1 case): `setUp` asserts at lines 26 and 28.
-   - `CustomerSuppressionMigrationTest` (2 cases): `setUp` calls `assertExitCode(0)` at line 25.
+**What changed.**
 
-   That is 42 of the 56 census cases. The same rule applies to SQLite, so the SQLite-census skips in
-   `ProductionFreeGrantSchemaTest` and `PaidGrantSchemaRecoveryTest` would also be refused, on main as
-   on this branch. The remaining 14 census cases skip before any assertion, and the recorded JUnit
-   shows `assertions="0"` for the `ProductionCheckoutMigrationTest`,
-   `ProductionTaxCheckoutMigrationTest` and `DiscoverySitemapNamespaceAdmissionTest` skips. There are
-   two possible fixes: move each driver skip ahead of the `setUp` assertions, for example into
-   `beforeRefreshingDatabase` or the top of `setUp` keyed on `$this->name()`; or make a reviewed
-   change to the zero-assertion rule. Neither is made here.
-2. **A selected file that requires a dedicated schema.** `FreeGrantConcurrencyTest` is selected
-   because it owns census methods. Its `beforeRefreshingDatabase` asserts that the MySQL database is
-   `vaseyaudio_free_grants` (`tests/Feature/FreeGrantConcurrencyTest.php:23`), so it fails against
-   the workflows' `vaseyaudio_test`. Main has the same problem.
+- `tests/Support/DisposableNativeDatabase.php` adds `isAdmitted(string $dedicated)`. It admits the
+  dedicated schema, as before. Otherwise it admits the connection's database only when all of these
+  hold:
+  - `VA_CI_DISPOSABLE_MYSQL=1`;
+  - `CI=true` (set by both GitHub Actions and GitLab CI);
+  - the `testing` environment;
+  - `DB::getDatabaseName() === getenv('DB_DATABASE')`;
+  - the name is a non-empty plain identifier of at most 64 characters, is not `vaseyaudio`, and
+    contains neither `prod` nor `live`.
+
+  Locally the dedicated schema stays required, because these tests drop every table in the connection's
+  database.
+- The guards formerly at `tests/Feature/FreeGrantSchemaRecoveryTest.php:26` and
+  `tests/Feature/FreeGrantConcurrencyTest.php:23` (now lines 27 and 24) call the helper. Each is still one assertion, so the
+  assertion counts do not change.
+- `tests/Unit/DisposableNativeDatabaseTest.php` (8 cases) covers both admitted paths. It also covers
+  each refusal: a missing or different marker, a missing or different `CI`, environments `local`,
+  `staging` and `production`, a database-name mismatch or unset `DB_DATABASE`, an empty name, and
+  production-looking names. Environment variables are set with `putenv` and restored in `tearDown`.
+- The GitHub `backend-mysql` env and the GitLab `backend-mysql` variables set
+  `ATTACHMENT_NATIVE_ISOLATED: '1'` and `VA_CI_DISPOSABLE_MYSQL: '1'`, each with a comment. No other
+  job sets them. `test-database-receipts.py` and `test-gitlab-database-receipts.py` pin both variables
+  to the MySQL jobs only.
+
+**Static reading of the newly enabled files.**
+
+- **Attachments: the flag is the only skip.** Each file has exactly one `markTestSkipped`, inside
+  `if (DB::getDriverName() === 'mysql')` → `if (getenv('ATTACHMENT_NATIVE_ISOLATED') !== '1')`
+  (`tests/Feature/SupportAttachmentsTest.php:41-43`, `tests/Feature/ServiceSupportAttachmentsTest.php:39-41`).
+- **Attachments: they touch only the current database.** With the flag set they run
+  `migrate:fresh --force` on the default connection (`SupportAttachmentsTest.php:45`,
+  `ServiceSupportAttachmentsTest.php:43`), which drops and rebuilds the tables of that connection's
+  database only. Neither file, nor their fixtures `tests/Support/InquiryConversationFixtures.php`,
+  `ServiceProjectFixtures.php`, `CustomerFixtures.php` and `TestOnlyMediaScanner.php`, contains
+  `information_schema`, `performance_schema`, `CREATE DATABASE`, `DROP DATABASE`, `SET GLOBAL` or a
+  named second connection. Media goes to faked private storage (`fakePrivateMediaStorage()`).
+- **`FreeGrantSchemaRecoveryTest`: scoped to the connection's database.**
+  - `Schema::dropAllTables()` (lines 31 and 41) uses Laravel's `MySqlBuilder::dropAllTables`, which
+    lists only `getCurrentSchemaListing()`, the connection's own database
+    (`vendor/laravel/framework/src/Illuminate/Database/Schema/MySqlBuilder.php:12-29`).
+  - Trigger inspection reads `information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE()` (line 78).
+  - Every other statement is `DB::unprepared` DDL on unqualified tables (lines 204–252).
+- **`FreeGrantConcurrencyTest`: one read-only server-wide query.** Its only access outside the
+  database is a read-only `SELECT` on `performance_schema.data_lock_waits`/`data_locks`/`threads`,
+  filtered by `OBJECT_SCHEMA` = the test database and the two worker connection IDs (line 58). The
+  workers inherit the job's `DB_*` environment (line 36).
+
+**Local evidence.**
+
+- **SQLite.** `APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync`,
+  using direct PHPUnit with this worktree's `vendor/autoload.php`; `public/build` was absent. The run
+  covered `DisposableNativeDatabaseTest`, `FreeGrantSchemaRecoveryTest`, `SupportAttachmentsTest`,
+  `ServiceSupportAttachmentsTest` and `CustomerListeningFreshnessTest`. Result: rc 0, **69 tests, 2,247
+  assertions, 0 failures, 0 errors, 0 skips**, broken down as 8/25, 8/1,941, 28/159, 8/56 and 17/66
+  (tests/assertions per file). `FreeGrantConcurrencyTest` on SQLite: rc 0, 1 test, skipped before the
+  guard (as before).
+
+- **MySQL 8.0 (not CI's 8.4).** This used a new, private Oracle MySQL `8.0.46-0ubuntu0.24.04.4`. Its
+  datadir was initialized in this session's scratch directory, and it listened on 127.0.0.1:33091 with
+  a socket under `/run/mysqld-opta`. The existing `/var/lib/mysql-fnd` daemon was not running and was
+  not touched. The server reported `STRICT_TRANS_TABLES`, `performance_schema=1` and `REPEATABLE-READ`.
+
+  Each run used a fresh disposable database and the CI environment: `APP_ENV=testing`,
+  `DB_CONNECTION=mysql`, `CI=true`, `VA_CI_DISPOSABLE_MYSQL=1`, `ATTACHMENT_NATIVE_ISOLATED=1`,
+  `DB_DATABASE=<that database>`, user `root` as in CI, and the same direct PHPUnit command. The JUnit
+  files are in `local-evidence/`. The three groups ran in parallel on three databases, so their wall
+  times include contention.
+
+  | Run | Result |
+  | --- | --- |
+  | `FreeGrantSchemaRecoveryTest` + `FreeGrantConcurrencyTest` (`mysql80-free-grants.xml`) | rc 0: 9 tests, 890 assertions, 1 skip (the census method `test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`, with `assertions="2"` from `setUp`); 39 s + 91 s |
+  | `SupportAttachmentsTest` (`mysql80-support-attachments.xml`) | rc 0: 28 tests, 159 assertions, 0 skips, 0 failures; 2,970 s (about 106 s per case) |
+  | `ServiceSupportAttachmentsTest` + `CustomerListeningFreshnessTest` (`mysql80-service-and-listening.xml`) | rc 0: 25 tests, 118 assertions, 1 skip (the census method `test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`, with `assertions="0"`); 765 s + 2,015 s |
+  | Guard check: `FreeGrantSchemaRecoveryTest` with `VA_CI_DISPOSABLE_MYSQL` unset (`mysql80-free-grants-guard-without-marker.xml`) | rc 1: all 8 fail in `setUp` with "A dedicated synthetic free-grant schema, or the CI job's disposable database, is required." |
+
+  The only skips were the two new census methods. Each skipped exactly as the census expects. The
+  free-grant skip carries 2 `setUp` assertions, which only #70's verifier change will accept.
+
+  Do not use these wall times to size CI. An earlier combined run measured about 105 s per attachment
+  case with no parallel load (4 cases in 7 minutes), and it was stopped for time. All of these runs are
+  much slower than the authors' recorded 12–15 s per case. A hosted MySQL 8.4 run remains the only
+  measurement for sizing.
 
 ## How the selection is enforced
 
@@ -266,76 +327,82 @@ All commands ran in `/home/user/wt-mysel` with PHP 8.4.26, doing PHPUnit discove
 ```
 python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql \
   --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection        # rc 0
-warning: 73 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; ...
-Proved 1703 selected MySQL-native tests in 158 files (of 7633 discovered tests in 555 files) across 8 nonempty shards.
-Shard 1: 251 tests; 23 complete files; estimated 18m 33s.
-Shard 2: 195 tests; 19 complete files; estimated 18m 37s.
-Shard 3: 187 tests; 19 complete files; estimated 18m 36s.
-Shard 4: 201 tests; 19 complete files; estimated 18m 36s.
-Shard 5: 218 tests; 20 complete files; estimated 18m 36s.
-Shard 6: 212 tests; 19 complete files; estimated 18m 34s.
-Shard 7: 213 tests; 19 complete files; estimated 18m 33s.
-Shard 8: 226 tests; 20 complete files; estimated 18m 37s.
+warning: 77 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; ...
+Proved 1764 selected MySQL-native tests in 162 files (of 7641 discovered tests in 556 files) across 8 nonempty shards.
+Shard 1: 252 tests; 19 complete files; estimated 19m 03s.
+Shard 2: 208 tests; 19 complete files; estimated 19m 05s.
+Shard 3: 209 tests; 20 complete files; estimated 19m 06s.
+Shard 4: 208 tests; 19 complete files; estimated 19m 04s.
+Shard 5: 243 tests; 20 complete files; estimated 19m 05s.
+Shard 6: 215 tests; 25 complete files; estimated 19m 03s.
+Shard 7: 218 tests; 20 complete files; estimated 19m 05s.
+Shard 8: 211 tests; 20 complete files; estimated 19m 05s.
 ```
 
-With `--shards=4` (the GitLab count) the run returned rc 0 and proved 1,703 cases across shards of
-463, 412, 398 and 430 cases, each estimated at about 37 minutes from the timings file.
+With `--shards=4` (the GitLab count) the run returned rc 0 and proved 1,764 cases across shards of
+477, 420, 429 and 438 cases, each estimated at about 38 minutes from the timings file.
 
 Both shard counts produced the same manifest `selection` block:
 
 | Field | Value |
 | --- | --- |
-| `policy_sha256` | `eb21499ec8ecd05d03ed7908e0998f578e8867bda04f6be46035e7adf0f1bcbb` |
+| `policy_sha256` | `959c7709e58661ef74a09af1bbbc0576ed71cc483e29c57872ad489b93ec6801` |
 | `sqlite_skip_policy_sha256` | `9080acdabcfc425ac37dcebee23c9f9be00bcd5a6790404977ba41c6994569b0` |
-| `mysql_skip_policy_sha256` | `334e55de1c15091404d431a36a85375e01bd4be56a0f3838e769c5b06cf886e5` |
-| `files` / `test_cases` | 158 / 1,703 |
-| `case_identity_sha256` | `113715a08fb83c6a252e4e7f937a1e7e598425aa46d93aedf41cc25cafc9dd6d` |
+| `mysql_skip_policy_sha256` | `3f8effc254318548c3e7791b0d2b468b731469dc5f581dd43c06ed212c2a6208` |
+| `files` / `test_cases` | 162 / 1,764 |
+| `case_identity_sha256` | `def70368d3097b9fda5d6967e0d6837081b83fab961819c2dc8a37c532508a29` |
 
 **Cross-checks against the verifier.**
 
-- `database_evidence` accepted the real 8-shard manifest and inventories, using a synthesized passing
-  JUnit file for shard 1 (251 cases). Its own recomputation gave 158 files and 1,703 cases.
+- At `6d17481`, `database_evidence` accepted the real 8-shard manifest and inventories, using a
+  synthesized passing JUnit file for shard 1. Its own recomputation matched the manifest.
 - It refused the real unflagged 8-shard MySQL partition.
 - It refused the earlier `78f8a7b` selection, which has no include list, with
   `Partition loses or duplicates cases, files or groups`.
 - With the census in place, `database_evidence` accepted every shard of the real 8-shard and 4-shard
   evidence. Each shard used synthesized JUnit in which exactly the census cases skip with 0
-  assertions: 56 MySQL skips in total. A shard whose census cases ran instead of skipping was refused
+  assertions: 58 MySQL skips in total at this revision. A shard whose census cases ran instead of skipping was refused
   with `MySQL skip identities differ from the reviewed SQLite-only policy`.
 
 **Unflagged output is unchanged.** Run without the flag, the new script and main's script
-(`git show 0f9b39c:scripts/ci/phpunit-shards.py`) both returned rc 0, and `diff -r` found all 18
-MySQL 8-shard files and all 6 SQLite 2-shard files byte-identical. `--mysql-native-selection` with
+(`git show 0f9b39c:scripts/ci/phpunit-shards.py`), each run on this revision's tree (7,641 tests in 556
+files), both returned rc 0, and `diff -r` found all 18 MySQL 8-shard files and all 6 SQLite 2-shard
+files byte-identical. `--mysql-native-selection` with
 `--prefix=phpunit-ci-sqlite` was refused with rc 1. Every generated `phpunit-ci-*` file was deleted
 afterwards.
 
 ### Duration estimates (C3)
 
 The estimates printed from the timings file are not reliable. `phpunit-timings-mysql.json` predates
-run 37921309772 and has no entry for 73 of the 158 selected files; the timings were not regenerated.
-Of the selected cases, 1,355 use `FinalizationDatabaseMigrations`. At the roughly 35 s per case
+run 37921309772 and has no entry for 77 of the 162 selected files; the timings were not regenerated.
+Of the selected cases, 1,372 use `FinalizationDatabaseMigrations`. At the roughly 35 s per case
 measured on GitHub:
 
 | Matrix | Finalization cases per shard | Estimated minutes at 35 s (finalization cases only) | Job limit |
 | --- | --- | --- | --- |
-| GitHub, 8 shards | 199, 192, 183, 149, 189, 144, 177, 122 | about 116, 112, 107, 87, 110, 84, 103, 71 | 150 min |
-| GitLab, 4 shards | 337, 324, 349, 345 | about 197, 189, 204, 201 | 240 min (was 90) |
+| GitHub, 8 shards | 241, 166, 159, 172, 177, 173, 160, 124 | about 141, 97, 93, 100, 103, 101, 93, 72 | 150 min |
+| GitLab, 4 shards | 361, 333, 339, 339 | about 211, 194, 198, 198 | 240 min (was 90) |
 
-The remaining selected cases per shard are 52, 3, 4, 52, 29, 68, 36 and 104 on GitHub, and 126, 88,
-49 and 85 on GitLab. Their time is not included in the estimates.
+The remaining selected cases per shard are 11, 42, 50, 36, 66, 42, 58 and 87 on GitHub, and 116, 87,
+90 and 99 on GitLab. Their time is not included in the estimates. That includes the 36 attachment
+cases, which run `migrate:fresh` per test without using `FinalizationDatabaseMigrations`; they sit in
+GitHub shards 2 and 4.
 
 - **GitLab.** The new 240-minute limit covers the estimate with some headroom. However, GitLab.com
   documents a 3-hour maximum for its hosted runners, and that cap would cancel these shards before
   they finish. I have not verified this cap for the project's runners, and GitLab speed is
   unmeasured. On hosted runners, a reviewed change to 8 GitLab MySQL shards would likely be needed.
-- **GitHub.** The 150-minute limit leaves about 30% headroom over the busiest shard's estimate.
+- **GitHub.** The busiest shard (shard 1, 241 such cases) is estimated at about 141 minutes, which
+  leaves only about 6% headroom under the 150-minute limit. The stale timing weights put it there. I
+  did not change the limit; fresh timings from the first hosted run, or a reviewed limit increase,
+  should settle it.
 
 ## Self-tests
 
 | Command | Result |
 | --- | --- |
 | `python3 scripts/ci/test-phpunit-shards.py` | rc 0, 48 tests |
-| `python3 scripts/ci/test-database-receipts.py` | rc 0, 54 tests |
+| `python3 scripts/ci/test-database-receipts.py` | rc 0, 55 tests |
 | `python3 scripts/ci/test-gitlab-database-receipts.py` | rc 0, 30 tests |
 | `python3 scripts/ci/test-ci-scope.py` | rc 0, 27 tests |
 | `python3 scripts/ci/test-workflow-cadence.py` | rc 0, 14 tests |
@@ -399,12 +466,22 @@ confirmed all three files were byte-identical afterwards. All 20 were killed:
 | L1–L4: the same four in the GitLab collector | killed |
 | Re-run of M1, M4, M5, M11 and M12 | killed |
 
+The option A workflow pins were checked the same way, restored with `cmp`. All 4 were killed:
+
+| Mutation | Result |
+| --- | --- |
+| W1: GitHub SQLite job also sets `VA_CI_DISPOSABLE_MYSQL` | killed |
+| W2: GitHub MySQL job loses `ATTACHMENT_NATIVE_ISOLATED` | killed |
+| W3: GitLab SQLite job also sets `ATTACHMENT_NATIVE_ISOLATED` | killed |
+| W4: GitLab MySQL job loses `VA_CI_DISPOSABLE_MYSQL` | killed |
+
 ## Not verified
 
 - No MySQL test has executed the selection, locally or hosted, so pass/fail and real durations are
   unknown. Only a MySQL run proves the census exact.
-- 42 census cases skip after `setUp` assertions, and `FreeGrantConcurrencyTest` needs a dedicated
-  schema. The receipts are expected to refuse both until they are addressed (see above).
+- Census cases that skip after `setUp` assertions stay refused on this branch until #70 merges and is
+  merged in.
+- The local MySQL evidence used Oracle MySQL 8.0.46, not CI's 8.4, and ran only the option A files.
 - The collectors ran only against synthetic fixtures.
 - The GitLab hosted-runner timeout cap was not checked against this project's runner settings.
 - The driver-branch and skip scans are textual. They are not execution evidence.

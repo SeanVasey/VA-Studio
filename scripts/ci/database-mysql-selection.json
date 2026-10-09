@@ -6,6 +6,8 @@
   "file_pattern": "^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\\.php$",
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+    "tests/Feature/CustomerListeningFreshnessTest.php",
+    "tests/Feature/FreeGrantSchemaRecoveryTest.php",
     "tests/Feature/LicenseTemplateAuthoringTest.php",
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
@@ -15,7 +17,9 @@
     "tests/Feature/ReviewedLicenseDraftTest.php",
     "tests/Feature/ReviewedOfferDraftTest.php",
     "tests/Feature/ServiceProjectSchemaTest.php",
+    "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",
+    "tests/Feature/SupportAttachmentsTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ]
 }

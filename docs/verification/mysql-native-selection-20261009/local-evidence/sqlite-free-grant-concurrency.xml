@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantConcurrencyTest" file="/home/user/wt-mysel/tests/Feature/FreeGrantConcurrencyTest.php" tests="1" assertions="0" errors="0" failures="0" skipped="1" time="0.000000">
+    <testcase name="test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity" file="/home/user/wt-mysel/tests/Feature/FreeGrantConcurrencyTest.php" line="27" class="Tests\Feature\FreeGrantConcurrencyTest" classname="Tests.Feature.FreeGrantConcurrencyTest" assertions="0" time="0.000000">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

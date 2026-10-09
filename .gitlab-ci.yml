@@ -110,8 +110,8 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Four shards of the reviewed native selection (1703 cases): 324 to 349 FinalizationDatabaseMigrations cases
-  # per shard, about 189 to 204 minutes at the 35 s measured on GitHub, before the other 49 to 126 cases.
+  # Four shards of the reviewed native selection (1764 cases): 333 to 361 FinalizationDatabaseMigrations cases
+  # per shard, about 194 to 211 minutes at the 35 s measured on GitHub, before the other 87 to 116 cases.
   # Unmeasured on GitLab. A runner's own maximum (GitLab.com documents 3 hours for hosted runners) still
   # applies, so four shards may not fit; more shards would need a reviewed count change.
   timeout: 240m
@@ -134,6 +134,12 @@ backend-mysql:
     DB_PASSWORD: disposable-gitlab-test-only
     DB_SOCKET: ''
     DB_URL: ''
+    # This job owns its disposable MySQL service, so the native attachment-consumer tests may run their
+    # test-only migrate:fresh here; without the flag they skip on MySQL.
+    ATTACHMENT_NATIVE_ISOLATED: '1'
+    # Admits the job's disposable DB_DATABASE where free-grant tests otherwise require their dedicated
+    # schema (tests/Support/DisposableNativeDatabase.php also requires CI=true and APP_ENV=testing).
+    VA_CI_DISPOSABLE_MYSQL: '1'
 
 backend-sqlite:
   extends: .database
