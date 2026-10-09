@@ -187,7 +187,7 @@ an absent-guard stand-in, corrected to the real lexical check before repair. `ro
 
 New-release deploy validates the frozen candidate using the protected current release when present,
 quiesces controlled services/writers before allocation/build, then repeats built-candidate admission before
-attachment/sealing. All post-quiesce failures keep writer admission closed for recovery; downtime includes
+attachment/sealing. Activation failures after quiesce and before healthy resume keep writer admission closed for recovery; downtime includes
 Composer/npm. Already running rogue/manual application-account processes outside the controlled census
 must separately be stopped. Existing builder-attestation limits remain explicit.
 

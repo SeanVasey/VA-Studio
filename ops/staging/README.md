@@ -198,7 +198,7 @@ renaming that account breaks every guarded write.
 9. It prunes to the newest 3 releases, detaching storage first. **Never `rm -rf` a release by hand**: while
    attached, its `storage/app/private` *is* the persistent store.
 
-Every failure after early quiesce leaves durable writer admission closed for inspected recovery. This
+Every activation failure after early quiesce and before a healthy resume leaves durable writer admission closed for inspected recovery. This
 stops controlled services and runner starts before build exposure; already-running rogue processes or
 manual scripts outside that census must be stopped separately. It does not attest an uncompromised builder.
 
