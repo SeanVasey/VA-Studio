@@ -79,6 +79,16 @@ The policy comparisons are set operations between those keys and `scripts/ci/dat
 - **Combined:** for every other file, the `d3e1c39a` run applies unchanged. The result is that the 216-pair policy equals the SQLite skips of the integrated tree, up to the limits below.
 - **Census self-test:** `python3 -I scripts/ci/test-database-receipts.py` gives 34 tests OK.
 
+## Integration with #56 (2026-10-09)
+
+#56 (merged at `86e22f1a`) appended one native-only pair to `main`'s list:
+`PaidGrantSchemaRecoveryTest::test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl`.
+Merging `main` into this branch (`b97a010`) resolved the file as the append-order union: `main`'s 184 pairs, then this
+branch's 33, **217 unique pairs** (computed from both merged files; no duplicate, no reordering). The #56 pair was
+already accounted for: #56 recorded it itself. The census self-test on the merged tree gives 34 tests OK
+(`evidence/union-217-self-test.txt`). This self-test checks the receipt tooling and list format; it is not a SQLite
+census run of the integrated tree.
+
 ## Failures seen in this run (not census entries)
 
 - **Contract renderer cases:**
@@ -89,7 +99,7 @@ The policy comparisons are set operations between those keys and `scripts/ci/dat
   - this is a harness artifact, not a product failure.
 - **`PublicTrackEmbedTest` (4 cases, shard 1):**
   - the file passes alone (18 tests, OK), so an earlier test in that shard leaks state into later responses;
-  - this is investigated separately and is not a census issue.
+  - this is investigated separately and is not a census issue (since diagnosed: Livewire asset-injection state left by an HTTP-rendered component; fix in PR #66).
 
 ## Not tested
 
