@@ -1,0 +1,1141 @@
+{
+ "status": 410,
+ "expires_at": "2026-10-07 14:22:02",
+ "now_utc": "2026-10-07 14:22:03",
+ "marks": [
+  {
+   "label": "before_finalize",
+   "ns": 6388058424450,
+   "utc": "2026-10-07 14:16:05",
+   "stmt_execute": 136542,
+   "questions": 137290,
+   "thread": 847
+  },
+  {
+   "label": "after_finalize",
+   "ns": 6455327724013,
+   "utc": "2026-10-07 14:17:12",
+   "stmt_execute": 201243,
+   "questions": 202041,
+   "thread": 847
+  },
+  {
+   "label": "after_document",
+   "ns": 6666076400734,
+   "utc": "2026-10-07 14:20:43",
+   "stmt_execute": 440276,
+   "questions": 441270,
+   "thread": 847
+  },
+  {
+   "label": "authorization_returned",
+   "ns": 6716872938377,
+   "utc": "2026-10-07 14:21:34",
+   "stmt_execute": 510481,
+   "questions": 511527,
+   "thread": 847
+  },
+  {
+   "label": "redeem_returned",
+   "ns": 6746668858809,
+   "utc": "2026-10-07 14:22:03",
+   "stmt_execute": 549072,
+   "questions": 550141,
+   "thread": 847
+  },
+  {
+   "label": "bytes_written",
+   "ns": 6746670665452,
+   "utc": "2026-10-07 14:22:03",
+   "stmt_execute": 549073,
+   "questions": 550142,
+   "thread": 847
+  }
+ ],
+ "events": [
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 22482482529
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 10300540973
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 270047109057
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 262888527011
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 235736742648
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 229785066920
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 192800931326
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 185853350276
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 152026186234
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 145369555032
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 114039846237
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 105542662114
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "held",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 29898710001
+    }
+   ]
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": [
+    {
+     "frame": "dispatch",
+     "phase": "prepared",
+     "phase_ok": true,
+     "dispatcher_ok": true,
+     "deadline_ok": true,
+     "remaining_ns": 21469096957
+    }
+   ]
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitting",
+   "observers": []
+  },
+  {
+   "event": "TransactionCommitted",
+   "observers": []
+  },
+  {
+   "event": "TransactionBeginning",
+   "observers": []
+  },
+  {
+   "event": "TransactionRolledBack",
+   "observers": []
+  }
+ ],
+ "sample_tail": [
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21658342038,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21656445767,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21652903541,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21649276299,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21645990627,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21641858884,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21640151790,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21636343762,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21632787206,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21629741322,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21625896451,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21622736160,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21618807176,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21615519913,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21611775595,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21608565649,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21603643895,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21600069068,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21596543700,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21594322566,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21589497998,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21585145665,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21581429638,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21577481007,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21574325075,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21570551367,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21565391888,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21563548572,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21560124358,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21552940766,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21551044444,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21546814287,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21543907955,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21539985694,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21536000243,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21530872024,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21527751553,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21521047466,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21518878315,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21515580682,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21493869339,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21485103658,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21485010386,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21480100645,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "held",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21475115200,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "event",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21469096957,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21467342480,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21463258077,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21459075199,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21455139837,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21451295945,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21447159407,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21443314423,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21437798108,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21434216898,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21428334181,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21422675472,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "dispatch",
+   "phase": "prepared",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21418503722,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "committed",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21379952255,
+   "current_dispatcher": "observer#3849"
+  },
+  {
+   "via": "signal",
+   "frame": "rows",
+   "phase": "committed",
+   "receipts": 2,
+   "phase_ok": true,
+   "dispatcher_ok": true,
+   "deadline_ok": true,
+   "remaining_ns": 21376538365,
+   "current_dispatcher": "observer#3849"
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+start 07:38:57
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+.......[36;1mS[0m[41;37mF[0m.                                                        10 / 10 (100%)
+
+Time: 00:20.423, Memory: 65.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSchemaRecoveryTest::test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl
+Failed asserting that '8.4.11' starts with "8.0.46".
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php:255
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 10[0m[37;41m, Assertions: 574[0m[37;41m, Failures: 1[0m[37;41m, Skipped: 1[0m[37;41m.[0m
+rc=1
+wall=21s end 07:39:18

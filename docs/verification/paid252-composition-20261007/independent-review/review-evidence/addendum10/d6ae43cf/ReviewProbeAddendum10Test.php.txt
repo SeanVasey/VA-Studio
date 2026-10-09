@@ -1,0 +1,263 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
+use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
+use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
+use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
+use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
+use App\Domain\Grants\Paid\PaidGrantDeadline;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantException;
+use App\Domain\Grants\Paid\PaidGrantFiles;
+use App\Domain\Grants\Paid\PaidGrants;
+use Carbon\CarbonImmutable;
+use App\Domain\Grants\Paid\PaidGrantRecords;
+use App\Domain\Grants\Paid\PaidGrantAssets;
+use Closure;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\PaidGrantMonotonicClock;
+use Tests\Support\ProductionCheckoutFixtures;
+use Tests\Support\ProductionCheckoutGatewayFixture;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\QuoteFixtures;
+use Tests\TestCase;
+use Throwable;
+
+// Loaded with this file, before any paid code runs in the process (see PaidGrantMonotonicClock).
+class_exists(PaidGrantMonotonicClock::class);
+
+/**
+ * Independent review addendum 10 probe (untracked, removed after recording). Built on PaidGrantCompletionBudgetTest.
+ * Codex P2 (comment 4222959609): completing a paid order re-verifies every line's original and assets. Each line's
+ * physical verification now has its own 300 s bound (the render lease), and the final fulfillment frame a fresh 60 s
+ * observation budget, so a large order that takes longer than 300 s in total can still be fulfilled. Verification time
+ * is spent on the virtual paid-namespace monotonic clock (Tests\Support\PaidGrantMonotonicClock) by a container double of
+ * PaidGrantFiles whose `verify()` is called once per line by completion only; no test sleeps. Synthetic rehearsal fixtures
+ * only; no live payment or legal facts are certified.
+ */
+final class ReviewProbeAddendum10Test extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use ProductionCheckoutJourneyFixture;
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        $this->preparePaidDependencies();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        PaidGrantMonotonicClock::reset();
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        Queue::fake();
+    }
+
+    protected function tearDown(): void
+    {
+        PaidGrantMonotonicClock::reset();
+        parent::tearDown();
+    }
+
+    protected function smtp(string $mode, int $noticeId): array
+    {
+        $capture = tempnam(sys_get_temp_dir(), 'va-paid-synthetic-smtp-');
+        $process = new Process(['python3', $this->paidDependencyPath('tests/Support/production_identity_smtp_sink.py'), $mode, $capture], timeout: 20);
+        $process->start();
+        try {
+            $process->waitUntil(fn (): bool => preg_match('/\A[0-9]+\n/', $process->getOutput()) === 1);
+            app()->instance(IdentityNoticeTransport::class, new LoopbackSmtp((int) trim($process->getOutput())));
+            (new WorkIdentityNotice)->process($noticeId);
+            $process->wait();
+            $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+
+            return filesize($capture) > 0 ? json_decode(file_get_contents($capture), true, 8, JSON_THROW_ON_ERROR) : [];
+        } finally {
+            $process->stop(0);
+            unlink($capture);
+        }
+    }
+
+    /**
+     * A10-I2: the per-line asset bound is invisible to the virtual clock. PaidGrantAssets hands the deadline to
+     * DeliveryAssetFiles (App\Domain\Delivery, real hrtime), so a deadline the paid namespace treats as 400 s expired is
+     * still accepted. A mutation that reverted the asset deadline to prepare()'s budget would not be caught by the suite.
+     */
+    public function test_probe_asset_verification_accepts_a_deadline_the_paid_clock_considers_expired(): void
+    {
+        $this->proveClockSeam();
+        $f = $this->twoLineOrder();
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $origin = (array) DB::table('paid_grant_origins')->orderBy('id')->first();
+        $assets = PaidGrantRecords::decode($origin)['assets'];
+        PaidGrantMonotonicClock::advance(1000);
+        $expired = PaidGrantDeadline::start(1)->value() - 401_000_000_000;
+        // The paid namespace sees this deadline as passed ...
+        $this->assertGreaterThan($expired, \App\Domain\Grants\Paid\hrtime(true) - 399_000_000_000);
+        // ... while the asset verifier (real clock) accepts it.
+        (new PaidGrantAssets)->verify($assets, $expired);
+        $this->addToAssertionCount(1);
+    }
+
+    /** Two completions of the same order overlap: the later finisher is refused with 409 and nothing is duplicated. */
+    public function test_probe_overlapping_completions_fulfil_once_and_the_later_one_gets_409(): void
+    {
+        $f = $this->twoLineOrder();
+        $outer = new class(new PaidGrantFiles)
+        {
+            public ?\Closure $during = null;
+
+            public int $verified = 0;
+
+            public function __construct(private readonly PaidGrantFiles $files) {}
+
+            public function verify(array|object $record): string
+            {
+                $bytes = $this->files->verify($record);
+                $this->verified++;
+                if ($this->during !== null) {
+                    $during = $this->during;
+                    $this->during = null;
+                    $during();
+                }
+
+                return $bytes;
+            }
+
+            public function __call(string $method, array $arguments): mixed
+            {
+                return $this->files->{$method}(...$arguments);
+            }
+        };
+        // Render both lines first (nothing fulfilled yet) by refusing completion once with a 301 s first line.
+        $this->slowVerification(301);
+        $this->assertSame(410, $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])));
+        $this->assertDatabaseCount('paid_fulfillments', 0);
+        $inner = null;
+        $outer->during = function () use ($f, &$inner): void {
+            // A second request completes the whole order while the first is still verifying line 1.
+            $inner = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        };
+        app()->instance(PaidGrantFiles::class, $outer);
+        $status = $this->refusedStatus(fn () => (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+        fwrite(STDERR, 'P2 outer status='.var_export($status, true)."\n");
+        $this->assertSame(409, $status);
+        $this->assertTrue($inner['fulfilled']);
+        // Outer line 1, inner lines 1 and 2, then outer line 2 before its final frame refuses.
+        $this->assertSame(4, $outer->verified);
+        $this->assertDatabaseCount('paid_fulfillments', 1);
+        $this->assertDatabaseCount('paid_originals', 2);
+        // A later read is fulfilled and stable.
+        app()->forgetInstance(PaidGrantFiles::class);
+        $this->assertSame($inner, (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+    }
+
+    /** The virtual clock must reach paid code, or every scenario above would pass for the wrong reason. */
+    private function proveClockSeam(): void
+    {
+        PaidGrantMonotonicClock::advance(1000);
+        try {
+            $this->assertGreaterThan(\hrtime(true) + 900_000_000_000, PaidGrantDeadline::start(1)->value(), 'The paid-namespace clock seam is not live.');
+        } finally {
+            PaidGrantMonotonicClock::reset();
+        }
+    }
+
+    /**
+     * Completion's per-line artifact verification takes `$seconds` virtual seconds (or `$per[n]` for the n-th call). The
+     * double forwards every other call (the render path's `store()`) to the real, pinned PaidGrantFiles unchanged.
+     *
+     * @param  array<int, int>  $per
+     */
+    private function slowVerification(int $seconds, array $per = []): object
+    {
+        $files = new class(new PaidGrantFiles, $seconds, $per)
+        {
+            public int $verified = 0;
+
+            public function __construct(private readonly PaidGrantFiles $files, private readonly int $seconds, private readonly array $per) {}
+
+            public function verify(array|object $record): string
+            {
+                $bytes = $this->files->verify($record);
+                $this->verified++;
+                PaidGrantMonotonicClock::advance($this->per[$this->verified] ?? $this->seconds);
+
+                return $bytes;
+            }
+
+            public function __call(string $method, array $arguments): mixed
+            {
+                return $this->files->{$method}(...$arguments);
+            }
+        };
+        app()->instance(PaidGrantFiles::class, $files);
+
+        return $files;
+    }
+
+    /** Two paid lines, both prepared (rendered) with no time spent, then left unfulfilled for completion to verify. */
+    private function twoLineOrder(): array
+    {
+        $catalog = ProductionCheckoutFixtures::catalog();
+        $second = QuoteFixtures::selection(3499);
+        $items = [...$catalog['items'], ...$second['items']];
+        $buyer = $this->enrollThroughLocalSmtp();
+        $access = new ProductionCustomerAccess;
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, ProductionCheckoutFixtures::exemptionPolicy($catalog), 'synthetic-two-lines-policy', $catalog['actor']);
+        $basis = (new TaxExemptions($access))->qualify($buyer['principal'], $buyer['user'], $authority['public_id'], $items,
+            ['qualified_exemption_confirmed' => true, 'reference' => 'synthetic:two-lines-buyer', 'source_sha256' => hash('sha256', 'NONBINDING TWO-LINE QUALIFICATION'),
+                'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
+                'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')], 'synthetic-two-lines-qualification', $catalog['actor']);
+        $checkout = new ProductionCheckout($access);
+        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $items, $basis['public_id'], ['legalName' => 'Declared synthetic buyer'], 'synthetic-two-lines-review');
+        $order = $checkout->accept($buyer['principal'], $buyer['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-two-lines-accept');
+        $gateway = new ProductionCheckoutGatewayFixture;
+        $hosted = new HostedCheckout($access, $gateway);
+        $hosted->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
+        $gateway->paid = true;
+        $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+        $batch = (new PaidGrants)->finalize($buyer['principal'], $buyer['user'], $order['orderId']);
+        $this->assertCount(2, $batch['lines']);
+
+        return compact('catalog', 'buyer', 'order', 'batch');
+    }
+
+    private function refusedStatus(Closure $call): int|string
+    {
+        try {
+            $call();
+        } catch (PaidGrantException $error) {
+            return $error->status;
+        } catch (Throwable $error) {
+            return $error::class;
+        }
+        $this->fail('Expected a refusal.');
+    }
+}

@@ -1,0 +1,7 @@
+# source 915ca2c9217d273ee1afa23e0486e084cae7c475 (915ca2c component) + test file sha256 4ff40f85c0cedcf4
+     × reopens the order of a refused download kept for retry, so the unused authorization can be retried 151ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/paid-grant-reopen-issued.test.tsx > reopening the order of an issued authorization > reopens the order of a refused download kept for retry, so the unused authorization can be retried
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+      Tests  1 failed | 2 passed (3)
+rc=1

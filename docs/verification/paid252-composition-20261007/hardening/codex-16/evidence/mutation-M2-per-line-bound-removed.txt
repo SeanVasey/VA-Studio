@@ -1,0 +1,49 @@
+# source: 093f9081 + codex-16 working tree + mutation M2-per-line-bound-removed (scratch worktree)
+M2-per-line-bound-removed applied
++            // Each line's physical re-verification gets its own non-extendable bound, the same as the per-line render
++            // lease, so a large order (up to 10 lines of 1 GiB assets) is not bounded by the one budget that prepare()
++            // started. A refused line fulfils nothing, and a retry finds every line prepared and gets fresh bounds.
++            $lineBudget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+-        return $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($bundle, $actor, $deadline): array {
+-            $deadline->proveCurrent();
++        // A fresh observation budget for the fulfillment frame and its body receipt. The frame still requires the exact
++        // bundle verified above and keeps every receipt, fence and post-commit proof of PaidGrantCommands::run.
++        $commit = PaidGrantDeadline::start();
++        return $commands->run($batchId, $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($bundle, $actor, $commit): array {
++            $commit->proveCurrent();
+-        }, $deadline, projectionRead: $projectionRead);
++        }, $commit, projectionRead: $projectionRead);
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/phpunit.xml
+
+E.E                                                                 3 / 3 (100%)
+
+Time: 00:27.774, Memory: 197.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_two_line_order_whose_verification_outlasts_one_lease_is_fulfilled_and_still_downloads
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDocuments.php:125
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDocuments.php:106
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/tests/Feature/PaidGrantCompletionBudgetTest.php:110
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantCompletionBudgetTest::test_a_retry_after_a_slow_completion_fulfils_without_restarting_from_an_expired_budget
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDocuments.php:125
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/app/Domain/Grants/Paid/PaidGrantDocuments.php:106
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m16/tests/Feature/PaidGrantCompletionBudgetTest.php:167
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 3, Assertions: 52, Errors: 2.
+rc=2

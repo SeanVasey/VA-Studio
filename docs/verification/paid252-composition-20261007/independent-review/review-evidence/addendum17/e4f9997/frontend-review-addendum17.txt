@@ -1,0 +1,18 @@
+# source e4f9997ec605572144b1ae92c49b29209b728564 + untracked tests/frontend/paid-grant-review-addendum17.test.tsx (sha256 fdb8f6ea0d8e11c9); node v24.21.0
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-review-addendum17.test.tsx
+ ✓ paid-grant-review-addendum17: A: two issued authorizations on one order give one button, and reopening brings back both Download buttons 402ms
+ ✓ paid-grant-review-addendum17: B: issued on two orders gives two buttons; the shown order never has one 209ms
+ ✓ paid-grant-review-addendum17: C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial that drops it 113ms
+ ✓ paid-grant-review-addendum17: D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without distu
+ ✓ paid-grant-review-addendum17: E: with nothing pending the reference form already reopens X and its Download returns (the finding is narrower than stated) 88ms
+ ✓ paid-grant-review-addendum17: F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 198ms
+ ✓ paid-grant-review-addendum17: G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same order (Info: redundant, same
+ ✓ paid-grant-review-addendum17: H (fixed, A16-L1): a refused download kept for retry offers to reopen its order; the retry still needs a saved status read 162ms
+ ✓ paid-grant-review-addendum17: I: a refused kept entry of X while Y is shown gives X a control (after the next render) and never Y 137ms
+ ✓ paid-grant-review-addendum17: J: a refusal then a denial drops the control, the kept entry and any retry 83ms
+ ✓ paid-grant-review-addendum17: K: after reopening, the retry is offered only for a saved read showing that exact authorization unused 157ms
+ ✓ paid-grant-review-addendum17: L: an issued and a refused kept authorization on one order give one control; reopening shows the Download and drops it 116ms
+ ✓ paid-grant-review-addendum17: M: a submitted download whose frame has not answered gives no control, and a retried kept entry stops giving one 113ms
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+rc=0

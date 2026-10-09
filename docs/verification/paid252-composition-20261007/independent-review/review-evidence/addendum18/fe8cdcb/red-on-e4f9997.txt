@@ -1,0 +1,14 @@
+# red: component at e4f9997 (sha256 fca051c754b52607) + tests/frontend/paid-grant-reopen-issued.test.tsx at fe8cdcb (sha256 5f7a51cb8175b922)
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-reopen-issued.test.tsx tests/frontend/paid-grant-review-addendum9.test.tsx
+ ✓ paid-grant-reopen-issued: reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 511ms
+ × paid-grant-review-addendum9: offers the retry from a read that completed before a non-current refusal arrived 587ms
+ ✓ paid-grant-reopen-issued: reopens the order of a refused download kept for retry, so the unused authorization can be retried 313ms
+ ✓ paid-grant-review-addendum9: offers the retry from a read still in flight when the refusal arrived, and not when that read lists the authorization attempted 353ms
+ × paid-grant-reopen-issued: shows the reopen control as soon as a hidden download frame reports its refusal, without another render 138ms
+ ✓ paid-grant-review-addendum9: records nothing for a non-refusal answer that arrives after a later request started, and shows no message 147ms
+ ✓ paid-grant-reopen-issued: drops the reopen control once the authorization is submitted, and a denial drops it with the token 222ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its author
+      Tests  2 failed | 5 passed (7)
+rc=1
+restored: git diff --quiet rc=0

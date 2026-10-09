@@ -1,0 +1,23 @@
+start 11:22:07
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 07:32.484, Memory: 99.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantMarginMeasureTest::test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization
+redemption refused -0.368s relative to the original authorization expiry
+Failed asserting that 403 is identical to 200.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/PaidGrantMarginMeasureTest.php:153
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 18[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1
+wall=453s end 11:29:40

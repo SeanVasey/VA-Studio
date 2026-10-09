@@ -1,0 +1,13 @@
+# source: a7892c9b + working tree
+# command: --filter 'PaidGrantHeavyWorkTest|PaidGrantPreparationBudgetTest|PaidGrantHttpJourneyTest' tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+............................                                      28 / 28 (100%)
+
+Time: 01:59.691, Memory: 222.00 MB
+
+OK (28 tests, 769 assertions)
+rc=0

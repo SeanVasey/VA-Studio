@@ -1,0 +1,35 @@
+# source: a7892c9b + codex-19 final working tree + mutation C13-M1-budget-exhaustion-410 (scratch worktree)
+C13-M1-budget-exhaustion-410 applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/phpunit.xml
+
+.E.......................E..                                      28 / 28 (100%)
+
+Time: 01:54.766, Memory: 222.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_completion_does_not_re_verify_while_the_buyer_lock_is_held
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantDocuments.php:45
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:305
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantHeavyWorkTest.php:152
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantPreparationBudgetTest::test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/app/Domain/Grants/Paid/PaidGrantDocuments.php:45
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m19/tests/Feature/PaidGrantPreparationBudgetTest.php:120
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 28, Assertions: 738, Errors: 2.
+rc=2

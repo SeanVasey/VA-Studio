@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantRedeemFrameConjunctTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php" tests="1" assertions="20180" errors="0" failures="0" skipped="0" time="332.194597">
+    <testcase name="test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php" line="89" class="Tests\Feature\PaidGrantRedeemFrameConjunctTest" classname="Tests.Feature.PaidGrantRedeemFrameConjunctTest" assertions="20180" time="332.194597"/>
+  </testsuite>
+</testsuites>

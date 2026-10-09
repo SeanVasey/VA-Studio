@@ -1,0 +1,29 @@
+cmd: (env: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3761 DB_DATABASE=vaseyaudio_review_paid252 DB_USERNAME=root DB_PASSWORD= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync APP_ENV=testing) php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/native-a-conjunct.xml tests/Feature/PaidGrantRedeemFrameConjunctTest.php
+head: 4a4a423022759ec706e7e235649552d0d2930128
+server: 8.4.11
+start: 2026-10-08T12:35:03Z
+uptime_start:  12:35:03 up  1:43,  0 user,  load average: 4.84, 4.59, 4.16
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 07:46.898, Memory: 119.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRedeemFrameConjunctTest::test_master_redemption_second_command_keeps_each_commit_observer_conjunct_within_the_original_authorization
+deadline conjunct: observer#3919 was 0.005s past its original deadline in historicalReceipt
+Failed asserting that false is true.
+
+/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantRedeemFrameConjunctTest.php:138
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 17448, Failures: 1.
+rc=1
+wall_s=467
+uptime_end:  12:42:50 up  1:51,  0 user,  load average: 7.29, 6.98, 5.53
+end: 2026-10-08T12:42:50Z

@@ -1,0 +1,10 @@
+cmd: probe copy of tests/frontend/paid-grant-review-addendum7.test.tsx with it.fails -> it; probe file deleted after
+head: 2c1b4f8ad1d47c8b586271dbdda3b1c3fce9c2b6
+ ❯ tests/frontend/zz-a7.test.tsx (3 tests | 1 failed) 537ms
+     × never evicts an unresolved download frame when a fourth download is submitted 204ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/zz-a7.test.tsx > review addendum 7 > never evicts an unresolved download frame when a fourth download is submitted
+AssertionError: expected false to be true // Object.is equality
+ ❯ tests/frontend/zz-a7.test.tsx:102:31
+      Tests  1 failed | 2 passed (3)
+rc=1

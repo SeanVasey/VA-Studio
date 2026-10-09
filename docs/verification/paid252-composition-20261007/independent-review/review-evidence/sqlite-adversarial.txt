@@ -1,0 +1,16 @@
+cmd: php -r '...phpunit' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/sqlite-adversarial.xml tests/Feature/PaidGrantReviewAdversarialTest.php  (SQLite, phpunit.xml defaults)
+head: 4a4a423022759ec706e7e235649552d0d2930128 + untracked tests/Feature/PaidGrantReviewAdversarialTest.php
+start: 2026-10-08T12:31:20Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+....                                                                4 / 4 (100%)
+
+Time: 00:57.234, Memory: 106.00 MB
+
+[30;42mOK (4 tests, 99 assertions)[0m
+rc=0
+wall_s=58
+end: 2026-10-08T12:32:18Z

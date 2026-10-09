@@ -1,0 +1,25 @@
+<?php
+// Reviewer probe (run from the worktree root): php <this file> late|early
+// late:  paid code runs before the seam file is loaded (call-site cached to the global hrtime).
+// early: the seam file is loaded first, as PaidGrantSnapshotDeadlineTest does at file scope.
+require getcwd().'/vendor/autoload.php';
+use App\Domain\Grants\Paid\PaidGrantDeadline;
+use Tests\Support\PaidGrantMonotonicClock;
+$mode = $argv[1] ?? 'early';
+if ($mode === 'late') {
+    $warm = PaidGrantDeadline::start(1)->value();           // resolves and caches the call site to \hrtime
+    class_exists(PaidGrantMonotonicClock::class);           // now defines App\Domain\Grants\Paid\hrtime
+} else {
+    class_exists(PaidGrantMonotonicClock::class);
+}
+echo "mode=$mode shadow_defined=", var_export(function_exists('App\Domain\Grants\Paid\hrtime'), true), "\n";
+$real = \hrtime(true); $at0 = PaidGrantDeadline::start(1)->value() - 1_000_000_000;
+echo 'offset 0: |paid - real| < 50 ms: ', var_export(abs($at0 - $real) < 50_000_000, true), "\n";
+PaidGrantMonotonicClock::advance(1000);
+$moved = PaidGrantDeadline::start(1)->value() - \hrtime(true);
+echo 'offset 1000 s: paid deadline - real now (s): ', round($moved / 1e9, 1), ' => seam ', $moved > 900_000_000_000 ? 'LIVE' : 'DEAD (global hrtime cached)', "\n";
+$d = PaidGrantDeadline::start(1);
+echo 'proveCurrent at offset 1000 on a fresh deadline: ';
+try { $d->proveCurrent(); echo "ok\n"; } catch (Throwable $e) { echo get_class($e), "\n"; }
+PaidGrantMonotonicClock::reset();
+echo 'array form untouched: ', var_export(is_array(App\Domain\Grants\Paid\hrtime()), true), "\n";

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantHttpJourneyTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHttpJourneyTest.php" tests="1" assertions="98" errors="0" failures="0" skipped="0" time="409.597678">
+    <testcase name="test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHttpJourneyTest.php" line="99" class="Tests\Feature\PaidGrantHttpJourneyTest" classname="Tests.Feature.PaidGrantHttpJourneyTest" assertions="98" time="409.597678"/>
+  </testsuite>
+</testsuites>

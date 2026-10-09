@@ -1,0 +1,35 @@
+# source: 703674d7 + round 21 final working tree + mutation A2-no-age-bound (scratch worktree)
+A2-no-age-bound applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/phpunit.xml
+
+..FF......                                                        10 / 10 (100%)
+
+Time: 00:25.510, Memory: 193.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_missing_or_implausible_request_time_falls_back_to_now_and_never_widens_admission
+Failed asserting that table [paid_redemptions] matches expected entries count of 0. Entries found: 1.
+.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithDatabase.php:118
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantRequestInstantTest.php:129
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantRequestInstantTest::test_the_admission_instant_rule
+Failed asserting that two DateTime objects are equal.
+--- Expected
++++ Actual
+@@ @@
+-2026-10-08T12:00:00.250000+0000
++2026-10-08T11:58:59.250000+0000
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m21b/tests/Feature/PaidGrantRequestInstantTest.php:148
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 10, Assertions: 99, Failures: 2.
+rc=1

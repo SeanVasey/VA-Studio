@@ -1,0 +1,17 @@
+# source: 703674d7 + final working tree
+# command: npx vitest run tests/frontend/paid-grant-*.test.tsx
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+A12 P3 stopped after 620000 ms
+
+ Test Files  12 passed (12)
+      Tests  68 passed (68)
+   Start at  22:18:06
+   Duration  10.28s (tests 57%, environment 36%, setup 4%, transform 2%, import 1%)
+
+Environment  jsdom was created 12 times · 9.75s total, 36% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=0

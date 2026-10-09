@@ -1,0 +1,29 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:00.173, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantSpoolReservationTest::test_one_buyer_holds_at_most_one_slot_while_another_buyer_is_admitted
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'same' => 'target_unavailable',
++    'same' => 'admitted',
+     'other' => 'admitted',
+     'none' => 'admitted',
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSpoolReservationTest.php:158
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 1[0m[37;41m, Failures: 1[0m[37;41m.[0m
+rc=1

@@ -1,0 +1,79 @@
+## A. Who creates or consumes PaidGrantRequestInstant (app, routes, bootstrap, config)
+# command: grep -rn 'PaidGrantRequestInstant\|receivedAt' app routes bootstrap config
+app/Domain/Grants/Paid/PaidGrantDownloads.php:38:     * The instant the server began this request, validated once, when captured (`PaidGrantRequestInstant::capture()`):
+app/Domain/Grants/Paid/PaidGrantDownloads.php:41:    public static function receivedAt(mixed $requestTime): PaidGrantRequestInstant
+app/Domain/Grants/Paid/PaidGrantDownloads.php:43:        return PaidGrantRequestInstant::capture($requestTime);
+app/Domain/Grants/Paid/PaidGrantDownloads.php:134:     * @param  PaidGrantRequestInstant|null  $receivedAt  When the server began this request, captured and validated before the
+app/Domain/Grants/Paid/PaidGrantDownloads.php:135:     *                                                    identity proof (`receivedAt()`); null means now. It is not re-checked
+app/Domain/Grants/Paid/PaidGrantDownloads.php:138:    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantRequestInstant $receivedAt = null): PaidGrantTransfer
+app/Domain/Grants/Paid/PaidGrantDownloads.php:148:        $admitted = $receivedAt?->at ?? CarbonImmutable::now('UTC');
+app/Domain/Grants/Paid/PaidGrantRequestInstant.php:13:final class PaidGrantRequestInstant
+app/Http/Controllers/PaidGrantController.php:119:            $receivedAt = PaidGrantDownloads::receivedAt($request->server('REQUEST_TIME_FLOAT'));
+app/Http/Controllers/PaidGrantController.php:124:            $transfer = (new PaidGrantDownloads)->redeem($authorization, $input['token'], $principal, $actor, $receivedAt);
+rc=0
+
+## B. unserialize / serialization sinks in app (none take request data; none touch the instant)
+# command: grep -rn 'unserialize(\|__unserialize\|__wakeup\|igbinary' app
+app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php:129:    public function __unserialize(array $data): never
+app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRequest.php:71:    public function __unserialize(array $data): never
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php:45:    public function __unserialize(array $data): void
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php:133:    public function __unserialize(array $data): void
+app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php:100:    public function __unserialize(array $data): void
+app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderSourceV2.php:113:    public function __unserialize(array $data): void
+app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderLocatorV2.php:48:    public function __unserialize(array $data): void
+app/Domain/Services/Projects/Attachments/ServiceProjectCommittedReadReceipt.php:44:    public function __unserialize(array $data): never
+app/Domain/Grants/Paid/PaidGrantReadReceipt.php:103:    public function __unserialize(array $data): void
+app/Domain/Grants/Paid/PaidGrantProjectionRead.php:52:    public function __unserialize(array $data): void
+app/Domain/Grants/Paid/PaidGrantConsumerCommitAdmission.php:36:    public function __unserialize(array $data): void
+rc=0
+# command: grep -rn 'ShouldQueue\|dispatch(' app/Domain/Grants/Paid app/Http/Controllers/PaidGrantController.php
+rc=1 (1 = no match)
+# command: grep -n "'serialization'\|serialize" config/session.php config/cache.php
+config/session.php:222:    | This value controls the serialization strategy for session data, which
+config/session.php:225:    | "gadget chain" serialization attacks if the APP_KEY is leaked.
+config/session.php:231:    'serialization' => 'json',
+config/cache.php:39:            'serialize' => false,
+config/cache.php:128:    | This value determines the classes that can be unserialized from cache
+config/cache.php:129:    | storage. By default, no PHP classes will be unserialized from your
+config/cache.php:134:    'serializable_classes' => false,
+rc=0
+
+## C. Identity proof call chain and locking statements (controller identity() -> ProductionCustomerSessions::principal())
+# command: grep -n 'forUser\|->current(\|->source(' app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php app/Domain/Customers/ProductionCustomerPrincipal.php app/Domain/Customers/ProductionCustomerAccess.php
+app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php:50:                    $proof = $access->current($principal, $actor);
+app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php:76:        (new ProductionCustomerAccess)->current($principal, $actor);
+app/Domain/Customers/ProductionCustomerPrincipal.php:26:    public static function forUser(User $trustedActor): self
+app/Domain/Customers/ProductionCustomerPrincipal.php:28:        $proof = app(ProductionCustomerAccess::class)->source($trustedActor);
+app/Domain/Customers/ProductionCustomerAccess.php:21:        return ProductionCustomerPrincipal::forUser($trustedActor);
+app/Domain/Customers/ProductionCustomerAccess.php:37:        $proof = $connection->transaction(fn (): array => $this->read($trustedActor, $reader));
+app/Domain/Customers/ProductionCustomerAccess.php:43:        $terminal = $this->read($trustedActor, $reader);
+app/Domain/Customers/ProductionCustomerAccess.php:55:        $proof = $this->source($trustedActor);
+app/Domain/Customers/ProductionCustomerAccess.php:66:        $proof = $this->read($trustedActor, $reader);
+app/Domain/Customers/ProductionCustomerAccess.php:85:        $proof = $this->read($trustedActor, $frame->reader(), $reader);
+rc=0
+# command: grep -n 'reader->one(\|reader->rows(\|assertPermanent()' app/Domain/Customers/ProductionCustomerAccess.php (read() lines 214-287, historical() lines 133-205)
+91:        if ($this->strings($reader->one('users', $principal->userId)) !== $this->strings($expectedRaw['user'])
+92:            || $this->strings($reader->one('customer_accounts', $principal->accountId)) !== $this->strings($expectedRaw['account'])) {
+144:        $user = $reader->one('users', $binding['user_id']);
+145:        $account = $reader->one('customer_accounts', $binding['account_id']);
+146:        $origins = $reader->rows('production_identity_origins', 'account_id = ?', [$binding['account_id']], 2);
+156:        $history = $reader->rows('production_identity_verifications', 'origin_id = ?', [(int) $origin['id']], 129);
+171:            $challenge = $reader->one('production_identity_challenges', (int) $entry['challenge_id']);
+199:        $reader->assertPermanent();
+222:        $user = $reader->one('users', $actor->id);
+223:        $accounts = $reader->rows('customer_accounts', 'user_id = ?', [$actor->id], 2);
+230:        $origins = $reader->rows('production_identity_origins', 'account_id = ?', [(int) $account['id']], 2);
+239:        $observations = $reader->rows('production_identity_verifications', 'origin_id = ?', [(int) $origin['id']], 129);
+254:        $challenge = $reader->one('production_identity_challenges', (int) $observation['challenge_id']);
+282:        $reader->assertPermanent();
+rc=0
+# command: grep -n 'FOR UPDATE\|SHOW CREATE TABLE\|information_schema' app/Domain/Customers/ProductionIdentity/IdentityRows.php
+72:                $audit = $this->primary->query('SHOW CREATE TABLE '.$this->table('audit_events'))->fetch(PDO::FETCH_ASSOC);
+106:                $statement = $this->primary->prepare('SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?');
+109:                $shown = $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
+133:            .($this->driver === 'mysql' && $this->committedFrame === null ? ' FOR UPDATE' : ''));
+rc=0
+
+## D. Paid routes are not mounted
+# command: grep -rn 'paid-grants.php\|PaidGrant' bootstrap routes/web.php routes/console.php app/Providers
+rc=1 (1 = no match)

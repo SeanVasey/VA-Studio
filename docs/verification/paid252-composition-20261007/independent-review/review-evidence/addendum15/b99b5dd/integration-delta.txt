@@ -1,0 +1,69 @@
+# command: git rev-parse b99b5dd^1 b99b5dd^2
+27a151b66d10b80d07d54685791a2a3d0efd44dc
+d4b112629ce8e0f2899b77d7057664b280633db6
+# command: git merge-base --is-ancestor 27a151b6 b99b5dd
+rc=0
+# command: git diff 27a151b6 b99b5dd -- app/Domain/Grants/Paid app/Http/Controllers/PaidGrantController.php app/Http/Middleware routes/paid-grants.php config/paid-grants.php database scripts/render-paid-grant.php resources/contracts tests/Feature/PaidGrant* tests/Support
+0
+rc=0 (byte count of the diff; 0 = identical)
+# command: git diff --stat 27a151b6 b99b5dd -- app config database routes bootstrap resources composer.json composer.lock package.json package-lock.json phpunit.xml tests/Support scripts/ci
+ app/Console/Commands/ManageRightsScopes.php | 204 ++++++++++++++++++++++++++++
+ 1 file changed, 204 insertions(+)
+rc=0
+# command: git diff --name-only 27a151b6 b99b5dd | grep -v '^docs/' 
+CHANGELOG.md
+CLAUDE.md
+app/Console/Commands/ManageRightsScopes.php
+ops/staging/README.md
+ops/staging/backup.sh
+ops/staging/bin/vasey-staging-ctl
+ops/staging/env.staging.example
+ops/staging/forge-deploy.sh
+ops/staging/nginx/vasey-staging.conf
+ops/staging/normalize-mysql-dump.py
+ops/staging/php-fpm/vasey-paid-delivery.conf
+ops/staging/php-fpm/vasey-staging.conf
+ops/staging/provision.sh
+ops/staging/release-step.sh
+ops/staging/seal-release.py
+ops/staging/test-commerce/env.test-commerce.example
+ops/staging/test-commerce/stripe-listen.service
+ops/staging/test-commerce/vasey-test-commerce-pipeline.service
+ops/staging/test-commerce/vasey-test-commerce-pipeline.timer
+ops/staging/validate-runtime.php
+ops/staging/workers/vasey-staging-workers.conf
+scripts/ops/run-test-commerce-pipeline.sh
+scripts/ops/validate-test-commerce-profile.php
+tests/Feature/RightsScopeCommandTest.php
+tests/Feature/RightsScopeCommandUnknownOutcomeTest.php
+tests/Feature/StagingTestCommerceProfileJourneyTest.php
+tests/Unit/StagingRuntimeValidatorTest.php
+tests/Unit/TestCommercePipelineRunnerTest.php
+tests/Unit/TestCommerceProfileValidatorTest.php
+tests/ops/test_staging_admin_defaults_custody.py
+tests/ops/test_staging_backup_credential_custody.py
+tests/ops/test_staging_backup_key_custody.py
+tests/ops/test_staging_build_admission.py
+tests/ops/test_staging_deploy_refresh.py
+tests/ops/test_staging_dump_normalization.py
+tests/ops/test_staging_operation_custody.py
+tests/ops/test_staging_operation_lease.py
+tests/ops/test_staging_pipeline_admission.py
+tests/ops/test_staging_protected_configuration.py
+tests/ops/test_staging_recovery_admission.py
+tests/ops/test_staging_release_sealing.py
+tests/ops/test_staging_runtime_directory_custody.py
+# command: git diff --name-only 27a151b6 b99b5dd -- docs/ops docs/verification/paid252-composition-20261007
+docs/ops/backup-restore-proof.md
+docs/ops/production-activation-packet.md
+docs/ops/staging-runbook.md
+docs/ops/staging-test-purchase.md
+rc=0
+# command: grep -rn 'paid-grants.php\|PaidGrant' bootstrap routes/web.php routes/console.php app/Providers (at b99b5dd)
+rc=1 (1 = no match: paid routes not mounted)
+# command: grep -n 'location ~' ops/staging/nginx/vasey-staging.conf
+146:    location ~ "^/paid-grants/authorizations/[0-9a-f-]{36}/redeem$" {
+159:    location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
+173:    location ~ "^/livewire-[0-9a-f]{8}/upload-file$" {
+199:    location ~ /\.(?!well-known/) { return 404; }
+200:    location ~ \.php$ { return 404; }

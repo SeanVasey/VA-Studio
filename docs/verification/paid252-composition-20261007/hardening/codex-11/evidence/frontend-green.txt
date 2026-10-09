@@ -1,0 +1,13 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+
+ Test Files  4 passed (4)
+      Tests  32 passed (32)
+   Start at  18:01:48
+   Duration  3.57s (tests 60%, environment 30%, setup 5%, transform 4%, import 1%)
+
+    Isolate  4 workers spawned · ~790ms startup each (spawn + environment, per file)
+             at least ~263ms faster with isolate: false — reuses workers across files instead of one per file
+
+rc=0

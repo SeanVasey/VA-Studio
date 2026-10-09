@@ -1,0 +1,17 @@
+# source b99b5dd4a44b30a997aab816f385727cde4fbce5 (integration of 27a151b6 + handoff/main 49489697)
+# php 8.4.26 ; public/build absent: yes
+$ php -r ...phpunit -- --colors=never --do-not-cache-result --filter PaidGrant tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio/phpunit.xml
+
+...............................................................  63 / 136 ( 46%)
+.............................S................................. 126 / 136 ( 92%)
+..........                                                      136 / 136 (100%)
+
+Time: 17:00.032, Memory: 294.04 MB
+
+OK, but some tests were skipped!
+Tests: 136, Assertions: 4954, Skipped: 1.
+rc=0

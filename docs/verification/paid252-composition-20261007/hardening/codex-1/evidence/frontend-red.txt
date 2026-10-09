@@ -1,0 +1,80 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (12 tests | 3 failed) 2629ms
+   ❯ per-operation request timeouts (3)
+     × sizes each abort from the measured server work instead of one 20 s limit 10ms
+     × keeps a measured-length document preparation open and still aborts it at its own bound 107ms
+     × recovers the same server authorization when a timed-out authorize is deliberately replayed 96ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > sizes each abort from the measured server work instead of one 20 s limit
+AssertionError: expected undefined to deeply equal { read: 30000, finalize: 80000, …(2) }
+
+- Expected:
+{
+  "authorize": 80000,
+  "document": 320000,
+  "finalize": 80000,
+  "read": 30000,
+}
+
++ Received:
+undefined
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:104:33
+    102|   const pendingFetch = (signals: AbortSignal[]) => (_: unknown, init?:…
+    103|   it('sizes each abort from the measured server work instead of one 20…
+    104|     expect(paidRequestTimeouts).toEqual({ read: 30_000, finalize: 80_0…
+       |                                 ^
+    105|     const timers = vi.spyOn(window, 'setTimeout');
+    106|     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > keeps a measured-length document preparation open and still aborts it at its own bound
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:129:87
+    127|     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    128|     fireEvent.click(screen.getByRole('button', { name: 'Prepare origin…
+    129|     await act(() => vi.advanceTimersByTimeAsync(100_000)); expect(sign…
+       |                                                                                       ^
+    130|     await act(() => vi.advanceTimersByTimeAsync(219_999)); expect(sign…
+    131|     await act(() => vi.advanceTimersByTimeAsync(1)); expect(signals[0]…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > recovers the same server authorization when a timed-out authorize is deliberately replayed
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:143:86
+    141|     fireEvent.click(screen.getByRole('button', { name: 'Authorize mast…
+    142|     // The measured native authorize took 12-20 s; the old uncondition…
+    143|     await act(() => vi.advanceTimersByTimeAsync(79_999)); expect(signa…
+       |                                                                                      ^
+    144|     await act(() => vi.advanceTimersByTimeAsync(1)); expect(signals[0]…
+    145|     vi.useRealTimers();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 9 passed (12)
+   Start at  13:24:57
+   Duration  4.90s (tests 57%, environment 34%, transform 6%, setup 2%)
+
+rc=1

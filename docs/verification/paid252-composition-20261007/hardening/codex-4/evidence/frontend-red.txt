@@ -1,0 +1,33 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (15 tests | 1 failed) 1050ms
+   ❯ per-operation request timeouts (6)
+     × does not treat a full status window as proof that a pushed-out authorization expired 56ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > does not treat a full status window as proof that a pushed-out authorization expired
+Error: [2mexpect([22m[31melement[39m[2m).toBeDisabled()[22m
+
+Received element is not disabled:
+  [31m<button
+  type="button"
+/>[39m
+ ❯ tests/frontend/paid-grant-journey.test.tsx:201:46
+    199|     fireEvent.click(authorize()); expect(await screen.findByRole('aler…
+    200|     const setAside = screen.getByRole('button', { name: 'Set aside and…
+    201|     await refreshStatus(4); expect(setAside).toBeDisabled();
+       |                                              ^
+    202|     await refreshStatus(5); expect(setAside).toBeDisabled();
+    203|     // The oldest entry in the full window has expired, so every older…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 14 passed (15)
+   Start at  16:24:33
+   Duration  1.99s (tests 57%, environment 30%, transform 9%, setup 4%, import 1%)
+
+rc=1

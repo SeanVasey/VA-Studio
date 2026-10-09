@@ -1,0 +1,19 @@
+# source: afd9cd94 + working tree (codex-18 prepare-budget change only); public/build absent
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter PaidGrant tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+...............................................................  63 / 108 ( 58%)
+.......S.....................................                   108 / 108 (100%)
+
+Time: 08:29.289, Memory: 270.04 MB
+
+OK, but some tests were skipped!
+Tests: 108, Assertions: 4259, Skipped: 1.
+
+real	8m29.940s
+user	8m0.207s
+sys	0m18.301s
+rc=0

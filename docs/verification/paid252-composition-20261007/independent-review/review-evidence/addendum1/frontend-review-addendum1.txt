@@ -1,0 +1,12 @@
+cmd: npx vitest run tests/frontend/paid-grant-review-addendum1.test.tsx (node_modules temporarily symlinked)
+head: 1cd837eb67c2186e9003bc537703116cdb92e1e7 + untracked review test
+
+ RUN  v5.0.1 /home/user/VA-Studio-review-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed | 1 expected fail (4)
+   Start at  16:12:49
+   Duration  2.09s (tests 47%, environment 37%, transform 10%, setup 5%, import 1%)
+
+rc=0

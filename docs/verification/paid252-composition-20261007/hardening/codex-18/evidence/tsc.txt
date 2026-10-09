@@ -1,0 +1,3 @@
+# source: 2c3f8cb8 + working tree
+# command: npx tsc --noEmit
+rc=0

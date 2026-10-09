@@ -1,0 +1,12 @@
+# uncommitted probe, run as root (uid 0) on 703674d7 + final working tree; kept here as .php.txt and removed from tests/
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:00.159, Memory: 59.00 MB
+
+OK (1 test, 6 assertions)
+rc=0

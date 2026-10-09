@@ -1,0 +1,9 @@
+[global]
+pid = <scratchpad>/a15/fpm/fpm.pid
+error_log = <scratchpad>/a15/fpm/fpm.log
+daemonize = yes
+[probe]
+listen = 127.0.0.1:19815
+pm = static
+pm.max_children = 1
+clear_env = yes

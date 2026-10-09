@@ -1,0 +1,47 @@
+# source: 2c3f8cb8 + codex-18 final working tree (product + tests) + mutation L1-fulfilled-order-re-verified (scratch worktree)
+L1-fulfilled-order-re-verified applied
++            $budget = PaidGrantDeadline::start(self::LEASE_SECONDS);
+-                $deadline->proveCurrent();
++                $budget->proveCurrent();
+-                $deadline->proveCurrent();
+-                (new PaidGrantAssets)->verify($claim['body']['assets'], $deadline->value());
++                $budget->proveCurrent();
++                (new PaidGrantAssets)->verify($claim['body']['assets'], $budget->value());
+-                }, $deadline);
++                }, $budget);
+-                    }, $deadline);
++                    }, $budget);
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/phpunit.xml
+
+...FE......                                                       11 / 11 (100%)
+
+Time: 01:30.670, Memory: 208.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantDocumentJourneyTest::test_actual_claim_render_original_and_complete_order_are_idempotent_and_missing_original_is_restore_only
+App\Domain\Contracts\ContractIssuanceException: Test contract issuance is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantFiles.php:148
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:133
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/app/Domain/Grants/Paid/PaidGrantDocuments.php:113
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Feature/PaidGrantDocumentJourneyTest.php:141
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantCompletionBudgetTest::test_preparing_an_already_fulfilled_order_hashes_no_file_and_returns_the_same_projection
+No original was re-verified.
+Failed asserting that 2 is identical to 0.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m18b/tests/Feature/PaidGrantCompletionBudgetTest.php:202
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 11, Assertions: 261, Errors: 1, Failures: 1.
+rc=2

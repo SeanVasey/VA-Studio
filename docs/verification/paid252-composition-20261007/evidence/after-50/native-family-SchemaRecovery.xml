@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantSchemaRecoveryTest" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" tests="10" assertions="574" errors="0" failures="1" skipped="1" time="20.419258">
+    <testcase name="test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="119" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="387" time="12.430072"/>
+    <testcase name="test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="171" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="139" time="2.437257"/>
+    <testsuite name="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write" tests="5" assertions="25" errors="0" failures="0" skipped="0" time="3.336809">
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #0" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="200" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="5" time="0.631419"/>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #1" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="200" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="5" time="0.651685"/>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #2" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="200" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="5" time="0.691330"/>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #3" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="200" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="5" time="0.636672"/>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #4" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="200" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="5" time="0.725703"/>
+    </testsuite>
+    <testcase name="test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="233" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="2" time="0.077572">
+      <skipped/>
+    </testcase>
+    <testcase name="test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="250" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="3" time="0.093010">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PaidGrantSchemaRecoveryTest::test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl
+Failed asserting that '8.4.11' starts with "8.0.46".
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php:255
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_no_line_can_activate_until_all_first_originals_are_complete_and_immutable" file="/home/user/VA-Studio-paid252/tests/Feature/PaidGrantSchemaRecoveryTest.php" line="292" class="Tests\Feature\PaidGrantSchemaRecoveryTest" classname="Tests.Feature.PaidGrantSchemaRecoveryTest" assertions="18" time="2.044539"/>
+  </testsuite>
+</testsuites>

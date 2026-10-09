@@ -1,0 +1,36 @@
+# source: 9605e95c + round 20 working tree + client mutation CM-I5-stop-leaves-request (restored afterwards)
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx (11 tests | 1 failed) 1497ms
+   ❯ continuing paid preparation after one click (11)
+     × stops a request in flight when Stop is chosen and sends nothing more 77ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > stops a request in flight when Stop is chosen and sends nothing more
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:174:32
+    172|     await advance(1_000);
+    173|     fireEvent.click(screen.getByRole('button', { name: 'Stop preparing…
+    174|     expect(signals[0].aborted).toBe(true);
+       |                                ^
+    175|     await advance(400_000);
+    176|     expect(s.posts()).toHaveLength(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 16 passed (17)
+   Start at  21:32:21
+   Duration  3.34s (tests 44%, environment 40%, setup 8%, transform 7%, import 1%)
+
+rc=1

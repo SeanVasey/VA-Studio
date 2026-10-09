@@ -1,0 +1,12 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0 basename_in=0
+app/Domain/Grants/Paid/PaidGrantDownloads.php pinned_in=0 basename_in=0
+app/Domain/Grants/Paid/PaidGrantRequestInstant.php pinned_in=0 basename_in=0
+app/Http/Controllers/PaidGrantController.php pinned_in=0 basename_in=0
+tests/Feature/PaidGrantRequestInstantTest.php pinned_in=0 basename_in=0
+ CHANGELOG.md                                  |  2 +-
+ app/Domain/Grants/Paid/PaidGrantDownloads.php | 45 ++++++-------------
+ app/Http/Controllers/PaidGrantController.php  |  3 +-
+ tests/Feature/PaidGrantRequestInstantTest.php | 63 +++++++++++++++++++++++++--
+ 4 files changed, 75 insertions(+), 38 deletions(-)
+new: app/Domain/Grants/Paid/PaidGrantRequestInstant.php

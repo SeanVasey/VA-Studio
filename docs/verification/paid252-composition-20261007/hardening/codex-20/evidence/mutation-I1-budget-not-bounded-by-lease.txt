@@ -1,0 +1,22 @@
+# source: 9605e95c + round 20 final working tree + mutation I1-budget-not-bounded-by-lease (scratch worktree)
+I1-budget-not-bounded-by-lease applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/phpunit.xml
+
+...........F..............                                        26 / 26 (100%)
+
+Time: 03:17.868, Memory: 215.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_the_line_budget_ends_with_the_database_lease_not_after_the_claim_frame_tail
+Failed asserting that 409 is identical to 410.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/tests/Feature/PaidGrantHeavyWorkTest.php:280
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 26, Assertions: 523, Failures: 1.
+rc=1

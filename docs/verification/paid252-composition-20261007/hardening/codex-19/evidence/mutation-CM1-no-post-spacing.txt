@@ -1,0 +1,56 @@
+# source: a7892c9b + codex-19 working tree + client mutation CM1-no-post-spacing (restored afterwards)
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx (7 tests | 2 failed) 798ms
+   ❯ continuing paid preparation after one click (7)
+     × keeps posting while each request makes progress, at least 10 s apart, until the order is fulfilled 384ms
+     × stops when the tab is hidden and does not resume on return 31ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > keeps posting while each request makes progress, at least 10 s apart, until the order is fulfilled
+AssertionError: expected [ { …(2) }, { …(2) }, { …(2) } ] to have a length of 1 but got 3
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:62:23
+     60|     fireEvent.click(screen.getByRole('button', { name: 'Prepare origin…
+     61|     await advance(0);
+     62|     expect(s.posts()).toHaveLength(1);
+       |                       ^
+     63|     expect(live()).toHaveTextContent('Preparing your files: 1 of 3 lin…
+     64|     expect(live()).toHaveAttribute('aria-live', 'polite');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > stops when the tab is hidden and does not resume on return
+AssertionError: expected [ { …(2) }, { …(2) } ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:151:23
+    149|     fireEvent.click(screen.getByRole('button', { name: 'Prepare origin…
+    150|     await advance(0);
+    151|     expect(s.posts()).toHaveLength(1);
+       |                       ^
+    152|     Object.defineProperty(document, 'visibilityState', { configurable:…
+    153|     await act(async () => { document.dispatchEvent(new Event('visibili…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 8 passed (10)
+   Start at  20:21:55
+   Duration  1.76s (tests 45%, environment 38%, transform 11%, setup 5%, import 1%)
+
+rc=1

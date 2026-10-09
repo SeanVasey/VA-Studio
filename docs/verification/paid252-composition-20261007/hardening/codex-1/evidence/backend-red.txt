@@ -1,0 +1,65 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m[41;37mF[0m.[31;1mE[0m[31;1mE[0m                                                              6 / 6 (100%)
+
+Time: 01:26.227, Memory: 101.02 MB
+
+There were 4 errors:
+
+1) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_outlasts_the_authorization_but_fits_the_derived_deadline_completes
+TypeError: Tests\Feature\PaidGrantTransferDeadlineTest::derived(): Return value must be of type int, null returned
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:261
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:107
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_stream_that_exceeds_the_derived_deadline_is_refused_mid_stream
+TypeError: Tests\Feature\PaidGrantTransferDeadlineTest::derived(): Return value must be of type int, null returned
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:261
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:128
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantTransferDeadlineTest::test_a_redemption_admitted_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:222
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:116
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:133
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDownloads.php:132
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:185
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantTransferDeadlineTest::test_shipped_defaults_policy_bounds_and_derived_formula
+ErrorException: Undefined array key "transfer_min_bytes_per_second"
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:204
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantTransferDeadlineTest::test_the_derived_deadline_is_capped_by_the_configured_maximum
+Failed asserting that 60 is greater than 60.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantTransferDeadlineTest.php:146
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 6[0m[37;41m, Assertions: 78[0m[37;41m, Errors: 4[0m[37;41m, Failures: 1[0m[37;41m.[0m
+
+real	1m26.598s
+user	0m55.870s
+sys	0m2.688s
+rc=2

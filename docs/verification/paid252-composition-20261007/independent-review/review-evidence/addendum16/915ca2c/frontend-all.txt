@@ -1,0 +1,6 @@
+# source 915ca2c9217d273ee1afa23e0486e084cae7c475, clean tracked tree, review probe moved out; node v24.21.0
+# npx vitest run
+ Test Files  65 passed (65)
+      Tests  1128 passed (1128)
+   Duration  81.25s (tests 53%, environment 34%, import 5%, setup 5%, transform 3%)
+rc=0

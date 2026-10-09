@@ -1,0 +1,13 @@
+# red: component at 8fc077f (sha256 d6b24f0c9e7a9c2e) + tests/frontend/paid-grant-reopen-issued.test.tsx at 915ca2c (sha256 c38a8ce3bed08f22); node v24.21.0
+# npx vitest run tests/frontend/paid-grant-reopen-issued.test.tsx
+     × reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 486ms
+     × drops the reopen control once the authorization is submitted, and a denial drops it with the token 297ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/paid-grant-reopen-issued.test.tsx > reopening the order of an issued authorization > reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+ FAIL  tests/frontend/paid-grant-reopen-issued.test.tsx > reopening the order of an issued authorization > drops the reopen control once the authorization is submitted, and a denial drops it with the token
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+rc=1
+restored-clean
