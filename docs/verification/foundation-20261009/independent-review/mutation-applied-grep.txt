@@ -1,0 +1,4 @@
+app/Domain/Customers/Preferences/ConsentMigrationAdmission.php:47:        $migration = require database_path('migrations/2026_10_06_000040_customer_accounts.php');
+app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php:198:        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php:343:        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php:364:        $legacy = require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php');

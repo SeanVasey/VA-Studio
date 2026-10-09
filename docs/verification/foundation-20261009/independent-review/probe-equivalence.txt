@@ -1,0 +1,16 @@
+2026_10_06_000040_customer_accounts.php props={"base:connection":"NULL","base:withinTransaction":"true"} same_class_a_b=true a!==b=true
+  guards() identical=true sha256=3966f9600fcc12cdaa134eeb46ced2a92457a24fe86a8ab346c9265c188ee81b
+2026_10_07_250000_customer_consent.php props={"base:connection":"NULL","base:withinTransaction":"true"} same_class_a_b=true a!==b=true
+  triggers(sqlite) identical=true sha256=15fe71f8e23181f90d91c5191b811293e754c3468dbdc75c73f0d9daf6c75998
+  definition(sqlite,customer_consent_policies) identical=true sha256=b6808a5b67312988a7f63f1e2ca9c8ee41d07904fc9c02cdefc70a22c52f6693
+  definition(sqlite,customer_consent_events) identical=true sha256=f64b3fb7d565a4d8f940d53e70bb5401e280831b8daa611927e27a3e53226c06
+  definition(sqlite,customer_consent_states) identical=true sha256=6e16dfbb6cf6e565c9deb703f5e511e56169e4a2c21864b3c03fa440a3377b79
+  triggers(mysql) identical=true sha256=e3e3176dc5fb469aacc4403c9c625a91ce19ea42be9670f23bbd3f9888fc8104
+  definition(mysql,customer_consent_policies) identical=true sha256=11413d26a43363824f5714b4fb943bf1c02bdd3ff2ca778d00cd19dc8171f2d3
+  definition(mysql,customer_consent_events) identical=true sha256=feedfbfe9751106808509e7e4c0532aba511896faa63167911164a089e86d405
+  definition(mysql,customer_consent_states) identical=true sha256=e14e2e531e2dbcea67ac1351ff55675cce50eac7419b46bfe741481859bbdf85
+2026_10_07_242000_customer_saved_tracks.php props={"base:connection":"NULL","base:withinTransaction":"true"} same_class_a_b=true a!==b=true
+  definition(sqlite) identical=true sha256=bd0a5ab8a56f2a1bffe056a31268895c3543abe34a9c4ff30366341c023e45a6
+  definition(mysql) identical=true sha256=843d72e35af8a5362da65a3e320fdbfec565a0fcb5601ac7fe118ac48f0ac478
+RESULT equivalent
+# rc=0

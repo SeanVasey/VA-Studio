@@ -1,0 +1,21 @@
+e2b3906b4a96af9c169f29e61071a34b535245b7
+0f9b39ce5d59e2d579d11a8ca15153ced1f565b4
+e2b3906b4a96af9c169f29e61071a34b535245b7
+base is ancestor
+ CHANGELOG.md                                       |   2 +
+ .../Preferences/ConsentMigrationAdmission.php      |   3 +-
+ .../Preferences/Suppression/SuppressionSchema.php  |   3 +-
+ .../ProductionFeatures/ProductionFeatureSchema.php |   5 +-
+ app/Support/MigrationDefinitions.php               |  23 +
+ docs/verification/foundation-20261009/README.md    |  93 +++
+ .../evidence/license-draft-fixture-local.txt       |  21 +
+ .../evidence/migration-recompilation-green.txt     |   5 +
+ .../evidence/migration-recompilation-red.txt       |  16 +
+ .../evidence/mysql80-migrate-fresh-timing.txt      | 171 +++++
+ .../evidence/sqlite-shard-1-main-512M.txt          |   3 +
+ .../evidence/sqlite-shard-1-memory-trace-main.tsv  | 817 +++++++++++++++++++++
+ .../evidence/sqlite-shard-2-main-512M.txt          |   2 +
+ tests/Feature/MigrationRecompilationTest.php       |  27 +
+ tests/browser/prepare-license-draft.php            |  22 +
+ 15 files changed, 1209 insertions(+), 4 deletions(-)
+b6bccc4d979e0ef755648ddfae7cecc9392ab269f64eab00650d48c0c9b4b765  /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review/reviewed-code-diff.patch

@@ -1,0 +1,7 @@
+# source=e2b3906 export=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src private mysqld 8.0.46 port 3419 own datadir; date=2026-10-09T13:45:59Z
+driver=mysql version=8.0.46-0ubuntu0.24.04.4
+run 1 rc=0 seconds=152.1 declared_classes=1274 memory_mb=62.5 migrations_rows=80
+run 2 rc=0 seconds=143.7 declared_classes=1274 memory_mb=64.5 migrations_rows=80
+run 3 rc=0 seconds=213.8 declared_classes=1274 memory_mb=64.5 migrations_rows=80
+RESULT no new classes on run 3
+# rc=0

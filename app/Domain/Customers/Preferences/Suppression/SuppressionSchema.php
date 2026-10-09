@@ -3,6 +3,7 @@
 namespace App\Domain\Customers\Preferences\Suppression;
 
 use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
+use App\Support\MigrationDefinitions;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 use PDO;
@@ -195,7 +196,7 @@ final class SuppressionSchema
     {
         $admission->dependencies();
         // Read-only exact ownership proof of the approved predecessor; never invoke its DDL.
-        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
         $namespace = [];
         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {

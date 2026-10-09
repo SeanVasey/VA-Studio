@@ -1,0 +1,16 @@
+# Red: repeated migrations recompile migration files; source main 0f9b39ce + new test only; php 8.4.26
+Configuration: /home/user/wt-fnd/phpunit.xml
+
+Time: 00:06.037, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\MigrationRecompilationTest::test_repeated_migrations_do_not_recompile_migration_files
+Failed asserting that 2469 is identical to 2433.
+
+/home/user/wt-fnd/tests/Feature/MigrationRecompilationTest.php:25
+/home/user/wt-fnd/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 5, Failures: 1.
+rc=1

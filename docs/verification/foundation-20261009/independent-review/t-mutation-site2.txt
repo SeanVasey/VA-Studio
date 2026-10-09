@@ -1,0 +1,21 @@
+# cwd=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src
+# files=tests/Feature/MigrationRecompilationTest.php
+# date=2026-10-09T13:44:03Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src/phpunit.xml
+
+Time: 00:06.156, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\MigrationRecompilationTest::test_repeated_migrations_do_not_recompile_migration_files
+Failed asserting that 2402 is identical to 2398.
+
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src/tests/Feature/MigrationRecompilationTest.php:25
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 5[0m[37;41m, Failures: 1[0m[37;41m.[0m
+# rc=1

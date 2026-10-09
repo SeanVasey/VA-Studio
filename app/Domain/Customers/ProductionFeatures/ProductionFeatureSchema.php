@@ -4,6 +4,7 @@ namespace App\Domain\Customers\ProductionFeatures;
 
 use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
+use App\Support\MigrationDefinitions;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 use PDO;
@@ -340,7 +341,7 @@ final class ProductionFeatureSchema
 
     private function legacyDependencies(PDO $pdo, string $driver, string $database, ConsentMigrationAdmission $admission): void
     {
-        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
+        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
         $namespace = [];
         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states', 'customer_saved_tracks'] as $table) {
@@ -361,7 +362,7 @@ final class ProductionFeatureSchema
             $sql = $type === 'table' ? (new ReflectionMethod($prior, 'definition'))->invoke($prior, $driver, $name) : $triggers[$name]['sql'];
             (new ReflectionMethod($prior, 'owned'))->invoke($prior, $pdo, $driver, $type, $name, $sql);
         }
-        $legacy = require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php');
+        $legacy = MigrationDefinitions::load('2026_10_07_242000_customer_saved_tracks.php');
         (new ReflectionMethod($legacy, 'owned'))->invoke($legacy, $pdo, $driver);
         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {
             $statement = $pdo->prepare($driver === 'sqlite' ? "SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=? ORDER BY name" : 'SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME');

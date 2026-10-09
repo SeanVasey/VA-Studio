@@ -1,0 +1,20 @@
+# Standalone reproduction: @playwright/test 1.63.0 (pinned) with Chromium headless shell 1243 (downloaded for this run),
+# Node 24.21.0. A local HTTP server answers POST /inquiry with JSON; the page fetches it and reads the body either with
+# response.json() or with the bounded ReadableStream reader pattern of resources/js/lib/order-inquiry.ts
+# (privateInquiryJson: read to done, then cancel/releaseLock). The spec's routing is mirrored: first POST route.fetch()
+# then route.abort('failed'); second POST route.continue() (or route.fetch()+route.fulfill()).
+# "hung" = Playwright response.finished() unresolved after 3 s (10 s in the first runs); in every hung case
+# response.json() then failed with "Network.getResponseBody: No data found for resource" and finished() stayed
+# unresolved after a further 3 s. The page itself received the full JSON in every run.
+
+Run A (1 sample each):   reader-cancel routed: HUNG; response-json routed: resolved
+Run B (1 sample each):   reader-cancel routed: resolved; reader-nocancel routed: HUNG; reader-cancel-if-not-done: resolved;
+                         reader-cancel unrouted: HUNG; response-json routed: resolved
+Run C (10 each):         reader-cancel routed 1/10 hung; reader-nocancel unrouted 0/10; response-json routed 0/10; response-json unrouted 0/10
+Run D (30 each):         reader-cancel routed (continue) 7/30 hung; reader-cancel routed (fetch+fulfill) 5/30 hung;
+                         all 48 non-hung responses parsed as {state: saved}
+Totals: stream-reader consumption 16 hung of 85 (A 1/1, B 2/4, C 1/20, D 12/60); response.json() consumption 0 of 22.
+The committed .mjs is the Run D script only (the A–C variants and the response.json()/unrouted controls were earlier
+edits of it); it imports playwright-core from the main checkout by absolute path.
+Conclusion: on Chromium, Playwright cannot reliably observe completion or body of a response the page consumes through a
+stream reader, whatever the routing. Page-side evidence is reliable.

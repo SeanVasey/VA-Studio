@@ -1,0 +1,2 @@
+Fatal error: Premature end of PHP process when running Tests\Feature\CustomerSuppressionMigrationTest::test_existing_foreign_index_and_reserved_guard_index_refuse_without_adoption.
+rc=2

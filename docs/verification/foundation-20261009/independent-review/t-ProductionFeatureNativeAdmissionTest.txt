@@ -1,0 +1,13 @@
+# cwd=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src
+# files=tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php
+# date=2026-10-09T13:42:36Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/fnd-review-src/phpunit.xml
+
+Time: 00:00.251, Memory: 61.00 MB
+
+[30;42mOK, but some tests were skipped![0m
+[30;42mTests: 3[0m[30;42m, Assertions: 0[0m[30;42m, Skipped: 3[0m[30;42m.[0m
+# rc=0

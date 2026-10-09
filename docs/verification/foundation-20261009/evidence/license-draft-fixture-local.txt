@@ -1,0 +1,21 @@
+# license-draft browser fixture, relaxed local harness (Claude Code container, 2026-10-09)
+# Source: main 0f9b39ce + working-tree fix of tests/browser/prepare-license-draft.php
+# Harness: tests/browser/run.mjs environment and tests/browser/bootstrap.php, without Playwright. ClamAV signatures cannot be fetched here
+# (database.clamav.net blocked), so bootstrap stops at installation_diagnostics after migrations, operator and catalog fixtures.
+# Both fixtures ran as scratch copies with only UnpaidReleaseBrowserFixture::directory()/effective() skipped and the refusal printing the exception.
+
+## bootstrap rc=1 (expected to stop at installation_diagnostics: no ClamAV signatures here)
+## php tests/browser/_scratch-red-ld.php prepare chromium-desktop rc=1
+
+REFUSED guard-or-evidence RuntimeException: Isolated unpaid-release fixture refused. @ line 226
+
+## php tests/browser/_scratch-green-ld.php prepare webkit-mobile rc=0
+{"name":"Synthetic editable draft webkit-mobile","versionId":2,"sources":{"prepared":"NONBINDING SYNTHETIC LICENSE DRAFT webkit-mobile. No saleable rights.","winner":"NONBINDING SYNTHETIC LICENSE DRAFT webkit-mobile. No saleable rights. Saved in the second tab.","recovered":"NONBINDING SYNTHETIC LICENSE DRAFT webkit-mobile. No saleable rights. Reviewed after reopening.","uncertain":"NONBINDING SYN
+
+## php tests/browser/_scratch-green-ld.php verify webkit-mobile prepared rc=0
+{"verified":true,"phase":"prepared","versionId":2,"source":"NONBINDING SYNTHETIC LICENSE DRAFT webkit-mobile. No saleable rights.","updates":0,"originalsUnchanged":true,"guardsUnchanged":true}
+
+
+
+# Located with the same harness on unfixed main: the refusal is the pre-existing-row check; the only changed row is
+CHANGED table=catalog_discovery_epoch key=1 cols=epoch
