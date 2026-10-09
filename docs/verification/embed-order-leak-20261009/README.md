@@ -40,6 +40,9 @@ Source: `875b7edc` (the branch merged with main `49489697`).
 | Regression test green | new test file + the fix | 2 tests, 3 assertions, rc 0 | `evidence/regression-green.txt` |
 | Pint `--test` | `tests/Feature/LivewireStateIsolationTest.php` | pass | — |
 
+After merging `main` at `3b3a3654` (#56, #60) the branch head `fd26aabb` repeats the ordered green (42 tests, 1,456
+assertions) and the regression test (2/3), rc 0 (`evidence/integrated-green.txt`).
+
 `ordered-phpunit.xml` copies `phpunit.xml`'s `<php>` block verbatim (checked with `diff`) and lists the two files in
 order. Its paths name the harness worktree.
 
