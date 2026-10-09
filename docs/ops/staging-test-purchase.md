@@ -58,7 +58,7 @@ Both are captured into each immutable test order. Changing them later affects ne
    php scripts/ops/validate-test-commerce-profile.php .env
    ```
 
-   Expect 35 `PASS` lines and `RESULT: PASS`. Each `FAIL` names the responsible check (for example `commerce.pricing_zero_test_tax`). The script reads only the file you pass it: inherited application variables and foreign configuration caches cannot mask its values. It never prints a value and makes no Stripe request. This validates the file; deploy/cache/workers must actually use that same file without shell overrides.
+   Expect 36 `PASS` lines and `RESULT: PASS`. Each `FAIL` names the responsible check (for example `commerce.pricing_zero_test_tax`). Secure and HttpOnly session cookies are required because the guest session owns order and download access. The script reads only the file you pass it: inherited application variables and foreign configuration caches cannot mask its values. It never prints a value and makes no Stripe request. This validates the file; deploy/cache/workers must actually use that same file without shell overrides.
 4. Optional, read-only Stripe probe. This makes one `GET /v1/account` request with the test key and confirms it belongs to `STRIPE_ACCOUNT_ID`:
 
    ```sh
@@ -284,9 +284,9 @@ Use only if the Dashboard endpoint cannot reach the host. `ops/staging/test-comm
 
 ## Evidence
 
-Recorded 2026-10-08 on PHP 8.4.26, SQLite, synthetic fixtures only:
+Recorded 2026-10-08–09 on PHP 8.4.26 with synthetic fixtures only. Current and historical selections, including SQLite and native MySQL 8.4.11 journeys, are distinguished in the [verification record](../verification/staging-test-commerce-20261009/README.md):
 
-- `tests/Unit/TestCommerceProfileValidatorTest.php`: the committed template passes all 35 checks in template mode; a filled synthetic profile passes against the real policy classes; 31 broken variants each fail on the responsible check; no value is printed.
+- `tests/Unit/TestCommerceProfileValidatorTest.php`: the committed template passes all 36 checks in template mode; a filled synthetic profile passes against the real policy classes; broken variants each fail on the responsible check, including script-readable cookies; safe exports cannot mask unsafe files or permit the optional account probe; no value is printed.
 - `tests/Unit/TestCommercePipelineRunnerTest.php`: cursor following, full-page repetition, page bounds with a saved reconcile cursor, reconcile cadence, failure handling, lock, bounded loop and log redaction, against a scripted stand-in for artisan.
 - `tests/Feature/StagingTestCommerceProfileJourneyTest.php`: configured only from the profile, a guest purchase runs quote → order → checkout → signed webhook (sent twice) → the runner's five commands → operator enable → download of the contract and master WAV with matching SHA-256. Also: reconcile without webhook, declined card, expired session, late payment, the missing scope link, and an abandoned order blocking its offer revision while a paid order releases it.
 - A real-process run of `run-test-commerce-pipeline.sh` with real artisan on a disposable SQLite database finalized, rendered a real `test-buyer-pdf-v2` contract and activated a seeded synthetic order.

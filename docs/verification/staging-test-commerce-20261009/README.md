@@ -1,6 +1,6 @@
 # PR #62 current verification
 
-Current reviewed functional source: `8f3d1cef024cabb6044f86c45f75ccb6fdc00550`. This integrates the original `ddb1fcc1` profile with main's CI policy, the merged D1 command and its immediate ledger, then closes four independently reproduced runner/validator findings. Earlier source `f592ec93890fdf95be8b05b3d4fb5ccb5e706ddf` covers the cursor/state repairs; the latest independent addendum assesses the subsequent file-authority and cadence repairs.
+Current functional source: `1b2d0aa85b00b55d36e71eae66d61340dfc0b820`. This integrates the original `ddb1fcc1` profile with main's CI policy, the merged D1 command and its immediate ledger, then closes five reproduced runner/validator findings. Earlier source `f592ec93890fdf95be8b05b3d4fb5ccb5e706ddf` covers the cursor/state repairs; `8f3d1cef` covers file authority and cadence; the final repair requires an HttpOnly guest ownership cookie.
 
 ## Actual local results
 
@@ -19,8 +19,11 @@ Current reviewed functional source: `8f3d1cef024cabb6044f86c45f75ccb6fdc00550`. 
 | `masking-cadence-green.txt` | Same targeted cases after runtime repair | Exit 0; 8 tests / 71 assertions |
 | `masking-cadence-sqlite.txt` | Current validator, runner and nine profile journeys | Exit 0; 73 tests / 783 assertions, no skips |
 | `masking-cadence-mysql84.txt` | Current nine profile journeys on native MySQL 8.4.11 | Exit 0; 9 tests / 249 assertions, no skips |
+| `http-only-red.txt` | False and quoted-false HttpOnly profiles before the final repair, without provider-probe arguments | Exit 1; 2 tests / 2 assertions / 2 failures; unsafe profiles incorrectly passed |
+| `http-only-sqlite.txt` | Final validator, runner and nine profile journey suites at `1b2d0aa8` | Exit 0; 76 tests / 813 assertions, no skips |
+| `http-only-template.txt` | Final synthetic template including secure and HttpOnly cookies | All 36 checks pass; no Stripe request |
 
-The application code remained unchanged throughout the affected selection; the runner repairs followed its original unit cases. The current selected suites were separately rerun after those repairs. The affected contract issuance selection uses the real isolated v2 renderer; the profile journeys use the synthetic renderer and provider transport.
+The application code remained unchanged throughout the affected selection; the runner repairs followed its original unit cases. The final selected suites were separately rerun after the cookie repair. The native nine-journey result predates only the validator check and explicit `SESSION_HTTP_ONLY=true` template setting (already the application default); no journey or domain service changed. The affected contract issuance selection uses the real isolated v2 renderer; the profile journeys use the synthetic renderer and provider transport.
 
 PHP **8.4.26**, PHPUnit **12.5.34**, SQLite in-memory and native MySQL **8.4.11**. The commerce worktree has physical locked vendor packages because shared symlinks violate the renderer's `open_basedir`. Validator tests deliberately remove inherited environment variables; the extracted genuine PHP executable was copied with a dependency RPATH and its default ini prefix relocated to `/tmp/va-php84cli`, so those isolated children retain the needed extensions. The original executable is preserved. No PHP version/SAPI or test-isolation behavior was substituted.
 
@@ -37,7 +40,9 @@ GitHub rejected the first unpublished evidence commit because a review fixture c
 
 ## Independent decision and limits
 
-[Current independent addendum](independent-review/MASKING-CADENCE-ADDENDUM.md): **APPROVE** at `8f3d1cef`, with 55 independent masking/interpolation/cache/privacy/cadence checks passing and two independently run real-command SQLite timing journeys (2/48). The original [decision](independent-review/DECISION.md), [carry addendum](independent-review/CANDIDATE-ADDENDUM.md) and 37-probe receipts remain historical evidence. Their exported-variable precedence contract is superseded: the current validator clears all inherited application inputs before boot, so a valid export cannot mask an unsafe file. Only the supplied file is certified; deployed config/cache/workers must actually use it. The original starvation/state red receipts remain alongside their passing successors.
+[Current HttpOnly addendum](independent-review/HTTPONLY-ADDENDUM.md): **APPROVE** at `1b2d0aa8`, with 32 independent default/interpolation/adapter/privacy checks passing. False or unresolved HttpOnly values refuse the optional account probe, even under a safe export. HttpOnly prevents reading the cookie value; same-origin scripts can still make authenticated requests. Its explicit source comparison carries the earlier runner, domain, timing and renderer approval forward.
+
+The prior [masking/cadence addendum](independent-review/MASKING-CADENCE-ADDENDUM.md) approved `8f3d1cef`, with 55 independent checks and two independently run real-command SQLite timing journeys (2/48). The original [decision](independent-review/DECISION.md), [carry addendum](independent-review/CANDIDATE-ADDENDUM.md) and 37-probe receipts remain historical evidence. Their exported-variable precedence contract is superseded: the current validator clears all inherited application inputs before boot, so a valid export cannot mask an unsafe file. Only the supplied file is certified; deployed config/cache/workers must actually use it. The original starvation/state red receipts remain alongside their passing successors.
 
 The runner and installed service now use a one-minute minimum interval, within the quote's 15-minute observation window. Actual domain command journeys prove an unpaid read followed by payment at +30 seconds and observation at +61 seconds issues a grant, while payment at +850 first observed at +901 remains a paid exception with no grant. Timer scheduling, slow stages, locks, backlog and payment near expiry still limit observation timeliness; no eligibility or retained-resource rule changed. The red masking cases allowed the optional probe branch before repair; synthetic input only was supplied. All repaired unsafe-file probe cases now refuse before account access.
 
