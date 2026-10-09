@@ -14,10 +14,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        // Livewire::test() leaves static auto-injection state set after it renders a component
-        // (SupportAutoInjectedAssets::$hasRenderedAComponentThisRequest). That state outlives the
-        // application, so a later test in the same process would get Livewire's <style>/<script>
-        // injected into every full-HTML response, such as the script-free public embed.
+        // A component rendered through a real HTTP request (a Filament page, say) leaves Livewire's
+        // static auto-injection state set (SupportAutoInjectedAssets::$hasRenderedAComponentThisRequest).
+        // That state outlives the application, so a later test in the same process would get Livewire's
+        // <style>/<script> injected into every full-HTML response, such as the script-free public embed.
         Livewire::flushState();
     }
 

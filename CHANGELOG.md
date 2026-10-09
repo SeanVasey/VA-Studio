@@ -53,6 +53,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- `PublicTrackEmbedTest` no longer fails when an earlier test in the same PHPUnit process renders a Livewire component through a real HTTP request: the base test case flushes Livewire's static asset-injection state before each test, and a regression test covers it. Test-only. Evidence: `docs/verification/embed-order-leak-20261009/`.
+
 - Install the captured private staging environment before Composer's Laravel hooks boot package discovery and Filament upgrade.
 
 - Seal private staging code/vendor/build/environment on protected inodes, validate root-mediated configuration refresh, require served backup key/hash custody and explicitly forward Stripe signatures. Writable Laravel runtime PHP remains an explicit trust exception.

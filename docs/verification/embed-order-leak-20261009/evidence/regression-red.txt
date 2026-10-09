@@ -1,0 +1,21 @@
+# source: 875b7edc301749cb67746ca282560db7458edd31 + new tests/Feature/LivewireStateIsolationTest.php (sha256 9232553e52f0c893); tests/TestCase.php = origin/main version (no flushState)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt-embed/phpunit.xml
+
+.F                                                                  2 / 2 (100%)
+
+Time: 00:00.245, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\LivewireStateIsolationTest::test_the_next_test_starts_without_livewire_asset_injection_state
+Failed asserting that true is false.
+
+/home/user/wt-embed/tests/Feature/LivewireStateIsolationTest.php:29
+/home/user/wt-embed/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 2, Failures: 1.
+rc=1

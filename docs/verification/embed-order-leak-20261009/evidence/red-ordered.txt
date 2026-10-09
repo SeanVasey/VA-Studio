@@ -1,0 +1,44 @@
+# source: 875b7edc301749cb67746ca282560db7458edd31 (harness/embed-order-leak merged with main 4948969); tests/TestCase.php replaced by origin/main's version (sha256 c1ab95960b6a3c23), i.e. WITHOUT Livewire::flushState
+# one process, executionOrder=default; config:
+        <testsuite name="ordered">
+            <file>/home/user/wt-embed/tests/Feature/MembershipAdministrationActionTest.php</file>
+            <file>/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php</file>
+        </testsuite>
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/embed-ordered.xml
+
+........................F.FFF.............                        42 / 42 (100%)
+
+Time: 01:16.062, Memory: 150.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\PublicTrackEmbedTest::test_embed_is_script_free_minimal_escaped_and_independent_of_session_or_host
+Failed asserting that actual size 1 matches expected size 0.
+
+/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php:68
+/home/user/wt-embed/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PublicTrackEmbedTest::test_embed_styles_remain_same_origin_with_a_hot_server_or_foreign_asset_origin@development hot server with data (true, '')
+Failed asserting that actual size 2 matches expected size 0.
+
+/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php:127
+/home/user/wt-embed/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PublicTrackEmbedTest::test_embed_styles_remain_same_origin_with_a_hot_server_or_foreign_asset_origin@cross-origin assets with data (false, 'https://assets.example.test')
+Failed asserting that actual size 2 matches expected size 0.
+
+/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php:127
+/home/user/wt-embed/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PublicTrackEmbedTest::test_embed_styles_remain_same_origin_with_a_hot_server_or_foreign_asset_origin@hot server and cross-origin assets with data (true, 'https://assets.example.test')
+Failed asserting that actual size 2 matches expected size 0.
+
+/home/user/wt-embed/tests/Feature/PublicTrackEmbedTest.php:127
+/home/user/wt-embed/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 42, Assertions: 1436, Failures: 4.
+rc=1
