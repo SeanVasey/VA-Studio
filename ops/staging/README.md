@@ -69,6 +69,12 @@ Only the root helper switches `current`. Custom roots must have canonical, root-
 group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
 use a fresh reviewed release and prove sealing/attachment before activation.
 
+Every independently callable helper action holds a separate root-owned `/etc/vasey-staging/ctl.lock`.
+This serializes attach/detach/prune/switch/resume/snapshot across concurrent sudo callers, including the
+entire pre-deploy backup. It is separate from the outer deploy lock, and application subprocesses do not
+inherit its descriptor. Re-provisioning preserves its inode. Nightly snapshots use this same helper action
+and fresh stopped-writer proof, so direct `ctl resume` cannot restart writers during a private-file copy.
+
 ## Provisioning, step by step
 
 The **Who** column says whether Sean does the step in the Forge UI (or at his registrar) or a script does it.
@@ -213,15 +219,17 @@ There is no global CSP: the application sets CSP on the responses that need one.
 
 `vasey-staging-backup nightly` (cron, 03:17 UTC) runs these steps:
 
-1. Quiesces the host for under a minute.
+1. Quiesces the host. Maintenance lasts through the snapshot, restore proof and optional off-host transfer;
+   duration depends on retained media and database size.
 2. Writes a `mysqldump --single-transaction` of the schema, the private-storage archive with file and
    directory manifests, and the served `.env` (it holds `APP_KEY`).
-3. Resumes the site.
-4. Proves the restore. A disposable `mysqld` on a private socket loads the dump and re-dumps it, the archive is
+3. Proves the restore inside the serialized `ctl snapshot` action. A disposable `mysqld` on a private socket loads the dump and re-dumps it, the archive is
    extracted as `forge` into a fresh directory, and hashes, names, directories, modes and ownership are checked.
    Only the immediate charset attribute of a string column in the dump's matching table-definition block
    may be normalized. All row/default/comment/routine bytes remain exact. Reproof invalidates an old success
    marker before checking hashes; a new marker is published atomically after verification and cleanup.
-5. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
+4. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
+5. Resumes the site, including after a failed snapshot/proof/transfer, then reports any failure. Successful
+   runs prune old local sets. A failed resume remains an explicit recovery condition.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.

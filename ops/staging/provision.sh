@@ -183,6 +183,12 @@ install -m 0600 -o "$APP_USER" -g "$APP_GROUP" /dev/null "$ROOT/.deploy.lock.new
 install -d -m 0700 -o "$NGINX_USER" -g "$NGINX_GROUP" /var/lib/nginx/vasey-staging-fastcgi
 install -d -m 0750 -o root -g "$APP_GROUP" /var/log/vasey-staging
 install -d -m 0755 -o root -g root /etc/vasey-staging
+# Preserve the lock inode on re-provision: replacing it would split concurrent helpers' authority.
+if [ ! -e /etc/vasey-staging/ctl.lock ] && [ ! -L /etc/vasey-staging/ctl.lock ]; then
+  (umask 077; set -C; : > /etc/vasey-staging/ctl.lock)
+fi
+[ -f /etc/vasey-staging/ctl.lock ] && [ ! -L /etc/vasey-staging/ctl.lock ] \
+  && [ "$(stat -c '%u %a' /etc/vasey-staging/ctl.lock)" = '0 600' ] || die "untrusted staging control lock"
 info "directories under $ROOT ready (private 0700 $APP_USER)"
 
 # ---------------------------------------------------------------- 5. MySQL

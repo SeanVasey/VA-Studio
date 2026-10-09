@@ -112,7 +112,7 @@ probe() {
     --resolve "$VASEY_STAGING_HOST:443:127.0.0.1" "https://$VASEY_STAGING_HOST/" 2>/dev/null || true
 }
 
-as_app() { runuser -u "$VASEY_APP_USER" -- "$@"; }
+as_app() { runuser -u "$VASEY_APP_USER" -- "$@" 8>&-; }
 
 served_release() {
   [ -L "$CURRENT" ] || return 1
@@ -296,6 +296,16 @@ cmd_status() {
   local p; for p in "${PROGRAMS[@]}"; do echo "$p: $(program_state "$p")"; done
   echo "GET /: $(probe)"
 }
+
+# The sudo entry point is independently callable by concurrent app processes. Serialize its full
+# actions separately from the deploy lock (which callers already hold). Recursive prune -> detach
+# stays inside this invocation. Never pass this lock descriptor to application-user subprocesses.
+protected_dir /etc/vasey-staging
+CONTROL_LOCK=/etc/vasey-staging/ctl.lock
+[ -f "$CONTROL_LOCK" ] && [ ! -L "$CONTROL_LOCK" ] && [ "$(stat -c '%u %a' "$CONTROL_LOCK")" = '0 600' ] \
+  || die "missing or untrusted helper action lock"
+exec 8>>"$CONTROL_LOCK"
+flock -x 8 || die "cannot lock helper action"
 
 case "${1:-}" in
   allocate|attach|detach|switch) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;

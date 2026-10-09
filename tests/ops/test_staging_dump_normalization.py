@@ -64,6 +64,20 @@ class DumpNormalizationTest(unittest.TestCase):
                 data = table(column)
                 self.assertEqual(normalize(data), data)
 
+    def test_native_saved_charset_setting_alignment_is_supported(self):
+        data = table(b"  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        data = data.replace(b"@saved_cs_client =", b"@saved_cs_client     =")
+        expected = data.replace(b"text CHARACTER SET utf8mb4 COLLATE", b"text COLLATE")
+        self.assertEqual(normalize(data), expected)
+
+    def test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset(self):
+        body = table(b"  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        for delimiter in (b";;", b"//", b"$$"):
+            with self.subTest(delimiter=delimiter):
+                routine = b"DELIMITER " + delimiter + b"\nCREATE PROCEDURE example()\nBEGIN\n" + body + b"END" + delimiter + b"\nDELIMITER ;\n"
+                data = routine + body
+                self.assertEqual(normalize(data), routine + body.replace(b"text CHARACTER SET utf8mb4 COLLATE", b"text COLLATE"))
+
     def test_binary_row_bytes_and_unknown_layout_remain_exact(self):
         data = b"INSERT INTO `terms` VALUES ('\xff CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');\r\n"
         self.assertEqual(normalize(data), data)

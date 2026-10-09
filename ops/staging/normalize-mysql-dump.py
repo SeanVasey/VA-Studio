@@ -12,7 +12,8 @@ import sys
 IDENTIFIER = rb"`(?:``|[^`])+`"
 DROP = re.compile(rb"DROP TABLE IF EXISTS (" + IDENTIFIER + rb");\r?\n?\Z")
 CREATE = re.compile(rb"CREATE TABLE (" + IDENTIFIER + rb") \(\r?\n?\Z")
-CLIENT_SETTING = re.compile(rb"/\*!\d{5} SET (?:@saved_cs_client = @@character_set_client|character_set_client = [a-zA-Z0-9_]+) \*/;\r?\n?\Z")
+CLIENT_SETTING = re.compile(rb"/\*!\d{5} SET (?:@saved_cs_client[ \t]+=[ \t]+@@character_set_client|character_set_client[ \t]+=[ \t]+[a-zA-Z0-9_]+) \*/;\r?\n?\Z")
+DELIMITER = re.compile(rb"DELIMITER[ \t]+([^\s]+)[ \t]*\r?\n?\Z", re.I)
 COLUMN = re.compile(rb"(  " + IDENTIFIER + rb" )(char|varchar|tinytext|text|mediumtext|longtext|enum|set)\b", re.I)
 CHARSET = re.compile(rb" CHARACTER SET utf8mb4(?= COLLATE utf8mb4_[a-zA-Z0-9_]+(?: |,|\r?$))")
 
@@ -47,8 +48,15 @@ def type_end(line, offset):
 
 
 def normalize(lines):
-    pending, in_table = None, False
+    pending, in_table, delimiter = None, False, b";"
     for line in lines:
+        directive = DELIMITER.fullmatch(line)
+        if directive:
+            delimiter = directive[1]
+            pending, in_table = None, False
+        if directive or delimiter != b";":
+            yield line
+            continue
         drop = DROP.fullmatch(line)
         create = CREATE.fullmatch(line)
         if drop:

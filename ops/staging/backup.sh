@@ -4,7 +4,7 @@
 # isolated restore proof, then an optional rsync to an off-host destination.
 #
 # Installed by provision.sh as /usr/local/sbin/vasey-staging-backup (root:root 0755) and run as root:
-#   vasey-staging-backup nightly            quiesce, snapshot, resume, restore-check, ship, prune (cron, 03:17 UTC)
+#   vasey-staging-backup nightly            quiesce, serialized snapshot/proof/ship, resume, prune (cron, 03:17 UTC)
 #   vasey-staging-backup predeploy          snapshot + restore-check on an already-quiesced host (deploy, via ctl)
 #   vasey-staging-backup restore-check DIR  re-prove an existing backup directory
 #   vasey-staging-backup ship DIR           copy one backup directory to VASEY_BACKUP_DEST
@@ -120,10 +120,10 @@ restore_check() {
 
   # Disposable server: its own datadir and socket, no TCP, no binlog, never the staging server.
   install -d -m 0700 -o mysql -g mysql -- "$data" "$run"
-  "$VASEY_MYSQLD" --no-defaults --initialize-insecure --user=mysql --datadir="$data" >"$RC_WORK/init.log" 2>&1 \
+  "$VASEY_MYSQLD" --no-defaults --initialize-insecure --user=mysql --datadir="$data" 8>&- >"$RC_WORK/init.log" 2>&1 \
     || die "disposable mysqld --initialize failed (AppArmor? see docs/ops/staging-runbook.md)"
   "$VASEY_MYSQLD" --no-defaults --user=mysql --datadir="$data" --socket="$sock" --pid-file="$run/mysqld.pid" \
-    --skip-networking --mysqlx=OFF --disable-log-bin --log-error="$run/error.log" >/dev/null 2>&1 &
+    --skip-networking --mysqlx=OFF --disable-log-bin --log-error="$run/error.log" 8>&- >/dev/null 2>&1 &
   RC_PID=$!
   local up=0
   for _ in $(seq 1 60); do
@@ -137,7 +137,7 @@ restore_check() {
   mysql "${R[@]}" < "$bk/database.sql" || die "loading the dump into the disposable server failed"
   install -d -m 0700 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$rpriv"
   runuser -u "$VASEY_APP_USER" -- tar --extract --file=- --directory="$rpriv" --no-same-owner --preserve-permissions \
-    < "$bk/private.tar" || die "private archive extraction failed"
+    8>&- < "$bk/private.tar" || die "private archive extraction failed"
 
   # 4. Verify: exact file set and hashes, exact directory set, owner-only modes and ownership, re-dump diff.
   if [ -s "$bk/private.sha256" ]; then
@@ -231,13 +231,12 @@ case "${1:-}" in
     flock -n 9 || die "a deploy or another backup holds the lock; skipping this run"
     "$CTL" quiesce
     snapshot_status=0
-    ( snapshot ) || snapshot_status=$?
+    # The serialized root helper re-proves stopped writers and holds its action lock through
+    # snapshot, restore verification and shipping. A direct ctl resume cannot race the copy.
+    "$CTL" snapshot || snapshot_status=$?
     # Resume even when the snapshot failed: a failed backup must not leave the site down overnight.
     if [ -L "$VASEY_ROOT/current" ]; then "$CTL" resume; fi
-    [ "$snapshot_status" = 0 ] || die "snapshot failed (site resumed)"
-    last=$(cat "$VASEY_BACKUP_DIR/.last")
-    restore_check "$last"
-    ship "$last"
+    [ "$snapshot_status" = 0 ] || die "snapshot, restore proof or shipping failed; resume completed if a release was served"
     prune_local
     ;;
   predeploy)
