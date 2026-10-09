@@ -131,7 +131,8 @@ return [
     | Renderer children need the CLI PHP. Under PHP-FPM, PHP_BINARY is the FPM
     | daemon, so non-CLI SAPIs require this absolute path to a CLI binary of
     | the exact running PHP version (App\Support\PhpCliBinary validates it).
-    | Unset outside the CLI, rendering fails closed. CLI processes ignore it.
+    | Unset under FPM, rendering fails closed. The CLI and its built-in server
+    | (`php -S`, `artisan serve`) ignore it and use their own PHP_BINARY.
     |
     */
 

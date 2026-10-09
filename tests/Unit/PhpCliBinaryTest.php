@@ -98,7 +98,7 @@ class PhpCliBinaryTest extends TestCase
     {
         foreach ([null, '', '   '] as $configured) {
             $this->refused('unconfigured', $this->fpm($configured));
-            $this->refused('unconfigured', new PhpCliBinary($configured, 'cli-server', PHP_BINARY));
+            $this->refused('unconfigured', new PhpCliBinary($configured, 'cgi-fcgi', PHP_BINARY));
         }
     }
 
@@ -156,7 +156,15 @@ class PhpCliBinaryTest extends TestCase
     {
         $this->assertTrue((new PhpCliBinary(null))->isCli());
         $this->assertFalse($this->fpm(null)->isCli());
-        $this->assertFalse(new PhpCliBinary(null, 'cli-server', PHP_BINARY)->isCli());
+        $this->assertFalse(new PhpCliBinary(null, 'cgi-fcgi', PHP_BINARY)->isCli());
+    }
+
+    /** `php -S` (artisan serve, the browser-spec server) runs in the CLI binary itself, whose PHP_BINARY is that CLI. */
+    public function test_the_built_in_server_runs_its_own_cli_binary_without_configuration(): void
+    {
+        $server = new PhpCliBinary(null, 'cli-server', '/opt/running/php');
+        $this->assertTrue($server->isCli());
+        $this->assertSame('/opt/running/php', $server->path());
     }
 
     public function test_failing_or_malformed_probes_are_refused(): void

@@ -1,0 +1,22 @@
+$ php docs/verification/php-cli-resolver-20261009/independent-review/probes/compare.php
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:11:06Z
+free             cli=c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b fpm=c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b fpm+record=c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b stored=c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b  identical=yes
+  cli argv0=/usr/bin/php8.4 (renderer built /usr/bin/php8.4, factory none)
+  fpm argv0=/usr/bin/php8.4 (renderer built /usr/sbin/php-fpm8.4, factory closure)
+  argv[1..] identical=yes (41 args) cwd identical=yes timeout cli=60 fpm=60 stdin identical=yes
+  child env cli={"LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}","LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu"}
+  child env fpm={"LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu","LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}"}  identical=yes
+production-free  cli=024b4fc926fd3edf23173b729c06005f966f6b174d0fb237adc2ff565532b11d fpm=024b4fc926fd3edf23173b729c06005f966f6b174d0fb237adc2ff565532b11d fpm+record=024b4fc926fd3edf23173b729c06005f966f6b174d0fb237adc2ff565532b11d stored=024b4fc926fd3edf23173b729c06005f966f6b174d0fb237adc2ff565532b11d  identical=yes
+  cli argv0=/usr/bin/php8.4 (renderer built /usr/bin/php8.4, factory none)
+  fpm argv0=/usr/bin/php8.4 (renderer built /usr/sbin/php-fpm8.4, factory closure)
+  argv[1..] identical=yes (41 args) cwd identical=yes timeout cli=60 fpm=60 stdin identical=yes
+  child env cli={"LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}","LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu"}
+  child env fpm={"LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu","LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}"}  identical=yes
+paid             cli=208411902445f55a0c6d59994d02b5ae089dcfc804757557b5042e50bbdb6d2c fpm=208411902445f55a0c6d59994d02b5ae089dcfc804757557b5042e50bbdb6d2c fpm+record=208411902445f55a0c6d59994d02b5ae089dcfc804757557b5042e50bbdb6d2c stored=208411902445f55a0c6d59994d02b5ae089dcfc804757557b5042e50bbdb6d2c  identical=yes
+  cli argv0=/usr/bin/php8.4 (renderer built /usr/bin/php8.4, factory none)
+  fpm argv0=/usr/bin/php8.4 (renderer built /usr/sbin/php-fpm8.4, factory closure)
+  argv[1..] identical=yes (41 args) cwd identical=yes timeout cli=60 fpm=60 stdin identical=yes
+  child env cli={"LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}","LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu"}
+  child env fpm={"LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu","LANG":"C","LC_ALL":"C","TZ":"UTC","TMPDIR":"{workspace}"}  identical=yes
+generic          cli=790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf fpm=790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf fpm+record=- stored=(n/a)  identical=yes
+# rc=0

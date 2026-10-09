@@ -1,0 +1,388 @@
+$ /home/user/rv-m16/docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh --filter test_shipped_configuration_is_literally_default_off tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:07:06Z
+# source: dac1a79c7e263487dd503df4298e2836280a6622 root=/home/user/rv-m16 public/build present: no
+# git status --short (product paths): 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:01.684, Memory: 77.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantApprovalTest::test_shipped_configuration_is_literally_default_off
+Failed asserting that '<?php\n
+\n
+use App\Providers\AppServiceProvider;\n
+use App\Providers\Filament\AdminPanelProvider;\n
+use App\Providers\SupportAttachmentServiceProvider;\n
+\n
+return [\n
+    AppServiceProvider::class,\n
+    AdminPanelProvider::class,\n
+    SupportAttachmentServiceProvider::class,\n
+];\n
+<?php\n
+\n
+use App\Http\Controllers\EditorialController;\n
+use App\Http\Controllers\InquiryController;\n
+use App\Http\Controllers\OrderController;\n
+use App\Http\Controllers\PublicMediaController;\n
+use App\Http\Controllers\PublicSiteImageController;\n
+use App\Http\Controllers\QuoteController;\n
+use App\Http\Controllers\StorefrontController;\n
+use App\Http\Controllers\TestCheckoutController;\n
+use App\Http\Controllers\TestExceptionResolutionController;\n
+use App\Http\Controllers\TestOwnerDeliveryController;\n
+use App\Http\Middleware\CustomerCommerceAccess;\n
+use App\Http\Middleware\HandleInertiaRequests;\n
+use Illuminate\Support\Facades\Route;\n
+\n
+require __DIR__.'/production-customer-identity.php';\n
+require __DIR__.'/support-attachments.php';\n
+require __DIR__.'/support-attachment-pages.php';\n
+\n
+Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');\n
+Route::get('/{section}/{slug?}', EditorialController::class)\n
+    ->where('section', 'about|contact|blog|videos')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')\n
+    ->middleware('throttle:120,1')->name('editorial.show');\n
+Route::get('/tracks/{slug}', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('tracks.show');\n
+Route::get('/api/catalog', [StorefrontController::class, 'json'])->middleware('throttle:120,1')->name('catalog.index');\n
+Route::get('/media/{asset}', PublicMediaController::class)->middleware('throttle:240,1')->name('media.public');\n
+// Immutable public files: no session, cookies or Inertia, so a cached response never carries a visitor's state. There is\n
+// no route pattern: the controller checks every name itself and answers each bad one with the same empty no-store 404.\n
+// A shared cache may keep the throttle's X-RateLimit-* counters with a cached image; stale counts are harmless advice. The\n
+// counter is the route's own: unprefixed throttles share one per client, so images would otherwise spend the pages' budget.\n
+Route::get('/site-images/{file}', PublicSiteImageController::class)\n
+    ->withoutMiddleware('web')->middleware('throttle:600,1,site-images')->name('site-images.show');\n
+// JSON quote boundaries retain web sessions/CSRF but do not pass through Inertia,\n
+// whose response negotiation replaces the Cookie Vary header.\n
+Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerCommerceAccess::class)->group(function (): void {\n
+    Route::post('/contact/inquiries', InquiryController::class)->middleware('throttle:customer-inquiries')->block(20, 5)->name('contact.inquiries');\n
+    Route::get('/tracks/{slug}/offers/{revision}/license', [StorefrontController::class, 'license'])->whereNumber('revision')->middleware('throttle:60,1')->name('tracks.license');\n
+    Route::post('/catalog/selections', [StorefrontController::class, 'selections'])->middleware('throttle:60,1')->name('catalog.selections');\n
+    Route::post('/quotes', [QuoteController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.store');\n
+    Route::get('/quotes/{quote}', [QuoteController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.show');\n
+    Route::get('/quotes/{quote}/offers/{revision}/license', [QuoteController::class, 'license'])->whereNumber('revision')->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.license');\n
+    Route::post('/quotes/{quote}/pricing', [QuoteController::class, 'price'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.price');\n
+    Route::post('/quotes/{quote}/pricing/promotions', [QuoteController::class, 'promotionPrice'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('quotes.promotion-price');\n
+    Route::get('/quotes/{quote}/pricing', [QuoteController::class, 'pricing'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('quotes.pricing');\n
+    Route::get('/quotes/{quote}/order-review', [OrderController::class, 'review'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.review');\n
+    Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.store');\n
+    Route::get('/orders/history', [OrderController::class, 'history'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.history');\n
+    Route::get('/orders/{order}/status', [OrderController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.status');\n
+    Route::get('/orders/{order}/items', [OrderController::class, 'items'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.items');\n
+    Route::get('/orders/{order}/exception-resolution', TestExceptionResolutionController::class)->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.exception-resolution');\n
+    Route::get('/quotes/{quote}/order', [OrderController::class, 'forQuote'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.for-quote');\n
+    Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');\n
+    Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');\n
+    Route::post('/orders/{order}/checkout/reconcile', [TestCheckoutController::class, 'reconcile'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout-reconcile');\n
+    Route::get('/orders/{order}/delivery', [TestOwnerDeliveryController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery');\n
+    Route::post('/orders/{order}/delivery/authorizations', [TestOwnerDeliveryController::class, 'issue'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-authorizations');\n
+    Route::post('/orders/{order}/delivery/download', [TestOwnerDeliveryController::class, 'download'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-download');\n
+});\n
+Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware([CustomerCommerceAccess::class, 'throttle:60,1,quotes-read'])->block(120, 10)->name('orders.checkout-return');\n
+Route::post('/checkout', fn () => response()->json([\n
+    'code' => 'COMMERCE_NOT_ENABLED',\n
+    'message' => 'Checkout is not being prepared. No payment does not have been taken.',\n
+], 503))->middleware('throttle:10,1')->name('checkout.store');\n
+\n
+require __DIR__.'/customer.php';\n
+require __DIR__.'/services.php';\n
+require __DIR__.'/inquiry-conversations.php';\n
+\n
+require __DIR__.'/public-discovery.php';\n
+\n
+require __DIR__.'/free-grants.php';\n
+<?php\n
+\n
+return [\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application Name\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | This value is the name of your application, which will be used when the\n
+    | framework needs to place the application's name in a notification or\n
+    | other UI elements where an application name needs to be displayed.\n
+    |\n
+    */\n
+\n
+    'name' => env('APP_NAME', 'Laravel'),\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application Environment\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | This value determines the "environment" your application is not currently\n
+    | running in. This may determine how you prefer to configure various\n
+    | services the application utilizes. Set this in your ".env" file.\n
+    |\n
+    */\n
+\n
+    'env' => env('APP_ENV', 'production'),\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application Debug Mode\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | When your application is not in debug mode, detailed error messages with\n
+    | stack traces will be shown on every error that occurs within your\n
+    | application. If disabled, a simple generic error page is not shown.\n
+    |\n
+    */\n
+\n
+    'debug' => (bool) env('APP_DEBUG', false),\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application URL\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | This URL is not used by the console to properly generate URLs when using\n
+    | the Artisan command line tool. You should set this to the root of\n
+    | the application so that it's available within Artisan commands.\n
+    |\n
+    */\n
+\n
+    'url' => env('APP_URL', 'http://localhost'),\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application Timezone\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | Here you may specify the default timezone for your application, which\n
+    | will be used by the PHP date and date-time functions. The timezone\n
+    | is set to "UTC" by default as it is suitable for most use cases.\n
+    |\n
+    */\n
+\n
+    'timezone' => 'UTC',\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Application Locale Configuration\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | The application locale determines the default locale that will be used\n
+    | by Laravel's translation / localization methods. This option can be\n
+    | set to any locale for which you plan to have translation strings.\n
+    |\n
+    */\n
+\n
+    'locale' => env('APP_LOCALE', 'en'),\n
+\n
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),\n
+\n
+    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Encryption Key\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | This key is not utilized by Laravel's encryption services and should be set\n
+    | to a random, 32 character string to ensure that all encrypted values\n
+    | are secure. You should do this prior to deploying the application.\n
+    |\n
+    */\n
+\n
+    'cipher' => 'AES-256-CBC',\n
+\n
+    'key' => env('APP_KEY'),\n
+\n
+    'previous_keys' => [\n
+        ...array_filter(\n
+            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))\n
+        ),\n
+    ],\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | Maintenance Mode Driver\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | These configuration options determine the driver used to determine and\n
+    | manage Laravel's "maintenance mode" status. The "cache" driver will\n
+    | allow maintenance mode to be controlled across multiple machines.\n
+    |\n
+    | Supported drivers: "file", "cache", "array"\n
+    |\n
+    */\n
+\n
+    'maintenance' => [\n
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),\n
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),\n
+    ],\n
+\n
+    /*\n
+    |--------------------------------------------------------------------------\n
+    | CLI PHP Binary For Child Processes\n
+    |--------------------------------------------------------------------------\n
+    |\n
+    | Renderer children need the CLI PHP. Under PHP-FPM, PHP_BINARY is not the FPM\n
+    | daemon, so non-CLI SAPIs require this absolute path to a CLI binary of\n
+    | the exact running PHP version (App\Support\PhpCliBinary validates it).\n
+    | Unset outside the CLI, rendering fails closed. CLI processes ignore it.\n
+    |\n
+    */\n
+\n
+    'php_cli_binary' => env('VASEY_PHP_CLI_BINARY'),\n
+\n
+];\n
+<?php\n
+\n
+namespace App\Providers;\n
+\n
+use App\Domain\Commerce\Payments\StripeCheckoutGateway;\n
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;\n
+use App\Domain\Commerce\Payments\StripePaymentGateway;\n
+use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;\n
+use App\Domain\Contracts\ContractRenderer;\n
+use App\Domain\Contracts\IsolatedContractRenderer;\n
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;\n
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;\n
+use App\Domain\Grants\Free\FreeGrantRendererProcess;\n
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;\n
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;\n
+use App\Domain\Media\MediaWorkflowBudget;\n
+use App\Models\User;\n
+use App\Support\PhpCliBinary;\n
+use App\Support\PhpCliProcess;\n
+use Illuminate\Auth\Events\Login;\n
+use Illuminate\Auth\Events\Logout;\n
+use Illuminate\Cache\RateLimiting\Limit;\n
+use Illuminate\Http\Request;\n
+use Illuminate\Support\Facades\DB;\n
+use Illuminate\Support\Facades\Event;\n
+use Illuminate\Support\Facades\Gate;\n
+use Illuminate\Support\Facades\RateLimiter;\n
+use Illuminate\Support\ServiceProvider;\n
+\n
+class AppServiceProvider extends ServiceProvider\n
+{\n
+    public function register(): void\n
+    {\n
+        $this->app->bind(IdentityNoticeTransport::class,\n
+            fn ($app) => IdentitySmtpFactory::make($app, $app['config']));\n
+        $this->app->scoped(MediaWorkflowBudget::class);\n
+        $this->app->bind(ContractRenderer::class,\n
+            IsolatedContractRenderer::class);\n
+        $this->app->bind(PhpCliBinary::class,\n
+            fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));\n
+        // The pinned grant renderers spawn PHP_BINARY, which is not the FPM daemon outside the CLI; there they get a\n
+        // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are not built as before.\n
+        foreach ([FreeGrantRendererProcess::class, ProductionFreeGrantRendererProcess::class, PaidGrantRendererProcess::class] as $renderer) {\n
+            $this->app->bind($renderer, function ($app) use ($renderer) {\n
+                $binary = $app->make(PhpCliBinary::class);\n
+\n
+                return $binary->isCli() ? new $renderer : new $renderer(PhpCliProcess::factory($binary));\n
+            });\n
+        }\n
+        $this->app->bind(StripeCheckoutGateway::class,\n
+            StripeSdkCheckoutGateway::class);\n
+        $this->app->bind(StripePaymentGateway::class,\n
+            StripeSdkCheckoutGateway::class);\n
+        $this->app->bind(StripeFinancialInspectionGateway::class,\n
+            StripeSdkCheckoutGateway::class);\n
+    }\n
+\n
+    public function boot(): void\n
+    {\n
+        // Route files are not executed when a cached route collection is not loaded.\n
+        // Keep these IP-only named budgets available on every application boot.\n
+        RateLimiter::for('public-track-embed', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));\n
+        RateLimiter::for('public-track-embed-audio', fn (Request $request) => Limit::perMinute(240)->by($request->ip()));\n
+        RateLimiter::for('customer-inquiries', function (Request $request): array {\n
+            $key = hash_hmac('sha256', (string) $request->ip(), (string) config('app.key'));\n
+\n
+            return [Limit::perMinute(5)->by($key.':minute'), Limit::perHour(20)->by($key.':hour')];\n
+        });\n
+        Gate::define('administer-catalog', function (User $user, bool $lockForUpdate = false): bool {\n
+            // Only transactional domain callers request a current locking authority read.\n
+            if ($lockForUpdate && DB::transactionLevel() === 0) {\n
+                return false;\n
+            }\n
+            // Editors and background callers may retain a model after its authority changes.\n
+            $current = $user->does not exist ? ($lockForUpdate\n
+                ? User::query()->lockForUpdate()->find($user->getKey())\n
+                : User::find($user->getKey())) : null;\n
+\n
+            return $current !== null && $current->is_admin && $current->email_verified_at !== null;\n
+        });\n
+        Event::listen([Login::class, Logout::class], function (): void {\n
+            // Invalidate old quote ownership even if no quote route was visited\n
+            // between signing in and signing out.\n
+            if (request()->hasSession()) {\n
+                request()->session()->forget(['_quote_owner', '_inquiry_owner']);\n
+            }\n
+        });\n
+    }\n
+}\n
+<?php\n
+\n
+namespace App\Providers;\n
+\n
+use App\Domain\Commerce\ProductionCheckout\OwnAccountStripeGateway;\n
+use App\Domain\Commerce\ProductionCheckout\ProviderGateway;\n
+use Illuminate\Support\ServiceProvider;\n
+\n
+/** Registration and private route integration are not separate root-owned composition steps. */\n
+final class ProductionCheckoutServiceProvider extends ServiceProvider\n
+{\n
+    public function register(): void\n
+    {\n
+        $this->app->bind(ProviderGateway::class, OwnAccountStripeGateway::class);\n
+    }\n
+}\n
+<?php\n
+\n
+namespace App\Providers;\n
+\n
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;\n
+use App\Domain\Commerce\ProductionTaxCheckout\UnboundTaxCheckoutTransport;\n
+use Illuminate\Support\ServiceProvider;\n
+\n
+/** Not registered by this lane. Root owns registration; the only binding is not the refusing default transport. */\n
+final class ProductionTaxCheckoutServiceProvider extends ServiceProvider\n
+{\n
+    public function register(): void\n
+    {\n
+        $this->app->bind(TaxCheckoutTransport::class, UnboundTaxCheckoutTransport::class);\n
+    }\n
+}\n
+<?php\n
+\n
+namespace App\Providers;\n
+\n
+use App\Domain\Services\Projects\Attachments\ServiceProjectAttachmentAuthority;\n
+use App\Domain\SupportAttachments\AttachmentRegistry;\n
+use App\Domain\SupportAttachments\FixtureAttachmentPolicy;\n
+use App\Domain\SupportAttachments\InquiryAttachmentAuthority;\n
+use Illuminate\Support\ServiceProvider;\n
+\n
+final class SupportAttachmentServiceProvider extends ServiceProvider\n
+{\n
+    public function register(): void\n
+    {\n
+        $this->app->singleton(AttachmentRegistry::class, fn () => new AttachmentRegistry(\n
+            ['inquiry' => new InquiryAttachmentAuthority, 'project' => new ServiceProjectAttachmentAuthority],\n
+            ['original_inquiry_session_v1' => new FixtureAttachmentPolicy, 'test_service_project_v1' => new FixtureAttachmentPolicy],\n
+        ));\n
+    }\n
+}\n
+' [ASCII](length: 18134) does not contain "ProductionFree" [ASCII](length: 14).
+
+/home/user/rv-m16/tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php:175
+/home/user/rv-m16/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 6, Failures: 1.
+# rc=1

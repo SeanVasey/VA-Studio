@@ -1,0 +1,26 @@
+$ /home/user/rv-m16/docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh --display-skipped tests/Feature/ProductionFreeGrants
+# cwd: /home/user/rv-m16-red  date: 2026-10-09T09:32:19Z
+# source: 214256a474e6913742206cf1e2fd451ec6b91253 root=/home/user/rv-m16-red public/build present: no
+# git status --short (product paths): 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16-red/phpunit.xml
+
+...............................................................  63 / 164 ( 38%)
+............................................................... 126 / 164 ( 76%)
+......SS..............................                          164 / 164 (100%)
+
+Time: 06:26.854, Memory: 235.00 MB
+
+There were 2 skipped tests:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl
+Native schema-global CHECK namespace required.
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest::test_native_temporary_shadow_of_an_owned_table_is_refused
+Native session temporary table resolution required.
+
+OK, but some tests were skipped!
+Tests: 164, Assertions: 1193, Skipped: 2.
+# rc=0

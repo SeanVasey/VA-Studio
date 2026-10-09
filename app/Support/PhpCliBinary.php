@@ -35,10 +35,13 @@ final class PhpCliBinary
         private readonly string $runningBuild = (PHP_ZTS ? '1' : '0').(PHP_DEBUG ? '1' : '0'),
     ) {}
 
-    /** Whether this process is itself the CLI, so its own `PHP_BINARY` can run renderer children unchanged. */
+    /**
+     * Whether this process runs in the CLI binary itself, so its own `PHP_BINARY` can run renderer children unchanged: the
+     * `cli` SAPI, or `cli-server` (`php -S`, `artisan serve`, the browser-spec server), which is the same CLI executable.
+     */
     public function isCli(): bool
     {
-        return $this->sapi === 'cli';
+        return in_array($this->sapi, ['cli', 'cli-server'], true);
     }
 
     /**

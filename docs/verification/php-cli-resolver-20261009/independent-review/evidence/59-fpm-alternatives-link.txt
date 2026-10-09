@@ -1,0 +1,8 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/run-fpm.sh alt /home/user/rv-m16 /usr/bin/php family=free family=generic
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:11:23Z
+# pool alt: PHP 8.4.26 (fpm-fcgi), root=/home/user/rv-m16 (dac1a79c7e26), VASEY_PHP_CLI_BINARY=/usr/bin/php
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php","root":"/home/user/rv-m16","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":true,"sha256":"c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php","root":"/home/user/rv-m16","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf"}
+# rc=0

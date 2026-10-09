@@ -13,7 +13,7 @@ against `main`'s product source (`evidence/fpm-red-main.txt`, `evidence/fpm-red-
 
 ## Change
 
-- `App\Support\PhpCliBinary` (WIP, hardened here). In the CLI it returns `PHP_BINARY` unchanged. Outside the CLI it
+- `App\Support\PhpCliBinary` (WIP, hardened here). In the CLI, and in its built-in server (`cli-server`: `php -S`, `artisan serve`, the browser-spec server; independent review L-2), it returns `PHP_BINARY` unchanged. Outside the CLI it
   requires `VASEY_PHP_CLI_BINARY` (`config('app.php_cli_binary')`): an absolute path without control characters whose
   canonical target is a regular executable file, proved by a `-n -r` probe with a scrubbed environment (`LANG=C`), a
   10 s limit, **at most 128 bytes of output and no stderr** (new), reporting `cli`, exactly the running `PHP_VERSION` and
@@ -68,7 +68,18 @@ CLI hashes: `evidence/*.cli-sha256.txt` and `evidence/cli-generic.txt`.
 | --- | --- | --- |
 | Binding tests red: final tests with `main`'s provider (no bindings) | 9 tests: the 6 Free/Paid tests fail (2 errors, 4 failures); the 3 family-256 tests pass by design; rc 2 | `evidence/binding-red-final.txt` |
 | Same with the final provider, plus the family-256 guards | 13 tests, 183 assertions, rc 0 | `evidence/binding-green-final.txt` |
-| Affected suites (see below) | SUITES_PLACEHOLDER | `evidence/suites-*.txt` |
+| Affected selection (103 files: Free, ProductionFree and Paid families, contract tests, resolver, validator), 3 shards, at `214256a4` | 75 + 557 + 533 = **1,165 tests, 0 failures**; 15 skips, all MySQL-only native cases; rc 0 each | `evidence/suites-214256a-shard-{0,1,2}.txt` |
+| `cli-server` treated as the CLI (review L-2), red | new unit case fails on `0f5890f0`, rc 1 | `evidence/cli-server-red.txt` |
+| Same, green, plus the focused M-16 files (resolver, Free/Paid/production-free CLI renderer, runtime validator, family-256 frozen-bytes and approval guards) | 7 files, 53 tests, 429 assertions, rc 0 each | `evidence/focused-cli-server-final.txt` |
+| Real `php -S` (cli-server) with `VASEY_PHP_CLI_BINARY` unset | free, paid and generic render with the same SHA-256 as the CLI | `evidence/cli-server-green.txt` |
+
+## Independent review
+
+`independent-review/DECISION.md`: **APPROVE WITH CONDITIONS** for a development merge of `214256a4` (the `dac1a79`
+REQUEST CHANGES for binding family 256, H-1, is fixed by `912f1e2`). Conditions C1 (this results row), C2 (CHANGELOG
+and upgrade note) and C3 (PR body) are met in the following commit, which also takes L-2 (`cli-server`) and fixes the
+I-3 docblock. Not taken: I-2 (an in-place rewrite of the binary within one second can reuse a cached validation; the
+binary is root-owned on the host) and L-1's remaining wording is covered by the upgrade note.
 
 ## Not tested
 

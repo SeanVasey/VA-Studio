@@ -1,0 +1,15 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/frozen-guard-mutations.sh
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:39:41Z
+== baseline (no mutation)
+OK (1 test, 73 assertions)
+== mutation: byte copy of a Paid file
+Failed asserting that '<?php\n
+Tests: 1, Assertions: 74, Failures: 1.
+== mutation: byte copy of a Free file (namespace line App\Domain\Grants\Free; has no trailing backslash)
+Failed asserting that an array does not have the key 'ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883'.
+Tests: 1, Assertions: 76, Failures: 1.
+== mutation: Free file copied with only its namespace rewritten
+OK (1 test, 76 assertions)
+== mutation: Paid file copied with only its namespace rewritten
+OK (1 test, 76 assertions)
+# rc=0
