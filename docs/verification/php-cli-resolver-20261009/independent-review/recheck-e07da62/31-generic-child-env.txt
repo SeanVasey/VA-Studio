@@ -1,0 +1,9 @@
+# source: export of e07da62 at /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src-e07; simulated fpm-fcgi resolver bound; rootless stand-in
+App\Domain\Contracts\IsolatedContractRenderer ok 790fd79695a5
+rc=0
+-- generic child env as the stand-in saw it:
+LANG=C
+LC_ALL=C
+LD_LIBRARY_PATH=$S/rootless/opt/lib/x86_64-linux-gnu-real
+TMPDIR=<workspace>
+TZ=UTC

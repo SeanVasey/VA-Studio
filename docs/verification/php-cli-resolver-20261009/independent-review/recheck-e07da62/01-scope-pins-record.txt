@@ -1,0 +1,11 @@
+# 2026-10-09T10:22:08Z commit e07da62f91bcd46685a7ff997dafabf22147ef3c parent 11d907026f42f2f85ae04adb1aaec98563718366
+files outside docs/ changed:
+app/Domain/Contracts/IsolatedContractRenderer.php
+tests/Feature/TestIsolatedContractRendererTest.php
+diff 11d90702..e07da62 -- pins/grants/support/scripts/config/ops/routes/bootstrap/db/env/providers: rc=0 (0=empty)
+diff origin/main(e5e500c)..e07da62 -- resources/contracts: rc=0
+copied review record vs reviewer originals:
+DELTA-DECISION.md identical
+evidence/ identical
+probes/ identical (excluding generic-cli-hash.php, written after the copy)
+0
