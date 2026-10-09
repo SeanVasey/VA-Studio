@@ -1,0 +1,27 @@
+# component at 915ca2c (sha256 b94f29b4f9535b7f) + tests/frontend/paid-grant-review-addendum17.test.tsx (sha256 fdb8f6ea0d8e11c9)
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-review-addendum17.test.tsx
+ ✓ paid-grant-review-addendum17: A: two issued authorizations on one order give one button, and reopening brings back both Download buttons 414ms
+ ✓ paid-grant-review-addendum17: B: issued on two orders gives two buttons; the shown order never has one 211ms
+ ✓ paid-grant-review-addendum17: C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial that drops it 113ms
+ ✓ paid-grant-review-addendum17: D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without distu
+ ✓ paid-grant-review-addendum17: E: with nothing pending the reference form already reopens X and its Download returns (the finding is narrower than stated) 86ms
+ ✓ paid-grant-review-addendum17: F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 160ms
+ ✓ paid-grant-review-addendum17: G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same order (Info: redundant, same
+ × paid-grant-review-addendum17: H (fixed, A16-L1): a refused download kept for retry offers to reopen its order; the retry still needs a saved status read 79ms
+ × paid-grant-review-addendum17: I: a refused kept entry of X while Y is shown gives X a control (after the next render) and never Y 113ms
+ × paid-grant-review-addendum17: J: a refusal then a denial drops the control, the kept entry and any retry 83ms
+ × paid-grant-review-addendum17: K: after reopening, the retry is offered only for a saved read showing that exact authorization unused 82ms
+ ✓ paid-grant-review-addendum17: L: an issued and a refused kept authorization on one order give one control; reopening shows the Download and drops it 138ms
+ ✓ paid-grant-review-addendum17: M: a submitted download whose frame has not answered gives no control, and a retried kept entry stops giving one 146ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected [] to deeply equal [ Array(1) ]
+ ❯ tests/frontend/paid-grant-review-addendum17.test.tsx:240:47
+AssertionError: expected [] to deeply equal [ Array(1) ]
+ ❯ tests/frontend/paid-grant-review-addendum17.test.tsx:274:47
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its author
+ ❯ tests/frontend/paid-grant-review-addendum17.test.tsx:288:12
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its author
+ ❯ tests/frontend/paid-grant-review-addendum17.test.tsx:307:21
+      Tests  4 failed | 9 passed (13)
+rc=1
+restored: git diff --quiet rc=0

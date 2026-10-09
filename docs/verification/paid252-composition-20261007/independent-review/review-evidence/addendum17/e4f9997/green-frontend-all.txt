@@ -1,0 +1,11 @@
+# source e4f9997ec605572144b1ae92c49b29209b728564, clean tracked tree (''), no review probe present; node v24.21.0
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-reopen-issued.test.tsx
+ ✓ reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 349ms
+ ✓ reopens the order of a refused download kept for retry, so the unused authorization can be retried 260ms
+ ✓ drops the reopen control once the authorization is submitted, and a denial drops it with the token 152ms
+      Tests  3 passed (3)
+rc=0
+# npx vitest run
+ Test Files  65 passed (65)
+      Tests  1129 passed (1129)
+rc=0

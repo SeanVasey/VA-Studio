@@ -1,0 +1,8 @@
+# git diff --stat 915ca2c e4f9997 -- app config database routes bootstrap
+rc=0
+# names outside docs/verification
+CHANGELOG.md
+resources/js/components/PaidGrantJourney.tsx
+tests/frontend/paid-grant-reopen-issued.test.tsx
+rc=0
+# HEAD e4f9997ec605572144b1ae92c49b29209b728564
