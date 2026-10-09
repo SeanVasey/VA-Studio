@@ -57,7 +57,7 @@ the harness identity checks skipped: unfixed → refused at the row check (the o
 `prepare` succeeds and `verify prepared` reports 0 updates with originals and guards unchanged. The real browser spec
 still needs CI.
 
-## C. Chromium inquiry retry timeout — patched here (test-only), awaiting CI
+## C. Chromium inquiry retry timeout — fixed here (test-only); passed on Chromium in focused CI
 
 `inquiry-conversation.spec.ts` ran 120.8 s against its 120 s budget. The report's step timeline shows the retried POST
 answered at 36.4 s with 200 and the test then waiting in `await linkedReplay.finished()` (line 164) until the timeout.
@@ -74,8 +74,9 @@ The spec now keeps the status and `cache-control` checks (available as soon as t
 replayed receipt from the page, which renders it only after validating exactly `{ state: 'saved', receipt }` with status
 200/201 and a JSON content type; the existing server proof (`conversation-order-verify`: one inquiry, one context,
 originals unchanged) and the identical-body/same-receipt checks are unchanged. The other Playwright body reads in the
-spec are on responses the page reads with `response.json()` or on direct `page.request` calls. Typecheck passes; the
-spec itself still needs CI (the harness bootstrap needs ClamAV signatures, which cannot be downloaded here).
+spec are on responses the page reads with `response.json()` or on direct `page.request` calls. Typecheck passes. The
+spec passed on Chromium in focused browser run `37951869517` at `5a8f6e2` (Results); one pass is not proof the
+intermittent stall cannot recur, and WebKit and the full Foundation browser jobs have not run it yet.
 
 ## D. WebKit preview playback and offline reload — open
 
@@ -119,6 +120,7 @@ SQLite receipts on this tree yet. MySQL still allows no skips at all; a reviewed
 | Regression test red / green | `0f9b39ce` + test / + fix | 1 failure / OK | `evidence/migration-recompilation-*.txt` |
 | License-draft fixture red / green (relaxed harness) | `0f9b39ce` / + fix | refused / prepared and verified | `evidence/license-draft-fixture-local.txt` |
 | Focused browser feedback `37938110858` (informative) | `e2b3906` | stopped by the workflow's own 720 s command budget before WebKit; Chromium: license-draft spec produced all three recovery screenshots with no failure capture (B fixed in CI); inquiry-conversation failed again (C) | GitHub run artifact |
+| Focused browser feedback `37951869517` (informative) | `5a8f6e2` | all 59 Chromium tests ran with no failure capture, including `inquiry-conversation` (42 s; its server proof records `exactRetry`, one inquiry, originals unchanged); stopped by the workflow's 720 s budget at WebKit test 60 of 118 | GitHub run artifact `focused-browser-37951869517-1` |
 | Chromium stream-response reproduction | pinned Playwright 1.63 / Chromium 1243 | 16/85 stream-reader runs hung, 0/22 `response.json()` | `evidence/chromium-stream-response-repro.*` |
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
