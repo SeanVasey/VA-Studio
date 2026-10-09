@@ -110,7 +110,11 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  timeout: 90m
+  # Four shards of the reviewed native selection (1703 cases): 324 to 349 FinalizationDatabaseMigrations cases
+  # per shard, about 189 to 204 minutes at the 35 s measured on GitHub, before the other 49 to 126 cases.
+  # Unmeasured on GitLab. A runner's own maximum (GitLab.com documents 3 hours for hosted runners) still
+  # applies, so four shards may not fit; more shards would need a reviewed count change.
+  timeout: 240m
   parallel:
     matrix:
       - SHARD: ['1', '2', '3', '4']

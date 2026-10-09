@@ -14,8 +14,9 @@ file is an input to that partition and changes only through review.
 
 With --mysql-native-selection (MySQL only), discovery stays complete, but only the files
 selected by the reviewed scripts/ci/database-mysql-selection.json are partitioned: every
-file owning a method from the reviewed SQLite skip census, plus every file whose
-repository path matches the policy's migration file pattern. The proof then requires
+file owning a method from the reviewed SQLite skip census, every file whose repository
+path matches the policy's migration file pattern, and every file in the policy's reviewed
+include_files list (each must be discovered). The proof then requires
 every selected case exactly once, and the manifest keeps the complete source census.
 
 CLI contract: https://docs.phpunit.de/en/12.5/textui.html#listing-tests
@@ -181,6 +182,8 @@ class Selection:
     skip_pairs: set[tuple[str, str]]
     policy_sha256: str
     sqlite_skip_policy_sha256: str
+    # Reviewed repository paths selected explicitly: native-only proofs that SQLite reaches through a fallback.
+    include_files: tuple[str, ...] = ()
 
 
 def read_selection(root: Path) -> Selection:
@@ -190,7 +193,7 @@ def read_selection(root: Path) -> Selection:
         policy = json.loads(raw)
     except ValueError as error:
         raise PartitionError("MySQL selection policy is not valid JSON") from error
-    if (not isinstance(policy, dict) or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern"}
+    if (not isinstance(policy, dict) or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern", "include_files"}
             or not is_count(policy["schema_version"], 1) or policy["schema_version"] != 1
             or policy["purpose"] != "reviewed-mysql-native-selection" or policy["sqlite_skip_policy"] != SQLITE_SKIP_POLICY
             or not isinstance(policy["file_pattern"], str) or not policy["file_pattern"].startswith("^")
@@ -200,6 +203,11 @@ def read_selection(root: Path) -> Selection:
         re.compile(policy["file_pattern"])
     except re.error as error:
         raise PartitionError("MySQL selection file pattern does not compile") from error
+    include = policy["include_files"]
+    if (not isinstance(include, list)
+            or not all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_/]+\.php", name) and ".." not in name for name in include)
+            or include != sorted(set(include))):
+        raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
     skip_raw = (root / SQLITE_SKIP_POLICY).read_bytes()
     try:
         census = json.loads(skip_raw)
@@ -216,14 +224,15 @@ def read_selection(root: Path) -> Selection:
                 or tuple(pair) in pairs):
             raise PartitionError("Invalid or duplicate SQLite skip method")
         pairs.add(tuple(pair))
-    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest())
+    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest(), tuple(include))
 
 
 def select_native(source: Inventory, selection: Selection) -> Inventory:
     """Restrict the complete inventory to whole files that MySQL must prove.
 
-    A file is selected when it owns a reviewed SQLite-skipped (class, method) pair or its
-    repository path matches the reviewed migration file pattern. Every expanded case and
+    A file is selected when it owns a reviewed SQLite-skipped (class, method) pair, its
+    repository path matches the reviewed migration file pattern, or the reviewed include
+    list names it. A listed file that PHPUnit did not discover is refused. Every expanded case and
     group of a selected file is kept, so the file still runs exactly as it was discovered.
     """
     discovered = set(source.methods.values())
@@ -231,6 +240,10 @@ def select_native(source: Inventory, selection: Selection) -> Inventory:
         raise PartitionError("Reviewed SQLite skip policy contains an undiscovered method")
     files = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.skip_pairs}
     files |= {file for file in source.files if re.fullmatch(selection.pattern, file)}
+    missing = set(selection.include_files) - source.files
+    if missing:
+        raise PartitionError("Reviewed MySQL include file was not discovered: " + ", ".join(sorted(missing)))
+    files |= set(selection.include_files)
     if not files:
         raise PartitionError("The MySQL-native selection is empty")
     cases = {identifier: file for identifier, file in source.cases.items() if file in files}

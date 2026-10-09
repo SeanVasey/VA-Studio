@@ -2,5 +2,19 @@
   "schema_version": 1,
   "purpose": "reviewed-mysql-native-selection",
   "sqlite_skip_policy": "scripts/ci/database-sqlite-skips.json",
-  "file_pattern": "^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\\.php$"
+  "file_pattern": "^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\\.php$",
+  "include_files": [
+    "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+    "tests/Feature/LicenseTemplateAuthoringTest.php",
+    "tests/Feature/PrivateProductDraftSchemaTest.php",
+    "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+    "tests/Feature/ReviewedLicenseDraftTest.php",
+    "tests/Feature/ReviewedOfferDraftTest.php",
+    "tests/Feature/ServiceProjectSchemaTest.php",
+    "tests/Feature/SupportAttachmentSchemaTest.php",
+    "tests/Unit/SchemaQualifierDelimiterTest.php"
+  ]
 }

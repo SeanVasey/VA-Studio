@@ -37,14 +37,19 @@ def listing(rows):
     return ET.tostring(root)
 
 
-# The committed, reviewed MySQL-native selection pattern; fixtures exercise the real policy.
-PATTERN = receipt.mysql_selection_pattern(Path(__file__).resolve().parents[2])
+# The committed, reviewed MySQL-native selection pattern; fixtures exercise the real pattern
+# with a synthetic reviewed include list, since the committed list names real test files.
+COMMITTED_SELECTION = receipt.mysql_selection(Path(__file__).resolve().parents[2])
+PATTERN = COMMITTED_SELECTION["file_pattern"]
+INCLUDED = "tests/Feature/SyntheticDriverBranchTest.php"
+SELECTION = {"file_pattern": PATTERN, "include_files": (INCLUDED,)}
 ROWS = [("Tests\\Feature\\Synthetic" + str(index) + "Test", f"tests/Feature/Synthetic{index}Test.php", "test_retained", None) for index in range(8)]
 ROWS += [("Tests\\Feature\\Synthetic" + str(index) + "MigrationTest", f"tests/Feature/Synthetic{index}MigrationTest.php", "test_schema", None) for index in range(8)]
 ROWS.append((SKIP[0], "tests/Feature/SyntheticMysqlTest.php", SKIP[1], "lock & \"quoted\"\nlabel"))
-# MySQL runs only files owning a reviewed SQLite skip plus migration files: nine of seventeen here.
-SELECTED_ROWS = [row for row in ROWS if (row[0], row[2]) == SKIP or re.fullmatch(PATTERN, row[1])]
-MIGRATION_ROWS = [row for row in SELECTED_ROWS if (row[0], row[2]) != SKIP]
+ROWS.append(("Tests\\Feature\\SyntheticDriverBranchTest", INCLUDED, "test_native_branch", None))
+# MySQL runs only files owning a reviewed SQLite skip, migration files and reviewed include files: ten of eighteen here.
+SELECTED_ROWS = [row for row in ROWS if (row[0], row[2]) == SKIP or re.fullmatch(PATTERN, row[1]) or row[1] == INCLUDED]
+MIGRATION_ROWS = [row for row in SELECTED_ROWS if re.fullmatch(PATTERN, row[1])]
 
 
 def selection_block(rows):
@@ -124,7 +129,7 @@ def evidence(engine, shard, alternate=False, *, count=None, mysql_rows=None):
     value = {"schema_version": 1, "purpose": "database-job-receipt-not-acceptance", "engine": engine, "shard": shard,
              "source": source(), "runtime": runtime(engine), "runtime_sha256": receipt.digest(receipt.canonical(runtime(engine))),
              "test_step_outcome": "success", "started_at": initial["started_at"], "finished_at": (now - timedelta(seconds=5)).isoformat(),
-             **receipt.database_evidence(files, source(), engine, shard, {SKIP}, shard_count=count, selection_pattern=PATTERN)}
+             **receipt.database_evidence(files, source(), engine, shard, {SKIP}, shard_count=count, selection=SELECTION)}
     files[f"{prefix}-{shard}-receipt.json"] = receipt.canonical(value)
     return files
 
@@ -217,22 +222,63 @@ class ParsingTests(unittest.TestCase):
             receipt.junit(results(ROWS), expected, ROOT, "sqlite", {SKIP})
         with self.assertRaises(receipt.ReceiptError):
             receipt.database_evidence(evidence("mysql", 1), source(), "mysql", 1, {SKIP, ("RemovedTest", "test_removed")},
-                                      shard_count=receipt.COUNTS["mysql"], selection_pattern=PATTERN)
+                                      shard_count=receipt.COUNTS["mysql"], selection=SELECTION)
+
+
+original_evidence = receipt.database_evidence
 
 
 class NativeSelectionTests(unittest.TestCase):
-    def verify(self, files, engine="mysql", shard=1, pattern=PATTERN):
-        return receipt.database_evidence(files, source(), engine, shard, {SKIP}, shard_count=receipt.COUNTS[engine], selection_pattern=pattern)
+    def verify(self, files, engine="mysql", shard=1, selection=SELECTION):
+        return receipt.database_evidence(files, source(), engine, shard, {SKIP}, shard_count=receipt.COUNTS[engine], selection=selection)
 
     def test_committed_policy_selects_whole_census_owning_and_migration_files(self):
         full = receipt.inventory(listing(ROWS), ROOT)
-        selected = receipt.native_selection(full, {SKIP}, PATTERN)
+        selected = receipt.native_selection(full, {SKIP}, SELECTION)
         self.assertEqual({row[1] for row in SELECTED_ROWS}, set(selected.values()))
-        self.assertEqual(9, len(selected))
+        self.assertEqual(10, len(selected))
+        self.assertIn(INCLUDED, selected.values())
         self.assertNotIn("tests/Feature/Synthetic0Test.php", selected.values())
         self.verify(evidence("mysql", 1))
         with self.assertRaisesRegex(receipt.ReceiptError, "Missing MySQL selection policy"):
-            self.verify(evidence("mysql", 1), pattern=None)
+            self.verify(evidence("mysql", 1), selection=None)
+        with self.assertRaisesRegex(receipt.ReceiptError, "Missing MySQL selection policy"):
+            self.verify(evidence("mysql", 1), selection={"file_pattern": PATTERN, "include_files": [INCLUDED]})
+
+    def test_reviewed_include_file_missing_from_discovery_rejects(self):
+        full = receipt.inventory(listing(ROWS), ROOT)
+        with self.assertRaisesRegex(receipt.ReceiptError, "include file is not in the complete inventory"):
+            receipt.native_selection(full, {SKIP}, {"file_pattern": PATTERN, "include_files": (INCLUDED, "tests/Feature/GoneTest.php")})
+        # The same refusal reaches the shard verifier.
+        with self.assertRaisesRegex(receipt.ReceiptError, "include file is not in the complete inventory"):
+            self.verify(evidence("mysql", 1), selection={"file_pattern": PATTERN, "include_files": ("tests/Feature/GoneTest.php",)})
+
+    def test_mysql_partition_without_the_reviewed_include_file_rejects(self):
+        # Archives built by a sharder that ignored the include list: internally coherent, but the
+        # verifier's recomputation from the committed policy still selects the listed file.
+        without = {"file_pattern": PATTERN, "include_files": ()}
+        with patch.object(receipt, "database_evidence", wraps=lambda *a, **k: original_evidence(*a, **(k | {"selection": without}))):
+            files = evidence("mysql", 1, mysql_rows=[row for row in SELECTED_ROWS if row[1] != INCLUDED])
+        with self.assertRaisesRegex(receipt.ReceiptError, "Partition loses or duplicates"):
+            self.verify(files)
+
+    def test_committed_selection_policy_include_list_is_sorted_unique_existing_and_validated(self):
+        repository = Path(__file__).resolve().parents[2]
+        include = COMMITTED_SELECTION["include_files"]
+        self.assertTrue(include)
+        self.assertEqual(list(include), sorted(set(include)))
+        for name in include:
+            self.assertTrue((repository / name).is_file(), name)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "scripts/ci").mkdir(parents=True)
+            valid = json.loads((repository / receipt.SELECTION_POLICY).read_text())
+            for bad in ({**valid, "include_files": list(reversed(valid["include_files"]))}, {**valid, "include_files": valid["include_files"][:1] * 2},
+                        {**valid, "include_files": ["tests/../app/X.php"]}, {**valid, "include_files": "tests/A.php"},
+                        {key: value for key, value in valid.items() if key != "include_files"}):
+                (root / receipt.SELECTION_POLICY).write_text(json.dumps(bad))
+                with self.subTest(bad=bad.get("include_files")), self.assertRaises(receipt.ReceiptError):
+                    receipt.mysql_selection(root)
 
     def test_mysql_partition_missing_a_selected_case_rejects(self):
         files = evidence("mysql", 2)
@@ -253,7 +299,7 @@ class NativeSelectionTests(unittest.TestCase):
         with self.assertRaisesRegex(receipt.ReceiptError, "Partition loses or duplicates"):
             self.verify(files)
         # A complete MySQL partition whose manifest claims the whole census as its selection is refused too.
-        with patch.object(receipt, "native_selection", side_effect=lambda full, pairs, pattern: dict(full["cases"])):
+        with patch.object(receipt, "native_selection", side_effect=lambda full, pairs, selection: dict(full["cases"])):
             files = evidence("mysql", 1, mysql_rows=ROWS)
         with self.assertRaisesRegex(receipt.ReceiptError, "Partition loses or duplicates"):
             self.verify(files)
@@ -288,7 +334,7 @@ class NativeSelectionTests(unittest.TestCase):
 
     def test_sqlite_path_is_unchanged_complete_and_rejects_a_selection(self):
         for shard in (1, 2):
-            value = self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard, pattern=None)
+            value = self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard, selection=None)
             self.assertEqual(value["source_census"], receipt.census(receipt.inventory(listing(ROWS), ROOT)))
         self.assertEqual(len(ROWS) - 1, sum(self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard)["results"]["executed_cases"] for shard in (1, 2)))
         files = evidence("sqlite", 1)
@@ -342,7 +388,7 @@ class NativeSelectionTests(unittest.TestCase):
 class CollectorTests(unittest.TestCase):
     def collect(self, api):
         with patch.object(receipt, "source_identity", return_value=source()), patch.object(receipt, "sqlite_skip_pairs", return_value={SKIP}), \
-                patch.object(receipt, "mysql_selection_pattern", return_value=PATTERN), \
+                patch.object(receipt, "mysql_selection", return_value=SELECTION), \
                 patch.object(receipt, "validate_discovered_files"), patch.object(receipt, "locked_dependencies", return_value=({}, runtime("mysql")["dependencies"])):
             return receipt.collect(Path(ROOT), {}, api)
 
@@ -528,16 +574,39 @@ class CollectorTests(unittest.TestCase):
     def test_a_sqlite_skipped_identity_not_executed_on_mysql_rejects_even_when_selection_agrees(self):
         # Forge a coherent world whose selection omits the census-owning file: every per-shard proof
         # and the selection equality then pass, so only the cross-engine invariant can refuse it.
-        def forged(full, pairs, pattern):
-            return {key: owner for key, owner in full["cases"].items() if re.fullmatch(pattern, owner)}
+        def forged(full, pairs, selection):
+            return {key: owner for key, owner in full["cases"].items() if re.fullmatch(selection["file_pattern"], owner)}
         with patch.object(receipt, "native_selection", side_effect=forged):
             api = FakeGithub(mysql_rows=MIGRATION_ROWS)
             with self.assertRaisesRegex(receipt.ReceiptError, "SQLite-skipped identity was not executed on MySQL"):
                 self.collect(api)
 
+    def test_collector_recomputes_the_mysql_selection_instead_of_trusting_the_executed_shards(self):
+        # Every per-shard proof is forged to accept a selection without the reviewed include file, so
+        # only the collector's own recomputation from the committed policy can notice it never ran.
+        without = {"file_pattern": PATTERN, "include_files": ()}
+        def forged(*args, **kwargs):
+            return original_evidence(*args, **(kwargs | {"selection": without} if args[2] == "mysql" else kwargs))
+        with patch.object(receipt, "database_evidence", side_effect=forged):
+            api = FakeGithub(mysql_rows=[row for row in SELECTED_ROWS if row[1] != INCLUDED])
+            with self.assertRaisesRegex(receipt.ReceiptError, "Actual MySQL shard executions differ from the MySQL-native selection"):
+                self.collect(api)
+
+    def test_collector_requires_the_mysql_executed_case_total_to_equal_the_selection(self):
+        # Receipts that coherently under-report one executed MySQL case must not satisfy the gate.
+        def under_reported(*args, **kwargs):
+            value = original_evidence(*args, **kwargs)
+            if args[2] == "mysql" and args[3] == 1:
+                value["results"] = value["results"] | {"executed_cases": value["results"]["executed_cases"] - 1}
+            return value
+        with patch.object(receipt, "database_evidence", side_effect=under_reported):
+            api = FakeGithub()
+            with self.assertRaisesRegex(receipt.ReceiptError, "MySQL did not execute the complete MySQL-native selection"):
+                self.collect(api)
+
     def test_mysql_executions_must_equal_the_selection_not_the_complete_census(self):
         # Every MySQL archive individually claims the complete census as its selection (a forged policy).
-        def complete(full, pairs, pattern):
+        def complete(full, pairs, selection):
             return dict(full["cases"])
         with patch.object(receipt, "native_selection", side_effect=complete):
             api = FakeGithub(mysql_rows=ROWS)

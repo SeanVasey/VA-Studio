@@ -379,10 +379,10 @@ def sqlite_skip_pairs(root: Path) -> set[tuple[str, str]]:
     return result
 
 
-def mysql_selection_pattern(root: Path) -> str:
-    """Return the committed, reviewed migration file pattern of the MySQL-native selection policy."""
+def mysql_selection(root: Path) -> dict:
+    """Return the committed, reviewed MySQL-native selection rules: migration file pattern and include list."""
     value = json_data(read_file(root / SELECTION_POLICY))
-    require(isinstance(value, dict) and set(value) == {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern"}
+    require(isinstance(value, dict) and set(value) == {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern", "include_files"}
             and type(value["schema_version"]) is int and value["schema_version"] == 1
             and value["purpose"] == "reviewed-mysql-native-selection" and value["sqlite_skip_policy"] == SQLITE_SKIP_POLICY
             and isinstance(value["file_pattern"], str) and value["file_pattern"].startswith("^")
@@ -391,19 +391,29 @@ def mysql_selection_pattern(root: Path) -> str:
         re.compile(value["file_pattern"])
     except re.error as error:
         raise ReceiptError("MySQL selection file pattern does not compile") from error
-    return value["file_pattern"]
+    include = value["include_files"]
+    require(isinstance(include, list)
+            and all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_/]+\.php", name) is not None and ".." not in name for name in include)
+            and include == sorted(set(include)), "MySQL selection include_files must be sorted, unique repository test paths")
+    return {"file_pattern": value["file_pattern"], "include_files": tuple(include)}
 
 
-def native_selection(full: dict, skip_pairs: set[tuple[str, str]], pattern: str) -> dict[str, str]:
+def native_selection(full: dict, skip_pairs: set[tuple[str, str]], selection: dict | None) -> dict[str, str]:
     """Recompute the MySQL-native cases (identifier -> owning file) from the complete inventory.
 
-    Whole files are selected: each file owning a reviewed SQLite-skipped method, plus each
-    file whose repository path matches the reviewed migration pattern.
+    Whole files are selected: each file owning a reviewed SQLite-skipped method, each file whose
+    repository path matches the reviewed migration pattern, and each reviewed include-list file.
+    A listed file that is not in the complete inventory is refused.
     """
-    require(isinstance(pattern, str) and pattern, "Missing MySQL selection policy")
+    require(isinstance(selection, dict) and set(selection) == {"file_pattern", "include_files"}
+            and isinstance(selection["file_pattern"], str) and selection["file_pattern"]
+            and isinstance(selection["include_files"], tuple), "Missing MySQL selection policy")
     require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
+    discovered = set(full["cases"].values())
+    require(set(selection["include_files"]) <= discovered, "Reviewed MySQL include file is not in the complete inventory")
     files = {owner for identifier_, owner in full["cases"].items() if full["methods"][identifier_] in skip_pairs}
-    files |= {owner for owner in set(full["cases"].values()) if re.fullmatch(pattern, owner)}
+    files |= {owner for owner in discovered if re.fullmatch(selection["file_pattern"], owner)}
+    files |= set(selection["include_files"])
     selected = {identifier_: owner for identifier_, owner in full["cases"].items() if owner in files}
     require(selected, "Empty MySQL-native selection")
     return selected
@@ -479,14 +489,14 @@ def evidence_names(engine: str, shard: int, *, shard_count: int) -> set[str]:
 
 
 def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard: int, skip_pairs: set[tuple[str, str]], *, shard_count: int,
-                      selection_pattern: str | None = None) -> dict:
+                      selection: dict | None = None) -> dict:
     evidence_names(engine, shard, shard_count=shard_count)
     prefix = "phpunit-ci-" + engine
     full = inventory(files[prefix + "-source-tests.xml"], source["checkout_root"])
     require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
     # SQLite partitions the complete inventory. MySQL partitions only the selection recomputed
     # here from the complete inventory and the committed policies; the manifest is not trusted.
-    target_cases = full["cases"] if engine == "sqlite" else native_selection(full, skip_pairs, selection_pattern)
+    target_cases = full["cases"] if engine == "sqlite" else native_selection(full, skip_pairs, selection)
     target_groups = full["groups"] if engine == "sqlite" else Counter(
         {key: value for key, value in full["groups"].items() if key[1] in target_cases})
     shards = [inventory(files[f"{prefix}-{index}-tests.xml"], source["checkout_root"]) for index in range(1, shard_count + 1)]
@@ -574,7 +584,7 @@ def finish(root: Path, engine: str, shard: int, env: dict) -> None:
              "test_step_outcome": "success", "started_at": initial["started_at"],
              "finished_at": datetime.now(timezone.utc).isoformat(),
              **database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=COUNTS[engine],
-                                 selection_pattern=mysql_selection_pattern(root) if engine == "mysql" else None)}
+                                 selection=mysql_selection(root) if engine == "mysql" else None)}
     write_json(root / (prefix + "-receipt.json"), value)
 
 
@@ -744,7 +754,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
                     and receipt["runtime"]["dependencies"]["composer_lock_sha256"] == source["policy_sha256"]["composer.lock"],
                     "Runtime dependency references differ from the actual committed lock")
             proof = database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=count,
-                                      selection_pattern=mysql_selection_pattern(root) if engine == "mysql" else None)
+                                      selection=mysql_selection(root) if engine == "mysql" else None)
             require(all(receipt.get(key) == value for key, value in proof.items()), "Database receipt does not match retained inventories and results")
             executed[engine].append(inventory(files[f"phpunit-ci-{engine}-{shard}-tests.xml"], source["checkout_root"]))
             initial = json_data(files[prefix + "-start.json"])
@@ -772,7 +782,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
     full = inventory(files["phpunit-ci-sqlite-source-tests.xml"], source["checkout_root"])
     full_ids = set(full["cases"])
     # Recompute the MySQL-native selection from the shared complete census and committed policies.
-    selected_ids = set(native_selection(full, sqlite_skip_pairs(root), mysql_selection_pattern(root)))
+    selected_ids = set(native_selection(full, sqlite_skip_pairs(root), mysql_selection(root)))
     expected_ids = {"sqlite": full_ids, "mysql": selected_ids}
     for engine, inventories in executed.items():
         observed = Counter(identifier_ for item in inventories for identifier_ in item["cases"])
@@ -794,7 +804,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
             "source": source, "artifacts": artifact_proof, "database_receipts": receipts,
             "sqlite_skip_policy": "exact identities match reviewed MySQL-only methods; JUnit cannot distinguish skip from incomplete; all counterparts executed on MySQL",
             "mysql_scope": "SQLite executed every source case exactly once (less reviewed skips); MySQL executed exactly the reviewed "
-                           "native selection (files owning SQLite-skipped methods plus migration test files) once, with zero skips",
+                           "native selection (files owning SQLite-skipped methods, migration test files and the reviewed include list) once, with zero skips",
             "shadow": shadow_decision()}
 
 

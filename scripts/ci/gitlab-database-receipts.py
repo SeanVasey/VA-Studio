@@ -148,7 +148,7 @@ def start(root: Path, engine: str, shard: int, env: dict) -> None:
 
 def evidence(files: dict, identity: dict, checkout_root: str, engine: str, shard: int, root: Path) -> dict:
     return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root), shard_count=COUNTS[engine],
-                                   selection_pattern=proof.mysql_selection_pattern(root) if engine == "mysql" else None)
+                                   selection=proof.mysql_selection(root) if engine == "mysql" else None)
 
 
 def finish(root: Path, engine: str, shard: int, env: dict) -> None:
@@ -362,7 +362,7 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
                           "digest_origin": "computed from authenticated exact-job download; GitLab exposes no archive digest here"})
     proof.require(len({proof.canonical(receipt["source_census"]) for receipt in receipts}) == 1, "Different complete source censuses")
     # SQLite must execute the complete census; MySQL exactly the selection recomputed from it and the committed policies.
-    expected = {"sqlite": set(full["cases"]), "mysql": set(proof.native_selection(full, proof.sqlite_skip_pairs(root), proof.mysql_selection_pattern(root)))}
+    expected = {"sqlite": set(full["cases"]), "mysql": set(proof.native_selection(full, proof.sqlite_skip_pairs(root), proof.mysql_selection(root)))}
     for engine, sets in inventories.items():
         observed = Counter(key for item in sets for key in item["cases"])
         proof.require(observed == Counter({key: 1 for key in expected[engine]}), "Executed partitions lose or duplicate source cases"
@@ -387,7 +387,7 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
             "artifacts": artifacts, "database_receipts": receipts, "reuse_enabled": False,
             "sqlite_skip_policy": "exact reviewed methods only; every counterpart executed on genuine MySQL",
             "mysql_scope": "SQLite executed every source case once (less reviewed skips); genuine MySQL executed exactly the reviewed "
-                           "native selection (files owning SQLite-skipped methods plus migration test files) once, with zero skips"}
+                           "native selection (files owning SQLite-skipped methods, migration test files and the reviewed include list) once, with zero skips"}
 
 
 def main() -> int:

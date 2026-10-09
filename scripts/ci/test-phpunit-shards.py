@@ -197,9 +197,9 @@ class PartitionProofTest(unittest.TestCase):
         groups = Counter({("money", "A::one"): 1, ("native", "C::race"): 1, ("native", "Order::up"): 1})
         return Inventory(cases, groups, methods)
 
-    def native_selection(self, pairs=frozenset({("C", "race")})):
+    def native_selection(self, pairs=frozenset({("C", "race")}), include=()):
         pattern = r"^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$"
-        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64)
+        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64, tuple(include))
 
     def selected_shards(self, target, count):
         assignments = module.partition(target, count)
@@ -218,6 +218,28 @@ class PartitionProofTest(unittest.TestCase):
         self.assertEqual(Counter({("native", "C::race"): 1, ("native", "Order::up"): 1}), target.groups)
         assignments, observed = self.selected_shards(target, 3)
         module.prove(target, assignments, observed)
+
+    def test_reviewed_include_files_are_selected_whole_and_must_be_discovered(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection(include=("tests/B.php",)))
+        self.assertIn("tests/B.php", target.files)
+        self.assertEqual({"C::race", "C::plain", "Order::up", "Ledger::up", "B::one"}, set(target.cases))
+        with self.assertRaisesRegex(PartitionError, "include file was not discovered: tests/Feature/GoneTest.php"):
+            module.select_native(source, self.native_selection(include=("tests/B.php", "tests/Feature/GoneTest.php")))
+
+    def test_selected_partition_missing_a_reviewed_include_file_rejects(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection(include=("tests/B.php",)))
+        assignments, observed = self.selected_shards(target, 2)
+        index = next(i for i, selected in enumerate(assignments) if "tests/B.php" in selected)
+        # The listed file was assigned but its shard did not run it.
+        observed[index].cases.pop("B::one")
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+        # Neither may the partition leave the listed file out altogether.
+        assignments[index] = assignments[index] - {"tests/B.php"}
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
 
     def test_native_selection_rejects_undiscovered_census_methods_and_an_empty_selection(self):
         source = self.native_source()
@@ -259,7 +281,7 @@ class PartitionProofTest(unittest.TestCase):
         (root / "scripts/ci").mkdir(parents=True)
         census = {"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods", "methods": [["C", "race"]]}
         valid = {"schema_version": 1, "purpose": "reviewed-mysql-native-selection", "sqlite_skip_policy": module.SQLITE_SKIP_POLICY,
-                 "file_pattern": "^tests/Feature/[A-Za-z]*MigrationTest\\.php$"}
+                 "file_pattern": "^tests/Feature/[A-Za-z]*MigrationTest\\.php$", "include_files": ["tests/A.php", "tests/Unit/BTest.php"]}
 
         def read(policy, skips=census):
             (root / module.SELECTION_POLICY).write_text(policy if isinstance(policy, str) else json.dumps(policy))
@@ -269,16 +291,26 @@ class PartitionProofTest(unittest.TestCase):
         parsed = read(valid)
         self.assertEqual({("C", "race")}, parsed.skip_pairs)
         self.assertEqual(64, len(parsed.policy_sha256))
+        self.assertEqual(("tests/A.php", "tests/Unit/BTest.php"), parsed.include_files)
         for policy in ["not json", [], {**valid, "schema_version": 2}, {**valid, "schema_version": True}, {**valid, "extra": 1},
                        {**valid, "purpose": "other"}, {**valid, "sqlite_skip_policy": "elsewhere.json"}, {**valid, "file_pattern": "Migration"},
-                       {**valid, "file_pattern": "^tests/(unclosed$"}, {**valid, "file_pattern": 3}]:
+                       {**valid, "file_pattern": "^tests/(unclosed$"}, {**valid, "file_pattern": 3},
+                       {key: value for key, value in valid.items() if key != "include_files"}, {**valid, "include_files": "tests/A.php"},
+                       {**valid, "include_files": ["tests/Unit/BTest.php", "tests/A.php"]}, {**valid, "include_files": ["tests/A.php", "tests/A.php"]},
+                       {**valid, "include_files": ["tests/../app/A.php"]}, {**valid, "include_files": ["app/A.php"]}, {**valid, "include_files": [3]}]:
             with self.assertRaises(PartitionError, msg=str(policy)):
                 read(policy)
         for skips in [{**census, "methods": []}, {**census, "methods": [["C", "race"], ["C", "race"]]}, {**census, "purpose": "other"}]:
             with self.assertRaises(PartitionError, msg=str(skips)):
                 read(valid, skips)
-        committed = module.read_selection(Path(__file__).resolve().parents[2])
+        repository = Path(__file__).resolve().parents[2]
+        committed = module.read_selection(repository)
         self.assertTrue(committed.skip_pairs)
+        # The reviewed include list names existing test files and none the pattern already selects.
+        self.assertTrue(committed.include_files)
+        for name in committed.include_files:
+            self.assertTrue((repository / name).is_file(), name)
+            self.assertIsNone(re.fullmatch(committed.pattern, name), name)
         for selected in ["tests/Feature/PromotionMigrationTest.php", "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
                          "tests/Unit/LedgerMigrationTest.php"]:
             self.assertRegex(selected, committed.pattern)
@@ -299,7 +331,7 @@ class PartitionProofTest(unittest.TestCase):
         (root / "scripts/ci").mkdir(parents=True)
         (root / "phpunit.xml").write_text('<phpunit><testsuites><testsuite name="All"><directory>tests</directory></testsuite></testsuites></phpunit>')
         (root / module.SELECTION_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-native-selection",
-            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "file_pattern": self.native_selection().pattern}))
+            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "file_pattern": self.native_selection().pattern, "include_files": ["tests/B.php"]}))
         (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods",
                                                                  "methods": [["C", "race"]]}))
         source = self.native_source()
@@ -321,7 +353,7 @@ class PartitionProofTest(unittest.TestCase):
 
     def test_selected_manifest_keeps_the_complete_source_census_and_records_the_exact_selection(self):
         source, manifest, stdout, root = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql", "--mysql-native-selection")
-        selected = {name: file for name, file in source.cases.items() if file in {"tests/C.php", "tests/Feature/OrderMigrationTest.php",
+        selected = {name: file for name, file in source.cases.items() if file in {"tests/B.php", "tests/C.php", "tests/Feature/OrderMigrationTest.php",
                                                                                    "tests/Feature/Nested/LedgerMigrationTest.php"}}
         self.assertEqual((len(source.files), len(source.cases)), (manifest["source_files"], manifest["source_test_cases"]))
         self.assertEqual(module.hashlib.sha256(json.dumps(sorted(source.cases.items())).encode()).hexdigest(), manifest["source_case_identity_sha256"])
@@ -329,13 +361,13 @@ class PartitionProofTest(unittest.TestCase):
         self.assertEqual({"policy": module.SELECTION_POLICY,
                           "policy_sha256": module.hashlib.sha256((root / module.SELECTION_POLICY).read_bytes()).hexdigest(),
                           "sqlite_skip_policy_sha256": module.hashlib.sha256((root / module.SQLITE_SKIP_POLICY).read_bytes()).hexdigest(),
-                          "files": 3, "test_cases": 4,
+                          "files": 4, "test_cases": 5,
                           "case_identity_sha256": module.hashlib.sha256(json.dumps(sorted(selected.items())).encode()).hexdigest()}, manifest["selection"])
         self.assertEqual(sorted(set(selected.values())), sorted(file for shard in manifest["shards"] for file in shard["files"]))
-        self.assertIn("Proved 4 selected MySQL-native tests in 3 files (of 9 discovered tests in 6 files)", stdout)
+        self.assertIn("Proved 5 selected MySQL-native tests in 4 files (of 9 discovered tests in 6 files)", stdout)
         for index in (1, 2):
             excluded = {node.text for node in ET.parse(root / f"phpunit-ci-mysql-{index}.xml").getroot().iter("exclude")}
-            self.assertTrue({"tests/A.php", "tests/B.php", "tests/D.phpt"} <= excluded)
+            self.assertTrue({"tests/A.php", "tests/D.phpt"} <= excluded)
 
     def test_without_the_flag_the_manifest_has_no_selection_and_partitions_everything(self):
         source, manifest, stdout, _ = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql")
