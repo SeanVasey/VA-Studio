@@ -77,6 +77,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
+- Staging deployment quiesces controlled application services and writers before candidate allocation/build, then seals generated artifacts before activation. Provisioning rejects unprotected or noncanonical root ancestry before host changes; build failure leaves admission closed for recovery.
 - Staging backup admission refuses multiline environment values and key-looking embedded lines, requires the exact environment hash record, and invalidates stale proof markers. Configuration capture refuses special files without blocking; provisioning and privileged helpers require a nonroot application account.
 - Staging control seals privileged release ancestry before bind/unbind and reserves atomic activation for the root helper. Restore proof normalizes only table column charset rendering, invalidates stale success markers and publishes after verification/cleanup. Same-SHA refresh freezes one admitted environment, preserves the existing key and takes a recoverable pre-change snapshot; recovery never infers stopped writers from a phase flag.
 

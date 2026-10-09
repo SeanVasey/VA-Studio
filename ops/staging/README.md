@@ -39,7 +39,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
-| `validate-runtime.php` | Isolated real Laravel configuration admission before quiesce; rejects key changes | run from the built release |
+| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes | run from each selected release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
 | `env.staging.example` | Every `.env.example` variable with staging-safe values and placeholders | pasted into Forge |
 
@@ -78,7 +78,9 @@ maintenance files remain application writable. This protects deployed source/ven
 bytes after sealing; it does not certify an uncompromised builder or immutable runtime PHP execution.
 Private bind-mounted contents are never traversed or changed by sealing.
 Only the root helper switches `current`. Custom roots must have canonical, root-owned ancestry without
-group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
+group/world write permission before provisioning; nonexistent descendants are created only under that
+protected prefix. App-owned ancestors, symlinks and noncanonical components refuse before host changes.
+Group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
 use a fresh reviewed release and prove sealing/attachment before activation.
 
 Every independently callable helper action holds a separate root-owned `/etc/vasey-staging/ctl.lock`.
@@ -169,14 +171,18 @@ renaming that account breaks every guarded write.
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
    - database cache, queue and sessions; `DB_HOST=127.0.0.1`; not `root`;
    - `MAIL_MAILER=log`; `STRIPE_MODE=test`; no live Stripe key; no production checkout flag.
-   The built release then admits the same copy through real Laravel configuration with inherited application
+   The protected current release, when present, admits the same copy through real Laravel configuration with inherited application
    settings and foreign configuration caches excluded. Duplicate keys, DB URL/socket overrides, production
    credentials and an `APP_KEY` change from the served release refuse before quiesce. The temporary copy is
    removed on exit; a later Forge edit waits for the next deploy attempt.
-2. It makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves it clean (status and tree hash).
+2. It quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
+   app-writable candidate**. It then makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves
+   it clean (status and tree hash). Downtime includes dependency installation and asset compilation.
 3. It runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, then `npm ci && npm run build`. The Vite manifest must exist.
-4. The validated `.env` starts as 0600; `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime exceptions and bind-mounts private storage.
-5. If a release is serving, `vasey-staging-ctl quiesce`:
+4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
+   `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
+   exceptions and bind-mounts private storage.
+5. The early `vasey-staging-ctl quiesce` established:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
@@ -191,6 +197,10 @@ renaming that account breaks every guarded write.
    - runs `artisan up` and requires `GET /` to answer 200, or re-enters maintenance.
 9. It prunes to the newest 3 releases, detaching storage first. **Never `rm -rf` a release by hand**: while
    attached, its `storage/app/private` *is* the persistent store.
+
+Every failure after early quiesce leaves durable writer admission closed for inspected recovery. This
+stops controlled services and runner starts before build exposure; already-running rogue processes or
+manual scripts outside that census must be stopped separately. It does not attest an uncompromised builder.
 
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
 real admission and unchanged key, quiesce, snapshot and restore proof, `ctl configure` captures the private

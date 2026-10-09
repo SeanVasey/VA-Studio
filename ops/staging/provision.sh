@@ -54,10 +54,30 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+root_ancestry() {
+  local cursor=$1 mode
+  # Missing descendants will be created by root. Existing ancestry must already satisfy ctl's boundary.
+  while [ ! -e "$cursor" ]; do
+    [ ! -L "$cursor" ] || die "--root has a dangling ancestor"
+    cursor=$(dirname -- "$cursor")
+  done
+  while :; do
+    [ -d "$cursor" ] && [ ! -L "$cursor" ] && [ "$(readlink -f -- "$cursor")" = "$cursor" ] \
+      && [ "$(stat -c %u "$cursor")" = 0 ] || die "--root requires canonical root-owned ancestry"
+    mode=$(stat -c %a "$cursor")
+    [ "$((8#$mode & 0022))" -eq 0 ] || die "--root ancestry must not be group/world writable"
+    [ "$cursor" != / ] || break
+    cursor=$(dirname -- "$cursor")
+  done
+}
+
 [[ "$HOST" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]] || die "--host must be a lowercase DNS name"
 [[ "$APP_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] && id "$APP_USER" >/dev/null 2>&1 || die "app user '$APP_USER' does not exist"
 [ "$(id -u "$APP_USER")" -gt 0 ] || die "application account must be nonroot"
 [[ "$ROOT" =~ ^/[A-Za-z0-9/_.-]+$ ]] && [[ "$ROOT" != *..* ]] || die "--root must be a plain absolute path"
+[[ "$ROOT" != / && "$ROOT" != */ && "$ROOT" != *//* && "$ROOT" != */./* && "$ROOT" != */. ]] \
+  || die "--root must use canonical components without a trailing slash"
+root_ancestry "$ROOT"
 [[ "$DB_NAME" =~ ^[a-z][a-z0-9_]{0,40}$ ]] || die "--db-name must match ^[a-z][a-z0-9_]{0,40}$"
 [[ "$APP_ENV_EXPECTED" =~ ^(local|staging)$ ]] || die "--app-env must be local or staging"
 APP_GROUP=$(id -gn "$APP_USER")

@@ -11,11 +11,12 @@
 #
 # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
 # It is never served. Each deploy follows docs/ops/production-activation-packet.md §4 (stage S1):
-#   1. a fresh, immutable checkout of the exact SHA in <root>/releases/<SHA>, proven clean;
+#   1. frozen environment checked; controlled services/writers quiesced before a candidate is allocated;
+#      then a fresh checkout of the exact SHA in <root>/releases/<SHA>, proven clean;
 #   2. composer install --no-dev from composer.lock, npm ci && npm run build, Vite manifest present;
 #   3. persistent private storage attached by bind mount (never a symlink), proven by inode;
 #   4. the Forge .env validated for the staging profile and installed 0600;
-#   5. the served release quiesced (maintenance proven by 503, workers, scheduler and PHP-FPM stopped);
+#   5. the already-quiesced host stays stopped through build, sealing and activation;
 #   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
 #   7. maintenance in the new release, migrate --pretend, migrate --force, config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
@@ -73,7 +74,7 @@ runtime_gate() {
     args+=("$previous/.env")
   fi
   env -i PATH="$PATH" LC_ALL=C "$PHP" "$release/ops/staging/validate-runtime.php" "${args[@]}" \
-    || die "runtime profile refused before quiesce"
+    || die "runtime profile refused"
 }
 
 art() { (cd "$REL" && env -i PATH="$PATH" LC_ALL=C "$PHP" artisan "$@" --no-interaction --no-ansi); }
@@ -129,7 +130,7 @@ need APP_MAINTENANCE_DRIVER file
 ! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
 ! grep -Eq '^PRODUCTION_CHECKOUT_[A-Z_]*ENABLED=(true|1)' "$RUNTIME_ENV" || die ".env enables production checkout; staging must not"
 # Fail closed on ambiguous encodings during the cheap pre-build check. The real dotenv/configuration
-# gate below repeats validation on the built candidate before any quiesce or key/config replacement.
+# gate validates the protected current release before quiesce and the built candidate before attachment.
 while IFS= read -r flag; do
   case "$(envget "$flag")" in false|'(false)'|'') ;; *) die ".env production checkout flags must be false or unset" ;; esac
 done < <(sed -n 's/^\(PRODUCTION_CHECKOUT_[A-Z_]*ENABLED\)=.*/\1/p' "$RUNTIME_ENV")
@@ -159,6 +160,19 @@ if [ -e "$REL" ]; then
   fi
   die "release $SHA already exists but is not current; to return to it follow the runbook's rollback, never rebuild in place"
 fi
+FIRST_INSTALL=1
+if [ -L "$CURRENT" ]; then
+  previous_release=$(readlink -f -- "$CURRENT") || die "served release is invalid"
+  previous_sha=$(basename -- "$previous_release")
+  [[ "$previous_sha" =~ ^[0-9a-f]{40}$ ]] && [ "$previous_release" = "$RELEASES/$previous_sha" ] \
+    && [ -d "$previous_release" ] || die "served release is not canonical"
+  # Validate with the already protected release before downtime; repeat on the built candidate below.
+  runtime_gate "$previous_release" "$RUNTIME_ENV"
+  FIRST_INSTALL=0
+fi
+step "quiesce before exposing a writable candidate or generated build artifacts"
+QUIESCED=1
+"${CTL[@]}" quiesce
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
 step "checkout $SHA"
 "${CTL[@]}" allocate "$SHA"
@@ -195,19 +209,10 @@ SEALED_GIT=(env -i PATH=/usr/bin:/bin LC_ALL=C GIT_NO_REPLACE_OBJECTS=1 GIT_CONF
 [ "$("${SEALED_GIT[@]}" rev-parse HEAD)" = "$SHA" ] || die "sealed checkout is not the requested SHA"
 "${SEALED_GIT[@]}" diff --quiet --no-ext-diff --no-textconv HEAD -- || die "tracked source changed before sealing"
 
-# ---------------------------------------------------------------- 5-6. quiesce, back up, prove the restore
-FIRST_INSTALL=1
-if [ -L "$CURRENT" ]; then
-  FIRST_INSTALL=0
-  step "quiesce the served release $(basename "$(readlink -f "$CURRENT")")"
-  QUIESCED=1
-  "${CTL[@]}" quiesce
+# ---------------------------------------------------------------- 5-6. already quiesced: back up and prove the restore
+if [ "$FIRST_INSTALL" = 0 ]; then
   step "backup and isolated restore proof before migrating"
   "${CTL[@]}" snapshot
-fi
-if [ "$FIRST_INSTALL" = 1 ]; then
-  QUIESCED=1
-  "${CTL[@]}" quiesce
 fi
 
 # ---------------------------------------------------------------- 7. migrate and cache in the new release

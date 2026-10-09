@@ -1,0 +1,123 @@
+"""Actual deploy ordering with owned Git/files/processes; host service/mount/build tools are fixtures."""
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+REPO = Path(__file__).resolve().parents[2]
+
+
+class BuildAdmissionTest(unittest.TestCase):
+    def test_running_application_cannot_inject_ignored_vendor_before_sealing(self):
+        source = (REPO / "ops/staging/forge-deploy.sh").read_text()
+        body = source[source.index('if [ -e "$REL" ]; then'):source.index('# ---------------------------------------------------------------- 7.')]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            mirror = root / "mirror"
+            mirror.mkdir()
+            for name, content in ((".gitignore", "/vendor/\n/public/build/\n.env\n"),
+                                  ("composer.lock", "{}\n"), ("package-lock.json", "{}\n")):
+                (mirror / name).write_text(content)
+            subprocess.run(["git", "init", "-q", str(mirror)], check=True)
+            subprocess.run(["git", "-C", str(mirror), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(mirror), "-c", "user.name=Test",
+                            "-c", "user.email=test@example.invalid", "commit", "-qm", "synthetic build"], check=True)
+            sha = subprocess.check_output(["git", "-C", str(mirror), "rev-parse", "HEAD"], text=True).strip()
+            release = root / "releases" / sha
+            served = root / "releases" / ("b" * 40)
+            served.mkdir(parents=True)
+            (root / "current").symlink_to(served)
+            (root / "private").mkdir()
+            (root / "evidence").mkdir()
+            env = root / "candidate.env"
+            env.write_text("APP_DEBUG=false\n")
+            (served / ".env").write_text(env.read_text())
+            live = root / "live"
+            live.touch()
+            injected = root / "injected"
+            actor = '''import pathlib,sys,time
+release,live,receipt=map(pathlib.Path,sys.argv[1:])
+while True:
+    target=release/'vendor/autoload.php'
+    if target.exists() and live.exists():
+        target.write_text('injected ignored application code')
+        receipt.touch()
+        break
+    time.sleep(0.005)
+'''
+            child = subprocess.Popen(["python3", "-c", actor, str(release), str(live), str(injected)])
+            try:
+                shell = '''step() { :; }
+die() { echo "$*" >&2; exit 1; }
+runtime_gate() { :; }
+ctl_fixture() {
+  echo "$1" >> "$TRACE"
+  case "$1" in
+    quiesce) rm -f "$LIVE"; kill "$ACTOR_PID" 2>/dev/null || true ;;
+    allocate) mkdir -p "$REL" ;;
+    attach) mkdir -p "$REL/storage/app/private" ;;
+  esac
+}
+CTL=(ctl_fixture)
+php_fixture() {
+  mkdir -p "$REL/vendor/composer"
+  printf 'approved ignored artifact' > "$REL/vendor/autoload.php"
+  printf '{}' > "$REL/vendor/composer/installed.json"
+  sleep 0.2
+}
+npm() { mkdir -p "$REL/public/build"; printf '{}' > "$REL/public/build/manifest.json"; }
+stat() { if [ "$2" = %d:%i ]; then echo 1:1; else command stat "$@"; fi; }
+'''
+                environment = {"PATH": "/usr/bin:/bin", "ROOT": str(root), "REL": str(release),
+                               "RELEASES": str(root / "releases"),
+                               "CURRENT": str(root / "current"), "RUNTIME_ENV": str(env), "SHA": sha,
+                               "VASEY_MIRROR": str(mirror), "STAMP": "synthetic", "EVIDENCE": str(root / ("evidence/synthetic-" + sha[:12])),
+                               "PHP": "php_fixture", "COMPOSER_BIN": "synthetic-composer", "LIVE": str(live),
+                               "ACTOR_PID": str(child.pid), "TRACE": str(root / "trace")}
+                run = subprocess.run(["bash", "-eu", "-c", shell + body], env=environment, capture_output=True, text=True)
+                self.assertEqual(run.returncode, 0, run.stderr)
+                self.assertFalse(injected.exists(), "live application injected ignored vendor bytes that Git accepted")
+                self.assertEqual((release / "vendor/autoload.php").read_text(), "approved ignored artifact")
+                trace = (root / "trace").read_text().splitlines()
+                self.assertLess(trace.index("quiesce"), trace.index("allocate"))
+            finally:
+                if child.poll() is None:
+                    child.terminate()
+                child.wait(timeout=2)
+
+    def test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes(self):
+        source = (REPO / "ops/staging/provision.sh").read_text()
+        guard = ""
+        if "root_ancestry()" in source:
+            guard = source[source.index("root_ancestry()"):source.index('\n[[ "$HOST"')]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            parent = root / "parent"
+            parent.mkdir()
+            shell = '''die() { echo "$*" >&2; exit 1; }
+stat() {
+  if [ "$2" = %u ]; then
+    if [ "$3" = "$BAD" ]; then echo 1000; else echo 0; fi
+  elif [ "$2" = %a ] && [ "$3" = /tmp ]; then echo 755;
+  else command stat "$@"; fi
+}
+'''
+            invocation = source[source.index('[[ "$ROOT"'):source.index('[[ "$DB_NAME"')]
+            def probe(bad="", root_value=None):
+                return subprocess.run(["bash", "-eu", "-c", shell + guard + invocation],
+                                      env={"PATH": "/usr/bin:/bin", "ROOT": root_value or str(parent / "new-root"), "BAD": bad},
+                                      capture_output=True, text=True)
+            good = probe()
+            self.assertEqual(good.returncode, 0, good.stderr)
+            self.assertNotEqual(probe(str(parent)).returncode, 0, "app-owned existing parent admitted")
+            parent.chmod(0o777)
+            self.assertNotEqual(probe().returncode, 0, "writable existing parent admitted")
+            parent.chmod(0o755)
+            for value in (str(parent) + "//new-root", str(parent) + "/./new-root", str(parent / "new-root") + "/",
+                          str(parent) + "/new-root/./child"):
+                with self.subTest(root=value):
+                    self.assertNotEqual(probe(root_value=value).returncode, 0, "noncanonical new root admitted")
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
