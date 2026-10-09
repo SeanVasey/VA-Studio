@@ -1,0 +1,27 @@
+# head: 6184118d363b0bf6a7590b9b54043b60aef319a9; untracked review test sha256: 1693d858e66cc8f4
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3793, database r54p1_probe; DB_CONNECTION=mysql APP_ENV=testing
+# purpose: the CP-1 and CP-3 probes (added after mysql-05 started) and the CP-2 reissue probe after its MySQL simulation was corrected (mysql-05 error: ALTER TABLE re-rendered CHECK literals as _ascii, so the owned-schema check refused with 'schema')
+# cmd: php -r '...phpunit' -- --colors=never --filter 'counter_regression|clock_ahead_tail|codex_p1' tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php
+# start: 2026-10-08T18:22:10Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+
+[review] driver=mysql reissue state={"stale_position":3,"hint_position":2,"fresh_position":3,"stale_appended_position":3,"stale_outcome":"settled","stale_sequence":2}
+[review] fresh append refusal: App\Domain\Memberships\Billing\BillingException superseded_retrieval
+..
+[review] driver=mysql codex-p1 state={"b":["settled",2],"a":"job returned normally","chain":[["settled",2]]}
+.                                                                 3 / 3 (100%)
+
+Time: 03:09.516, Memory: 91.00 MB
+
+Review Codex P1Adversarial (Tests\Feature\ProductionMembershipBilling\ReviewCodexP1Adversarial)
+ ✔ Probe after a counter regression an in flight stale retrieval borrows a reissued position
+ ✔ Probe a clock ahead tail refuses a later reversal with clock and stays fresh for the skew
+ ✔ Probe codex p1 start positions do not order reads and a pre reversal settled read stays the tail
+
+OK (3 tests, 16 assertions)
+rc=0
+# end: 2026-10-08T18:25:19Z

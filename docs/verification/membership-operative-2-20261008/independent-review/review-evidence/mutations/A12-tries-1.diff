@@ -1,0 +1,13 @@
+diff --git a/app/Jobs/RetrieveMembershipInvoice.php b/app/Jobs/RetrieveMembershipInvoice.php
+index 828ad6f6..a9190b17 100644
+--- a/app/Jobs/RetrieveMembershipInvoice.php
++++ b/app/Jobs/RetrieveMembershipInvoice.php
+@@ -27,7 +27,7 @@ final class RetrieveMembershipInvoice implements ShouldQueue
+ {
+     use Dispatchable, InteractsWithQueue, Queueable;
+ 
+-    public int $tries = 3;
++    public int $tries = 1;
+ 
+     private readonly string $sealedInvoiceRef;
+ 

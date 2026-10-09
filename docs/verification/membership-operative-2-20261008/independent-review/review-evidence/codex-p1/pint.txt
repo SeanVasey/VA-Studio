@@ -1,0 +1,7 @@
+# cmd: /home/user/VA-Studio/vendor/bin/pint --test <the 16 PHP files added or modified by f341b725>
+# files: app/Console/Commands/SweepMembershipBillingHints.php app/Domain/Memberships/Billing/BillingHintRecovery.php app/Domain/Memberships/Billing/BillingHintSweep.php app/Domain/Memberships/Billing/BillingLedger.php app/Domain/Memberships/Billing/BillingReconciliation.php app/Domain/Memberships/Billing/BillingSchema.php app/Domain/Memberships/Billing/BillingValues.php app/Domain/Memberships/Billing/BillingWebhookIntake.php tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php tests/Support/membership-billing-stale-race-worker.php 
+{"tool":"pint","result":"passed"}
+rc=0
+
+# untracked review test (style only, not product code): pint --test tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php
+rc=1 (style fixers only; file is not committed)

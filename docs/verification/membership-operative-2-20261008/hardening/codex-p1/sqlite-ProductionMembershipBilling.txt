@@ -1,0 +1,16 @@
+$ base HEAD 83821fc0423d4eadd0715c7077c7ed64caba158d + uncommitted lane changes (git status in README)
+$ php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --log-junit docs/verification/membership-operative-2-20261008/hardening/codex-p1/sqlite-ProductionMembershipBilling.xml tests/Feature/ProductionMembershipBilling
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.............SS................................................  63 / 161 ( 39%)
+............................................................... 126 / 161 ( 78%)
+...................................                             161 / 161 (100%)
+
+Time: 02:45.405, Memory: 187.00 MB
+
+OK, but some tests were skipped!
+Tests: 161, Assertions: 782, Skipped: 2.
+rc=0

@@ -1,0 +1,7 @@
+# private instance: mysqld 8.4.11 --no-defaults --user=root, 127.0.0.1:3794, socket /tmp/claude-0/r54p1b.sock, datadir $scratchpad/r54p1b/data (pid 2714); initialized with --initialize-insecure, started 2026-10-08 ~20:18Z
+shutdown rc=0
+pid 2714 exited
+datadir deleted
+scratch tree copies (mut, mut59) deleted
+# other daemons untouched: 0 other mysqld process(es) still running, none on 3794
+2026-10-08T21:59:20Z

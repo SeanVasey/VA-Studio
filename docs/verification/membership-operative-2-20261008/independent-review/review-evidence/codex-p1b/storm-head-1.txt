@@ -1,0 +1,18 @@
+# tree: head (/home/user/VA-Studio-review-m54); head 59e8f8e2; database r54b_storm on 127.0.0.1:3794
+# cmd: php -r '...phpunit' -- --colors=never --filter 'test_native_cross_invoice_wait_split_between_claim_and_append|test_native_concurrent_retrievals_of_different_invoices' docs/verification/membership-operative-2-20261008/independent-review/review-evidence/probes/Lane2ReviewProbeTest.php
+# start: 2026-10-08T21:06:49Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+OBSERVATION native-cross-invoice-split: lock on invoice A held 8.0s; claim of invoice B 1.30s (claimed 9b740cdb); append to invoice B 2.58s (saved refused seq=1)
+.OBSERVATION native-cross-invoice-storm: metric(lock_deadlocks,enabled) before=0 after=1; retrievals=20 failed=0 []; innodb_status_latest_deadlock=present; per-worker: STORM1=1(12.73s),2(8.68s),3(9.36s),4(7.81s),5(7.36s) ; STORM2=1(14.18s),2(8.98s),3(8.96s),4(9.12s),5(5.45s) ; STORM3=1(11.35s),2(7.9s),3(8.98s),4(8.6s),5(8.41s) ; STORM4=1(10.17s),2(7.84s),3(8.73s),4(8.29s),5(8.65s)
+DEADLOCK-SECTION LATEST DETECTED DEADLOCK / ------------------------ / 2026-10-08 21:09:52 140293487716032 / *** (1) TRANSACTION: / TRANSACTION 722809, ACTIVE 2 sec inserting / mysql tables in use 12, locked 12 / LOCK WAIT 15 lock struct(s), heap size 1128, 12 row lock(s), undo log entries 1 / MySQL thread id 63, OS thread handle 140294440474304, query id 2920268 localhost 127.0.0.1 root / INSERT INTO `production_membership_billing_observations` (id, invoice_id, sequence, outcome, facts_hash, line_period_start, line_period_end, amount_minor, currency, retrieved_at, retrieval_started_at, retrieval_position, retrieval_end_position, freshness_deadline, api_version, sdk_reference, prior_seal, payload_ciphertext, created_at, seal) VALUES ('ebc0c14a-6429-474c-ae44-c1056842bb53', '3daefd0d-a57b-4150-8e61-8e351387e262', '1', 'refused', 'bdc3d6d81782c2af909352415382e731fa8e9c9b867bfaa3762611acefe73442', NULL, NULL, NULL, NULL, '2026-10-08 21:09:45', '2026-10-08 21:09:45.340998', '3', '8', '2026-10-08 21:19:45', '2026-08-26.dahlia', '0d8b075e1a97d15c5324353a5277d0ea686ea525', '0000000000000000000000000000000000000000000000000000000000000000', 'eyJpdiI6InY5cm5kaVNmSHZMMmlpZ3JlbWV5aHc9PSIsInZhbHVlIjoibDRwUG5ncm9HbDJDdGZKQTUrOHptdm5LVnVwUFB1eXlwY3kxTkErcnVkOUw3TUI0RDU1YWNNV21iVjhZamxpUXl2T3BFUEsvMzc4M0xoTjZQK1lQUjU4TGhYZ2FoS2hxT3ZndFN5b2gyL2lsTFNwaVlYUU95cnplcVFBTkZOQmdiZlRlRkhjR2VyNVZBZnpIaW1Nc0JWVzExNURRa1dGNVhMVmZ0d2Zzd0V0alFBOEd6UVIvdDlSL1FJSHJrUVppYWh2dStIVG02L25RRm8rVTlsdDZnTkJuQ3Y3T2xjdDhrTVhWOVRib2NYQ2d0ZmlWbkhVT2VSSWJLN0VNUGsxeWZOZFEzY2dVUmx6dFR5VEw4aXhXM3dNZzczQWlGUHQzbkJjaVg5QUQ2M1FjYTEvbVJ2VS9NU0RMM3BKQ3JpeTFNdnM4OCtTMWFzcG1GdVF0STl3b1NBcHB2Tk5EWlpvdXN6dDFFQ09WU1d6MGI5U0NNNnAvZi94cXJ1Q3k0dHQxdHJyVVhqVjJtSnFBLzZEeGlBL0ZYRWdaclRRQ3Q0OWUrcWo5dTRYK3poeDNHMUtqZkZsQVNFS09LaXZOeTg3eCIsIm1hYyI6IjJhNzMyYmIxOWFjNDQ4YTc0MDQ4NTI2MjA2N2NmNDM3MDNhNmQ2NGRhMDNiMGJkMDA0ZWRkNTJmZDc3ZTZhOTciLCJ0YWciOiIifQ==', '2026-10-08 21:09:51', '003cccef88c0644ee10c6f8120c513bad7d08bb0eb2201cac2e9090eed5f85b9') /  / *** (1) HOLDS THE LOCK(S): / RECORD LOCKS space id 18460 page no 5 n bits 72 index production_membership_billing_observations_u0 of table `r54b_storm`.`production_membership_billing_observations` trx id 722809 lock mode S locks gap before rec / Record lock, heap no 3 PHYSICAL RECORD: n_fields 3; compact format; info bits 0 /  0: len 30; hex 63313039613065662d323836322d346232332d383439332d346336666462; asc c109a0ef-2862-4
+.                                                                  2 / 2 (100%)
+
+Time: 03:39.796, Memory: 89.00 MB
+
+OK (2 tests, 13 assertions)
+rc=0
+# end: 2026-10-08T21:10:29Z

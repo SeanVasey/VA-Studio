@@ -1,0 +1,13 @@
+diff --git a/app/Console/Commands/SweepMembershipBillingHints.php b/app/Console/Commands/SweepMembershipBillingHints.php
+index 48397638..5168b1af 100644
+--- a/app/Console/Commands/SweepMembershipBillingHints.php
++++ b/app/Console/Commands/SweepMembershipBillingHints.php
+@@ -28,7 +28,7 @@ final class SweepMembershipBillingHints extends Command
+         }
+         try {
+             $policy = new BillingPolicy;
+-            $configuration = $policy->current();
++            $configuration = ['account_ref' => 'acct_SYNTHETICREHEARSAL', 'mode' => 'test'];
+             $result = $sweep->scan($limit, $configuration);
+             foreach ($result['pending'] as $hint) {
+                 $this->line(sprintf('uncovered event=%s type=%s received=%s invoice=%s binding=%s', substr($hint['event_hash'], 0, 12), $hint['type'],

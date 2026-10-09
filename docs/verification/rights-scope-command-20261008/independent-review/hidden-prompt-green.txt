@@ -1,0 +1,15 @@
+Reviewed source: 1d28114aa9b7066a96c5372631eb71127f59adec
+Command (real PTY):
+source /workspace/.va-studio-toolchain/activate.sh && php docs/verification/rights-scope-command-20261008/independent-review/hidden-prompt-probe.php
+
+The same synthetic-only unsupported-hide probe was rerun after the fix.
+No stdin response was supplied: the process returned immediately.
+
+Output:
+ Staff password (hidden):
+ > Rights scope management is unavailable. No changes were made.
+
+Exit: 1. No PHPUnit cases were run in this PTY probe. With visible fallback
+disabled, the unsupported-hide condition refuses before reading a password
+or consulting any persisted user. No password marker is echoed or requested
+through an exposed read.

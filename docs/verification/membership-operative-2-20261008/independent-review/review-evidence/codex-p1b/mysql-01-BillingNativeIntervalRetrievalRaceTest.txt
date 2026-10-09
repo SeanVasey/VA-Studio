@@ -1,0 +1,16 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42  (worktree clean apart from untracked review files: 0 tracked changes)
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3794, database r54b_lane; DB_CONNECTION=mysql APP_ENV=testing
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php
+# start: 2026-10-08T20:28:14Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 06:55.013, Memory: 89.00 MB
+
+OK (2 tests, 28 assertions)
+rc=0
+# end: 2026-10-08T20:35:10Z

@@ -1,0 +1,52 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+FF.                                                                 3 / 3 (100%)
+
+Time: 00:04.923, Memory: 87.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_settled_snapshot_appended_after_a_newer_reversal_is_refused_and_never_becomes_current
+A snapshot read before the refund is not current evidence.
+Failed asserting that Array &0 [
+    'id' => 'db269fd9-d730-46e7-a08d-43161854f415',
+    'invoice_id' => '629e38d5-debd-4e89-8bac-28c467d225fe',
+    'sequence' => 3,
+    'outcome' => 'settled',
+    'facts_hash' => '08bf5316985f80c7575ac8b0a83c8c58a7c2b8e3850094788257dd42ff7f7435',
+    'line_period_start' => '2026-10-07 00:00:00',
+    'line_period_end' => '2026-11-07 00:00:00',
+    'amount_minor' => 1234,
+    'currency' => 'XTS',
+    'retrieved_at' => '2026-10-07 01:00:30',
+    'freshness_deadline' => '2026-10-07 01:10:30',
+    'api_version' => '2026-08-26.dahlia',
+    'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525',
+    'prior_seal' => '96837412d6f377a03d532472676a90914c83cbb47f445c576325a74e66027cbe',
+    'payload_ciphertext' => 'eyJpdiI6IjJ6M3FYS1JzWnUzR2VaaVUwc0pNTEE9PSIsInZhbHVlIjoiNi9Ka1pob3ZSWFM0RkFHNkpBb3IzRHhxZjZRT1hrK3p3Z3VGeXRJU2hXMnhQeW1VbVdHcGtzMUJ4YzRGL2Jvb3JvdENjQ24yS2swQXlnME1BRTVzamRVNER3KzYxMnpTamliR1NUREVmenJrcmpYZmhVUmhSV1FDOVRiN1lRc0xza3p5MWw4SmIrMG8ydzRLaU16cVladjBPSU5EaGtRRkVBMG1lUDlaQmNPT3dYakp0eW1ZdHhXTDArZjk0YnJFN3VNbmFrS2dhYTBVWkl1MHRtYVJES0lzYVo4L2l2L0NzVXM5UFFibnQ0cHMwcnVDM25PbWRtOXA5WnRZR09zMk1qdFp2S2ZsTTc5c1JmeFh1Y2xCa0tiTmV4aGYwYk4zcTRUWEFxcHhXbUxCNll5Z01hL0pzQzBwUFhGWTRzekdQVGtmTlRnVWJzREg0MTJxL3A5WjFnNXdpVkdWSXVHZ0VHQ3lQbGZoK0xPLzMyUnRWaE1xQ1dtZG1TbU5kT3ZxUlIxejM3WEtXUXE4QmRvcXFhT3YxR3FvN1RGRGY3WlpPWUZGYXk3ZkE1RFhsTng3UEpKUGNFa0g2b1hXWG5HeUlrS0pUWWM1TkJPTWo5bFg0Q0NUR0Q4REM5Mi9ScHRXWEhPWGEzSlViQkZRQTRJVDc5VkVEK0tnUGhkQWt5L3pjMHdwZGE4bVU4Wkc2Q3NWclE2Q2JRdEZQUjBseFNId1RSMGJvY0lsRUMyRGpDTjNGM1Bid2ozdjFMRzhLZkZhWE1lemw4MHRnTVdod2ZkZXNIdHpGUXhrUHpFUmtBaXM1U08yWEhBYk5aTkkrUjU5Vmw0R2ErMXRWRDBzQU1sZUdKamUvL1JRSHBqMnR1VjVqMXE4cG1jYWNMZW5zSzAyU3dHOEZwWmsvdldLMnd2THgwbm1QbVVJR09JbmMydm5oYm0zZlFlYmx4TFlKbVBudDNpVWUwdlRsMXBkeGtyZmNyUUh1OTQ4RmhJeU9WV0Jjdnk2c1RPcExsZitsaTVob1AwUkl1SnhVVXdlZC9DL21LZHpzUT09IiwibWFjIjoiM2M0OTljYzQxNjJmNDI3YzkyOTE2N2I1ZjQ4N2NlOGUyNDU0YmZlM2U4MTdlMzBlYjQ1MThkZTkwM2Y0NGQxMSIsInRhZyI6IiJ9',
+    'seal' => '63a811e10af4503ecd7706a0663b68ce228ea9e1fa6715f0b469a6c1464b5c06',
+    'created_at' => '2026-10-07 01:00:30',
+] is null.
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:63
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_first_retrieval_cannot_claim_the_tail_after_a_fresh_one_created_the_identity
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'reversed',
++    1 => 'settled',
+ ]
+
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 7, Failures: 2.
+rc=1

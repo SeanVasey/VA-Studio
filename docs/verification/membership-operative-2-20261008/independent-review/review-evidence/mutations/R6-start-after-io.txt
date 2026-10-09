@@ -1,0 +1,64 @@
+### tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/phpunit.xml
+
+FF.F                                                                4 / 4 (100%)
+
+Time: 00:06.908, Memory: 91.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_settled_snapshot_appended_after_a_newer_reversal_is_refused_and_never_becomes_current
+A snapshot read before the refund is not current evidence.
+Failed asserting that Array &0 [
+    'id' => 'd558be36-f832-40a7-aad1-d09b72a38f31',
+    'invoice_id' => '6b51833f-c938-4c07-bb3c-d7fef32d198c',
+    'sequence' => 3,
+    'outcome' => 'settled',
+    'facts_hash' => '08bf5316985f80c7575ac8b0a83c8c58a7c2b8e3850094788257dd42ff7f7435',
+    'line_period_start' => '2026-10-07 00:00:00',
+    'line_period_end' => '2026-11-07 00:00:00',
+    'amount_minor' => 1234,
+    'currency' => 'XTS',
+    'retrieved_at' => '2026-10-07 01:00:30',
+    'retrieval_started_at' => '2026-10-07 01:00:30.000000',
+    'freshness_deadline' => '2026-10-07 01:10:30',
+    'api_version' => '2026-08-26.dahlia',
+    'sdk_reference' => '0d8b075e1a97d15c5324353a5277d0ea686ea525',
+    'prior_seal' => 'b0fe20729542cf3e616f3c04e019eb68eeeeca98244349dff7df7c7b3683582d',
+    'payload_ciphertext' => 'eyJpdiI6IjJ5Q0E1aUlacGgxNi9RTklFOXJXcUE9PSIsInZhbHVlIjoieWo1T29VWTQxZWN1ZWFYaUtXNXR1Q2l6RW9OM3dpV0NaWnZ2Z3ZveTBDVTFsamp2OUZxaklsaXFONUQxZjk2YWFzM0VVRkRGbkNyb1B5RGRldXBwSDFndVpaTndITVN6aWJNRU5NQUdzTFl1Y2NDdGp5YjkrZTBsT0x6Tk9vVEE0bFR1VVhtNExNU3p4b3VHZUpNSk1zTU5kYmo5aHVodjNWODBaVXZLOE1GTDMrZUt1L3FOTCtXbHppd2MrZlJyRzM0R3VGSlByL2c4dnNoWmNISG5PZDNncnFmRGtEMHRoajlGWHRTUFBrRFp4NmdSa3o5YjRUNFR1NHcxeVI1eEhVWUVSMEJOY2FscGVCR25JUGd3WWlNYWdCRld6K1JUdE5YN05YbWVydXQ4ZWozMUhWRUQwMkVBUmRPaVJzYUVhbVlySnBkWnJxd011S2hXNXFWdGpuR3JTQ3kwWXBrdk4zazhFRUkvMFNmZVFPWUF3cSt3OGdqNndyS1I2NGxpdzh1bjRIYXpPdS9VNXZtbytqcVJYa1hMNmJYN0V6TjhELzZnbDVPWlRXSUVkZzVpTUlGZTNrTDNxUXVFYldCaU1aTG5ORjNOaEpvU0pYSjE1RTN1T043Y0lqRXdYMVBlVzZDazA1Y2dYUWRqdlV1Z2RBTUQ2Nk51c1dJUWlUTUJQWDY2Tk5Cd1RoWjlTTlByaXMzRVRzdjh6WE9EdlNrbjlVdWJDdGhjNXo4d05teGVmRDFPeUc0UGw3OG50YXJ0d2tQZnpMWi9GVEViVk5oNXNCL0tpdWV1bHhLSTlXZThxazFLa29YKytIWVVBYXp1am44aVpoczVIWm0zTUE2cmo3NGpybmFtWUtjMFl0dlRMc1JBV1liTkswbTV6TmRjNXA3VDZlbFE5d0NzVnA1eHNLYXJSSndENTlaMHd5TURGblBta3B5SGxwUEVKeE9nTUJuTDBrTmw2ZjhFM2V2Vm1McHpTMmJ3c0hjWmw1d3RITFpuWGpjNnd2T3NVd0Zva3RwWExTaUFSUWNGRFBoZnlRelU2dz09IiwibWFjIjoiMzVkYmQ2OTQ2MWRmODhlY2RkZDdjOGI2ZGJhMGQ2MTUyOGQ0ODM3Mjc0YWU0ZTQ0MDM1OWIyNDA3MzU4N2Y4ZSIsInRhZyI6IiJ9',
+    'seal' => 'e81c2cdfbf3d605a2ce0beb6c436b095965c8e8c15f8e5f0e9e02ad21f2740c3',
+    'created_at' => '2026-10-07 01:00:30',
+] is null.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:63
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_stale_first_retrieval_cannot_claim_the_tail_after_a_fresh_one_created_the_identity
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'reversed',
++    1 => 'settled',
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:77
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingOverlappingRetrievalTest::test_a_retrieval_that_began_before_the_hint_does_not_cover_it_and_one_that_began_after_does
+A retrieval that began before the hint must not cover it.
+Failed asserting that null is identical to Array &0 [
+    'binding_id' => 'd0eab0dc-1d6e-497b-a769-a5696b769e64',
+    'invoice_ref' => 'in_SYNTHETIC',
+].
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/review-member2-mut/tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 10, Failures: 3.
+rc=1

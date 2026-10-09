@@ -24,6 +24,16 @@ class BillingSettlementTest extends TestCase
             [$verdict->facts['invoice_payment_ref'], $verdict->facts['payment_intent_ref'], $verdict->facts['charge_ref'], $verdict->facts['balance_transaction_ref']]);
     }
 
+    /**
+     * L2-4 (lane 2 review): every binding field is load-bearing. The invoice-id comparison had no test, so removing it left every
+     * test green; a retrieved invoice that is not the one requested must never validate the binding, whatever else matches.
+     */
+    public function test_binding_is_not_validated_when_the_retrieved_invoice_is_not_the_requested_one(): void
+    {
+        $this->assertTrue(BillingSettlement::bindingValidated(F::snapshots(F::graph()), F::expectation()), 'Control: the exact graph validates.');
+        $this->assertFalse(BillingSettlement::bindingValidated(F::snapshots(F::graph(['invoice' => ['id' => 'in_SYNTHETIC_OTHER']])), F::expectation()));
+    }
+
     public function test_fixtures_cannot_invent_or_flatten_provider_fields(): void
     {
         foreach ([[Invoice::class, ['subscription' => F::SUBSCRIPTION]], [Invoice::class, ['payment_intent' => F::PAYMENT_INTENT]],

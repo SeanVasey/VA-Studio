@@ -1,0 +1,252 @@
+Assessed exact source: d7e60167037c04e3e5c26549153027a25c7d0fb2
+test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) ...
+  test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='dot-component') ... FAIL
+  test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='parent-component') ... FAIL
+  test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='double-slash') ... FAIL
+  test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='relative') ... FAIL
+  test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='trailing-slash') ... FAIL
+test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) ...
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='missing') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='leaf-symlink') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='dangling-link') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='hardlink') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='directory') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='fifo') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-400') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-640') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-644') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-660') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-666') ... FAIL
+  test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='app-leaf') ... FAIL
+test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) ...
+  test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='app-parent') ... FAIL
+  test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='app-ancestor') ... FAIL
+  test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='group-parent') ... FAIL
+  test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='world-ancestor') ... FAIL
+  test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='ancestor-symlink') ... FAIL
+test_protected_profiles_and_socket_default (__main__.AdminDefaultsReview.test_protected_profiles_and_socket_default) ... ok
+
+======================================================================
+FAIL: test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='dot-component')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 154, in test_canonical_path
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : dot-component: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='parent-component')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 154, in test_canonical_path
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : parent-component: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='double-slash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 154, in test_canonical_path
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : double-slash: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='relative')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 154, in test_canonical_path
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : relative: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) (state='trailing-slash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 154, in test_canonical_path
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : trailing-slash: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : missing: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='leaf-symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : leaf-symlink: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='dangling-link')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : dangling-link: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='hardlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : hardlink: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : directory: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='fifo')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : fifo: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-400')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : mode-400: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-640')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : mode-640: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-644')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : mode-644: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-660')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : mode-660: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='mode-666')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : mode-666: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) (state='app-leaf')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 144, in test_leaf_custody
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : app-leaf: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='app-parent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 149, in test_parent_authority
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : app-parent: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='app-ancestor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 149, in test_parent_authority
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : app-ancestor: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='group-parent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 149, in test_parent_authority
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : group-parent: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='world-ancestor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 149, in test_parent_authority
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : world-ancestor: unsafe CLI admission succeeded
+
+======================================================================
+FAIL: test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) (state='ancestor-symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 149, in test_parent_authority
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/admin-defaults-probe.py", line 132, in probe
+    self.assertNotEqual(result.returncode, 0, f"{state}: unsafe CLI admission succeeded")
+AssertionError: 0 == 0 : ancestor-symlink: unsafe CLI admission succeeded
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.406s
+
+FAILED (failures=22)

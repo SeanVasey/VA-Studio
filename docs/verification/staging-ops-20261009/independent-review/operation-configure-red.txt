@@ -1,0 +1,15 @@
+Exact assessed source: 0e0df68d7eca40c892eb8cfc959264f240ffd04c
+test_standalone_configure_cannot_leave_an_unfenced_orphan (__main__.OperationProbe.test_standalone_configure_cannot_leave_an_unfenced_orphan) ... FAIL
+
+======================================================================
+FAIL: test_standalone_configure_cannot_leave_an_unfenced_orphan (__main__.OperationProbe.test_standalone_configure_cannot_leave_an_unfenced_orphan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/operation-custody-probe.py", line 170, in test_standalone_configure_cannot_leave_an_unfenced_orphan
+    self.assertNotEqual(resumed.returncode, 0, "public resume passed a surviving standalone configuration child")
+AssertionError: 0 == 0 : public resume passed a surviving standalone configuration child
+
+----------------------------------------------------------------------
+Ran 1 test in 0.054s
+
+FAILED (failures=1)

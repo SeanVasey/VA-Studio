@@ -1,0 +1,10 @@
+PASS reconcile save: runner exit=1
+PASS reconcile clear: runner exit=1
+PASS finalize save: runner exit=1
+PASS finalize clear: runner exit=1
+PASS contracts save: runner exit=1
+PASS contracts clear: runner exit=1
+PASS activate save: runner exit=1
+PASS activate clear: runner exit=1
+PASS reconcile timestamp: runner exit=1
+RESULT: 0 of 9 state failure checks failed

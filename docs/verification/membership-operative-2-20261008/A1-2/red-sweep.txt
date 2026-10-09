@@ -1,0 +1,50 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+EEEE.                                                               5 / 5 (100%)
+
+Time: 00:05.633, Memory: 91.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_it_refuses_while_the_billing_policy_is_off_and_neither_lists_nor_dispatches
+Symfony\Component\Console\Exception\CommandNotFoundException: The command "membership-billing:sweep-hints" does not exist.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:55
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_the_dry_run_lists_uncovered_hints_by_hash_and_dispatches_nothing
+Symfony\Component\Console\Exception\CommandNotFoundException: The command "membership-billing:sweep-hints" does not exist.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:73
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_dispatch_queues_one_retrieval_per_uncovered_invoice_and_leaves_covered_hints_alone
+Symfony\Component\Console\Exception\CommandNotFoundException: The command "membership-billing:sweep-hints" does not exist.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:100
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCommandTest::test_a_second_sweep_after_the_retrieval_ran_dispatches_nothing
+Symfony\Component\Console\Exception\CommandNotFoundException: The command "membership-billing:sweep-hints" does not exist.
+
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Console/Application.php:162
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/home/user/VA-Studio/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/VA-Studio-member-ops2/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCommandTest.php:117
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 5, Assertions: 1, Errors: 4.
+rc=2

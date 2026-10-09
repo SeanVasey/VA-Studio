@@ -1,0 +1,14 @@
+nginx version: nginx/1.26.3
+PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 17:16:18) (NTS)
+scope=owned prefix; transport=loopback TLS; app=synthetic FastCGI responder; no Forge activation or provider I/O
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 184, in <module>
+    main()
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 114, in main
+    run([NGINX, "-t", "-p", scratch + "/", "-c", str(root / "nginx.conf")])
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 27, in run
+    return subprocess.run(args, text=True, capture_output=True, check=True, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/workspace/.va-studio-toolchain/root/usr/sbin/nginx', '-t', '-p', '/tmp/vao-ng-q3mx0ete/', '-c', '/tmp/vao-ng-q3mx0ete/nginx.conf']' returned non-zero exit status 1.

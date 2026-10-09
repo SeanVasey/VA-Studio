@@ -1,0 +1,13 @@
+diff --git a/app/Domain/Memberships/Billing/BillingReconciliation.php b/app/Domain/Memberships/Billing/BillingReconciliation.php
+index 57f6a7d5..a1ee6fab 100644
+--- a/app/Domain/Memberships/Billing/BillingReconciliation.php
++++ b/app/Domain/Memberships/Billing/BillingReconciliation.php
+@@ -72,7 +72,7 @@ final class BillingReconciliation
+             // can precede validation. Whatever refusal comes first, a first retrieval claims the identity only once the retrieved
+             // account, invoice, customer and parent subscription all match the binding (Addendum 1, A1-1). A refusal for a
+             // reason after that point (currency, amount, shape, ...) is about an invoice this binding owns and is recorded.
+-            BillingException::require(! ($verdict->outcome === 'refused' && (in_array($verdict->reason, self::BINDING_REFUSALS, true) || ! $validated)),
++            BillingException::require(! ($verdict->outcome === 'refused' && in_array($verdict->reason, self::BINDING_REFUSALS, true)),
+                 'binding_refused_'.$verdict->reason);
+             $invoice = $this->ledger->invoice($binding, $invoiceRef);
+         }

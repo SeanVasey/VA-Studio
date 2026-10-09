@@ -1,0 +1,13 @@
+Exact assessed source: a7cf5d55e6f89da367cf59181c05ef9efa7a8d10
+test_existing_identity_refuses_ambiguous_private_credentials_without_rotation (__main__.DatabaseCredentialProbe.test_existing_identity_refuses_ambiguous_private_credentials_without_rotation) ... ok
+test_new_identity_never_overwrites_orphan_credentials_or_uses_bad_generation (__main__.DatabaseCredentialProbe.test_new_identity_never_overwrites_orphan_credentials_or_uses_bad_generation) ... ok
+test_fixed_helper_refuses_writable_links_and_nonregular_files_before_operation (__main__.OperationProbe.test_fixed_helper_refuses_writable_links_and_nonregular_files_before_operation) ... ok
+test_killed_activation_parent_blocks_every_mutator_but_allows_inspection (__main__.OperationProbe.test_killed_activation_parent_blocks_every_mutator_but_allows_inspection) ... ok
+test_prepare_keeps_build_and_sealing_under_one_lease (__main__.OperationProbe.test_prepare_keeps_build_and_sealing_under_one_lease) ... ok
+test_refresh_retains_leases_through_configuration_child_and_resume (__main__.OperationProbe.test_refresh_retains_leases_through_configuration_child_and_resume) ... ok
+test_standalone_configure_cannot_leave_an_unfenced_orphan (__main__.OperationProbe.test_standalone_configure_cannot_leave_an_unfenced_orphan) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.664s
+
+OK

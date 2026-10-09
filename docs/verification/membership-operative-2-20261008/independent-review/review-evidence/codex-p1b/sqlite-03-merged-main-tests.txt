@@ -1,0 +1,23 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42; SQLite; the seven test files the merge of main d3e1c39a brought in, run on the merged tree to look for semantic conflicts with the changed 259000
+## tests/Feature/DiscoveryEpochMigrationTest.php
+OK (9 tests, 42 assertions)
+rc=0
+## tests/Feature/PrivateTrackReviewTest.php
+OK (16 tests, 215 assertions)
+rc=0
+## tests/Feature/ProductionTrackCapabilitiesGuardsTest.php
+OK (28 tests, 126 assertions)
+rc=0
+## tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php
+OK (23 tests, 606 assertions)
+rc=0
+## tests/Feature/ProductionTrackPolicyEngineTest.php
+OK, but some tests were skipped!
+Tests: 1, Assertions: 0, Skipped: 1.
+rc=0
+## tests/Feature/RightsEvidenceGuardMigrationTest.php
+OK (33 tests, 195 assertions)
+rc=0
+## tests/Feature/ServiceProjectSchemaTest.php
+OK (3 tests, 19 assertions)
+rc=0

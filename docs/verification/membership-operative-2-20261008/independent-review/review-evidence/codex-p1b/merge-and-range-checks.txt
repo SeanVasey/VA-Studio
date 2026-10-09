@@ -1,0 +1,11 @@
+# git diff --stat 4cb4cba8 2e08af42 -- <lane paths>  (empty = the merge of main d3e1c39a changes no lane file)
+rc=0
+# git diff --stat 72045620 d3e1c39a -- scripts/ci/database-sqlite-skips.json  (empty = main did not change the census)
+rc=0
+# 046372b9 ADDENDUM-CODEX-P1.md identical to the reviewer's copy: verified with diff (no output)
+# commits 6184118d..2e08af42 (first parent):
+2e08af42 chore(merge): integrate main at d3e1c39a (migration test drift #58, checkout-return timer #59)
+4cb4cba8 docs(verification): record the membership read-interval ordering fix
+cbd5e5c5 fix(membership): order billing retrievals by their read intervals, not their start positions
+046372b9 docs(verification): record the membership lane 2 review addendum for the Codex P1 fixes
+3fed2392 test(frontend): let Inertia's anchor-scroll timer run before the checkout-return environment is torn down

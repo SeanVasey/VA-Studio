@@ -1,0 +1,17 @@
+test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal (__main__.ControlConcurrencyProbe.test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal) ... FAIL
+
+======================================================================
+FAIL: test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal (__main__.ControlConcurrencyProbe.test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/ctl-concurrency-probe.py", line 120, in test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal
+    self.assertIn("rm-while-mounted=no", trace,
+AssertionError: 'rm-while-mounted=no' not found in 'attach\nrm-while-mounted=yes\n' : the root helper dispatches recursive removal after a concurrent permitted attach rebinds PRIVATE
+
+----------------------------------------------------------------------
+Ran 1 test in 0.151s
+
+FAILED (failures=1)
+Independent competing attach completed while prune held its final read.
+attach
+rm-while-mounted=yes

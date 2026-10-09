@@ -1,0 +1,47 @@
+# mutation CP-4: BillingHintSweep keyset without the (received_at = ? AND id > ?) tie-break, scratch copy of the worktree, SQLite
+--- /home/user/VA-Studio-member-ops2/app/Domain/Memberships/Billing/BillingHintSweep.php	2026-10-08 13:36:37.352031275 +0000
++++ app/Domain/Memberships/Billing/BillingHintSweep.php	2026-10-08 18:48:46.474632261 +0000
+@@ -50,8 +50,8 @@
+         $where = 'disposition = ?';
+         $bindings = ['retrieval_hint'];
+         if ($from !== null) {
+-            $where .= ' AND (received_at > ? OR (received_at = ? AND id > ?))';
+-            array_push($bindings, $from['received_at'], $from['received_at'], $from['id']);
++            $where .= ' AND (received_at > ?)';
++            array_push($bindings, $from['received_at']);
+         }
+         $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table(BillingSchema::TABLES[3]).' WHERE '.$where.' ORDER BY received_at, id LIMIT '.($limit + 1));
+         $statement->execute($bindings);
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/phpunit.xml
+
+.......F                                                            8 / 8 (100%)
+
+Time: 00:09.732, Memory: 95.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSweepHintsCursorTest::test_hints_sharing_one_received_at_second_are_each_examined_exactly_once_across_page_boundaries
+Every hint of the shared second is examined exactly once.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'event=46434d8d5852',
+-    1 => 'event=5bb3a7eaf999',
+-    2 => 'event=7e3ebfe9c05c',
+-    3 => 'event=9c5c41904091',
+-    4 => 'event=fabf5169cba3',
++    0 => 'event=7e3ebfe9c05c',
++    1 => 'event=fabf5169cba3',
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p1bi/mutation-cp4/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php:246
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 8, Assertions: 116, Failures: 1.
+rc=1

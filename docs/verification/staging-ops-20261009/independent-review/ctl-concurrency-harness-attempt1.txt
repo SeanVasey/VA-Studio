@@ -1,0 +1,17 @@
+test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal (__main__.ControlConcurrencyProbe.test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal) ... FAIL
+
+======================================================================
+FAIL: test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal (__main__.ControlConcurrencyProbe.test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/ctl-concurrency-probe.py", line 101, in test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal
+    wait_for(base / "read-observed", prune)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/ctl-concurrency-probe.py", line 63, in wait_for
+    raise AssertionError("prune exited before reaching final read: " + out + err)
+AssertionError: prune exited before reaching final read: vasey-staging-ctl: privileged directory ancestry must be root-owned
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.025s
+
+FAILED (failures=1)

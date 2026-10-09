@@ -1,0 +1,50 @@
+# head: 2e08af4290b8dafbfb7c42b3c9e325807fa25d42; untracked review test sha256: f47bef97d75ffe58
+# engine: SQLite :memory:
+# cmd: php -r '...phpunit' -- --colors=never --testdox tests/Feature/ProductionMembershipBilling/ReviewCodexP1BIntervalAdversarialTest.php
+# start: 2026-10-08T20:27:56Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+
+[review] driver=sqlite cp1 state={"b":["settled",2,3],"chain":[["settled",2,3],["reversed",5,6]]}
+.
+[review] driver=sqlite three-way A then B: {"A":"concurrent_retrieval","B":"concurrent_retrieval"} chain=[["settled",1,2],["settled",5,6]]
+.
+[review] driver=sqlite three-way B then A: {"A":"concurrent_retrieval","B":"concurrent_retrieval"} chain=[["settled",1,2],["settled",5,6]]
+.
+[review] driver=sqlite 1680 schedules, appends by result: {"admitted":2604,"superseded_retrieval":408,"concurrent_retrieval":2028}
+.
+[review] driver=sqlite liveness: {"n1s":3,"n1e":7,"w1s":4,"w1e":5,"w2s":6,"w2e":9,"w3s":10,"w3e":13,"r1":"concurrent_retrieval","r2":"concurrent_retrieval","r3":"concurrent_retrieval"}
+..
+[review] driver=sqlite lost-append refusal: changed_policy
+.
+[review] driver=sqlite cp2 state={"stale_start":4,"hint":3,"r2_start":4,"stale_row":["settled",4,5],"r2_refusal":"concurrent_retrieval","retry":["reversed",7,8]}
+..
+[review] driver=sqlite 83821fc0-shape assertOwned refused: schema
+
+[review] driver=sqlite 83821fc0-shape up refused: schema
+
+[review] driver=sqlite 6184118d-shape assertOwned refused: schema
+
+[review] driver=sqlite 6184118d-shape up refused: schema
+.                                                        10 / 10 (100%)
+
+Time: 10:38.739, Memory: 95.00 MB
+
+Review Codex P1BInterval Adversarial (Tests\Feature\ProductionMembershipBilling\ReviewCodexP1BIntervalAdversarial)
+ ✔ Cp1 gateway before read is released for retry and the retry records the reversal
+ ✔ Three way interleavings through the reconciliation never admit an older read after a newer one with data set "A then B"
+ ✔ Three way interleavings through the reconciliation never admit an older read after a newer one with data set "B then A"
+ ✔ All 1680 three retrieval schedules admit exactly the reads that began after the tail ended
+ ✔ Probe a job exhausted by three overlapping winners leaves a tail that began after its first read ended
+ ✔ A definitive read superseded by a later unknown tail leaves nothing settled current
+ ✔ A failed end allocation or a lost append leaves only anonymous positions and changes no coverage
+ ✔ Probe cp2 a reissued start still admits the stale read once but the holder is retried not ended
+ ✔ Probe cp3 a clock ahead tail still refuses a later reversal with clock
+ ✔ Both earlier 259000 shapes are refused and not adopted
+
+OK (10 tests, 9546 assertions)
+rc=0
+# end: 2026-10-08T20:38:35Z

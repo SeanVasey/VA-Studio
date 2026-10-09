@@ -1,0 +1,40 @@
+# head: 6184118d363b0bf6a7590b9b54043b60aef319a9  (worktree clean apart from untracked review files: 0 tracked changes)
+# engine: mysqld 8.4.11 --no-defaults, 127.0.0.1:3793, database r54p1_probe; DB_CONNECTION=mysql APP_ENV=testing
+# cmd: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php
+# start: 2026-10-08T18:11:25Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-m54/phpunit.xml
+
+...
+[review] driver=mysql explicit-id outcomes={"0":"admitted as id 2","-5":"refused: SQLSTATE[22003]: Numeric value out of range: 1264 Out of range value for column "} rows=[[1,"retrieval"],[2,"retrieval"],[3,"retrieval"]]
+.E
+[review] driver=mysql previous-shape assertOwned refused: schema
+
+[review] driver=mysql previous-shape up refused: schema
+.                                                              6 / 6 (100%)
+
+Time: 09:51.300, Memory: 93.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\ReviewCodexP1AdversarialTest::test_probe_after_a_counter_regression_an_in_flight_stale_retrieval_borrows_a_reissued_position
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (schema).
+
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingException.php:19
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:437
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:109
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingSchema.php:48
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:330
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:226
+/home/user/VA-Studio-review-m54/tests/Support/InterleavingBillingGateway.php:59
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingReconciliation.php:122
+/home/user/VA-Studio-review-m54/app/Domain/Memberships/Billing/BillingReconciliation.php:47
+/home/user/VA-Studio-review-m54/tests/Feature/ProductionMembershipBilling/ReviewCodexP1AdversarialTest.php:235
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 41, Errors: 1.
+rc=2
+# end: 2026-10-08T18:21:17Z

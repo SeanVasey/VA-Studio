@@ -1,0 +1,14 @@
+# green: BillingNativeDedupRaceTest, MySQL 8.4.11 private 127.0.0.1:3917, worktree /home/user/VA-Studio-member-ops2 (3fed2392 + this change)
+2026-10-08T19:18:22Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-member-ops2/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 01:19.734, Memory: 81.00 MB
+
+OK (1 test, 15 assertions)
+rc=0
+elapsed_seconds=80

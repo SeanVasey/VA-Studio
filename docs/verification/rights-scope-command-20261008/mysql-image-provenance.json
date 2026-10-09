@@ -1,0 +1,57 @@
+{
+  "image": "mysql:8.4.11",
+  "index_digest": "sha256:6ea90827b1100f8f2ae306a539f86d2c264a26ed435a2a9f75551dd5c3aeb242",
+  "manifest_digest": "sha256:80f4933e3835f9dc4d35a28ec500d7986cb4414e6c6821c5461239cb7beb8995",
+  "layers": [
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:0da02031b8109b1e4f838db1d6ebbebafcce8f05b799018f73cb97e201d2c663",
+      "size": 47941627
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:e49eff447cf4f73f6c00aa97c8c3e0daa3625d7ab9b58fee2ef881f3c0415590",
+      "size": 884
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:b23c4a59849a8b41f240db9009cda9555bfed34b2c2db35663c6bc24ce3f265f",
+      "size": 783560
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:442cf390878331a896b1ab0d7d1eed1e10f1e255780f9fd341dfecb379d1e0b4",
+      "size": 6198178
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:9056f6ecb394359dfe87b0e746d4485e161f4f1c5bf140e498aa3a9097b2dff9",
+      "size": 2608
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:ff557ec8ac737f139cdd330e275c3bfca9fdc671bb87583511831c91eaffe2f8",
+      "size": 332
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:1c8d0b814939dd4d78df05161b0e8a5b892c74d18ca6e2ced927ddac62f8baf3",
+      "size": 51629304
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:3a129719b3ee49a44231e17b8892482a66070b0995808fe4793b7426799224f8",
+      "size": 321
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:ea066d40f8befa2086f23b9f7039c2868513a58bbf0d5be3d6abff9665ef5af6",
+      "size": 132422522
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:1be21a6c94a690459920512a340ac5fd40e4ee85c24e9b20e781d402456e824b",
+      "size": 5230
+    }
+  ]
+}

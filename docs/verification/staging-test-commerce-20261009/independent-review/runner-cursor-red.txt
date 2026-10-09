@@ -1,0 +1,25 @@
+finalize sweep 1: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline finalize 11111111-1111-4111-8111-111111111111 retry
+2026-10-09T00:21:52Z test-commerce-pipeline finalize page bound reached items=1 pages=1; the next sweep continues
+finalize sweep 2: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline finalize 11111111-1111-4111-8111-111111111111 retry
+2026-10-09T00:21:52Z test-commerce-pipeline finalize page bound reached items=1 pages=1; the next sweep continues
+finalize calls: ['vasey:finalize-test-payments --limit=1 --no-ansi --no-interaction', 'vasey:finalize-test-payments --limit=1 --no-ansi --no-interaction']
+FAIL finalize: next bounded sweep must advance past the retained first row
+contracts sweep 1: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline contracts 11111111-1111-4111-8111-111111111111 changed
+2026-10-09T00:21:52Z test-commerce-pipeline contracts page bound reached items=1 pages=1; the next sweep continues
+contracts sweep 2: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline contracts 11111111-1111-4111-8111-111111111111 changed
+2026-10-09T00:21:52Z test-commerce-pipeline contracts page bound reached items=1 pages=1; the next sweep continues
+contracts calls: ['vasey:issue-test-contracts --limit=1 --no-ansi --no-interaction', 'vasey:issue-test-contracts --limit=1 --no-ansi --no-interaction']
+FAIL contracts: next bounded sweep must advance past the retained first row
+activate sweep 1: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline activate 11111111-1111-4111-8111-111111111111 asset_unavailable
+2026-10-09T00:21:52Z test-commerce-pipeline activate page bound reached items=1 pages=1; the next sweep continues
+activate sweep 2: exit=0
+2026-10-09T00:21:52Z test-commerce-pipeline activate 11111111-1111-4111-8111-111111111111 asset_unavailable
+2026-10-09T00:21:52Z test-commerce-pipeline activate page bound reached items=1 pages=1; the next sweep continues
+activate calls: ['vasey:activate-test-fulfillment --limit=1 --no-ansi --no-interaction', 'vasey:activate-test-fulfillment --limit=1 --no-ansi --no-interaction']
+FAIL activate: next bounded sweep must advance past the retained first row
+RESULT: 3 of 3 stage cursor checks failed

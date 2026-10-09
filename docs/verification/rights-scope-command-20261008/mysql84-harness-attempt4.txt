@@ -1,0 +1,16 @@
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+Disposable MySQL startup did not become ready.
+2026-10-08T23:51:50.231199Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-08T23:51:50.408272Z 0 [System] [MY-010116] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 8467
+2026-10-08T23:51:50.412161Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-08T23:51:50.472926Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-08T23:51:50.606589Z 0 [Warning] [MY-013829] [Server] Missing data directory for ICU regular expressions: /workspace/.va-studio-toolchain/mysql84/lib64/mysql/private/.
+2026-10-08T23:51:50.609322Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-08T23:51:50.609336Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-08T23:51:50.609889Z 0 [ERROR] [MY-010250] [Server] Failed to create a socket for IPv4 '127.0.0.1': errno: 1.
+2026-10-08T23:51:50.609903Z 0 [ERROR] [MY-010255] [Server] Can't create IP socket: Operation not permitted
+2026-10-08T23:51:50.609910Z 0 [ERROR] [MY-010119] [Server] Aborting
+2026-10-08T23:51:52.068411Z 0 [System] [MY-010910] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-08T23:51:52.068421Z 0 [System] [MY-015016] [Server] MySQL Server - end.

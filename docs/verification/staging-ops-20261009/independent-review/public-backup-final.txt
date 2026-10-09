@@ -1,0 +1,11 @@
+Exact assessed source: b72c8efcb48ea433c58659b824ad32d4c174bf6d
+test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) ... ok
+test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) ... ok
+test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) ... ok
+test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) ... ok
+test_legal_public_asset_and_internal_code_aliases_remain_readable (__main__.PublicLinkProbe.test_legal_public_asset_and_internal_code_aliases_remain_readable) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.209s
+
+OK
