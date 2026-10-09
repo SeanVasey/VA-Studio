@@ -8232,16 +8232,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-file",
-            "version": "3.9.4",
+            "version": "3.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-file.git",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e"
+                "reference": "bfe19eb7cf7d344ce0dd71ed472ac4d0efc371e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/02089faaaed42cb5137d23ba2236e6809124999e",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/bfe19eb7cf7d344ce0dd71ed472ac4d0efc371e6",
+                "reference": "bfe19eb7cf7d344ce0dd71ed472ac4d0efc371e6",
                 "shasum": ""
             },
             "require": {
@@ -8250,7 +8250,7 @@
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.51.2",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8296,7 +8296,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:57:54+00:00"
+            "time": "2026-10-03T09:55:26+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf",
@@ -8385,16 +8385,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-encrypt",
-            "version": "2.11.4",
+            "version": "2.11.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-encrypt.git",
-                "reference": "c9e6ee4456d4701b20897a12e35eb2820c723abd"
+                "reference": "0d11e6dc9548f39eff857d8bf925e297f0430b0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-encrypt/zipball/c9e6ee4456d4701b20897a12e35eb2820c723abd",
-                "reference": "c9e6ee4456d4701b20897a12e35eb2820c723abd",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-encrypt/zipball/0d11e6dc9548f39eff857d8bf925e297f0430b0b",
+                "reference": "0d11e6dc9548f39eff857d8bf925e297f0430b0b",
                 "shasum": ""
             },
             "require": {
@@ -8405,7 +8405,7 @@
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.51.2",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8446,7 +8446,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:58:11+00:00"
+            "time": "2026-10-03T09:55:42+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-filter",
@@ -8516,16 +8516,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-font",
-            "version": "4.4.1",
+            "version": "4.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-font.git",
-                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
+                "reference": "cd9da3e82da10a32c29ff65e2d44a6416fa46f47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
-                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/cd9da3e82da10a32c29ff65e2d44a6416fa46f47",
+                "reference": "cd9da3e82da10a32c29ff65e2d44a6416fa46f47",
                 "shasum": ""
             },
             "require": {
@@ -8539,7 +8539,7 @@
                 "tecnickcom/tc-lib-unicode-data": "^3.0"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.51.2",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8585,7 +8585,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T11:04:30+00:00"
+            "time": "2026-10-03T21:35:29+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-graph",
@@ -8972,23 +8972,23 @@
         },
         {
             "name": "tecnickcom/tc-lib-unicode-data",
-            "version": "3.0.9",
+            "version": "3.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-unicode-data.git",
-                "reference": "24e5cec5ee4ce607fab77aceb1a67a3eaf817528"
+                "reference": "9d894cdcfe82b4143155ec63b110a78607aef763"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-unicode-data/zipball/24e5cec5ee4ce607fab77aceb1a67a3eaf817528",
-                "reference": "24e5cec5ee4ce607fab77aceb1a67a3eaf817528",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-unicode-data/zipball/9d894cdcfe82b4143155ec63b110a78607aef763",
+                "reference": "9d894cdcfe82b4143155ec63b110a78607aef763",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.51.2",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -9028,7 +9028,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:59:03+00:00"
+            "time": "2026-10-03T09:56:31+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
