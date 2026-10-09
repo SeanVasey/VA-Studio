@@ -1,0 +1,10 @@
+# source 8fc077f24136e865975187e7056ade91b4debec3 + working tree: PaidGrantJourney.tsx sha256 b94f29b4f9535b7f, test sha256 c38a8ce3bed08f22; node v24.21.0
+      Tests  1128 passed (1128)
+   Start at  08:11:02
+   Duration  83.06s (tests 54%, environment 34%, import 5%, setup 5%, transform 2%)
+
+Environment  jsdom was created 65 times · 78.79s total, 34% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=0

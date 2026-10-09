@@ -107,7 +107,7 @@ function documentAnswer(x: unknown, o: PaidOrigin): { origin: PaidOrigin; busy: 
 }
 export function PaidGrantJourney() {
   const [data, setData] = useState<Listing | null>(null), [origin, setOrigin] = useState<PaidOrigin | null>(null), [order, setOrder] = useState('');
-  const [status, setStatus] = useState<Status | null>(null), [issued, setIssued] = useState<{ auth: Authorization; originId: string }[]>([]);
+  const [status, setStatus] = useState<Status | null>(null), [issued, setIssued] = useState<{ auth: Authorization; originId: string; orderId: string }[]>([]);
   const [pending, setPending] = useState<Pending | null>(null), [reviewedSaved, setReviewedSaved] = useState(false), [statusAfter, setStatusAfter] = useState<{ pending: Pending; issuedAt: number } | null>(null);
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false), [message, setMessage] = useState(''), [progress, setProgress] = useState('');
   // A continuing preparation: its run number (bumped to stop it), whether it is running, and the last document POST time.
@@ -173,9 +173,10 @@ export function PaidGrantJourney() {
         || !sqlDate(a.expiresAt) || !kind(a.kind) || a.kind !== p.body.kind || !line?.files.some(f => f.kind === a.kind)
         || a.filename !== `paid-license-${line.id}-${a.kind}${media[a.kind][0]}` || a.mimeType !== media[a.kind][1]) throw new Error();
       // The server keeps only a token hash, so each issued authorization stays in memory with its order until it is
-      // submitted, a denial occurs or the page is left; later reads, other orders or other authorizations keep it.
-      const issuedAuth = a as unknown as Authorization, originId = p.origin!.id;
-      setIssued(list => [...list.filter(i => i.auth.id !== issuedAuth.id), { auth: issuedAuth, originId }]); setOrigin(p.origin!);
+      // submitted, a denial occurs or the page is left; later reads, other orders or other authorizations keep it. The
+      // order id lets the page reopen that order after it was cleared, even one older than the bounded index (Codex 4228014577).
+      const issuedAuth = a as unknown as Authorization, originId = p.origin!.id, orderId = p.origin!.orderId;
+      setIssued(list => [...list.filter(i => i.auth.id !== issuedAuth.id), { auth: issuedAuth, originId, orderId }]); setOrigin(p.origin!);
     }
     setPending(null); setReviewedSaved(false);
   }); }
@@ -288,6 +289,9 @@ export function PaidGrantJourney() {
     catch { setMessage(unknown); } finally { form.querySelectorAll('input').forEach(f => { f.value = ''; }); form.remove(); }
   }
   const shown = origin ? issued.filter(i => i.originId === origin.id).map(i => i.auth) : [];
+  // Orders holding an issued, not yet submitted authorization that are not shown (a hidden tab or another order cleared
+  // them): one reopen control per order, using the ids retained at issuance.
+  const unshownIssued = denied ? [] : issued.filter((i, n, all) => i.originId !== origin?.id && all.findIndex(j => j.originId === i.originId) === n);
   const retryable = denied || !origin || status?.originId !== origin.id ? [] : kept.current.filter(m => m.refused).map(m => m.auth)
     .filter(r => shown.every(a => a.id !== r.id) && status.lines.some(l => l.history.some(h => h.id === r.id && h.kind === r.kind && h.status === 'unused')));
   const unfinished = origin?.lines.filter(l => l.documentStatus !== 'complete') ?? [];
@@ -311,6 +315,7 @@ export function PaidGrantJourney() {
           its exact retry is what reopens it. */}
       {pending.origin && origin?.id !== pending.origin.id && <button type="button" disabled={busy}
         onClick={() => { const o = pending.origin!; open(o.id, o.orderId); }}>Reopen this order</button>}</div>}
+    {unshownIssued.map(i => <button type="button" key={i.originId} disabled={busy} onClick={() => open(i.originId, i.orderId)}>Reopen order {i.orderId} to download its authorized file</button>)}
     {!denied && <form onSubmit={e => { e.preventDefault(); finalize(); }}><label htmlFor="paid-order-reference">Saved order reference</label>
       <input id="paid-order-reference" value={order} maxLength={36} autoComplete="off" disabled={busy || !!pending} onChange={e => setOrder(e.target.value)} />
       <button type="submit" disabled={busy || !!pending || !uuid(order)}>Prepare licenses for this paid order</button></form>}
