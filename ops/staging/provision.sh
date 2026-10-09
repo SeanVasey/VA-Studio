@@ -189,6 +189,18 @@ if [ ! -e /etc/vasey-staging/ctl.lock ] && [ ! -L /etc/vasey-staging/ctl.lock ];
 fi
 [ -f /etc/vasey-staging/ctl.lock ] && [ ! -L /etc/vasey-staging/ctl.lock ] \
   && [ "$(stat -c '%u %a' /etc/vasey-staging/ctl.lock)" = '0 600' ] || die "untrusted staging control lock"
+# A stable shared writer lock and a durable root-owned gate cover independent systemd/cron/daemon
+# sweeps between quiesce and resume. Never replace the lock inode or reopen an existing closed gate.
+if [ ! -e /etc/vasey-staging/writer.lock ] && [ ! -L /etc/vasey-staging/writer.lock ]; then
+  (umask 022; set -C; : > /etc/vasey-staging/writer.lock)
+fi
+if [ ! -e /etc/vasey-staging/writer-admission ] && [ ! -L /etc/vasey-staging/writer-admission ]; then
+  (umask 022; set -C; printf 'closed\n' > /etc/vasey-staging/writer-admission)
+fi
+for file in /etc/vasey-staging/writer.lock /etc/vasey-staging/writer-admission; do
+  [ -f "$file" ] && [ ! -L "$file" ] && [ "$(stat -c '%u %a' "$file")" = '0 644' ] \
+    || die "untrusted staging writer admission"
+done
 info "directories under $ROOT ready (private 0700 $APP_USER)"
 
 # ---------------------------------------------------------------- 5. MySQL

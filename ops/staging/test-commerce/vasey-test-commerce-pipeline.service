@@ -9,6 +9,8 @@
 #
 # <APP_USER> must be the user that owns storage/app/private and runs the queue workers (on Forge,
 # usually "forge"). The script reads no secret itself; artisan reads the application's .env.
+# For the Forge kit set <APP_ROOT> to /srv/vasey-staging/current, never the mirror. Its fixed root-owned
+# writer gate automatically skips scheduled starts between ctl quiesce and successful resume.
 [Unit]
 Description=VASEY.AUDIO staging test-commerce pipeline sweep (Stripe test mode only)
 After=network-online.target mysql.service
@@ -26,6 +28,7 @@ Environment=CONTRACT_PAGE_LIMIT=5
 Environment=MAX_PAGES=20
 Environment=COMMAND_TIMEOUT_SECONDS=600
 Environment=RECONCILE_INTERVAL_SECONDS=60
+Environment=PHP_BIN=/usr/bin/php8.4
 TimeoutStartSec=3600
 Nice=5
 NoNewPrivileges=yes

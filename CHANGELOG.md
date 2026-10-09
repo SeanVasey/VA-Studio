@@ -10,7 +10,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
-- Private Laravel Forge staging kit with protected release activation, isolated runtime admission, test-only nginx/FPM/workers, least-privilege MySQL provisioning and recoverable database/private-file/environment backups. Hosting credentials, real content and the first Stripe TEST purchase remain operator inputs.
+- Private Laravel Forge staging kit with protected release activation, isolated runtime admission, test-only nginx/FPM/workers, least-privilege MySQL provisioning and recoverable database/private-file/environment backups. A root-owned admission gate and shared writer lock pause independent test-commerce sweeps through quiesce, snapshot and switch until healthy resume. Hosting credentials, real content and the first Stripe TEST purchase remain operator inputs.
 
 - Private Stripe TEST rehearsal profile, policy validator, bounded post-payment pipeline runner and purchase walkthrough. Cursor progress covers retained work across sweeps; failed state persistence is reported without private paths. Templates enable nothing until the operator supplies and validates the private host configuration.
 

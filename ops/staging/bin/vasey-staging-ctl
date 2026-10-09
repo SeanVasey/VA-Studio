@@ -52,6 +52,42 @@ BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
 
 valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
 
+WRITER_LOCK=/etc/vasey-staging/writer.lock
+WRITER_GATE=/etc/vasey-staging/writer-admission
+
+writer_files() {
+  protected_dir /etc/vasey-staging
+  local file
+  for file in "$WRITER_LOCK" "$WRITER_GATE"; do
+    [ -f "$file" ] && [ ! -L "$file" ] && [ "$(stat -c '%u %a' -- "$file")" = '0 644' ] \
+      || die "missing or untrusted staging writer admission"
+  done
+}
+
+writer_gate_value() {
+  writer_files
+  [ "$(stat -c %s -- "$WRITER_GATE")" -le 7 ] || die "invalid staging writer admission"
+  if cmp -s -- "$WRITER_GATE" <(printf 'open\n'); then printf 'open\n'; return; fi
+  if cmp -s -- "$WRITER_GATE" <(printf 'closed\n'); then printf 'closed\n'; return; fi
+  die "invalid staging writer admission"
+}
+
+writer_gate_write() {
+  writer_files
+  local scratch
+  scratch=$(mktemp /etc/vasey-staging/.writer-admission.XXXXXXXX) || die "cannot stage writer admission"
+  if ! { printf '%s\n' "$1" > "$scratch" && chmod 0644 "$scratch" && mv -T -- "$scratch" "$WRITER_GATE"; }; then
+    rm -f -- "$scratch"; die "cannot publish writer admission"
+  fi
+}
+
+writer_barrier() {
+  writer_files
+  exec 7<"$WRITER_LOCK"
+  flock -xn 7 || die "an admitted test-commerce sweep is still active; gate stays closed, retry quiesce after it finishes"
+  [ "$(writer_gate_value)" = closed ] || die "writer admission must be closed (run quiesce first)"
+}
+
 # Every ancestor of a privileged path must remain outside the application's rename authority.
 # The default /srv/vasey-staging ancestry is root-owned; custom roots must meet the same boundary.
 protected_dir() {
@@ -112,7 +148,7 @@ probe() {
     --resolve "$VASEY_STAGING_HOST:443:127.0.0.1" "https://$VASEY_STAGING_HOST/" 2>/dev/null || true
 }
 
-as_app() { runuser -u "$VASEY_APP_USER" -- "$@" 8>&-; }
+as_app() { runuser -u "$VASEY_APP_USER" -- "$@" 8>&- 7<&-; }
 
 served_release() {
   [ -L "$CURRENT" ] || return 1
@@ -135,7 +171,7 @@ workers_stopped() {
     case "$s" in STOPPED|EXITED|FATAL) ;; *) return 1 ;; esac
   done
   # Nothing of the application user may still run artisan workers outside supervisor either.
-  ! pgrep -u "$VASEY_APP_USER" -f 'artisan (queue:work|queue:listen|schedule:work|schedule:run|horizon)' >/dev/null
+  ! pgrep -u "$VASEY_APP_USER" -f 'artisan (queue:work|queue:listen|schedule:work|schedule:run|horizon|vasey:(process-stripe-receipts|reconcile-test-payments|finalize-test-payments|issue-test-contracts|activate-test-fulfillment))' >/dev/null
 }
 
 web_stopped() {
@@ -190,6 +226,10 @@ cmd_detach() {
 }
 
 cmd_quiesce() {
+  # Close future scheduled invocations before checking the stable shared lock. An already admitted
+  # sweep makes this action fail before snapshot/migration; the durable closed gate remains for retry.
+  writer_gate_write closed
+  writer_barrier
   local cur
   if [ ! -e "$CURRENT" ] && [ ! -L "$CURRENT" ]; then
     echo "no served release; nothing to quiesce"
@@ -215,6 +255,7 @@ cmd_quiesce() {
 }
 
 cmd_switch() {
+  writer_barrier
   local sha=${1:-}; valid_sha "$sha" || die "switch needs a 40-hex SHA"
   sealed_release "$sha"
   workers_stopped && web_stopped || die "switch requires a quiesced host"
@@ -232,6 +273,7 @@ cmd_switch() {
 }
 
 cmd_resume() {
+  writer_barrier
   local cur; cur=$(served_release) || die "no served release to resume"
   [ -f "$cur/storage/framework/maintenance.php" ] || die "served release is not in maintenance; resume expects it to be"
   local sha; sha=$(basename "$cur")
@@ -259,10 +301,12 @@ cmd_resume() {
     fi
     die "GET / answered $code after artisan up: back in maintenance (marker and 503 proven); fix or roll back"
   fi
-  echo "resumed $sha (GET / 200)"
+  writer_gate_write open
+  echo "resumed $sha (GET / 200, test-commerce admission open)"
 }
 
 cmd_snapshot() {
+  writer_barrier
   workers_stopped && web_stopped || die "snapshot requires a quiesced host (run quiesce first)"
   [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
   "$BACKUP_BIN" predeploy
@@ -293,6 +337,7 @@ cmd_status() {
   echo "host: $VASEY_STAGING_HOST"
   echo "current: $(served_release 2>/dev/null || echo none)"
   echo "php-fpm: $(systemctl is-active "$VASEY_PHP_FPM_SERVICE" 2>/dev/null || true)"
+  echo "test-commerce admission: $(writer_gate_value)"
   local p; for p in "${PROGRAMS[@]}"; do echo "$p: $(program_state "$p")"; done
   echo "GET /: $(probe)"
 }

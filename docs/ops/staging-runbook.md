@@ -154,8 +154,12 @@ those flags on, the automatic part of the pipeline is:
 2. Verification queues `FinalizeTestPaymentJob` on `payments`.
 3. Finalization queues `IssueTestContractJob` on `contracts`.
 
-**Everything after that is manual.** Run these as `forge` in the served release. `ORDER` is the opaque order
-UUID shown on the order page and in the admin lists.
+The bounded runner also reconciles missed observations, finalizes, issues contracts and activates ready
+orders. Use the reviewed current-based timer/scheduler from [the purchase walkthrough](staging-test-purchase.md#4-start-the-pipeline-runner).
+It participates in the root-owned writer gate, so quiesce blocks future sweeps until successful resume.
+The commands below are manual inspection/recovery alternatives; per-order delivery enablement remains
+manual. Run them as `forge` in the served release. `ORDER` is the opaque order UUID shown on the order page
+and in the admin lists. Stop any manual writer before snapshot/migration; do not use a mirror or old runner.
 
 ```sh
 # Inspect what arrived (no provider I/O):
@@ -287,6 +291,10 @@ failed deploy's evidence directory.
 still points at the previous release and its environment is unchanged. A failed quiesce or partial resume
 does not prove stopped writers. Inspect `ctl status` and establish quiesce before resuming. If any migration
 ran, use B; if same-SHA configuration replacement began, use D.
+
+An admitted test-commerce sweep can make quiesce refuse before stopping services. Its durable admission
+marker stays closed, so new scheduled sweeps skip. Wait for the existing sweep to finish, then retry
+quiesce and follow the applicable recovery below. Never edit the marker to bypass a failed operation.
 
 ```sh
 cd "$(readlink -f /srv/vasey-staging/current)"

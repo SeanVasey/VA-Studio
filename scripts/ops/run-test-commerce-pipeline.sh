@@ -32,7 +32,9 @@
 #   RECONCILE_INTERVAL_SECONDS minimum seconds between reconcile sweeps (default 60; 0 = every sweep)
 #   STATE_DIR                  lock, reconcile cursor and timestamp (default $APP_ROOT/storage/app/private/test-commerce-pipeline)
 #   LOOP_ITERATIONS            sweeps per --loop run (default 60), LOOP_SLEEP_SECONDS between them (default 60)
-# Exit codes: 0 every stage succeeded (or another sweep held the lock), 1 a stage failed, 2 usage.
+# On the Forge kit, the fixed root-owned /etc/vasey-staging writer gate admits each sweep under a
+# shared lock. Quiesce closes it before draining writers; timers/daemons cannot enter until resume.
+# Exit codes: 0 stages succeeded or admission skipped, 1 a stage failed, 2 usage/untrusted admission.
 # Logs: one line per item, as "<stage> <opaque id> <bounded outcome>". Command output that does not
 # match those shapes is never echoed, so secrets, paths or provider bodies cannot reach the log.
 set -uo pipefail
@@ -72,9 +74,39 @@ fi
 [[ -f "$APP_ROOT/artisan" ]] || { printf 'APP_ROOT does not contain artisan\n' >&2; exit 2; }
 command -v timeout >/dev/null 2>&1 || { printf 'coreutils timeout is required\n' >&2; exit 2; }
 command -v flock >/dev/null 2>&1 || { printf 'util-linux flock is required\n' >&2; exit 2; }
-if ! { mkdir -p -- "$STATE_DIR" && chmod 700 -- "$STATE_DIR"; } 2>/dev/null; then
-  printf 'cannot prepare STATE_DIR\n' >&2; exit 2
-fi
+
+writer_admit() {
+  local directory=/etc/vasey-staging lock=/etc/vasey-staging/writer.lock gate=/etc/vasey-staging/writer-admission
+  local ancestor mode path
+  # Other local harnesses need no kit gate. An existing kit directory always requires both files;
+  # partial provisioning and dangling links cannot silently fall back to an unguarded sweep.
+  [[ -e "$directory" || -L "$directory" ]] || return 0
+  [[ -d "$directory" && ! -L "$directory" && "$(/usr/bin/readlink -f -- "$directory")" == "$directory" ]] || return 2
+  ancestor=$directory
+  while :; do
+    [[ "$(/usr/bin/stat -c %u -- "$ancestor")" == 0 ]] || return 2
+    mode=$(/usr/bin/stat -c %a -- "$ancestor") || return 2
+    (( (8#$mode & 8#022) == 0 )) || return 2
+    [[ "$ancestor" != / ]] || break
+    ancestor=$(/usr/bin/dirname -- "$ancestor")
+  done
+  for path in "$lock" "$gate"; do
+    [[ -f "$path" && ! -L "$path" && -r "$path" && "$(/usr/bin/stat -c '%u %a' -- "$path")" == '0 644' ]] || return 2
+  done
+  # The stable lock inode is not replaced by provision or gate updates. Keep this descriptor in
+  # artisan children too: killing the runner must not release an orphan child's writer admission.
+  exec 8<"$lock" || return 2
+  if ! /usr/bin/flock -sn 8; then
+    log "writer admission held by host control; skipped"
+    return 3
+  fi
+  [[ "$(/usr/bin/stat -c %s -- "$gate")" -le 7 ]] || return 2
+  if /usr/bin/cmp -s -- "$gate" <(printf 'open\n'); then return 0; fi
+  if /usr/bin/cmp -s -- "$gate" <(printf 'closed\n'); then
+    log "writer admission closed; skipped"; return 3
+  fi
+  return 2
+}
 
 # Publish state atomically, or fail without exposing private paths. A successful sweep must not
 # claim continuation/cadence was saved when disk, ownership or path errors prevented it.
@@ -199,20 +231,48 @@ sweep() {
   return "$failed"
 }
 
-exec 9> "$STATE_DIR/pipeline.lock" || { printf 'cannot open lock file\n' >&2; exit 2; }
-if ! flock -n 9; then
-  log "another sweep holds the lock; skipped"
-  exit 0
-fi
+PIPELINE_LOCK_HELD=0
+guarded_sweep() {
+  local status
+  writer_admit
+  status=$?
+  if (( status != 0 )); then
+    exec 8<&-
+    (( status == 3 )) && return 0
+    printf 'untrusted staging writer admission\n' >&2; return 2
+  fi
+  # Even lock/state-directory creation occurs only after admission. Closed timer invocations make
+  # no private-store changes while a snapshot is running.
+  if ! { mkdir -p -- "$STATE_DIR" && chmod 700 -- "$STATE_DIR"; } 2>/dev/null; then
+    exec 8<&-; printf 'cannot prepare STATE_DIR\n' >&2; return 2
+  fi
+  if (( PIPELINE_LOCK_HELD == 0 )); then
+    if ! exec 9>> "$STATE_DIR/pipeline.lock"; then
+      exec 8<&-; printf 'cannot open lock file\n' >&2; return 2
+    fi
+    if ! flock -n 9; then
+      exec 9>&- 8<&-
+      log "another sweep holds the lock; skipped"; return 0
+    fi
+    PIPELINE_LOCK_HELD=1
+  fi
+  sweep
+  status=$?
+  exec 8<&-
+  return "$status"
+}
 
 if [[ "$mode" == once ]]; then
-  sweep
+  guarded_sweep
   exit $?
 fi
 
 overall=0
 for (( iteration = 1; iteration <= LOOP_ITERATIONS; iteration++ )); do
-  sweep || overall=1
+  guarded_sweep
+  status=$?
+  (( status != 2 )) || exit 2
+  (( status == 0 )) || overall=1
   (( iteration < LOOP_ITERATIONS )) && sleep "$LOOP_SLEEP_SECONDS"
 done
 exit "$overall"

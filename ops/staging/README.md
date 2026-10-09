@@ -75,6 +75,16 @@ entire pre-deploy backup. It is separate from the outer deploy lock, and applica
 inherit its descriptor. Re-provisioning preserves its inode. Nightly snapshots use this same helper action
 and fresh stopped-writer proof, so direct `ctl resume` cannot restart writers during a private-file copy.
 
+The independent test-commerce runner shares `/etc/vasey-staging/writer.lock` and the root-owned
+`writer-admission` marker. Both start with admission closed; re-provision preserves their state and the
+lock inode. Every sweep checks the protected files and holds a shared lock through its artisan children,
+including an orphan after runner termination. Quiesce atomically closes the marker before taking the
+exclusive lock; an active sweep makes quiesce fail and leave admission closed for a later retry.
+Snapshot and switch require closed admission and hold the exclusive barrier. Only resume after GET `/`
+returns 200 opens admission again. The timer may remain scheduled: future invocations skip without private
+state changes. Use only the reviewed oneshot runner from `current`; remove mirror/old-copy jobs first.
+This does not fence arbitrary manual SQL or an unreviewed script: operators must stop those separately.
+
 ## Provisioning, step by step
 
 The **Who** column says whether Sean does the step in the Forge UI (or at his registrar) or a script does it.

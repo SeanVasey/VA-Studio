@@ -120,10 +120,10 @@ restore_check() {
 
   # Disposable server: its own datadir and socket, no TCP, no binlog, never the staging server.
   install -d -m 0700 -o mysql -g mysql -- "$data" "$run"
-  "$VASEY_MYSQLD" --no-defaults --initialize-insecure --user=mysql --datadir="$data" 8>&- >"$RC_WORK/init.log" 2>&1 \
+  "$VASEY_MYSQLD" --no-defaults --initialize-insecure --user=mysql --datadir="$data" 8>&- 7<&- >"$RC_WORK/init.log" 2>&1 \
     || die "disposable mysqld --initialize failed (AppArmor? see docs/ops/staging-runbook.md)"
   "$VASEY_MYSQLD" --no-defaults --user=mysql --datadir="$data" --socket="$sock" --pid-file="$run/mysqld.pid" \
-    --skip-networking --mysqlx=OFF --disable-log-bin --log-error="$run/error.log" 8>&- >/dev/null 2>&1 &
+    --skip-networking --mysqlx=OFF --disable-log-bin --log-error="$run/error.log" 8>&- 7<&- >/dev/null 2>&1 &
   RC_PID=$!
   local up=0
   for _ in $(seq 1 60); do
@@ -137,7 +137,7 @@ restore_check() {
   mysql "${R[@]}" < "$bk/database.sql" || die "loading the dump into the disposable server failed"
   install -d -m 0700 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$rpriv"
   runuser -u "$VASEY_APP_USER" -- tar --extract --file=- --directory="$rpriv" --no-same-owner --preserve-permissions \
-    8>&- < "$bk/private.tar" || die "private archive extraction failed"
+    8>&- 7<&- < "$bk/private.tar" || die "private archive extraction failed"
 
   # 4. Verify: exact file set and hashes, exact directory set, owner-only modes and ownership, re-dump diff.
   if [ -s "$bk/private.sha256" ]; then
