@@ -110,22 +110,22 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Sixteen shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
+  # Twenty-four shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
   # Foundation run 37967128232 measured hosted MySQL 8.4 at about 54 s per selected case (shards 2 and 3:
-  # 186 minutes each), not the 35 s assumed before, and its cancelled shards ran slower still. At 68 s per
-  # FinalizationDatabaseMigrations case the busiest of these shards is about 122 minutes, but scaling the
-  # unmeasured files by the cancelled shards' pace projects up to about 179 to 210 minutes, which would
-  # exceed this limit. GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the
-  # limit stays 175 minutes. Shard durations on GitLab stay unmeasured until a hosted run.
+  # 186 minutes each), and its cancelled shards ran slower still. Scaling the untimed files by the cancelled
+  # shards' pace (1.72 to 2.03 times) projects the busiest shard at about 141 to 166 minutes. That shard is
+  # BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it. GitLab.com hosted runners
+  # kill any job at 3 hours regardless of this setting, so the limit stays 175 minutes; job setup counts
+  # against it, so the upper projection leaves little room. Shard durations on GitLab stay unmeasured.
   timeout: 175m
   parallel:
     matrix:
-      - SHARD: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16']
+      - SHARD: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
   services:
     - name: mysql:8.4
       alias: mysql
   variables:
-    SHARD_COUNT: '16'
+    SHARD_COUNT: '24'
     DB_CONNECTION: mysql
     MYSQL_DATABASE: vaseyaudio_test
     MYSQL_ROOT_PASSWORD: disposable-gitlab-test-only

@@ -20,8 +20,8 @@ ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("database_proofs", ROOT / "scripts/ci/database-receipts.py")
 proof = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(proof)
-# Sixteen MySQL shards keep each GitLab job under the hosted 3-hour cap at measured hosted speed; the partition matches GitHub's.
-COUNTS = {"mysql": 16, "sqlite": 2}
+# Twenty-four MySQL shards keep each GitLab job under the hosted 3-hour cap at projected hosted speed; the partition matches GitHub's.
+COUNTS = {"mysql": 24, "sqlite": 2}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"
