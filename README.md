@@ -144,8 +144,15 @@ conditions recorded. Prefer local affected checks; manually request
 
 **Foundation CI** is manual final verification through
 `.github/workflows/final-verification.yml`, requiring the exact reviewed
-`expected_sha`. It retains the complete MySQL/SQLite partitions and all browser
-checks. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
+`expected_sha`. SQLite runs the complete PHP suite. MySQL runs only the reviewed
+[native selection](docs/verification/mysql-native-selection-20261009/README.md):
+files owning a method in the SQLite skip census, migration test files and a reviewed
+include list (163 of 557 files, 1,765 of 7,642 cases). Other tests no longer run on
+MySQL in Foundation CI, including 47 driver-branching test files pinned in its `residual_files`.
+MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
+and each of them must have run on SQLite. GitHub and the GitLab workflow both split that selection
+into 8 MySQL shards; GitLab's 175-minute job limit stays under its hosted runners' 3-hour cap.
+All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real
 providers, device playback, restore drills and production deployment remain

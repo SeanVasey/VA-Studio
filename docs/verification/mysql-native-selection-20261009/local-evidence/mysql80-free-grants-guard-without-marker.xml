@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FreeGrantSchemaRecoveryTest" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" tests="8" assertions="0" errors="0" failures="8" skipped="0" time="0.000000">
+    <testcase name="test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="117" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="169" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write" tests="5" assertions="0" errors="0" failures="5" skipped="0" time="0.000000">
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #0" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="199" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #0
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #1" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="199" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #1
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #2" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="199" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #2
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #3" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="199" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #3
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #4" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="199" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #4
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target" file="/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php" line="232" class="Tests\Feature\FreeGrantSchemaRecoveryTest" classname="Tests.Feature.FreeGrantSchemaRecoveryTest" assertions="0" time="0.000000">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target
+A dedicated synthetic free-grant schema, or the CI job's disposable database, is required.
+Failed asserting that false is true.
+
+/home/user/wt-mysel/tests/Feature/FreeGrantSchemaRecoveryTest.php:27
+/home/user/wt-mysel/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

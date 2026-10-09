@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Native GitLab provenance and complete-shard adversarial unit fixtures, not acceptance."""
+from contextlib import ExitStack
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import importlib.util
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -41,7 +43,8 @@ def env():
             'CI_API_V4_URL': native.API, 'CI_COMMIT_SHA': 'a' * 40, 'CI_PIPELINE_ID': '123',
             'CI_PIPELINE_SOURCE': 'merge_request_event', 'CI_MERGE_REQUEST_IID': '1',
             'CI_MERGE_REQUEST_PROJECT_ID': str(native.PROJECT), 'CI_MERGE_REQUEST_EVENT_TYPE': 'detached',
-            'CI_JOB_ID': '13', 'CI_JOB_NAME': 'backend', 'CI_RUNNER_ID': '513'}
+            # FakeGitlab numbers jobs from 1 with the aggregate 'backend' job last.
+            'CI_JOB_ID': str(len(native.UPSTREAM) + 1), 'CI_JOB_NAME': 'backend', 'CI_RUNNER_ID': str(500 + len(native.UPSTREAM) + 1)}
 
 
 def runtime(engine):
@@ -59,8 +62,8 @@ def producer(job):
     return {'job_id': job['id'], 'job_name': job['name'], 'runner_id': job['runner']['id'], 'job_image_reference': 'php:8.4-cli-bookworm'}
 
 
-def evidence(engine, shard, job, alternate=False):
-    files = fixtures.evidence(engine, shard, alternate, count=native.COUNTS[engine])
+def evidence(engine, shard, job, alternate=False, mysql_rows=None):
+    files = fixtures.evidence(engine, shard, alternate, count=native.COUNTS[engine], mysql_rows=mysql_rows)
     prefix = f'phpunit-ci-{engine}-{shard}'
     del files[prefix + '-receipt.json']
     initial = {'schema_version': 1, 'purpose': 'gitlab-database-start-not-acceptance', 'engine': engine, 'shard': shard,
@@ -69,13 +72,14 @@ def evidence(engine, shard, job, alternate=False):
     files[prefix + '-start.json'] = proof.canonical(initial)
     value = initial | {'purpose': 'gitlab-database-receipt-not-acceptance', 'runtime_sha256': proof.digest(proof.canonical(runtime(engine))),
                        'test_step_outcome': 'success', 'finished_at': at(-30),
-                       **proof.database_evidence(files, {'checkout_root': str(ROOT), 'policy_sha256': identity()['policy_sha256']}, engine, shard, {fixtures.SKIP}, shard_count=native.COUNTS[engine])}
+                       **proof.database_evidence(files, {'checkout_root': str(ROOT), 'policy_sha256': identity()['policy_sha256']}, engine, shard, {fixtures.SKIP}, shard_count=native.COUNTS[engine],
+                                                  selection=fixtures.SELECTION, mysql_skips={fixtures.MYSQL_SKIP})}
     files[prefix + '-receipt.json'] = proof.canonical(value)
     return files
 
 
 class FakeGitlab:
-    def __init__(self):
+    def __init__(self, mysql_rows=None):
         self.pipeline = {'id': 123, 'project_id': native.PROJECT, 'sha': 'a' * 40,
                          'source': 'merge_request_event', 'ref': identity()['ref'], 'status': 'running', 'created_at': at(-70)}
         self.rows, self.archives = [], {}
@@ -89,7 +93,7 @@ class FakeGitlab:
             self.rows.append(job)
             if name in native.DATABASE_JOBS:
                 engine, shard = native.DATABASE_JOBS[name]
-                self.replace(identifier, evidence(engine, shard, job))
+                self.replace(identifier, evidence(engine, shard, job, mysql_rows=mysql_rows))
         self.calls = 0
 
     def get(self, path):
@@ -113,15 +117,28 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
-    def test_native_policy_stays_four_plus_two_when_github_uses_eight_plus_two(self):
-        self.assertEqual({'mysql': 4, 'sqlite': 2}, native.COUNTS)
-        self.assertEqual({'mysql': 8, 'sqlite': 2}, proof.COUNTS)
-        self.assertEqual(6, len(native.DATABASE_JOBS))
+    def test_native_policy_matches_githubs_eight_plus_two_under_the_hosted_three_hour_cap(self):
+        self.assertEqual({'mysql': 8, 'sqlite': 2}, native.COUNTS)
+        self.assertEqual(proof.COUNTS, native.COUNTS)
+        self.assertEqual(10, len(native.DATABASE_JOBS))
         workflow = (Path(__file__).parents[2] / '.gitlab-ci.yml').read_text()
         for engine, count in native.COUNTS.items():
             block = workflow.split(f'backend-{engine}:\n', 1)[1].split('\n\n', 1)[0]
             self.assertIn('SHARD: [' + ', '.join(repr(str(n)) for n in range(1, count + 1)) + ']', block)
             self.assertIn(f"SHARD_COUNT: '{count}'", block)
+        # GitLab.com hosted runners stop any job at 3 hours, so the MySQL limit must stay below 180 minutes.
+        mysql_block = workflow.split('backend-mysql:\n', 1)[1].split('\n\n', 1)[0]
+        self.assertIn('\n  timeout: 175m\n', mysql_block)
+        # The shared template narrows only MySQL to the reviewed native selection.
+        template = workflow.split('.database:\n', 1)[1].split('\n\n', 1)[0]
+        self.assertIn('if [ "$DB_CONNECTION" = mysql ]; then set -- --mysql-native-selection; else set --; fi', template)
+        self.assertIn('--timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json" "$@"', template)
+        self.assertEqual(1, workflow.count('--mysql-native-selection'))
+        # The native isolation variables are pinned to the MySQL job's own variables only.
+        mysql_block = workflow.split('backend-mysql:\n', 1)[1].split('\n\n', 1)[0]
+        for variable in ('ATTACHMENT_NATIVE_ISOLATED', 'VA_CI_DISPOSABLE_MYSQL'):
+            self.assertEqual(1, workflow.count(variable), variable)
+            self.assertIn(f"\n    {variable}: '1'\n", mysql_block.split('\n  variables:\n', 1)[1] + '\n', variable)
 
     def test_physical_write_process_control_is_required_by_both_engine_receipts(self):
         for engine in ('sqlite', 'mysql'):
@@ -145,19 +162,101 @@ class NativeCollectorTests(unittest.TestCase):
                 with self.subTest(engine=engine, forged_archive_missing=extension), self.assertRaisesRegex(proof.ReceiptError, 'Unsupported PHP runtime'):
                     self.collect(api)
 
+    mysql_census = frozenset({fixtures.MYSQL_SKIP})
+
     def collect(self, api):
         with patch.object(native, 'source', return_value=identity()), patch.object(proof, 'sqlite_skip_pairs', return_value={fixtures.SKIP}), \
+                patch.object(proof, 'mysql_selection', return_value=fixtures.SELECTION), patch.object(proof, 'mysql_skip_pairs', return_value=self.mysql_census), \
                 patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
             return native.collect(ROOT, env(), api)
 
-    def test_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
+    def test_ten_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
         value = self.collect(FakeGitlab())
-        self.assertEqual(6, len(value['database_receipts']))
-        self.assertEqual(12, len(value['upstream_jobs']))
+        self.assertEqual(10, len(value['database_receipts']))
+        self.assertEqual(16, len(value['upstream_jobs']))
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
-        self.assertEqual(len(fixtures.ROWS), sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(len(fixtures.SELECTED_ROWS) - 1, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(1, sum(r['results']['skipped_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
+        self.assertEqual(len(fixtures.ROWS) - 1, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'sqlite'))
+        self.assertIn('native selection', value['mysql_scope'])
+
+    def test_sqlite_skipped_identity_not_executed_on_mysql_rejects_even_when_selection_agrees(self):
+        def forged(full, pairs, selection):
+            return {key: owner for key, owner in full['cases'].items() if re.fullmatch(selection['file_pattern'], owner)}
+        # The fixtures and the native collector load separate module copies; forge the selection in both.
+        with patch.object(proof, 'native_selection', side_effect=forged), patch.object(fixtures.receipt, 'native_selection', side_effect=forged):
+            api = FakeGitlab(mysql_rows=fixtures.MIGRATION_ROWS)
+            with self.assertRaisesRegex(proof.ReceiptError, 'SQLite-skipped identity was not executed on genuine MySQL'):
+                self.collect(api)
+
+    def forge(self, *, mysql_skips=None, sqlite_skips=None):
+        """Forge every per-shard proof (fixture and native module copies) so only collector checks can refuse."""
+        def forging(original):
+            def call(*args, **kwargs):
+                args = list(args)
+                if args[2] == 'mysql' and mysql_skips is not None:
+                    kwargs = kwargs | {'mysql_skips': mysql_skips}
+                if args[2] == 'sqlite' and sqlite_skips is not None:
+                    args[4] = sqlite_skips
+                return original(*args, **kwargs)
+            return call
+        stack = ExitStack()
+        stack.enter_context(patch.object(proof, 'database_evidence', side_effect=forging(proof.database_evidence)))
+        stack.enter_context(patch.object(fixtures.receipt, 'database_evidence', side_effect=forging(fixtures.receipt.database_evidence)))
+        return stack
+
+    def test_collector_refuses_a_method_in_both_skip_censuses(self):
+        api = FakeGitlab()
+        self.mysql_census = frozenset({fixtures.MYSQL_SKIP, fixtures.SKIP})
+        with self.forge(mysql_skips={fixtures.MYSQL_SKIP}), self.assertRaisesRegex(proof.ReceiptError, 'both the SQLite and the MySQL'):
+            self.collect(api)
+
+    def test_collector_refuses_mysql_skips_that_differ_from_the_reviewed_census(self):
+        fixtures.MYSQL_RESULT_SKIPS = set()
+        try:
+            with self.forge(mysql_skips=set()):
+                api = FakeGitlab()
+        finally:
+            fixtures.MYSQL_RESULT_SKIPS = {fixtures.MYSQL_SKIP}
+        with self.forge(mysql_skips=set()), self.assertRaisesRegex(proof.ReceiptError, 'Genuine MySQL skip identities differ'):
+            self.collect(api)
+
+    def test_collector_refuses_a_mysql_skipped_identity_that_sqlite_also_skipped(self):
+        fixtures.EXTRA_SQLITE_SKIPS.add(fixtures.MYSQL_SKIP)
+        try:
+            with self.forge(sqlite_skips={fixtures.SKIP, fixtures.MYSQL_SKIP}):
+                api = FakeGitlab()
+        finally:
+            fixtures.EXTRA_SQLITE_SKIPS.clear()
+        with self.forge(sqlite_skips={fixtures.SKIP, fixtures.MYSQL_SKIP}), \
+                self.assertRaisesRegex(proof.ReceiptError, 'A MySQL-skipped identity was not executed on SQLite'):
+            self.collect(api)
+
+    def test_collector_recomputes_the_mysql_selection_instead_of_trusting_the_executed_shards(self):
+        # Every per-shard proof (fixture and native module copies) is forged to accept a selection
+        # without the reviewed include file; only the collector's own recomputation can refuse it.
+        without = fixtures.SELECTION | {'include_files': ()}
+        def forging(original):
+            def call(*args, **kwargs):
+                return original(*args, **(kwargs | {'selection': without} if args[2] == 'mysql' else kwargs))
+            return call
+        rows = [row for row in fixtures.SELECTED_ROWS if row[1] != fixtures.INCLUDED]
+        with patch.object(proof, 'database_evidence', side_effect=forging(proof.database_evidence)), \
+                patch.object(fixtures.receipt, 'database_evidence', side_effect=forging(fixtures.receipt.database_evidence)):
+            api = FakeGitlab(mysql_rows=rows)
+            with self.assertRaisesRegex(proof.ReceiptError, 'Executed MySQL partitions differ from the MySQL-native selection'):
+                self.collect(api)
+
+    def test_complete_or_unselected_mysql_partition_rejects(self):
+        # Archives forged under a policy that selects the complete census; the collector recomputes the real selection.
+        def complete(full, pairs, selection):
+            return dict(full['cases'])
+        with patch.object(proof, 'native_selection', side_effect=complete), patch.object(fixtures.receipt, 'native_selection', side_effect=complete):
+            api = FakeGitlab(mysql_rows=fixtures.ROWS)
+        with self.assertRaisesRegex(proof.ReceiptError, 'Partition loses or duplicates'):
+            self.collect(api)
 
     def test_wrong_pipeline_project_commit_source_ref_or_own_job_rejects(self):
         for field, bad in [('id',124), ('project_id',1), ('sha','c'*40), ('source','schedule'), ('ref','main'), ('status','success'), ('created_at',at(10))]:
@@ -199,7 +298,7 @@ class NativeCollectorTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
         api = FakeGitlab(); metadata = api.rows[0]['artifacts'][0]
         api.rows[0]['artifacts_file'] = {'filename':metadata['filename'],'size':metadata['size']}
-        self.assertEqual(6,len(self.collect(api)['artifacts']))
+        self.assertEqual(10,len(self.collect(api)['artifacts']))
 
     def test_receipt_wrong_source_job_runner_runtime_dependencies_time_or_start_rejects(self):
         for mutation in ('source','job','runner','image','mysql_version','mysql_schema','mysql_isolation','php','dependencies','runtime_hash','time','start'):
@@ -232,6 +331,19 @@ class NativeCollectorTests(unittest.TestCase):
             elif mutation == 'unknown': case.set('name','test_unselected')
             files['phpunit-ci-mysql-1-results.xml'] = ET.tostring(tree); api.replace(1,files)
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
+
+    def test_old_four_shard_or_mixed_shard_count_mysql_archives_reject(self):
+        # A 4-shard archive from before the move to 8 shards cannot pass, alone (mixed counts) or in the first
+        # four MySQL slots: its per-shard config and listing members are named for 4 shards, not 8.
+        mysql_jobs = [row for row in FakeGitlab().rows if native.DATABASE_JOBS.get(row['name'], ('',))[0] == 'mysql']
+        for scope in ('one', 'all_first_four'):
+            api = FakeGitlab()
+            for row in mysql_jobs[:1] if scope == 'one' else mysql_jobs[:4]:
+                engine, shard = native.DATABASE_JOBS[row['name']]
+                with patch.dict(native.COUNTS, {'mysql': 4}):
+                    api.replace(row['id'], evidence(engine, shard, api.rows[row['id'] - 1]))
+            with self.subTest(scope=scope), self.assertRaisesRegex(proof.ReceiptError, 'unexpected ZIP entry'):
+                self.collect(api)
 
     def test_inconsistent_partition_manifest_rejects(self):
         api = FakeGitlab(); api.replace(1,evidence('mysql',1,api.rows[0],alternate=True))

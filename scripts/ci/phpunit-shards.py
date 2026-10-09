@@ -12,6 +12,17 @@ gets a file; the proof below requires every expanded case exactly once regardles
 Each CI job derives the same partition from the same commit, so the committed timing
 file is an input to that partition and changes only through review.
 
+With --mysql-native-selection (MySQL only), discovery stays complete, but only the files
+selected by the reviewed scripts/ci/database-mysql-selection.json are partitioned: every
+file owning a method from the reviewed SQLite skip census, every file whose repository
+path matches the policy's migration file pattern, and every file in the policy's reviewed
+include_files list (each must be discovered). The policy also pins the exact pattern_files the
+pattern matches and the residual_files: driver-branching test files deliberately left off MySQL,
+which must be discovered and unselected. The reviewed MySQL skip census
+(scripts/ci/database-mysql-skips.json) must name only discovered, selected methods that are
+not in the SQLite census; its hash is recorded with the selection. The proof then requires
+every selected case exactly once, and the manifest keeps the complete source census.
+
 CLI contract: https://docs.phpunit.de/en/12.5/textui.html#listing-tests
 Source checked at composer.lock's PHPUnit 12.5.34 reference
 6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f:
@@ -24,7 +35,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 import json
 import os
@@ -39,6 +50,16 @@ import xml.etree.ElementTree as ET
 NS = "{https://xml.phpunit.de/testSuite}"
 XSI = "http://www.w3.org/2001/XMLSchema-instance"
 ET.register_namespace("xsi", XSI)
+SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
+# A PHP file under tests/ that branches on the database driver or reads the configured connection.
+# Method calls named driver() (session, cache) are not database branches and are excluded.
+DRIVER_BRANCHING = re.compile(
+    r"getDriverName|ATTR_DRIVER_NAME|\[\s*['\"]driver['\"]\s*\]|->driver\b(?!\s*\()"
+    r"|(?:getenv|env)\(\s*['\"]DB_CONNECTION['\"]|\$_(?:ENV|SERVER)\[\s*['\"]DB_CONNECTION['\"]\s*\]")
+# A PHPUnit test class file; everything else under tests/ is a helper (support, worker, fixture or browser script).
+TEST_FILE = re.compile(r"tests/(?:Feature|Unit)/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+Test\.php")
+SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
+MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
 
 
 class PartitionError(Exception):
@@ -49,6 +70,8 @@ class PartitionError(Exception):
 class Inventory:
     cases: dict[str, str]
     groups: Counter
+    # case identifier -> (test class, test method); PHPT cases have no entry
+    methods: dict[str, tuple[str, str]] = field(default_factory=dict)
 
     @property
     def files(self) -> set[str]:
@@ -130,6 +153,7 @@ def read_inventory(path: Path, root: Path) -> Inventory:
     if tree.tag != NS + "testSuite" or [x.tag for x in tree] != [NS + "tests", NS + "groups"]:
         raise PartitionError("Unknown PHPUnit test-list XML shape")
     cases: dict[str, str] = {}
+    methods: dict[str, tuple[str, str]] = {}
     for item in tree[0]:
         if item.tag == NS + "testClass" and set(item.attrib) == {"name", "file"}:
             file = relative_file(item.attrib["file"], root)
@@ -139,16 +163,18 @@ def read_inventory(path: Path, root: Path) -> Inventory:
             for method in item:
                 if method.tag != NS + "testMethod" or set(method.attrib) != {"id", "name"} or list(method):
                     raise PartitionError("Unknown PHPUnit test method shape")
-                identifiers.append(method.attrib["id"])
+                identifiers.append((method.attrib["id"], (item.attrib["name"], method.attrib["name"])))
         elif item.tag == NS + "phpt" and set(item.attrib) == {"file"} and not list(item):
             file = relative_file(item.attrib["file"], root)
-            identifiers = ["phpt:" + file]
+            identifiers = [("phpt:" + file, None)]
         else:
             raise PartitionError("Unknown PHPUnit test-list entry")
-        for identifier in identifiers:
+        for identifier, method in identifiers:
             if not identifier or identifier in cases:
                 raise PartitionError("Empty or duplicate test identifier in source inventory")
             cases[identifier] = file
+            if method is not None:
+                methods[identifier] = method
     groups: Counter = Counter()
     for group in tree[1]:
         if group.tag != NS + "group" or set(group.attrib) != {"name"}:
@@ -159,7 +185,169 @@ def read_inventory(path: Path, root: Path) -> Inventory:
             groups[(group.attrib["name"], test.attrib["id"])] += 1
     if not cases:
         raise PartitionError("Source inventory has no tests")
-    return Inventory(cases, groups)
+    return Inventory(cases, groups, methods)
+
+
+@dataclass
+class Selection:
+    pattern: str
+    skip_pairs: set[tuple[str, str]]
+    policy_sha256: str
+    sqlite_skip_policy_sha256: str
+    # Reviewed repository paths selected explicitly: native-only proofs that SQLite reaches through a fallback.
+    include_files: tuple[str, ...] = ()
+    # Reviewed SQLite-only (class, method) pairs that skip on MySQL; they must lie inside the selection.
+    mysql_skip_pairs: set[tuple[str, str]] = field(default_factory=set)
+    mysql_skip_policy_sha256: str = ""
+    # Exactly the discovered files the migration pattern matches; a rename must be a reviewed policy edit.
+    pattern_files: tuple[str, ...] = ()
+    # Reviewed driver-branching test files that stay off MySQL; each must be discovered and unselected.
+    residual_files: tuple[str, ...] = ()
+    # Reviewed non-test files under tests/ that branch on the driver (helpers, workers, fixtures, browser scripts).
+    branching_helper_files: tuple[str, ...] = ()
+
+
+def path_list(value: object, label: str, pattern: str = r"tests/[A-Za-z0-9_./-]+\.php") -> tuple[str, ...]:
+    """Validate a reviewed list of repository paths under tests/: sorted, unique, no traversal."""
+    if (not isinstance(value, list)
+            or not all(isinstance(name, str) and re.fullmatch(pattern, name) and ".." not in name for name in value)
+            or value != sorted(set(value))):
+        raise PartitionError("MySQL selection " + label + " must be sorted, unique repository test paths")
+    return tuple(value)
+
+
+def statically_selected(selection: Selection) -> set[str]:
+    """The selected files without PHPUnit discovery: census owners (PSR-4 Tests\\ -> tests/), pattern_files, include_files."""
+    owners = {"tests/" + cls.removeprefix("Tests\\").replace("\\", "/") + ".php" for cls, _ in selection.skip_pairs}
+    return owners | set(selection.pattern_files) | set(selection.include_files)
+
+
+def branching_coverage_errors(root: Path, paths: list[str], selection: Selection) -> list[str]:
+    """Every driver-branching test file must be selected or a reviewed residual file, and both lists must stay exact.
+
+    A residual file that no longer branches, or that is now selected, is stale. Non-test files under tests/
+    (support classes, race workers, paid-development fixtures, browser scripts) are not run by PHPUnit
+    themselves, so they are listed exactly in branching_helper_files: adding or removing a branching helper
+    is a reviewed policy edit. Proving which tests use a helper would need call-graph analysis.
+    """
+    tests, helpers = driver_branching_files(root, paths)
+    selected, residual = statically_selected(selection), set(selection.residual_files)
+    errors = [f"driver-branching test file neither selected nor residual: {name}" for name in sorted(tests - selected - residual)]
+    errors += [f"residual file no longer branches on the driver: {name}" for name in sorted(residual - tests)]
+    errors += [f"residual file is selected: {name}" for name in sorted(residual & selected)]
+    errors += [f"driver-branching helper not in branching_helper_files: {name}" for name in sorted(helpers - set(selection.branching_helper_files))]
+    errors += [f"branching_helper_files entry no longer branches: {name}" for name in sorted(set(selection.branching_helper_files) - helpers)]
+    return errors
+
+
+def driver_branching_files(root: Path, paths: list[str]) -> tuple[set[str], set[str]]:
+    """Return (test files, helper files) among the given tests/**/*.php paths that branch on the driver."""
+    tests, helpers = set(), set()
+    for name in paths:
+        if name.startswith("tests/") and name.endswith(".php") and DRIVER_BRANCHING.search((root / name).read_text(errors="replace")):
+            (tests if TEST_FILE.fullmatch(name) else helpers).add(name)
+    return tests, helpers
+
+
+def read_census(raw: bytes, purpose: str, label: str, *, require_entries: bool, require_sorted: bool) -> set[tuple[str, str]]:
+    """Parse a reviewed (class, method) skip census; duplicates and unknown shapes are refused."""
+    try:
+        census = json.loads(raw)
+    except ValueError as error:
+        raise PartitionError(label + " skip policy is not valid JSON") from error
+    if (not isinstance(census, dict) or set(census) != {"schema_version", "purpose", "methods"}
+            or not is_count(census["schema_version"], 1) or census["schema_version"] != 1
+            or census["purpose"] != purpose or not isinstance(census["methods"], list)
+            or (require_entries and not census["methods"])):
+        raise PartitionError("Unknown " + label + " skip policy shape")
+    pairs: set[tuple[str, str]] = set()
+    for pair in census["methods"]:
+        if (not isinstance(pair, list) or len(pair) != 2 or not all(isinstance(item, str) and item for item in pair)
+                or tuple(pair) in pairs):
+            raise PartitionError("Invalid or duplicate " + label + " skip method")
+        pairs.add(tuple(pair))
+    if require_sorted and census["methods"] != sorted(census["methods"]):
+        raise PartitionError(label + " skip policy methods must be sorted")
+    return pairs
+
+
+def read_selection(root: Path) -> Selection:
+    """Read the reviewed MySQL-native selection policy and the SQLite skip census it names."""
+    raw = (root / SELECTION_POLICY).read_bytes()
+    try:
+        policy = json.loads(raw)
+    except ValueError as error:
+        raise PartitionError("MySQL selection policy is not valid JSON") from error
+    if (not isinstance(policy, dict)
+            or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "pattern_files",
+                               "include_files", "residual_files", "branching_helper_files"}
+            or not is_count(policy["schema_version"], 1) or policy["schema_version"] != 1
+            or policy["purpose"] != "reviewed-mysql-native-selection" or policy["sqlite_skip_policy"] != SQLITE_SKIP_POLICY
+            or policy["mysql_skip_policy"] != MYSQL_SKIP_POLICY
+            or not isinstance(policy["file_pattern"], str) or not policy["file_pattern"].startswith("^")
+            or not policy["file_pattern"].endswith("$")):
+        raise PartitionError("Unknown MySQL selection policy shape")
+    try:
+        re.compile(policy["file_pattern"])
+    except re.error as error:
+        raise PartitionError("MySQL selection file pattern does not compile") from error
+    include = policy["include_files"]
+    if (not isinstance(include, list)
+            or not all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_/]+\.php", name) and ".." not in name for name in include)
+            or include != sorted(set(include))):
+        raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
+    pattern_files = path_list(policy["pattern_files"], "pattern_files")
+    residual_files = path_list(policy["residual_files"], "residual_files")
+    helper_files = path_list(policy["branching_helper_files"], "branching_helper_files")
+    skip_raw = (root / SQLITE_SKIP_POLICY).read_bytes()
+    pairs = read_census(skip_raw, "reviewed-mysql-only-sqlite-skip-methods", "SQLite", require_entries=True, require_sorted=False)
+    mysql_raw = (root / MYSQL_SKIP_POLICY).read_bytes()
+    mysql_pairs = read_census(mysql_raw, "reviewed-sqlite-only-mysql-skip-methods", "MySQL", require_entries=False, require_sorted=True)
+    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest(), tuple(include),
+                     mysql_pairs, hashlib.sha256(mysql_raw).hexdigest(), pattern_files, residual_files, helper_files)
+
+
+def select_native(source: Inventory, selection: Selection) -> Inventory:
+    """Restrict the complete inventory to whole files that MySQL must prove.
+
+    A file is selected when it owns a reviewed SQLite-skipped (class, method) pair, its
+    repository path matches the reviewed migration file pattern, or the reviewed include
+    list names it. A listed file that PHPUnit did not discover is refused. Every expanded case and
+    group of a selected file is kept, so the file still runs exactly as it was discovered.
+    """
+    discovered = set(source.methods.values())
+    if not selection.skip_pairs <= discovered:
+        raise PartitionError("Reviewed SQLite skip policy contains an undiscovered method")
+    files = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.skip_pairs}
+    matched = {file for file in source.files if re.fullmatch(selection.pattern, file)}
+    if matched != set(selection.pattern_files):
+        raise PartitionError("MySQL selection pattern_files differ from the pattern's discovered matches; unexpected: "
+                             + ", ".join(sorted(matched - set(selection.pattern_files))) + "; missing: "
+                             + ", ".join(sorted(set(selection.pattern_files) - matched)))
+    files |= matched
+    missing = set(selection.include_files) - source.files
+    if missing:
+        raise PartitionError("Reviewed MySQL include file was not discovered: " + ", ".join(sorted(missing)))
+    files |= set(selection.include_files)
+    if not files:
+        raise PartitionError("The MySQL-native selection is empty")
+    residual = set(selection.residual_files)
+    if not residual <= source.files or residual & files:
+        raise PartitionError("Reviewed MySQL residual_files must be discovered and unselected: "
+                             + ", ".join(sorted((residual - source.files) | (residual & files))))
+    # The MySQL skip census names only discovered, selected methods and never a SQLite census method,
+    # so no case can be skipped by both engines.
+    if not selection.mysql_skip_pairs <= discovered:
+        raise PartitionError("Reviewed MySQL skip policy contains an undiscovered method")
+    if selection.mysql_skip_pairs & selection.skip_pairs:
+        raise PartitionError("A method is in both the SQLite and the MySQL skip policies")
+    outside = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.mysql_skip_pairs} - files
+    if outside:
+        raise PartitionError("Reviewed MySQL skip policy names a method outside the selection: " + ", ".join(sorted(outside)))
+    cases = {identifier: file for identifier, file in source.cases.items() if file in files}
+    groups = Counter({key: value for key, value in source.groups.items() if key[1] in cases})
+    methods = {identifier: method for identifier, method in source.methods.items() if identifier in cases}
+    return Inventory(cases, groups, methods)
 
 
 def partition(source: Inventory, count: int, weights: dict[str, int] | None = None) -> list[set[str]]:
@@ -253,20 +441,27 @@ def main() -> None:
     parser.add_argument("--shards", type=int, required=True)
     parser.add_argument("--prefix", required=True)
     parser.add_argument("--timings", type=Path, help="Balance on measured per-file milliseconds (scripts/ci/phpunit-timings.py) instead of case counts")
+    parser.add_argument("--mysql-native-selection", action="store_true",
+                        help=f"Partition only the files selected by {SELECTION_POLICY} (requires --prefix=phpunit-ci-mysql)")
     args = parser.parse_args()
     if not re.fullmatch(r"phpunit-ci-[a-z0-9-]+", args.prefix):
         raise PartitionError("Invalid generated configuration prefix")
+    if args.mysql_native_selection and args.prefix != "phpunit-ci-mysql":
+        raise PartitionError("--mysql-native-selection is only valid with --prefix=phpunit-ci-mysql")
     root = Path(__file__).resolve().parents[2]
     source_path = root / "phpunit.xml"
     source = ET.parse(source_path)
     if source.getroot().tag != "phpunit":
         raise PartitionError("Unknown PHPUnit configuration root")
     timings = read_timings(root / args.timings) if args.timings else None
+    selection = read_selection(root) if args.mysql_native_selection else None
     with tempfile.TemporaryDirectory(prefix="phpunit-partition-") as temp:
         full = discover(source_path, Path(temp) / "all.xml", root)
         refuse_cross_file_dependencies(root, full.files)
-        weights, untimed = file_weights(full, timings)
-        assignments = partition(full, args.shards, weights)
+        # Without a selection the target is the complete inventory, exactly as before.
+        target = full if selection is None else select_native(full, selection)
+        weights, untimed = file_weights(target, timings)
+        assignments = partition(target, args.shards, weights)
         observed = []
         lists = [(Path(temp) / "all.xml", root / f"{args.prefix}-source-tests.xml")]
         for index, selected in enumerate(assignments, 1):
@@ -277,7 +472,7 @@ def main() -> None:
             listing = Path(temp) / f"shard-{index}.xml"
             observed.append(discover(config, listing, root))
             lists.append((listing, root / f"{args.prefix}-{index}-tests.xml"))
-        prove(full, assignments, observed)
+        prove(target, assignments, observed)
         for listing, evidence in lists:
             with evidence.open("xb") as output:
                 output.write(listing.read_bytes())
@@ -288,7 +483,8 @@ def main() -> None:
         "source_test_cases": len(full.cases),
         "source_case_identity_sha256": hashlib.sha256(json.dumps(sorted(full.cases.items())).encode()).hexdigest(),
         "source_group_identity_sha256": hashlib.sha256(json.dumps(sorted(full.groups.items())).encode()).hexdigest(),
-        "proof": "every expanded source case, file and group appears exactly once",
+        "proof": "every expanded source case, file and group appears exactly once" if selection is None
+                 else "every selected case, file and group appears exactly once",
         "weighting": {"basis": "expanded-cases"} if timings is None else {
             "basis": "measured-milliseconds", "timings_file": args.timings.as_posix(), "timings_sha256": timings.sha256,
             "timings_driver": timings.driver, "timings_source": timings.source, "untimed_files": untimed,
@@ -299,6 +495,14 @@ def main() -> None:
             for index, (selected, shard) in enumerate(zip(assignments, observed, strict=True), 1)
         ],
     }
+    if selection is not None:
+        manifest["selection"] = {
+            "policy": SELECTION_POLICY, "policy_sha256": selection.policy_sha256,
+            "sqlite_skip_policy_sha256": selection.sqlite_skip_policy_sha256,
+            "mysql_skip_policy_sha256": selection.mysql_skip_policy_sha256,
+            "files": len(target.files), "test_cases": len(target.cases),
+            "case_identity_sha256": hashlib.sha256(json.dumps(sorted(target.cases.items())).encode()).hexdigest(),
+        }
     with (root / f"{args.prefix}-manifest.json").open("x") as output:
         json.dump(manifest, output, indent=2)
         output.write("\n")
@@ -308,7 +512,11 @@ def main() -> None:
         names = ", ".join(untimed[:5]) + (", ..." if len(untimed) > 5 else "")
         print(f"{marker}{len(untimed)} test file(s) have no entry in {args.timings} and use the fallback weight; "
               f"refresh it with scripts/ci/phpunit-timings.py: {names}", file=sys.stderr)
-    print(f"Proved {len(full.cases)} expanded tests in {len(full.files)} files across {args.shards} nonempty shards.")
+    if selection is None:
+        print(f"Proved {len(full.cases)} expanded tests in {len(full.files)} files across {args.shards} nonempty shards.")
+    else:
+        print(f"Proved {len(target.cases)} selected MySQL-native tests in {len(target.files)} files "
+              f"(of {len(full.cases)} discovered tests in {len(full.files)} files) across {args.shards} nonempty shards.")
     for item in manifest["shards"]:
         estimate = f"; estimated {item['weight'] // 60000}m {item['weight'] // 1000 % 60:02d}s" if timings else ""
         print(f"Shard {item['index']}: {item['test_cases']} tests; {len(item['files'])} complete files{estimate}.")

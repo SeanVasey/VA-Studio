@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("database_proofs", ROOT / "scripts/ci/database-receipts.py")
 proof = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(proof)
-COUNTS = {"mysql": 4, "sqlite": 2}
+# Eight MySQL shards keep each GitLab job under the hosted 3-hour cap; the partition matches GitHub's.
+COUNTS = {"mysql": 8, "sqlite": 2}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"
@@ -147,7 +148,9 @@ def start(root: Path, engine: str, shard: int, env: dict) -> None:
 
 
 def evidence(files: dict, identity: dict, checkout_root: str, engine: str, shard: int, root: Path) -> dict:
-    return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root), shard_count=COUNTS[engine])
+    return proof.database_evidence(files, {"checkout_root": checkout_root, "policy_sha256": identity["policy_sha256"]}, engine, shard, proof.sqlite_skip_pairs(root), shard_count=COUNTS[engine],
+                                   selection=proof.mysql_selection(root) if engine == "mysql" else None,
+                                   mysql_skips=proof.mysql_skip_pairs(root) if engine == "mysql" else None)
 
 
 def finish(root: Path, engine: str, shard: int, env: dict) -> None:
@@ -309,7 +312,7 @@ def archive_metadata(job: dict, identity: dict, engine: str, shard: int) -> dict
     return {"filename": expected_name, "size": metadata["size"]}
 
 
-def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: int, raw: bytes) -> tuple[dict, dict]:
+def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: int, raw: bytes) -> tuple[dict, dict, dict]:
     files = proof.archive(raw, proof.evidence_names(engine, shard, shard_count=COUNTS[engine]))
     prefix = f"phpunit-ci-{engine}-{shard}"
     receipt = proof.json_data(files.pop(prefix + "-receipt.json"))
@@ -338,7 +341,7 @@ def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: 
     proof.require(initial == expected | {"purpose": "gitlab-database-start-not-acceptance"}, "Pre-test source/runtime differs from final receipt")
     proof.require(timestamp(job["started_at"]) <= timestamp(receipt["started_at"]) <= timestamp(receipt["finished_at"])
                   <= timestamp(job["finished_at"]) <= datetime.now(timezone.utc), "Receipt outside native job interval")
-    return receipt, proof.inventory(files[prefix + "-tests.xml"], checkout)
+    return receipt, proof.inventory(files[prefix + "-tests.xml"], checkout), full
 
 
 def collect(root: Path, env: dict, api: Gitlab) -> dict:
@@ -347,24 +350,36 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
     jobs = accept_jobs(api.jobs(identity["pipeline_id"]), identity, number(env, "CI_JOB_ID"))
     receipts, artifacts = [], []
     inventories = {engine: [] for engine in COUNTS}
+    full = None
     for name, (engine, shard) in DATABASE_JOBS.items():
         job = jobs[name]
         metadata = archive_metadata(job, identity, engine, shard)
         expected_name = metadata["filename"]
         raw = api.artifact(job["id"])
         proof.require(len(raw) == metadata["size"], "Native archive size differs from metadata")
-        receipt, inventory = validate_receipt(root, identity, job, engine, shard, raw)
+        receipt, inventory, full = validate_receipt(root, identity, job, engine, shard, raw)
         receipts.append(receipt)
         inventories[engine].append(inventory)
         artifacts.append({"job_id": job["id"], "filename": expected_name, "download_sha256": proof.digest(raw),
                           "digest_origin": "computed from authenticated exact-job download; GitLab exposes no archive digest here"})
     proof.require(len({proof.canonical(receipt["source_census"]) for receipt in receipts}) == 1, "Different complete source censuses")
-    mysql_ids = Counter(key for item in inventories["mysql"] for key in item["cases"])
+    # SQLite must execute the complete census; MySQL exactly the selection recomputed from it and the committed policies.
+    sqlite_census, mysql_census = proof.sqlite_skip_pairs(root), proof.mysql_skip_pairs(root)
+    proof.require(not sqlite_census & mysql_census, "A method is in both the SQLite and the MySQL skip policies")
+    expected = {"sqlite": set(full["cases"]), "mysql": set(proof.native_selection(full, sqlite_census, proof.mysql_selection(root)))}
+    mysql_expected_skips = {key for key in expected["mysql"] if full["methods"][key] in mysql_census}
     for engine, sets in inventories.items():
         observed = Counter(key for item in sets for key in item["cases"])
-        proof.require(observed == mysql_ids and set(observed.values()) == {1}, "Executed partitions lose or duplicate source cases")
+        proof.require(observed == Counter({key: 1 for key in expected[engine]}), "Executed partitions lose or duplicate source cases"
+                      if engine == "sqlite" else "Executed MySQL partitions differ from the MySQL-native selection")
         proof.require(len({r["file_sha256"][f"phpunit-ci-{engine}-manifest.json"] for r in receipts if r["engine"] == engine}) == 1, "Different per-engine partition manifests")
-    proof.require(sum(r["results"]["executed_cases"] for r in receipts if r["engine"] == "mysql") == len(mysql_ids), "Incomplete genuine MySQL execution")
+    mysql_skipped = {key for r in receipts if r["engine"] == "mysql" for key in r["results"]["skipped_ids"]}
+    proof.require(mysql_skipped == mysql_expected_skips, "Genuine MySQL skip identities differ from the reviewed SQLite-only policy")
+    proof.require(sum(r["results"]["executed_cases"] for r in receipts if r["engine"] == "mysql") == len(expected["mysql"] - mysql_skipped), "Incomplete genuine MySQL execution")
+    sqlite_skipped = {key for r in receipts if r["engine"] == "sqlite" for key in r["results"]["skipped_ids"]}
+    mysql_executed = {key for item in inventories["mysql"] for key in item["cases"]} - mysql_skipped
+    proof.require(mysql_skipped <= expected["sqlite"] - sqlite_skipped, "A MySQL-skipped identity was not executed on SQLite")
+    proof.require(sqlite_skipped <= mysql_executed, "A SQLite-skipped identity was not executed on genuine MySQL")
     final_jobs = accept_jobs(api.jobs(identity["pipeline_id"]), identity, number(env, "CI_JOB_ID"))
     for name, (engine, shard) in DATABASE_JOBS.items():
         proof.require(archive_metadata(final_jobs[name], identity, engine, shard) == archive_metadata(jobs[name], identity, engine, shard)
@@ -378,7 +393,10 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
             "outer_acceptance": "pending; this aggregate and pipeline must subsequently succeed",
             "source": identity, "upstream_jobs": {name: jobs[name]["id"] for name in sorted(UPSTREAM)},
             "artifacts": artifacts, "database_receipts": receipts, "reuse_enabled": False,
-            "sqlite_skip_policy": "exact reviewed methods only; every counterpart executed on genuine MySQL"}
+            "sqlite_skip_policy": "exact reviewed methods only; every counterpart executed on genuine MySQL",
+            "mysql_skip_policy": "exact reviewed SQLite-only methods inside the selection; every counterpart executed on SQLite",
+            "mysql_scope": "SQLite executed every source case once (less reviewed skips); genuine MySQL executed exactly the reviewed "
+                           "native selection (files owning SQLite-skipped methods, migration test files and the reviewed include list) once, skipping only the reviewed SQLite-only methods"}
 
 
 def main() -> int:
@@ -399,7 +417,7 @@ def main() -> int:
                 print("Native current-project/pipeline job-token provenance API is available.")
             else:
                 proof.write_json(ROOT / "phpunit-ci-gitlab-collection.json", collect(ROOT, env, api))
-                print("All mandatory native upstream jobs and six complete database receipts verified; outer acceptance pending; reuse disabled.")
+                print(f"All mandatory native upstream jobs and {sum(COUNTS.values())} complete database receipts verified; outer acceptance pending; reuse disabled.")
         else:
             proof.require(args.engine in COUNTS and args.shard is not None and 1 <= args.shard <= COUNTS[args.engine], "Invalid database shard")
             (start if args.command == "start" else finish)(ROOT, args.engine, args.shard, env)

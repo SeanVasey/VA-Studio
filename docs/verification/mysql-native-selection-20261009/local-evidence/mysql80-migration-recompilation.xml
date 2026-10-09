@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\MigrationRecompilationTest" file="/home/user/wt-mysel/tests/Feature/MigrationRecompilationTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="252.242742">
+    <testcase name="test_repeated_migrations_do_not_recompile_migration_files" file="/home/user/wt-mysel/tests/Feature/MigrationRecompilationTest.php" line="15" class="Tests\Feature\MigrationRecompilationTest" classname="Tests.Feature.MigrationRecompilationTest" assertions="5" time="252.242742"/>
+  </testsuite>
+</testsuites>

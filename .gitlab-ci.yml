@@ -81,7 +81,10 @@ backend-quality:
     - bash scripts/ci/setup-gitlab-php.sh
   script:
     - python3 scripts/ci/gitlab-database-receipts.py start --engine="$DB_CONNECTION" --shard="$SHARD"
-    - python3 scripts/ci/phpunit-shards.py --shards="$SHARD_COUNT" --prefix="phpunit-ci-$DB_CONNECTION" --timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json"
+    - |
+      # MySQL partitions only the reviewed native selection; SQLite partitions the complete suite.
+      if [ "$DB_CONNECTION" = mysql ]; then set -- --mysql-native-selection; else set --; fi
+      python3 scripts/ci/phpunit-shards.py --shards="$SHARD_COUNT" --prefix="phpunit-ci-$DB_CONNECTION" --timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json" "$@"
     - |
       set +e
       php vendor/bin/phpunit --configuration="phpunit-ci-$DB_CONNECTION-$SHARD.xml" --log-junit="phpunit-ci-$DB_CONNECTION-$SHARD-results.xml" --fail-on-phpunit-warning --display-warnings
@@ -107,15 +110,20 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  timeout: 90m
+  # Eight shards of the reviewed native selection (1765 cases), the same partition as GitHub's: 124 to 241
+  # FinalizationDatabaseMigrations cases per shard, about 72 to 141 minutes at the 35 s measured on GitHub,
+  # before the other 16 to 87 cases. GitLab.com hosted runners kill any job at 3 hours regardless of this
+  # setting, so the limit is 175 minutes: under that cap, with about 24% headroom over the busiest estimate.
+  # Shard durations on GitLab stay unmeasured until a hosted run.
+  timeout: 175m
   parallel:
     matrix:
-      - SHARD: ['1', '2', '3', '4']
+      - SHARD: ['1', '2', '3', '4', '5', '6', '7', '8']
   services:
     - name: mysql:8.4
       alias: mysql
   variables:
-    SHARD_COUNT: '4'
+    SHARD_COUNT: '8'
     DB_CONNECTION: mysql
     MYSQL_DATABASE: vaseyaudio_test
     MYSQL_ROOT_PASSWORD: disposable-gitlab-test-only
@@ -127,6 +135,12 @@ backend-mysql:
     DB_PASSWORD: disposable-gitlab-test-only
     DB_SOCKET: ''
     DB_URL: ''
+    # This job owns its disposable MySQL service, so the native attachment-consumer tests may run their
+    # test-only migrate:fresh here; without the flag they skip on MySQL.
+    ATTACHMENT_NATIVE_ISOLATED: '1'
+    # Admits the job's disposable DB_DATABASE where free-grant tests otherwise require their dedicated
+    # schema (tests/Support/DisposableNativeDatabase.php also requires CI=true and APP_ENV=testing).
+    VA_CI_DISPOSABLE_MYSQL: '1'
 
 backend-sqlite:
   extends: .database

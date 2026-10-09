@@ -11,6 +11,7 @@ use LogicException;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\DisposableNativeDatabase;
 use Tests\TestCase;
 
 /** Only synthetic isolated databases. Real Migrator faults preserve every surviving object/old ledger byte. */
@@ -23,7 +24,7 @@ final class FreeGrantSchemaRecoveryTest extends TestCase
         parent::setUp();
         $this->assertTrue(app()->environment('testing'));
         if (DB::getDriverName() === 'mysql') {
-            $this->assertSame('vaseyaudio_free_grants', DB::getDatabaseName(), 'A dedicated synthetic free-grant schema is required.');
+            $this->assertTrue(DisposableNativeDatabase::isAdmitted('vaseyaudio_free_grants'), 'A dedicated synthetic free-grant schema, or the CI job\'s disposable database, is required.');
         } else {
             $this->assertSame(':memory:', DB::getDatabaseName());
         }

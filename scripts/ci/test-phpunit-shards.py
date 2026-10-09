@@ -8,9 +8,11 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 spec = importlib.util.spec_from_file_location("phpunit_shards", Path(__file__).with_name("phpunit-shards.py"))
@@ -182,6 +184,295 @@ class PartitionProofTest(unittest.TestCase):
             path.write_text("<?php // " + spelling)
             with self.assertRaises(PartitionError):
                 module.refuse_cross_file_dependencies(self.root, {"tests/A.php"})
+
+    def native_source(self):
+        """A complete inventory with one census-owning file, one migration file and two unselected files."""
+        for file in ["tests/Feature/OrderMigrationTest.php", "tests/Feature/Nested/LedgerMigrationTest.php"]:
+            (self.root / file).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / file).write_text("<?php // isolated selection fixture\n")
+        cases = {"A::one": "tests/A.php", "A::two#0": "tests/A.php", "A::two#1": "tests/A.php", "B::one": "tests/B.php",
+                 "C::race": "tests/C.php", "C::plain": "tests/C.php", "Order::up": "tests/Feature/OrderMigrationTest.php",
+                 "Ledger::up": "tests/Feature/Nested/LedgerMigrationTest.php", "phpt:tests/D.phpt": "tests/D.phpt"}
+        methods = {identifier: tuple(identifier.split("#")[0].split("::")) for identifier in cases if not identifier.startswith("phpt:")}
+        groups = Counter({("money", "A::one"): 1, ("native", "C::race"): 1, ("native", "Order::up"): 1})
+        return Inventory(cases, groups, methods)
+
+    PATTERN_FILES = ("tests/Feature/Nested/LedgerMigrationTest.php", "tests/Feature/OrderMigrationTest.php")
+
+    def native_selection(self, pairs=frozenset({("C", "race")}), include=(), mysql_pairs=frozenset(), pattern_files=PATTERN_FILES, residual=()):
+        pattern = r"^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$"
+        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64, tuple(include), set(mysql_pairs), "3" * 64,
+                                tuple(pattern_files), tuple(residual))
+
+    def test_pattern_files_pin_exactly_the_discovered_pattern_matches(self):
+        source = self.native_source()
+        module.select_native(source, self.native_selection())
+        for pinned in [self.PATTERN_FILES[:1], self.PATTERN_FILES + ("tests/Feature/GoneMigrationTest.php",)]:
+            with self.subTest(pinned=pinned), self.assertRaisesRegex(PartitionError, "pattern_files differ"):
+                module.select_native(source, self.native_selection(pattern_files=pinned))
+        # Renaming a migration test out of the pattern silently dropped it from MySQL; now the pinned list refuses it.
+        renamed = Inventory({name: ("tests/Feature/OrderSchemaTest.php" if file == "tests/Feature/OrderMigrationTest.php" else file)
+                             for name, file in source.cases.items()}, source.groups, source.methods)
+        with self.assertRaisesRegex(PartitionError, "pattern_files differ"):
+            module.select_native(renamed, self.native_selection())
+
+    def test_residual_files_must_be_discovered_and_unselected(self):
+        source = self.native_source()
+        module.select_native(source, self.native_selection(residual=("tests/A.php", "tests/B.php")))
+        for residual in [("tests/C.php",), ("tests/Feature/OrderMigrationTest.php",), ("tests/Feature/GoneTest.php",)]:
+            with self.subTest(residual=residual), self.assertRaisesRegex(PartitionError, "residual_files"):
+                module.select_native(source, self.native_selection(residual=residual))
+
+    def branching_root(self, files):
+        root = self.root / "branching"
+        for name, body in files.items():
+            (root / name).parent.mkdir(parents=True, exist_ok=True)
+            (root / name).write_text("<?php\n" + body + "\n")
+        return root, sorted(files)
+
+    def test_driver_branching_files_must_be_selected_residual_or_listed_helpers_and_the_lists_stay_exact(self):
+        files = {"tests/Feature/RaceTest.php": "if (DB::getDriverName() === 'mysql') {}",
+                 "tests/Feature/OrderMigrationTest.php": "$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);",
+                 "tests/Feature/FallbackTest.php": "$d = $connection['driver'];",
+                 "tests/Unit/EnvTest.php": "getenv('DB_CONNECTION');",
+                 "tests/Feature/PropertyTest.php": "$this->driver === 'sqlite';",
+                 "tests/Feature/SessionTest.php": "app('session')->driver(); $env = ['DB_CONNECTION' => 'mysql'];",
+                 "tests/Feature/PlainTest.php": "$this->assertTrue(true);",
+                 "tests/Support/race-worker.php": "$_SERVER['DB_CONNECTION'];",
+                 "tests/browser/prepare.php": "env('DB_CONNECTION');"}
+        root, paths = self.branching_root(files)
+        tests, helpers = module.driver_branching_files(root, paths)
+        self.assertEqual({"tests/Feature/RaceTest.php", "tests/Feature/OrderMigrationTest.php", "tests/Feature/FallbackTest.php",
+                          "tests/Unit/EnvTest.php", "tests/Feature/PropertyTest.php"}, tests)
+        self.assertEqual({"tests/Support/race-worker.php", "tests/browser/prepare.php"}, helpers)
+        exact = module.Selection("^$", {("Tests\\Feature\\RaceTest", "test_race")}, "1" * 64, "2" * 64, ("tests/Unit/EnvTest.php",), set(), "3" * 64,
+                                 ("tests/Feature/OrderMigrationTest.php",), ("tests/Feature/FallbackTest.php", "tests/Feature/PropertyTest.php"),
+                                 ("tests/Support/race-worker.php", "tests/browser/prepare.php"))
+        self.assertEqual([], module.branching_coverage_errors(root, paths, exact))
+        mutations = {
+            "dropped residual": (dict(residual_files=("tests/Feature/FallbackTest.php",)), "neither selected nor residual: tests/Feature/PropertyTest.php"),
+            "stale residual": (dict(residual_files=exact.residual_files + ("tests/Feature/PlainTest.php",)), "no longer branches on the driver: tests/Feature/PlainTest.php"),
+            "selected residual": (dict(residual_files=exact.residual_files + ("tests/Unit/EnvTest.php",)), "residual file is selected: tests/Unit/EnvTest.php"),
+            "unlisted helper": (dict(branching_helper_files=("tests/browser/prepare.php",)), "helper not in branching_helper_files: tests/Support/race-worker.php"),
+            "stale helper": (dict(branching_helper_files=exact.branching_helper_files + ("tests/Support/plain.php",)), "entry no longer branches: tests/Support/plain.php"),
+            "census owner dropped": (dict(skip_pairs=set()), "neither selected nor residual: tests/Feature/RaceTest.php"),
+        }
+        for name, (change, message) in mutations.items():
+            with self.subTest(name):
+                errors = module.branching_coverage_errors(root, paths, module.Selection(**{**exact.__dict__, **change}))
+                self.assertIn(message, "\n".join(errors))
+
+    def test_committed_policy_covers_every_driver_branching_file_under_tests_exactly(self):
+        repository = Path(__file__).resolve().parents[2]
+        selection = module.read_selection(repository)
+        paths = sorted(path.relative_to(repository).as_posix() for path in (repository / "tests").rglob("*.php"))
+        self.assertEqual([], module.branching_coverage_errors(repository, paths, selection))
+        # The pinned pattern files are exactly the pattern's matches among the tracked test files.
+        self.assertEqual(sorted(name for name in paths if re.fullmatch(selection.pattern, name)), list(selection.pattern_files))
+
+    def selected_shards(self, target, count):
+        assignments = module.partition(target, count)
+        observed = []
+        for selected in assignments:
+            cases = {name: file for name, file in target.cases.items() if file in selected}
+            observed.append(Inventory(cases, Counter({key: value for key, value in target.groups.items() if key[1] in cases})))
+        return assignments, observed
+
+    def test_native_selection_keeps_whole_census_and_migration_files_with_every_case_and_group(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection())
+        self.assertEqual({"tests/C.php", "tests/Feature/OrderMigrationTest.php", "tests/Feature/Nested/LedgerMigrationTest.php"}, target.files)
+        # The census names one method of C; the whole file, including its unlisted method, is selected.
+        self.assertEqual({"C::race", "C::plain", "Order::up", "Ledger::up"}, set(target.cases))
+        self.assertEqual(Counter({("native", "C::race"): 1, ("native", "Order::up"): 1}), target.groups)
+        assignments, observed = self.selected_shards(target, 3)
+        module.prove(target, assignments, observed)
+
+    def test_reviewed_include_files_are_selected_whole_and_must_be_discovered(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection(include=("tests/B.php",)))
+        self.assertIn("tests/B.php", target.files)
+        self.assertEqual({"C::race", "C::plain", "Order::up", "Ledger::up", "B::one"}, set(target.cases))
+        with self.assertRaisesRegex(PartitionError, "include file was not discovered: tests/Feature/GoneTest.php"):
+            module.select_native(source, self.native_selection(include=("tests/B.php", "tests/Feature/GoneTest.php")))
+
+    def test_mysql_skip_census_must_be_discovered_selected_and_disjoint_from_the_sqlite_census(self):
+        source = self.native_source()
+        module.select_native(source, self.native_selection(mysql_pairs={("C", "plain"), ("Order", "up")}))
+        for pairs, message in [({("Order", "removed")}, "undiscovered"), ({("C", "race")}, "both the SQLite and the MySQL"),
+                               ({("B", "one")}, "outside the selection")]:
+            with self.subTest(pairs=pairs), self.assertRaisesRegex(PartitionError, message):
+                module.select_native(source, self.native_selection(mysql_pairs=pairs))
+
+    def test_selected_partition_missing_a_reviewed_include_file_rejects(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection(include=("tests/B.php",)))
+        assignments, observed = self.selected_shards(target, 2)
+        index = next(i for i, selected in enumerate(assignments) if "tests/B.php" in selected)
+        # The listed file was assigned but its shard did not run it.
+        observed[index].cases.pop("B::one")
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+        # Neither may the partition leave the listed file out altogether.
+        assignments[index] = assignments[index] - {"tests/B.php"}
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+
+    def test_native_selection_rejects_undiscovered_census_methods_and_an_empty_selection(self):
+        source = self.native_source()
+        with self.assertRaises(PartitionError):
+            module.select_native(source, self.native_selection({("C", "race"), ("Removed", "test_removed")}))
+        nothing = module.Selection(r"^tests/NoMatch\.php$", set(), "1" * 64, "2" * 64)
+        with self.assertRaises(PartitionError):
+            module.select_native(source, nothing)
+
+    def test_selected_partition_missing_a_selected_case_rejects(self):
+        target = module.select_native(self.native_source(), self.native_selection())
+        assignments, observed = self.selected_shards(target, 2)
+        shard = next(item for item in observed if "C::plain" in item.cases)
+        shard.cases.pop("C::plain")
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+
+    def test_selected_partition_containing_an_unselected_file_rejects(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection())
+        assignments, observed = self.selected_shards(target, 2)
+        # A shard that also ran an unselected file is not the reviewed selection, even if every selected case is present.
+        observed[0].cases["B::one"] = "tests/B.php"
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+        assignments[0] = assignments[0] | {"tests/B.php"}
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+
+    def test_discovery_records_each_class_method_pair_for_the_selection(self):
+        path = self.inventory_xml('''<tests><testClass name="A" file="tests/A.php">
+          <testMethod id="A::one with data set #0" name="one"/><testMethod id="A::two" name="two"/>
+          </testClass><phpt file="tests/D.phpt"/></tests><groups/>''')
+        result = module.read_inventory(path, self.root)
+        self.assertEqual({"A::one with data set #0": ("A", "one"), "A::two": ("A", "two")}, result.methods)
+
+    def test_selection_policy_rejects_unknown_shapes_and_the_committed_policy_selects_migration_files(self):
+        root = self.root / "policy"
+        (root / "scripts/ci").mkdir(parents=True)
+        census = {"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods", "methods": [["C", "race"]]}
+        mysql_census = {"schema_version": 1, "purpose": "reviewed-sqlite-only-mysql-skip-methods", "methods": [["A", "one"], ["B", "two"]]}
+        valid = {"schema_version": 1, "purpose": "reviewed-mysql-native-selection", "sqlite_skip_policy": module.SQLITE_SKIP_POLICY,
+                 "mysql_skip_policy": module.MYSQL_SKIP_POLICY, "file_pattern": "^tests/Feature/[A-Za-z]*MigrationTest\\.php$",
+                 "pattern_files": ["tests/Feature/OrderMigrationTest.php"], "include_files": ["tests/A.php", "tests/Unit/BTest.php"],
+                 "residual_files": ["tests/Feature/FallbackTest.php"], "branching_helper_files": ["tests/Support/race-worker.php"]}
+
+        def read(policy, skips=census, mysql_skips=mysql_census):
+            (root / module.SELECTION_POLICY).write_text(policy if isinstance(policy, str) else json.dumps(policy))
+            (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps(skips))
+            (root / module.MYSQL_SKIP_POLICY).write_text(mysql_skips if isinstance(mysql_skips, str) else json.dumps(mysql_skips))
+            return module.read_selection(root)
+
+        parsed = read(valid)
+        self.assertEqual({("C", "race")}, parsed.skip_pairs)
+        self.assertEqual(64, len(parsed.policy_sha256))
+        self.assertEqual(("tests/A.php", "tests/Unit/BTest.php"), parsed.include_files)
+        self.assertEqual({("A", "one"), ("B", "two")}, parsed.mysql_skip_pairs)
+        self.assertEqual(64, len(parsed.mysql_skip_policy_sha256))
+        self.assertEqual(set(), read(valid, mysql_skips={**mysql_census, "methods": []}).mysql_skip_pairs)
+        for mysql_skips in ["not json", {**mysql_census, "methods": [["B", "two"], ["A", "one"]]}, {**mysql_census, "methods": [["A", "one"], ["A", "one"]]},
+                            {**mysql_census, "purpose": "reviewed-mysql-only-sqlite-skip-methods"}, {**mysql_census, "methods": [["A"]]},
+                            {**mysql_census, "extra": 1}]:
+            with self.assertRaises(PartitionError, msg=str(mysql_skips)):
+                read(valid, mysql_skips=mysql_skips)
+        for policy in ["not json", [], {**valid, "schema_version": 2}, {**valid, "schema_version": True}, {**valid, "extra": 1},
+                       {**valid, "purpose": "other"}, {**valid, "sqlite_skip_policy": "elsewhere.json"}, {**valid, "file_pattern": "Migration"},
+                       {**valid, "file_pattern": "^tests/(unclosed$"}, {**valid, "file_pattern": 3},
+                       {key: value for key, value in valid.items() if key != "include_files"}, {**valid, "include_files": "tests/A.php"},
+                       {key: value for key, value in valid.items() if key != "mysql_skip_policy"}, {**valid, "mysql_skip_policy": "elsewhere.json"},
+                       {**valid, "include_files": ["tests/Unit/BTest.php", "tests/A.php"]}, {**valid, "include_files": ["tests/A.php", "tests/A.php"]},
+                       {**valid, "include_files": ["tests/../app/A.php"]}, {**valid, "include_files": ["app/A.php"]}, {**valid, "include_files": [3]},
+                       *({key: value for key, value in valid.items() if key != missing} for missing in ("pattern_files", "residual_files", "branching_helper_files")),
+                       {**valid, "pattern_files": ["tests/Feature/OrderMigrationTest.php"] * 2}, {**valid, "residual_files": ["tests/Z.php", "tests/A.php"]},
+                       {**valid, "branching_helper_files": ["tests/../x.php"]}, {**valid, "residual_files": "tests/A.php"}]:
+            with self.assertRaises(PartitionError, msg=str(policy)):
+                read(policy)
+        for skips in [{**census, "methods": []}, {**census, "methods": [["C", "race"], ["C", "race"]]}, {**census, "purpose": "other"}]:
+            with self.assertRaises(PartitionError, msg=str(skips)):
+                read(valid, skips)
+        repository = Path(__file__).resolve().parents[2]
+        committed = module.read_selection(repository)
+        self.assertTrue(committed.skip_pairs)
+        # The reviewed include list names existing test files and none the pattern already selects.
+        self.assertTrue(committed.include_files)
+        for name in committed.include_files:
+            self.assertTrue((repository / name).is_file(), name)
+            self.assertIsNone(re.fullmatch(committed.pattern, name), name)
+        for selected in ["tests/Feature/PromotionMigrationTest.php", "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+                         "tests/Unit/LedgerMigrationTest.php"]:
+            self.assertRegex(selected, committed.pattern)
+        for unselected in ["tests/Support/FinalizationDatabaseMigrations.php", "tests/Feature/MigrationTest.php.bak",
+                           "tests/Feature/NativeSchemaIsolationTest.php", "tests/browser/OrderMigrationTest.php", "xtests/Feature/OrderMigrationTest.php"]:
+            self.assertIsNone(re.fullmatch(committed.pattern, unselected), unselected)
+
+    def test_native_selection_flag_is_refused_for_any_prefix_but_mysql_before_discovery(self):
+        for prefix in ["phpunit-ci-sqlite", "phpunit-ci-mysql-extra"]:
+            with patch.object(sys, "argv", ["phpunit-shards.py", "--shards=2", "--prefix=" + prefix, "--mysql-native-selection"]), \
+                    patch.object(module, "discover") as discovery, self.assertRaisesRegex(PartitionError, "only valid with"):
+                module.main()
+            discovery.assert_not_called()
+
+    def run_isolated_main(self, *arguments):
+        """Run main() against a fixture repository whose PHPUnit discovery honours each configuration's exclusions."""
+        root = self.root / "repository"
+        (root / "scripts/ci").mkdir(parents=True)
+        (root / "phpunit.xml").write_text('<phpunit><testsuites><testsuite name="All"><directory>tests</directory></testsuite></testsuites></phpunit>')
+        (root / module.SELECTION_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-native-selection",
+            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "mysql_skip_policy": module.MYSQL_SKIP_POLICY,
+            "file_pattern": self.native_selection().pattern, "pattern_files": list(self.PATTERN_FILES), "include_files": ["tests/B.php"],
+            "residual_files": ["tests/A.php"], "branching_helper_files": []}))
+        (root / module.MYSQL_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-sqlite-only-mysql-skip-methods",
+                                                                "methods": [["C", "plain"]]}))
+        (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods",
+                                                                 "methods": [["C", "race"]]}))
+        source = self.native_source()
+        for file in source.files:
+            (root / file).parent.mkdir(parents=True, exist_ok=True)
+            (root / file).write_text("<?php // isolated main fixture\n")
+
+        def discover(config, output, _root):
+            excluded = {node.text for node in ET.parse(config).getroot().iter("exclude")}
+            cases = {name: file for name, file in source.cases.items() if file not in excluded}
+            output.write_text("<listing/>")
+            return Inventory(cases, Counter({key: value for key, value in source.groups.items() if key[1] in cases}),
+                             {name: method for name, method in source.methods.items() if name in cases})
+
+        with patch.object(module, "__file__", str(root / "scripts/ci/phpunit-shards.py")), patch.object(module, "discover", side_effect=discover), \
+                patch.object(sys, "argv", ["phpunit-shards.py", *arguments]), contextlib.redirect_stdout(io.StringIO()) as stdout:
+            module.main()
+        return source, json.loads((root / "phpunit-ci-mysql-manifest.json").read_text()), stdout.getvalue(), root
+
+    def test_selected_manifest_keeps_the_complete_source_census_and_records_the_exact_selection(self):
+        source, manifest, stdout, root = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql", "--mysql-native-selection")
+        selected = {name: file for name, file in source.cases.items() if file in {"tests/B.php", "tests/C.php", "tests/Feature/OrderMigrationTest.php",
+                                                                                   "tests/Feature/Nested/LedgerMigrationTest.php"}}
+        self.assertEqual((len(source.files), len(source.cases)), (manifest["source_files"], manifest["source_test_cases"]))
+        self.assertEqual(module.hashlib.sha256(json.dumps(sorted(source.cases.items())).encode()).hexdigest(), manifest["source_case_identity_sha256"])
+        self.assertEqual("every selected case, file and group appears exactly once", manifest["proof"])
+        self.assertEqual({"policy": module.SELECTION_POLICY,
+                          "policy_sha256": module.hashlib.sha256((root / module.SELECTION_POLICY).read_bytes()).hexdigest(),
+                          "sqlite_skip_policy_sha256": module.hashlib.sha256((root / module.SQLITE_SKIP_POLICY).read_bytes()).hexdigest(),
+                          "mysql_skip_policy_sha256": module.hashlib.sha256((root / module.MYSQL_SKIP_POLICY).read_bytes()).hexdigest(),
+                          "files": 4, "test_cases": 5,
+                          "case_identity_sha256": module.hashlib.sha256(json.dumps(sorted(selected.items())).encode()).hexdigest()}, manifest["selection"])
+        self.assertEqual(sorted(set(selected.values())), sorted(file for shard in manifest["shards"] for file in shard["files"]))
+        self.assertIn("Proved 5 selected MySQL-native tests in 4 files (of 9 discovered tests in 6 files)", stdout)
+        for index in (1, 2):
+            excluded = {node.text for node in ET.parse(root / f"phpunit-ci-mysql-{index}.xml").getroot().iter("exclude")}
+            self.assertTrue({"tests/A.php", "tests/D.phpt"} <= excluded)
+
+    def test_without_the_flag_the_manifest_has_no_selection_and_partitions_everything(self):
+        source, manifest, stdout, _ = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql")
+        self.assertNotIn("selection", manifest)
+        self.assertEqual("every expanded source case, file and group appears exactly once", manifest["proof"])
+        self.assertEqual(sorted(source.files), sorted(file for shard in manifest["shards"] for file in shard["files"]))
+        self.assertIn(f"Proved {len(source.cases)} expanded tests in {len(source.files)} files across 2 nonempty shards.", stdout)
 
     def timings(self, files, fallback=1000):
         return module.Timings("mysql", "fixture", fallback, files, "0" * 64)

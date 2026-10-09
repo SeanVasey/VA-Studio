@@ -147,8 +147,13 @@ jobs:
     if: needs.scope.outputs.mode != 'docs'
     name: backend-mysql (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
-    # A shard takes 22 to 38 minutes and has taken 57 on a slow runner. A hung test must not hold a runner for the 6-hour default.
-    timeout-minutes: 90
+    # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
+    # SQLite-skipped methods, migration test files and a reviewed include list, 1765 of 7642 cases in 163 files.
+    # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes (about 35 s per migrate:fresh
+    # test). The selection's duration on hosted MySQL is unmeasured: 1372 selected cases use
+    # FinalizationDatabaseMigrations (124 to 241 per shard), about 72 to 141 minutes at 35 s each, so the limit
+    # is 210 minutes (about 50% headroom) until fresh MySQL timings exist. A hung test still cannot hold a runner for 6 hours.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:
@@ -180,6 +185,12 @@ jobs:
       CACHE_STORE: array
       SESSION_DRIVER: array
       QUEUE_CONNECTION: sync
+      # This job owns its disposable MySQL service container, so the native attachment-consumer tests may run
+      # their test-only migrate:fresh here; without the flag they skip on MySQL.
+      ATTACHMENT_NATIVE_ISOLATED: '1'
+      # Admits the CI job's disposable DB_DATABASE where free-grant tests otherwise require their dedicated
+      # schema (tests/Support/DisposableNativeDatabase.php also requires CI=true and APP_ENV=testing).
+      VA_CI_DISPOSABLE_MYSQL: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -204,8 +215,8 @@ jobs:
         env:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
-      - name: Prove the complete MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
+      - name: Prove the native-selection MySQL test partition
+        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
       - name: Run all tests assigned to this MySQL shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
