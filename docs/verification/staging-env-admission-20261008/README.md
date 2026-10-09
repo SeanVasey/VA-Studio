@@ -1,9 +1,9 @@
 # Staging environment admission (Lane B2), 2026-10-08
 
-- **Branch:** `harness/staging-env-admission`, from `main` `89e3e61f`. Uncommitted when this record was written; the integration owner commits.
+- **Branch:** `harness/staging-env-admission`, WIP `2ec1c559` from `main` `89e3e61f`; integrated with `main` `49489697` (`cc4e62b`) and `e5e500ca` (`5e78202`) and completed by the Claude Code harness on 2026-10-09.
 - **Sensitivity:** authentication (staff MFA) and payment/commerce admission. Independent review is required before merge (AGENTS.md).
 - **Scope:** environment admission and staff MFA only. No receipt, guard, schema, money or evidence logic changed. Each gate keeps its default-off flag, Stripe `test` mode check, account and credential-shape checks.
-- **Not done:** no commit, push, GitHub action, MySQL run (shared `:3306` untouched) or browser run.
+- **Not done:** no MySQL or browser run; no host.
 
 ## What changed
 
@@ -113,6 +113,40 @@ These are unchanged:
 - `ServiceProjectAttachmentSourceV1.php:148`, `:183`
 - the reflection readers `BillingPolicy.php:107`, `Production\MembershipPolicy.php:94`, `MemberGrantPolicy.php:84` and `ProductionFreeGrantPolicy.php:64`
 
+## Completion on 2026-10-09 (after integrating #62, #63, #65 and #56)
+
+- **Profile validator** (`scripts/ops/validate-test-commerce-profile.php`): `runtime.app_env_local` became
+  `runtime.app_env_admitted`, exactly `staging` or `local` (never `testing` or `production`). A complete staging profile
+  passes every real policy check; `Staging`, `staging-eu` and `stage` are refused.
+- **Staging kit:** `ops/staging/env.staging.example` and `test-commerce/env.test-commerce.example` default to
+  `APP_ENV=staging`; `provision.sh --app-env` defaults to `staging` (`local` remains the accepted interim profile);
+  `ops/staging/README.md` and `docs/ops/staging-runbook.md` describe required staff TOTP in staging.
+- **D1 under staging:** `vasey:rights-scope` writes are gated by `InventoryPolicy`, which now admits staging; its refusal
+  text names staging. A new staging variant of the D1 link test proves register → link → `PrepareOrder` under
+  `staging`. Staging only accepts ClamAV scan evidence (`ScanEngines`), so the fixture media there carry a synthetic
+  ClamAV-engine stand-in; under the test-only scanner, staging correctly reports the selection unpublishable.
+- **Free256 frozen pin:** `ActivationPolicy.php` is pinned by `ProductionFreeGrantFrozenBytesTest`. Only `account()`'s
+  environment gate changed; family 256 (via `PreparedDeliveryStream` and `DeliveryAssetFiles`) uses only
+  `outsideTransactions()`, which is unchanged. The pin is updated with that note; this needs the independent reviewer's
+  re-review against family 256.
+- **Paid252 (#56):** `PaidGrantPolicy` enabled its operative lane in every environment except local/testing, so staging
+  would have admitted it when configured. `enabled()` and `provePure()` now refuse it in staging (red recorded first).
+- **Census made exhaustive:** the source census now requires every `local`/`testing` gate in `app/` to be classified;
+  this surfaced the paid gate and `ServiceProjectAttachmentSourceV1` (kept local/testing only).
+
 ## Results
 
-RESULTS_PLACEHOLDER
+PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
+
+| Run | Source | Result | Evidence |
+| --- | --- | --- | --- |
+| Red baseline: B2's staging tests on `main` | `main` `e5e500ca` product + B2's `RightsScopeCommandTest`, `StagingOperatorMfaTest`, `TestCommerceProfileValidatorTest` | D1 staging variant fails (`ORDER_POLICY_UNAVAILABLE`); staging MFA not required (2 failures); staging profile refused; rc 1 each | `evidence/red-on-main-e5e500ca.txt` |
+| Red: paid operative lane in staging | `5e78202` + new test, `PaidGrantPolicy` unchanged | staging `enabled()` true; rc 1 | `evidence/paid-operative-staging-red.txt` |
+| B2 affected selection (96 files by class reference), 3 shards | `cc4e62b` + working tree, before the validator, template, D1 and paid changes | 1,838 tests; only failure the Free256 `ActivationPolicy` pin (since re-pinned); skips are MySQL-only | see final run below |
+| Ops kit tests (`python3 tests/ops/test_*.py`, 13 files) | after the `provision.sh` default change | 74 tests OK | — |
+| Private-server preflight self-test | after integration | 20 tests OK | — |
+| Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
+
+## Not tested
+
+MySQL (race and native schema cases skip on SQLite by design), browser, a real staging host, Stripe.
