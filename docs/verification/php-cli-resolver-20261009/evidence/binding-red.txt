@@ -1,0 +1,57 @@
+# source: 039821bb0efa75ac66f633c561242e4cf2c70b01 (53f8ef60 WIP merged with main) + working tree, EXCEPT app/Providers/AppServiceProvider.php at HEAD (WIP: resolver bound, pinned renderers NOT bound)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt-m16/phpunit.xml
+
+FEFFEF                                                              6 / 6 (100%)
+
+Time: 00:12.013, Memory: 185.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_the_document_renders_through_the_configured_cli_with_the_pinned_arguments
+ErrorException: Undefined array key 0
+
+/home/user/wt-m16/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/wt-m16/tests/Feature/FreeGrantCliRendererTest.php:45
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantCliRendererTest::test_outside_the_cli_the_original_renders_through_the_configured_cli_byte_identically
+ErrorException: Undefined array key 0
+
+/home/user/wt-m16/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/wt-m16/tests/Feature/ProductionFreeGrants/ProductionFreeGrantCliRendererTest.php:51
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 4 failures:
+
+1) Tests\Feature\FreeGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+Failed asserting that null is an instance of class Closure.
+
+/home/user/wt-m16/tests/Feature/FreeGrantCliRendererTest.php:28
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_the_render_fails_closed_before_any_child
+An unconfigured CLI binary cannot render.
+
+/home/user/wt-m16/tests/Feature/FreeGrantCliRendererTest.php:62
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+Failed asserting that null is an instance of class Closure.
+
+/home/user/wt-m16/tests/Feature/ProductionFreeGrants/ProductionFreeGrantCliRendererTest.php:34
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_the_render_fails_closed
+An unconfigured CLI binary cannot render.
+
+/home/user/wt-m16/tests/Feature/ProductionFreeGrants/ProductionFreeGrantCliRendererTest.php:64
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 17, Errors: 2, Failures: 4.
+rc=2

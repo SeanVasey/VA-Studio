@@ -1,0 +1,1 @@
+{"family":"generic","sapi":"cli","php_binary":"/usr/bin/php8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf","size_bytes":751516}

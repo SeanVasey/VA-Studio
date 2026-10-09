@@ -1,0 +1,49 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Contracts\ContractFiles;
+use App\Domain\Grants\Free\FreeGrantDocuments;
+use App\Domain\Grants\Free\FreeGrantRecords;
+use App\Domain\Grants\Free\FreeGrantRendererProcess;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FreeGrantFixtures;
+use Tests\TestCase;
+
+/**
+ * M-16 evidence probe (not a product test): records the exact renderer stdin payload ({input, profile}) and the PDF
+ * SHA-256 the CLI produced, so a real PHP-FPM request can render the same payload and compare bytes.
+ * Output directory: env M16_CAPTURE_DIR.
+ */
+final class M16CaptureFreeProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    private function capturing(string $class, string $name): void
+    {
+        $directory = (string) getenv('M16_CAPTURE_DIR');
+        $this->app->instance($class, new $class(function (array $command, string $cwd, array $environment, string $payload) use ($directory, $name): Process {
+            file_put_contents($directory.'/'.$name.'.payload.json', $payload);
+
+            return new Process($command, $cwd, $environment, $payload, 60);
+        }));
+    }
+
+    public function test_capture_free(): void
+    {
+        $this->fakePrivateMediaStorage();
+        $f = FreeGrantFixtures::source();
+        $accepted = FreeGrantFixtures::accept($f, FreeGrantFixtures::publish($f))['origin'];
+        $this->capturing(FreeGrantRendererProcess::class, 'free');
+        (new FreeGrantDocuments)->issue($accepted['id'], $accepted['originHash'], $f['customer']['principal'], $f['customer']['user']);
+        $manifest = FreeGrantRecords::decode((array) DB::table('free_originals')->sole());
+        $bytes = (new ContractFiles)->verify($manifest['artifact']);
+        file_put_contents(getenv('M16_CAPTURE_DIR').'/free.cli-sha256', hash('sha256', $bytes));
+        $this->assertSame($manifest['artifact']['pdf_hash'], hash('sha256', $bytes));
+    }
+}

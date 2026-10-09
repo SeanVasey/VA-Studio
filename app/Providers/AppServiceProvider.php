@@ -11,6 +11,7 @@ use App\Domain\Contracts\IsolatedContractRenderer;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Grants\Free\FreeGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
@@ -39,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
             fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));
         // The pinned grant renderers spawn PHP_BINARY, which is the FPM daemon outside the CLI; there they get a
         // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
-        foreach ([FreeGrantRendererProcess::class, ProductionFreeGrantRendererProcess::class] as $renderer) {
+        foreach ([FreeGrantRendererProcess::class, ProductionFreeGrantRendererProcess::class, PaidGrantRendererProcess::class] as $renderer) {
             $this->app->bind($renderer, function ($app) use ($renderer) {
                 $binary = $app->make(PhpCliBinary::class);
 
