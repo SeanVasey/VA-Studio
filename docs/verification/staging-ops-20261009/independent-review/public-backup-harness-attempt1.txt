@@ -1,0 +1,69 @@
+Exact assessed source: b72c8efcb48ea433c58659b824ad32d4c174bf6d
+test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) ...
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='fail') ... ERROR
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-user') ... ERROR
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-host') ... ERROR
+test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) ...
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='valid') ... FAIL
+test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) ... ok
+test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) ... ok
+test_legal_public_asset_and_internal_code_aliases_remain_readable (__main__.PublicLinkProbe.test_legal_public_asset_and_internal_code_aliases_remain_readable) ... ok
+
+======================================================================
+ERROR: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='fail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 172, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertEqual((root / "trace").read_text(), "authentication\n")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmp26v249v9/trace'
+
+======================================================================
+ERROR: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-user')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 172, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertEqual((root / "trace").read_text(), "authentication\n")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmp__psvcrc/trace'
+
+======================================================================
+ERROR: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-host')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 172, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertEqual((root / "trace").read_text(), "authentication\n")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmpf3i8msj_/trace'
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='valid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: False != True : backup credential does not authenticate; restore it privately or perform an explicit account rotation
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.223s
+
+FAILED (failures=1, errors=3)

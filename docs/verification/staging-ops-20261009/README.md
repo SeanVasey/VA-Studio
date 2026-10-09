@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `2eee8d420aa822414841a801318b04888e4e71ac` (Composer environment ordering, following operation custody at `9cc584c4`). The kit integrates main's CI
+Current tested functional source: `b72c8efcb48ea433c58659b824ad32d4c174bf6d` (public-link admission and backup credential proof, following Composer ordering and operation custody). The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -294,3 +294,48 @@ hook sees frozen bytes at mode0600 before npm and no inherited APP_ENV; it is no
 actual Laravel package discovery. Prior bounded approvals carry on unchanged paths.
 Final evidence-only publication requires an explicit empty-source-diff carry and
 exact-head preflight/code-review gates before merge.
+
+## Public-link and backup-credential repair, exact source `b72c8efc`
+
+Codex on `9e6b7fd5` found 4226801376 (a friendly public symlink could expose the
+protected environment through static serving) and 4226801382 (an empty/truncated
+backup profile could pass provisioning). The sealer now refuses any link resolving
+to `.env` and any link under, or at, `public` that resolves outside that tree.
+Both sealing and readonly verification apply the same predicate; ordinary public
+asset/directory aliases and nonpublic internal code links remain admitted.
+
+Backup provisioning requires a finite root-owned0600 single-link regular file with
+exactly the five generated literal lines. Missing, empty, truncated, linked, writable,
+extra/NUL/missing-newline or oversized data refuses. An absent account cannot overwrite
+an orphan profile; generation is checked and persistence is no-clobber. A scrubbed
+MySQL client with one admitted defaults file and `--no-login-paths` must authenticate
+exactly `vasey_backup@127.0.0.1` before grants. Refusal requires private restore or
+explicit account recovery; there is no automatic rotation.
+
+Owner [red](codex-repair/public-backup-red-9e6b7fd5.txt): **67 methods, 17 failures
+/1 error** at `9e6b7fd5`; the error is the missing authentication trace causing an
+index lookup failure, not a host/tool setup error. Files/links/bytes/modes are real;
+root/database authentication and grants are bounded fixtures. Repaired precommit
+[green](codex-repair/public-backup-green.txt): **67 PASS**. Exact committed source
+receipts: [operations](codex-repair/final-ops-b72c8efc.txt) **67 PASS** and genuine
+PHP8.4.26 [runtime](codex-repair/final-runtime-b72c8efc.txt) **13 tests /63 assertions
+PASS**. Six Bash scripts parsed separately; Shellcheck0.10 `-x` and whitespace pass.
+Prior transport/migration evidence remains historical. Independent review and exact
+publication gates remain required; actual Forge acceptance is unexecuted.
+
+Independent [public/backup addendum](independent-review/PUBLIC-BACKUP-ADDENDUM.md)
+**APPROVES exact `b72c8efc`**. Bounded actual-function selection: **5 methods PASS**;
+old `9e6b7fd5`: **32 failing states** (12 links and20 custody/authentication/creation).
+The first reviewer fixture PATH mismatch is retained separately. Genuine
+[MySQL8.4.11 authentication](independent-review/public-backup-native.txt) accepts
+the correct privately generated credential, rejects a wrong password, and rejects
+an independently proved authenticated `vasey_backup@localhost` identity. The guarded
+driver requires the unique disposable helper datadir, empty socket, testing schema
+and loopback3306; root ownership is modeled, client/server/password authentication
+are genuine, native libraries use a trusted toolchain adapter after environment
+scrubbing. Initial passing receipt is preserved; generated credentials/server are
+cleaned and no secret enters the receipts. Native-driver Pint passes with unchanged
+bytes. Owner receipt progress and empty assertion-message trailing spaces are
+normalized only for diff checks; results are unchanged. Actual Forge credentials,
+grants, backup/restore/shipping and provider purchase remain unproved. The exact
+publication still requires explicit empty-source-diff carry and final merge gates.

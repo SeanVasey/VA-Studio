@@ -1,0 +1,314 @@
+Exact assessed source: 9e6b7fd563c2a83558157cf952a243e83f39a80c
+test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) ...
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='fail') ... FAIL
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-user') ... FAIL
+  test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-host') ... FAIL
+test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) ...
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='valid') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='empty') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='truncated') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='no-newline') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='crlf') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='nul') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='wrong-port') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='wrong-host') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='extra-client') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='shell-looking') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='oversized') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='symlink') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='hardlink') ... FAIL
+  test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='writable') ... FAIL
+test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) ...
+  test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='orphan') ... FAIL
+  test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='dangling') ... FAIL
+  test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='bad-generation') ... FAIL
+test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) ...
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='direct-env') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='private-source') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='private-directory') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='env-chain') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='internal-env') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='public-root') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='direct-env') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='private-source') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='private-directory') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='env-chain') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='internal-env') ... FAIL
+  test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='public-root') ... FAIL
+test_legal_public_asset_and_internal_code_aliases_remain_readable (__main__.PublicLinkProbe.test_legal_public_asset_and_internal_code_aliases_remain_readable) ... ok
+
+======================================================================
+FAIL: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='fail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 171, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertNotEqual(run.returncode, 0, "authentication failure reached successful provisioning")
+AssertionError: 0 == 0 : authentication failure reached successful provisioning
+
+======================================================================
+FAIL: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-user')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 171, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertNotEqual(run.returncode, 0, "authentication failure reached successful provisioning")
+AssertionError: 0 == 0 : authentication failure reached successful provisioning
+
+======================================================================
+FAIL: test_bad_authentication_or_identity_never_reaches_grants (__main__.BackupCredentialProbe.test_bad_authentication_or_identity_never_reaches_grants) (auth='wrong-host')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 171, in test_bad_authentication_or_identity_never_reaches_grants
+    self.assertNotEqual(run.returncode, 0, "authentication failure reached successful provisioning")
+AssertionError: 0 == 0 : authentication failure reached successful provisioning
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='valid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 155, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual((root / "trace").read_text().splitlines()[0], "authentication")
+AssertionError: 'database-mutation' != 'authentication'
+- database-mutation
++ authentication
+
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='truncated')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='no-newline')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='crlf')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='nul')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='wrong-port')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='wrong-host')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='extra-client')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='shell-looking')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='oversized')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='hardlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_identity_requires_exact_private_profile_without_repair (__main__.BackupCredentialProbe.test_existing_identity_requires_exact_private_profile_without_repair) (case='writable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 152, in test_existing_identity_requires_exact_private_profile_without_repair
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='orphan')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 186, in test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation
+    self.assertNotEqual(run.returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='dangling')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 186, in test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation
+    self.assertNotEqual(run.returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation (__main__.BackupCredentialProbe.test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation) (case='bad-generation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 186, in test_missing_identity_refuses_orphan_files_and_invalid_generation_before_mutation
+    self.assertNotEqual(run.returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='direct-env')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='private-source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='private-directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='env-chain')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='internal-env')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='seal', case='public-root')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='direct-env')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='private-source')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='private-directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='env-chain')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='internal-env')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+======================================================================
+FAIL: test_environment_and_outside_public_aliases_refuse_during_seal_and_verify (__main__.PublicLinkProbe.test_environment_and_outside_public_aliases_refuse_during_seal_and_verify) (mode='verify', case='public-root')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/public-backup-probe.py", line 53, in test_environment_and_outside_public_aliases_refuse_during_seal_and_verify
+    with self.assertRaises((ValueError, OSError, RuntimeError)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (<class 'ValueError'>, <class 'OSError'>, <class 'RuntimeError'>) not raised
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.168s
+
+FAILED (failures=32)
