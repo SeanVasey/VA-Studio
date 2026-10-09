@@ -362,7 +362,7 @@ SAPI/version/extensions. Never print `.env` or credentials while rebuilding the 
 | `/workspace/VA-Studio-ops` | merged #63 final head, clean; independent evidence all committed |
 | `/workspace/VA-Studio-commerce` | merged #62 head4902c45e, clean |
 | `/workspace/VA-Studio-rights` | merged #65 head8453909e, clean |
-| `/workspace/VA-Studio-rights-red` | detached old red3aad7d15, retained |
+| `/workspace/VA-Studio-rights-red` | detached old red3aad7d15, retained; its untracked `tests/Feature/RightsScopeCommandTest.php` is the earlier regression fixture, preserve it |
 | `/workspace/VA-Studio-paid252` | detached27a151b6, read-only prepared; physical vendor copied excluding package .git directories for renderer open_basedir; no source changes |
 
 `source /workspace/.va-studio-toolchain/activate.sh` activates PHP8.4.26, Composer2.8.8, Node24.19,
