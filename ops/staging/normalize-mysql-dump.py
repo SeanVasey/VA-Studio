@@ -14,6 +14,7 @@ DROP = re.compile(rb"DROP TABLE IF EXISTS (" + IDENTIFIER + rb");\r?\n?\Z")
 CREATE = re.compile(rb"CREATE TABLE (" + IDENTIFIER + rb") \(\r?\n?\Z")
 CLIENT_SETTING = re.compile(rb"/\*!\d{5} SET (?:@saved_cs_client[ \t]+=[ \t]+@@character_set_client|character_set_client[ \t]+=[ \t]+[a-zA-Z0-9_]+) \*/;\r?\n?\Z")
 DELIMITER = re.compile(rb"DELIMITER[ \t]+([^\s]+)[ \t]*\r?\n?\Z", re.I)
+UNSUPPORTED_MODE = re.compile(rb"(?:/\*!\d{5} )?SET [^\r\n]*\bSQL_MODE\b[^\r\n]*\bNO_BACKSLASH_ESCAPES\b", re.I)
 COLUMN = re.compile(rb"(  " + IDENTIFIER + rb" )(char|varchar|tinytext|text|mediumtext|longtext|enum|set)\b", re.I)
 CHARSET = re.compile(rb" CHARACTER SET utf8mb4(?= COLLATE utf8mb4_[a-zA-Z0-9_]+(?: |,|\r?$))")
 
@@ -47,14 +48,62 @@ def type_end(line, offset):
     return None
 
 
+class SqlContext:
+    """Track lexical context so routine string/comment bytes cannot become directives."""
+    def __init__(self):
+        self.quote, self.block, self.escaped = None, False, False
+
+    def outside(self):
+        return self.quote is None and not self.block
+
+    def consume(self, line):
+        offset = 0
+        while offset < len(line):
+            byte = line[offset]
+            following = line[offset + 1:offset + 2]
+            if self.block:
+                if byte == 42 and following == b"/":
+                    self.block = False
+                    offset += 1
+            elif self.quote is not None:
+                if self.escaped:
+                    self.escaped = False
+                elif byte == 92 and self.quote in (39, 34):
+                    self.escaped = True
+                elif byte == self.quote:
+                    if following == bytes([self.quote]):
+                        offset += 1
+                    else:
+                        self.quote = None
+            elif byte in (39, 34, 96):
+                self.quote = byte
+            elif byte == 47 and following == b"*":
+                self.block = True
+                offset += 1
+            elif byte == 35 or (byte == 45 and following == b"-" and (offset + 2 == len(line) or line[offset + 2] <= 32)):
+                break
+            offset += 1
+
+
 def normalize(lines):
     pending, in_table, delimiter = None, False, b";"
+    context = SqlContext()
     for line in lines:
-        directive = DELIMITER.fullmatch(line)
+        original = line
+        outside = context.outside()
+        if outside and UNSUPPORTED_MODE.match(line):
+            # The known dump contract enables backslash escapes. Unknown lexical modes cannot
+            # safely admit later schema spellings; fail instead of approximating string boundaries.
+            raise ValueError("unsupported dump lexical mode")
+        directive = DELIMITER.fullmatch(line) if outside else None
         if directive:
             delimiter = directive[1]
             pending, in_table = None, False
-        if directive or delimiter != b";":
+        if directive:
+            yield line
+            continue
+        if delimiter != b";" or not outside:
+            context.consume(original)
             yield line
             continue
         drop = DROP.fullmatch(line)
@@ -76,6 +125,7 @@ def normalize(lines):
                     attribute = CHARSET.match(line, end)
                     if attribute:
                         line = line[:end] + line[attribute.end():]
+        context.consume(original)
         yield line
 
 
@@ -86,7 +136,7 @@ def main():
         with open(sys.argv[1], "rb") as source:
             for line in normalize(source):
                 sys.stdout.buffer.write(line)
-    except OSError:
+    except (OSError, ValueError):
         sys.stderr.write("dump normalization unavailable\n")
         return 1
     return 0

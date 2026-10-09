@@ -228,6 +228,8 @@ There is no global CSP: the application sets CSP on the responses that need one.
    Only the immediate charset attribute of a string column in the dump's matching table-definition block
    may be normalized. All row/default/comment/routine bytes remain exact. Reproof invalidates an old success
    marker before checking hashes; a new marker is published atomically after verification and cleanup.
+   Delimiter directives count only outside SQL strings/comments. An explicit `NO_BACKSLASH_ESCAPES` mode
+   refuses normalization rather than guessing literal boundaries; retain the failed proof for review.
 4. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
 5. Resumes the site, including after a failed snapshot/proof/transfer, then reports any failure. Successful
    runs prune old local sets. A failed resume remains an explicit recovery condition.

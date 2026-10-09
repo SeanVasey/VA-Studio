@@ -182,7 +182,8 @@ mysqldump --defaults-extra-file=<RESTORE_OPTION_FILE> --single-transaction --qui
 #    comparison `ops/staging/backup.sh restore-check` performs.
 if ! diff -q <BACKUP_DIR>/redump.sql <BACKUP_DIR>/database.sql >/dev/null; then
   # This parser changes only the immediate utf8mb4 charset attribute of string columns in
-  # mysqldump's matching DROP/CREATE TABLE blocks. INSERT, default/comment and routine bytes stay exact.
+  # mysqldump's matching DROP/CREATE TABLE blocks outside routine delimiters and SQL strings/comments.
+  # INSERT, default/comment and routine bytes stay exact. Unsupported NO_BACKSLASH_ESCAPES refuses.
   python3 -I <REPO>/ops/staging/normalize-mysql-dump.py <BACKUP_DIR>/redump.sql > <BACKUP_DIR>/redump.normalized.sql || exit 1
   python3 -I <REPO>/ops/staging/normalize-mysql-dump.py <BACKUP_DIR>/database.sql > <BACKUP_DIR>/database.normalized.sql || exit 1
   diff -q <BACKUP_DIR>/redump.normalized.sql <BACKUP_DIR>/database.normalized.sql >/dev/null || exit 1

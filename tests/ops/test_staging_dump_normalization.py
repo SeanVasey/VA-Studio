@@ -78,6 +78,19 @@ class DumpNormalizationTest(unittest.TestCase):
                 data = routine + body
                 self.assertEqual(normalize(data), routine + body.replace(b"text CHARACTER SET utf8mb4 COLLATE", b"text COLLATE"))
 
+    def test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact(self):
+        schema = table(b"  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+        for opener, closer in ((b"SET @value = '\n", b"';\n"),
+                               (b'SET @value = "\n', b'";\n'),
+                               (b"/* multiline comment\n", b"*/\n")):
+            with self.subTest(opener=opener):
+                routine = b"DELIMITER ;;\nCREATE PROCEDURE example()\nBEGIN\n" + opener + b"DELIMITER ;\n" + schema + closer + b"END;;\nDELIMITER ;\n"
+                self.assertEqual(normalize(routine), routine)
+
+    def test_unknown_dump_escape_mode_refuses_instead_of_guessing_literal_boundaries(self):
+        with self.assertRaises(ValueError):
+            normalize(b"/*!50003 SET sql_mode = 'NO_BACKSLASH_ESCAPES' */ ;\n" + table(b"  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"))
+
     def test_binary_row_bytes_and_unknown_layout_remain_exact(self):
         data = b"INSERT INTO `terms` VALUES ('\xff CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');\r\n"
         self.assertEqual(normalize(data), data)
