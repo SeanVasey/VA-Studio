@@ -233,7 +233,7 @@ class NativeCollectorTests(unittest.TestCase):
     def test_collector_recomputes_the_mysql_selection_instead_of_trusting_the_executed_shards(self):
         # Every per-shard proof (fixture and native module copies) is forged to accept a selection
         # without the reviewed include file; only the collector's own recomputation can refuse it.
-        without = {'file_pattern': fixtures.PATTERN, 'include_files': ()}
+        without = fixtures.SELECTION | {'include_files': ()}
         def forging(original):
             def call(*args, **kwargs):
                 return original(*args, **(kwargs | {'selection': without} if args[2] == 'mysql' else kwargs))

@@ -1,12 +1,15 @@
 # MySQL native selection for Foundation CI — 2026-10-09
 
-Branch `harness/mysql-native-selection` is based on main `0f9b39ce5d59e2d579d11a8ca15153ced1f565b4`.
+Branch `harness/mysql-native-selection` branched from main `0f9b39ce5d59e2d579d11a8ca15153ced1f565b4` and
+merged main `596d2133` (which contains #70 and #81) at `2f8deb8`.
 The earlier commits are `78f8a7b`, `23ff88e` and `6d17481`. `6d17481` applied conditions C1 to C4 from
 the independent review of `23ff88e`, whose decision was APPROVE WITH CONDITIONS. `916392d` added the
 reviewed MySQL skip census. `22371ae` implemented option A for the tests that need a dedicated
 schema: the MySQL jobs mark their disposable database, and four more files join the selection. The
 branch then merged main at `2f8deb8`, which brought in #70 (merged at `13409a29`) and the new
-`tests/Feature/MigrationRecompilationTest.php`; this revision updates the counts to that tree.
+`tests/Feature/MigrationRecompilationTest.php`. `552589d` updated the counts to that tree. This revision
+applies the conditions of the independent re-review of `552589d` (APPROVE WITH CONDITIONS): residual and
+pattern files are pinned in the policy, and blockers and warnings are recorded explicitly.
 
 This note records partition and self-test evidence only. No local or hosted MySQL test run has
 executed the selection, so it is not Foundation acceptance.
@@ -67,85 +70,108 @@ native-only proof passes on SQLite only through a fallback branch:
 A static scan found no `markTestSkipped` call in the first 12 files or anywhere in `tests/Support`. The
 four files added for option A skip only as described under "Option A" below.
 
-## Residual risk pending Sean's decision
+## Residual risk pending Sean's decision (enforced)
 
-The selection still finds MySQL-only behaviour only where SQLite skips it, where the test file is a
-migration test, or where the include list names the file. The review found 61 unselected files
-(936 cases) that branch on `getDriverName()`, `ATTR_DRIVER_NAME` or `['driver']`. Fifteen of them are
-now in the include list. `SchemaQualifierDelimiterTest` is the sixteenth included file and was not
-among the 61.
+The selection finds MySQL-only behaviour only in these places:
 
-**That leaves 46 files (611 cases).** They run on SQLite through a fallback branch and do not run on
-MySQL in Foundation CI. None of them were added:
+- where SQLite skips it;
+- where the test file is a migration test;
+- where the include list names the file.
 
-| File | Cases |
-| --- | --- |
-| `tests/Feature/CustomerConsentAdmissionTest.php` | 22 |
-| `tests/Feature/CustomerListeningNotesCapacityTest.php` | 3 |
-| `tests/Feature/CustomerSuppressionRetainedTargetTest.php` | 2 |
-| `tests/Feature/CustomerSuppressionSourceBoundaryTest.php` | 7 |
-| `tests/Feature/DiscoveryEpochRecoveryTest.php` | 18 |
-| `tests/Feature/FinalizationDatabaseLifecycleTest.php` | 4 |
-| `tests/Feature/FreeGrantAuthorityTest.php` | 6 |
-| `tests/Feature/FreeGrantDownloadsTest.php` | 4 |
-| `tests/Feature/PrivateProductDraftTest.php` | 24 |
-| `tests/Feature/ProductionAmountInputConsistencyAccessTest.php` | 15 |
-| `tests/Feature/ProductionAmountRequirementsAccessTest.php` | 12 |
-| `tests/Feature/ProductionCheckoutCommittedReceiptTest.php` | 12 |
-| `tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php` | 7 |
-| `tests/Feature/ProductionCheckoutReceiptParentTest.php` | 4 |
-| `tests/Feature/ProductionCheckoutSourceTransactionTest.php` | 11 |
-| `tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php` | 3 |
-| `tests/Feature/ProductionFeatures/ProductionFeatureSealedRunTest.php` | 3 |
-| `tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php` | 8 |
-| `tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php` | 2 |
-| `tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php` | 2 |
-| `tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php` | 9 |
-| `tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php` | 8 |
-| `tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php` | 10 |
-| `tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php` | 8 |
-| `tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php` | 11 |
-| `tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php` | 8 |
-| `tests/Feature/ProductionIdentityAdapters/IdentityHistoricalConfigurationAdmissionTest.php` | 4 |
-| `tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php` | 9 |
-| `tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php` | 17 |
-| `tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php` | 2 |
-| `tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php` | 1 |
-| `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php` | 7 |
-| `tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php` | 5 |
-| `tests/Feature/ProductionTrackCapabilitiesGuardsTest.php` | 28 |
-| `tests/Feature/ProductionTrackPolicyDraftTest.php` | 76 |
-| `tests/Feature/ProductionTrackPreparationPacketGuardsTest.php` | 26 |
-| `tests/Feature/ResumableMediaUploadsTest.php` | 25 |
-| `tests/Feature/RightsDeclarationWriterTest.php` | 33 |
-| `tests/Feature/RightsEvidenceGuardTest.php` | 43 |
-| `tests/Feature/ServiceProjectAttachmentAuthorityTest.php` | 17 |
-| `tests/Feature/ServiceProjectCredentialResolverTest.php` | 1 |
-| `tests/Feature/ServiceProjectRecoveryTest.php` | 7 |
-| `tests/Feature/SiteContentDamagedPublicationTest.php` | 4 |
-| `tests/Feature/SupportAttachmentRegistrationTest.php` | 12 |
-| `tests/Feature/TestPaymentExceptionOperationsTest.php` | 25 |
-| `tests/Feature/TestUnpaidReleaseTest.php` | 46 |
+Test files that branch on the driver but are in none of these stay off MySQL. **That is now enforced, not
+just disclosed.** `scripts/ci/database-mysql-selection.json` lists them in `residual_files`.
+`scripts/ci/test-phpunit-shards.py` scans every `tests/**/*.php` file for driver branching: `getDriverName`,
+`ATTR_DRIVER_NAME`, a `['driver']` subscript, `->driver` (not the `driver()` method calls of session or
+cache), and `DB_CONNECTION` reads through `getenv`/`env`/`$_ENV`/`$_SERVER`. The rule has two halves:
+
+- **Test files.** Every branching test file (`tests/Feature|Unit/**/*Test.php`) must be selected (it owns
+  a census method, is in `pattern_files` or is in `include_files`) or be listed in `residual_files`. A
+  residual file that no longer branches, or that is now selected, also fails, so the list stays exact.
+  The sharder and both verifiers also refuse a residual file that is undiscovered or selected.
+- **Helper files.** Branching non-test files under `tests/` are support classes, race workers,
+  paid-development fixture snapshots and browser scripts. PHPUnit does not run them as tests. They are
+  listed exactly in `branching_helper_files`: 96 files, 66 in `tests/Support`, 20 in `tests/Fixtures` and
+  10 in `tests/browser`. A new or removed branching helper is a reviewed policy edit. I chose this over
+  requiring each helper's users to be covered, because finding the users would need call-graph
+  analysis: traits, `Process` worker paths and fixture snapshots. The exact list is simpler and leaves
+  nothing implicit. Listing a helper does not claim MySQL coverage for it.
+
+The scan matched one test file the earlier review's narrower patterns missed:
+`tests/Unit/CommerceGuardBytesTest.php`. It mocks `getDriverName` and touches no database.
+
+**47 files (625 cases) remain on SQLite only.** They run on SQLite, often through a fallback branch, and
+do not run on MySQL in Foundation CI. Whether to add any of them is Sean's decision.
+
+| File | Cases | Why it branches |
+| --- | --- | --- |
+| `tests/Feature/CustomerConsentAdmissionTest.php` | 22 | Reads `sqlite_master` or `information_schema` by driver to snapshot the schema around consent admission |
+| `tests/Feature/CustomerListeningNotesCapacityTest.php` | 3 | Adds MySQL-only assertions inside the capacity checks (lines 46, 88) |
+| `tests/Feature/CustomerSuppressionRetainedTargetTest.php` | 2 | Drops its temporary shadow table with driver-specific DDL |
+| `tests/Feature/CustomerSuppressionSourceBoundaryTest.php` | 7 | Creates the foreign boundary table as TEMPORARY only on MySQL |
+| `tests/Feature/DiscoveryEpochRecoveryTest.php` | 18 | Installs and checks DiscoveryEpoch guards for the active driver |
+| `tests/Feature/FinalizationDatabaseLifecycleTest.php` | 4 | Runs lifecycle workers per connection driver; MySQL retains views |
+| `tests/Feature/FreeGrantAuthorityTest.php` | 6 | MySQL-only authority and shadow refusal branches (lines 62, 79) |
+| `tests/Feature/FreeGrantDownloadsTest.php` | 4 | SQLite-only branch (line 160) |
+| `tests/Feature/PrivateProductDraftTest.php` | 24 | Driver-specific REPLACE verb and a MySQL-only engine check |
+| `tests/Feature/ProductionAmountInputConsistencyAccessTest.php` | 15 | Driver-specific access path; one assertion requires MySQL |
+| `tests/Feature/ProductionAmountRequirementsAccessTest.php` | 12 | Driver-specific access path; one assertion requires MySQL |
+| `tests/Feature/ProductionCheckoutCommittedReceiptTest.php` | 12 | Builds `CurrentRows` readers for the active driver |
+| `tests/Feature/ProductionCheckoutPrimaryBoundaryTest.php` | 7 | Proves `PrimaryBoundary` for the active driver, with a native branch |
+| `tests/Feature/ProductionCheckoutReceiptParentTest.php` | 4 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionCheckoutSourceTransactionTest.php` | 11 | `CurrentRows` reader and driver-specific source-transaction checks |
+| `tests/Feature/ProductionFeatures/ProductionFeatureHeldFloorTest.php` | 3 | Expects a different refusal and version on MySQL |
+| `tests/Feature/ProductionFeatures/ProductionFeatureSealedRunTest.php` | 3 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php` | 8 | Creates TEMPORARY foreign tables only on MySQL |
+| `tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php` | 2 | Creates a TEMPORARY foreign table only on MySQL |
+| `tests/Feature/ProductionFreeGrants/ProductionFreeGrantLibraryWindowTest.php` | 2 | Native-only branch that asserts the driver is not SQLite (line 49) |
+| `tests/Feature/ProductionIdentity/ProductionIdentityDependencyAdmissionTest.php` | 9 | Driver-specific dependency admission fixtures |
+| `tests/Feature/ProductionIdentity/ProductionIdentityJourneyTest.php` | 8 | Builds `CurrentRows` readers for the active driver |
+| `tests/Feature/ProductionIdentity/ProductionIdentityKeyRotationTest.php` | 10 | Builds `CurrentRows` readers for the active driver |
+| `tests/Feature/ProductionIdentity/ProductionIdentityNoticeTest.php` | 8 | Uses the active driver's identity guard SQL |
+| `tests/Feature/ProductionIdentity/ProductionIdentityRuntimeTest.php` | 11 | `CurrentRows` reader; one branch asserts MySQL |
+| `tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php` | 8 | `CurrentRows` reader and a driver-specific fixture |
+| `tests/Feature/ProductionIdentityAdapters/IdentityHistoricalConfigurationAdmissionTest.php` | 4 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionIdentityAdapters/ProductionAccountFeatureAccessTest.php` | 9 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionMembership/MembershipRowsFunctionClosureTest.php` | 17 | MySQL-only and SQLite-only branches in the row-function closure checks |
+| `tests/Feature/ProductionSuppression/ProductionSuppressionSealTest.php` | 2 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionSuppression/ProductionSuppressionTimestampGuardTest.php` | 1 | Extra SQLite-only malformed raw-text cases; MySQL-tolerant message check |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutGuardTest.php` | 7 | SQLite-only guard cases (the data provider is empty on MySQL) |
+| `tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php` | 5 | Builds a `CurrentRows` reader for the active driver |
+| `tests/Feature/ProductionTrackCapabilitiesGuardsTest.php` | 28 | Asserts the SQLite driver (line 62) |
+| `tests/Feature/ProductionTrackPolicyDraftTest.php` | 76 | SQLite-only branch (line 424) |
+| `tests/Feature/ProductionTrackPreparationPacketGuardsTest.php` | 26 | SQLite-only branch (line 197) |
+| `tests/Feature/ResumableMediaUploadsTest.php` | 25 | Driver-specific temporary-table cleanup |
+| `tests/Feature/RightsDeclarationWriterTest.php` | 33 | Driver-specific trigger DDL in one fixture |
+| `tests/Feature/RightsEvidenceGuardTest.php` | 43 | SQLite- and MySQL-specific guard branches (14 sites) |
+| `tests/Feature/ServiceProjectAttachmentAuthorityTest.php` | 17 | Driver-specific temporary-table DDL |
+| `tests/Feature/ServiceProjectCredentialResolverTest.php` | 1 | Records the driver in a probe file |
+| `tests/Feature/ServiceProjectRecoveryTest.php` | 7 | Driver-specific temporary tables and recovery branches |
+| `tests/Feature/SiteContentDamagedPublicationTest.php` | 4 | Driver-specific damage fixture |
+| `tests/Feature/SupportAttachmentRegistrationTest.php` | 12 | Schema-qualified table name chosen by driver |
+| `tests/Feature/TestPaymentExceptionOperationsTest.php` | 25 | SQLite-only branch (line 350) |
+| `tests/Feature/TestUnpaidReleaseTest.php` | 46 | Driver-specific trigger DDL in one fixture |
+| `tests/Unit/CommerceGuardBytesTest.php` | 14 | Mocks `getDriverName` to render guard SQL for both drivers; touches no database (found by the wider scan) |
 
 In total, 394 of the 557 files (5,877 of the 7,642 cases) no longer run on MySQL in Foundation CI.
 They still run on SQLite.
 
 ## MySQL skip signals (C2)
 
-### Attachment consumers and other MySQL skips (C2): covered by Foundation once a hosted run passes
+### Attachment consumers and other MySQL skips (C2): configured, not yet proven on hosted MySQL
 
 - `tests/Feature/SupportAttachmentsTest.php` (28 cases) and `tests/Feature/ServiceSupportAttachmentsTest.php`
   (8 cases) are now selected. Their `setUp` skips on MySQL only when `ATTACHMENT_NATIVE_ISOLATED` is not
-  `1`. The MySQL jobs (and only they) now set it, so on CI these cases run their native paths
-  instead of skipping. The flag is environment-gated, so it is deliberately not in the census: any skip
+  `1`. The MySQL jobs (and only they) now set it, so on CI these cases are configured to run their
+  native paths instead of skipping. No hosted run has confirmed this yet. The flag is environment-gated, so it is deliberately not in the census: any skip
   of these cases on CI MySQL is refused as an unlisted skip.
 - The two SQLite-only methods,
   `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`
   and `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`,
   are now in the MySQL skip census, and their files are selected.
 
-**The native attachment-consumer release blocker is closed for Foundation once a hosted MySQL run
-passes.** Until then it is unverified on MySQL 8.4; see the local MySQL 8.0 evidence below.
+**The native attachment-consumer release blocker stays open until an exact-SHA Foundation run passes
+on hosted MySQL 8.4.** Only then does it close for Foundation. The local MySQL 8.0 evidence below does
+not close it.
 
 ### MySQL skip census (`scripts/ci/database-mysql-skips.json`)
 
@@ -222,6 +248,11 @@ run red; it cannot hide a case.
   job sets them. `test-database-receipts.py` and `test-gitlab-database-receipts.py` pin both variables
   to the MySQL jobs only.
 
+**Warning.** Set `VA_CI_DISPOSABLE_MYSQL=1` only against a private, disposable mysqld that nothing else
+uses. The guarded tests drop every table in `DB_DATABASE`, so copying the CI environment onto a shared
+or long-lived server wipes that database. The helper's docblock and
+`docs/verification/ci-database-receipts.md` carry the same warning.
+
 **Static reading of the newly enabled files.**
 
 - **Attachments: the flag is the only skip.** Each file has exactly one `markTestSkipped`, inside
@@ -294,8 +325,15 @@ run red; it cannot hide a case.
 - Re-discovery must cover every selected case, file and group exactly once.
 - The manifest's `selection` block records the policy path, both policy hashes, the selected file
   and case counts, and the case identity hash.
-- The sharder refuses an empty selection, a census pair that PHPUnit no longer discovers, and any
-  `include_files` entry that is undiscovered or malformed.
+- The sharder refuses:
+  - an empty selection;
+  - a census pair that PHPUnit no longer discovers;
+  - any `include_files` entry that is undiscovered or malformed;
+  - any difference between the pattern's discovered matches and the pinned `pattern_files` (50 files),
+    so a rename or a new migration test is a reviewed policy edit;
+  - a `residual_files` entry that is undiscovered or selected.
+
+  The verifier makes the same two `pattern_files` and `residual_files` checks.
 - Without the flag, the output is byte-for-byte what it was before this change.
 
 **Shard verifier.** `scripts/ci/database-receipts.py` keeps the selection policy in `POLICY_FILES`.
@@ -350,7 +388,7 @@ Both shard counts produced the same manifest `selection` block:
 
 | Field | Value |
 | --- | --- |
-| `policy_sha256` | `959c7709e58661ef74a09af1bbbc0576ed71cc483e29c57872ad489b93ec6801` |
+| `policy_sha256` | `bc2b913e3918dee8f13adda2bd6e67f63c76619b4b40c7514465ca5867cb4ecb` |
 | `sqlite_skip_policy_sha256` | `9080acdabcfc425ac37dcebee23c9f9be00bcd5a6790404977ba41c6994569b0` |
 | `mysql_skip_policy_sha256` | `3f8effc254318548c3e7791b0d2b468b731469dc5f581dd43c06ed212c2a6208` |
 | `files` / `test_cases` | 163 / 1,765 |
@@ -392,10 +430,10 @@ The remaining selected cases per shard are 16, 42, 50, 37, 66, 37, 58 and 87 on 
 cases, which run `migrate:fresh` per test without using `FinalizationDatabaseMigrations`; they sit in
 GitHub shards 2 and 4.
 
-- **GitLab.** The new 240-minute limit covers the estimate with some headroom. However, GitLab.com
-  documents a 3-hour maximum for its hosted runners, and that cap would cancel these shards before
-  they finish. I have not verified this cap for the project's runners, and GitLab speed is
-  unmeasured. On hosted runners, a reviewed change to 8 GitLab MySQL shards would likely be needed.
+- **GitLab.** The 240-minute limit covers the estimate with some headroom. However, GitLab.com documents
+  a 3-hour maximum for its hosted runners, and that cap would cancel these shards before they finish.
+  I have not verified this cap for the project's runners, and GitLab speed is unmeasured. This is an
+  open blocker; see "Open blockers" below.
 - **`MigrationRecompilationTest`.** Selected through the migration pattern since the merge of main. It
   is not counted above, because it uses neither `FinalizationDatabaseMigrations` nor `RefreshDatabase`;
   it runs `migrate:fresh` four times itself. That is about 4 × 35 s in CI. It sits in GitHub shard 1
@@ -407,12 +445,31 @@ GitHub shards 2 and 4.
   now 210 minutes (about 50% headroom); fresh timings from the first hosted run should replace both
   the estimate and the limit.
 
+## Open blockers
+
+- **GitLab hosted MySQL results are not evidence yet.** A GitLab MySQL result counts only after one of
+  two things happens: it is confirmed that the project's GitLab runners allow a job timeout of at least
+  240 minutes, or a reviewed change moves GitLab to 8 MySQL shards. GitLab.com documents a 3-hour
+  maximum for hosted runners, and the 4-shard estimate is up to about 211 minutes.
+- **No MySQL claims before a hosted run.** None of these may be claimed until one exact-SHA Foundation
+  run passes on hosted MySQL 8.4: MySQL-native coverage of the selection, exactness of the MySQL skip
+  census, or closure of the attachment-consumer blocker. The local MySQL 8.0 runs above do not count.
+
+## Next steps
+
+1. Dispatch one exact-SHA Foundation run on hosted MySQL 8.4 for the reviewed candidate.
+2. After the first hosted run, regenerate `scripts/ci/phpunit-timings-mysql.json` from its shard JUnit
+   with `scripts/ci/phpunit-timings.py`. 78 of the 163 selected files are currently untimed. Then
+   revisit the 210-minute GitHub and 240-minute GitLab limits.
+3. Resolve the GitLab blocker above.
+4. Sean decides whether any of the 47 residual files should join the selection.
+
 ## Self-tests
 
 | Command | Result |
 | --- | --- |
-| `python3 scripts/ci/test-phpunit-shards.py` | rc 0, 48 tests |
-| `python3 scripts/ci/test-database-receipts.py` | rc 0, 55 tests |
+| `python3 scripts/ci/test-phpunit-shards.py` | rc 0, 52 tests |
+| `python3 scripts/ci/test-database-receipts.py` | rc 0, 59 tests |
 | `python3 scripts/ci/test-gitlab-database-receipts.py` | rc 0, 30 tests |
 | `python3 scripts/ci/test-ci-scope.py` | rc 0, 27 tests |
 | `python3 scripts/ci/test-workflow-cadence.py` | rc 0, 14 tests |
@@ -484,6 +541,38 @@ The option A workflow pins were checked the same way, restored with `cmp`. All 4
 | W2: GitHub MySQL job loses `ATTACHMENT_NATIVE_ISOLATED` | killed |
 | W3: GitLab SQLite job also sets `ATTACHMENT_NATIVE_ISOLATED` | killed |
 | W4: GitLab MySQL job loses `VA_CI_DISPOSABLE_MYSQL` | killed |
+
+The re-review's C2 and C5 add these tests:
+
+- Driver-branching scan: a fixture tree with each branching form, plus negative cases (`driver()` method
+  calls, `'DB_CONNECTION' => ...` writes). It checks the exact test and helper sets and that each list
+  stays exact.
+- The repository-wide scan over `tests/**/*.php` against the committed policy.
+- `pattern_files` pinning in the sharder and the verifier, including a migration test renamed out of
+  the pattern.
+- `residual_files` must be discovered and unselected (sharder and verifier).
+- The new list shapes are validated by both readers.
+- A MySQL census skip that carries `setUp` assertions is accepted, and refused without its census entry.
+- `test_exact_reviewed_sqlite_skips_and_no_mysql_skip` is renamed to
+  `test_each_engine_skips_exactly_its_own_census_and_a_skip_may_carry_setup_assertions`.
+
+Each mutation was applied in place and the files restored; `sha256sum -c` confirmed all three files were
+byte-identical afterwards:
+
+| Mutation | Result |
+| --- | --- |
+| P1: policy drops a `residual_files` entry | killed |
+| P2: policy adds a stale residual entry (`BulkLicenseDraftSourceAuthoringActionTest`, no driver branching) | killed |
+| P3: policy drops a `branching_helper_files` entry | killed |
+| P4: policy drops a `pattern_files` entry | killed |
+| S1: sharder ignores `pattern_files` | killed |
+| S2: sharder drops the residual check | killed |
+| S3: scan no longer recognises `->driver` | killed |
+| S4: scan ignores a stale residual entry | killed |
+| S5: scan ignores unlisted helpers | killed |
+| V1: verifier ignores `pattern_files` | killed |
+| V2: verifier drops the residual check | killed |
+| Real rename: `tests/Feature/PromotionMigrationTest.php` moved to `tests/Integration/` | refused by the sharder (rc 1, "pattern_files differ … missing: tests/Feature/PromotionMigrationTest.php") and by the repository self-test (rc 1); moved back, and `sha256sum -c` confirmed it |
 
 ## Not verified
 

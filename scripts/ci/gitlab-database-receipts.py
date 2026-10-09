@@ -311,7 +311,7 @@ def archive_metadata(job: dict, identity: dict, engine: str, shard: int) -> dict
     return {"filename": expected_name, "size": metadata["size"]}
 
 
-def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: int, raw: bytes) -> tuple[dict, dict]:
+def validate_receipt(root: Path, identity: dict, job: dict, engine: str, shard: int, raw: bytes) -> tuple[dict, dict, dict]:
     files = proof.archive(raw, proof.evidence_names(engine, shard, shard_count=COUNTS[engine]))
     prefix = f"phpunit-ci-{engine}-{shard}"
     receipt = proof.json_data(files.pop(prefix + "-receipt.json"))

@@ -16,7 +16,9 @@ With --mysql-native-selection (MySQL only), discovery stays complete, but only t
 selected by the reviewed scripts/ci/database-mysql-selection.json are partitioned: every
 file owning a method from the reviewed SQLite skip census, every file whose repository
 path matches the policy's migration file pattern, and every file in the policy's reviewed
-include_files list (each must be discovered). The reviewed MySQL skip census
+include_files list (each must be discovered). The policy also pins the exact pattern_files the
+pattern matches and the residual_files: driver-branching test files deliberately left off MySQL,
+which must be discovered and unselected. The reviewed MySQL skip census
 (scripts/ci/database-mysql-skips.json) must name only discovered, selected methods that are
 not in the SQLite census; its hash is recorded with the selection. The proof then requires
 every selected case exactly once, and the manifest keeps the complete source census.
@@ -49,6 +51,13 @@ NS = "{https://xml.phpunit.de/testSuite}"
 XSI = "http://www.w3.org/2001/XMLSchema-instance"
 ET.register_namespace("xsi", XSI)
 SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
+# A PHP file under tests/ that branches on the database driver or reads the configured connection.
+# Method calls named driver() (session, cache) are not database branches and are excluded.
+DRIVER_BRANCHING = re.compile(
+    r"getDriverName|ATTR_DRIVER_NAME|\[\s*['\"]driver['\"]\s*\]|->driver\b(?!\s*\()"
+    r"|(?:getenv|env)\(\s*['\"]DB_CONNECTION['\"]|\$_(?:ENV|SERVER)\[\s*['\"]DB_CONNECTION['\"]\s*\]")
+# A PHPUnit test class file; everything else under tests/ is a helper (support, worker, fixture or browser script).
+TEST_FILE = re.compile(r"tests/(?:Feature|Unit)/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+Test\.php")
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
 
@@ -190,6 +199,54 @@ class Selection:
     # Reviewed SQLite-only (class, method) pairs that skip on MySQL; they must lie inside the selection.
     mysql_skip_pairs: set[tuple[str, str]] = field(default_factory=set)
     mysql_skip_policy_sha256: str = ""
+    # Exactly the discovered files the migration pattern matches; a rename must be a reviewed policy edit.
+    pattern_files: tuple[str, ...] = ()
+    # Reviewed driver-branching test files that stay off MySQL; each must be discovered and unselected.
+    residual_files: tuple[str, ...] = ()
+    # Reviewed non-test files under tests/ that branch on the driver (helpers, workers, fixtures, browser scripts).
+    branching_helper_files: tuple[str, ...] = ()
+
+
+def path_list(value: object, label: str, pattern: str = r"tests/[A-Za-z0-9_./-]+\.php") -> tuple[str, ...]:
+    """Validate a reviewed list of repository paths under tests/: sorted, unique, no traversal."""
+    if (not isinstance(value, list)
+            or not all(isinstance(name, str) and re.fullmatch(pattern, name) and ".." not in name for name in value)
+            or value != sorted(set(value))):
+        raise PartitionError("MySQL selection " + label + " must be sorted, unique repository test paths")
+    return tuple(value)
+
+
+def statically_selected(selection: Selection) -> set[str]:
+    """The selected files without PHPUnit discovery: census owners (PSR-4 Tests\\ -> tests/), pattern_files, include_files."""
+    owners = {"tests/" + cls.removeprefix("Tests\\").replace("\\", "/") + ".php" for cls, _ in selection.skip_pairs}
+    return owners | set(selection.pattern_files) | set(selection.include_files)
+
+
+def branching_coverage_errors(root: Path, paths: list[str], selection: Selection) -> list[str]:
+    """Every driver-branching test file must be selected or a reviewed residual file, and both lists must stay exact.
+
+    A residual file that no longer branches, or that is now selected, is stale. Non-test files under tests/
+    (support classes, race workers, paid-development fixtures, browser scripts) are not run by PHPUnit
+    themselves, so they are listed exactly in branching_helper_files: adding or removing a branching helper
+    is a reviewed policy edit. Proving which tests use a helper would need call-graph analysis.
+    """
+    tests, helpers = driver_branching_files(root, paths)
+    selected, residual = statically_selected(selection), set(selection.residual_files)
+    errors = [f"driver-branching test file neither selected nor residual: {name}" for name in sorted(tests - selected - residual)]
+    errors += [f"residual file no longer branches on the driver: {name}" for name in sorted(residual - tests)]
+    errors += [f"residual file is selected: {name}" for name in sorted(residual & selected)]
+    errors += [f"driver-branching helper not in branching_helper_files: {name}" for name in sorted(helpers - set(selection.branching_helper_files))]
+    errors += [f"branching_helper_files entry no longer branches: {name}" for name in sorted(set(selection.branching_helper_files) - helpers)]
+    return errors
+
+
+def driver_branching_files(root: Path, paths: list[str]) -> tuple[set[str], set[str]]:
+    """Return (test files, helper files) among the given tests/**/*.php paths that branch on the driver."""
+    tests, helpers = set(), set()
+    for name in paths:
+        if name.startswith("tests/") and name.endswith(".php") and DRIVER_BRANCHING.search((root / name).read_text(errors="replace")):
+            (tests if TEST_FILE.fullmatch(name) else helpers).add(name)
+    return tests, helpers
 
 
 def read_census(raw: bytes, purpose: str, label: str, *, require_entries: bool, require_sorted: bool) -> set[tuple[str, str]]:
@@ -222,7 +279,8 @@ def read_selection(root: Path) -> Selection:
     except ValueError as error:
         raise PartitionError("MySQL selection policy is not valid JSON") from error
     if (not isinstance(policy, dict)
-            or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "include_files"}
+            or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "pattern_files",
+                               "include_files", "residual_files", "branching_helper_files"}
             or not is_count(policy["schema_version"], 1) or policy["schema_version"] != 1
             or policy["purpose"] != "reviewed-mysql-native-selection" or policy["sqlite_skip_policy"] != SQLITE_SKIP_POLICY
             or policy["mysql_skip_policy"] != MYSQL_SKIP_POLICY
@@ -238,12 +296,15 @@ def read_selection(root: Path) -> Selection:
             or not all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_/]+\.php", name) and ".." not in name for name in include)
             or include != sorted(set(include))):
         raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
+    pattern_files = path_list(policy["pattern_files"], "pattern_files")
+    residual_files = path_list(policy["residual_files"], "residual_files")
+    helper_files = path_list(policy["branching_helper_files"], "branching_helper_files")
     skip_raw = (root / SQLITE_SKIP_POLICY).read_bytes()
     pairs = read_census(skip_raw, "reviewed-mysql-only-sqlite-skip-methods", "SQLite", require_entries=True, require_sorted=False)
     mysql_raw = (root / MYSQL_SKIP_POLICY).read_bytes()
     mysql_pairs = read_census(mysql_raw, "reviewed-sqlite-only-mysql-skip-methods", "MySQL", require_entries=False, require_sorted=True)
     return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest(), tuple(include),
-                     mysql_pairs, hashlib.sha256(mysql_raw).hexdigest())
+                     mysql_pairs, hashlib.sha256(mysql_raw).hexdigest(), pattern_files, residual_files, helper_files)
 
 
 def select_native(source: Inventory, selection: Selection) -> Inventory:
@@ -258,13 +319,22 @@ def select_native(source: Inventory, selection: Selection) -> Inventory:
     if not selection.skip_pairs <= discovered:
         raise PartitionError("Reviewed SQLite skip policy contains an undiscovered method")
     files = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.skip_pairs}
-    files |= {file for file in source.files if re.fullmatch(selection.pattern, file)}
+    matched = {file for file in source.files if re.fullmatch(selection.pattern, file)}
+    if matched != set(selection.pattern_files):
+        raise PartitionError("MySQL selection pattern_files differ from the pattern's discovered matches; unexpected: "
+                             + ", ".join(sorted(matched - set(selection.pattern_files))) + "; missing: "
+                             + ", ".join(sorted(set(selection.pattern_files) - matched)))
+    files |= matched
     missing = set(selection.include_files) - source.files
     if missing:
         raise PartitionError("Reviewed MySQL include file was not discovered: " + ", ".join(sorted(missing)))
     files |= set(selection.include_files)
     if not files:
         raise PartitionError("The MySQL-native selection is empty")
+    residual = set(selection.residual_files)
+    if not residual <= source.files or residual & files:
+        raise PartitionError("Reviewed MySQL residual_files must be discovered and unselected: "
+                             + ", ".join(sorted((residual - source.files) | (residual & files))))
     # The MySQL skip census names only discovered, selected methods and never a SQLite census method,
     # so no case can be skipped by both engines.
     if not selection.mysql_skip_pairs <= discovered:

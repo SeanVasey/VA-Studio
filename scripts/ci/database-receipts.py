@@ -396,10 +396,11 @@ def mysql_skip_pairs(root: Path) -> set[tuple[str, str]]:
 
 
 def mysql_selection(root: Path) -> dict:
-    """Return the committed, reviewed MySQL-native selection rules: migration file pattern and include list."""
+    """Return the committed, reviewed MySQL-native selection rules: pattern, pinned pattern files, include and residual lists."""
     value = json_data(read_file(root / SELECTION_POLICY))
     require(isinstance(value, dict)
-            and set(value) == {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "include_files"}
+            and set(value) == {"schema_version", "purpose", "sqlite_skip_policy", "mysql_skip_policy", "file_pattern", "pattern_files",
+                               "include_files", "residual_files", "branching_helper_files"}
             and type(value["schema_version"]) is int and value["schema_version"] == 1
             and value["purpose"] == "reviewed-mysql-native-selection" and value["sqlite_skip_policy"] == SQLITE_SKIP_POLICY
             and value["mysql_skip_policy"] == MYSQL_SKIP_POLICY
@@ -413,7 +414,13 @@ def mysql_selection(root: Path) -> dict:
     require(isinstance(include, list)
             and all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_/]+\.php", name) is not None and ".." not in name for name in include)
             and include == sorted(set(include)), "MySQL selection include_files must be sorted, unique repository test paths")
-    return {"file_pattern": value["file_pattern"], "include_files": tuple(include)}
+    for key in ("pattern_files", "residual_files", "branching_helper_files"):
+        names = value[key]
+        require(isinstance(names, list)
+                and all(isinstance(name, str) and re.fullmatch(r"tests/[A-Za-z0-9_./-]+\.php", name) is not None and ".." not in name for name in names)
+                and names == sorted(set(names)), "MySQL selection " + key + " must be sorted, unique repository test paths")
+    return {"file_pattern": value["file_pattern"], "pattern_files": tuple(value["pattern_files"]), "include_files": tuple(include),
+            "residual_files": tuple(value["residual_files"])}
 
 
 def native_selection(full: dict, skip_pairs: set[tuple[str, str]], selection: dict | None) -> dict[str, str]:
@@ -421,19 +428,25 @@ def native_selection(full: dict, skip_pairs: set[tuple[str, str]], selection: di
 
     Whole files are selected: each file owning a reviewed SQLite-skipped method, each file whose
     repository path matches the reviewed migration pattern, and each reviewed include-list file.
-    A listed file that is not in the complete inventory is refused.
+    A listed file that is not in the complete inventory is refused. The pattern's matches must
+    equal the pinned pattern_files, and every residual file must be discovered and unselected.
     """
-    require(isinstance(selection, dict) and set(selection) == {"file_pattern", "include_files"}
+    require(isinstance(selection, dict) and set(selection) == {"file_pattern", "pattern_files", "include_files", "residual_files"}
             and isinstance(selection["file_pattern"], str) and selection["file_pattern"]
-            and isinstance(selection["include_files"], tuple), "Missing MySQL selection policy")
+            and all(isinstance(selection[key], tuple) for key in ("pattern_files", "include_files", "residual_files")),
+            "Missing MySQL selection policy")
     require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
     discovered = set(full["cases"].values())
     require(set(selection["include_files"]) <= discovered, "Reviewed MySQL include file is not in the complete inventory")
     files = {owner for identifier_, owner in full["cases"].items() if full["methods"][identifier_] in skip_pairs}
-    files |= {owner for owner in discovered if re.fullmatch(selection["file_pattern"], owner)}
+    matched = {owner for owner in discovered if re.fullmatch(selection["file_pattern"], owner)}
+    require(matched == set(selection["pattern_files"]), "MySQL selection pattern_files differ from the pattern's discovered matches")
+    files |= matched
     files |= set(selection["include_files"])
     selected = {identifier_: owner for identifier_, owner in full["cases"].items() if owner in files}
     require(selected, "Empty MySQL-native selection")
+    residual = set(selection["residual_files"])
+    require(residual <= discovered and not residual & files, "Reviewed MySQL residual_files must be discovered and unselected")
     return selected
 
 

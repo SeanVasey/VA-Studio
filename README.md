@@ -148,7 +148,7 @@ conditions recorded. Prefer local affected checks; manually request
 [native selection](docs/verification/mysql-native-selection-20261009/README.md):
 files owning a method in the SQLite skip census, migration test files and a reviewed
 include list (163 of 557 files, 1,765 of 7,642 cases). Other tests no longer run on
-MySQL in Foundation CI, including 46 files that branch on the database driver.
+MySQL in Foundation CI, including 47 driver-branching test files pinned in its `residual_files`.
 MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
 and each of them must have run on SQLite.
 All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See

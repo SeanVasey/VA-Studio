@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\DB;
  * (set by both GitHub Actions and GitLab CI), the testing environment, and a connection whose database
  * is exactly DB_DATABASE. The name must also be a plain identifier that does not look like a real or
  * production schema.
+ *
+ * WARNING: set VA_CI_DISPOSABLE_MYSQL=1 only against a private, disposable mysqld that nothing else
+ * uses. The guarded tests drop every table in DB_DATABASE. Copying the CI environment onto a shared
+ * or long-lived server wipes whatever database DB_DATABASE names there.
  */
 final class DisposableNativeDatabase
 {
