@@ -1,0 +1,14 @@
+# component at 8fc077f + tests/frontend/paid-grant-review-addendum16.test.tsx (sha256 527018d6a2c58e1a): case D only, failing line
+# npx vitest run tests/frontend/paid-grant-review-addendum16.test.tsx -t 'D: while another order'
+     × D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without disturbing the replay 630ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ tests/frontend/paid-grant-review-addendum16.test.tsx:161:21
+      Tests  1 failed | 7 skipped (8)
+rc=1
+# probe line:
+159:    // The round 24 control is the only way back to X here (fails on 8fc077f).
+160-    const before = calls.length;
+161-    fireEvent.click(button(reopenFor(orderId)));
+restored rc=0

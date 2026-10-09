@@ -123,7 +123,7 @@ export function PaidGrantJourney() {
     // Stop removes its own button; keep focus on the progress line rather than letting it fall to the page (A12-I4).
     progressLine.current?.focus();
   }
-  const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
+  const sentAt = useRef(0), kept = useRef<{ auth: Authorization; refused: boolean; originId: string; orderId: string }[]>([]), active = useRef(false), generation = useRef(0), request = useRef<AbortController | null>(null), inflight = useRef(false), frames = useRef<HTMLIFrameElement[]>([]), alert = useRef<HTMLDivElement>(null);
   function clear(keepPending = false, keepFrames = false) { setData(null); setOrigin(null); setOrder(''); setStatus(null); setProgress(''); if (!keepPending) setPending(null); setReviewedSaved(false); setStatusAfter(null); if (!keepFrames) { frames.current.forEach(f => f.remove()); frames.current = []; } }
   function refuse() { stopContinuing(); clear(); kept.current = []; setIssued([]); setDenied(true); setMessage('Access changed. Open a fresh sign-in page before continuing.'); }
   useEffect(() => {
@@ -267,7 +267,10 @@ export function PaidGrantJourney() {
   // Kept per authorization: a second submission before the first frame answers must not orphan the first one's retry.
   function retryDownload(a: Authorization) { if (kept.current.some(m => m.auth.id === a.id && m.refused)) submit(a); }
   function submit(a: Authorization) {
-    const token = csrf(); if (!token || denied || busy) return; setIssued(list => list.filter(i => i.auth.id !== a.id)); const mark = { auth: a, refused: false }; kept.current = [...kept.current.filter(m => m.auth.id !== a.id), mark]; setStatus(null);
+    // Downloads are offered only for the shown order; the kept entry retains it so a refusal that clears the page can still
+    // lead back to its retry (independent review A16-L1).
+    const token = csrf(); if (!token || denied || busy || !origin) return; setIssued(list => list.filter(i => i.auth.id !== a.id));
+    const mark = { auth: a, refused: false, originId: origin.id, orderId: origin.orderId }; kept.current = [...kept.current.filter(m => m.auth.id !== a.id), mark]; setStatus(null);
     // Frames are never evicted to make room: removing one that has not reported back would abort a download the server may
     // still commit. They are removed on their own refusal, a denial, leaving the page and unmount.
     const frame = document.createElement('iframe'); frame.name = `paid-grant-${crypto.randomUUID()}`; frame.title = 'Paid license attachment response'; frame.hidden = true; frame.setAttribute('referrerpolicy', 'no-referrer');
@@ -289,9 +292,10 @@ export function PaidGrantJourney() {
     catch { setMessage(unknown); } finally { form.querySelectorAll('input').forEach(f => { f.value = ''; }); form.remove(); }
   }
   const shown = origin ? issued.filter(i => i.originId === origin.id).map(i => i.auth) : [];
-  // Orders holding an issued, not yet submitted authorization that are not shown (a hidden tab or another order cleared
-  // them): one reopen control per order, using the ids retained at issuance.
-  const unshownIssued = denied ? [] : issued.filter((i, n, all) => i.originId !== origin?.id && all.findIndex(j => j.originId === i.originId) === n);
+  // Orders holding an issued, not yet submitted authorization, or a refused download kept for retry, that are not shown (a
+  // hidden tab, a refusal or another order cleared them): one reopen control per order, using the ids retained with it.
+  const unshownIssued = denied ? [] : [...issued, ...kept.current.filter(m => m.refused)]
+    .filter((i, n, all) => i.originId !== origin?.id && all.findIndex(j => j.originId === i.originId) === n);
   const retryable = denied || !origin || status?.originId !== origin.id ? [] : kept.current.filter(m => m.refused).map(m => m.auth)
     .filter(r => shown.every(a => a.id !== r.id) && status.lines.some(l => l.history.some(h => h.id === r.id && h.kind === r.kind && h.status === 'unused')));
   const unfinished = origin?.lines.filter(l => l.documentStatus !== 'complete') ?? [];

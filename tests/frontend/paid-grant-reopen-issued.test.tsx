@@ -5,7 +5,8 @@ import { PaidGrantJourney, type PaidOrigin } from '../../resources/js/components
 // Codex P2 4228014577: an authorization issued for an order older than the 20-row index, then a hidden tab (which clears the
 // shown order but keeps the issued authorization in memory), left its Download button unreachable: the index did not list the
 // order and the issued entry kept only the batch id, which open() cannot use without the order id. Its short-lived token then
-// expired unused. Each issued authorization now keeps its order, and the page offers to reopen it.
+// expired unused. Each issued authorization now keeps its order, and the page offers to reopen it. A refused download kept for
+// retry had the same gap after the refusal cleared its order (independent review A16-L1); it keeps its order too.
 const batchId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', orderId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', lineId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const authorizationId = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', otherBatch = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee', otherOrder = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
 const token = 'ISSUED_SYNTHETIC_TOKEN'.padEnd(43, 'a');
@@ -18,6 +19,8 @@ const authorization = { authorization: { id: authorizationId, token, expiresAt: 
 const olderListing = { schemaVersion: 1, originLimit: 20, origins: [{ id: otherBatch, orderId: otherOrder, createdAt: '2026-10-07 02:02:03', provenance: 'synthetic_rehearsal' }] };
 const button = (name: string) => screen.getByRole('button', { name });
 const reopen = `Reopen order ${orderId} to download its authorized file`;
+const unusedStatus = { status: { schemaVersion: 1, originId: batchId, fulfilled: true, lines: [{ id: lineId, attemptCount: 0, maxDownloads: 3, historyLimit: 20, renderRetryAllowed: false, renderRetryAfter: null,
+  history: [{ id: authorizationId, kind: 'master_wav', issuedAt: '2026-10-07 01:02:03', expiresAt: '2026-10-07 01:03:03', status: 'unused', attemptedAt: null }] }] } };
 
 beforeEach(() => { document.head.insertAdjacentHTML('beforeend', `<meta data-paid-csrf name="csrf-token" content="${'c'.repeat(40)}">`); });
 afterEach(() => { vi.restoreAllMocks(); document.head.querySelectorAll('[data-paid-csrf]').forEach(e => e.remove());
@@ -59,6 +62,36 @@ describe('reopening the order of an issued authorization', () => {
     expect(button('Download authorized file')).toBeEnabled();
     expect(screen.queryByRole('button', { name: reopen })).not.toBeInTheDocument();
     // The token stays in memory only.
+    expect(document.body.innerHTML).not.toContain(token);
+  });
+
+  it('reopens the order of a refused download kept for retry, so the unused authorization can be retried', async () => {
+    vi.spyOn(HTMLFormElement.prototype, 'submit').mockImplementation(() => {});
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(authorization))
+      .mockResolvedValueOnce(response(olderListing)).mockResolvedValueOnce(response({ origin: complete })).mockResolvedValueOnce(response(unusedStatus));
+    render(<PaidGrantJourney />);
+    fireEvent.change(screen.getByLabelText('Saved order reference'), { target: { value: orderId } });
+    fireEvent.click(button('Prepare licenses for this paid order'));
+    await screen.findByLabelText('Retained paid order');
+    fireEvent.click(button('Authorize master_wav for Original synthetic recording'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Download authorized file' }));
+    // The redemption is refused before anything is recorded; the refusal clears the order and keeps the token for retry.
+    const frame = document.querySelector<HTMLIFrameElement>('iframe[title="Paid license attachment response"]')!;
+    Object.defineProperty(frame, 'contentDocument', { configurable: true, value: { location: { href: 'http://localhost/paid-grants/authorizations/x/redeem' },
+      body: { textContent: JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' }) } } });
+    await act(async () => { frame.dispatchEvent(new Event('load')); });
+    expect(screen.getByRole('alert')).toHaveTextContent('The download was refused');
+    expect(screen.queryByLabelText('Retained paid order')).not.toBeInTheDocument();
+    fireEvent.click(button('Open paid licenses'));
+    await screen.findByRole('button', { name: `Open saved order ${otherOrder}` });
+    expect(screen.queryByRole('button', { name: `Open saved order ${orderId}` })).not.toBeInTheDocument();
+
+    fireEvent.click(button(reopen));
+    await screen.findByLabelText('Retained paid order');
+    expect(fetcher.mock.calls[3][0]).toBe(`/paid-grants/origins/${batchId}`);
+    expect(screen.queryByRole('button', { name: reopen })).not.toBeInTheDocument();
+    fireEvent.click(button('Refresh preparation and download status'));
+    expect(await screen.findByRole('button', { name: 'Retry the authorized download' })).toBeEnabled();
     expect(document.body.innerHTML).not.toContain(token);
   });
 
