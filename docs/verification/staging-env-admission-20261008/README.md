@@ -176,7 +176,7 @@ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
 | Ops fixture after merging main `b9cb7b67` (#67): `test_staging_protected_configuration` red on main, its candidate env lacking the newly required `VASEY_PHP_CLI_BINARY` | `e07da62` (#67 head) | 1 failure, rc 1 | `evidence/ops-protected-configuration-red-main.txt` |
 | Same with the fixture supplying the running CLI PHP | integrated head + fix | 3 tests OK | `evidence/ops-protected-configuration-green.txt` |
 | All ops kit tests + private-server preflight self-test | integrated head + fix | 13 files, 74 tests OK; preflight 20 OK | `evidence/final-ops-tests.txt` |
-| Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
+| Final affected selection: the reviewer's 115 files plus the M-16, staging and Livewire-isolation files (124), 4 shards | `0b88d78` (main `b9cb7b67` merged; `5ad7546` after it changes only the Python ops fixture) | 491 + 569 + 481 + 424 = **1,965 tests, 17,676 assertions, 0 failures**; 33 skips (the same count as the reviewer's MySQL-native/POSIX-only skips); rc 0 each | `evidence/final-selection.txt`, `evidence/final-shard-{0..3}.txt` |
 
 ## Not tested
 

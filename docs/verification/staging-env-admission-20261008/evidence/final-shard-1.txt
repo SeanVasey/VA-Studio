@@ -1,1 +1,11 @@
 # B2 final affected selection shard 1 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt-b2/phpunit-ci-b2final-1.xml
+
+Time: 15:26.652, Memory: 329.00 MB
+
+OK, but some tests were skipped!
+Tests: 569, Assertions: 5413, Skipped: 23.
+rc=0
