@@ -1,0 +1,19 @@
+test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate) ... FAIL
+
+======================================================================
+FAIL: test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_deploy_refresh.py", line 49, in test_forge_edit_after_admission_does_not_replace_validated_candidate
+    self.assertEqual((release / ".env").read_text(), candidate,
+AssertionError: 'APP_[51 chars]AAA=\nAPP_DEBUG=false\nCONTACT_FROM_NAME=new\nAPP_DEBUG=true\n' != 'APP_[51 chars]AAA=\nAPP_DEBUG=false\nCONTACT_FROM_NAME=new\n'
+  APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  APP_DEBUG=false
+  CONTACT_FROM_NAME=new
+- APP_DEBUG=true
+ : refresh installed a later Forge edit instead of the profile it validated
+
+----------------------------------------------------------------------
+Ran 1 test in 0.011s
+
+FAILED (failures=1)

@@ -1,0 +1,75 @@
+test_application_writable_privileged_ancestry_is_rejected (__main__.RepairedBoundaries.test_application_writable_privileged_ancestry_is_rejected) ... FAIL
+test_detach_rejects_an_unrelated_mount_before_unmount (__main__.RepairedBoundaries.test_detach_rejects_an_unrelated_mount_before_unmount) ... FAIL
+test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks (__main__.RepairedBoundaries.test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks) ... FAIL
+test_failed_activation_phase_does_not_claim_stopped_writers (__main__.RepairedBoundaries.test_failed_activation_phase_does_not_claim_stopped_writers) ... ok
+test_failed_reproof_removes_old_success_marker (__main__.RepairedBoundaries.test_failed_reproof_removes_old_success_marker) ... ok
+test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) ... 
+  test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='regular') ... FAIL
+  test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='outside') ... FAIL
+  test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='dangling') ... FAIL
+test_quoted_production_flag_is_refused (__main__.RepairedBoundaries.test_quoted_production_flag_is_refused) ... ok
+test_refresh_preserves_key_saves_old_env_and_stops_on_control_failure (__main__.RepairedBoundaries.test_refresh_preserves_key_saves_old_env_and_stops_on_control_failure) ... ok
+test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) ... 
+  test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) (failure=None) ... FAIL
+
+======================================================================
+FAIL: test_application_writable_privileged_ancestry_is_rejected (__main__.RepairedBoundaries.test_application_writable_privileged_ancestry_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 80, in test_application_writable_privileged_ancestry_is_rejected
+    self.assertIn("group/world writable", run.stderr)
+AssertionError: 'group/world writable' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_detach_rejects_an_unrelated_mount_before_unmount (__main__.RepairedBoundaries.test_detach_rejects_an_unrelated_mount_before_unmount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 71, in test_detach_rejects_an_unrelated_mount_before_unmount
+    self.assertIn("unrelated mount", run.stderr)
+AssertionError: 'unrelated mount' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks (__main__.RepairedBoundaries.test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 63, in test_detach_rejects_escaped_leaf_after_canonical_ancestor_checks
+    self.assertIn("private mount target", run.stderr)
+AssertionError: 'private mount target' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='regular')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 96, in test_invalid_current_is_not_treated_as_first_install
+    self.assertIn("refusing a first-install fallback", run.stderr)
+AssertionError: 'refusing a first-install fallback' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='outside')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 96, in test_invalid_current_is_not_treated_as_first_install
+    self.assertIn("refusing a first-install fallback", run.stderr)
+AssertionError: 'refusing a first-install fallback' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_invalid_current_is_not_treated_as_first_install (__main__.RepairedBoundaries.test_invalid_current_is_not_treated_as_first_install) (shape='dangling')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 96, in test_invalid_current_is_not_treated_as_first_install
+    self.assertIn("refusing a first-install fallback", run.stderr)
+AssertionError: 'refusing a first-install fallback' not found in 'environment: line 8: die: command not found\n'
+
+======================================================================
+FAIL: test_switch_checks_quiescence_maintenance_and_attachment_before_selection (__main__.RepairedBoundaries.test_switch_checks_quiescence_maintenance_and_attachment_before_selection) (failure=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/repair-boundaries-probe.py", line 110, in test_switch_checks_quiescence_maintenance_and_attachment_before_selection
+    self.assertEqual(run.returncode, 0, run.stderr)
+AssertionError: 127 != 0 : environment: line 9: die: command not found
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.126s
+
+FAILED (failures=7)

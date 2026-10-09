@@ -1,0 +1,8 @@
+{"version":"8.4.11","performance_schema":1,"socket":"","bind_address":"127.0.0.1","isolation":"REPEATABLE-READ"}
+{"synthetic_schema":"original","lines":["DROP TABLE IF EXISTS `dump_probe`;","CREATE TABLE `dump_probe` (","  `id` int NOT NULL,","  `inherited` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,","  `explicit` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,","  `choices` enum('one','two') COLLATE utf8mb4_unicode_ci DEFAULT NULL,"]}
+{"synthetic_schema":"redump","lines":["DROP TABLE IF EXISTS `dump_probe`;","CREATE TABLE `dump_probe` (","  `id` int NOT NULL,","  `inherited` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,","  `explicit` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,","  `choices` enum('one','two') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,"]}
+
+Fatal error: Uncaught RuntimeException: native normalized dump differs in /workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/native-dump-normalization.php:46
+Stack trace:
+#0 {main}
+  thrown in /workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/native-dump-normalization.php on line 46

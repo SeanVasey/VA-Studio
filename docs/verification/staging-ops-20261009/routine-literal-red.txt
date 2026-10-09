@@ -1,0 +1,43 @@
+test_binary_row_bytes_and_unknown_layout_remain_exact (__main__.DumpNormalizationTest.test_binary_row_bytes_and_unknown_layout_remain_exact) ... ok
+test_changed_insert_rows_remain_different (__main__.DumpNormalizationTest.test_changed_insert_rows_remain_different) ... ok
+test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump (__main__.DumpNormalizationTest.test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump) ... ok
+test_defaults_comments_and_escaped_identifiers_remain_exact (__main__.DumpNormalizationTest.test_defaults_comments_and_escaped_identifiers_remain_exact) ... ok
+test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset (__main__.DumpNormalizationTest.test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset) ... ok
+test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) ... 
+  test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b"SET @value = '\n") ... FAIL
+  test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b'SET @value = "\n') ... FAIL
+  test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b'/* multiline comment\n') ... FAIL
+test_enum_strings_remain_exact_while_real_attribute_is_normalized (__main__.DumpNormalizationTest.test_enum_strings_remain_exact_while_real_attribute_is_normalized) ... ok
+test_first_generation_and_redump_string_columns_match (__main__.DumpNormalizationTest.test_first_generation_and_redump_string_columns_match) ... ok
+test_native_saved_charset_setting_alignment_is_supported (__main__.DumpNormalizationTest.test_native_saved_charset_setting_alignment_is_supported) ... ok
+test_other_charsets_malformed_types_and_later_attributes_remain_exact (__main__.DumpNormalizationTest.test_other_charsets_malformed_types_and_later_attributes_remain_exact) ... ok
+test_routine_ddl_and_nonmatching_table_names_are_not_normalized (__main__.DumpNormalizationTest.test_routine_ddl_and_nonmatching_table_names_are_not_normalized) ... ok
+
+======================================================================
+FAIL: test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b"SET @value = '\n")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_dump_normalization.py", line 88, in test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact
+    self.assertEqual(normalize(routine), routine)
+AssertionError: b"DEL[250 chars]ext COLLATE utf8mb4_unicode_ci\n) ENGINE=InnoD[24 chars] ;\n" != b"DEL[250 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[46 chars] ;\n"
+
+======================================================================
+FAIL: test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b'SET @value = "\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_dump_normalization.py", line 88, in test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact
+    self.assertEqual(normalize(routine), routine)
+AssertionError: b'DEL[250 chars]ext COLLATE utf8mb4_unicode_ci\n) ENGINE=InnoD[24 chars] ;\n' != b'DEL[250 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[46 chars] ;\n'
+
+======================================================================
+FAIL: test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) (opener=b'/* multiline comment\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_dump_normalization.py", line 88, in test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact
+    self.assertEqual(normalize(routine), routine)
+AssertionError: b'DEL[256 chars]ext COLLATE utf8mb4_unicode_ci\n) ENGINE=InnoD[24 chars] ;\n' != b'DEL[256 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[46 chars] ;\n'
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.019s
+
+FAILED (failures=3)
