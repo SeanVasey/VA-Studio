@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `a44664f4afffb8780093ba247b616b5375ed86e7`. The kit integrates main's CI
+Current tested functional source: `2eee8d420aa822414841a801318b04888e4e71ac` (Composer environment ordering, following operation custody at `9cc584c4`). The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -256,8 +256,41 @@ Independent review found a public legacy configure bypass at0e0: a killed root c
 
 Owner new [7 methods /3 safety failures at0e0](codex-repair/operation-public-red.txt) reproduce cold quiesce refusal and killed public stop/start missing markers. Current exact committed [59 operations PASS](codex-repair/final-ops-a7cf5d55.txt), genuine [PHP8.4.26 runtime13/63 PASS](codex-repair/final-runtime-a7cf5d55.txt), Bash6 individually parsed, Shellcheck and whitespace PASS. The prior57/13 receipts retain their original core source identity. Root/service/database authority remains bounded fixtures, not installed Forge evidence. Independent final decision and exact publication gates are still required before merge.
 
-### Final functional source 9cc584c4
+### Operation-custody functional source 9cc584c4
 
 `9cc584c471a90bacac8979c185496d0cc412a292` adds readonly resume admission before recovery-marker creation. A redundant/queued resume after successful activation refuses an open gate or absent maintenance without poisoning a healthy host with a stale marker. Owner [8 methods /1 failure at a7cf](codex-repair/operation-resume-admission-red.txt) retains that actual-body regression. Exact committed owner [60 operations PASS](codex-repair/final-ops-9cc584c4.txt), genuine [PHP8.4.26 runtime13/63 PASS](codex-repair/final-runtime-9cc584c4.txt), Bash6/Shellcheck/whitespace PASS. Earlier 57/59 receipts remain historical at their exact sources. Final independent decision and publication gate are recorded by the evidence-only successor; no host/provider operation is asserted.
 
 Independent [operation/custody addendum](independent-review/OPERATION-CUSTODY-ADDENDUM.md) **APPROVES exact9cc584c4**: final10methods PASS, including7warm/cold/partial states and5readonly resume refusals. Current60ops and PHP13/63 owner receipts inspected. All new review receipts and failed fixture attempts are released and retained; normalization is disclosed in the addendum. Final evidence-only publication retains this product source and requires an explicit carry plus exact-head preflight/code-review gates.
+
+## Composer environment ordering, exact source `2eee8d42`
+
+Codex on `ee9d1af2` found 4226653387: Composer invokes Laravel package discovery and
+Filament upgrade before the captured environment was installed, under a scrubbed
+process environment. The helper now installs the captured private `.env` mode0600
+before invoking Composer. Git checkout cleanliness is still proved before installing
+this ignored file; built-runtime admission and protected sealing remain later checks.
+
+Owner [red](codex-repair/composer-profile-red-ee9d1af2.txt) runs the actual fixed helper
+with genuine Git and PHP interpreting a bounded Composer fixture: **3 methods,
+1 failure**, helper exit23 because the first hook has no frozen profile. The fixture
+checks exact captured bytes and private mode before creating any bootstrap artifacts;
+Composer/npm effects and runtime admission are substitutes. The repaired focused
+[green](codex-repair/composer-profile-green.txt) is **3 PASS**. Exact committed source
+receipts: [operations](codex-repair/final-ops-2eee8d42.txt) **61 PASS**, genuine PHP8.4.26
+[runtime](codex-repair/final-runtime-2eee8d42.txt) **13 tests /63 assertions PASS**.
+
+Six Bash scripts parsed separately and Shellcheck0.10 `-x` passed: provision, backup,
+Forge deploy, fixed release step, privileged controller and
+`scripts/ops/run-test-commerce-pipeline.sh`; whitespace check passed. An initial syntax
+command named a nonexistent pipeline helper and exited127; the corrected complete
+selection above passed. Existing native HTTP and migration receipts retain their
+historical identities. No new actual host, provider, build or purchase acceptance
+is asserted.
+
+Independent [Composer ordering addendum](independent-review/COMPOSER-ORDERING-ADDENDUM.md)
+**APPROVES exact `2eee8d42`**: actual PHP8.4.26/Composer2.8.8 hook execution,
+**1 method FAIL** at `ee9d1af2`, **1 method PASS** at the repair. The owned minimal PHP
+hook sees frozen bytes at mode0600 before npm and no inherited APP_ENV; it is not
+actual Laravel package discovery. Prior bounded approvals carry on unchanged paths.
+Final evidence-only publication requires an explicit empty-source-diff carry and
+exact-head preflight/code-review gates before merge.

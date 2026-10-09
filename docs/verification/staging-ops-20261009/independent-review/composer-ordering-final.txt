@@ -1,0 +1,10 @@
+Exact assessed source: 2eee8d420aa822414841a801318b04888e4e71ac
+Composer version 2.8.8 2025-04-04 16:56:46
+PHP version 8.4.26 (/workspace/.va-studio-toolchain/standalone/bin/php8.4)
+Run the "diagnose" command to get more detailed diagnostics output.
+test_native_package_discovery_hook_reads_frozen_candidate_before_npm (__main__.ComposerOrderingProbe.test_native_package_discovery_hook_reads_frozen_candidate_before_npm) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.309s
+
+OK
