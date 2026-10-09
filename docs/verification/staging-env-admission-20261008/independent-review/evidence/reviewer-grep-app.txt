@@ -1,0 +1,100 @@
+app/Support/Diagnostics/InstallationReport.php:84:        $hosted = app()->isProduction() || TestEnvironment::refusesProductionOnly();
+app/Support/Diagnostics/InstallationReport.php:87:        if (TestEnvironment::refusesProductionOnly()) {
+app/Support/Diagnostics/InstallationReport.php:158:            app()->isProduction() => 'production',
+app/Support/Diagnostics/InstallationReport.php:159:            TestEnvironment::refusesProductionOnly() => TestEnvironment::STAGING,
+app/Support/SupportAttachmentUi.php:10:        return app()->environment('local', 'testing') && config('support-attachments.fixture_enabled') === true;
+app/Support/StorefrontMetadata.php:52:            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
+app/Support/StorefrontMetadata.php:69:            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
+app/Filament/Resources/TestPromotionResource.php:39:        abort_unless($actor instanceof User && TestEnvironment::admitsTestCommerce(), 403);
+app/Filament/Resources/TestPromotionResource.php:49:        return TestEnvironment::admitsTestCommerce() && $actor instanceof User && Gate::forUser($actor)->allows('administer-catalog');
+app/Providers/Filament/AdminPanelProvider.php:78:            ->multiFactorAuthentication([AppAuthentication::make()->recoverable()], isRequired: fn () => TestEnvironment::requiresStaffMfa())
+app/Domain/Contracts/ContractIssuancePolicy.php:36:        if (config('contracts.test_issuance_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
+app/Domain/Inquiries/OrderInquiry.php:197:        if (! TestEnvironment::admitsTestCommerce()) {
+app/Domain/Memberships/Production/MembershipPolicy.php:43:            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
+app/Domain/Memberships/Production/MembershipPolicy.php:45:            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment']))
+app/Domain/Memberships/Production/MembershipPolicy.php:75:        $environment = $this->environment($instances);
+app/Domain/Memberships/Production/MembershipPolicy.php:97:    private function environment(array $instances): mixed
+app/Domain/Memberships/MembershipPolicy.php:28:        return TestEnvironment::admitsTestCommerce() && config('memberships.test_mode_enabled') === true;
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:33:        BillingException::require($this->fixtureTransport === null || ($configuration['mode'] === 'test' && app()->environment('testing')), 'provider_transport');
+app/Domain/Memberships/Billing/StripeSdkBillingGateway.php:129:        BillingException::require($this->fixtureTransport === null || ($configuration['mode'] === 'test' && app()->environment('testing')), 'provider_transport');
+app/Domain/Memberships/Billing/BillingPolicy.php:41:            && in_array($configuration['environment'], ['local', 'testing'], true), 'provenance');
+app/Domain/Memberships/Billing/BillingPolicy.php:84:        $environment = $this->environment();
+app/Domain/Memberships/Billing/BillingPolicy.php:107:    private function environment(): ?string
+app/Domain/Notifications/TransactionalNotificationPolicy.php:23:        if (! TestEnvironment::admitsTestCommerce() || ! app(CustomerAccessPolicy::class)->enabled()
+app/Domain/Catalog/Discovery/CurrentEligibleTrackSnapshot.php:251:        return CanonicalJson::hash(['environment' => app()->environment(), 'media' => config('media'), 'commerce' => config('commerce'),
+app/Domain/Catalog/DiscoverySitemap/SitemapConfiguration.php:25:            'generation_seconds' => self::GENERATION_SECONDS, 'environment' => app()->environment(),
+app/Domain/Customers/Preferences/LocalConsentRuntime.php:11:        return TestEnvironment::admitsTestCommerce() && config('customer-preferences.test_grants_enabled') === true;
+app/Domain/Customers/CustomerAccessPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('customer.test_accounts_enabled') === true;
+app/Domain/Customers/Listening/ListeningEvidence.php:123:        $proof = ['configuration' => [app()->environment(), config('app.timezone'), config('media'), config('commerce'), config('filesystems.disks.local')],
+app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:51:        if (! app()->environment('local', 'testing') || $port < 1024 || ! str_starts_with($caFile, '/')
+app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:68:        $rehearsalEnvironment = app()->environment('local', 'testing');
+app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php:70:            : $provenance === IdentityPolicy::PRODUCTION && ! TestEnvironment::refusesProductionOnly();
+app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php:34:        if (! app()->environment('local', 'testing') || $mail->provenance !== IdentityPolicy::REHEARSAL
+app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:31:            && (app()->environment('local', 'testing') ? $scope === self::REHEARSAL
+app/Domain/Customers/ProductionIdentity/IdentityPolicy.php:32:                : $scope === self::PRODUCTION && ! TestEnvironment::refusesProductionOnly());
+app/Domain/Commerce/PromotionPolicy.php:21:        if (! TestEnvironment::admitsTestCommerce()) {
+app/Domain/Commerce/PricingPolicy.php:21:            if (! TestEnvironment::admitsTestCommerce() || ! is_string($json) || strlen($json) > 8192) {
+app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php:22:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
+app/Domain/Commerce/Payments/VerifyStripeWebhook.php:21:            || ! TestEnvironment::admitsTestCommerce()
+app/Domain/Commerce/Payments/PaymentProcessingPolicy.php:13:        if (config('payments.stripe.processing_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
+app/Domain/Commerce/Payments/StripeSdkCheckoutGateway.php:132:            if (! TestEnvironment::admitsTestCommerce()
+app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php:24:        CheckoutException::require($this->fixtureTransport === null || ($context->fundsMode === 'test' && app()->environment('testing')), 'provider', 503);
+app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php:60:        CheckoutException::require($mode !== 'test' || app()->environment(['local', 'testing']), 'unsupported');
+app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php:62:        CheckoutException::require($mode !== 'live' || ! TestEnvironment::refusesProductionOnly(), 'unsupported');
+app/Domain/Commerce/PromotionUsage.php:166:        if (! TestEnvironment::admitsTestCommerce()) {
+app/Domain/Commerce/Orders/OrderPolicy.php:14:        if (! TestEnvironment::admitsTestCommerce()) {
+app/Domain/Commerce/Readiness/StripeCapabilityProbe.php:50:                && ($this->fixtureTransport === null) !== app()->environment('testing')
+app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:60:        $modeEnvironment = $modeValid && ($mode !== 'test' || app()->environment(['local', 'testing']))
+app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:61:            && ($mode !== 'live' || ! TestEnvironment::refusesProductionOnly());
+app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php:101:                app()->environment('testing') && ! $this->probe->usesFixture() => 'fixture_transport_required_in_testing',
+app/Domain/Commerce/Readiness/ProductionCommerceReadiness.php:63:            'production_environment' => [app()->environment('production'), 'Run the future production candidate in the production environment.'],
+app/Domain/Commerce/ProductionTaxCheckout/TaxExecutionContext.php:56:        CheckoutException::require($mode === 'test' && app()->environment('local', 'testing')
+app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php:22:        return app()->environment('local', 'testing') && config('production-tax-checkout.enabled') === true;
+app/Domain/Commerce/Operations/TestPaymentExceptionOperations.php:172:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
+app/Domain/Commerce/Finalization/FinalizationPolicy.php:20:        if (config('payments.stripe.finalization_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
+app/Domain/Commerce/Checkout/CheckoutPolicy.php:15:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.checkout_enabled') !== true) {
+app/Domain/Commerce/Checkout/CheckoutPolicy.php:36:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test' ||
+app/Domain/Commerce/PromotionAdministration.php:174:        if (! TestEnvironment::admitsTestCommerce()) { throw new AuthorizationException; }
+app/Domain/Commerce/ComparePricingSettlement.php:52:        $this->assertMatch(TestEnvironment::admitsTestCommerce() && $policy['scope'] === 'test', 'test_scope_required');
+app/Domain/Commerce/Inventory/InventoryPolicy.php:13:        if (! TestEnvironment::admitsTestCommerce()) { throw new QuoteException('INVENTORY_UNAVAILABLE', 503); }
+app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:148:        $environment = $application->environment();
+app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:183:            $currentEnvironment = $application->environment();
+app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php:237:            AttachmentException::require($currentEnvironment === $environment && in_array($currentEnvironment, ['local', 'testing'], true)
+app/Domain/Services/Projects/ServiceProjectPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('services-projects.test_enabled') === true;
+app/Domain/SupportAttachments/FixtureAttachmentPolicy.php:20:        AttachmentException::require(app()->environment(['local', 'testing']) && config('support-attachments.fixture_enabled') === true
+app/Domain/SupportAttachments/FixtureAttachmentPolicy.php:46:        return $engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing'));
+app/Domain/Delivery/ActivationPolicy.php:22:        if (config('delivery.test_activation_enabled') !== true || ! TestEnvironment::admitsTestCommerce()
+app/Domain/Delivery/DeliveryAssets.php:97:                || ($entry['scan_scope'] === 'test-only' && ! app()->environment('testing'))) { throw new DeliveryException('asset_unavailable'); }
+app/Domain/Delivery/PrepareTestDeliveryStream.php:19:        if (! TestEnvironment::admitsTestCommerce() || DIRECTORY_SEPARATOR !== '/') { throw new DeliveryException('unavailable'); }
+app/Domain/Delivery/PrepareTestDeliveryStream.php:85:            || ($target['scan_scope'] === 'test-only' && ! app()->environment('testing')))) { throw new \UnexpectedValueException; }
+app/Domain/Delivery/TestAccessPolicy.php:24:        if (! TestEnvironment::admitsTestCommerce() || config('payments.stripe.mode') !== 'test'
+app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php:32:        ProductionFreeGrantException::require(in_array($configuration['environment'], ['local', 'testing'], true), 'environment');
+app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php:64:        $environment = App::environment();
+app/Domain/Grants/Member/MemberGrantPolicy.php:39:            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
+app/Domain/Grants/Member/MemberGrantPolicy.php:41:            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment'])), 'provenance');
+app/Domain/Grants/Member/MemberGrantPolicy.php:68:        $environment = $this->environment($instances);
+app/Domain/Grants/Member/MemberGrantPolicy.php:87:    private function environment(array $instances): mixed
+app/Domain/Grants/Paid/PaidGrantPolicy.php:15:        return app()->environment('local', 'testing') && config('paid-grants.rehearsal_enabled') === true
+app/Domain/Grants/Paid/PaidGrantPolicy.php:16:            || ! app()->environment('local', 'testing') && ! TestEnvironment::refusesProductionOnly()
+app/Domain/Grants/Paid/PaidGrantPolicy.php:95:        $rehearsal = in_array($environment, ['local', 'testing'], true);
+app/Domain/Grants/Paid/PaidGrantPolicy.php:99:                : ! TestEnvironment::isStaging($environment)
+app/Domain/Grants/Paid/PaidGrantPrepareStream.php:151:            || ($target['scan_scope'] === 'test-only' && ! app()->environment('testing')))) {
+app/Domain/Grants/Paid/PaidGrantRows.php:107:        $this->environment = $this->application->environment();
+app/Domain/Grants/Paid/PaidGrantRows.php:131:            && app('config') === $this->configuration && app()->environment() === $this->environment);
+app/Domain/Grants/Paid/PaidGrantRows.php:138:            && app('config') === $this->configuration && app()->environment() === $this->environment);
+app/Domain/Grants/Paid/PaidGrantAssets.php:49:            PaidGrantException::require(! $test || $line['provenance'] === 'synthetic_rehearsal' && app()->environment('testing'), 409);
+app/Domain/Grants/Paid/PaidGrantAssets.php:144:                && ($file['scan_scope'] !== 'test-only' || app()->environment('testing')));
+app/Domain/Grants/Free/FreeGrantPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true
+app/Domain/Grants/Free/FreeGrantPolicy.php:32:            FreeGrantException::require(TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true, 404);
+app/Domain/Grants/Free/TestFreeGrantIdentity.php:78:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
+app/Domain/Grants/Free/FreeGrantDefinitions.php:19:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
+app/Domain/Grants/Free/FreeGrantSources.php:38:            FreeGrantException::require(! $testScan || app()->environment('testing'), 409);
+app/Domain/SiteBuilder/PublicPagesSitemap.php:12:        if (app()->environment('production')) {
+app/Domain/Media/ScanEngines.php:11:        return $engine === 'clamav' || ($engine === 'test-only' && ($historical || app()->environment('testing')));
+app/Http/Controllers/PublicDiscoveryController.php:16:        if (app()->environment('production') && config('discovery-sitemap.enabled') === true) {
+app/Http/Controllers/PublicDiscoveryController.php:30:        if (app()->environment('production')) {
+app/Http/Controllers/PublicDiscoveryController.php:42:        if (app()->environment('production')) {
+app/Http/Controllers/PublicDiscoveryController.php:67:            'X-Robots-Tag' => app()->environment('production') ? 'noindex, follow' : 'noindex, nofollow',
+app/Http/Controllers/PublicPagesSitemapController.php:21:            'X-Robots-Tag' => app()->environment('production') ? 'noindex, follow' : 'noindex, nofollow',
+app/Http/Controllers/DiscoveryTrackSitemapController.php:19:        if (! app()->environment('production')) {
+app/Http/Controllers/FreeGrantController.php:147:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 403);

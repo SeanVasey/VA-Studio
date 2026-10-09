@@ -1,0 +1,24 @@
+# Probe: Filament page MFA middleware is compiled into the route cache (rv-b2 @ 56efbb7a517abc55f17ea9a8b37b29e4970a2210)
+## 1. no route cache, APP_ENV=staging: middleware on admin/tracks
+admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent', 'Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
+## 2. route:cache built with APP_ENV=local, then served with APP_ENV=staging
+
+ INFO Routes cached successfully. 
+
+rc=0
+admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent']
+## 2b. same cache: does the panel still say MFA is required at runtime under staging?
+{"env":"staging","panelRequired":true}
+
+## 3. route:cache built with APP_ENV=staging
+
+ INFO Routes cached successfully. 
+
+rc=0
+admin/tracks ['Filament\\Http\\Middleware\\SetUpPanel:admin', 'Illuminate\\Cookie\\Middleware\\EncryptCookies', 'Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse', 'Illuminate\\Session\\Middleware\\StartSession', 'Illuminate\\View\\Middleware\\ShareErrorsFromSession', 'Filament\\Http\\Middleware\\Authenticate', 'Filament\\Http\\Middleware\\AuthenticateSession', 'Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery', 'Illuminate\\Routing\\Middleware\\SubstituteBindings', 'Filament\\Http\\Middleware\\DisableBladeIconComponents', 'Filament\\Http\\Middleware\\DispatchServingFilamentEvent', 'Filament\\Auth\\MultiFactor\\Http\\Middleware\\EnsureMultiFactorAuthenticationIsEnabled']
+
+ INFO Route cache cleared successfully. 
+
+rc=0
+packages.php
+services.php

@@ -247,7 +247,8 @@ outside the controlled census must be stopped separately. This does not attest a
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
 real admission and unchanged key, then one `ctl refresh` invocation holds quiesce, snapshot and restore proof, protected capture of the private
 evidence file through anchored no-follow descriptors, revalidates it against real Laravel configuration,
-atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
+atomically installs root:app-group 0440 `.env`, then builds the runtime configuration and route caches as the app. The route
+cache is rebuilt because the panel's MFA page middleware is compiled into it from `APP_ENV`.
 A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
 `ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
 

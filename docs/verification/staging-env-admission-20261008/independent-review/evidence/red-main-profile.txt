@@ -1,0 +1,63 @@
+# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --filter staging_profile_passes tests/Unit/TestCommerceProfileValidatorTest.php
+# started: 2026-10-09T09:29:08Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2-red/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.367, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\TestCommerceProfileValidatorTest::test_a_staging_profile_passes_and_near_miss_environment_names_are_refused
+PASS profile.parse - The file parses as dotenv.
+PASS profile.unique_keys - Every key appears once.
+PASS profile.placeholders_replaced - No <PLACEHOLDER> remains.
+PASS profile.no_live_keys - No live-mode key appears in the parsed configuration values.
+PASS runtime.boot - The application booted with this file only (no host .env, no cached config).
+FAIL runtime.app_env_local - APP_ENV is exactly local (every test-commerce gate requires local or testing; hosts never run testing).
+PASS runtime.app_debug_off - APP_DEBUG is false.
+PASS runtime.app_url_equals_return_origin - APP_URL is an HTTPS origin equal to the checkout return_origin.
+PASS runtime.queue_database - QUEUE_CONNECTION is database (receipt, finalization and contract jobs need an asynchronous queue).
+PASS runtime.session_secure_cookie - SESSION_SECURE_COOKIE is true.
+PASS runtime.session_http_only - SESSION_HTTP_ONLY is true (the guest session owns order and download access).
+PASS stripe.mode_test - STRIPE_MODE is test.
+FAIL stripe.account - STRIPE_ACCOUNT_ID is an own-account acct_ identifier (CheckoutPolicy::account).
+PASS stripe.secret_key_test - STRIPE_TEST_SECRET_KEY is a standard sk_test_ key (same rule as StripeSdkCheckoutGateway).
+PASS stripe.webhook_receiver - A synthetic event signed with STRIPE_WEBHOOK_SECRET passes the real VerifyStripeWebhook, and a wrongly signed one is refused.
+FAIL commerce.pricing - VASEY_TEST_PRICING_POLICY passes PricingPolicy::current() and is in its effective window now.
+FAIL commerce.pricing_zero_test_tax - Pricing tax is fixed_test at 0 bps for provider stripe and the configured account (CheckoutEvidence::request).
+FAIL commerce.pricing_window_margin - The pricing window stays open for at least 14 more days.
+PASS commerce.promotions - VASEY_TEST_PROMOTIONS is empty, or every campaign passes PromotionPolicy.
+FAIL commerce.inventory - VASEY_TEST_INVENTORY_POLICY passes InventoryPolicy::current().
+FAIL commerce.inventory_ttl_covers_quote - Inventory ttl_seconds is at least the 900-second quote lifetime.
+PASS commerce.exclusive_selection_off - VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty (exclusive test activation is outside this profile).
+FAIL commerce.order - VASEY_TEST_ORDER_POLICY passes OrderPolicy::current().
+FAIL commerce.checkout - VASEY_TEST_CHECKOUT_POLICY passes CheckoutPolicy::current() and checkout is enabled.
+FAIL commerce.checkout_https_origin - The checkout return_origin is HTTPS (the loopback HTTP allowance is for local development only).
+FAIL payments.processing - Payment processing is enabled for the configured test account (PaymentProcessingPolicy::account).
+FAIL payments.finalization - STRIPE_TEST_FINALIZATION_POLICY equals FinalizationPolicy::CONTRACT and finalization is enabled.
+FAIL contracts.issuance_v2 - VASEY_TEST_CONTRACT_ISSUANCE_POLICY equals the v2 contract and issuance is enabled.
+PASS contracts.renderer_runtime - The pinned test-buyer-pdf-v2 renderer runtime, packages and font assets verify on this PHP.
+FAIL delivery.activation - VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY equals ActivationPolicy::CONTRACT and activation is enabled.
+FAIL delivery.access - VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT and owner delivery is enabled.
+FAIL customer.accounts - Test customer accounts are enabled (CustomerAccessPolicy).
+FAIL customer.identity_private_capture - Test identity uses private_capture: no email is sent (CustomerIdentityPolicy).
+FAIL customer.purchase_claims - Guest purchase claims are enabled (CustomerPurchaseClaimPolicy).
+PASS boundary.out_of_profile_families_off - Production checkout, production tax checkout and the other test families are off.
+PASS boundary.no_production_checkout_key - No production checkout key or funds mode is configured.
+RESULT: FAIL (18 of 36 checks failed; no Stripe request made)
+
+Failed asserting that 1 is identical to 0.
+
+/home/user/rv-b2-red/tests/Unit/TestCommerceProfileValidatorTest.php:141
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+# finished: 2026-10-09T09:29:08Z
+rc=1

@@ -383,6 +383,10 @@ cmd_configure() {
   mv -T -- "$ENV_CANDIDATE" "$cur/.env" || die "cannot install protected environment"
   as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" config:cache \
     --no-interaction --no-ansi >/dev/null 2>&1 || die "configuration cache failed; remain quiesced and restore the snapshot"
+  # The panel's MFA page middleware is compiled into the route cache from APP_ENV, so a changed environment
+  # (the local -> staging switch) must not keep serving routes cached under the previous one.
+  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" route:cache \
+    --no-interaction --no-ansi >/dev/null 2>&1 || die "route cache failed; remain quiesced and restore the snapshot"
   sealed_release "$sha"
   echo "configured $sha; admission remains closed until healthy resume"
 }

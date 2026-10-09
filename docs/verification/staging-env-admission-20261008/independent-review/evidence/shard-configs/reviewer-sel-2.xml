@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="reviewer-2">
+            <file>tests/Feature/CustomerAccountCommerceTest.php</file>
+            <file>tests/Feature/CustomerPurchaseClaimTest.php</file>
+            <file>tests/Feature/FreeGrantAdministrationTest.php</file>
+            <file>tests/Feature/FreeGrantDefinitionsTest.php</file>
+            <file>tests/Feature/FreeGrantJourneyTest.php</file>
+            <file>tests/Feature/InstallationReportTest.php</file>
+            <file>tests/Feature/OrderPreparationTest.php</file>
+            <file>tests/Feature/PaidGrantCompletionBudgetTest.php</file>
+            <file>tests/Feature/PaidGrantHeavyWorkTest.php</file>
+            <file>tests/Feature/PaidGrantRequestInstantTest.php</file>
+            <file>tests/Feature/PaidGrantSourceJourneyTest.php</file>
+            <file>tests/Feature/ProductionCheckoutNativeRaceTest.php</file>
+            <file>tests/Feature/ProductionCheckoutSourceTransactionTest.php</file>
+            <file>tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php</file>
+            <file>tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php</file>
+            <file>tests/Feature/ProductionMembership/MembershipPreparationTest.php</file>
+            <file>tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php</file>
+            <file>tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php</file>
+            <file>tests/Feature/PromotionConcurrencyTest.php</file>
+            <file>tests/Feature/PromotionPricingTest.php</file>
+            <file>tests/Feature/PublicCatalogRelatedLinksTest.php</file>
+            <file>tests/Feature/RightsScopeCommandUnknownOutcomeTest.php</file>
+            <file>tests/Feature/ServiceSupportAttachmentsTest.php</file>
+            <file>tests/Feature/SharedInventoryTest.php</file>
+            <file>tests/Feature/SiteImageReleaseDamageTest.php</file>
+            <file>tests/Feature/TestContractProfileSuccessorTest.php</file>
+            <file>tests/Feature/TestContractSuccessorActivationTest.php</file>
+            <file>tests/Unit/ProductionCheckoutProviderTest.php</file>
+            <file>tests/Unit/StagingRuntimeValidatorTest.php</file>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="DB_URL" value=""/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>

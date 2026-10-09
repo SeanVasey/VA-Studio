@@ -128,11 +128,35 @@ These are unchanged:
 - **Free256 frozen pin:** `ActivationPolicy.php` is pinned by `ProductionFreeGrantFrozenBytesTest`. Only `account()`'s
   environment gate changed; family 256 (via `PreparedDeliveryStream` and `DeliveryAssetFiles`) uses only
   `outsideTransactions()`, which is unchanged. The pin is updated with that note; this needs the independent reviewer's
-  re-review against family 256.
+  re-review against family 256 (approved; see below).
 - **Paid252 (#56):** `PaidGrantPolicy` enabled its operative lane in every environment except local/testing, so staging
   would have admitted it when configured. `enabled()` and `provePure()` now refuse it in staging (red recorded first).
 - **Census made exhaustive:** the source census now requires every `local`/`testing` gate in `app/` to be classified;
   this surfaced the paid gate and `ServiceProjectAttachmentSourceV1` (kept local/testing only).
+
+- **Route cache across the `local` → `staging` switch (review C1):** the panel compiles its MFA page middleware into
+  the route cache from `APP_ENV`. A same-SHA deploy after a Forge `.env` change runs `ctl refresh`, whose configure step
+  rebuilt only the configuration cache, so a route cache built under `local` kept serving staging without page-level
+  MFA. `cmd_configure` now also runs `route:cache` as the app after `config:cache`; the runbook gains a host check
+  (`route:list --path=admin/tracks`). Shown with the ops fixture (red, then green) and against the real application
+  (`evidence/configure-route-cache-real.txt`).
+
+## Independent review
+
+`independent-review/DECISION.md`: **APPROVE WITH CONDITIONS** for a development merge of `56efbb7a`. It authorizes no
+production deployment, live payments or keys, Paid252 operative activation, production memberships or member grants,
+production customer identity, or DNS/cutover.
+
+- **C1 (Medium):** fixed as above.
+- **C2 (Low, follow-up, not taken here):** `PromotionAdministration` and `ManageRightsScope` writes complete for an
+  unenrolled admin when called below the panel in staging. Most production catalog writes (`PublishOffer`,
+  `PublishLicense`, `SaveTrackMetadata`, ...) rely on the panel middleware the same way; adding the domain-level
+  `AdminMultiFactor` check belongs in its own reviewed change.
+- **Inherited failure:** `ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported`
+  failed on `main` since #56 and identically at `56efbb7`; it is fixed by M-16 (#67, `af232a8`), not by B2.
+- Confirmed: exact-match helper semantics, the exhaustive gate census, staging refusals (live mode and keys, livemode
+  webhooks, production-checkout funds, production identity, verified membership/member-grant provenance, the Paid252
+  operative lane), the Free256 `ActivationPolicy` re-pin, and the D1 stand-in scanner.
 
 ## Results
 
@@ -145,6 +169,10 @@ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
 | B2 affected selection (96 files by class reference), 3 shards | `cc4e62b` + working tree, before the validator, template, D1 and paid changes | 1,838 tests; only failure the Free256 `ActivationPolicy` pin (since re-pinned); skips are MySQL-only | see final run below |
 | Ops kit tests (`python3 tests/ops/test_*.py`, 13 files) | after the `provision.sh` default change | 74 tests OK | — |
 | Private-server preflight self-test | after integration | 20 tests OK | — |
+| Reviewer: affected selection, 115 files, 4 shards | `56efbb7` | 1,848 tests, 33 MySQL/POSIX skips, 1 failure (the inherited frozen-bytes one above) | `independent-review/evidence/affected-shard-*.txt` |
+| Red: configure rebuilds the route cache (C1) | `56efbb7` + updated ops test | 1 failure: only `config:cache` ran; rc 1 | `evidence/configure-route-cache-red.txt` |
+| Green: all ops kit tests after the C1 fix | working tree | 13 files, 74 tests OK | `evidence/configure-route-cache-green.txt` |
+| Real route cache across `APP_ENV` | working tree | built under `local`, served under `staging`: no MFA middleware; rebuilt under `staging`: present | `evidence/configure-route-cache-real.txt` |
 | Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
 
 ## Not tested

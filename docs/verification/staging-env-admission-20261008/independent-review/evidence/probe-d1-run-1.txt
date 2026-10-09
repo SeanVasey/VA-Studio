@@ -1,0 +1,23 @@
+# cwd: /home/user/rv-b2  HEAD: 56efbb7a517abc55f17ea9a8b37b29e4970a2210  status-dirty-tracked: 0
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result /home/user/rv-b2/docs/verification/staging-env-admission-20261008/independent-review/evidence/probes/ReviewerD1StagingProbeTest.php
+# started: 2026-10-09T09:33:15Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2/phpunit.xml
+
+
+PROBE D1 without stand-in under staging: {
+    "create quote (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409",
+    "link (test-only scan) staging": "QuoteException:SELECTION_CHANGED:409"
+}
+.
+PROBE full D1 chain under staging: unlinked=QuoteException:INVENTORY_SCOPE_UNAVAILABLE:409 order=prepared env=staging
+.                                                                  2 / 2 (100%)
+
+Time: 00:05.249, Memory: 92.00 MB
+
+OK (2 tests, 5 assertions)
+# finished: 2026-10-09T09:33:21Z
+rc=0

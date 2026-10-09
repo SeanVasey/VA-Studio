@@ -63,6 +63,14 @@ page, as in production (`AdminPanelProvider`, `TestEnvironment::requiresStaffMfa
 3. Scan the QR code, confirm with a current code, and store the recovery codes offline.
 4. Sign out and back in to confirm the code is asked for.
 
+**After a switch from `APP_ENV=local` to `staging`**, confirm the panel pages carry the MFA middleware. The panel
+compiles it into the route cache from `APP_ENV`; a deploy or `ctl refresh` rebuilds that cache, but a route cache
+built under `local` would serve staging without page-level MFA:
+
+```sh
+art route:list --path=admin/tracks --json -v | grep -c EnsureMultiFactorAuthenticationIsEnabled   # expect 1 or more
+```
+
 Rerun `art vasey:doctor`; the `operator` check now passes.
 
 ## 3. Seller tag
@@ -96,7 +104,7 @@ MEDIA_TAG_SHA256=<the 64 lowercase hex characters>
 ```
 
 Then click **Deploy Now**. When the served SHA is unchanged and only `.env` differs, the deploy refreshes the
-configuration. It quiesces, installs `.env`, runs `config:cache` and resumes, so the workers pick up the tag.
+configuration. It quiesces, installs `.env`, runs `config:cache` and `route:cache` and resumes, so the workers pick up the tag.
 Then process one real master, listen to the tagged preview and confirm the mix with Sean before publishing
 anything.
 

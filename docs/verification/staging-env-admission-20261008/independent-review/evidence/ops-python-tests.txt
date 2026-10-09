@@ -1,0 +1,173 @@
+## python3 tests/ops/test_staging_admin_defaults_custody.py
+test_default_socket_path_does_not_require_a_defaults_file (__main__.AdminDefaultsCustodyTest.test_default_socket_path_does_not_require_a_defaults_file) ... ok
+test_protected_admin_defaults_reach_the_first_query (__main__.AdminDefaultsCustodyTest.test_protected_admin_defaults_reach_the_first_query) ... ok
+test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.740s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_backup_credential_custody.py
+test_existing_backup_account_refuses_incomplete_or_unsafe_profile_before_grants (__main__.BackupCredentialCustodyTest.test_existing_backup_account_refuses_incomplete_or_unsafe_profile_before_grants) ... ok
+test_missing_database_account_never_overwrites_orphan_backup_profile (__main__.BackupCredentialCustodyTest.test_missing_database_account_never_overwrites_orphan_backup_profile) ... ok
+test_new_backup_account_persists_private_profile_before_authentication (__main__.BackupCredentialCustodyTest.test_new_backup_account_persists_private_profile_before_authentication) ... ok
+test_valid_looking_but_non_authenticating_profile_refuses_before_grants (__main__.BackupCredentialCustodyTest.test_valid_looking_but_non_authenticating_profile_refuses_before_grants) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.390s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_backup_key_custody.py
+test_absent_or_ambiguous_manifest_refuses (__main__.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses) ... ok
+test_dangling_outside_and_non_symlink_current_cannot_become_first_install (__main__.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install) ... ok
+test_genuine_first_install_admission_is_explicit (__main__.BackupKeyCustodyTest.test_genuine_first_install_admission_is_explicit) ... ok
+test_genuine_no_current_snapshot_records_none (__main__.BackupKeyCustodyTest.test_genuine_no_current_snapshot_records_none) ... ok
+test_key_looking_lines_inside_multiline_values_are_not_admitted (__main__.BackupKeyCustodyTest.test_key_looking_lines_inside_multiline_values_are_not_admitted) ... ok
+test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) ... ok
+test_served_release_missing_env_refuses_before_publishing_any_snapshot (__main__.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot) ... ok
+test_served_restore_requires_the_exact_environment_hash_record (__main__.BackupKeyCustodyTest.test_served_restore_requires_the_exact_environment_hash_record) ... ok
+test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse (__main__.BackupKeyCustodyTest.test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.908s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_build_admission.py
+test_composer_hooks_receive_frozen_environment_before_bootstrap (__main__.BuildAdmissionTest.test_composer_hooks_receive_frozen_environment_before_bootstrap)
+Run the actual helper; Composer/npm/runtime effects are bounded fixtures. ... ok
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... ok
+test_running_application_cannot_inject_ignored_vendor_before_sealing (__main__.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.229s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_deploy_refresh.py
+test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate) ... ok
+test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.103s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_dump_normalization.py
+test_binary_row_bytes_and_unknown_layout_remain_exact (__main__.DumpNormalizationTest.test_binary_row_bytes_and_unknown_layout_remain_exact) ... ok
+test_changed_insert_rows_remain_different (__main__.DumpNormalizationTest.test_changed_insert_rows_remain_different) ... ok
+test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump (__main__.DumpNormalizationTest.test_cli_refuses_unreadable_input_instead_of_a_successful_empty_dump) ... ok
+test_defaults_comments_and_escaped_identifiers_remain_exact (__main__.DumpNormalizationTest.test_defaults_comments_and_escaped_identifiers_remain_exact) ... ok
+test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset (__main__.DumpNormalizationTest.test_delimiter_routine_body_is_exact_and_top_level_schema_resumes_after_reset) ... ok
+test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact (__main__.DumpNormalizationTest.test_directive_and_schema_spellings_inside_multiline_literals_and_comments_are_exact) ... ok
+test_enum_strings_remain_exact_while_real_attribute_is_normalized (__main__.DumpNormalizationTest.test_enum_strings_remain_exact_while_real_attribute_is_normalized) ... ok
+test_first_generation_and_redump_string_columns_match (__main__.DumpNormalizationTest.test_first_generation_and_redump_string_columns_match) ... ok
+test_native_saved_charset_setting_alignment_is_supported (__main__.DumpNormalizationTest.test_native_saved_charset_setting_alignment_is_supported) ... ok
+test_other_charsets_malformed_types_and_later_attributes_remain_exact (__main__.DumpNormalizationTest.test_other_charsets_malformed_types_and_later_attributes_remain_exact) ... ok
+test_routine_ddl_and_nonmatching_table_names_are_not_normalized (__main__.DumpNormalizationTest.test_routine_ddl_and_nonmatching_table_names_are_not_normalized) ... ok
+test_unknown_dump_escape_mode_refuses_instead_of_guessing_literal_boundaries (__main__.DumpNormalizationTest.test_unknown_dump_escape_mode_refuses_instead_of_guessing_literal_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.049s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_operation_custody.py
+test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (__main__.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) ... ok
+test_existing_database_identity_requires_private_complete_credential_custody (__main__.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ... ok
+test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (__main__.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.401s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_operation_lease.py
+test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (__main__.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries) ... ok
+test_fresh_activation_can_requiesce_an_already_stopped_served_release (__main__.OperationLeaseTest.test_fresh_activation_can_requiesce_an_already_stopped_served_release) ... ok
+test_killed_root_parent_blocks_resume_while_migration_child_survives (__main__.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives) ... ok
+test_migration_holds_control_and_writer_locks_until_switch_and_resume (__main__.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume) ... ok
+test_prepare_retains_control_lease_until_writable_build_child_is_reaped (__main__.OperationLeaseTest.test_prepare_retains_control_lease_until_writable_build_child_is_reaped) ... ok
+test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (__main__.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) ... ok
+test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume (__main__.OperationLeaseTest.test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume) ... ok
+test_resume_refuses_an_open_gate_without_poisoning_recovery_custody (__main__.OperationLeaseTest.test_resume_refuses_an_open_gate_without_poisoning_recovery_custody) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 2.787s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_pipeline_admission.py
+test_closed_gate_blocks_repeated_future_sweeps (__main__.PipelineAdmissionTest.test_closed_gate_blocks_repeated_future_sweeps) ... ok
+test_exclusive_root_lock_blocks_an_open_gate_sweep (__main__.PipelineAdmissionTest.test_exclusive_root_lock_blocks_an_open_gate_sweep) ... ok
+test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan (__main__.PipelineAdmissionTest.test_missing_malformed_symlinked_or_writable_gate_refuses_before_artisan) ... ok
+test_open_gate_runs_all_five_stages (__main__.PipelineAdmissionTest.test_open_gate_runs_all_five_stages) ... ok
+test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness (__main__.PipelineAdmissionTest.test_partial_kit_refuses_while_an_absent_kit_keeps_the_local_harness) ... ok
+test_quiesce_leaves_future_invocations_closed_after_helper_exits (__main__.PipelineAdmissionTest.test_quiesce_leaves_future_invocations_closed_after_helper_exits) ... ok
+test_snapshot_does_not_cross_an_already_admitted_shared_writer (__main__.PipelineAdmissionTest.test_snapshot_does_not_cross_an_already_admitted_shared_writer) ... ok
+test_snapshot_requires_the_durable_closed_gate (__main__.PipelineAdmissionTest.test_snapshot_requires_the_durable_closed_gate) ... ok
+test_writer_lock_survives_runner_death_until_its_child_finishes (__main__.PipelineAdmissionTest.test_writer_lock_survives_runner_death_until_its_child_finishes) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.999s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_protected_configuration.py
+test_open_admission_or_active_writer_refuses_before_environment_changes (__main__.ProtectedConfigurationTest.test_open_admission_or_active_writer_refuses_before_environment_changes) ... ok
+test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache (__main__.ProtectedConfigurationTest.test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache) ... ok
+test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.366s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_recovery_admission.py
+test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication (__main__.RecoveryAdmissionTest.test_already_mounted_bind_recovers_exact_fstab_entry_without_duplication) ... ok
+test_first_install_also_takes_the_pre_migration_snapshot (__main__.RecoveryAdmissionTest.test_first_install_also_takes_the_pre_migration_snapshot) ... ok
+test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair (__main__.RecoveryAdmissionTest.test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair) ... ok
+test_served_release_propagates_a_failed_sealing_check_inside_command_substitution (__main__.RecoveryAdmissionTest.test_served_release_propagates_a_failed_sealing_check_inside_command_substitution) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.703s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_release_sealing.py
+test_environment_capture_refuses_links_escapes_and_writable_ancestry (__main__.ReleaseSealingTest.test_environment_capture_refuses_links_escapes_and_writable_ancestry) ... ok
+test_external_and_runtime_code_symlinks_refuse (__main__.ReleaseSealingTest.test_external_and_runtime_code_symlinks_refuse) ... ok
+test_hard_links_refuse_without_mutating_the_external_inode (__main__.ReleaseSealingTest.test_hard_links_refuse_without_mutating_the_external_inode) ... ok
+test_internal_code_symlinks_and_executable_bits_are_preserved (__main__.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved) ... ok
+test_old_open_writer_cannot_change_the_published_inode (__main__.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode) ... ok
+test_post_seal_revision_check_detects_source_changed_during_build (__main__.ReleaseSealingTest.test_post_seal_revision_check_detects_source_changed_during_build) ... ok
+test_privileged_cli_refuses_root_as_the_application_account (__main__.ReleaseSealingTest.test_privileged_cli_refuses_root_as_the_application_account) ... ok
+test_public_asset_aliases_stay_inside_the_public_tree (__main__.ReleaseSealingTest.test_public_asset_aliases_stay_inside_the_public_tree) ... ok
+test_public_symlinks_cannot_expose_private_release_paths (__main__.ReleaseSealingTest.test_public_symlinks_cannot_expose_private_release_paths) ... ok
+test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (__main__.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable) ... ok
+test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer (__main__.ReleaseSealingTest.test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.839s
+
+OK
+rc=0
+## python3 tests/ops/test_staging_runtime_directory_custody.py
+test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) ... ok
+test_regular_runtime_directories_and_existing_gitignore_are_preserved (__main__.RuntimeDirectoryCustodyTest.test_regular_runtime_directories_and_existing_gitignore_are_preserved) ... ok
+test_replacement_after_open_cannot_redirect_descriptor_metadata_changes (__main__.RuntimeDirectoryCustodyTest.test_replacement_after_open_cannot_redirect_descriptor_metadata_changes) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.459s
+
+OK
+rc=0
+## python3 scripts/ops/test-private-server-preflight.py
+....................
+----------------------------------------------------------------------
+Ran 20 tests in 4.725s
+
+OK
+rc=0

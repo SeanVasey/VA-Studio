@@ -1,0 +1,32 @@
+# cwd: /home/user/rv-b2-red  HEAD: e5e500cadae68958293089ccc2b4a22bcdb9df66  status-dirty-tracked: 2
+# public/build present: no
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/StagingOperatorMfaTest.php
+# started: 2026-10-09T09:29:02Z
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-b2-red/phpunit.xml
+
+F.F                                                                 3 / 3 (100%)
+
+Time: 00:01.790, Memory: 81.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\StagingOperatorMfaTest::test_staging_panel_requires_enrollment_before_protected_catalog_access
+Failed asserting that false is true.
+
+/home/user/rv-b2-red/tests/Feature/StagingOperatorMfaTest.php:63
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\StagingOperatorMfaTest::test_requirement_follows_the_current_environment
+staging
+Failed asserting that false is identical to true.
+
+/home/user/rv-b2-red/tests/Feature/StagingOperatorMfaTest.php:86
+/home/user/rv-b2-red/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 7, Failures: 2.
+# finished: 2026-10-09T09:29:04Z
+rc=1
