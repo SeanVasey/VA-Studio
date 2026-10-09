@@ -1,0 +1,162 @@
+test_default_socket_path_does_not_require_a_defaults_file (__main__.AdminDefaultsCustodyTest.test_default_socket_path_does_not_require_a_defaults_file) ... ok
+test_protected_admin_defaults_reach_the_first_query (__main__.AdminDefaultsCustodyTest.test_protected_admin_defaults_reach_the_first_query) ... ok
+test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) ...
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='missing') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='symlink') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='hardlink') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='directory') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='fifo') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='public') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='readonly') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='writable') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='app-owned-file') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='app-owned-parent') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='writable-parent') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='symlink-parent') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='noncanonical') ... FAIL
+  test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='relative') ... FAIL
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='hardlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='fifo')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='public')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='readonly')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='writable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='app-owned-file')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='app-owned-parent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='writable-parent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='symlink-parent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='noncanonical')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) (state='relative')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 91, in test_unsafe_admin_defaults_refuse_before_the_first_query
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_admin_defaults_custody.py", line 77, in probe
+    self.assertEqual(run.returncode == 0, expected, run.stdout + run.stderr)
+AssertionError: True != False :
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.172s
+
+FAILED (failures=14)

@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `381d116bbea46f9f3dd5a7bc05f80b147d77ca8e` (app credential authentication, following public-link/backup proof, Composer ordering and operation custody). The kit integrates main's CI
+Current tested functional source: `fd9dd035dc9069db3727bd12960bb5952eb28399` (administrator defaults custody, following app authentication, public-link/backup proof, Composer ordering and operation custody). The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -370,3 +370,38 @@ modeled, while native client/server authentication, bytes/modes and cleanup are 
 Actual Forge credentials/grants, SIGKILL cleanup, backup shipping and Stripe TEST
 purchase remain unverified. Publication still requires explicit source-equivalence
 carry and final exact-head preflight/code-review gates before merge.
+
+## Administrator defaults custody, exact source `fd9dd035`
+
+Codex on `d7e60167` found 4227010176: `--mysql-admin-defaults` accepted a readable,
+app-owned or replaceable administrator file. The optional file now requires a
+canonical absolute path without symlinks, protected root-owned ancestors without
+group/world write, and a root-owned0600 regular single-link leaf. Admission runs
+before packages, host changes or the first MySQL query. The default local socket
+path is unchanged. No file is sourced, chmodded or repaired by this admission.
+
+Owner [old-source red](codex-repair/admin-defaults-red-d7e60167.txt): **3 methods
+/14 failing unsafe states**; [focused green](codex-repair/admin-defaults-green.txt):
+**3 PASS**. Missing, symlinked, hard-linked, directory/FIFO, public/read-only/writable,
+app-owned leaf/ancestor, writable/symlinked ancestor and noncanonical/relative paths
+refuse before a traced first query. Valid private file and default socket succeed.
+Root authority and MySQL are bounded fixtures; filesystem modes, links and paths
+are genuine. Exact committed source [operations](codex-repair/final-ops-fd9dd035.txt)
+**71 PASS**, genuine PHP8.4.26 [runtime](codex-repair/final-runtime-fd9dd035.txt)
+**13 tests /63 assertions PASS**, Bash6 separately/Shellcheck/whitespace PASS.
+Trailing owner receipt spaces are normalized only for diff checks. Independent
+approval and final exact-head publication gates remain required. Earlier native
+app/backup authentication and transport evidence retains its original source;
+actual Forge root/admin custody, services and provider purchase remain unexecuted.
+
+Independent [administrator defaults addendum](independent-review/ADMIN-DEFAULTS-ADDENDUM.md)
+**APPROVES exact `fd9dd035dc9069db3727bd12960bb5952eb28399`**. The actual complete
+CLI prelude and first-query construction pass **4 methods /25 states**: 22 refusals
+and3 admitted states. Old `d7e60167` retains **22 unsafe-admission failures**. Root
+ownership and MySQL are bounded fixtures; real paths, modes, links and early call
+ordering are exercised. Owner71/13-63 receipts inspected. Bash/Shellcheck `-x` pass;
+an initial omitted `-x` caused SC1091 and is disclosed, not passing evidence.
+Only three independent red progress-line trailing spaces are normalized. Prior
+source approvals carry on unchanged paths. This publication also corrects prose
+spacing in ops README/CHANGELOG; explicit reviewed source equivalence and final
+exact-head preflight/Codex gates remain required before merge.

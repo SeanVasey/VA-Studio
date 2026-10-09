@@ -158,7 +158,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 1. **Checks:** Ubuntu 24.04; RAM (refuses under about 3.7 GB, warns under 8 GB); swap; PHP extensions in the CLI and in FPM; ffmpeg encoders; `prlimit` limits; tool paths; ClamAV signature age and readability by the app user.
 2. **Directories:** as in [Server layout](#server-layout), with the stated owners and modes. Private storage gets the same `.gitignore` bytes the repository tracks, so a backup restores exactly the tree the release expects.
 3. **MySQL** (as root over the local socket, or with `--mysql-admin-defaults FILE`):
-   The optional admin file must be a canonical absolute, root-owned0600 regular single-link
+   The optional admin file must be a canonical absolute, root-owned 0600 regular single-link
    file with no symlinks and root-owned parent directories that are not group/world writable.
    Unsafe custody refuses before packages, host changes or the first MySQL query. Do not
    place the file in the application checkout; restore it privately without printing credentials.
@@ -175,7 +175,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    and environment; completion/refusal cleans it before returning. Stale passwords require recovery.
    If the account is absent but its credential file exists, provisioning refuses rather than overwriting
    it or following a link. Do not paste credential contents into chat or the repository.
-   The backup account likewise requires a finite root-owned0600 single-link literal generated
+   The backup account likewise requires a finite root-owned 0600 single-link literal generated
    `backup.my.cnf` profile. Before grants, a scrubbed client with login paths disabled must authenticate
    exactly `vasey_backup@127.0.0.1`. Missing, truncated, unsafe or stale credentials require private
    restore or explicit account rotation; an orphan profile is never overwritten automatically.
