@@ -1,0 +1,22 @@
+Reviewed source: 2bfaed149f5b51ef0c3c01a84603b3588f567f90
+Command (real PTY):
+source /workspace/.va-studio-toolchain/activate.sh && php docs/verification/rights-scope-command-20261008/independent-review/hidden-prompt-probe.php
+
+The probe disables Symfony stty support, uses an empty in-memory SQLite
+database, and supplies no real credential or persisted actor. The password
+text below is a deliberately public synthetic marker typed through write_stdin.
+
+Initial process output:
+ Staff password (hidden):
+ >
+
+write_stdin input: SYNTHETIC-NONSECRET-PASSWORD-MARKER\n
+Resulting process output:
+SYNTHETIC-NONSECRET-PASSWORD-MARKER
+
+Rights scope management is unavailable. No changes were made.
+
+Exit: 1. No PHPUnit cases were run in this PTY probe. The literal marker
+being echoed proves the unsupported-hide fallback is visible. The final
+generic refusal is caused by the intentionally empty database after input
+has already been exposed; it does not repair password privacy.

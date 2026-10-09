@@ -1,0 +1,18 @@
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+/bin/bash: /workspace/.va-studio-toolchain/mysql-image/root/usr/lib64/libtinfo.so.6: no version information available (required by /bin/bash)
+mysqld: Can't open shared library '/workspace/.va-studio-toolchain/mysql84/lib64/mysql/plugin/component_reference_cache.so' (errno: 0 /workspace/.va-studio-toolchain/mysql84/lib64/mysql/plugin/component_reference_cache.so: cannot open shared object file: No such)
+mysqld: Cannot load component from specified URN: 'file://component_reference_cache'.
+Disposable MySQL startup did not become ready.
+2026-10-08T23:51:16.338615Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-08T23:51:16.514504Z 0 [System] [MY-010116] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld (mysqld 8.4.11) starting as process 8269
+2026-10-08T23:51:16.518026Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-08T23:51:16.576286Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-08T23:51:16.702529Z 0 [Warning] [MY-013829] [Server] Missing data directory for ICU regular expressions: /workspace/.va-studio-toolchain/mysql84/lib64/mysql/private/.
+2026-10-08T23:51:16.705299Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-08T23:51:16.705312Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-08T23:51:16.705889Z 0 [ERROR] [MY-010250] [Server] Failed to create a socket for IPv4 '127.0.0.1': errno: 1.
+2026-10-08T23:51:16.705898Z 0 [ERROR] [MY-010255] [Server] Can't create IP socket: Operation not permitted
+2026-10-08T23:51:16.705904Z 0 [ERROR] [MY-010119] [Server] Aborting
+2026-10-08T23:51:18.163915Z 0 [System] [MY-010910] [Server] /workspace/.va-studio-toolchain/mysql-image/root/usr/sbin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-08T23:51:18.163925Z 0 [System] [MY-015016] [Server] MySQL Server - end.
