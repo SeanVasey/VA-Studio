@@ -10,9 +10,12 @@ use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\IsolatedContractRenderer;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
+use App\Domain\Grants\Free\FreeGrantRendererProcess;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
 use App\Support\PhpCliBinary;
+use App\Support\PhpCliProcess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -34,6 +37,15 @@ class AppServiceProvider extends ServiceProvider
             IsolatedContractRenderer::class);
         $this->app->bind(PhpCliBinary::class,
             fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));
+        // The pinned grant renderers spawn PHP_BINARY, which is the FPM daemon outside the CLI; there they get a
+        // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
+        foreach ([FreeGrantRendererProcess::class, ProductionFreeGrantRendererProcess::class] as $renderer) {
+            $this->app->bind($renderer, function ($app) use ($renderer) {
+                $binary = $app->make(PhpCliBinary::class);
+
+                return $binary->isCli() ? new $renderer : new $renderer(PhpCliProcess::factory($binary));
+            });
+        }
         $this->app->bind(StripeCheckoutGateway::class,
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripePaymentGateway::class,

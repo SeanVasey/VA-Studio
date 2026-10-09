@@ -140,7 +140,7 @@ class TestIsolatedContractRendererTest extends TestCase
         // A distinct same-version CLI stand-in, so the spawned path cannot coincide with PHP_BINARY.
         $directory = sys_get_temp_dir().'/php-cli-renderer-'.bin2hex(random_bytes(8)); mkdir($directory, 0700);
         $cli = $directory.'/php-cli';
-        file_put_contents($cli, "#!/bin/sh\nprintf '%s' ".escapeshellarg('cli '.PHP_VERSION)."\n"); chmod($cli, 0700);
+        file_put_contents($cli, "#!/bin/sh\nprintf '%s' ".escapeshellarg('cli '.PHP_VERSION.' '.(PHP_ZTS ? '1' : '0').(PHP_DEBUG ? '1' : '0'))."\n"); chmod($cli, 0700);
         $commands = [];
         $capture = function ($command, $root, $environment, $payload) use (&$commands, $reply) {
             $commands[] = array_map(fn ($argument) => str_replace($environment['TMPDIR'], '{workspace}', $argument), $command);

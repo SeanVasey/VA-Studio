@@ -10,7 +10,7 @@ use RuntimeException;
  */
 final class PhpCliBinaryUnavailable extends RuntimeException
 {
-    /** @param 'unconfigured'|'invalid_path'|'not_executable'|'probe_failed'|'not_cli'|'version_mismatch' $reason */
+    /** @param 'unconfigured'|'invalid_path'|'not_executable'|'probe_failed'|'not_cli'|'version_mismatch'|'build_mismatch'|'unexpected_command' $reason */
     public function __construct(public readonly string $reason)
     {
         parent::__construct('A validated CLI PHP binary is unavailable.');

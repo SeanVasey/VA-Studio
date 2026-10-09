@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 // Run with an empty application environment. No values, exceptions or provider responses are printed.
 // Usage: php validate-runtime.php ENV_FILE EXPECTED_ENV HOST DATABASE [PREVIOUS_ENV_FILE]
+use App\Support\PhpCliBinary;
+use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
@@ -75,6 +77,14 @@ try {
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
+        // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
+        try {
+            (new PhpCliBinary(config('app.php_cli_binary'), 'fpm-fcgi'))->path();
+            $check('runtime.php_cli_binary', true);
+        } catch (PhpCliBinaryUnavailable) {
+            $check('runtime.php_cli_binary', false);
+        }
     }
 } catch (Throwable) {
     $failures[] = 'runtime.unavailable';
