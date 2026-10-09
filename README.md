@@ -144,8 +144,11 @@ conditions recorded. Prefer local affected checks; manually request
 
 **Foundation CI** is manual final verification through
 `.github/workflows/final-verification.yml`, requiring the exact reviewed
-`expected_sha`. It retains the complete MySQL/SQLite partitions and all browser
-checks. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
+`expected_sha`. SQLite runs the complete PHP suite. MySQL runs only the reviewed
+[native selection](docs/verification/mysql-native-selection-20261009/README.md):
+files owning a method in the SQLite skip census plus migration test files (1,434
+of 7,633 cases at `0f9b39c`). Other tests no longer run on MySQL in Foundation CI.
+All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real
 providers, device playback, restore drills and production deployment remain

@@ -81,7 +81,10 @@ backend-quality:
     - bash scripts/ci/setup-gitlab-php.sh
   script:
     - python3 scripts/ci/gitlab-database-receipts.py start --engine="$DB_CONNECTION" --shard="$SHARD"
-    - python3 scripts/ci/phpunit-shards.py --shards="$SHARD_COUNT" --prefix="phpunit-ci-$DB_CONNECTION" --timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json"
+    - |
+      # MySQL partitions only the reviewed native selection; SQLite partitions the complete suite.
+      if [ "$DB_CONNECTION" = mysql ]; then set -- --mysql-native-selection; else set --; fi
+      python3 scripts/ci/phpunit-shards.py --shards="$SHARD_COUNT" --prefix="phpunit-ci-$DB_CONNECTION" --timings="scripts/ci/phpunit-timings-$DB_CONNECTION.json" "$@"
     - |
       set +e
       php vendor/bin/phpunit --configuration="phpunit-ci-$DB_CONNECTION-$SHARD.xml" --log-junit="phpunit-ci-$DB_CONNECTION-$SHARD-results.xml" --fail-on-phpunit-warning --display-warnings

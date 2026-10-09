@@ -12,6 +12,12 @@ gets a file; the proof below requires every expanded case exactly once regardles
 Each CI job derives the same partition from the same commit, so the committed timing
 file is an input to that partition and changes only through review.
 
+With --mysql-native-selection (MySQL only), discovery stays complete, but only the files
+selected by the reviewed scripts/ci/database-mysql-selection.json are partitioned: every
+file owning a method from the reviewed SQLite skip census, plus every file whose
+repository path matches the policy's migration file pattern. The proof then requires
+every selected case exactly once, and the manifest keeps the complete source census.
+
 CLI contract: https://docs.phpunit.de/en/12.5/textui.html#listing-tests
 Source checked at composer.lock's PHPUnit 12.5.34 reference
 6cbff63d670de92cb1cb3d2ff9f40327e9da9c7f:
@@ -24,7 +30,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 import json
 import os
@@ -39,6 +45,8 @@ import xml.etree.ElementTree as ET
 NS = "{https://xml.phpunit.de/testSuite}"
 XSI = "http://www.w3.org/2001/XMLSchema-instance"
 ET.register_namespace("xsi", XSI)
+SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
+SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 
 
 class PartitionError(Exception):
@@ -49,6 +57,8 @@ class PartitionError(Exception):
 class Inventory:
     cases: dict[str, str]
     groups: Counter
+    # case identifier -> (test class, test method); PHPT cases have no entry
+    methods: dict[str, tuple[str, str]] = field(default_factory=dict)
 
     @property
     def files(self) -> set[str]:
@@ -130,6 +140,7 @@ def read_inventory(path: Path, root: Path) -> Inventory:
     if tree.tag != NS + "testSuite" or [x.tag for x in tree] != [NS + "tests", NS + "groups"]:
         raise PartitionError("Unknown PHPUnit test-list XML shape")
     cases: dict[str, str] = {}
+    methods: dict[str, tuple[str, str]] = {}
     for item in tree[0]:
         if item.tag == NS + "testClass" and set(item.attrib) == {"name", "file"}:
             file = relative_file(item.attrib["file"], root)
@@ -139,16 +150,18 @@ def read_inventory(path: Path, root: Path) -> Inventory:
             for method in item:
                 if method.tag != NS + "testMethod" or set(method.attrib) != {"id", "name"} or list(method):
                     raise PartitionError("Unknown PHPUnit test method shape")
-                identifiers.append(method.attrib["id"])
+                identifiers.append((method.attrib["id"], (item.attrib["name"], method.attrib["name"])))
         elif item.tag == NS + "phpt" and set(item.attrib) == {"file"} and not list(item):
             file = relative_file(item.attrib["file"], root)
-            identifiers = ["phpt:" + file]
+            identifiers = [("phpt:" + file, None)]
         else:
             raise PartitionError("Unknown PHPUnit test-list entry")
-        for identifier in identifiers:
+        for identifier, method in identifiers:
             if not identifier or identifier in cases:
                 raise PartitionError("Empty or duplicate test identifier in source inventory")
             cases[identifier] = file
+            if method is not None:
+                methods[identifier] = method
     groups: Counter = Counter()
     for group in tree[1]:
         if group.tag != NS + "group" or set(group.attrib) != {"name"}:
@@ -159,7 +172,71 @@ def read_inventory(path: Path, root: Path) -> Inventory:
             groups[(group.attrib["name"], test.attrib["id"])] += 1
     if not cases:
         raise PartitionError("Source inventory has no tests")
-    return Inventory(cases, groups)
+    return Inventory(cases, groups, methods)
+
+
+@dataclass
+class Selection:
+    pattern: str
+    skip_pairs: set[tuple[str, str]]
+    policy_sha256: str
+    sqlite_skip_policy_sha256: str
+
+
+def read_selection(root: Path) -> Selection:
+    """Read the reviewed MySQL-native selection policy and the SQLite skip census it names."""
+    raw = (root / SELECTION_POLICY).read_bytes()
+    try:
+        policy = json.loads(raw)
+    except ValueError as error:
+        raise PartitionError("MySQL selection policy is not valid JSON") from error
+    if (not isinstance(policy, dict) or set(policy) != {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern"}
+            or not is_count(policy["schema_version"], 1) or policy["schema_version"] != 1
+            or policy["purpose"] != "reviewed-mysql-native-selection" or policy["sqlite_skip_policy"] != SQLITE_SKIP_POLICY
+            or not isinstance(policy["file_pattern"], str) or not policy["file_pattern"].startswith("^")
+            or not policy["file_pattern"].endswith("$")):
+        raise PartitionError("Unknown MySQL selection policy shape")
+    try:
+        re.compile(policy["file_pattern"])
+    except re.error as error:
+        raise PartitionError("MySQL selection file pattern does not compile") from error
+    skip_raw = (root / SQLITE_SKIP_POLICY).read_bytes()
+    try:
+        census = json.loads(skip_raw)
+    except ValueError as error:
+        raise PartitionError("SQLite skip policy is not valid JSON") from error
+    if (not isinstance(census, dict) or set(census) != {"schema_version", "purpose", "methods"}
+            or not is_count(census["schema_version"], 1) or census["schema_version"] != 1
+            or census["purpose"] != "reviewed-mysql-only-sqlite-skip-methods"
+            or not isinstance(census["methods"], list) or not census["methods"]):
+        raise PartitionError("Unknown SQLite skip policy shape")
+    pairs: set[tuple[str, str]] = set()
+    for pair in census["methods"]:
+        if (not isinstance(pair, list) or len(pair) != 2 or not all(isinstance(item, str) and item for item in pair)
+                or tuple(pair) in pairs):
+            raise PartitionError("Invalid or duplicate SQLite skip method")
+        pairs.add(tuple(pair))
+    return Selection(policy["file_pattern"], pairs, hashlib.sha256(raw).hexdigest(), hashlib.sha256(skip_raw).hexdigest())
+
+
+def select_native(source: Inventory, selection: Selection) -> Inventory:
+    """Restrict the complete inventory to whole files that MySQL must prove.
+
+    A file is selected when it owns a reviewed SQLite-skipped (class, method) pair or its
+    repository path matches the reviewed migration file pattern. Every expanded case and
+    group of a selected file is kept, so the file still runs exactly as it was discovered.
+    """
+    discovered = set(source.methods.values())
+    if not selection.skip_pairs <= discovered:
+        raise PartitionError("Reviewed SQLite skip policy contains an undiscovered method")
+    files = {file for identifier, file in source.cases.items() if source.methods.get(identifier) in selection.skip_pairs}
+    files |= {file for file in source.files if re.fullmatch(selection.pattern, file)}
+    if not files:
+        raise PartitionError("The MySQL-native selection is empty")
+    cases = {identifier: file for identifier, file in source.cases.items() if file in files}
+    groups = Counter({key: value for key, value in source.groups.items() if key[1] in cases})
+    methods = {identifier: method for identifier, method in source.methods.items() if identifier in cases}
+    return Inventory(cases, groups, methods)
 
 
 def partition(source: Inventory, count: int, weights: dict[str, int] | None = None) -> list[set[str]]:
@@ -253,20 +330,27 @@ def main() -> None:
     parser.add_argument("--shards", type=int, required=True)
     parser.add_argument("--prefix", required=True)
     parser.add_argument("--timings", type=Path, help="Balance on measured per-file milliseconds (scripts/ci/phpunit-timings.py) instead of case counts")
+    parser.add_argument("--mysql-native-selection", action="store_true",
+                        help=f"Partition only the files selected by {SELECTION_POLICY} (requires --prefix=phpunit-ci-mysql)")
     args = parser.parse_args()
     if not re.fullmatch(r"phpunit-ci-[a-z0-9-]+", args.prefix):
         raise PartitionError("Invalid generated configuration prefix")
+    if args.mysql_native_selection and args.prefix != "phpunit-ci-mysql":
+        raise PartitionError("--mysql-native-selection is only valid with --prefix=phpunit-ci-mysql")
     root = Path(__file__).resolve().parents[2]
     source_path = root / "phpunit.xml"
     source = ET.parse(source_path)
     if source.getroot().tag != "phpunit":
         raise PartitionError("Unknown PHPUnit configuration root")
     timings = read_timings(root / args.timings) if args.timings else None
+    selection = read_selection(root) if args.mysql_native_selection else None
     with tempfile.TemporaryDirectory(prefix="phpunit-partition-") as temp:
         full = discover(source_path, Path(temp) / "all.xml", root)
         refuse_cross_file_dependencies(root, full.files)
-        weights, untimed = file_weights(full, timings)
-        assignments = partition(full, args.shards, weights)
+        # Without a selection the target is the complete inventory, exactly as before.
+        target = full if selection is None else select_native(full, selection)
+        weights, untimed = file_weights(target, timings)
+        assignments = partition(target, args.shards, weights)
         observed = []
         lists = [(Path(temp) / "all.xml", root / f"{args.prefix}-source-tests.xml")]
         for index, selected in enumerate(assignments, 1):
@@ -277,7 +361,7 @@ def main() -> None:
             listing = Path(temp) / f"shard-{index}.xml"
             observed.append(discover(config, listing, root))
             lists.append((listing, root / f"{args.prefix}-{index}-tests.xml"))
-        prove(full, assignments, observed)
+        prove(target, assignments, observed)
         for listing, evidence in lists:
             with evidence.open("xb") as output:
                 output.write(listing.read_bytes())
@@ -288,7 +372,8 @@ def main() -> None:
         "source_test_cases": len(full.cases),
         "source_case_identity_sha256": hashlib.sha256(json.dumps(sorted(full.cases.items())).encode()).hexdigest(),
         "source_group_identity_sha256": hashlib.sha256(json.dumps(sorted(full.groups.items())).encode()).hexdigest(),
-        "proof": "every expanded source case, file and group appears exactly once",
+        "proof": "every expanded source case, file and group appears exactly once" if selection is None
+                 else "every selected case, file and group appears exactly once",
         "weighting": {"basis": "expanded-cases"} if timings is None else {
             "basis": "measured-milliseconds", "timings_file": args.timings.as_posix(), "timings_sha256": timings.sha256,
             "timings_driver": timings.driver, "timings_source": timings.source, "untimed_files": untimed,
@@ -299,6 +384,13 @@ def main() -> None:
             for index, (selected, shard) in enumerate(zip(assignments, observed, strict=True), 1)
         ],
     }
+    if selection is not None:
+        manifest["selection"] = {
+            "policy": SELECTION_POLICY, "policy_sha256": selection.policy_sha256,
+            "sqlite_skip_policy_sha256": selection.sqlite_skip_policy_sha256,
+            "files": len(target.files), "test_cases": len(target.cases),
+            "case_identity_sha256": hashlib.sha256(json.dumps(sorted(target.cases.items())).encode()).hexdigest(),
+        }
     with (root / f"{args.prefix}-manifest.json").open("x") as output:
         json.dump(manifest, output, indent=2)
         output.write("\n")
@@ -308,7 +400,11 @@ def main() -> None:
         names = ", ".join(untimed[:5]) + (", ..." if len(untimed) > 5 else "")
         print(f"{marker}{len(untimed)} test file(s) have no entry in {args.timings} and use the fallback weight; "
               f"refresh it with scripts/ci/phpunit-timings.py: {names}", file=sys.stderr)
-    print(f"Proved {len(full.cases)} expanded tests in {len(full.files)} files across {args.shards} nonempty shards.")
+    if selection is None:
+        print(f"Proved {len(full.cases)} expanded tests in {len(full.files)} files across {args.shards} nonempty shards.")
+    else:
+        print(f"Proved {len(target.cases)} selected MySQL-native tests in {len(target.files)} files "
+              f"(of {len(full.cases)} discovered tests in {len(full.files)} files) across {args.shards} nonempty shards.")
     for item in manifest["shards"]:
         estimate = f"; estimated {item['weight'] // 60000}m {item['weight'] // 1000 % 60:02d}s" if timings else ""
         print(f"Shard {item['index']}: {item['test_cases']} tests; {len(item['files'])} complete files{estimate}.")

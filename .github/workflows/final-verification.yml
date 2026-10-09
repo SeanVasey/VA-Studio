@@ -147,7 +147,11 @@ jobs:
     if: needs.scope.outputs.mode != 'docs'
     name: backend-mysql (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
-    # A shard takes 22 to 38 minutes and has taken 57 on a slow runner. A hung test must not hold a runner for the 6-hour default.
+    # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
+    # SQLite-skipped methods plus migration test files, 1434 of 7633 cases at 0f9b39c. Run 37921309772 showed
+    # the complete suite cannot finish in 8 x 90 minutes (about 35 s per migrate:fresh test). The selection's
+    # duration on hosted MySQL is unmeasured: 1095 selected cases use FinalizationDatabaseMigrations (98 to 170
+    # per shard), so a shard may still approach this limit. A hung test must not hold a runner for 6 hours.
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -204,8 +208,8 @@ jobs:
         env:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
-      - name: Prove the complete MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
+      - name: Prove the native-selection MySQL test partition
+        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
       - name: Run all tests assigned to this MySQL shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings

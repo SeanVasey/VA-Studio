@@ -46,11 +46,15 @@ POLICY_FILES = (
     WORKFLOW_PATH, "scripts/ci/database-receipts.py", "scripts/ci/test-database-receipts.py",
     "scripts/ci/ci-scope.py", "scripts/ci/phpunit-shards.py", "phpunit.xml",
     "scripts/ci/verify-php-test-runtime.php", "scripts/ci/test-php-test-runtime.py",
-    "scripts/ci/database-sqlite-skips.json",
+    "scripts/ci/database-sqlite-skips.json", "scripts/ci/database-mysql-selection.json",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
 )
 COUNTS = {"mysql": 8, "sqlite": 2}
+SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
+SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
+# The step that derives each engine's partition; MySQL partitions only its reviewed native selection.
+PARTITION_STEPS = {"mysql": "Prove the native-selection MySQL test partition", "sqlite": "Prove the complete SQLite test partition"}
 
 
 class ReceiptError(Exception):
@@ -363,7 +367,7 @@ def inventory(raw: bytes, checkout_root: str) -> dict:
 
 
 def sqlite_skip_pairs(root: Path) -> set[tuple[str, str]]:
-    value = json_data(read_file(root / "scripts/ci/database-sqlite-skips.json"))
+    value = json_data(read_file(root / SQLITE_SKIP_POLICY))
     require(isinstance(value, dict) and set(value) == {"schema_version", "purpose", "methods"}
             and type(value["schema_version"]) is int and value["schema_version"] == 1 and value["purpose"] == "reviewed-mysql-only-sqlite-skip-methods"
             and isinstance(value["methods"], list) and value["methods"], "Unknown SQLite skip policy")
@@ -373,6 +377,36 @@ def sqlite_skip_pairs(root: Path) -> set[tuple[str, str]]:
                 and tuple(pair) not in result, "Invalid or duplicate SQLite skip method")
         result.add(tuple(pair))
     return result
+
+
+def mysql_selection_pattern(root: Path) -> str:
+    """Return the committed, reviewed migration file pattern of the MySQL-native selection policy."""
+    value = json_data(read_file(root / SELECTION_POLICY))
+    require(isinstance(value, dict) and set(value) == {"schema_version", "purpose", "sqlite_skip_policy", "file_pattern"}
+            and type(value["schema_version"]) is int and value["schema_version"] == 1
+            and value["purpose"] == "reviewed-mysql-native-selection" and value["sqlite_skip_policy"] == SQLITE_SKIP_POLICY
+            and isinstance(value["file_pattern"], str) and value["file_pattern"].startswith("^")
+            and value["file_pattern"].endswith("$"), "Unknown MySQL selection policy")
+    try:
+        re.compile(value["file_pattern"])
+    except re.error as error:
+        raise ReceiptError("MySQL selection file pattern does not compile") from error
+    return value["file_pattern"]
+
+
+def native_selection(full: dict, skip_pairs: set[tuple[str, str]], pattern: str) -> dict[str, str]:
+    """Recompute the MySQL-native cases (identifier -> owning file) from the complete inventory.
+
+    Whole files are selected: each file owning a reviewed SQLite-skipped method, plus each
+    file whose repository path matches the reviewed migration pattern.
+    """
+    require(isinstance(pattern, str) and pattern, "Missing MySQL selection policy")
+    require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
+    files = {owner for identifier_, owner in full["cases"].items() if full["methods"][identifier_] in skip_pairs}
+    files |= {owner for owner in set(full["cases"].values()) if re.fullmatch(pattern, owner)}
+    selected = {identifier_: owner for identifier_, owner in full["cases"].items() if owner in files}
+    require(selected, "Empty MySQL-native selection")
+    return selected
 
 
 def census(value: dict) -> dict:
@@ -444,11 +478,17 @@ def evidence_names(engine: str, shard: int, *, shard_count: int) -> set[str]:
             f"{prefix}-{shard}-results.xml", f"{prefix}-{shard}-start.json", f"{prefix}-{shard}-receipt.json"}
 
 
-def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard: int, skip_pairs: set[tuple[str, str]], *, shard_count: int) -> dict:
+def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard: int, skip_pairs: set[tuple[str, str]], *, shard_count: int,
+                      selection_pattern: str | None = None) -> dict:
     evidence_names(engine, shard, shard_count=shard_count)
     prefix = "phpunit-ci-" + engine
     full = inventory(files[prefix + "-source-tests.xml"], source["checkout_root"])
     require(skip_pairs <= set(full["methods"].values()), "Reviewed SQLite skip policy contains an undiscovered method")
+    # SQLite partitions the complete inventory. MySQL partitions only the selection recomputed
+    # here from the complete inventory and the committed policies; the manifest is not trusted.
+    target_cases = full["cases"] if engine == "sqlite" else native_selection(full, skip_pairs, selection_pattern)
+    target_groups = full["groups"] if engine == "sqlite" else Counter(
+        {key: value for key, value in full["groups"].items() if key[1] in target_cases})
     shards = [inventory(files[f"{prefix}-{index}-tests.xml"], source["checkout_root"]) for index in range(1, shard_count + 1)]
     cases, groups, owners = Counter(), Counter(), Counter()
     for item in shards:
@@ -457,14 +497,19 @@ def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard:
         cases.update(item["cases"].keys())
         groups.update(item["groups"])
         owners.update(set(item["cases"].values()))
-    require(cases == Counter({key: 1 for key in full["cases"]}) and groups == full["groups"]
-            and owners == Counter({name: 1 for name in set(full["cases"].values())}), "Partition loses or duplicates cases, files or groups")
+    require(cases == Counter({key: 1 for key in target_cases}) and groups == target_groups
+            and owners == Counter({name: 1 for name in set(target_cases.values())}), "Partition loses or duplicates cases, files or groups")
     manifest = json_data(files[prefix + "-manifest.json"])
     full_census = census(full)
-    require(isinstance(manifest, dict) and set(manifest) == {"schema_version", "source_configuration_sha256", "source_files", "source_test_cases",
-            "source_case_identity_sha256", "source_group_identity_sha256", "proof", "weighting", "shards"}
+    manifest_keys = {"schema_version", "source_configuration_sha256", "source_files", "source_test_cases",
+                     "source_case_identity_sha256", "source_group_identity_sha256", "proof", "weighting", "shards"}
+    proof_text = "every expanded source case, file and group appears exactly once"
+    if engine == "mysql":
+        manifest_keys.add("selection")
+        proof_text = "every selected case, file and group appears exactly once"
+    require(isinstance(manifest, dict) and set(manifest) == manifest_keys
             and type(manifest.get("schema_version")) is int and manifest["schema_version"] == 1
-            and manifest.get("proof") == "every expanded source case, file and group appears exactly once"
+            and manifest.get("proof") == proof_text
             and manifest.get("source_configuration_sha256") == source["policy_sha256"]["phpunit.xml"]
             and manifest.get("source_files") == full_census["files"] and manifest.get("source_test_cases") == full_census["cases"]
             and manifest.get("source_case_identity_sha256") == full_census["case_identity_sha256"]
@@ -476,7 +521,13 @@ def database_evidence(files: dict[str, bytes], source: dict, engine: str, shard:
             and weighting["timings_sha256"] == source["policy_sha256"][timing_path] and weighting["timings_driver"] == engine
             and isinstance(weighting["timings_source"], str) and weighting["timings_source"]
             and isinstance(weighting["untimed_files"], list) and len(set(weighting["untimed_files"])) == len(weighting["untimed_files"])
-            and set(weighting["untimed_files"]) <= set(full["cases"].values()), "Partition weighting differs from the source policy")
+            and set(weighting["untimed_files"]) <= set(target_cases.values()), "Partition weighting differs from the source policy")
+    if engine == "mysql":
+        expected_selection = {"policy": SELECTION_POLICY, "policy_sha256": source["policy_sha256"][SELECTION_POLICY],
+                              "sqlite_skip_policy_sha256": source["policy_sha256"][SQLITE_SKIP_POLICY],
+                              "files": len(set(target_cases.values())), "test_cases": len(target_cases),
+                              "case_identity_sha256": digest(json.dumps(sorted(target_cases.items())).encode())}
+        require(manifest["selection"] == expected_selection, "Manifest selection differs from the recomputed MySQL-native selection")
     entries = manifest.get("shards")
     require(isinstance(entries, list) and len(entries) == shard_count, "Missing partition entry")
     for index, item in enumerate(shards, 1):
@@ -521,7 +572,9 @@ def finish(root: Path, engine: str, shard: int, env: dict) -> None:
     value = {"schema_version": 1, "purpose": "database-job-receipt-not-acceptance", "engine": engine, "shard": shard,
              "source": source, "runtime": runtime, "runtime_sha256": digest(canonical(runtime)),
              "test_step_outcome": "success", "started_at": initial["started_at"],
-             "finished_at": datetime.now(timezone.utc).isoformat(), **database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=COUNTS[engine])}
+             "finished_at": datetime.now(timezone.utc).isoformat(),
+             **database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=COUNTS[engine],
+                                 selection_pattern=mysql_selection_pattern(root) if engine == "mysql" else None)}
     write_json(root / (prefix + "-receipt.json"), value)
 
 
@@ -652,7 +705,7 @@ def collect(root: Path, env: dict, api: Github) -> dict:
                     and job.get("head_sha") == source["event"]["head"] and job.get("status") == "completed"
                     and job.get("conclusion") == "success", "Database job is not successful in this explicit attempt")
             engine_label = "MySQL" if engine == "mysql" else "SQLite"
-            for name in (f"Record source and {engine_label} runtime before tests", f"Prove the complete {engine_label} test partition",
+            for name in (f"Record source and {engine_label} runtime before tests", PARTITION_STEPS[engine],
                          f"Run all tests assigned to this {engine_label} shard", f"Verify complete {engine_label} shard receipt", "Retain partition and test evidence"):
                 steps = [step for step in job.get("steps", []) if step.get("name") == name]
                 require(len(steps) == 1 and steps[0].get("status") == "completed" and steps[0].get("conclusion") == "success",
@@ -690,7 +743,8 @@ def collect(root: Path, env: dict, api: Github) -> dict:
             require(receipt["runtime"]["dependencies"] == locked_dependencies(root)[1]
                     and receipt["runtime"]["dependencies"]["composer_lock_sha256"] == source["policy_sha256"]["composer.lock"],
                     "Runtime dependency references differ from the actual committed lock")
-            proof = database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=count)
+            proof = database_evidence(files, source, engine, shard, sqlite_skip_pairs(root), shard_count=count,
+                                      selection_pattern=mysql_selection_pattern(root) if engine == "mysql" else None)
             require(all(receipt.get(key) == value for key, value in proof.items()), "Database receipt does not match retained inventories and results")
             executed[engine].append(inventory(files[f"phpunit-ci-{engine}-{shard}-tests.xml"], source["checkout_root"]))
             initial = json_data(files[prefix + "-start.json"])
@@ -715,21 +769,32 @@ def collect(root: Path, env: dict, api: Github) -> dict:
     for receipt in receipts:
         if receipt["engine"] == "sqlite":
             sqlite_skipped.update(receipt["results"]["skipped_ids"])
-    full_ids = set(inventory(files["phpunit-ci-sqlite-source-tests.xml"], source["checkout_root"])["cases"])
+    full = inventory(files["phpunit-ci-sqlite-source-tests.xml"], source["checkout_root"])
+    full_ids = set(full["cases"])
+    # Recompute the MySQL-native selection from the shared complete census and committed policies.
+    selected_ids = set(native_selection(full, sqlite_skip_pairs(root), mysql_selection_pattern(root)))
+    expected_ids = {"sqlite": full_ids, "mysql": selected_ids}
     for engine, inventories in executed.items():
         observed = Counter(identifier_ for item in inventories for identifier_ in item["cases"])
-        require(observed == Counter({identifier_: 1 for identifier_ in full_ids}), "Actual database shard executions lose or duplicate source cases")
+        require(observed == Counter({identifier_: 1 for identifier_ in expected_ids[engine]}),
+                "Actual database shard executions lose or duplicate source cases" if engine == "sqlite"
+                else "Actual MySQL shard executions differ from the MySQL-native selection")
         require(len({receipt["file_sha256"][f"phpunit-ci-{engine}-manifest.json"] for receipt in receipts if receipt["engine"] == engine}) == 1,
                 "Database jobs derived inconsistent partition manifests")
     require(sqlite_skipped <= full_ids, "Unknown SQLite skipped identity")
-    # MySQL's exact partition and zero skips prove every shared source identity executed.
-    require(sum(receipt["results"]["executed_cases"] for receipt in receipts if receipt["engine"] == "mysql") == len(full_ids),
-            "MySQL did not execute the complete shared source census")
+    # MySQL's exact selected partition and zero skips prove every selected identity executed.
+    require(sum(receipt["results"]["executed_cases"] for receipt in receipts if receipt["engine"] == "mysql") == len(selected_ids),
+            "MySQL did not execute the complete MySQL-native selection")
+    # No case may go unexecuted on both engines: every SQLite skip must have executed on MySQL.
+    mysql_executed = {identifier_ for item in executed["mysql"] for identifier_ in item["cases"]}
+    require(sqlite_skipped <= mysql_executed, "A SQLite-skipped identity was not executed on MySQL")
     require(api.get(run_path).get("run_attempt") == attempt, "Current run attempt changed during collection")
     return {"schema_version": 1, "purpose": "database-receipt-collection-shadow-only",
             "outer_acceptance": "pending; producing aggregate and workflow must subsequently finish successfully",
             "source": source, "artifacts": artifact_proof, "database_receipts": receipts,
             "sqlite_skip_policy": "exact identities match reviewed MySQL-only methods; JUnit cannot distinguish skip from incomplete; all counterparts executed on MySQL",
+            "mysql_scope": "SQLite executed every source case exactly once (less reviewed skips); MySQL executed exactly the reviewed "
+                           "native selection (files owning SQLite-skipped methods plus migration test files) once, with zero skips",
             "shadow": shadow_decision()}
 
 

@@ -8,9 +8,11 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 spec = importlib.util.spec_from_file_location("phpunit_shards", Path(__file__).with_name("phpunit-shards.py"))
@@ -182,6 +184,165 @@ class PartitionProofTest(unittest.TestCase):
             path.write_text("<?php // " + spelling)
             with self.assertRaises(PartitionError):
                 module.refuse_cross_file_dependencies(self.root, {"tests/A.php"})
+
+    def native_source(self):
+        """A complete inventory with one census-owning file, one migration file and two unselected files."""
+        for file in ["tests/Feature/OrderMigrationTest.php", "tests/Feature/Nested/LedgerMigrationTest.php"]:
+            (self.root / file).parent.mkdir(parents=True, exist_ok=True)
+            (self.root / file).write_text("<?php // isolated selection fixture\n")
+        cases = {"A::one": "tests/A.php", "A::two#0": "tests/A.php", "A::two#1": "tests/A.php", "B::one": "tests/B.php",
+                 "C::race": "tests/C.php", "C::plain": "tests/C.php", "Order::up": "tests/Feature/OrderMigrationTest.php",
+                 "Ledger::up": "tests/Feature/Nested/LedgerMigrationTest.php", "phpt:tests/D.phpt": "tests/D.phpt"}
+        methods = {identifier: tuple(identifier.split("#")[0].split("::")) for identifier in cases if not identifier.startswith("phpt:")}
+        groups = Counter({("money", "A::one"): 1, ("native", "C::race"): 1, ("native", "Order::up"): 1})
+        return Inventory(cases, groups, methods)
+
+    def native_selection(self, pairs=frozenset({("C", "race")})):
+        pattern = r"^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\.php$"
+        return module.Selection(pattern, set(pairs), "1" * 64, "2" * 64)
+
+    def selected_shards(self, target, count):
+        assignments = module.partition(target, count)
+        observed = []
+        for selected in assignments:
+            cases = {name: file for name, file in target.cases.items() if file in selected}
+            observed.append(Inventory(cases, Counter({key: value for key, value in target.groups.items() if key[1] in cases})))
+        return assignments, observed
+
+    def test_native_selection_keeps_whole_census_and_migration_files_with_every_case_and_group(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection())
+        self.assertEqual({"tests/C.php", "tests/Feature/OrderMigrationTest.php", "tests/Feature/Nested/LedgerMigrationTest.php"}, target.files)
+        # The census names one method of C; the whole file, including its unlisted method, is selected.
+        self.assertEqual({"C::race", "C::plain", "Order::up", "Ledger::up"}, set(target.cases))
+        self.assertEqual(Counter({("native", "C::race"): 1, ("native", "Order::up"): 1}), target.groups)
+        assignments, observed = self.selected_shards(target, 3)
+        module.prove(target, assignments, observed)
+
+    def test_native_selection_rejects_undiscovered_census_methods_and_an_empty_selection(self):
+        source = self.native_source()
+        with self.assertRaises(PartitionError):
+            module.select_native(source, self.native_selection({("C", "race"), ("Removed", "test_removed")}))
+        nothing = module.Selection(r"^tests/NoMatch\.php$", set(), "1" * 64, "2" * 64)
+        with self.assertRaises(PartitionError):
+            module.select_native(source, nothing)
+
+    def test_selected_partition_missing_a_selected_case_rejects(self):
+        target = module.select_native(self.native_source(), self.native_selection())
+        assignments, observed = self.selected_shards(target, 2)
+        shard = next(item for item in observed if "C::plain" in item.cases)
+        shard.cases.pop("C::plain")
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+
+    def test_selected_partition_containing_an_unselected_file_rejects(self):
+        source = self.native_source()
+        target = module.select_native(source, self.native_selection())
+        assignments, observed = self.selected_shards(target, 2)
+        # A shard that also ran an unselected file is not the reviewed selection, even if every selected case is present.
+        observed[0].cases["B::one"] = "tests/B.php"
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+        assignments[0] = assignments[0] | {"tests/B.php"}
+        with self.assertRaises(PartitionError):
+            module.prove(target, assignments, observed)
+
+    def test_discovery_records_each_class_method_pair_for_the_selection(self):
+        path = self.inventory_xml('''<tests><testClass name="A" file="tests/A.php">
+          <testMethod id="A::one with data set #0" name="one"/><testMethod id="A::two" name="two"/>
+          </testClass><phpt file="tests/D.phpt"/></tests><groups/>''')
+        result = module.read_inventory(path, self.root)
+        self.assertEqual({"A::one with data set #0": ("A", "one"), "A::two": ("A", "two")}, result.methods)
+
+    def test_selection_policy_rejects_unknown_shapes_and_the_committed_policy_selects_migration_files(self):
+        root = self.root / "policy"
+        (root / "scripts/ci").mkdir(parents=True)
+        census = {"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods", "methods": [["C", "race"]]}
+        valid = {"schema_version": 1, "purpose": "reviewed-mysql-native-selection", "sqlite_skip_policy": module.SQLITE_SKIP_POLICY,
+                 "file_pattern": "^tests/Feature/[A-Za-z]*MigrationTest\\.php$"}
+
+        def read(policy, skips=census):
+            (root / module.SELECTION_POLICY).write_text(policy if isinstance(policy, str) else json.dumps(policy))
+            (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps(skips))
+            return module.read_selection(root)
+
+        parsed = read(valid)
+        self.assertEqual({("C", "race")}, parsed.skip_pairs)
+        self.assertEqual(64, len(parsed.policy_sha256))
+        for policy in ["not json", [], {**valid, "schema_version": 2}, {**valid, "schema_version": True}, {**valid, "extra": 1},
+                       {**valid, "purpose": "other"}, {**valid, "sqlite_skip_policy": "elsewhere.json"}, {**valid, "file_pattern": "Migration"},
+                       {**valid, "file_pattern": "^tests/(unclosed$"}, {**valid, "file_pattern": 3}]:
+            with self.assertRaises(PartitionError, msg=str(policy)):
+                read(policy)
+        for skips in [{**census, "methods": []}, {**census, "methods": [["C", "race"], ["C", "race"]]}, {**census, "purpose": "other"}]:
+            with self.assertRaises(PartitionError, msg=str(skips)):
+                read(valid, skips)
+        committed = module.read_selection(Path(__file__).resolve().parents[2])
+        self.assertTrue(committed.skip_pairs)
+        for selected in ["tests/Feature/PromotionMigrationTest.php", "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+                         "tests/Unit/LedgerMigrationTest.php"]:
+            self.assertRegex(selected, committed.pattern)
+        for unselected in ["tests/Support/FinalizationDatabaseMigrations.php", "tests/Feature/MigrationTest.php.bak",
+                           "tests/Feature/NativeSchemaIsolationTest.php", "tests/browser/OrderMigrationTest.php", "xtests/Feature/OrderMigrationTest.php"]:
+            self.assertIsNone(re.fullmatch(committed.pattern, unselected), unselected)
+
+    def test_native_selection_flag_is_refused_for_any_prefix_but_mysql_before_discovery(self):
+        for prefix in ["phpunit-ci-sqlite", "phpunit-ci-mysql-extra"]:
+            with patch.object(sys, "argv", ["phpunit-shards.py", "--shards=2", "--prefix=" + prefix, "--mysql-native-selection"]), \
+                    patch.object(module, "discover") as discovery, self.assertRaisesRegex(PartitionError, "only valid with"):
+                module.main()
+            discovery.assert_not_called()
+
+    def run_isolated_main(self, *arguments):
+        """Run main() against a fixture repository whose PHPUnit discovery honours each configuration's exclusions."""
+        root = self.root / "repository"
+        (root / "scripts/ci").mkdir(parents=True)
+        (root / "phpunit.xml").write_text('<phpunit><testsuites><testsuite name="All"><directory>tests</directory></testsuite></testsuites></phpunit>')
+        (root / module.SELECTION_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-native-selection",
+            "sqlite_skip_policy": module.SQLITE_SKIP_POLICY, "file_pattern": self.native_selection().pattern}))
+        (root / module.SQLITE_SKIP_POLICY).write_text(json.dumps({"schema_version": 1, "purpose": "reviewed-mysql-only-sqlite-skip-methods",
+                                                                 "methods": [["C", "race"]]}))
+        source = self.native_source()
+        for file in source.files:
+            (root / file).parent.mkdir(parents=True, exist_ok=True)
+            (root / file).write_text("<?php // isolated main fixture\n")
+
+        def discover(config, output, _root):
+            excluded = {node.text for node in ET.parse(config).getroot().iter("exclude")}
+            cases = {name: file for name, file in source.cases.items() if file not in excluded}
+            output.write_text("<listing/>")
+            return Inventory(cases, Counter({key: value for key, value in source.groups.items() if key[1] in cases}),
+                             {name: method for name, method in source.methods.items() if name in cases})
+
+        with patch.object(module, "__file__", str(root / "scripts/ci/phpunit-shards.py")), patch.object(module, "discover", side_effect=discover), \
+                patch.object(sys, "argv", ["phpunit-shards.py", *arguments]), contextlib.redirect_stdout(io.StringIO()) as stdout:
+            module.main()
+        return source, json.loads((root / "phpunit-ci-mysql-manifest.json").read_text()), stdout.getvalue(), root
+
+    def test_selected_manifest_keeps_the_complete_source_census_and_records_the_exact_selection(self):
+        source, manifest, stdout, root = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql", "--mysql-native-selection")
+        selected = {name: file for name, file in source.cases.items() if file in {"tests/C.php", "tests/Feature/OrderMigrationTest.php",
+                                                                                   "tests/Feature/Nested/LedgerMigrationTest.php"}}
+        self.assertEqual((len(source.files), len(source.cases)), (manifest["source_files"], manifest["source_test_cases"]))
+        self.assertEqual(module.hashlib.sha256(json.dumps(sorted(source.cases.items())).encode()).hexdigest(), manifest["source_case_identity_sha256"])
+        self.assertEqual("every selected case, file and group appears exactly once", manifest["proof"])
+        self.assertEqual({"policy": module.SELECTION_POLICY,
+                          "policy_sha256": module.hashlib.sha256((root / module.SELECTION_POLICY).read_bytes()).hexdigest(),
+                          "sqlite_skip_policy_sha256": module.hashlib.sha256((root / module.SQLITE_SKIP_POLICY).read_bytes()).hexdigest(),
+                          "files": 3, "test_cases": 4,
+                          "case_identity_sha256": module.hashlib.sha256(json.dumps(sorted(selected.items())).encode()).hexdigest()}, manifest["selection"])
+        self.assertEqual(sorted(set(selected.values())), sorted(file for shard in manifest["shards"] for file in shard["files"]))
+        self.assertIn("Proved 4 selected MySQL-native tests in 3 files (of 9 discovered tests in 6 files)", stdout)
+        for index in (1, 2):
+            excluded = {node.text for node in ET.parse(root / f"phpunit-ci-mysql-{index}.xml").getroot().iter("exclude")}
+            self.assertTrue({"tests/A.php", "tests/B.php", "tests/D.phpt"} <= excluded)
+
+    def test_without_the_flag_the_manifest_has_no_selection_and_partitions_everything(self):
+        source, manifest, stdout, _ = self.run_isolated_main("--shards=2", "--prefix=phpunit-ci-mysql")
+        self.assertNotIn("selection", manifest)
+        self.assertEqual("every expanded source case, file and group appears exactly once", manifest["proof"])
+        self.assertEqual(sorted(source.files), sorted(file for shard in manifest["shards"] for file in shard["files"]))
+        self.assertIn(f"Proved {len(source.cases)} expanded tests in {len(source.files)} files across 2 nonempty shards.", stdout)
 
     def timings(self, files, fallback=1000):
         return module.Timings("mysql", "fixture", fallback, files, "0" * 64)
