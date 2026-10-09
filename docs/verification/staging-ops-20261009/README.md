@@ -208,7 +208,7 @@ Independent [build admission addendum](independent-review/BUILD-ADMISSION-ADDEND
 Codex on3b7d1b9 added4226365351 (same-SHA unhealthy retry reports success),4226365357 (first-install
 migration skips snapshot),4226365364 (already-mounted private bind omits persistent fstab entry).
 `same-sha-health-red.txt` retains2methods/2failures; `recovery-admission-red.txt` retains13methods/2failures.
-Expanded3method red adds a Bash failure-return property using a substituted sealed_release(){ return1; },
+Expanded3method red adds a Bash failure-return property using a substituted sealed_release() { return 1; },
 not an actual old Python-sealer defect. The independent genuine Python exit23 check confirms the old
 seal_tool already dies on such failure. `recovery-admission-expanded-red.txt` has2 product safety failures
 and1 defensive-return property failure; the explicit return guard is defense in depth.
@@ -227,3 +227,7 @@ then50 receipts are preserved; neither is relabeled as the committed run. Five B
 checks pass. First-install restore sets still do not establish historical encryption-key custody.
 
 Publication formatting strips only unittest progress whitespace and the empty-stdout assertion suffix in the new recovery reds; outcomes and traces are unchanged.
+
+Independent [recovery addendum](independent-review/RECOVERY-ADMISSION-ADDENDUM.md) **APPROVES exacta44664f4**, carried toea9e0568 by empty product-source diff and inspected docs. Expanded independent5methods pass (initial4methods includes18health states); historical3methods reproduce7safety failures, and actual old Python wrapper already refuses its genuine error. Evidence-only publication preserves runtime source.
+
+Two trailing spaces after empty assertion messages in the independent recovery red receipt were removed for `git diff --check`; command results and failure outcomes are unchanged.
