@@ -1,0 +1,45 @@
+# source: git archive 11d907026f42f2f85ae04adb1aaec98563718366 -> /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src (+ hardlinked vendor, .env, bootstrap/cache from wt-m16); harness = committed independent-review/probes, payloads = committed capture/
+# attempt 40-fpm-head.txt failed before any request (socket path > 108 chars); not counted
+fatal: not a git repository (or any of the parent directories): .git
+# pool a: PHP 8.4.26 (fpm-fcgi), root=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src (), VASEY_PHP_CLI_BINARY=/usr/bin/php8.4
+## family=resolve
+{"family":"resolve","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","resolved":"/usr/bin/php8.4"}
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Paid\\PaidGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":false,"reason":"storage_failed"}
+## family=production-free
+{"family":"production-free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\ProductionFree\\ProductionFreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=production-free-composed
+{"family":"production-free-composed","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","composed":true,"renderer_class":"App\\Domain\\Grants\\ProductionFree\\ProductionFreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=free&record=1
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","factory":"closure","ok":false,"reason":"storage_failed"}
+rc=0
+fatal: not a git repository (or any of the parent directories): .git
+# pool b: PHP 8.4.26 (fpm-fcgi), root=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src (), VASEY_PHP_CLI_BINARY=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link
+## family=resolve
+{"family":"resolve","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","resolved":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php"}
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Paid\\PaidGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=production-free-composed
+{"family":"production-free-composed","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","composed":true,"renderer_class":"App\\Domain\\Grants\\ProductionFree\\ProductionFreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":false,"reason":"storage_failed"}
+## family=paid&record=1
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link","root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Paid\\PaidGrantRendererProcess","factory":"closure","ok":false,"reason":"storage_failed"}
+rc=0
+fatal: not a git repository (or any of the parent directories): .git
+# pool c: PHP 8.4.26 (fpm-fcgi), root=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src (), VASEY_PHP_CLI_BINARY=<unset>
+## family=resolve
+{"family":"resolve","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","reason":"unconfigured","message":"A validated CLI PHP binary is unavailable.","previous":null}
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Grants\\Paid\\PaidGrantRendererProcess","ok":false,"reason":"storage_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":false,"reason":"render_failed"}
+rc=0

@@ -1,0 +1,16 @@
+/usr/bin/php8.4
+  probe-rule libraries=["\/usr\/lib\/x86_64-linux-gnu"]
+  child argv0='/usr/bin/php8.4'
+  child LD_LIBRARY_PATH='/usr/lib/x86_64-linux-gnu'
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php
+  probe-rule libraries=["\/tmp\/claude-0\/-home-user-VA-Studio\/819a7072-2821-506e-ba97-e0193a1820d0\/scratchpad\/m16-delta\/rootless\/opt\/lib\/x86_64-linux-gnu-real"]
+  child argv0='/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php'
+  child LD_LIBRARY_PATH='/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/lib/x86_64-linux-gnu-real'
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/nolib/bin/php
+  probe-rule libraries=[]
+  child argv0='/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/nolib/bin/php'
+  child LD_LIBRARY_PATH=false
+colon split demo: ["\/tmp\/claude-0\/-home-user-VA-Studio\/819a7072-2821-506e-ba97-e0193a1820d0\/scratchpad\/m16-delta\/colon\/a","b\/lib\/x86_64-linux-gnu"]
+-- nolib probe env:
+LANG=C
+LC_ALL=C

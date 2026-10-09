@@ -31,7 +31,8 @@ against `main`'s product source (`evidence/fpm-red-main.txt`, `evidence/fpm-red-
   (`dirname(binary, 2)/lib/<arch>`) from that binary. Flags, script, working directory, scrubbed environment, input and
   the 60 s limit pass through; each renderer still verifies its pinned profile and bounds its own output. In the CLI the
   container builds them exactly as before (no factory).
-- `IsolatedContractRenderer` (generic, not pinned): uses the resolver directly (WIP).
+- `IsolatedContractRenderer` (generic, not pinned): uses the resolver directly (WIP), and gives its child the same sibling
+  `lib/<arch>` loader path the probe validated the binary under (Codex P2 4228998422; delta review L-D1).
 - `ops/staging/validate-runtime.php`: new `runtime.php_cli_binary` check runs the same validation on the deploy's
   candidate environment. `ops/staging/env.staging.example` sets `VASEY_PHP_CLI_BINARY=/usr/bin/php8.4`;
   `docs/ops/staging-runbook.md` §7 describes the behaviour and the pre-enable host check.
@@ -69,13 +70,16 @@ CLI hashes: `evidence/*.cli-sha256.txt` and `evidence/cli-generic.txt`.
 | --- | --- | --- |
 | Binding tests red: final tests with `main`'s provider (no bindings) | 9 tests: the 6 Free/Paid tests fail (2 errors, 4 failures); the 3 family-256 tests pass by design; rc 2 | `evidence/binding-red-final.txt` |
 | Same with the final provider, plus the family-256 guards | 13 tests, 183 assertions, rc 0 | `evidence/binding-green-final.txt` |
-| Affected selection (103 files: Free, ProductionFree and Paid families, contract tests, resolver, validator), 3 shards, at `214256a4` | 75 + 557 + 533 = **1,165 tests, 0 failures**; 15 skips, all MySQL-only native cases; rc 0 each | `evidence/suites-214256a-shard-{0,1,2}.txt` |
+| Affected selection (103 files: Free, ProductionFree and Paid families, contract tests, resolver, validator), 3 shards, at `214256a4` | 75 + 557 + 533 = **1,165 tests, 0 failures**; 15 skips (the shard output records the count, not which cases; the selection's skips are MySQL-native by design); rc 0 each | `evidence/suites-214256a-shard-{0,1,2}.txt` |
 | `cli-server` treated as the CLI (review L-2), red | new unit case fails on `0f5890f0`, rc 1 | `evidence/cli-server-red.txt` |
 | Same, green, plus the focused M-16 files (resolver, Free/Paid/production-free CLI renderer, runtime validator, family-256 frozen-bytes and approval guards) | 7 files, 53 tests, 429 assertions, rc 0 each | `evidence/focused-cli-server-final.txt` |
 | Real `php -S` (cli-server) with `VASEY_PHP_CLI_BINARY` unset | free, paid and generic render with the same SHA-256 as the CLI | `evidence/cli-server-green.txt` |
 | Probe under the renderers' sibling library path (Codex P2 4228948830), red | a CLI that needs its sibling `lib/<arch>` is refused (`probe_failed`) at `fc779d06`, rc 2 | `evidence/probe-libraries-red.txt` |
 | Same, green: the 7 focused files | 54 tests, rc 0 each | `evidence/probe-libraries-green.txt` |
 | Genuine FPM smoke after that fix, with the independent reviewer's captured payloads | free, paid and composed production-free render with **exactly the reviewer's stored CLI SHA-256** (`c4e812cf…`, `20841190…`, `024b4fc9…`); generic `790fd796…`; shipped production-free and every family with the binary unset stay `render_failed`. A first attempt in this round had no capture directory mounted (harness `M16_CAPTURE_DIR`) and failed before rendering; it is not counted | `evidence/fpm-green-probe-libraries.txt` |
+| Generic renderer child under the validated binary's library path (Codex P2 4228998422), red | `11d90702` + new test: child gets no `LD_LIBRARY_PATH`, rc 1 | `evidence/generic-libraries-red.txt` |
+| Same, green: generic contract families (renderer, acceptance, issuance, successor, activation) plus the 7 focused files | 12 files, 150 tests, rc 0 each | `evidence/generic-libraries-green.txt` |
+| Genuine FPM smoke after that fix | free, paid, composed production-free match the stored CLI hashes; generic `790fd796…`; shipped production-free and every family unset stay `render_failed` | `evidence/fpm-green-generic-libraries.txt` |
 
 ## Independent review
 
@@ -84,6 +88,10 @@ REQUEST CHANGES for binding family 256, H-1, is fixed by `912f1e2`). Conditions 
 and upgrade note) and C3 (PR body) are met in the following commit, which also takes L-2 (`cli-server`) and fixes the
 I-3 docblock. Not taken: I-2 (an in-place rewrite of the binary within one second can reuse a cached validation; the
 binary is root-owned on the host) and L-1's remaining wording is covered by the upgrade note.
+
+`independent-review/delta-11d90702/DELTA-DECISION.md`: **APPROVE WITH CONDITIONS**; the approval extends to `11d90702`
+(cli-server as CLI and the probe loader path are sound; pins untouched). Its new finding L-D1 (the generic child lacked the
+loader path the probe validates under) is fixed in the following commit, which D-C1 re-checks. D-C2 (PR body) is met.
 
 ## Not tested
 

@@ -4,6 +4,7 @@ namespace App\Domain\Contracts;
 
 use App\Support\CanonicalJson;
 use App\Support\PhpCliBinary;
+use App\Support\PhpCliProcess;
 use Closure;
 use Symfony\Component\Process\Process;
 use Throwable;
@@ -36,6 +37,9 @@ final class IsolatedContractRenderer implements ContractRenderer
             }
             $environment['LANG'] = 'C'; $environment['LC_ALL'] = 'C'; $environment['TZ'] = 'UTC';
             $environment['TMPDIR'] = $workspace->path;
+            // The loader path the binary was validated under (rootless PHP with sibling libraries), as the pinned renderers set it.
+            $libraries = PhpCliProcess::libraries($binary);
+            if ($libraries !== []) { $environment['LD_LIBRARY_PATH'] = implode(PATH_SEPARATOR, $libraries); }
             $command = [$binary, '-d', 'memory_limit=128M', '-d', 'max_execution_time=60',
                 '-d', 'display_errors=stderr', '-d', 'log_errors=0', '-d', 'allow_url_fopen=0', '-d', 'allow_url_include=0',
                 '-d', 'open_basedir='.$projectRoot.PATH_SEPARATOR.$workspace->path,

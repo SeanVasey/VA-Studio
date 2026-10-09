@@ -1,0 +1,6 @@
+sapi=cli-server
+PHP_BINARY=/usr/bin/php8.4
+isCli=true
+path=/usr/bin/php8.4
+child=cli 8.4.26 rc=0
+fpm-unset=A validated CLI PHP binary is unavailable.

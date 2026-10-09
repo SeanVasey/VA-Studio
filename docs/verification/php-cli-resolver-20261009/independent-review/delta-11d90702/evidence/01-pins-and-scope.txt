@@ -1,0 +1,14 @@
+# 2026-10-09T10:14:40Z origin/main=e5e500cadae68958293089ccc2b4a22bcdb9df66 head=11d907026f42f2f85ae04adb1aaec98563718366
+git diff origin/main 11d90702 -- resources/contracts : rc=0 (0 = empty)
+git diff origin/main -- resources/contracts (worktree) : rc=0
+git diff 214256a4 11d90702 -- resources/contracts app/Domain scripts : rc=0
+product/config files changed in delta:
+.env.example
+app/Support/PhpCliBinary.php
+app/Support/PhpCliProcess.php
+config/app.php
+worktree foreign changes (not by reviewer, not in reviewed commit):
+ M app/Domain/Contracts/IsolatedContractRenderer.php
+ M tests/Feature/TestIsolatedContractRendererTest.php
+?? docs/verification/php-cli-resolver-20261009/evidence/generic-libraries-green.txt
+?? docs/verification/php-cli-resolver-20261009/evidence/generic-libraries-red.txt

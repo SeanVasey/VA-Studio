@@ -157,6 +157,33 @@ class TestIsolatedContractRendererTest extends TestCase
         $this->assertSame(array_slice($commands[0], 1), array_slice($commands[1], 1));
     }
 
+    /**
+     * Codex P2 (PR #67): a rootless CLI that needs its sibling `lib/<arch>` passes the probe under that loader path, so its
+     * render child gets the same path (`PhpCliProcess::libraries()`), as the pinned renderers' children do.
+     */
+    public function test_simulated_fpm_child_gets_the_validated_binarys_sibling_library_path(): void
+    {
+        $profile = ['test' => 'synthetic-profile']; $reply = $this->reply($profile);
+        $directory = sys_get_temp_dir().'/php-cli-rootless-'.bin2hex(random_bytes(8));
+        mkdir($directory.'/bin', 0700, true); mkdir($directory.'/lib/x86_64-linux-gnu', 0700, true);
+        $libraries = realpath($directory.'/lib/x86_64-linux-gnu');
+        $cli = $directory.'/bin/php';
+        file_put_contents($cli, "#!/bin/sh\n[ \"\$LD_LIBRARY_PATH\" = ".escapeshellarg($libraries)." ] || exit 127\nprintf '%s' "
+            .escapeshellarg('cli '.PHP_VERSION.' '.(PHP_ZTS ? '1' : '0').(PHP_DEBUG ? '1' : '0'))."\n"); chmod($cli, 0700);
+        $seen = [];
+        $capture = function ($command, $root, $environment, $payload) use (&$seen, $reply) {
+            $seen = [$command[0], $environment['LD_LIBRARY_PATH'] ?? null];
+            return new Process([PHP_BINARY, '-r', $this->outputCode($reply)], $root, $environment, $payload, 60);
+        };
+        try {
+            $this->app->instance(PhpCliBinary::class, new PhpCliBinary($cli, 'fpm-fcgi', '/usr/sbin/php-fpm8.4'));
+            (new IsolatedContractRenderer($capture))->render([], $profile);
+        } finally {
+            unlink($cli); rmdir($directory.'/bin'); rmdir($directory.'/lib/x86_64-linux-gnu'); rmdir($directory.'/lib'); rmdir($directory);
+        }
+        $this->assertSame([$cli, $libraries], $seen);
+    }
+
     public function test_secondary_database_transaction_blocks_rendering_before_process_creation(): void
     {
         config(['database.connections.contract_render_guard' => config('database.connections.'.config('database.default'))]);
