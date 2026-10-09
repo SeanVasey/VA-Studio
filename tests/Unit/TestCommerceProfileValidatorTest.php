@@ -107,9 +107,9 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validateFile(self::root().'/'.self::TEMPLATE, ['--template']);
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(35, $checks);
+        $this->assertCount(36, $checks);
         $this->assertNotContains(false, $checks);
-        $this->assertStringContainsString('RESULT: PASS (0 of 35 checks failed; template mode', $output);
+        $this->assertStringContainsString('RESULT: PASS (0 of 36 checks failed; template mode', $output);
         $this->assertNoSecretPrinted($output);
     }
 
@@ -128,7 +128,7 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validate(self::filled());
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(35, $checks);
+        $this->assertCount(36, $checks);
         $this->assertNotContains(false, $checks);
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
@@ -144,6 +144,7 @@ class TestCommerceProfileValidatorTest extends TestCase
             'secret key' => ['STRIPE_TEST_SECRET_KEY', 'invalid-file-key', self::FILLED['<sk_test_KEY>'], 'stripe.secret_key_test'],
             'origin' => ['APP_URL', 'https://different.synthetic.invalid', 'https://staging.synthetic.invalid', 'runtime.app_url_equals_return_origin'],
             'production boundary' => ['PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED', 'true', 'false', 'boundary.out_of_profile_families_off'],
+            'guest ownership cookie' => ['SESSION_HTTP_ONLY', 'false', 'true', 'runtime.session_http_only'],
         ];
     }
 
@@ -184,6 +185,8 @@ class TestCommerceProfileValidatorTest extends TestCase
             'loopback http origin' => [static fn (string $p): string => str_replace('https://staging.synthetic.invalid', 'http://localhost', $p), 'commerce.checkout_https_origin'],
             'sync queue' => [$set('QUEUE_CONNECTION', 'sync'), 'runtime.queue_database'],
             'insecure session cookie' => [$set('SESSION_SECURE_COOKIE', 'false'), 'runtime.session_secure_cookie'],
+            'script-readable session cookie' => [$set('SESSION_HTTP_ONLY', 'false'), 'runtime.session_http_only'],
+            'quoted script-readable session cookie' => [$set('SESSION_HTTP_ONLY', '"false"'), 'runtime.session_http_only'],
             'live stripe mode' => [$set('STRIPE_MODE', 'live'), 'stripe.mode_test'],
             'restricted key' => [$set('STRIPE_TEST_SECRET_KEY', 'rk_test_SyntheticValidatorKey123456'), 'stripe.secret_key_test'],
             'live key anywhere' => [$set('STRIPE_TEST_SECRET_KEY', 'sk_'.'live_'.'SyntheticValidatorKey123456') /* split so secret scanning does not read a synthetic value as a live key */, 'profile.no_live_keys'],

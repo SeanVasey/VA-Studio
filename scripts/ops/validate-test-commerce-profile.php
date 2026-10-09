@@ -217,6 +217,8 @@ if ($booted) {
     $attempt('runtime.queue_database', 'QUEUE_CONNECTION is database (receipt, finalization and contract jobs need an asynchronous queue).',
         fn () => config('queue.default') === 'database' && config('queue.connections.database.driver') === 'database');
     $attempt('runtime.session_secure_cookie', 'SESSION_SECURE_COOKIE is true.', fn () => config('session.secure') === true);
+    $attempt('runtime.session_http_only', 'SESSION_HTTP_ONLY is true (the guest session owns order and download access).',
+        fn () => config('session.http_only') === true);
 
     // ---- Stripe test mode
     $attempt('stripe.mode_test', 'STRIPE_MODE is test.', fn () => config('payments.stripe.mode') === 'test');
