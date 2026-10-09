@@ -123,4 +123,19 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | CLI PHP Binary For Child Processes
+    |--------------------------------------------------------------------------
+    |
+    | Renderer children need the CLI PHP. Under PHP-FPM, PHP_BINARY is the FPM
+    | daemon, so non-CLI SAPIs require this absolute path to a CLI binary of
+    | the exact running PHP version (App\Support\PhpCliBinary validates it).
+    | Unset under FPM, rendering fails closed. The CLI and its built-in server
+    | (`php -S`, `artisan serve`) ignore it and use their own PHP_BINARY.
+    |
+    */
+
+    'php_cli_binary' => env('VASEY_PHP_CLI_BINARY'),
+
 ];

@@ -1,0 +1,120 @@
+<?php
+
+// Independent-review probe (not a product test). Copied to tests/Feature/ReviewCaptureProbeTest.php in the scratch
+// worktree /home/user/rv-m16-red (dac1a79, provider untouched) and run in the CLI. For each pinned family it records,
+// in REVIEW_CAPTURE_DIR: the renderer's exact stdin payload, the argument vector and environment keys it built, and the
+// SHA-256 of the stored PDF. A real php-fpm request later renders the same payload; hashes and argv are compared.
+
+namespace Tests\Feature;
+
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Grants\Free\FreeGrantDocuments;
+use App\Domain\Grants\Free\FreeGrantRecords;
+use App\Domain\Grants\Free\FreeGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantRecords;
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrants;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
+use App\Domain\Contracts\ContractFiles;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FreeGrantFixtures;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\ProductionFreeGrantFixtures;
+use Tests\TestCase;
+
+final class ReviewCaptureProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use ProductionCheckoutJourneyFixture;
+    use ProductionFreeGrantFixtures;
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        if ($this->name() === 'test_capture_paid') {
+            $this->preparePaidDependencies();
+        }
+    }
+
+    private function capturing(string $class, string $name): void
+    {
+        $directory = (string) getenv('REVIEW_CAPTURE_DIR');
+        $this->app->instance($class, new $class(function (array $command, string $cwd, array $environment, string $payload) use ($directory, $name): Process {
+            file_put_contents($directory.'/'.$name.'.payload.json', $payload);
+            $workspace = (string) $environment['TMPDIR'];
+            file_put_contents($directory.'/'.$name.'.cli-argv.json', json_encode([
+                'argv' => array_map(fn ($a) => str_replace($workspace, '{workspace}', $a), $command),
+                'cwd' => $cwd,
+                'env_set' => array_keys(array_filter($environment, fn ($v) => $v !== false)),
+                'env_values' => array_map(fn ($v) => str_replace($workspace, '{workspace}', (string) $v), array_filter($environment, fn ($v) => $v !== false)),
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+            return new Process($command, $cwd, $environment, $payload, 60);
+        }));
+    }
+
+    public function test_capture_free(): void
+    {
+        $this->fakePrivateMediaStorage();
+        $f = FreeGrantFixtures::source();
+        $accepted = FreeGrantFixtures::accept($f, FreeGrantFixtures::publish($f))['origin'];
+        $this->capturing(FreeGrantRendererProcess::class, 'free');
+        (new FreeGrantDocuments)->issue($accepted['id'], $accepted['originHash'], $f['customer']['principal'], $f['customer']['user']);
+        $bytes = (new ContractFiles)->verify(FreeGrantRecords::decode((array) DB::table('free_originals')->sole())['artifact']);
+        file_put_contents(getenv('REVIEW_CAPTURE_DIR').'/free.stored-sha256', hash('sha256', $bytes));
+        $this->assertStringStartsWith('%PDF-', $bytes);
+    }
+
+    public function test_capture_production_free(): void
+    {
+        $this->freeSetup();
+        $definition = $this->openDefinition();
+        $owner = $this->customer();
+        $grants = new ProductionFreeGrants;
+        $review = $grants->review($definition['id'], 'Declared Synthetic Buyer', $owner['principal'], $owner['user']);
+        $origin = $grants->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']);
+        $this->capturing(ProductionFreeGrantRendererProcess::class, 'production-free');
+        (new ProductionFreeGrantDocuments)->render($origin['id']);
+        $sha = (string) DB::table('production_free_originals')->value('sha256');
+        file_put_contents(getenv('REVIEW_CAPTURE_DIR').'/production-free.stored-sha256', $sha);
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/', $sha);
+    }
+
+    public function test_capture_paid(): void
+    {
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        Queue::fake();
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $batch = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->capturing(PaidGrantRendererProcess::class, 'paid');
+        (new PaidGrantDocuments)->prepare($batch['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
+        $bytes = file_get_contents(Storage::disk('local')->path($manifest['artifact']['storage_path']));
+        file_put_contents(getenv('REVIEW_CAPTURE_DIR').'/paid.stored-sha256', hash('sha256', $bytes));
+        $this->assertStringStartsWith('%PDF-1.', $bytes);
+    }
+}

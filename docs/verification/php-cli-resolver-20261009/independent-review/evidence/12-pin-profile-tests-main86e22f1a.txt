@@ -1,0 +1,24 @@
+$ /home/user/rv-m16/docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+# cwd: /home/user/rv-m16-main  date: 2026-10-09T08:58:51Z
+# source: 86e22f1add4e3b0cf05e79af4946e9bcfa4d9afe root=/home/user/rv-m16-main public/build present: no
+# git status --short (product paths): 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16-main/phpunit.xml
+
+..F                                                                 3 / 3 (100%)
+
+Time: 00:00.508, Memory: 59.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantFrozenBytesTest::test_no_paid_lane_or_old_free_family_file_is_copied_or_imported
+Failed asserting that directory "/home/user/rv-m16-main/app/Domain/Grants/Paid" does not exist.
+
+/home/user/rv-m16-main/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php:68
+/home/user/rv-m16-main/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 79, Failures: 1.
+# rc=1

@@ -1,0 +1,16 @@
+# exact source 11d907026f42f2f85ae04adb1aaec98563718366, porcelain lines 0; harness copied from /home/user/wt-m16/docs/verification/php-cli-resolver-20261009/independent-review (committed in this head)
+[09-Oct-2026 10:11:13] WARNING: [pool review] cannot bind to UNIX socket '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/run/dh/fpm.sock' as path is too long (found length: 120, maximal length: 108), trying cut socket path instead '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/ru'
+# pool dh: PHP 8.4.26 (fpm-fcgi), root=/home/user/wt-m16 (11d907026f42), VASEY_PHP_CLI_BINARY=/usr/bin/php8.4
+## family=resolve
+Listening socket's path name is too long.
+rc=232
+[09-Oct-2026 10:11:24] WARNING: [pool review] cannot bind to UNIX socket '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/run/dhr/fpm.sock' as path is too long (found length: 121, maximal length: 108), trying cut socket path instead '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/ru'
+# pool dhr: PHP 8.4.26 (fpm-fcgi), root=/home/user/wt-m16 (11d907026f42), VASEY_PHP_CLI_BINARY=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link
+## family=resolve
+Listening socket's path name is too long.
+rc=232
+[09-Oct-2026 10:11:34] WARNING: [pool review] cannot bind to UNIX socket '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/run/dhu/fpm.sock' as path is too long (found length: 121, maximal length: 108), trying cut socket path instead '/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/fpm-harness/ru'
+# pool dhu: PHP 8.4.26 (fpm-fcgi), root=/home/user/wt-m16 (11d907026f42), VASEY_PHP_CLI_BINARY=<unset>
+## family=resolve
+Listening socket's path name is too long.
+rc=232

@@ -33,7 +33,7 @@ class StagingRuntimeValidatorTest extends TestCase
             'CACHE_STORE=database', 'QUEUE_CONNECTION=database', 'DB_QUEUE_RETRY_AFTER=1200',
             'DB_CONNECTION=mysql', 'DB_HOST=127.0.0.1', 'DB_DATABASE=vasey_staging',
             'DB_USERNAME=vasey_app', 'DB_PASSWORD=SyntheticPrivateRuntimeMarker',
-            'FILESYSTEM_DISK=local', 'MAIL_MAILER=log', 'STRIPE_MODE=test', '',
+            'FILESYSTEM_DISK=local', 'MAIL_MAILER=log', 'STRIPE_MODE=test', 'VASEY_PHP_CLI_BINARY='.PHP_BINARY, '',
         ]);
     }
 
@@ -95,6 +95,25 @@ class StagingRuntimeValidatorTest extends TestCase
         $this->assertSame(1, $process->getExitCode(), $process->getErrorOutput());
         $this->assertStringContainsString('FAIL '.$failure, $process->getErrorOutput());
         $this->assertStringNotContainsString('PASS runtime.profile', $process->getOutput());
+    }
+
+    public static function cliBinaries(): array
+    {
+        return [
+            'unset' => [''],
+            'relative' => ['php8.4'],
+            'missing' => ['/nonexistent/synthetic/php8.4'],
+            'not executable' => ['/etc/hostname'],
+        ];
+    }
+
+    /** M-16: a renderer child started inside an FPM request needs a genuine CLI PHP of the running version. */
+    #[DataProvider('cliBinaries')]
+    public function test_an_unusable_cli_binary_for_renderer_children_is_refused(string $binary): void
+    {
+        $process = $this->validate(str_replace('VASEY_PHP_CLI_BINARY='.PHP_BINARY, 'VASEY_PHP_CLI_BINARY='.$binary, $this->profile()));
+        $this->assertSame(1, $process->getExitCode(), $process->getErrorOutput());
+        $this->assertSame("FAIL runtime.php_cli_binary\n", $process->getErrorOutput());
     }
 
     public function test_replacing_the_served_key_is_refused_before_configuration_changes(): void

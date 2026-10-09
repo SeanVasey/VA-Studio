@@ -1,0 +1,15 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/validator-privacy.sh
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:13:45Z
+== configured=<dir>/ReviewPathMarker7f3a/php-ok rc=0
+(no php_cli_binary line)
+marker absent from output
+== configured=<dir>/ReviewPathMarker7f3a/php-83 rc=1
+FAIL runtime.php_cli_binary
+marker absent from output
+== configured=<dir>/ReviewPathMarker7f3a/php-fpm rc=1
+FAIL runtime.php_cli_binary
+marker absent from output
+== configured=<dir>/ReviewPathMarker7f3a/missing rc=1
+FAIL runtime.php_cli_binary
+marker absent from output
+# rc=0

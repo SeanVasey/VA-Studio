@@ -1,0 +1,8 @@
+# source: export of 11d90702 at /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/src; simulated fpm-fcgi resolver bound in container; CLI host
+App\Domain\Contracts\IsolatedContractRenderer reason=render_failed
+rc=0
+-- generic child env as the stand-in saw it:
+LANG=C
+LC_ALL=C
+TMPDIR=<workspace>
+TZ=UTC

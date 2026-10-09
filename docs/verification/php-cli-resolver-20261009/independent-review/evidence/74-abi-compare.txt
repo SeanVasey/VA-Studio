@@ -1,0 +1,33 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/abi-compare.sh
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:13:02Z
+== /usr/bin/php8.4
+PHP 8.4.26 (cli) (built: Sep 24 2026 17:15:37) (NTS)
+[PHP Modules] Core date filter hash json libxml openssl pcntl pcre random Reflection session sodium SPL standard zlib  [Zend Modules]  
+PHP API => 20240924
+Zend Extension Build => API420240924,NTS
+PHP Extension Build => API20240924,NTS
+Debug Build => no
+Thread Safety => disabled
+Linked Version => 1.3
+== /usr/sbin/php-fpm8.4
+PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 17:15:37) (NTS)
+[PHP Modules] cgi-fcgi Core date filter hash json libxml openssl pcre random Reflection session sodium SPL standard zlib  [Zend Modules]  
+PHP API => 20240924
+Zend Extension Build => API420240924,NTS
+PHP Extension Build => API20240924,NTS
+Debug Build => no
+Thread Safety => disabled
+Linked Version => 1.3
+== /usr/bin/php8.3
+PHP 8.3.6 (cli) (built: Sep  2 2026 12:56:02) (NTS)
+[PHP Modules] Core date filter hash json libxml openssl pcntl pcre random Reflection session sodium SPL standard zlib  [Zend Modules]  
+PHP API => 20230831
+Zend Extension Build => API420230831,NTS
+PHP Extension Build => API20230831,NTS
+Debug Build => no
+Thread Safety => disabled
+Linked Version => 1.3
+== ldd zlib
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f849e9d3000)
+	libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f3e11e53000)
+# rc=0

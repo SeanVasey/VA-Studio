@@ -1,0 +1,24 @@
+# Red: generic child without the validated binary's library path (Codex P2 4228998422); source 11d9070 + new test only
+Configuration: /home/user/wt-m16/phpunit.xml
+
+Time: 00:00.273, Memory: 61.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\TestIsolatedContractRendererTest::test_simulated_fpm_child_gets_the_validated_binarys_sibling_library_path
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => '/tmp/php-cli-rootless-197d32005d48985e/bin/php',
+-    1 => '/tmp/php-cli-rootless-197d32005d48985e/lib/x86_64-linux-gnu',
++    1 => null,
+ ]
+
+/home/user/wt-m16/tests/Feature/TestIsolatedContractRendererTest.php:184
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1

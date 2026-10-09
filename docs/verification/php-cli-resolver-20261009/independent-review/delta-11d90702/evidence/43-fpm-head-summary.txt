@@ -1,0 +1,23 @@
+# pool a: PHP 8.4.26 (fpm-fcgi) | cli= /usr/bin/php8.4
+   {"family": "resolve", "resolved": "/usr/bin/php8.4"}
+   {"family": "free", "ok": true, "sha256": "c4e812cfa40b"}
+   {"family": "paid", "ok": true, "sha256": "208411902445"}
+   {"family": "generic", "ok": true, "sha256": "790fd79695a5"}
+   {"family": "production-free", "reason": "render_failed", "ok": false}
+   {"family": "production-free-composed", "ok": true, "sha256": "024b4fc926fd", "composed": true}
+   {"family": "free", "ok": true, "sha256": "c4e812cfa40b", "factory": "closure", "child_env_keys": ["LANG", "LC_ALL", "LD_LIBRARY_PATH", "TMPDIR", "TZ"], "child_LD_LIBRARY_PATH": "/usr/lib/x86_64-linux-gnu", "argv0": "/usr/bin/php8.4", "renderer_built_argv0": "/usr/sbin/php-fpm8.4"}
+rc=0
+# pool b: PHP 8.4.26 (fpm-fcgi) | cli= $S/rootless/php-link
+   {"family": "resolve", "resolved": "$S/rootless/opt/bin/php"}
+   {"family": "free", "ok": true, "sha256": "c4e812cfa40b"}
+   {"family": "paid", "ok": true, "sha256": "208411902445"}
+   {"family": "production-free-composed", "ok": true, "sha256": "024b4fc926fd", "composed": true}
+   {"family": "generic", "reason": "render_failed", "ok": false}
+   {"family": "paid", "ok": true, "sha256": "208411902445", "factory": "closure", "child_env_keys": ["LANG", "LC_ALL", "LD_LIBRARY_PATH", "TMPDIR", "TZ"], "child_LD_LIBRARY_PATH": "$S/rootless/opt/lib/x86_64-linux-gnu-real", "argv0": "$S/rootless/opt/bin/php", "renderer_built_argv0": "/usr/sbin/php-fpm8.4"}
+rc=0
+# pool c: PHP 8.4.26 (fpm-fcgi) | cli= <unset>
+   {"family": "resolve", "reason": "unconfigured"}
+   {"family": "free", "reason": "render_failed", "ok": false}
+   {"family": "paid", "reason": "render_failed", "ok": false}
+   {"family": "generic", "reason": "render_failed", "ok": false}
+rc=0

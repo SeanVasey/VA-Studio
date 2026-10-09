@@ -1,0 +1,44 @@
+# Focused M-16 tests after the cli-server change: source 0f5890f + working tree (committed next)
+# php 8.4.26
+## tests/Unit/PhpCliBinaryTest.php
+
+Time: 00:00.087, Memory: 24.50 MB
+
+OK (13 tests, 99 assertions)
+rc=0
+## tests/Feature/FreeGrantCliRendererTest.php
+
+Time: 00:06.983, Memory: 96.00 MB
+
+OK (3 tests, 14 assertions)
+rc=0
+## tests/Feature/PaidGrantCliRendererTest.php
+
+Time: 00:17.360, Memory: 102.00 MB
+
+OK (3 tests, 45 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantCliRendererTest.php
+
+Time: 00:06.315, Memory: 89.00 MB
+
+OK (3 tests, 15 assertions)
+rc=0
+## tests/Unit/StagingRuntimeValidatorTest.php
+
+Time: 00:04.139, Memory: 24.50 MB
+
+OK (17 tests, 79 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+
+Time: 00:00.246, Memory: 59.00 MB
+
+OK (3 tests, 103 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php
+
+Time: 00:16.029, Memory: 93.00 MB
+
+OK (11 tests, 74 assertions)
+rc=0

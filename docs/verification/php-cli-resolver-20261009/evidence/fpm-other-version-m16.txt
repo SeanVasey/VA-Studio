@@ -1,0 +1,3 @@
+# pool v83: php-fpm8.4 8.4.26, root=/home/user/wt-m16, VASEY_PHP_CLI_BINARY=/usr/bin/php8.3
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.3","app_env":"local","ok":false,"reason":"render_failed"}

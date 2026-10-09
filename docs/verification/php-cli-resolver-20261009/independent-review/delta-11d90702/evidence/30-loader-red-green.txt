@@ -1,0 +1,17 @@
+== old
+ERROR: ld.so: object '/evil/pre.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php => REFUSED A validated CLI PHP binary is unavailable. prev=false
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link => REFUSED A validated CLI PHP binary is unavailable. prev=false
+rc=0
+-- env the stand-in saw (filtered):
+LANG=C
+LC_ALL=C
+== new
+ERROR: ld.so: object '/evil/pre.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php => OK /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php
+/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/php-link => OK /tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/bin/php
+rc=0
+-- env the stand-in saw (filtered):
+LANG=C
+LC_ALL=C
+LD_LIBRARY_PATH=/tmp/claude-0/-home-user-VA-Studio/819a7072-2821-506e-ba97-e0193a1820d0/scratchpad/m16-delta/rootless/opt/lib/x86_64-linux-gnu-real

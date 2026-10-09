@@ -1,0 +1,86 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantRecords;
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrants;
+use Closure;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
+use ReflectionProperty;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\PhpCliWrapperFixture;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+
+/** M-16 evidence probe (not a product test): captures the paid renderer payload and CLI hash. Outside the CLI, the pinned paid renderer's child runs through the validated CLI binary, unchanged otherwise. */
+final class M16CapturePaidProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use PhpCliWrapperFixture;
+    use ProductionCheckoutJourneyFixture;
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        $this->preparePaidDependencies();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
+        Queue::fake();
+    }
+
+    private function retained(): array
+    {
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $f['batch'] = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+
+        return $f;
+    }
+
+    public function test_capture_paid(): void
+    {
+        $f = $this->retained();
+        $directory = (string) getenv('M16_CAPTURE_DIR');
+        $this->app->instance(PaidGrantRendererProcess::class, new PaidGrantRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use ($directory): \Symfony\Component\Process\Process {
+            file_put_contents($directory.'/paid.payload.json', $payload);
+
+            return new \Symfony\Component\Process\Process($command, $cwd, $environment, $payload, 60);
+        }));
+        (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
+        $bytes = file_get_contents(Storage::disk('local')->path($manifest['artifact']['storage_path']));
+        file_put_contents($directory.'/paid.cli-sha256', hash('sha256', $bytes));
+        $this->assertStringStartsWith('%PDF-1.', $bytes);
+    }
+
+    private function factoryOf(PaidGrantRendererProcess $renderer): ?Closure
+    {
+        return (new ReflectionProperty($renderer, 'processFactory'))->getValue($renderer);
+    }
+}

@@ -1,0 +1,4 @@
+$ php docs/verification/php-cli-resolver-20261009/independent-review/probes/review-fpm-smoke.php generic 1
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:10:50Z
+{"family":"generic","sapi":"cli","php_binary":"/usr/bin/php8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf"}
+# rc=0

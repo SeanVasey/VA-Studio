@@ -1,0 +1,3 @@
+$ git diff --stat e5e500ca 214256a -- resources/contracts app/Domain/Grants scripts/render-free-grant.php scripts/render-production-free-grant.php scripts/render-paid-grant.php
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:40:18Z
+# rc=0

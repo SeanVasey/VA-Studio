@@ -192,50 +192,35 @@ account:
 
 Staff can see read-only state in the admin under **Test contract issuance** and **Test payment exceptions**.
 
-## 7. Known blocker: free-grant documents under PHP-FPM
+## 7. Renderer children under PHP-FPM (M-16)
 
-**Finding (verified).** Free-grant PDF rendering runs inside the web request
-(`POST /free-grants/origins/{origin}/document`, `FreeGrantController.php:89`). It starts
-`[PHP_BINARY, '-n', ..., scripts/render-free-grant.php]` (`app/Domain/Grants/Free/FreeGrantRendererProcess.php:81`).
+**Why.** Contract and grant PDFs render in a bounded child process. Free, production-free and paid grant documents
+render inside the web request (for example `POST /free-grants/origins/{origin}/document`). Under PHP-FPM, `PHP_BINARY`
+is the FPM daemon: on PHP 8.4.26 a `[PHP_BINARY, '-n', ...]` spawn exits 64 with php-fpm's usage text, so every such
+render failed closed with `render_failed` (`docs/verification/php-cli-resolver-20261009/`).
 
-Under PHP-FPM, `PHP_BINARY` is the FPM binary. On a scratch PHP 8.4.26 FPM pool behind nginx, a request
-reported:
-- `PHP_SAPI=fpm-fcgi`;
-- `PHP_BINARY=/usr/sbin/php-fpm8.4`.
+**What runs now.**
+- In the CLI (queue workers, Artisan, tests) every renderer still spawns its own `PHP_BINARY`, unchanged.
+- Outside the CLI, children run the binary named by `VASEY_PHP_CLI_BINARY` (`config('app.php_cli_binary')`), after
+  `App\Support\PhpCliBinary` proves it: an absolute path whose canonical target is a regular executable file, and a
+  scrubbed-environment `-n` probe (10 s, at most 128 bytes, no stderr) that reports the `cli` SAPI, exactly the
+  running `PHP_VERSION` and the same thread-safety and debug build. Success is cached per file identity; a replaced
+  binary is probed again. Unset, invalid or mismatched fails closed with `render_failed`; the path is never shown.
+- The pinned renderers (`FreeGrantRendererProcess`, `ProductionFreeGrantRendererProcess`, `PaidGrantRendererProcess`)
+  are frozen by their contract profiles, so they are not edited. The container gives the free and paid renderers,
+  outside the CLI only, a process factory (`App\Support\PhpCliProcess`). Family 256 (production free grants) ships
+  unbound by design; the step that composes and mounts it must add the same binding. The factory replaces just the
+  executable and re-derives the fixed sibling library directory from the CLI binary. Flags, script, working directory, scrubbed environment, input and the 60 s
+  limit are unchanged, and each renderer still verifies its pinned profile and bounds its output.
+- Do not point `VASEY_PHP_CLI_BINARY` at `/usr/bin/php`: it is an `update-alternatives` link that can move to another
+  version. A move is caught by the probe, but then rendering stops until the setting is fixed.
 
-The same `[PHP_BINARY, '-n', '-d', ..., script]` spawn exited 64 and printed php-fpm's usage text instead of
-running the script. The renderer therefore fails closed with `render_failed`. With `/usr/bin/php8.4` in place
-of `PHP_BINARY`, the same spawn from the same FPM request ran the child under `cli` (exit 0).
-
-The same pattern is in:
-- `app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php:61,81` (unmounted);
-- `app/Domain/Grants/Paid/PaidGrantRendererProcess.php:60,80` on the Paid252 branch. Its document route
-  renders inside the HTTP request, so the same failure would hit paid delivery once mounted.
-
-`IsolatedContractRenderer` (test contracts) is unaffected because it runs in the `contracts` queue worker,
-which is the CLI.
-
-**Required fix (product code, needs independent review):**
-1. Resolve the child binary through one helper instead of `PHP_BINARY`:
-   - under `PHP_SAPI === 'cli'`, keep `PHP_BINARY` (workers and tests are unchanged);
-   - otherwise use an explicit configured absolute CLI path, for example `config('contracts.php_cli_binary')`
-     from a new `VASEY_PHP_CLI_BINARY`, set to `/usr/bin/php8.4` on staging.
-2. Validate it before use: absolute path, `realpath` equal to the configured path, a regular executable file,
-   and a one-time `-n -r 'echo PHP_VERSION;'` probe that matches the parent's `PHP_VERSION`.
-   - A mismatch or a missing value fails closed with `render_failed`.
-   - Do not use Symfony's `PhpExecutableFinder`: it returns `/usr/bin/php`, an `update-alternatives` link that
-     can point at another PHP version.
-3. Derive the `LD_LIBRARY_PATH` sibling directory from the resolved CLI path, not `PHP_BINARY`.
-4. Use the helper in `FreeGrantRendererProcess`, `ProductionFreeGrantRendererProcess`, Paid252's
-   `PaidGrantRendererProcess` and, for consistency, `IsolatedContractRenderer`.
-5. Add regression tests:
-   - a resolver unit test with an injected SAPI and binary (FPM without a configured path refuses; FPM with a
-     valid path returns it; a version mismatch refuses);
-   - an ops check that renders one synthetic document through the real FPM pool before free grants are
-     enabled on a host.
-
-Until that lands, keep `VASEY_TEST_FREE_GRANTS_ENABLED=false` on staging and leave free downloads out of
-Monday.
+**Host checks.**
+1. `ops/staging/validate-runtime.php` (run by every deploy and `ctl refresh`) fails `runtime.php_cli_binary` unless the
+   configured binary passes the same probe the FPM pool will run.
+2. Before enabling free grants (`VASEY_TEST_FREE_GRANTS_ENABLED=true`), render one synthetic document through the real
+   FPM pool and confirm a PDF, not `render_failed`. The harness used for the evidence is in
+   `docs/verification/php-cli-resolver-20261009/`.
 
 ## 8. Backups and the restore proof
 

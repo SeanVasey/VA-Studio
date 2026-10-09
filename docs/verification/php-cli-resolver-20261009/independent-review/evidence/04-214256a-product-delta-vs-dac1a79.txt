@@ -1,0 +1,5 @@
+$ git diff --stat dac1a79 214256a -- app config ops resources routes bootstrap
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:40:18Z
+ app/Providers/AppServiceProvider.php | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+# rc=0

@@ -1,0 +1,60 @@
+$ /home/user/rv-m16/docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh --filter \(CliRendererTest\|test_shipped_configuration_is_literally_default_off\) tests/Feature
+# cwd: /home/user/rv-m16-red  date: 2026-10-09T09:38:52Z
+# source: 214256a474e6913742206cf1e2fd451ec6b91253 root=/home/user/rv-m16-red public/build present: no
+# git status --short (product paths):  M app/Providers/AppServiceProvider.php 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16-red/phpunit.xml
+
+FEFFEF....                                                        10 / 10 (100%)
+
+Time: 00:34.168, Memory: 195.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_the_document_renders_through_the_configured_cli_with_the_pinned_arguments
+ErrorException: Undefined array key 0
+
+/home/user/rv-m16-red/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/rv-m16-red/tests/Feature/FreeGrantCliRendererTest.php:45
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantCliRendererTest::test_outside_the_cli_the_original_renders_through_the_configured_cli_with_the_pinned_arguments
+ErrorException: Undefined array key 0
+
+/home/user/rv-m16-red/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/home/user/rv-m16-red/tests/Feature/PaidGrantCliRendererTest.php:85
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 4 failures:
+
+1) Tests\Feature\FreeGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+Failed asserting that null is an instance of class Closure.
+
+/home/user/rv-m16-red/tests/Feature/FreeGrantCliRendererTest.php:28
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_the_render_fails_closed_before_any_child
+An unconfigured CLI binary cannot render.
+
+/home/user/rv-m16-red/tests/Feature/FreeGrantCliRendererTest.php:62
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+Failed asserting that null is an instance of class Closure.
+
+/home/user/rv-m16-red/tests/Feature/PaidGrantCliRendererTest.php:70
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_no_original_is_published
+An unconfigured CLI binary cannot render.
+
+/home/user/rv-m16-red/tests/Feature/PaidGrantCliRendererTest.php:98
+/home/user/rv-m16-red/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 67, Errors: 2, Failures: 4.
+# rc=2

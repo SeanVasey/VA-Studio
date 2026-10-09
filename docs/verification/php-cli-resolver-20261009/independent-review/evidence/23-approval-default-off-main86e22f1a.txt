@@ -1,0 +1,15 @@
+$ /home/user/rv-m16/docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh --filter test_shipped_configuration_is_literally_default_off tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php
+# cwd: /home/user/rv-m16-main  date: 2026-10-09T09:07:05Z
+# source: 86e22f1add4e3b0cf05e79af4946e9bcfa4d9afe root=/home/user/rv-m16-main public/build present: no
+# git status --short (product paths): 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16-main/phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 00:01.617, Memory: 77.00 MB
+
+OK (1 test, 6 assertions)
+# rc=0

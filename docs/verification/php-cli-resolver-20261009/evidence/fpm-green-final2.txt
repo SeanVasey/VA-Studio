@@ -1,0 +1,11 @@
+# pool g5: php-fpm8.4 8.4.26, root=/home/user/wt-m16, VASEY_PHP_CLI_BINARY=/usr/bin/php8.4
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"d3fb73c9ba4970154856af8eb0dbd3b339026ab7783a0dbd83a19f386bb91053","size_bytes":760378,"composed":false}
+## family=production-free
+{"family":"production-free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":false,"reason":"render_failed"}
+## family=production-free-composed
+{"family":"production-free-composed","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"2e5f8b94372998ba957df397bc3c12c20d6474430ccd99afa00aa00256bf7cee","size_bytes":759094,"composed":true}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"c30389d30bf42fb36ba7606568289fae783ec81d5487aefccda3423a581d2747","size_bytes":809234,"composed":false}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf","size_bytes":751516,"composed":false}

@@ -1,0 +1,14 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/run-fpm.sh red-main /home/user/rv-m16-main '' family=raw family=free family=production-free family=paid family=generic
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:10:33Z
+# pool red-main: PHP 8.4.26 (fpm-fcgi), root=/home/user/rv-m16-main (86e22f1add4e), VASEY_PHP_CLI_BINARY=<unset>
+## family=raw
+{"family":"raw","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16-main","exit":64,"stdout_head":"Usage: php-fpm8.4 [-n] [-e] [-h] [-i] [-m] [-v] [-t] [-p <pr"}
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16-main","renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":false,"reason":"render_failed"}
+## family=production-free
+{"family":"production-free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16-main","renderer_class":"App\\Domain\\Grants\\ProductionFree\\ProductionFreeGrantRendererProcess","ok":false,"reason":"render_failed"}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16-main","renderer_class":"App\\Domain\\Grants\\Paid\\PaidGrantRendererProcess","ok":false,"reason":"render_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"root":"/home/user/rv-m16-main","renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":false,"reason":"render_failed"}
+# rc=0

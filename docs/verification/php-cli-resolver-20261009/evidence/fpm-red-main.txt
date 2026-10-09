@@ -1,0 +1,9 @@
+# pool red-main: php-fpm8.4 8.4.26, root=/home/user/wt-embed, VASEY_PHP_CLI_BINARY=<unset>
+## family=raw
+{"family":"raw","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","exit":64,"stdout_head":"Usage: php-fpm8.4 [-n] [-e] [-h] [-i] [-m] [-v] [-t] [-p <pr","stderr_head":""}
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}
+## family=production-free
+{"family":"production-free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}

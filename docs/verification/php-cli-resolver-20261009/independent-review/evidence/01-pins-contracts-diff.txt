@@ -1,0 +1,3 @@
+$ git diff --stat 86e22f1a dac1a79 -- resources/contracts app/Domain/Grants scripts
+# cwd: /home/user/rv-m16  date: 2026-10-09T08:57:12Z
+# rc=0
