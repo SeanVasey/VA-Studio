@@ -172,3 +172,5 @@ limits above still apply. The independent final decision is recorded separately;
 not a substitute for that decision.
 
 Publication formatting removes trailing whitespace from new unittest progress lines and one empty-stdout assertion line; assertions, failure details and outcomes are unchanged.
+
+Independent [Codex repair addendum](independent-review/CODEX-REPAIR-ADDENDUM.md) **APPROVES exact functional11248aa3**, explicitly carried to evidence candidate1f84d0b3 by empty product-source diff. Independent boundary9 and canonical43 pass; all four new issues are closed. Final publication is an evidence-only successor and retains the same source.
