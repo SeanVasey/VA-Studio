@@ -37,6 +37,8 @@ use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberGrantFactsAuthority;
 use App\Domain\Grants\Member\MemberGrantPolicy;
 use App\Domain\Grants\Member\MemberOriginalArtifactAuthority;
+use App\Domain\Grants\Paid\PaidGrantException;
+use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Inquiries\InquiryException;
 use App\Domain\Inquiries\OrderInquiry;
 use App\Domain\Media\ScanEngines;
@@ -137,6 +139,10 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Memberships/Production/MembershipPolicy.php',
         'app/Domain/Grants/Member/MemberGrantPolicy.php',
         'app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php',
+        // #56: paid grant rehearsal is local/testing only; its operative lane refuses staging explicitly.
+        'app/Domain/Grants/Paid/PaidGrantPolicy.php',
+        // Service project attachment sources stay local/testing only (synthetic attachment evidence).
+        'app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php',
     ];
 
     private const LOCAL_TESTING_GATE = '/environment\(\[?\'local\', \'testing\'\]?\)|in_array\(\$[a-zA-Z\[\]\']+, \[\'local\', \'testing\'\], true\)/';
@@ -422,6 +428,31 @@ class StagingEnvironmentAdmissionTest extends TestCase
         $this->assertFalse($this->in('staging', fn () => TaxCheckoutPolicy::enabled()), 'production tax checkout rehearsal stays local/testing');
     }
 
+    public function test_staging_never_enables_the_operative_paid_grant_lane(): void
+    {
+        // #56's paid family: rehearsal is local/testing only; the operative lane is production-only, never staging.
+        config(['paid-grants.rehearsal_enabled' => true, 'paid-grants.operative_enabled' => true]);
+        $enabled = fn (): bool => (new PaidGrantPolicy)->enabled();
+        $this->assertTrue($this->in('local', $enabled));
+        $this->assertTrue($this->in('production', $enabled));
+        $this->assertFalse($this->in('staging', $enabled));
+        $policy = ['schema_version' => 1, 'version' => 'synthetic-operative', 'purpose' => 'paid-original-delivery',
+            'provenance' => 'verified_production', 'max_downloads' => 3, 'authorization_seconds' => 60];
+        config(['paid-grants.delivery_policy' => $policy, 'production-customer-identity.enabled' => true,
+            'production-customer-identity.provenance' => IdentityPolicy::PRODUCTION]);
+        $proof = function (string $environment) use ($policy): string {
+            try {
+                PaidGrantPolicy::provePure($policy, app('config'), $environment);
+
+                return 'admitted';
+            } catch (PaidGrantException $error) {
+                return (string) $error->status;
+            }
+        };
+        $this->assertSame('admitted', $proof('production'));
+        $this->assertSame('403', $proof('staging'));
+    }
+
     public function test_staging_never_admits_verified_production_membership_or_member_grant_provenance(): void
     {
         config(['member-grants.enabled' => true, 'member-grants.provenance' => IdentityPolicy::PRODUCTION,
@@ -503,6 +534,18 @@ class StagingEnvironmentAdmissionTest extends TestCase
             $this->assertMatchesRegularExpression(self::LOCAL_TESTING_GATE, $source, $file);
             $this->assertStringNotContainsString('admitsTestCommerce', $source, $file);
         }
+        // Exhaustive: every local/testing gate anywhere in app/ is a classified local-only file, so a gate added later
+        // (as #56's paid family did) must be decided here instead of silently refusing or admitting staging.
+        $gated = [];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(app_path(), \FilesystemIterator::SKIP_DOTS)) as $path) {
+            if ($path->getExtension() === 'php' && preg_match(self::LOCAL_TESTING_GATE, file_get_contents($path->getPathname()))) {
+                $gated[] = Str::after($path->getPathname(), base_path().'/');
+            }
+        }
+        sort($gated);
+        $classified = self::LOCAL_ONLY_FILES;
+        sort($classified);
+        $this->assertSame($classified, $gated);
         // No gate names staging itself: the helper is the single place that admits it.
         $named = [];
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(app_path(), \FilesystemIterator::SKIP_DOTS)) as $path) {

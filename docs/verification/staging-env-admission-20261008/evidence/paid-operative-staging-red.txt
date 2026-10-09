@@ -1,0 +1,6 @@
+# source 5e782021cefc8ce9cdbadf3282743c0917be239a + working tree: new paid staging test and exhaustive census (StagingEnvironmentAdmissionTest sha256 2d46122e85206d14); PaidGrantPolicy unchanged
+1) Tests\Feature\StagingEnvironmentAdmissionTest::test_staging_never_enables_the_operative_paid_grant_lane
+Failed asserting that true is false.
+FAILURES!
+Tests: 2, Assertions: 93, Failures: 1.
+rc=1

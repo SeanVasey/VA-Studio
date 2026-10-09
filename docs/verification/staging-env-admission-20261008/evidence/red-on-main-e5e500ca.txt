@@ -1,0 +1,25 @@
+# source: main e5e500cadae68958293089ccc2b4a22bcdb9df66 product, with B2's versions of RightsScopeCommandTest, StagingOperatorMfaTest (new) and TestCommerceProfileValidatorTest (sha256 ed853d5d02ba13b3 ccc76e4230132dd1 2a1589dfec9db141 )
+## --filter staging_admits tests/Feature/RightsScopeCommandTest.php
+1) Tests\Feature\RightsScopeCommandTest::test_staging_admits_the_same_link_and_order_preparation
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+-'INVENTORY_SCOPE_UNAVAILABLE'
++'ORDER_POLICY_UNAVAILABLE'
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1
+## tests/Feature/StagingOperatorMfaTest.php
+1) Tests\Feature\StagingOperatorMfaTest::test_staging_panel_requires_enrollment_before_protected_catalog_access
+Failed asserting that false is true.
+2) Tests\Feature\StagingOperatorMfaTest::test_requirement_follows_the_current_environment
+Failed asserting that false is identical to true.
+FAILURES!
+Tests: 3, Assertions: 7, Failures: 2.
+rc=1
+## --filter staging_profile_passes tests/Unit/TestCommerceProfileValidatorTest.php
+1) Tests\Unit\TestCommerceProfileValidatorTest::test_a_staging_profile_passes_and_near_miss_environment_names_are_refused
+Failed asserting that 1 is identical to 0.
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+rc=1
