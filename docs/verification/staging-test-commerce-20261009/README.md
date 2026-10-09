@@ -1,6 +1,6 @@
 # PR #62 current verification
 
-Reviewed sensitive source: `f592ec93890fdf95be8b05b3d4fb5ccb5e706ddf`. This integrates the original `ddb1fcc1` profile with main's CI policy, the merged D1 command and its immediate ledger. Subsequent evidence/documentation commits leave runtime and canonical tests unchanged.
+Current reviewed functional source: `8f3d1cef024cabb6044f86c45f75ccb6fdc00550`. This integrates the original `ddb1fcc1` profile with main's CI policy, the merged D1 command and its immediate ledger, then closes four independently reproduced runner/validator findings. Earlier source `f592ec93890fdf95be8b05b3d4fb5ccb5e706ddf` covers the cursor/state repairs; the latest independent addendum assesses the subsequent file-authority and cadence repairs.
 
 ## Actual local results
 
@@ -14,6 +14,11 @@ Reviewed sensitive source: `f592ec93890fdf95be8b05b3d4fb5ccb5e706ddf`. This inte
 | `state-repair-sqlite.txt` | Current validator, runner and profile journey suites | Exit 0; 63 tests / 664 assertions, no skips |
 | `journey-mysql84.txt` | Current seven synthetic profile journeys on disposable MySQL 8.4.11 | Exit 0; 7 tests / 201 assertions, no skips |
 | `template.txt` | Synthetic template through real policy/configuration checks | All 35 checks pass; no Stripe request |
+| `masking-cadence-red.txt` | First masking/cadence regressions before repair, with one incorrect check identifier | Exit 1; 8 tests / 15 assertions / 8 failures, 1 warning |
+| `masking-cadence-red-corrected.txt` | Corrected masking/cadence regressions before runtime repair | Exit 1; 8 tests / 15 assertions / 8 failures, no warning |
+| `masking-cadence-green.txt` | Same targeted cases after runtime repair | Exit 0; 8 tests / 71 assertions |
+| `masking-cadence-sqlite.txt` | Current validator, runner and nine profile journeys | Exit 0; 73 tests / 783 assertions, no skips |
+| `masking-cadence-mysql84.txt` | Current nine profile journeys on native MySQL 8.4.11 | Exit 0; 9 tests / 249 assertions, no skips |
 
 The application code remained unchanged throughout the affected selection; the runner repairs followed its original unit cases. The current selected suites were separately rerun after those repairs. The affected contract issuance selection uses the real isolated v2 renderer; the profile journeys use the synthetic renderer and provider transport.
 
@@ -32,6 +37,8 @@ GitHub rejected the first unpublished evidence commit because a review fixture c
 
 ## Independent decision and limits
 
-[Independent review](independent-review/DECISION.md): **APPROVE** at the exact sensitive source, with 37 independent subprocess probe checks passing. The original starvation/state red receipts are retained alongside their green successors. The review also verifies exported environment refusal, configuration-cache isolation, log privacy, timeouts/locks/modes, cursor reset and the corrected rights guidance.
+[Current independent addendum](independent-review/MASKING-CADENCE-ADDENDUM.md): **APPROVE** at `8f3d1cef`, with 55 independent masking/interpolation/cache/privacy/cadence checks passing and two independently run real-command SQLite timing journeys (2/48). The original [decision](independent-review/DECISION.md), [carry addendum](independent-review/CANDIDATE-ADDENDUM.md) and 37-probe receipts remain historical evidence. Their exported-variable precedence contract is superseded: the current validator clears all inherited application inputs before boot, so a valid export cannot mask an unsafe file. Only the supplied file is certified; deployed config/cache/workers must actually use it. The original starvation/state red receipts remain alongside their passing successors.
+
+The runner and installed service now use a one-minute minimum interval, within the quote's 15-minute observation window. Actual domain command journeys prove an unpaid read followed by payment at +30 seconds and observation at +61 seconds issues a grant, while payment at +850 first observed at +901 remains a paid exception with no grant. Timer scheduling, slow stages, locks, backlog and payment near expiry still limit observation timeliness; no eligibility or retained-resource rule changed. The red masking cases allowed the optional probe branch before repair; synthetic input only was supplied. All repaired unsafe-file probe cases now refuse before account access.
 
 Unpaid pending reservations remain retained and can block their actual shared scope. New scopes/revisions are not a resolution workaround. Real operator rights/terms/prices and seller/assent input remain required. Account probing, Stripe CLI/Dashboard delivery, systemd installation, actual host deployment, real media, a real Stripe TEST purchase and native concurrency are untested here. No live mode, secret, provider request or activation was supplied by this change.
