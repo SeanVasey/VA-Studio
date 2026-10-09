@@ -143,7 +143,7 @@ if ($entries !== null) {
     $record('profile.placeholders_replaced', $unreplaced === [], $unreplaced === [] ? 'No <PLACEHOLDER> remains.'
         : 'Unreplaced placeholders in: '.implode(', ', $unreplaced).'.');
     $live = array_keys(array_filter($values, static fn (string $v): bool => preg_match('/(?:sk|rk|pk)_live_/', $v) === 1));
-    $record('profile.no_live_keys', $live === [], $live === [] ? 'No live-mode key appears anywhere in the file.'
+    $record('profile.no_live_keys', $live === [], $live === [] ? 'No live-mode key appears in the parsed configuration values.'
         : 'Live-mode key material found in: '.implode(', ', $live).'. Remove it.');
 }
 

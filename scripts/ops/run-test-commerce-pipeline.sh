@@ -72,9 +72,22 @@ fi
 [[ -f "$APP_ROOT/artisan" ]] || { printf 'APP_ROOT does not contain artisan\n' >&2; exit 2; }
 command -v timeout >/dev/null 2>&1 || { printf 'coreutils timeout is required\n' >&2; exit 2; }
 command -v flock >/dev/null 2>&1 || { printf 'util-linux flock is required\n' >&2; exit 2; }
-if ! { mkdir -p -- "$STATE_DIR" && chmod 700 -- "$STATE_DIR"; }; then
+if ! { mkdir -p -- "$STATE_DIR" && chmod 700 -- "$STATE_DIR"; } 2>/dev/null; then
   printf 'cannot prepare STATE_DIR\n' >&2; exit 2
 fi
+
+# Publish state atomically, or fail without exposing private paths. A successful sweep must not
+# claim continuation/cadence was saved when disk, ownership or path errors prevented it.
+save_state() {
+  local target="$1" value="$2" scratch
+  scratch=$(mktemp "$STATE_DIR/.state.XXXXXXXX" 2>/dev/null) || return 1
+  if ! { printf '%s' "$value" > "$scratch" && mv -T -- "$scratch" "$target"; } 2>/dev/null; then
+    rm -f -- "$scratch" >/dev/null 2>&1 || true
+    return 1
+  fi
+}
+
+clear_state() { rm -f -- "$1" >/dev/null 2>&1; }
 
 # Runs one artisan page. Sets PAGE_ITEMS and PAGE_NEXT; returns the command's exit status.
 # Only "<id> <outcome>" and "NEXT_AFTER=<uuid>" lines are logged; anything else is counted, not shown.
@@ -82,7 +95,7 @@ run_page() {
   local stage="$1" id_re="$2"; shift 2
   local output status line suppressed=0
   PAGE_ITEMS=0 PAGE_NEXT=''
-  output="$(cd -- "$APP_ROOT" && timeout --kill-after=30 "$COMMAND_TIMEOUT_SECONDS" "$PHP_BIN" artisan "$@" --no-ansi --no-interaction 2>/dev/null)"
+  output="$( { cd -- "$APP_ROOT" && timeout --kill-after=30 "$COMMAND_TIMEOUT_SECONDS" "$PHP_BIN" artisan "$@" --no-ansi --no-interaction; } 2>/dev/null)"
   status=$?
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
@@ -121,7 +134,7 @@ drain_cursor() {
   local stage="$1" command="$2" limit="$3" cursor_file="${4:-}"
   local after='' page=0 total=0
   if [[ -n "$cursor_file" && -f "$cursor_file" ]]; then
-    after="$(head -c 64 -- "$cursor_file")"
+    after="$(head -c 64 -- "$cursor_file" 2>/dev/null)"
     [[ "$after" =~ $UUID_RE ]] || after=''
   fi
   while (( page < MAX_PAGES )); do
@@ -131,19 +144,23 @@ drain_cursor() {
     if ! run_page "$stage" "$UUID_RE" "${args[@]}"; then
       if [[ -n "$after" && -n "$cursor_file" ]]; then
         # A stored cursor may no longer resolve; restart from the beginning on the next sweep.
-        rm -f -- "$cursor_file"
+        clear_state "$cursor_file" || log "$stage FAILED (cannot clear cursor state)"
       fi
       log "$stage FAILED (command exit non-zero; check the test-commerce profile)"; return 1
     fi
     total=$((total + PAGE_ITEMS))
     if [[ -z "$PAGE_NEXT" ]] || (( PAGE_ITEMS < limit )); then
-      [[ -n "$cursor_file" ]] && rm -f -- "$cursor_file"
+      if [[ -n "$cursor_file" ]] && ! clear_state "$cursor_file"; then
+        log "$stage FAILED (cannot clear cursor state)"; return 1
+      fi
       log "$stage done items=$total pages=$page"; return 0
     fi
     after="$PAGE_NEXT"
   done
   if [[ -n "$cursor_file" ]]; then
-    printf '%s' "$after" > "$cursor_file"
+    if ! save_state "$cursor_file" "$after"; then
+      log "$stage FAILED (cannot save cursor state)"; return 1
+    fi
     log "$stage page bound reached items=$total pages=$page; resuming after the saved cursor next sweep"
   else
     log "$stage page bound reached items=$total pages=$page; the next sweep continues"
@@ -154,7 +171,7 @@ reconcile_due() {
   local stamp="$STATE_DIR/reconcile.last" last now
   (( RECONCILE_INTERVAL_SECONDS == 0 )) && return 0
   [[ -f "$stamp" ]] || return 0
-  last="$(head -c 20 -- "$stamp")"
+  last="$(head -c 20 -- "$stamp" 2>/dev/null)"
   [[ "$last" =~ ^[0-9]+$ ]] || return 0
   now="$(date +%s)"
   (( now - last >= RECONCILE_INTERVAL_SECONDS || now < last ))
@@ -166,7 +183,9 @@ sweep() {
   drain_receipts || failed=1
   if reconcile_due; then
     if drain_cursor reconcile vasey:reconcile-test-payments "$PAGE_LIMIT" "$STATE_DIR/reconcile.cursor"; then
-      date +%s > "$STATE_DIR/reconcile.last"
+      if ! save_state "$STATE_DIR/reconcile.last" "$(date +%s)"; then
+        log "reconcile FAILED (cannot save cadence state)"; failed=1
+      fi
     else
       failed=1
     fi

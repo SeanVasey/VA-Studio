@@ -200,6 +200,44 @@ class TestCommercePipelineRunnerTest extends TestCase
         $this->assertStringNotContainsString('--after=', $calls[3]);
     }
 
+    public static function failedCursorOperations(): array
+    {
+        $cases = [];
+        foreach (self::retainedCursorStages() as [$stage, $command, $retained]) {
+            $cases[$stage.' write'] = [$stage, $command, $retained, true];
+            $cases[$stage.' clear'] = [$stage, $command, $retained, false];
+        }
+
+        return $cases;
+    }
+
+    #[DataProvider('failedCursorOperations')]
+    public function test_cursor_state_failures_fail_the_sweep_without_private_paths(string $stage, string $command, string $retained, bool $fullPage): void
+    {
+        mkdir($this->dir.'/state/'.$stage.'.cursor', 0700);
+        if ($fullPage) {
+            $this->page($command, 'start', [self::U1.' '.$retained, 'NEXT_AFTER='.self::U1]);
+        }
+        $process = $this->sweep(['PAGE_LIMIT' => '1', 'CONTRACT_PAGE_LIMIT' => '1', 'MAX_PAGES' => '1']);
+
+        $this->assertSame(1, $process->getExitCode(), $process->getOutput());
+        $this->assertStringContainsString($stage.' FAILED (cannot '.($fullPage ? 'save' : 'clear').' cursor state)', $process->getOutput());
+        $this->assertStringContainsString('sweep end status=1', $process->getOutput());
+        $this->assertStringNotContainsString('resuming after the saved cursor', $process->getOutput());
+        $this->assertStringNotContainsString($this->dir, $process->getOutput().$process->getErrorOutput());
+    }
+
+    public function test_reconcile_timestamp_failure_fails_the_sweep_without_private_paths(): void
+    {
+        mkdir($this->dir.'/state/reconcile.last', 0700);
+        $process = $this->sweep();
+
+        $this->assertSame(1, $process->getExitCode(), $process->getOutput());
+        $this->assertStringContainsString('reconcile FAILED (cannot save cadence state)', $process->getOutput());
+        $this->assertStringContainsString('sweep end status=1', $process->getOutput());
+        $this->assertStringNotContainsString($this->dir, $process->getOutput().$process->getErrorOutput());
+    }
+
     public function test_a_failing_stage_fails_the_sweep_without_skipping_later_stages(): void
     {
         $this->page('vasey:finalize-test-payments', 'start', [], 1);

@@ -149,7 +149,8 @@ class StagingTestCommerceProfileJourneyTest extends TestCase
         $f = QuoteFixtures::selection();
         if ($link) {
             $scopes = app(ManageRightsScope::class);
-            // Same calls, keys and references as the documented operator step (one scope per offer revision).
+            // Isolated single-right fixture: each unrelated offer here gets its own explicit identity.
+            // Real operators use the reviewed command and verify any shared-rights relationship.
             $scope = $scopes->register('offer-revision-'.$f['revision']->id, 'STAGING-SCOPE-REVISION-'.$f['revision']->id, $f['actor']);
             $scopes->link($scope->id, $f['revision']->id, 'STAGING-LINK-REVISION-'.$f['revision']->id, $f['actor']);
         }

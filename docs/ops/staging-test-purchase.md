@@ -114,6 +114,8 @@ A non-blocking lock prevents overlapping sweeps. The log shows only opaque IDs a
 
 Each cursor stage saves progress when it reaches the page bound, so unresolved early rows cannot starve later work. After reaching the end it clears that cursor and revisits earlier unresolved rows on the next sweep. A command failure resets its saved cursor; retained domain effects remain idempotent.
 
+Cursor and cadence writes are atomic. A failed state write or removal fails the sweep with a bounded diagnostic; it never reports saved progress when persistence failed.
+
 The queue workers (Lane A: `payments`, `contracts`, `default`, `media`) give faster results, but the runner alone completes the chain within about two minutes of the event.
 
 ### 5. Make each offer purchasable: link its rights scope
