@@ -38,6 +38,7 @@ class OperationLeaseTest(unittest.TestCase):
         php.write_text('''#!/bin/bash
 if [ "$1" = -r ]; then exit 0; fi
 printf '%s\\n' "$2" >> TRACE_PATH
+if [ "$2" = down ]; then mkdir -p RELEASE_PATH/storage/framework; touch RELEASE_PATH/storage/framework/maintenance.php; fi
 if [ "$2" = install ]; then
   mkdir -p RELEASE_PATH/vendor/composer
   printf 'approved artifact' > RELEASE_PATH/vendor/autoload.php
@@ -61,7 +62,8 @@ fi
         self.helper = self.root / "release-step.sh"
         self.helper.write_text((REPO / "ops/staging/release-step.sh").read_text().replace("/etc/vasey-staging/staging.conf", str(config)))
         self.helper.chmod(0o644)
-        source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        self.source = Path(os.environ.get("STAGING_CTL_TEST_SOURCE", str(REPO / "ops/staging/bin/vasey-staging-ctl")))
+        source = self.source.read_text()
         definitions = source[source.index("valid_sha() {"):source.index("# The sudo entry point")]
         dispatch = source[source.index("# The sudo entry point"):]
         self.control = self.root / "control.sh"
@@ -95,6 +97,7 @@ cmd_attach() { echo attach >> "$TRACE"; }
                             "CURRENT": str(self.root / "current"), "RELEASE_STEP": str(self.helper),
                             "OPERATION_MARKER": str(self.operation), "BACKUP_BIN": str(backup), "TRACE": str(self.trace)}
         self.environment.update(VASEY_APP_USER=pwd.getpwuid(os.getuid()).pw_name, VASEY_APP_GROUP="fixture-group")
+        self.environment.update(VASEY_PHP=str(php), VASEY_PHP_FPM_SERVICE="fixture-fpm")
 
     def tearDown(self):
         self.finish.touch()
@@ -236,6 +239,40 @@ cmd_attach() { echo attach >> "$TRACE"; }
         finally:
             self.cleanup_process(operation)
             if resume is not None: self.cleanup_process(resume)
+
+    def test_public_stop_and_start_keep_recovery_marker_after_root_parent_death(self):
+        child = self.root / "service-child"
+        child.write_text('#!/bin/bash\necho $$ > ' + repr(str(self.entered)) + '\nwhile [ ! -e ' + repr(str(self.finish)) + ' ]; do sleep 0.01; done\n')
+        fixture = '\ncmd_quiesce() { writer_gate_write closed; writer_barrier; as_app /bin/bash ' + repr(str(child)) + '; }\ncmd_resume() { as_app /bin/bash ' + repr(str(child)) + '; writer_gate_write open; }\n'
+        self.control.write_text(self.control.read_text().replace('# The sudo entry point', fixture + '\n# The sudo entry point'))
+        for action in ("quiesce", "resume"):
+            with self.subTest(action=action):
+                self.entered.unlink(missing_ok=True)
+                self.operation.unlink(missing_ok=True)
+                self.finish.unlink(missing_ok=True)
+                operation = self.start(action)
+                try:
+                    self.wait_entered(operation)
+                    operation.kill()
+                    operation.wait(timeout=2)
+                    self.assertTrue(self.operation.is_file(), "root parent death lost public-operation recovery custody")
+                    resumed = subprocess.run(["bash", str(self.control), "resume"], env=self.environment,
+                                             capture_output=True, text=True, timeout=3)
+                    self.assertNotEqual(resumed.returncode, 0, resumed.stdout + resumed.stderr)
+                    self.assertEqual((self.conf / "writer-admission").read_text(), "closed\n")
+                finally: self.cleanup_process(operation)
+
+    def test_fresh_activation_can_requiesce_an_already_stopped_served_release(self):
+        source = self.source.read_text()
+        actual = source[source.index('cmd_quiesce()'):source.index('cmd_switch()')]
+        (self.root / "current").symlink_to(self.release)
+        fixture = '\nprobe() { echo 502; }\nsupervisorctl() { echo unexpected-redundant-stop >&2; return 1; }\nsystemctl() { return 0; }\n'
+        self.control.write_text(self.control.read_text().replace('# The sudo entry point', actual + fixture + '\n# The sudo entry point'))
+        run = subprocess.run(["bash", str(self.control), "quiesce"], env=self.environment,
+                             capture_output=True, text=True, timeout=3)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertTrue((self.release / "storage/framework/maintenance.php").exists())
+        self.assertEqual((self.conf / "writer-admission").read_text(), "closed\n")
 
 
 if __name__ == "__main__": unittest.main(verbosity=2)

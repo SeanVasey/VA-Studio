@@ -292,6 +292,8 @@ snapshot and migration evidence, and choose the recovery below before removing t
 Never clear it while a child might still write. Marker removal is an explicit root recovery action;
 the application account cannot perform it and no script auto-clears a failed operation. A healthy resume
 followed by a later marker-cleanup/evidence failure needs inspection, rather than an assumed closed gate.
+Fresh quiesce is safe when the previous phase already stopped FPM/workers: it proves stopped state,
+retains the maintenance marker and closed gate, and does not require HTTP503 from an absent backend.
 
 Decide which case applies by comparing `migrate-status-before.txt` and `migrate-status-after.txt` in the
 failed deploy's evidence directory.
@@ -400,7 +402,9 @@ generate a new `APP_KEY` or overwrite the saved environment to make a failed ref
 
 Release source/vendor/build files are root-owned read-only after attachment; `.env` is root:app-group
 0440. Ordinary configuration refresh uses one `ctl refresh <sha> <private evidence file>` operation.
-Direct `ctl configure` is an inspected recovery primitive; it does not replace the enclosing refresh lease.
+There is no standalone public `ctl configure` action; use the enclosing refresh operation. Standalone
+quiesce/resume also retain interruption markers while their application children run. Recovery quiesce
+preserves an existing marker until the explicit root recovery above has stopped surviving children.
 Do not restore app write permission on code or `.env`. Runtime-generated PHP under `bootstrap/cache`
 and `storage/framework` remains an explicit application trust exception, as described in the kit README.
 Backups refuse missing/invalid served environments and invalid `current`; recovery needs the verified

@@ -266,10 +266,16 @@ cmd_quiesce() {
   # 1. New requests: maintenance in the release that actually serves traffic, proven by marker and exact 503.
   as_app "$VASEY_PHP" "$cur/artisan" down --no-interaction >/dev/null || die "artisan down failed; nothing stopped"
   [ -f "$cur/storage/framework/maintenance.php" ] || die "no maintenance marker after artisan down"
-  [ "$(probe)" = 503 ] || die "served release is not answering 503 after artisan down"
+  # A successful prepare already stopped FPM. Re-quiesce must prove stopped services rather than
+  # demanding an HTTP503 from a deliberately absent FastCGI backend (which normally answers502).
+  if ! web_stopped; then
+    [ "$(probe)" = 503 ] || die "served release is not answering 503 after artisan down"
+  fi
   # 2. Workers and scheduler (supervisor waits for the current job; up to stopwaitsecs).
-  as_app "$VASEY_PHP" "$cur/artisan" queue:restart --no-interaction >/dev/null || true
-  supervisorctl stop 'vasey-staging:*' >/dev/null || die "supervisorctl stop failed"
+  if ! workers_stopped; then
+    as_app "$VASEY_PHP" "$cur/artisan" queue:restart --no-interaction >/dev/null || true
+    supervisorctl stop 'vasey-staging:*' >/dev/null || die "supervisorctl stop failed"
+  fi
   workers_stopped || die "a worker or the scheduler is still running"
   # 3. Requests admitted before `down` may still be writing (uploads): stop PHP-FPM and prove no PHP serves.
   systemctl stop "$VASEY_PHP_FPM_SERVICE" || die "could not stop $VASEY_PHP_FPM_SERVICE"
@@ -457,6 +463,23 @@ cmd_refresh() {
   operation_finish
 }
 
+public_quiesce() {
+  local own_marker=0
+  if [ ! -e "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ]; then
+    operation_begin quiesce none
+    own_marker=1
+  fi
+  cmd_quiesce
+  # Recovery may quiesce an interrupted operation, but must never clear that operation's marker.
+  if [ "$own_marker" = 1 ]; then operation_finish; fi
+}
+
+public_resume() {
+  operation_begin resume none
+  cmd_resume
+  operation_finish
+}
+
 cmd_prune() {
   local cur=''
   if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
@@ -506,7 +529,6 @@ fi
 
 case "${1:-}" in
   allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
-  configure) [ "$#" = 3 ] || die "configure requires exactly a SHA and private evidence file" ;;
   prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
   activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
   quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
@@ -515,16 +537,15 @@ case "${1:-}" in
   allocate) cmd_allocate "${2:-}" ;;
   attach)   cmd_attach "${2:-}" ;;
   detach)   cmd_detach "${2:-}" ;;
-  quiesce)  cmd_quiesce ;;
-  resume)   cmd_resume ;;
+  quiesce)  public_quiesce ;;
+  resume)   public_resume ;;
   healthy)  cmd_healthy "${2:-}" ;;
   switch)   cmd_switch "${2:-}" ;;
   snapshot) cmd_snapshot ;;
-  configure) cmd_configure "${2:-}" "${3:-}" ;;
   prepare) cmd_prepare "$2" "$3" "$4" ;;
   activate) cmd_activate "$2" "$3" ;;
   refresh) cmd_refresh "$2" "$3" ;;
   prune)    cmd_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh|configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
 esac

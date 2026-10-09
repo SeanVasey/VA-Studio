@@ -70,7 +70,7 @@ before mounting. The sealer walks through no-follow directory descriptors, close
 opening children and copies regular code/vendor/build files onto fresh root-owned read-only inodes.
 Hard links, external/runtime code symlinks and special files refuse; an old writable descriptor cannot
 change the newly installed inode. Executable bits remain executable and nginx can read public build files.
-The configured application account must be nonroot; provisioning and privileged entry points refuse UID 0. The protected `.env` is root:app-group 0440. Only `ctl configure` performs ordinary environment refresh,
+The configured application account must be nonroot; provisioning and privileged entry points refuse UID 0. The protected `.env` is root:app-group 0440. Only `ctl refresh` performs ordinary environment refresh,
 under closed writer admission, after real runtime admission and unchanged-key validation.
 
 Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `storage/logs` and
@@ -96,6 +96,9 @@ switch and healthy resume. Each invocation retains the root control lock and wri
 its critical child. `ctl refresh <sha> <private-env>` similarly encloses the configuration refresh.
 The fixed root-owned `release-step.sh` runs only as the application user with a scrubbed environment;
 application children receive neither privileged lock descriptor. Root never writes application evidence paths.
+Standalone quiesce/resume also retain interruption markers while their application children run;
+recovery quiesce preserves any existing marker. Configuration is internal to refresh, with no standalone
+public `configure` action.
 
 Each operation creates root-only `/etc/vasey-staging/operation-in-progress` before quiesce and removes it
 only after its child has completed and sealing or healthy activation succeeds. A failure or killed root
@@ -206,6 +209,8 @@ renaming that account breaks every guarded write.
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
+   If prepare already stopped FPM, quiesce proves that stopped state instead of requiring HTTP503
+   from an absent backend. Already-stopped workers are proved rather than redundantly stopped again.
 6. Still inside that invocation, snapshot takes a backup and **restore proof** before anything is migrated,
    including a first-install retry. A no-current set explicitly has no historical environment/key.
 7. The fixed helper runs these steps as the application user in the new release while root retains both locks:
