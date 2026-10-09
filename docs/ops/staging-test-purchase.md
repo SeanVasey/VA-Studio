@@ -112,6 +112,8 @@ A non-blocking lock prevents overlapping sweeps. The log shows only opaque IDs a
 2026-10-12T14:03:03Z test-commerce-pipeline activate 6d0c…-… activated
 ```
 
+Each cursor stage saves progress when it reaches the page bound, so unresolved early rows cannot starve later work. After reaching the end it clears that cursor and revisits earlier unresolved rows on the next sweep. A command failure resets its saved cursor; retained domain effects remain idempotent.
+
 The queue workers (Lane A: `payments`, `contracts`, `default`, `media`) give faster results, but the runner alone completes the chain within about two minutes of the event.
 
 ### 5. Make each offer purchasable: link its rights scope
@@ -257,7 +259,7 @@ Run each drill on a fresh order, using a dedicated drill offer: drills 1 (if aba
 | --- | --- | --- |
 | Cart says checkout is not available | A profile flag or policy is off or invalid | `php scripts/ops/validate-test-commerce-profile.php .env` |
 | `INVENTORY_SCOPE_UNAVAILABLE` on Prepare order | Offer revision not linked | Setup step 5 |
-| `INVENTORY_UNAVAILABLE` on Prepare order | Another order holds or abandoned this offer revision | Wait 15 minutes for a hold; otherwise publish and link a new revision (setup step 5) |
+| `INVENTORY_UNAVAILABLE` on Prepare order | A held or pending reservation occupies the actual rights scope, including linked variants | Identify the occupied scope/reservation. An unused hold can expire; a pending abandoned order needs the separately reviewed resolution path. Use dedicated drill content and preserve the original evidence (setup step 5). |
 | `PRICING_UNAVAILABLE` | Pricing policy invalid or outside its window | `commerce.pricing` check |
 | `PRICING_CHANGED` on an open cart | The pricing policy changed after the cart was priced | Start a new cart |
 | Webhook delivery `400 STRIPE_WEBHOOK_INVALID` | Wrong `STRIPE_WEBHOOK_SECRET`, host clock more than 5 minutes off, or both the Dashboard endpoint and `stripe listen` in use | Re-copy the secret; check `timedatectl` |

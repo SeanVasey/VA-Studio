@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -160,6 +161,43 @@ class TestCommercePipelineRunnerTest extends TestCase
         $this->assertCount(1, array_filter($this->calls(), fn ($call) => str_starts_with($call, 'vasey:reconcile-test-payments')));
         $this->assertCount(2, array_filter($this->calls(), fn ($call) => str_starts_with($call, 'vasey:finalize-test-payments')));
         $this->assertStringContainsString('reconcile not due (interval 900s)', $second->getOutput());
+    }
+
+    public static function retainedCursorStages(): array
+    {
+        return [
+            'finalize retries' => ['finalize', 'vasey:finalize-test-payments', 'retry'],
+            'contract retries' => ['contracts', 'vasey:issue-test-contracts', 'retry'],
+            'activation blocked' => ['activate', 'vasey:activate-test-fulfillment', 'pending_contracts'],
+        ];
+    }
+
+    #[DataProvider('retainedCursorStages')]
+    public function test_page_bounded_retained_rows_do_not_starve_later_work_and_are_revisited(string $stage, string $command, string $retained): void
+    {
+        $this->page($command, 'start', [self::U1.' '.$retained, 'NEXT_AFTER='.self::U1]);
+        $this->page($command, self::U1, [self::U2.' ready', 'NEXT_AFTER='.self::U2]);
+        $this->page($command, self::U2, []);
+        $env = ['PAGE_LIMIT' => '1', 'CONTRACT_PAGE_LIMIT' => '1', 'MAX_PAGES' => '1'];
+        $first = $this->sweep($env);
+        $second = $this->sweep($env);
+
+        $this->assertSame(0, $first->getExitCode());
+        $this->assertSame(0, $second->getExitCode());
+        $this->assertStringContainsString($stage.' '.self::U2.' ready', $second->getOutput());
+        $this->assertSame(self::U2, file_get_contents($this->dir.'/state/'.$stage.'.cursor'));
+
+        $third = $this->sweep($env);
+        $this->assertSame(0, $third->getExitCode());
+        $this->assertFileDoesNotExist($this->dir.'/state/'.$stage.'.cursor');
+        $fourth = $this->sweep($env);
+        $this->assertSame(0, $fourth->getExitCode());
+        $this->assertStringContainsString($stage.' '.self::U1.' '.$retained, $fourth->getOutput());
+        $calls = array_values(array_filter($this->calls(), fn ($call) => str_starts_with($call, $command)));
+        $this->assertCount(4, $calls);
+        $this->assertStringContainsString('--after='.self::U1, $calls[1]);
+        $this->assertStringContainsString('--after='.self::U2, $calls[2]);
+        $this->assertStringNotContainsString('--after=', $calls[3]);
     }
 
     public function test_a_failing_stage_fails_the_sweep_without_skipping_later_stages(): void

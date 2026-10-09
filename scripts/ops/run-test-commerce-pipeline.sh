@@ -11,7 +11,9 @@
 #   4. vasey:issue-test-contracts      paid grants without a committed original contract
 #   5. vasey:activate-test-fulfillment paid orders without an activation proof
 # Stages 2-5 follow the NEXT_AFTER cursor each command prints, so a backlog larger than one page is
-# drained, not just its first page. Stage 1 has no cursor; it repeats while a page comes back full,
+# drained across bounded sweeps, not just its first page. Stages 2-5 retain their cursor at the
+# page bound, then restart from the beginning after reaching the end so unresolved rows are retried.
+# Stage 1 has no cursor; it repeats while a page comes back full,
 # because processed, quarantined and not-yet-due receipts leave its selection.
 #
 # Deliberately NOT run here:
@@ -113,7 +115,8 @@ drain_receipts() {
 }
 
 # Stages 2-5: follow NEXT_AFTER. A cursor_file persists progress across sweeps when the page bound
-# is reached (used for reconcile, whose selection never shrinks for abandoned sessions).
+# is reached. Every cursor stage can retain unresolved rows; saving progress prevents those rows
+# from starving later work. Reaching the end clears progress so earlier unresolved rows are revisited.
 drain_cursor() {
   local stage="$1" command="$2" limit="$3" cursor_file="${4:-}"
   local after='' page=0 total=0
@@ -170,9 +173,9 @@ sweep() {
   else
     log "reconcile not due (interval ${RECONCILE_INTERVAL_SECONDS}s)"
   fi
-  drain_cursor finalize vasey:finalize-test-payments "$PAGE_LIMIT" || failed=1
-  drain_cursor contracts vasey:issue-test-contracts "$CONTRACT_PAGE_LIMIT" || failed=1
-  drain_cursor activate vasey:activate-test-fulfillment "$PAGE_LIMIT" || failed=1
+  drain_cursor finalize vasey:finalize-test-payments "$PAGE_LIMIT" "$STATE_DIR/finalize.cursor" || failed=1
+  drain_cursor contracts vasey:issue-test-contracts "$CONTRACT_PAGE_LIMIT" "$STATE_DIR/contracts.cursor" || failed=1
+  drain_cursor activate vasey:activate-test-fulfillment "$PAGE_LIMIT" "$STATE_DIR/activate.cursor" || failed=1
   log "sweep end status=$failed"
   return "$failed"
 }
