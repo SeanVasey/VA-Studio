@@ -166,6 +166,9 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    `/root/vasey-staging-secrets` must have canonical protected ancestry. An existing app account requires
    a regular root-owned 0600 single-link `db-app.env` containing exactly the generated username/password
    format. Missing, linked, writable or incomplete custody refuses with private recovery instructions.
+   A scrubbed client with login paths disabled must authenticate exactly `vasey_app@127.0.0.1` before
+   grants. A private temporary client file under the secrets directory keeps its password out of argv
+   and environment; completion/refusal cleans it before returning. Stale passwords require recovery.
    If the account is absent but its credential file exists, provisioning refuses rather than overwriting
    it or following a link. Do not paste credential contents into chat or the repository.
    The backup account likewise requires a finite root-owned0600 single-link literal generated

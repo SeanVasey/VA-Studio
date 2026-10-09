@@ -81,6 +81,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
+- Staging provisioning authenticates the persisted app credential as its exact database identity before grants, using a private temporary client file with cleanup and no password in arguments or environment.
+
 - Staging seals refuse environment aliases and public symlinks outside the public tree. Provisioning requires an intact private backup profile and authenticates its exact database identity before grants; orphan credentials require explicit recovery.
 
 - Staging unchanged-SHA retries require read-only root health proof; first-install retries snapshot before migration; already-mounted private binds reconcile their persistent fstab entry. Served-release selection adds defensive propagation of returned failure inside shell command substitution; Python helper failures were already fatal.

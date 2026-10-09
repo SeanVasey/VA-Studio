@@ -19,6 +19,8 @@ class OperationCustodyTest(unittest.TestCase):
             shell = '''die() { echo "$*" >&2; exit 1; }
 user_exists() { return 0; }
 mysql_q() { echo grant >> "$TRACE"; }
+mysql() { printf 'vasey_app@127.0.0.1\\n'; }
+env() { while [[ "${1:-}" == -* || "${1:-}" == *=* ]]; do shift; done; "$@"; }
 info() { :; }
 stat() {
   if [ "$2" = '%u %a %h' ]; then printf '0 %s %s\\n' "$(command stat -c %a "$3")" "$(command stat -c %h "$3")";
@@ -55,6 +57,40 @@ stat() {
                     self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
                     self.assertEqual(trace.exists(), case == "valid", "database grant occurred without credential custody")
                     self.assertNotIn("A" * 40, run.stdout + run.stderr)
+
+    def test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file(self):
+        source = (REPO / "ops/staging/provision.sh").read_text()
+        body = source[source.index("app_credential_custody()"):source.index("# Backup-only account")]
+        for outcome in ("stale", "wrong-identity", "valid"):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                profile = root / "db-app.env"
+                profile.write_text("DB_USERNAME=vasey_app\nDB_PASSWORD=" + "A" * 40 + "\n")
+                profile.chmod(0o600)
+                shell = '''die() { echo "$*" >&2; exit 1; }
+user_exists() { return 0; }
+mysql_q() { echo grant >> "$TRACE"; }
+info() { :; }
+mysql() {
+  echo auth >> "$TRACE"
+  [ "$OUTCOME" != stale ] || return 1
+  if [ "$OUTCOME" = wrong-identity ]; then printf 'vasey_app@localhost\\n';
+  else printf 'vasey_app@127.0.0.1\\n'; fi
+}
+env() { while [[ "${1:-}" == -* || "${1:-}" == *=* ]]; do shift; done; "$@"; }
+stat() {
+  if [ "$2" = '%u %a %h' ]; then printf '0 %s %s\\n' "$(command stat -c %a "$3")" "$(command stat -c %h "$3")";
+  else command stat "$@"; fi
+}
+'''
+                run = subprocess.run(["bash", "-eu", "-c", shell + body], capture_output=True, text=True, timeout=2,
+                                     env={"PATH": "/usr/bin:/bin", "SECRETS": str(root), "DB_NAME": "fixture_database",
+                                          "TRACE": str(root / "trace"), "OUTCOME": outcome})
+                self.assertEqual(run.returncode == 0, outcome == "valid", run.stdout + run.stderr)
+                trace = (root / "trace").read_text().splitlines()
+                self.assertEqual(trace, ["auth", "grant"] if outcome == "valid" else ["auth"])
+                self.assertEqual(sorted(path.name for path in root.iterdir()), ["db-app.env", "trace"], "temporary credential was retained")
+                self.assertNotIn("A" * 40, run.stdout + run.stderr)
 
     def test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration(self):
         source = (REPO / "ops/staging/forge-deploy.sh").read_text()

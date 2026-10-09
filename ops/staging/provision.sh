@@ -258,6 +258,25 @@ app_credential_custody() {
   unset credential
 }
 
+app_credential_authentication() (
+  # Keep credentials out of argv/environment; cleanup is scoped to this subshell.
+  app_auth_client=$(command -v mysql) || die "MySQL client unavailable"
+  mapfile -t app_auth_credentials < "$SECRETS/db-app.env"
+  app_auth_profile=$(mktemp "$SECRETS/.app-auth.XXXXXXXX") || die "cannot prepare private app authentication"
+  app_auth_status=0
+  trap 'app_auth_status=$?; rm -f -- "$app_auth_profile" || exit 1; exit "$app_auth_status"' EXIT
+  printf '[client]\nhost=127.0.0.1\nport=3306\nuser=vasey_app\npassword=%s\n' \
+    "${app_auth_credentials[1]#DB_PASSWORD=}" > "$app_auth_profile" \
+    || die "cannot persist private app authentication"
+  unset app_auth_credentials
+  app_auth_identity=$(env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$app_auth_client" \
+    --defaults-file="$app_auth_profile" --no-login-paths --protocol=TCP --connect-timeout=5 \
+    --batch --skip-column-names -e 'SELECT CURRENT_USER()' 2>/dev/null) \
+    || die "app credential does not authenticate; restore it privately or perform an explicit account rotation"
+  [ "$app_auth_identity" = 'vasey_app@127.0.0.1' ] \
+    || die "app credential authenticated an unexpected identity; recover explicitly"
+)
+
 if ! user_exists vasey_app; then
   [ ! -e "$SECRETS/db-app.env" ] && [ ! -L "$SECRETS/db-app.env" ] \
     || die "app credential file exists without its database account; inspect privately and recover explicitly"
@@ -270,6 +289,7 @@ if ! user_exists vasey_app; then
   info "created MySQL account vasey_app@127.0.0.1; its password is in $SECRETS/db-app.env (root only)"
 fi
 app_credential_custody
+app_credential_authentication
 mysql_q "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES, TRIGGER, CREATE TEMPORARY TABLES, LOCK TABLES ON \`$DB_NAME\`.* TO 'vasey_app'@'127.0.0.1'"
 
 # Backup-only account (docs/ops/backup-restore-proof.md): read, triggers, events, routines; no writes.
