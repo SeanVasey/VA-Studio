@@ -56,6 +56,7 @@ done
 
 [[ "$HOST" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]] || die "--host must be a lowercase DNS name"
 [[ "$APP_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] && id "$APP_USER" >/dev/null 2>&1 || die "app user '$APP_USER' does not exist"
+[ "$(id -u "$APP_USER")" -gt 0 ] || die "application account must be nonroot"
 [[ "$ROOT" =~ ^/[A-Za-z0-9/_.-]+$ ]] && [[ "$ROOT" != *..* ]] || die "--root must be a plain absolute path"
 [[ "$DB_NAME" =~ ^[a-z][a-z0-9_]{0,40}$ ]] || die "--db-name must match ^[a-z][a-z0-9_]{0,40}$"
 [[ "$APP_ENV_EXPECTED" =~ ^(local|staging)$ ]] || die "--app-env must be local or staging"

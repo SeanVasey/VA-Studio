@@ -69,7 +69,7 @@ before mounting. The sealer walks through no-follow directory descriptors, close
 opening children and copies regular code/vendor/build files onto fresh root-owned read-only inodes.
 Hard links, external/runtime code symlinks and special files refuse; an old writable descriptor cannot
 change the newly installed inode. Executable bits remain executable and nginx can read public build files.
-The protected `.env` is root:app-group 0440. Only `ctl configure` performs ordinary environment refresh,
+The configured application account must be nonroot; provisioning and privileged entry points refuse UID 0. The protected `.env` is root:app-group 0440. Only `ctl configure` performs ordinary environment refresh,
 under closed writer admission, after real runtime admission and unchanged-key validation.
 
 Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `storage/logs` and
@@ -261,7 +261,9 @@ There is no global CSP: the application sets CSP on the responses that need one.
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
 
 A served release must have a singly linked regular environment with one valid literal 32-byte APP_KEY
-before any snapshot is published. Invalid/dangling/outside `current` never becomes a first install.
+before any snapshot is published. The backup profile requires one assignment per line; multiline quoted
+values are refused so apparent key lines inside another value cannot establish custody. Restore admission
+requires exactly the recorded checksum for `env.backup`. Invalid/dangling/outside `current` never becomes a first install.
 Restore reproof invalidates old success first, requires an unambiguous release manifest, and requires
 both `env.backup` and its hash for a served release. Only an explicit `release_sha=none` bootstrap set
 may omit the key; such a set cannot claim recovery of previously encrypted columns.

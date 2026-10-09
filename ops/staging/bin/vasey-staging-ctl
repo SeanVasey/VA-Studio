@@ -42,6 +42,7 @@ case "$(stat -c %a "$CONF")" in 600|640|644|400|440|444) ;; *) die "$CONF must n
 
 : "${VASEY_STAGING_HOST:?}" "${VASEY_APP_USER:?}" "${VASEY_APP_GROUP:?}" "${VASEY_ROOT:?}" "${VASEY_PHP:?}" \
   "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_PROBE_NETRC:?}" "${VASEY_KEEP_RELEASES:=3}"
+[ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 ROOT=$VASEY_ROOT
 RELEASES=$ROOT/releases

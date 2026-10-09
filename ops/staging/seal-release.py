@@ -29,7 +29,7 @@ def checked_link(root, relative):
 
 
 def copy_file(parent, name, relative, app_uid, app_gid):
-    source = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent)
+    source = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
     staged = ".sealed-" + secrets.token_hex(16)
     output = None
     try:
@@ -156,7 +156,7 @@ def stage_environment(base, source, target, app_uid, app_gid):
         info = os.fstat(descriptor)
         if info.st_uid not in (ROOT_UID, app_uid) or info.st_mode & 0o022:
             raise ValueError("untrusted candidate ancestry")
-        data_descriptor = os.open(relative.parts[-1], os.O_RDONLY | os.O_NOFOLLOW, dir_fd=descriptor)
+        data_descriptor = os.open(relative.parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
         before = os.fstat(data_descriptor)
         if (not stat.S_ISREG(before.st_mode) or before.st_uid != app_uid or before.st_nlink != 1
                 or stat.S_IMODE(before.st_mode) != 0o600 or before.st_size > 1048576):
@@ -170,7 +170,7 @@ def stage_environment(base, source, target, app_uid, app_gid):
         if (before.st_size, before.st_mtime_ns, before.st_ctime_ns, before.st_nlink) != (
                 after.st_size, after.st_mtime_ns, after.st_ctime_ns, after.st_nlink):
             raise ValueError("candidate changed during capture")
-        output = os.open(target, os.O_WRONLY | os.O_NOFOLLOW)
+        output = os.open(target, os.O_WRONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
         destination = os.fstat(output)
         if (not stat.S_ISREG(destination.st_mode) or destination.st_uid != ROOT_UID
                 or destination.st_nlink != 1 or stat.S_IMODE(destination.st_mode) != 0o600):
@@ -197,13 +197,17 @@ def main():
     if os.geteuid() != 0:
         raise ValueError("root is required")
     if len(sys.argv) == 7 and sys.argv[1] == "stage-env":
-        stage_environment(sys.argv[2], sys.argv[3], sys.argv[4], pwd.getpwnam(sys.argv[5]).pw_uid,
-                          grp.getgrnam(sys.argv[6]).gr_gid)
+        app_uid = pwd.getpwnam(sys.argv[5]).pw_uid
+        if app_uid == 0:
+            raise ValueError("application account must be nonroot")
+        stage_environment(sys.argv[2], sys.argv[3], sys.argv[4], app_uid, grp.getgrnam(sys.argv[6]).gr_gid)
         return
     if len(sys.argv) != 5 or sys.argv[1] not in ("seal", "verify"):
         raise ValueError("root seal/verify requires one release and the configured account")
-    run(sys.argv[2], pwd.getpwnam(sys.argv[3]).pw_uid, grp.getgrnam(sys.argv[4]).gr_gid,
-        sys.argv[1] == "seal")
+    app_uid = pwd.getpwnam(sys.argv[3]).pw_uid
+    if app_uid == 0:
+        raise ValueError("application account must be nonroot")
+    run(sys.argv[2], app_uid, grp.getgrnam(sys.argv[4]).gr_gid, sys.argv[1] == "seal")
 
 
 if __name__ == "__main__":

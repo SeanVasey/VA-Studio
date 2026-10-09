@@ -77,6 +77,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Security
 
+- Staging backup admission refuses multiline environment values and key-looking embedded lines, requires the exact environment hash record, and invalidates stale proof markers. Configuration capture refuses special files without blocking; provisioning and privileged helpers require a nonroot application account.
 - Staging control seals privileged release ancestry before bind/unbind and reserves atomic activation for the root helper. Restore proof normalizes only table column charset rendering, invalidates stale success markers and publishes after verification/cleanup. Same-SHA refresh freezes one admitted environment, preserves the existing key and takes a recoverable pre-change snapshot; recovery never infers stopped writers from a phase flag.
 
 - The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any upload field in the application does not refuse stored paths, or if any code turns that guard off.

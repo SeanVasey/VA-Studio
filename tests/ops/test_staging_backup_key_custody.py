@@ -63,7 +63,7 @@ mysqldump() { echo synthetic-dump; }
         directory = Path((self.root / "backups/.last").read_text().strip())
         self.assertIn("release_sha=none\n", (directory / "MANIFEST").read_text())
 
-    def restore_admission(self, manifest=None, env=None, hashed=False):
+    def restore_admission(self, manifest=None, env=None, hashed=False, hash_contents=None):
         backup = self.root / "candidate"
         backup.mkdir(exist_ok=True)
         for name in ("database.sql", "private.tar"):
@@ -78,6 +78,8 @@ mysqldump() { echo synthetic-dump; }
             if hashed:
                 result = subprocess.run(["sha256sum", "env.backup"], cwd=backup, capture_output=True, text=True, check=True)
                 (backup / "env.backup.sha256").write_text(result.stdout)
+        if hash_contents is not None:
+            (backup / "env.backup.sha256").write_text(hash_contents)
         prefix = self.source[self.source.index("restore_check()"):self.source.index('  install -d -m 0711')]
         run = subprocess.run(["bash", "-c", self.shell + self.definitions + prefix +
                               '\n}\nrestore_check "$CANDIDATE"\necho ACCEPTED'],
@@ -101,6 +103,26 @@ mysqldump() { echo synthetic-dump; }
         run = self.restore_admission("release_sha=none\n")
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertIn("ACCEPTED", run.stdout)
+
+    def test_served_restore_requires_the_exact_environment_hash_record(self):
+        key = "APP_KEY=base64:" + "A" * 43 + "=\n"
+        valid = self.restore_admission("release_sha=" + "a" * 40 + "\n", key, True)
+        self.assertEqual(valid.returncode, 0, valid.stderr)
+        backup = self.root / "candidate"
+        wrong = (backup / "database.sql.sha256").read_text()
+        for manifest in (wrong, (backup / "env.backup.sha256").read_text() + wrong):
+            with self.subTest(manifest=manifest):
+                run = self.restore_admission("release_sha=" + "a" * 40 + "\n", key, True, manifest)
+                self.assertNotEqual(run.returncode, 0, run.stdout)
+
+    def test_key_looking_lines_inside_multiline_values_are_not_admitted(self):
+        key = "base64:" + "A" * 43 + "="
+        path = self.root / "multiline.env"
+        for quote in ('"', "'"):
+            path.write_text("CONTACT_FROM_NAME=" + quote + "multiline\nAPP_KEY=" + key + "\n" + quote + "\n")
+            run = subprocess.run(["bash", "-c", self.shell + self.definitions + '\nvalid_env_key "$KEY_ENV"'],
+                                 env={**self.environment, "KEY_ENV": str(path)}, capture_output=True, text=True)
+            self.assertNotEqual(run.returncode, 0, run.stdout)
 
     def test_valid_literal_quoted_keys_are_accepted_but_duplicate_empty_or_wrong_length_keys_refuse(self):
         key = "base64:" + "A" * 43 + "="

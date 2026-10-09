@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 REPO = Path(__file__).resolve().parents[2]
 SEALER = REPO / "ops/staging/seal-release.py"
@@ -159,6 +159,47 @@ stat() {
                              env={"PATH": "/usr/bin:/bin", "GIT_NO_REPLACE_OBJECTS": "1",
                                   "GIT_CONFIG_GLOBAL": "/dev/null"}, capture_output=True, text=True)
         self.assertEqual(run.returncode, 1, run.stderr)
+
+    def test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer(self):
+        evidence = self.root / "evidence"
+        evidence.mkdir(mode=0o750)
+        source = evidence / "candidate"
+        os.mkfifo(source, 0o600)
+        output = self.root / "protected-output"
+        output.write_text("")
+        output.chmod(0o600)
+        driver = """import importlib.util, os, sys
+spec = importlib.util.spec_from_file_location('fifo_sealer', sys.argv[1])
+module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+module.ROOT_UID = os.getuid(); module.ROOT_GID = os.getgid()
+try:
+    module.stage_environment(sys.argv[2], sys.argv[3], sys.argv[4], os.getuid(), os.getgid())
+except (ValueError, OSError):
+    sys.exit(0)
+sys.exit(1)
+"""
+        try:
+            run = subprocess.run(["python3", "-c", driver, str(SEALER), str(evidence), str(source), str(output)],
+                                 capture_output=True, text=True, timeout=1)
+        except subprocess.TimeoutExpired:
+            self.fail("untrusted FIFO blocked before regular-file admission")
+        self.assertEqual(run.returncode, 0, run.stderr)
+
+    def test_privileged_cli_refuses_root_as_the_application_account(self):
+        spec = importlib.util.spec_from_file_location("root_account_sealer", SEALER)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for argv in ([str(SEALER), "verify", str(self.release), "root", "root"],
+                     [str(SEALER), "stage-env", str(self.root), str(self.root / "candidate"),
+                      str(self.root / "target"), "root", "root"]):
+            with patch.object(module.os, "geteuid", return_value=0), patch.object(module.sys, "argv", argv), \
+                    patch.object(module.pwd, "getpwnam", return_value=Mock(pw_uid=0)), \
+                    patch.object(module.grp, "getgrnam", return_value=Mock(gr_gid=0)), \
+                    patch.object(module, "run") as run, patch.object(module, "stage_environment") as stage:
+                with self.assertRaises(ValueError):
+                    module.main()
+                run.assert_not_called()
+                stage.assert_not_called()
 
 
 if __name__ == "__main__":

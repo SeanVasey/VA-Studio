@@ -33,6 +33,7 @@ log() { echo "vasey-staging-backup: $(date -u +%FT%TZ) $*"; }
 : "${VASEY_RESTORE_CHECK_DIR:=/var/lib/mysql-restore-check}" "${VASEY_RESTORE_STRICT_MODES:=1}"
 : "${VASEY_BACKUP_DEST:=}" "${VASEY_BACKUP_SSH_KEY:=/root/.ssh/vasey_staging_backup}"
 : "${VASEY_MYSQLD:=/usr/sbin/mysqld}"
+[ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 PRIVATE=$VASEY_ROOT/private
 CTL=/usr/local/sbin/vasey-staging-ctl
@@ -52,8 +53,29 @@ valid_env_key() {
   "$VASEY_PHP" -n -r '
     $data = file_get_contents($argv[1], false, null, 0, 1048577);
     if ($data === false || strlen($data) > 1048576 || str_contains($data, "\0")) exit(1);
-    if (preg_match_all("/^[\t ]*(?:export[\t ]+)?APP_KEY[\t ]*=(.*)$/m", $data, $matches) !== 1) exit(1);
-    $value = trim($matches[1][0]);
+    // This backup profile supports one assignment per line. Reject multiline values before
+    // identifying APP_KEY, so key-looking text inside another value cannot establish custody.
+    $keys = [];
+    foreach (explode("\n", $data) as $line) {
+      $line = trim($line, " \t\r");
+      if ($line === "" || $line[0] === "#") continue;
+      if (str_contains($line, "\r") || preg_match("~^(?:export[ \t]+)?([A-Za-z_][A-Za-z0-9_]*)[ \t]*=(.*)$~D", $line, $assignment) !== 1) exit(1);
+      $candidate = ltrim($assignment[2], " \t");
+      if ($candidate !== "" && ($candidate[0] === chr(34) || $candidate[0] === chr(39))) {
+        $quote = $candidate[0];
+        $closed = false;
+        for ($i = 1, $length = strlen($candidate); $i < $length; $i++) {
+          if ($quote === chr(34) && $candidate[$i] === chr(92)) { $i++; continue; }
+          if ($candidate[$i] === $quote) { $closed = true; break; }
+        }
+        if (!$closed) exit(1);
+        $suffix = ltrim(substr($candidate, $i + 1), " \t");
+        if ($suffix !== "" && $suffix[0] !== "#") exit(1);
+      } elseif (strpbrk(explode("#", $candidate, 2)[0], chr(34).chr(39)) !== false) exit(1);
+      if ($assignment[1] === "APP_KEY") $keys[] = trim($candidate);
+    }
+    if (count($keys) !== 1) exit(1);
+    $value = $keys[0];
     $pattern = "~^(?:([\"\\x27])(base64:[A-Za-z0-9+/]{43}=)\\1|(base64:[A-Za-z0-9+/]{43}=))(?:[ \t]*(?:\\#.*)?)?$~";
     if (preg_match($pattern, $value, $key) !== 1) exit(1);
     $encoded = ($key[2] ?? "") !== "" ? $key[2] : ($key[3] ?? "");
@@ -145,7 +167,8 @@ restore_check() {
     valid_env_key "$bk/env.backup" \
       && [ -f "$bk/env.backup.sha256" ] && [ ! -L "$bk/env.backup.sha256" ] \
       || die "served backup requires its environment/key and hash"
-    (cd "$bk" && sha256sum --check --quiet env.backup.sha256) || die "env.backup hash mismatch"
+    # Check the exact recorded file, never another pathname supplied by the hash manifest.
+    (cd "$bk" && sha256sum env.backup | cmp -s - env.backup.sha256) || die "env.backup hash mismatch"
   fi
   (cd "$bk" && sha256sum --check --quiet database.sql.sha256 private.tar.sha256) || die "backup files do not match their recorded hashes"
 
