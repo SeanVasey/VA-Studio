@@ -140,6 +140,7 @@ step "runtime .env passes the staging profile checks (APP_ENV=$VASEY_EXPECTED_AP
 if [ -e "$REL" ]; then
   if [ "$(readlink -f "$CURRENT" 2>/dev/null || true)" = "$REL" ]; then
     if cmp -s "$RUNTIME_ENV" "$REL/.env"; then
+      "${CTL[@]}" healthy "$SHA" || die "served SHA is not healthy; inspect ctl status and recover explicitly"
       step "$SHA is already the served release and its .env is unchanged; nothing to do"; exit 0
     fi
     # Environment-only change (for example the seller tag or Lane B's test-commerce values): the release stays
@@ -210,10 +211,8 @@ SEALED_GIT=(env -i PATH=/usr/bin:/bin LC_ALL=C GIT_NO_REPLACE_OBJECTS=1 GIT_CONF
 "${SEALED_GIT[@]}" diff --quiet --no-ext-diff --no-textconv HEAD -- || die "tracked source changed before sealing"
 
 # ---------------------------------------------------------------- 5-6. already quiesced: back up and prove the restore
-if [ "$FIRST_INSTALL" = 0 ]; then
-  step "backup and isolated restore proof before migrating"
-  "${CTL[@]}" snapshot
-fi
+step "backup and isolated restore proof before migrating (including first install)"
+"${CTL[@]}" snapshot
 
 # ---------------------------------------------------------------- 7. migrate and cache in the new release
 art down >/dev/null

@@ -167,7 +167,7 @@ served_release() {
   target=$(readlink -f "$CURRENT") || return 1
   valid_sha "$(basename "$target")" || die "current does not point at a SHA-named release"
   [ "$target" = "$RELEASES/$(basename "$target")" ] || die "current points outside the release container"
-  sealed_release "$(basename "$target")"
+  sealed_release "$(basename "$target")" || return 1
   printf '%s\n' "$target"
 }
 
@@ -190,6 +190,13 @@ web_stopped() {
     && ! pgrep -u "$VASEY_APP_USER" -f 'php-fpm|artisan serve|octane' >/dev/null
 }
 
+persist_private_bind() {
+  local line="$PRIVATE $1 none bind 0 0"
+  grep -qxF -- "$line" /etc/fstab || printf '%s\n' "$line" >> /etc/fstab \
+    || die "cannot persist private bind entry"
+  grep -qxF -- "$line" /etc/fstab || die "private bind entry not persisted"
+}
+
 cmd_attach() {
   local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
   local rel=$RELEASES/$sha target=$RELEASES/$sha/storage/app/private
@@ -198,6 +205,7 @@ cmd_attach() {
   [ "$(stat -c '%U %a' "$PRIVATE")" = "$VASEY_APP_USER 700" ] || die "persistent private root must be $VASEY_APP_USER 0700"
   if mountpoint -q "$target"; then
     [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "$target is mounted from something else"
+    persist_private_bind "$target"
     echo "attached (already) $sha"; return 0
   fi
   # The sealed parent ancestry prevents app renames. Pin the private leaf as an additional boundary:
@@ -211,8 +219,7 @@ cmd_attach() {
   mount --no-canonicalize --bind -- "$PRIVATE" /proc/self/cwd
   cd /
   [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] && [ ! -L "$target" ] || die "attach did not take effect"
-  local line="$PRIVATE $target none bind 0 0"
-  grep -qxF -- "$line" /etc/fstab || printf '%s\n' "$line" >> /etc/fstab
+  persist_private_bind "$target"
   echo "attached $sha"
 }
 
@@ -316,6 +323,28 @@ cmd_resume() {
   echo "resumed $sha (GET / 200, test-commerce admission open)"
 }
 
+cmd_healthy() {
+  local sha=${1:-} cur p pid
+  valid_sha "$sha" || die "healthy needs a 40-hex SHA"
+  cur=$(served_release) || die "no sealed served release"
+  [ "$cur" = "$RELEASES/$sha" ] || die "another SHA is served"
+  writer_files
+  cmp -s -- "$WRITER_GATE" <(printf 'open\n') || die "writer admission is not open"
+  [ ! -e "$cur/storage/framework/maintenance.php" ] && [ ! -L "$cur/storage/framework/maintenance.php" ] \
+    && [ ! -e "$cur/storage/framework/down" ] && [ ! -L "$cur/storage/framework/down" ] || die "served release is in maintenance"
+  [ ! -L "$cur/storage/app/private" ] && mountpoint -q "$cur/storage/app/private" \
+    && [ "$(stat -c %d:%i "$cur/storage/app/private")" = "$(stat -c %d:%i "$PRIVATE")" ] \
+    && grep -qxF -- "$PRIVATE $cur/storage/app/private none bind 0 0" /etc/fstab || die "served private bind is not persistent"
+  systemctl is-active --quiet "$VASEY_PHP_FPM_SERVICE" || die "PHP-FPM is not active"
+  for p in "${PROGRAMS[@]}"; do
+    [ "$(program_state "$p")" = RUNNING ] || die "a supervised worker is not running"
+    pid=$(supervisorctl pid "vasey-staging:$p")
+    [[ "$pid" =~ ^[0-9]+$ ]] && [ "$(readlink -f "/proc/$pid/cwd")" = "$cur" ] || die "worker is not on the served release"
+  done
+  [ "$(probe)" = 200 ] || die "served release does not answer HTTP 200"
+  echo "healthy $sha"
+}
+
 cmd_snapshot() {
   writer_barrier
   workers_stopped && web_stopped || die "snapshot requires a quiesced host (run quiesce first)"
@@ -388,7 +417,7 @@ exec 8>>"$CONTROL_LOCK"
 flock -x 8 || die "cannot lock helper action"
 
 case "${1:-}" in
-  allocate|attach|detach|switch) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
+  allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
   configure) [ "$#" = 3 ] || die "configure requires exactly a SHA and private evidence file" ;;
   quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
 esac
@@ -398,10 +427,11 @@ case "${1:-}" in
   detach)   cmd_detach "${2:-}" ;;
   quiesce)  cmd_quiesce ;;
   resume)   cmd_resume ;;
+  healthy)  cmd_healthy "${2:-}" ;;
   switch)   cmd_switch "${2:-}" ;;
   snapshot) cmd_snapshot ;;
   configure) cmd_configure "${2:-}" "${3:-}" ;;
   prune)    cmd_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch <sha> | configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
 esac

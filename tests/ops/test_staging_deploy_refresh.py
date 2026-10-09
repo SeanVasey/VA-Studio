@@ -8,6 +8,31 @@ DEPLOY = Path(__file__).resolve().parents[2] / "ops/staging/forge-deploy.sh"
 
 
 class EnvironmentRefreshTest(unittest.TestCase):
+    def test_same_sha_unchanged_environment_requires_a_successful_health_proof(self):
+        source = DEPLOY.read_text()
+        branch = source[source.index('if [ -e "$REL" ]; then'):source.index('FIRST_INSTALL=1')]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            release = root / ("a" * 40)
+            release.mkdir()
+            (release / ".env").write_text("synthetic unchanged environment")
+            (root / "current").symlink_to(release)
+            shell = '''step() { :; }
+die() { echo "$*" >&2; exit 1; }
+ctl_fixture() { echo "$1" >> "$TRACE"; [ "$1" = healthy ] && [ "$HEALTHY" = 1 ]; }
+CTL=(ctl_fixture)
+'''
+            for healthy in ("0", "1"):
+                trace = root / "trace"
+                trace.unlink(missing_ok=True)
+                run = subprocess.run(["bash", "-eu", "-c", shell + branch], capture_output=True, text=True,
+                                     env={"PATH": "/usr/bin:/bin", "REL": str(release), "CURRENT": str(root / "current"),
+                                          "SHA": "a" * 40, "RUNTIME_ENV": str(release / ".env"),
+                                          "TRACE": str(trace), "HEALTHY": healthy})
+                with self.subTest(healthy=healthy):
+                    self.assertEqual(run.returncode == 0, healthy == "1", run.stdout + run.stderr)
+                    self.assertEqual(trace.read_text().strip() if trace.exists() else "", "healthy")
+
     def test_forge_edit_after_admission_does_not_replace_validated_candidate(self):
         source = DEPLOY.read_text()
         branch = source[source.index('if [ -e "$REL" ]; then'):source.index('install -d -m 0750 "$ROOT/evidence/')]

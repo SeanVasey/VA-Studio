@@ -300,6 +300,12 @@ An admitted test-commerce sweep can make quiesce refuse before stopping services
 marker stays closed, so new scheduled sweeps skip. Wait for the existing sweep to finish, then retry
 quiesce and follow the applicable recovery below. Never edit the marker to bypass a failed operation.
 
+Retrying a served SHA with unchanged environment requires the root `healthy <sha>` check. Maintenance,
+closed admission, wrong worker path or failed HTTP200 refuses; inspect and recover rather than treating
+unchanged files as success. Every migration attempt, including no-current first-install retries, takes
+a snapshot/proof first. First-install sets do not contain a historical encryption key. Reattachment also
+repairs a missing exact fstab bind entry before reporting success.
+
 ```sh
 cd "$(readlink -f /srv/vasey-staging/current)"
 sudo -n /usr/local/sbin/vasey-staging-ctl status

@@ -186,7 +186,8 @@ renaming that account breaks every guarded write.
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
-6. `vasey-staging-ctl snapshot` takes a backup and **restore proof** before anything is migrated.
+6. `vasey-staging-ctl snapshot` takes a backup and **restore proof** before anything is migrated,
+   including a first-install retry. A no-current set explicitly has no historical environment/key.
 7. In the new release:
    - `artisan down`, then `migrate --pretend` (evidence only; see the runbook), then `migrate --force`;
    - `config:cache`, `route:cache`, `view:cache`, `event:cache` (all verified to work with this codebase);
@@ -208,6 +209,11 @@ evidence file through anchored no-follow descriptors, revalidates it against rea
 atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
 A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
 `ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
+
+An unchanged served SHA is a successful no-op only after `ctl healthy <sha>` proves the sealed current
+release, persistent private bind, open admission, no maintenance, active FPM, all supervised workers on
+that release and HTTP200. It refuses partial state and leaves recovery explicit. An already-mounted bind
+still reconciles its exact fstab entry before reporting attachment success.
 
 `storage:link` is not run: no code uses the public disk. Previews, artwork and site images stream through
 controllers from private storage. `queue:restart` is issued by the quiesce. The workers are then stopped
