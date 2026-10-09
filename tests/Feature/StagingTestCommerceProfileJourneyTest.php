@@ -112,10 +112,10 @@ class StagingTestCommerceProfileJourneyTest extends TestCase
         foreach ((new Parser)->parse($raw) as $entry) {
             $this->profile[$entry->getName()] = $entry->getValue()->isDefined() ? $entry->getValue()->get()->getChars() : '';
         }
-        $this->assertSame('local', $this->profile['APP_ENV']);
+        $this->assertSame('staging', $this->profile['APP_ENV']);
         $this->assertSame(self::ORIGIN, $this->profile['APP_URL']);
         foreach ($this->profile as $name => $value) {
-            // PHPUnit keeps "testing"; both satisfy the policies' local/testing gate.
+            // PHPUnit keeps "testing"; it and the profile's "staging" both satisfy TestEnvironment::admitsTestCommerce().
             if ($name === 'APP_ENV') {
                 continue;
             }

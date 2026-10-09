@@ -9,6 +9,7 @@ use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Orders\PrepareOrder;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Media\MalwareScanner;
 use App\Models\User;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,9 +68,9 @@ class RightsScopeCommandTest extends TestCase
     }
 
     /** A published, priced, unlinked non-exclusive selection exactly as Studio leaves it today. */
-    private function pricedUnlinked(): array
+    private function pricedUnlinked(?MalwareScanner $scanner = null): array
     {
-        $f = QuoteFixtures::selection();
+        $f = QuoteFixtures::selection(scanner: $scanner);
         $quote = app(CreateQuote::class)->handle(InventoryFixtures::OWNER, (string) Str::uuid(), $f['items']);
         app(PriceQuote::class)->create($quote->public_id, InventoryFixtures::OWNER);
 
@@ -89,7 +90,31 @@ class RightsScopeCommandTest extends TestCase
 
     public function test_command_link_turns_an_unlinked_revision_order_failure_into_a_prepared_order(): void
     {
-        $f = $this->pricedUnlinked();
+        $this->linkTurnsAnUnlinkedOrderFailureIntoAPreparedOrder();
+    }
+
+    public function test_staging_admits_the_same_link_and_order_preparation(): void
+    {
+        // B2: a staging host is where operators link real offers before the first test purchase. The synthetic
+        // fixtures are testing-only, so only the command and order preparation run under staging. Staging accepts
+        // only ClamAV scan evidence (ScanEngines), so the fixture media carry a synthetic stand-in for a host scan.
+        try {
+            $this->linkTurnsAnUnlinkedOrderFailureIntoAPreparedOrder('staging');
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+    }
+
+    private function linkTurnsAnUnlinkedOrderFailureIntoAPreparedOrder(string $environment = 'testing'): void
+    {
+        $f = $this->pricedUnlinked($environment === 'testing' ? null : new class extends MalwareScanner
+        {
+            public function scan(string $path): array
+            {
+                return ['engine' => 'clamav', 'version' => 'synthetic-host-scan-stand-in', 'status' => 'clean', 'sha256' => hash_file('sha256', $path)];
+            }
+        });
+        $this->app['env'] = $environment;
         try {
             $this->prepare($f['quote']);
             $this->fail('An unlinked offer revision prepared an order.');
@@ -180,7 +205,7 @@ class RightsScopeCommandTest extends TestCase
         $this->assertSame($before, $this->evidence());
     }
 
-    public function test_writes_are_refused_outside_local_and_testing_environments(): void
+    public function test_writes_are_refused_outside_local_testing_and_staging_environments(): void
     {
         $f = QuoteFixtures::selection();
         $before = $this->evidence();

@@ -23,7 +23,7 @@ final class ProductionFreeGrantFrozenBytesTest extends TestCase
         'scripts/contract-renderer-autoload.php' => '09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01',
         'app/Domain/Delivery/DeliveryAssetFiles.php' => '3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c',
         'app/Domain/Delivery/PreparedDeliveryStream.php' => 'e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13',
-        'app/Domain/Delivery/ActivationPolicy.php' => '23253c453e7edefcf877eb191a07b0fba69f877a48fdfc91b8cfd36bbdaa7086',
+        'app/Domain/Delivery/ActivationPolicy.php' => '38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95', // B2: account()'s environment gate only; outsideTransactions() unchanged
         'app/Domain/Delivery/DeliveryException.php' => 'a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc',
         'app/Domain/Customers/ProductionCustomerAccess.php' => 'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7',
         'app/Domain/Customers/ProductionCustomerPrincipal.php' => 'd49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b',

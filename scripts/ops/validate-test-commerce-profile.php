@@ -205,8 +205,8 @@ if ($booted) {
     $record('runtime.boot', true, 'The application booted with this file only (no host .env, no cached config).');
 
     // ---- Runtime
-    $attempt('runtime.app_env_local', 'APP_ENV is exactly local (every test-commerce gate requires local or testing; hosts never run testing).',
-        fn () => app()->environment() === 'local');
+    $attempt('runtime.app_env_admitted', 'APP_ENV is exactly staging or local (test commerce admits local, testing and staging; hosts never run testing).',
+        fn () => in_array(app()->environment(), ['staging', 'local'], true));
     $attempt('runtime.app_debug_off', 'APP_DEBUG is false.', fn () => config('app.debug') === false);
     $attempt('runtime.app_url_equals_return_origin', 'APP_URL is an HTTPS origin equal to the checkout return_origin.', function () {
         $policy = json_decode((string) config('commerce.test_checkout_policy'), true, 16, JSON_THROW_ON_ERROR);

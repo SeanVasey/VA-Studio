@@ -11,7 +11,7 @@
 #   --mirror DIR              Forge site checkout that holds the Forge-managed .env (default: /home/<app-user>/<host>)
 #   --db-name NAME            MySQL schema (default: vasey_staging)
 #   --mysql-admin-defaults F  root-owned 0600 [client] file under protected ancestry (default: root via the local socket)
-#   --app-env NAME            APP_ENV the deploy insists on (default: local; the one switch for a later `staging`)
+#   --app-env NAME            APP_ENV the deploy insists on (default: staging; local is the earlier interim profile)
 #   --basic-auth-user NAME    staging basic-auth user; the password is read from the terminal (never an argument)
 #   --skip-packages           do not apt-get anything (re-runs that only refresh config)
 #
@@ -37,7 +37,7 @@ warn() { echo "provision: WARNING: $*" >&2; }
 
 [ "$(id -u)" -eq 0 ] || die "run as root (sudo bash $0 ...)"
 
-HOST="" APP_USER=forge ROOT=/srv/vasey-staging MIRROR="" DB_NAME=vasey_staging MYSQL_ADMIN_DEFAULTS="" APP_ENV_EXPECTED=local
+HOST="" APP_USER=forge ROOT=/srv/vasey-staging MIRROR="" DB_NAME=vasey_staging MYSQL_ADMIN_DEFAULTS="" APP_ENV_EXPECTED=staging
 BASIC_USER="" SKIP_PACKAGES=0
 while [ $# -gt 0 ]; do
   case "$1" in

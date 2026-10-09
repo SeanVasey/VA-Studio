@@ -183,7 +183,7 @@ final class ManageRightsScopes extends Command
         $reason = match ($error->errorCode) {
             'INVENTORY_SCOPE_CONFLICT' => 'the scope key or revision link already exists with a different evidence reference or scope; existing identity is immutable.',
             'SELECTION_CHANGED' => 'the revision is not the current revision of an active offer on a published track that passes publication readiness.',
-            'INVENTORY_UNAVAILABLE' => 'rights scopes are available only in the local and testing environments.',
+            'INVENTORY_UNAVAILABLE' => 'rights scopes are available only in the local, testing and staging environments.',
             default => 'the domain service refused the request.',
         };
 
