@@ -231,3 +231,27 @@ Publication formatting strips only unittest progress whitespace and the empty-st
 Independent [recovery addendum](independent-review/RECOVERY-ADMISSION-ADDENDUM.md) **APPROVES exacta44664f4**, carried toea9e0568 by empty product-source diff and inspected docs. Expanded independent5methods pass (initial4methods includes18health states); historical3methods reproduce7safety failures, and actual old Python wrapper already refuses its genuine error. Evidence-only publication preserves runtime source.
 
 Two trailing spaces after empty assertion messages in the independent recovery red receipt were removed for `git diff --check`; command results and failure outcomes are unchanged.
+
+## Root operation lease and database custody, core source 0e0df68d
+
+Supersedes the earlier publication checkpoints above. Codex on56587038 found4226458399 (root control/writer locks ended before migration, permitting independent resume) and4226458404 (existing app identity could have no persisted credentials).
+
+Tested source `0e0df68d7eca40c892eb8cfc959264f240ffd04c` uses three narrow root operations. `prepare` retains control/writer locks from fresh quiesce through fixed unprivileged checkout/build and sealing. `activate` retains them from fresh quiesce through verified snapshot, fixed unprivileged migration/cache/doctor, switch and healthy resume. `refresh` encloses snapshot/configuration/resume. The fixed root-installed helper requires protected ancestry, root0644 regular single-link custody; children close privileged FDs7/8. Root does not write application evidence paths. A protected root600 operation marker persists on failure or parent death, blocking all public mutating actions until explicit root recovery stops surviving children and inspects/restores state. Successful child completion plus sealing/healthy resume clears it. Between phases another action may run, so activate re-establishes fresh quiesce and snapshot; failures outside phases need inspection rather than a presumed closed gate.
+
+Provisioning checks protected credential-store ancestry, refuses pre-existing files for absent identities before overwrite, uses no-clobber creation, and requires a finite root600 single-link regular app credential containing exactly the literal generated profile. It does not source the file or rotate an existing account. Missing/unsafe/incomplete custody requires private operator recovery.
+
+Owner red: [2 methods /8 failures](codex-repair/operation-custody-red.txt); seven original unsafe credential cases and a modeled independent-resume gap causing migration refusal. This is bounded host/database authority, not a genuine host mutation. Four implementation/harness attempts are retained separately (including missing PHP PATH discovery); no failed attempt is represented as green. Trailing receipt whitespace is normalized solely for diff checks, without changing outcomes.
+
+Exact committed owner commands:
+
+- `source /workspace/.va-studio-toolchain/activate.sh; python3 -m unittest discover -s tests/ops -p 'test_staging_*.py' -v`: [57 PASS](codex-repair/final-ops-0e0df68d.txt), including real flock/process continuity, killed root parent with surviving migration child, fixed build and refresh lease, failed migration/blocked retries, readonly health, real Laravel configuration and sealing/backup boundaries. Root/service/database identities remain explicit fixtures.
+- Genuine portable PHP8.4.26 PHPUnit entry point selecting `tests/Unit/StagingRuntimeValidatorTest.php`: [13 tests /63 assertions PASS](codex-repair/final-runtime-0e0df68d.txt).
+- Each of six Bash scripts parsed separately; Shellcheck0.10 `-x` and whitespace PASS at this source. Native HTTP templates and prior28 transport cases are unchanged; no new actual host/provider claim.
+
+Independent operation/custody decision is pending at this receipt commit; publication and merge require its exact-source approval, final preflight/code review and resolved findings. Actual Forge service/root/mount/MySQL credential recovery remains unexecuted.
+
+### Latest lifecycle successor a7cf5d55
+
+Independent review found a public legacy configure bypass at0e0: a killed root controller could leave its cache child alive while later resume opened admission. Actual independent red is retained. `a7cf5d55e6f89da367cf59181c05ef9efa7a8d10` removes that public action (configuration remains internal to refresh) and gives standalone stop/start interruption custody. Recovery quiesce never clears an existing interrupted-operation marker. Fresh activate re-quiesce now proves an already stopped backend/worker census rather than requiring HTTP503 from an absent backend or redundantly stopping STOPPED workers.
+
+Owner new [7 methods /3 safety failures at0e0](codex-repair/operation-public-red.txt) reproduce cold quiesce refusal and killed public stop/start missing markers. Current exact committed [59 operations PASS](codex-repair/final-ops-a7cf5d55.txt), genuine [PHP8.4.26 runtime13/63 PASS](codex-repair/final-runtime-a7cf5d55.txt), Bash6 individually parsed, Shellcheck and whitespace PASS. The prior57/13 receipts retain their original core source identity. Root/service/database authority remains bounded fixtures, not installed Forge evidence. Independent final decision and exact publication gates are still required before merge.

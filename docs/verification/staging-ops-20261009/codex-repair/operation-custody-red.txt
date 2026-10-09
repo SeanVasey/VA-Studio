@@ -1,0 +1,78 @@
+test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ...
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='missing') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='empty') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='wrong-user') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='extra-line') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='writable') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='symlink') ... FAIL
+  test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='hardlink') ... FAIL
+test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (test_staging_operation_custody.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... FAIL
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='wrong-user')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='extra-line')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='writable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='symlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) (case='hardlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 48, in test_existing_database_identity_requires_private_complete_credential_custody
+    self.assertEqual(run.returncode == 0, case == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (test_staging_operation_custody.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 75, in test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration
+    self.assertEqual(run.returncode, 0, run.stderr)
+AssertionError: 73 != 0 :
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.017s
+
+FAILED (failures=8)

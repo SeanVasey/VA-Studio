@@ -1,0 +1,39 @@
+test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (test_staging_operation_lease.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries) ... ok
+test_fresh_activation_can_requiesce_an_already_stopped_served_release (test_staging_operation_lease.OperationLeaseTest.test_fresh_activation_can_requiesce_an_already_stopped_served_release) ... FAIL
+test_killed_root_parent_blocks_resume_while_migration_child_survives (test_staging_operation_lease.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives) ... ok
+test_migration_holds_control_and_writer_locks_until_switch_and_resume (test_staging_operation_lease.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume) ... ok
+test_prepare_retains_control_lease_until_writable_build_child_is_reaped (test_staging_operation_lease.OperationLeaseTest.test_prepare_retains_control_lease_until_writable_build_child_is_reaped) ... ok
+test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) ...
+  test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) (action='quiesce') ... FAIL
+  test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) (action='resume') ... FAIL
+test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume (test_staging_operation_lease.OperationLeaseTest.test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume) ... ok
+
+======================================================================
+FAIL: test_fresh_activation_can_requiesce_an_already_stopped_served_release (test_staging_operation_lease.OperationLeaseTest.test_fresh_activation_can_requiesce_an_already_stopped_served_release)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 273, in test_fresh_activation_can_requiesce_an_already_stopped_served_release
+    self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+AssertionError: 1 != 0 : served release is not answering 503 after artisan down
+
+
+======================================================================
+FAIL: test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) (action='quiesce')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 258, in test_public_stop_and_start_keep_recovery_marker_after_root_parent_death
+    self.assertTrue(self.operation.is_file(), "root parent death lost public-operation recovery custody")
+AssertionError: False is not true : root parent death lost public-operation recovery custody
+
+======================================================================
+FAIL: test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) (action='resume')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 258, in test_public_stop_and_start_keep_recovery_marker_after_root_parent_death
+    self.assertTrue(self.operation.is_file(), "root parent death lost public-operation recovery custody")
+AssertionError: False is not true : root parent death lost public-operation recovery custody
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.776s
+
+FAILED (failures=3)
