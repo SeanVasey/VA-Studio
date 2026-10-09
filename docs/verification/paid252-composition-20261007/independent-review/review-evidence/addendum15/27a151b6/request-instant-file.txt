@@ -1,0 +1,13 @@
+# source: 27a151b66d10b80d07d54685791a2a3d0efd44dc (worktree /home/user/rv56-a15, clean: 0 tracked changes); public/build absent: yes
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv56-a15/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 01:05.938, Memory: 101.00 MB
+
+OK (7 tests, 129 assertions)
+rc=0 wall=66s

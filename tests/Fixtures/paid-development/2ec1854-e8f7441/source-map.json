@@ -1,0 +1,354 @@
+{
+  "producer_source": "2ec1854c2b3606250e59b157f06703151318af0a",
+  "identity_source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+  "identity_repair": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+  "status": "Producer UNREVIEWED and separate fresh-policy child pending; witness e8 independently approved by root. No final consumer acceptance.",
+  "files": [
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ApproveExemptionAuthority.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "2e96884a8bfc6737de5a7a5f57b50cec9b514f5a3133280de9720c411b090ae6"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutException.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "f5ae038aac1aab1aa30e56fada96fdb6855c5bc585829745a16e3cac18afa770"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "c04dbc3b448272290ec9e818ccc4e8b87139d9d20db1cf5aeb0932da015389d8"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommandTransaction.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "caaa90a41de3ebe343d54f86f46e3abc5e711f8caa32c07298c59d77f393aa97"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "99f00ee5251072fa9c257e96bb65e2370e40806f85dc7885523e1f4e9e99aabd"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentPolicy.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "b151c733ad31dc67e57e2c3a33b98791130f07160b976de114b5a0ba5467c532"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/CurrentSelection.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "b0c47f1fd18059acfbe57ed2d27527a90e1a958baeef47899b14f39da303a584"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Evidence.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "e557b6a0b904cbcfa2e0c7325302e60e9ec5189814c1af79a2be2e0c590a5847"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "ac908ae218e7988ef5cef50eaeed808a4838c57422e99a1694fff6ecd4c4436c"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ExemptionPolicyV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "971377ae3cc85145da1f47490569aaecdf1b85c9961089114a4a20dd7eaa04b7"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "4c666b7d13aa4d341ce23310a909d47d5a9e6797da2ea8dd80f398f64a65fe8b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedCheckout.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "b95de60fd827eefdb557b9762e3a2d2f628139b3fd7a52b89401c524c4e0f8ee"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/HostedEvidence.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "13eb973ddd2ea872c788f18d7258aff30b1b73c21923d1ad2a2d05e4272e2024"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OrderEvidence.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "4b7864a88b3f0bd4fcdc21169f8d36fc5243b484f3eb88cb2b8bb270ede2a8b0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "c102ae223e433ab8e086a563fcba94a83f63d009f293d424756170d0ea819a0f"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/OwnAccountStripeGateway.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "7b08341640033b05df0d4318653e68c348ad1a62ee59c97dbc01a36af722785b"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/PrimaryBoundary.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "469d849f7f8277e266e034c964c5b5c5d01232bbe2fb6fc4665fc75d23afe6c3"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionCheckout.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "eff295bb191cbc748fd0bb9cfd6c94bc7060ad70e148a712d08d7c3bae6ccca9"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderConsumerCommitAdmissionV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "0a1b219af99bf60d0b77f4570711a37e186c1e737d1fa721e886c607983c9608"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderLocatorV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "c881ad5238322ebe3c14f161c225ae518ad6c4255ab978cb60f551c8747fff11"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ProviderGateway.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "8b6fa1fa41b62bbc454b8a06edd02d37bfb73dba29fc33a245a69572640ccc46"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/Records.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "ba9d56a49613a7e74a5416481d2a93faeeda8348c3909ee357e2dda3ba3fee0e"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/ResolvedConnection.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "314596810f65f280c7804ae1bf58887bf3c223626a7bc5c792cf5d9e548cf575"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/StaffProof.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "479ebb9617d26d554ab66b8bc6f7cb028d2c899eae56cd30bb7ec404f00c8d0a"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionCheckout/TaxExemptions.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "1560cfbb7f2c20afc3c873f79e240995a9181bbe2329f5f9088b78ba737ea95d"
+    },
+    {
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "7dbaeed358ab1051dd34608fbf966645ae7756f163700733bf9708f1233aba42"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionCustomerPrincipal.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "ab0ddc7dcabb41fd8d003582c9a78814a90f5cd4fa80be4bc2c5208192306b0c"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "b8820fa80d7ab8bf588d443dfdf31dc80617e289b54c3116a8b3a8f685cf8546"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "623e31f469a0a1779e3f992f5d1c48b0aaa2382d308109bc33cc78f70a7c821b"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "23f855f53a01e5df3a4dab630e9fc8e2d513f23bf56de391f2380d41d29ee9a8"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityException.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php",
+      "source": "e6c02b90719923bc4ba435f86399b077980c1ddc",
+      "sha256": "82a2b5217f57da35eb90e099b4d26240c4c40082fa18977356de25b4c862cd78"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "6058e3e4ced2900e1ccc93bd9110691c041ad0c4ecafe2f0373d323ceb17cb90"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php",
+      "source": "e8f744163600bb394e3f09c8c7f838f9fc62c885",
+      "sha256": "1bc64f515cd6707b5e3dd9577aa98ac3aa32fc8b731d87654eb484caf1dc65fc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "445a001b81c7125b4c87188a3515406424ce2d89bb97cb3d3edc02f1dc12298f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "5b4b0a0b90b252589794de84f34d44a12a9c9cdf39613521a13cffcedcae9dc9"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentitySchema.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "99916a84234471ca95c8ec6c8b6b57324321e0132b38197c42f6c43b66eaf8d5"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "bc32bdaba43bf9ad0956121da38820eb9adf5da5f421ba160140f0606d224c93"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6"
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "path": "app/Providers/ProductionCheckoutServiceProvider.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "e228541e68867a3a7d3edc5e390e7474d2f0a9ad923a6f7e27b95870835bfd83"
+    },
+    {
+      "path": "config/production_checkout.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "8be44ca3e4eac53d7adbc4d5103a40a371301572908708a84b66e259825e82dd"
+    },
+    {
+      "path": "database/migrations/2026_10_07_246000_production_checkout.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "e834a67c3ffeeb26a9dc11a5701eb5e4d30f332421395b3e682e773996dec615"
+    },
+    {
+      "path": "database/migrations/2026_10_07_247000_production_customer_identity.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "a2cfa089ea5452aec894f24f6779f5deee63fb3a2453fd6c12d4a5d8b1273166"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutFixtures.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "31eea4cd98f80f4e2d90c987657f0d22264d355a16078107a5b33884f42c7558"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutGatewayFixture.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutJourneyFixture.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4"
+    },
+    {
+      "path": "tests/Support/ProductionCheckoutProviderFixtures.php",
+      "source": "2ec1854c2b3606250e59b157f06703151318af0a",
+      "sha256": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6"
+    },
+    {
+      "path": "tests/Support/ProductionIdentityFixture.php",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7"
+    },
+    {
+      "path": "tests/Support/production_identity_smtp_sink.py",
+      "source": "b9871dff4cd734779cd12809d736fb69af4e3dc7",
+      "sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6"
+    }
+  ],
+  "identity_witness_repair": "e8f744163600bb394e3f09c8c7f838f9fc62c885"
+}

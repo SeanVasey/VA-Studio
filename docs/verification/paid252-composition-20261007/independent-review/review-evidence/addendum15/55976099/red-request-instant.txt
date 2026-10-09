@@ -1,0 +1,45 @@
+# source: 55976099a5ac4f705ffe1e7d9d0491efa4981fda product, unmodified (git diff --stat -- app: ''), + the two new behaviour tests from 27a151b6 inserted into the 55976099 test file (copy: PaidGrantRequestInstantTest-red.php.txt, sha256 6928ca09c82d467c87da10c2410fcc9d7fc72d17001619e6fdf5cb301684f1b3); public/build absent
+# command: php -r '...phpunit' -- --colors=never --do-not-cache-result tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv56-a15/phpunit.xml
+
+.FE...                                                              6 / 6 (100%)
+
+Time: 01:00.058, Memory: 101.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_a_captured_instant_admits_the_redemption_after_more_than_the_age_bound_has_passed
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantDownloads.php:304
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantDownloads.php:179
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantCommands.php:64
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantCommands.php:43
+/home/user/rv56-a15/app/Domain/Grants/Paid/PaidGrantDownloads.php:189
+/home/user/rv56-a15/tests/Feature/PaidGrantRequestInstantTest.php:134
+/home/user/rv56-a15/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_an_identity_proof_longer_than_the_capture_age_bound_does_not_expire_a_request_received_in_time
+Expected response status code [200] but received 410.
+Failed asserting that 410 is identical to 200.
+
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/rv56-a15/vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+/home/user/rv56-a15/tests/Feature/PaidGrantRequestInstantTest.php:119
+/home/user/rv56-a15/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 107, Errors: 1, Failures: 1.
+rc=2

@@ -1,0 +1,19 @@
+# git diff --stat 8fc077f 915ca2c -- app config database routes bootstrap
+rc=0
+# git diff --stat 8fc077f 915ca2c (all)
+ CHANGELOG.md                                       |   2 +-
+ .../hardening/codex-24/README.md                   |  41 +++
+ .../hardening/codex-24/evidence/frontend-all.txt   |  10 +
+ .../codex-24/evidence/mutation-M1-empty-order.txt  |   8 +
+ .../codex-24/evidence/red-on-8fc077f2.txt          | 293 +++++++++++++++++++++
+ .../hardening/codex-24/evidence/tsc.txt            |   2 +
+ resources/js/components/PaidGrantJourney.tsx       |  13 +-
+ tests/frontend/paid-grant-reopen-issued.test.tsx   |  92 +++++++
+ 8 files changed, 456 insertions(+), 5 deletions(-)
+rc=0
+# outside docs/verification
+CHANGELOG.md
+resources/js/components/PaidGrantJourney.tsx
+tests/frontend/paid-grant-reopen-issued.test.tsx
+rc=0
+# HEAD 915ca2c9217d273ee1afa23e0486e084cae7c475

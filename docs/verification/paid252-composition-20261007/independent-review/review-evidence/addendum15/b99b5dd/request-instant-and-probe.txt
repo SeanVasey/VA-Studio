@@ -1,0 +1,30 @@
+# source: b99b5dd4a44b30a997aab816f385727cde4fbce5 (integrated merge; tracked tree clean: 0 changes) + untracked probe tests/Feature/ReviewProbeAddendum15Test.php (sha256 28ed0acbb10e3c19db2eab568ccc4e1c7870eb5837c9e7f79e9914e368e9212a); public/build absent: yes
+# command: php -r '...phpunit' -- --colors=never --do-not-cache-result --testdox --filter 'PaidGrantRequestInstantTest|ReviewProbeAddendum15Test' tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv56-a15/phpunit.xml
+
+.............                                                     13 / 13 (100%)
+
+Time: 02:17.517, Memory: 208.00 MB
+
+Paid Grant Request Instant (Tests\Feature\PaidGrantRequestInstant)
+ ✔ A request received before expiry is admitted although its identity proof ends after it
+ ✔ An identity proof longer than the capture age bound does not expire a request received in time
+ ✔ A captured instant admits the redemption after more than the age bound has passed
+ ✔ A request received after expiry is still refused with nothing recorded
+ ✔ A missing or implausible request time falls back to now and never widens admission
+ ✔ The admission instant rule
+ ✔ The admitted instant can only be obtained by capture time validation
+
+Review Probe Addendum15 (Tests\Feature\ReviewProbeAddendum15)
+ ✔ P1 client headers cannot set the admitted instant
+ ✔ P2 expiry is valid to start at microsecond resolution
+ ✔ P3a an old admitted instant does not excuse the one attempt rule
+ ✔ P3b an old admitted instant does not excuse a current identity revocation
+ ✔ P4 the type can be forged only by in process reflection or unserialize
+ ✔ P5 an out of range server time fails closed before anything is recorded
+
+OK (13 tests, 241 assertions)
+rc=0 wall=139s

@@ -1,0 +1,99 @@
+# source: a7892c9b (product unmodified) + new tests/Feature/PaidGrantHeavyWorkTest.php + changed PaidGrantPreparationBudgetTest (three-line case) + PaidGrantHttpJourneyTest (busy key)
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --filter 'PaidGrantHeavyWorkTest|PaidGrantPreparationBudgetTest|PaidGrantHttpJourneyTest' tests/Feature
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+FEFFFFF.................E..                                       27 / 27 (100%)
+
+Time: 01:43.006, Memory: 221.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_completion_does_not_re_verify_while_the_buyer_lock_is_held
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:28
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:298
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:152
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantPreparationBudgetTest::test_three_lines_rendering_120_s_each_are_all_prepared_with_one_attempt_each
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantException.php:17
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDeadline.php:34
+/home/user/VA-Studio-paid252/app/Domain/Grants/Paid/PaidGrantDocuments.php:28
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantPreparationBudgetTest.php:120
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 6 failures:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_a_request_that_finds_the_buyer_lock_held_returns_the_projection_without_claiming_rendering_or_hashing
+Failed asserting that null is true.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:126
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PaidGrantHeavyWorkTest::test_the_lock_is_held_during_each_heavy_step_and_released_after_success_and_after_an_exception
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'render' => Array &1 [
+-        0 => true,
+-        1 => true,
++        0 => false,
++        1 => false,
+     ],
+     'verify' => Array &2 [
+-        0 => true,
+-        1 => true,
++        0 => false,
++        1 => false,
+     ],
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:189
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PaidGrantHeavyWorkTest::test_a_lock_left_by_a_crashed_worker_expires_and_is_reacquired
+Failed asserting that null is true.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:207
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PaidGrantHeavyWorkTest::test_a_live_claim_by_another_request_is_reported_busy_and_unchanged
+Failed asserting that null is true.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:230
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\PaidGrantHeavyWorkTest::test_the_database_cache_store_provides_the_lock_from_the_migrated_table
+Failed asserting that null is true.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHeavyWorkTest.php:248
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\PaidGrantHttpJourneyTest::test_actual_typed_buyer_http_finalization_paid_pdf_and_native_file_delivery_preserve_originals
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'origin',
+-    1 => 'busy',
+ ]
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantHttpJourneyTest.php:112
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 27, Assertions: 620, Errors: 2, Failures: 6.
+rc=2

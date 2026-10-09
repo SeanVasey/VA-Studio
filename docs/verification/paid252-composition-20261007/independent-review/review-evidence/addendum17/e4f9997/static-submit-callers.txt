@@ -1,0 +1,16 @@
+# source e4f9997ec605572144b1ae92c49b29209b728564: every call of submit()/retryDownload() and the render guard around them
+# grep -n "submit(\|retryDownload(" (excluding HTMLFormElement.prototype.submit)
+268:  function retryDownload(a: Authorization) { if (kept.current.some(m => m.auth.id === a.id && m.refused)) submit(a); }
+269:  function submit(a: Authorization) {
+341:      {shown.map(a => <div key={a.id}><p>{a.filename}; expires {a.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => submit(a)}>Download authorized file</button></div>)}
+342:      {retryable.map(r => <div key={r.id}><p>{r.filename} is still authorized and unused; expires {r.expiresAt} UTC.</p><button type="button" disabled={busy} onClick={() => retryDownload(r)}>Retry
+rc=0
+# the enclosing guard: the Retained paid order section renders only when origin is set
+328:    {origin && <section aria-label="Retained paid order"><p className="paid-license-reference">Order {origin.orderId
+rc=0
+# retryable is [] without a shown origin
+299:  const retryable = denied || !origin || status?.originId !== origin.id ? [] : kept.current.filter(m => m.refused).m
+rc=0
+# submit early return
+272:    const token = csrf(); if (!token || denied || busy || !origin) return; setIssued(list => list.filter(i => i.auth.id !== a.id));
+rc=0

@@ -1,0 +1,35 @@
+# source: 55976099 + final working tree + mutation M2 (a public constructor, so any caller could inject an unvalidated time); public/build absent
+--- /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/PaidGrantRequestInstant.php.final	2026-10-08 22:57:22.431185699 +0000
++++ app/Domain/Grants/Paid/PaidGrantRequestInstant.php	2026-10-08 22:57:22.435433689 +0000
+@@ -12,7 +12,7 @@
+  */
+ final class PaidGrantRequestInstant
+ {
+-    private function __construct(public readonly CarbonImmutable $at) {}
++    public function __construct(public readonly CarbonImmutable $at) {}
+ 
+     /**
+      * The SAPI's `REQUEST_TIME_FLOAT` (never a client header), else Laravel's `LARAVEL_START` (set at the top of
+# command: ... -- --colors=never --filter test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation tests/Feature/PaidGrantRequestInstantTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-paid252/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:01.442, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantRequestInstantTest::test_the_admitted_instant_can_only_be_obtained_by_capture_time_validation
+Failed asserting that false is true.
+
+/home/user/VA-Studio-paid252/tests/Feature/PaidGrantRequestInstantTest.php:196
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 12, Failures: 1.
+rc=1
+# after restoring the final file
+cmp: identical, rc=0

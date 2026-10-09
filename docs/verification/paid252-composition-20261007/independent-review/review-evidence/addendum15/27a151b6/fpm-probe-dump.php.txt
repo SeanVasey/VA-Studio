@@ -1,0 +1,7 @@
+<?php
+$start = microtime(true);
+header('Content-Type: application/json');
+echo json_encode(['REQUEST_TIME_FLOAT_type' => gettype($_SERVER['REQUEST_TIME_FLOAT'] ?? null), 'REQUEST_TIME_FLOAT' => $_SERVER['REQUEST_TIME_FLOAT'] ?? null,
+ 'REQUEST_TIME' => $_SERVER['REQUEST_TIME'] ?? null, 'script_start_minus_request_time_float' => $start - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0),
+ 'HTTP_REQUEST_TIME_FLOAT' => $_SERVER['HTTP_REQUEST_TIME_FLOAT'] ?? null, 'HTTP_X_REQUEST_TIME' => $_SERVER['HTTP_X_REQUEST_TIME'] ?? null,
+ 'env_REQUEST_TIME_FLOAT' => getenv('REQUEST_TIME_FLOAT'), 'sapi' => PHP_SAPI, 'php' => PHP_VERSION], JSON_PRESERVE_ZERO_FRACTION);

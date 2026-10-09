@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbeAddendum12Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum12Test.php" tests="2" assertions="37" errors="0" failures="0" skipped="0" time="12.549414">
+    <testcase name="test_probe_a_redeem_whose_locate_outlasts_the_observation_budget_is_refused_with_nothing_recorded" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum12Test.php" line="113" class="Tests\Feature\ReviewProbeAddendum12Test" classname="Tests.Feature.ReviewProbeAddendum12Test" assertions="17" time="6.791989"/>
+    <testcase name="test_probe_a_record_frame_whose_post_commit_tail_crosses_the_lease_end_answers_410_but_keeps_the_line" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum12Test.php" line="136" class="Tests\Feature\ReviewProbeAddendum12Test" classname="Tests.Feature.ReviewProbeAddendum12Test" assertions="20" time="5.757425"/>
+  </testsuite>
+</testsuites>

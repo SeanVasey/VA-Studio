@@ -1,0 +1,21 @@
+# source: 27a151b66d10b80d07d54685791a2a3d0efd44dc + untracked probe tests/Feature/ReviewProbeAddendum15Test.php (sha256 28ed0acbb10e3c19db2eab568ccc4e1c7870eb5837c9e7f79e9914e368e9212a); public/build absent
+# command: php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result --testdox tests/Feature/ReviewProbeAddendum15Test.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv56-a15/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 01:10.085, Memory: 109.00 MB
+
+Review Probe Addendum15 (Tests\Feature\ReviewProbeAddendum15)
+ ✔ P1 client headers cannot set the admitted instant
+ ✔ P2 expiry is valid to start at microsecond resolution
+ ✔ P3a an old admitted instant does not excuse the one attempt rule
+ ✔ P3b an old admitted instant does not excuse a current identity revocation
+ ✔ P4 the type can be forged only by in process reflection or unserialize
+ ✔ P5 an out of range server time fails closed before anything is recorded
+
+OK (6 tests, 112 assertions)
+rc=0

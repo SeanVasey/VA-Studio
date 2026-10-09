@@ -1,0 +1,40 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (12 tests | 1 failed) 1927ms
+   ❯ per-operation request timeouts (3)
+     × sizes each abort from the measured server work instead of one 20 s limit 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > per-operation request timeouts > sizes each abort from the measured server work instead of one 20 s limit
+AssertionError: expected { read: 80000, finalize: 80000, …(2) } to deeply equal { read: 30000, finalize: 80000, …(2) }
+
+- Expected
++ Received
+
+  {
+    "authorize": 80000,
+    "document": 320000,
+    "finalize": 80000,
+-   "read": 30000,
++   "read": 80000,
+  }
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:104:33
+    102|   const pendingFetch = (signals: AbortSignal[]) => (_: unknown, init?:…
+    103|   it('sizes each abort from the measured server work instead of one 20…
+    104|     expect(paidRequestTimeouts).toEqual({ read: 30_000, finalize: 80_0…
+       |                                 ^
+    105|     const timers = vi.spyOn(window, 'setTimeout');
+    106|     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 passed (12)
+   Start at  16:01:58
+   Duration  4.96s (tests 44%, environment 39%, transform 10%, setup 6%)
+
+rc=1

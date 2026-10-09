@@ -1,0 +1,238 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
+use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\Paid\PaidGrantCommands;
+use App\Domain\Grants\Paid\PaidGrantDeadline;
+use App\Domain\Grants\Paid\PaidGrantDocuments;
+use App\Domain\Grants\Paid\PaidGrantDownloads;
+use App\Domain\Grants\Paid\PaidGrantException;
+use App\Domain\Grants\Paid\PaidGrantPolicy;
+use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use App\Domain\Grants\Paid\PaidGrants;
+use App\Domain\Grants\Paid\PaidGrantTransfer;
+use Carbon\CarbonImmutable;
+use Closure;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\PaidGrantMonotonicClock;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+use Throwable;
+
+// Loaded with this file, before any paid code runs in the process (see PaidGrantMonotonicClock).
+class_exists(PaidGrantMonotonicClock::class);
+
+/**
+ * Independent review addendum 9 (a6c02498): adversarial probes for the split redemption budgets. Untracked reviewer
+ * probe, deleted after recording. Synthetic rehearsal fixtures only.
+ */
+final class ReviewProbeAddendum9Test extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidGrantDependencyFixtures;
+    use ProductionCheckoutJourneyFixture;
+
+    private const FIRST_FRAME = 1;
+
+    private const COMMIT_FRAME = 2;
+
+    /** @var list<int> */
+    private array $commits = [];
+
+    protected function beforeRefreshingDatabase(): void
+    {
+        $this->preparePaidDependencies();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        PaidGrantMonotonicClock::reset();
+        $this->fakePrivateMediaStorage();
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
+            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-customer-identity.historical_receipts_enabled' => true,
+            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
+            'production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'paid-grants.rehearsal_enabled' => true,
+            'paid-grants.delivery_policy' => ['schema_version' => 1, 'version' => 'explicit-synthetic-delivery-v1', 'purpose' => 'paid-original-delivery',
+                'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60],
+            // A long transfer allowance, so a 410 before the first byte can only come from the observation budget.
+            'paid-grants.transfer_base_seconds' => 600,
+            'paid-grants.snapshot_seconds' => 300]);
+        Queue::fake();
+    }
+
+    protected function tearDown(): void
+    {
+        PaidGrantMonotonicClock::reset();
+        parent::tearDown();
+    }
+
+    protected function smtp(string $mode, int $noticeId): array
+    {
+        $capture = tempnam(sys_get_temp_dir(), 'va-paid-synthetic-smtp-');
+        $process = new Process(['python3', $this->paidDependencyPath('tests/Support/production_identity_smtp_sink.py'), $mode, $capture], timeout: 20);
+        $process->start();
+        try {
+            $process->waitUntil(fn (): bool => preg_match('/\A[0-9]+\n/', $process->getOutput()) === 1);
+            app()->instance(IdentityNoticeTransport::class, new LoopbackSmtp((int) trim($process->getOutput())));
+            (new WorkIdentityNotice)->process($noticeId);
+            $process->wait();
+            $this->assertSame(0, $process->getExitCode(), $process->getErrorOutput());
+
+            return filesize($capture) > 0 ? json_decode(file_get_contents($capture), true, 8, JSON_THROW_ON_ERROR) : [];
+        } finally {
+            $process->stop(0);
+            unlink($capture);
+        }
+    }
+
+    /** A9-I1: valid-to-start now spans the whole snapshot budget: a redemption admitted in time commits ~28 min past expiry. */
+    public function test_a_redemption_admitted_in_time_commits_after_a_long_snapshot_far_past_expiry(): void
+    {
+        config(['paid-grants.snapshot_seconds' => 1800]);
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $expires = CarbonImmutable::parse($auth['expiresAt'], 'UTC');
+        $this->duringSnapshot(1700, fn () => $this->travelTo($expires->addSeconds(1700)));
+        $transfer = $this->redeem($f, $auth);
+        $this->assertSame($this->masterBytes($f), $this->drain($transfer));
+        $row = (array) DB::table('paid_redemptions')->sole();
+        $this->assertTrue(CarbonImmutable::parse($row['created_at'], 'UTC')->greaterThanOrEqualTo($expires->addSeconds(1699)));
+        // A new redemption is refused once the lifetime has passed.
+        app()->forgetInstance(PaidGrantPrepareStream::class);
+        $this->assertSame(410, $this->refusedStatus(fn () => $this->redeem($f, $auth)));
+        $this->assertDatabaseCount('paid_redemptions', 1);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /** The fresh commit frame re-proves enablement and provenance after a long snapshot; nothing is recorded on refusal. */
+    public function test_disabling_or_switching_provenance_during_a_long_snapshot_refuses_the_commit_frame(): void
+    {
+        config(['paid-grants.snapshot_seconds' => 1800]);
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $original = config('paid-grants.delivery_policy');
+        foreach ([
+            'disabled' => fn () => config(['paid-grants.rehearsal_enabled' => false]),
+            'production-policy' => fn () => config(['paid-grants.delivery_policy' => ['provenance' => 'verified_production'] + $original]),
+        ] as $label => $change) {
+            $this->duringSnapshot(1000, $change);
+            $status = $this->refusedStatus(fn () => $this->redeem($f, $auth));
+            fwrite(STDERR, "P2 ".$label." status=".var_export($status, true)."\n");
+            $this->assertContains($status, [403, 404, 409, 503], $label.' refused with '.var_export($status, true));
+            $this->assertDatabaseCount('paid_redemptions', 0);
+            config(['paid-grants.rehearsal_enabled' => true, 'paid-grants.delivery_policy' => $original]);
+            PaidGrantMonotonicClock::reset();
+        }
+        // The spool slot and reservation were released; the same authorization still redeems.
+        app()->forgetInstance(PaidGrantPrepareStream::class);
+        $this->assertSame($this->masterBytes($f), $this->drain($this->redeem($f, $auth)));
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    /** A second redemption of the same authorization committed during the snapshot window is refused by the commit frame. */
+    public function test_a_redemption_row_committed_during_the_snapshot_refuses_the_commit_frame_with_409(): void
+    {
+        config(['paid-grants.snapshot_seconds' => 1800]);
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $this->duringSnapshot(1000, function () use ($auth): void {
+            $id = DB::table('paid_authorizations')->where('public_id', $auth['id'])->value('id');
+            DB::table('paid_redemptions')->insert(['authorization_id' => $id, 'created_at' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s')]);
+        });
+        $this->assertSame(409, $this->refusedStatus(fn () => $this->redeem($f, $auth)));
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    private function duringSnapshot(int $seconds, Closure $change): void
+    {
+        app()->instance(PaidGrantPrepareStream::class, new class($seconds, $change) extends PaidGrantPrepareStream
+        {
+            public function __construct(private readonly int $seconds, private readonly Closure $change) {}
+
+            protected function copyTarget(array $target, $destination, int $deadline): void
+            {
+                parent::copyTarget($target, $destination, $deadline);
+                PaidGrantMonotonicClock::advance($this->seconds);
+                ($this->change)();
+            }
+        });
+    }
+
+    private function complete(): array
+    {
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $f['batch'] = (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['batch'] = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($f['batch']['fulfilled']);
+
+        return $f;
+    }
+
+    private function authorize(array $f): array
+    {
+        return (new PaidGrantDownloads)->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $f['batch']['lines'][0]['originHash'], 'kind' => 'master_wav', 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+    }
+
+    private function redeem(array $f, array $auth): PaidGrantTransfer
+    {
+        return (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+    }
+
+    private function drain(PaidGrantTransfer $transfer): string
+    {
+        $bytes = '';
+        $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+            $bytes .= $chunk;
+        });
+
+        return $bytes;
+    }
+
+    private function masterBytes(array $f): string
+    {
+        return file_get_contents(Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path));
+    }
+
+    private function refusal(Closure $call): Throwable
+    {
+        try {
+            $call();
+        } catch (Throwable $error) {
+            return $error;
+        }
+        $this->fail('Expected a refusal.');
+    }
+
+    private function refusedStatus(Closure $call): int|string
+    {
+        $error = $this->refusal($call);
+
+        return $error instanceof PaidGrantException ? $error->status : $error::class;
+    }
+}

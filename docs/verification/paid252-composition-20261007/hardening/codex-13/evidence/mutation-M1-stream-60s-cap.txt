@@ -1,0 +1,25 @@
+# source: 9004245f + codex-13 working tree + mutation M1-stream-60s-cap (scratch worktree)
+M1-stream-60s-cap applied to app/Domain/Grants/Paid/PaidGrantPrepareStream.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/phpunit.xml
+
+E.....                                                              6 / 6 (100%)
+
+Time: 00:51.575, Memory: 206.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantSnapshotDeadlineTest::test_a_snapshot_started_late_in_the_observation_budget_gets_its_own_bound
+App\Domain\Delivery\DeliveryException: Test fulfillment activation is unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantPrepareStream.php:112
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/app/Domain/Grants/Paid/PaidGrantDownloads.php:148
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:313
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56base/tests/Feature/PaidGrantSnapshotDeadlineTest.php:122
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 6, Assertions: 140, Errors: 1.
+rc=2

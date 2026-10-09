@@ -1,0 +1,6 @@
+# source 8a2f91dd595511ad9b0e08c0625d41da4e3c7702 (component as e4f9997) + test file sha256 5f7a51cb8175b922
+     × shows the reopen control as soon as a hidden download frame reports its refusal, without another render 91ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+      Tests  1 failed | 3 passed (4)
+rc=1

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PaidGrantReviewAdversarialTest" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php" tests="4" assertions="99" errors="0" failures="0" skipped="0" time="51.649248">
+    <testcase name="test_a_token_minted_for_one_authorization_is_refused_against_another_and_the_database_refuses_a_second_redemption_row" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php" line="136" class="Tests\Feature\PaidGrantReviewAdversarialTest" classname="Tests.Feature.PaidGrantReviewAdversarialTest" assertions="25" time="11.402056"/>
+    <testcase name="test_another_enrolled_account_cannot_locate_redeem_or_read_a_valid_authorization_and_the_owner_still_can" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php" line="165" class="Tests\Feature\PaidGrantReviewAdversarialTest" classname="Tests.Feature.PaidGrantReviewAdversarialTest" assertions="24" time="11.831209"/>
+    <testcase name="test_expiry_refuses_without_consuming_and_a_spent_authorization_replayed_after_expiry_reports_expiry_before_consumption" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php" line="183" class="Tests\Feature\PaidGrantReviewAdversarialTest" classname="Tests.Feature.PaidGrantReviewAdversarialTest" assertions="22" time="12.675976"/>
+    <testcase name="test_tampered_authorize_inputs_refuse_and_the_download_budget_is_exhausted_at_max_downloads" file="/home/user/VA-Studio-review-paid252/tests/Feature/PaidGrantReviewAdversarialTest.php" line="210" class="Tests\Feature\PaidGrantReviewAdversarialTest" classname="Tests.Feature.PaidGrantReviewAdversarialTest" assertions="28" time="15.740006"/>
+  </testsuite>
+</testsuites>

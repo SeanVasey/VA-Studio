@@ -1,0 +1,15 @@
+#!/bin/bash
+# usage: native-run.sh <label> <file> [filter]
+cd /home/user/VA-Studio-paid252
+S=/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad
+E=docs/verification/paid252-composition-20261007/evidence/after-50
+export APP_ENV=testing DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3711 DB_DATABASE=vaseyaudio_paid252b DB_USERNAME=root DB_PASSWORD= DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync
+label=$1; file=$2; filter=$3
+args=(-c phpunit.xml)
+[ -n "$filter" ] && args+=(--filter "$filter")
+args+=("$file" --log-junit "$E/native-$label.xml")
+s=$(date +%s); echo "start $(date -u +%T)" > "$E/native-$label.txt"
+php $S/phpunit-wt2.php "${args[@]}" >> "$E/native-$label.txt" 2>&1
+rc=$?
+echo "rc=$rc" >> "$E/native-$label.txt"
+echo "wall=$(( $(date +%s)-s ))s end $(date -u +%T)" >> "$E/native-$label.txt"

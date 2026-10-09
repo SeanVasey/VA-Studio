@@ -1,0 +1,154 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx (21 tests | 2 failed) 3316ms
+   ❯ mounted original paid-purpose journey (15)
+     × keeps download frames across a hidden tab and removes them only when the page is left 132ms
+     × keeps an unrelated uncertain authorize replay when another download is refused 219ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > mounted original paid-purpose journey > keeps download frames across a hidden tab and removes them only when the page is left
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/frontend/paid-grant-journey.test.tsx:146:31
+    144|     visibility.mockReturnValue('hidden'); act(() => { document.dispatc…
+    145|     // Removing the frame would abort a download the server may still …
+    146|     expect(frame.isConnected).toBe(true); expect(screen.queryByLabelTe…
+       |                               ^
+    147|     visibility.mockReturnValue('visible'); act(() => { window.dispatch…
+    148|     expect(frame.isConnected).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-journey.test.tsx > mounted original paid-purpose journey > keeps an unrelated uncertain authorize replay when another download is refused
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Retry the exact request"
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Paid license journey":
+  [36m<section[39m
+    [33maria-busy[39m=[32m"false"[39m
+    [33maria-label[39m=[32m"Paid license journey"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p />[39m
+
+  --------------------------------------------------
+  alert:
+
+  Name "":
+  [36m<div[39m
+    [33mclass[39m=[32m"customer-account-message"[39m
+    [33mrole[39m=[32m"alert"[39m
+    [33mtabindex[39m=[32m"-1"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Open paid licenses":
+  [36m<button[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare licenses for this paid order":
+  [36m<button[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "Saved order reference":
+  [36m<input[39m
+    [33mautocomplete[39m=[32m"off"[39m
+    [33mid[39m=[32m"paid-order-reference"[39m
+    [33mmaxlength[39m=[32m"36"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33maria-busy[39m=[32m"false"[39m
+      [33maria-label[39m=[32m"Paid license journey"[39m
+    [36m>[39m
+      [36m<p>[39m
+        [0mYour original accepted license and exact purchased files stay together. Every line must finish preparation before an order can download. A declared buyer name is not verified legal identity.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"customer-account-message"[39m
+        [33mrole[39m=[32m"alert"[39m
+        [33mtabindex[39m=[32m"-1"[39m
+      [36m>[39m
+        [0mThe download was refused. Refresh saved licenses and download status; an authorization that is still unused can then be retried.[0m
+      [36m</div>[39m
+      [36m<button[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0mOpen paid licenses[0m
+      [36m</button>[39m
+      [36m<form>[39m
+        [36m<label[39m
+          [33mfor[39m=[32m"paid-order-reference"[39m
+        [36m>[39m
+          [0mSaved order reference[0m
+        [36m</label>[39m
+        [36m<input[39m
+          [33mautocomplete[39m=[32m"off"[39m
+          [33mid[39m=[32m"paid-order-reference"[39m
+          [33mmaxlength[39m=[32m"36"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+        [36m<button[39m
+          [33mdisabled[39m=[32m""[39m
+          [33mtype[39m=[32m"submit"[39m
+        [36m>[39m
+          [0mPrepare licenses for this paid order[0m
+        [36m</button>[39m
+      [36m</form>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError ../VA-Studio/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../VA-Studio/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ tests/frontend/paid-grant-journey.test.tsx:167:19
+    165|     expect(screen.getByRole('alert')).toHaveTextContent('refused');
+    166|     // The master authorize may have committed: its exact replay must …
+    167|     expect(screen.getByRole('button', { name: 'Retry the exact request…
+       |                   ^
+    168|   });
+    169|   it('drops issued authorizations when the page is left', async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 35 passed (37)
+   Start at  18:07:51
+   Duration  5.26s (tests 57%, environment 35%, setup 4%, transform 3%, import 1%)
+
+Environment  jsdom was created 5 times · 4.96s total, 35% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+rc=1

@@ -1,0 +1,10 @@
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  16:09:54
+   Duration  4.18s (tests 62%, environment 29%, transform 6%, setup 3%)
+
+rc=0

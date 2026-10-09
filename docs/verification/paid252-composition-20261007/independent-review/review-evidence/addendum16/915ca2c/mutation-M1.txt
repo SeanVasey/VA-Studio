@@ -1,0 +1,19 @@
+# mutation M1 on 915ca2c9
+applied M1: 'orderId = p.origin!.orderId;' -> "orderId = '';"
+# mutated component sha256 8e33eb7263a9cb90
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-reopen-issued.test.tsx tests/frontend/paid-grant-review-addendum16.test.tsx
+ × paid-grant-reopen-issued: reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 
+ × paid-grant-review-addendum16: A: two issued authorizations on one order give one button, and reopening brings back both Download buttons
+ × paid-grant-review-addendum16: B: issued on two orders gives two buttons; the shown order never has one 132ms
+ × paid-grant-reopen-issued: drops the reopen control once the authorization is submitted, and a denial drops it with the token 269ms
+ × paid-grant-review-addendum16: C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial tha
+ × paid-grant-review-addendum16: D: while another order has a pending authorize, the reference form is closed and the index omits X; the co
+ ✓ paid-grant-review-addendum16: E: with nothing pending the reference form already reopens X and its Download returns (the finding is nar
+ × paid-grant-review-addendum16: F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 182ms
+ × paid-grant-review-addendum16: G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same
+ ✓ paid-grant-review-addendum16: H (gap, A16-L1): a refused download kept for retry has no reopen control once its order is cleared; only 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  2 failed (2)
+      Tests  8 failed | 2 passed (10)
+rc=1
+restored: git diff --quiet rc=0

@@ -1,0 +1,21 @@
+# component at 8fc077f (sha256 d6b24f0c9e7a9c2e) + untracked tests/frontend/paid-grant-review-addendum16.test.tsx (sha256 527018d6a2c58e1a); node v24.21.0
+# npx vitest run --reporter=verbose tests/frontend/paid-grant-review-addendum16.test.tsx
+ × A: two issued authorizations on one order give one button, and reopening brings back both Download buttons 594ms
+ × B: issued on two orders gives two buttons; the shown order never has one 149ms
+ × C: a reopen answer for a different order or batch is rejected and keeps the control; a 404 is a denial that drops it 154ms
+ × D: while another order has a pending authorize, the reference form is closed and the index omits X; the control reopens X without disturbing the replay 227ms
+ ✓ E: with nothing pending the reference form already reopens X and its Download returns (the finding is narrower than stated) 142ms
+ × F: busy gating while a reopen read is in flight, and a hidden tab during it keeps the issued entries 160ms
+ × G: a pending authorize on X with another issued authorization on X shows both reopen controls for the same order (Info: redundant, same action) 107ms
+ ✓ H (gap, A16-L1): a refused download kept for retry has no reopen control once its order is cleared; only the reference form leads back 204ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected [] to have a length of 1 but got +0
+AssertionError: expected [] to deeply equal [ Array(1) ]
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Reopen order bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb to download its authorized file"
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+rc=1
+restored: git diff --exit-code rc=0

@@ -1,0 +1,58 @@
+# source: 9605e95c + round 20 working tree + client mutation CM-I6-wall-clock-spacing (restored afterwards)
+
+ RUN  v5.0.1 /home/user/VA-Studio-paid252
+
+ ❯ tests/frontend/paid-grant-review-addendum11.test.tsx (3 tests | 1 failed) 531ms
+   ❯ review addendum 11: continuation edges (3)
+     × no longer stalls the next document request after a backward wall-clock step (fixed in round 20) 73ms
+ ❯ tests/frontend/paid-grant-continuation.test.tsx (11 tests | 1 failed) 1573ms
+   ❯ continuing paid preparation after one click (11)
+     × measures POST spacing on the monotonic clock, so a backward wall-clock step does not stall the next request (A11-I6) 47ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/paid-grant-continuation.test.tsx > continuing paid preparation after one click > measures POST spacing on the monotonic clock, so a backward wall-clock step does not stall the next request (A11-I6)
+AssertionError: expected [ { …(2) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/frontend/paid-grant-continuation.test.tsx:190:23
+    188|     await act(async () => { release(json({ origin: originOf(['complete…
+    189|     await advance(9_000);
+    190|     expect(s.posts()).toHaveLength(2);
+       |                       ^
+    191|   });
+    192|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/frontend/paid-grant-review-addendum11.test.tsx > review addendum 11: continuation edges > no longer stalls the next document request after a backward wall-clock step (fixed in round 20)
+AssertionError: expected [ { …(2) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/frontend/paid-grant-review-addendum11.test.tsx:101:23
+     99|     await act(async () => { release(json({ origin: originOf(['complete…
+    100|     await advance(9_000);
+    101|     expect(s.posts()).toHaveLength(2);
+       |                       ^
+    102|   });
+    103| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 15 passed (17)
+   Start at  21:32:12
+   Duration  3.79s (environment 48%, tests 37%, setup 8%, transform 5%, import 1%)
+
+rc=1

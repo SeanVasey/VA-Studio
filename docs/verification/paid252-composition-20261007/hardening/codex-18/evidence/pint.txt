@@ -1,0 +1,2 @@
+# command: /home/user/VA-Studio/vendor/bin/pint --test app/Domain/Grants/Paid/PaidGrantDocuments.php tests/Feature/PaidGrantPreparationBudgetTest.php tests/Feature/PaidGrantCompletionBudgetTest.php tests/Feature/PaidGrantDocumentJourneyTest.php tests/Support/PaidGrantClockedAssetFiles.php
+{"tool":"pint","result":"passed"} rc=0

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ReviewProbeAddendum13Test" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum13Test.php" tests="2" assertions="24" errors="0" failures="0" skipped="0" time="0.176939">
+    <testcase name="test_probe_a_live_holders_sealed_0400_snapshot_survives_a_nested_admission" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum13Test.php" line="35" class="Tests\Feature\ReviewProbeAddendum13Test" classname="Tests.Feature.ReviewProbeAddendum13Test" assertions="8" time="0.160745"/>
+    <testcase name="test_probe_received_at_edges_and_header_isolation" file="/home/user/VA-Studio-review-paid252/tests/Feature/ReviewProbeAddendum13Test.php" line="58" class="Tests\Feature\ReviewProbeAddendum13Test" classname="Tests.Feature.ReviewProbeAddendum13Test" assertions="16" time="0.016194"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,32 @@
+# source: 9605e95c + round 20 final working tree + mutation A-ttl-360 (scratch worktree)
+A-ttl-360 applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/phpunit.xml
+
+..........F...............                                        26 / 26 (100%)
+
+Time: 04:18.945, Memory: 215.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PaidGrantHeavyWorkTest::test_the_lock_outlasts_a_slow_claim_frame_followed_by_a_long_line
+The buyer lock must still be held at the end of the render and at the line's record frame.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => true,
+-    1 => true,
++    0 => false,
++    1 => false,
+ ]
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/tests/Feature/PaidGrantHeavyWorkTest.php:258
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 26, Assertions: 524, Failures: 1.
+rc=1

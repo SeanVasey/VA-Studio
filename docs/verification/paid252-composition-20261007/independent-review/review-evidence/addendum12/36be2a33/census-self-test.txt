@@ -1,0 +1,8 @@
+cmd: python3 -I scripts/ci/test-database-receipts.py
+head: 36be2a33d63ef73d67079e67d8fc819a7c226d04
+..................................
+----------------------------------------------------------------------
+Ran 34 tests in 6.208s
+
+OK
+rc=0

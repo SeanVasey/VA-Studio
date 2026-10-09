@@ -1,0 +1,26 @@
+# source: 9605e95c + round 20 final working tree + mutation L2a-post-frame-check-uses-now (scratch worktree)
+L2a-post-frame-check-uses-now applied
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/phpunit.xml
+
+.E........................                                        26 / 26 (100%)
+
+Time: 03:18.418, Memory: 215.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\PaidGrantAuthorizationWindowTest::test_a_redeem_started_before_expiry_whose_locate_and_first_frame_cross_it_is_admitted
+App\Domain\Grants\Paid\PaidGrantException: Paid grant request unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/app/Domain/Grants/Paid/PaidGrantException.php:17
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/app/Domain/Grants/Paid/PaidGrantDownloads.php:270
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/app/Domain/Grants/Paid/PaidGrantDownloads.php:151
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/tests/Feature/PaidGrantAuthorizationWindowTest.php:193
+/tmp/claude-0/-home-user-VA-Studio/8839656b-df19-5c03-a1af-24c989093d81/scratchpad/p56m20/tests/Feature/PaidGrantAuthorizationWindowTest.php:119
+/home/user/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 26, Assertions: 525, Errors: 1.
+rc=2

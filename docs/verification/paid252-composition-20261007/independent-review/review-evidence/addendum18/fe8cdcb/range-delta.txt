@@ -1,0 +1,31 @@
+# git diff --stat e4f9997 fe8cdcb -- app config database routes bootstrap
+rc=0
+# names outside docs/verification
+CHANGELOG.md
+resources/js/components/PaidGrantJourney.tsx
+tests/frontend/paid-grant-reopen-issued.test.tsx
+tests/frontend/paid-grant-review-addendum9.test.tsx
+# git diff --numstat e4f9997 fe8cdcb -- tests (added, deleted)
+20	0	tests/frontend/paid-grant-reopen-issued.test.tsx
+3	3	tests/frontend/paid-grant-review-addendum9.test.tsx
+# addendum9 test change
+diff --git a/tests/frontend/paid-grant-review-addendum9.test.tsx b/tests/frontend/paid-grant-review-addendum9.test.tsx
+index 122c256..07088f1 100644
+--- a/tests/frontend/paid-grant-review-addendum9.test.tsx
++++ b/tests/frontend/paid-grant-review-addendum9.test.tsx
+@@ -56,9 +56,9 @@ describe('review addendum 9: refusals recorded independently of the request gene
+     await act(async () => { answer(frame, JSON.stringify({ code: 'PAID_GRANT_UNAVAILABLE' })); });
+     expect(frame.isConnected).toBe(false);
+     expect(screen.queryByText(/download was refused/)).not.toBeInTheDocument();
+-    // A9-I4: a non-current refusal changes only refs, so nothing re-renders and the retry is not shown yet.
+-    expect(retry()).not.toBeInTheDocument();
+-    // The next render for any reason (here a plain re-render, no fetch) offers it from the pre-refusal read.
++    // A9-I4, now fixed (Codex 4228172320): the refusal itself renders, so the retry is offered at once from the pre-refusal
++    // read, and a later render keeps it.
++    expect(retry()).toBeInTheDocument();
+     view.rerender(<PaidGrantJourney />);
+     expect(retry()).toBeInTheDocument();
+     expect(fetcher).toHaveBeenCalledTimes(4);
+# reopen-issued: deleted lines
+0
+# HEAD fe8cdcb088bb0f2a4922ce345019078350d6790e

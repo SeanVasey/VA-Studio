@@ -1,0 +1,18 @@
+# Every changed or new file checked against resources/contracts/*/profile-assets.json
+CHANGELOG.md pinned_in=0
+app/Domain/Grants/Paid/PaidGrantDocuments.php pinned_in=0
+app/Http/Controllers/PaidGrantController.php pinned_in=0
+resources/js/components/PaidGrantJourney.tsx pinned_in=0
+tests/Feature/PaidGrantHttpJourneyTest.php pinned_in=0
+tests/Feature/PaidGrantPreparationBudgetTest.php pinned_in=0
+tests/frontend/paid-grant-finish-completion.test.tsx pinned_in=0
+tests/Feature/PaidGrantHeavyWorkTest.php pinned_in=0
+tests/frontend/paid-grant-continuation.test.tsx pinned_in=0
+ CHANGELOG.md                                       |   2 +-
+ app/Domain/Grants/Paid/PaidGrantDocuments.php      | 247 ++++++++++++++-------
+ app/Http/Controllers/PaidGrantController.php       |   6 +-
+ resources/js/components/PaidGrantJourney.tsx       | 121 ++++++++--
+ tests/Feature/PaidGrantHttpJourneyTest.php         |   6 +-
+ tests/Feature/PaidGrantPreparationBudgetTest.php   |  11 +-
+ .../frontend/paid-grant-finish-completion.test.tsx |  24 +-
+ 7 files changed, 300 insertions(+), 117 deletions(-)

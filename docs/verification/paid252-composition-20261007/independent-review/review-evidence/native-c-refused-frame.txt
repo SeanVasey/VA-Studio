@@ -1,0 +1,19 @@
+cmd: (env: DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3761 DB_DATABASE=vaseyaudio_review_paid252 DB_USERNAME=root DB_PASSWORD= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync APP_ENV=testing) php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --log-junit docs/verification/paid252-composition-20261007/independent-review/review-evidence/native-c-refused-frame.xml tests/Feature/PaidGrantRefusedFrameCallbackTest.php
+head: 4a4a423022759ec706e7e235649552d0d2930128
+server: 8.4.11
+start: 2026-10-08T12:49:32Z
+uptime_start:  12:49:32 up  1:57,  0 user,  load average: 5.91, 6.31, 5.77
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/VA-Studio-review-paid252/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 08:50.170, Memory: 100.00 MB
+
+OK (2 tests, 44 assertions)
+rc=0
+wall_s=530
+uptime_end:  12:58:22 up  2:06,  0 user,  load average: 6.93, 6.58, 6.07
+end: 2026-10-08T12:58:22Z

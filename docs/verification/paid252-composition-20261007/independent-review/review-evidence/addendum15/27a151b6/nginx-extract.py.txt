@@ -1,0 +1,6 @@
+import sys, re, subprocess
+rev, out = sys.argv[1], sys.argv[2]
+doc = subprocess.run(['git','show',f'{rev}:docs/ops/paid-delivery-runtime.md'],capture_output=True,text=True,check=True).stdout
+block = re.search(r'```nginx\n(.*?)```', doc, re.S).group(1)
+block = block.replace('include fastcgi_params;', 'include /etc/nginx/fastcgi_params;')
+open(out,'w').write('pid %s/nginx.pid;\nerror_log %s/logs/error.log;\nevents {}\nhttp {\n access_log off;\n server {\n listen 127.0.0.1:19816;\n%s\n }\n}\n' % (sys.argv[3], sys.argv[3], block))

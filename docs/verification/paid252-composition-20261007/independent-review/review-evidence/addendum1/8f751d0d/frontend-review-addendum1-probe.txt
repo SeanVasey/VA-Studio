@@ -1,0 +1,14 @@
+cmd: probe copy of tests/frontend/paid-grant-review-addendum1.test.tsx with it.fails -> it (confirms each expected-fail fails at its final gate assertion); probe file deleted after
+head: 8f751d0d368222c310e37d623eab1e8d5f0f2956
+ ❯ tests/frontend/zz-review-probe.test.tsx (7 tests | 2 failed) 1141ms
+     × a failed exact retry invalidates the earlier saved status read for setting the request aside 459ms
+     × does not offer set-aside on a status read taken while the abandoned authorize may still commit 109ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/frontend/zz-review-probe.test.tsx > review addendum 1: set-aside gate for a lost authorize > a failed exact retry invalidates the earlier saved status read for setting the request aside
+Received element is not disabled:
+ ❯ tests/frontend/zz-review-probe.test.tsx:58:24
+ FAIL  tests/frontend/zz-review-probe.test.tsx > review addendum 1: a hidden tab keeps the exact replay (c0a68b2d) > does not offer set-aside on a status read taken while the abandoned authorize may still commit
+Received element is not disabled:
+ ❯ tests/frontend/zz-review-probe.test.tsx:181:24
+      Tests  2 failed | 5 passed (7)
+rc=1
