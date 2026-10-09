@@ -10,6 +10,14 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Forge staging build, activation and configuration refresh now retain privileged operation locks through their fixed unprivileged children. A persistent root-only recovery marker blocks independent resume and mutating retries after interruption. Provisioning refuses absent, linked, writable or incomplete app credential custody and requires explicit private recovery instead of silently succeeding or rotating an existing account.
+
+- Private Laravel Forge staging kit with protected release activation, isolated runtime admission, test-only nginx/FPM/workers, least-privilege MySQL provisioning and recoverable database/private-file/environment backups. A root-owned admission gate and shared writer lock pause independent test-commerce sweeps through quiesce, snapshot and switch until healthy resume. Hosting credentials, real content and the first Stripe TEST purchase remain operator inputs.
+
+- Private Stripe TEST rehearsal profile, policy validator, bounded post-payment pipeline runner and purchase walkthrough. Cursor progress covers retained work across sweeps; failed state persistence is reported without private paths. Templates enable nothing until the operator supplies and validates the private host configuration.
+
+- `vasey:rights-scope` lists unlinked published offer revisions and lets verified catalog staff register scopes and link exact revisions through the audited inventory service. Writes require a hidden password confirmation in a trusted interactive console; immutable references and links retain their existing guards. This supplies the missing operator step before test order preparation.
+
 - Read-only track publication manifest foundation: a standalone authorized capture returns immutable minimized identity for current ready metadata, rights, verified derivatives and active immutable offers/licenses at one recorded instant. It creates no retained approval, compare/apply boundary, publication fence, UI or schedule; existing media-integrity cache and mutable-scope limits remain explicit.
 
 - Reviewed manual track publication guards: publish/unpublish confirmations bind exact current metadata and monotonic publication revisions, use fresh persisted authority/MFA and consume stale confirmations before atomic publication/audit writes. The additive counter migration retains history and guards on rollback; scheduling remains separate.
@@ -45,6 +53,14 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Install the captured private staging environment before Composer's Laravel hooks boot package discovery and Filament upgrade.
+
+- Seal private staging code/vendor/build/environment on protected inodes, validate root-mediated configuration refresh, require served backup key/hash custody and explicitly forward Stripe signatures. Writable Laravel runtime PHP remains an explicit trust exception.
+
+- The private TEST pipeline reconciles at a one-minute minimum by default, within the quote's 15-minute observation window. Profile validation clears inherited application inputs before boot so a safe exported value cannot mask an invalid file or authorize the optional account probe. Late observations still retain paid exceptions; no payment eligibility rule changes.
+
+- The private TEST profile requires an HttpOnly session cookie before accepting configuration or permitting its optional account probe. This prevents browser scripts from reading the guest ownership cookie value; it does not prevent authenticated requests by same-origin scripts.
+
 - Production customer identity survives a routine `APP_KEY` rotation. Stored identity digests (owner, credential, recipient, address, request, payload, proof, completion, lease and evidence hashes, plus consent recipient digests) verify in constant time under the current key or any `APP_PREVIOUS_KEYS` entry, and address/request lookups select under every candidate, refusing ambiguous matches. New digests use only the current key, a removed or unknown key never verifies, and nothing stored is re-keyed. Customers sign in again after a rotation because the session marker is current-key only.
 - Pre-existing test failures on main (33 ids at `f7224ed3`) are repaired in test fixtures only; no migration, guard, refusal or assertion changed. The capability rollback fixtures now derive every later foreign-key dependent (238 packets, 239 assent, 246 checkout) from the live catalog. The discovery-epoch and service-project rollback tests derive the step that actually reaches their migration. The rights guard fixture removes the 240 triggers and proves an admitted 035 baseline first. Before these fixes, 18 refusal cases passed because of a later dependent rather than their own injected drift. A stale `PublicationReadiness::blockers()` override no longer kills a whole PHPUnit shard with a fatal error. The bulk-license and offer-draft browser helpers treat the discovery epoch as a counter that may only advance, and that must not move in no-op phases. Evidence: `docs/verification/migration-test-drift-20261008/`.
 - Publication-guard tests compare complete audit contexts with strict canonical JSON while retaining typed values, and explicitly prove ordinary null-tag normalization before complete row comparisons. The separate synthetic quote publisher enrolls through the existing encrypted MFA helper when used by required-MFA inquiry fixtures; application authority and all race cases remain intact.
@@ -64,6 +80,19 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
 
 ### Security
+
+- Staging runtime directory initialization uses no-follow pinned directory handles for ownership/mode changes, and exclusively creates private `.gitignore` without following application-placed links.
+
+- Staging provisioning refuses an unsafe MySQL administrator defaults file before host changes or database queries, requiring canonical root-owned 0600 single-link custody under protected ancestry.
+
+- Staging provisioning authenticates the persisted app credential as its exact database identity before grants, using a private temporary client file with cleanup and no password in arguments or environment.
+
+- Staging seals refuse environment aliases and public symlinks outside the public tree. Provisioning requires an intact private backup profile and authenticates its exact database identity before grants; orphan credentials require explicit recovery.
+
+- Staging unchanged-SHA retries require read-only root health proof; first-install retries snapshot before migration; already-mounted private binds reconcile their persistent fstab entry. Served-release selection adds defensive propagation of returned failure inside shell command substitution; Python helper failures were already fatal.
+- Staging deployment quiesces controlled application services and writers before candidate allocation/build, then seals generated artifacts before activation. Provisioning rejects unprotected or noncanonical root ancestry before host changes; build failure leaves admission closed for recovery.
+- Staging backup admission refuses multiline environment values and key-looking embedded lines, requires the exact environment hash record, and invalidates stale proof markers. Configuration capture refuses special files without blocking; provisioning and privileged helpers require a nonroot application account.
+- Staging control seals privileged release ancestry before bind/unbind and reserves atomic activation for the root helper. Restore proof normalizes only table column charset rendering, invalidates stale success markers and publishes after verification/cleanup. Same-SHA refresh freezes one admitted environment, preserves the existing key and takes a recoverable pre-change snapshot; recovery never infers stopped writers from a phase flag.
 
 - The media upload form no longer describes or accepts a stored file path, or a number naming a stored file, placed in its form state. A catalog administrator who knew the storage path of a private object, such as another upload or a contract, could learn whether it existed, its size and its detected file type. No file contents were exposed, and such a path was never ingested. A test now fails if any upload field in the application does not refuse stored paths, or if any code turns that guard off.
 

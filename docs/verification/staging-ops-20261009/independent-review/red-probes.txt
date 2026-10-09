@@ -1,0 +1,41 @@
+test_application_deploy_can_activate_under_provisioned_parent (__main__.IndependentStagingOpsProbes.test_application_deploy_can_activate_under_provisioned_parent) ... FAIL
+test_charset_normalization_preserves_row_bytes (__main__.IndependentStagingOpsProbes.test_charset_normalization_preserves_row_bytes) ... FAIL
+test_detach_refuses_symlink_to_nonrelease_mount (__main__.IndependentStagingOpsProbes.test_detach_refuses_symlink_to_nonrelease_mount) ... FAIL
+test_validator_refuses_effective_quoted_production_flag (__main__.IndependentStagingOpsProbes.test_validator_refuses_effective_quoted_production_flag) ... FAIL
+
+======================================================================
+FAIL: test_application_deploy_can_activate_under_provisioned_parent (__main__.IndependentStagingOpsProbes.test_application_deploy_can_activate_under_provisioned_parent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 78, in test_application_deploy_can_activate_under_provisioned_parent
+    self.assertEqual(run.returncode, 0,
+AssertionError: 1 != 0 : nonroot activation denied: provisioned root:root 0755 likewise denies app directory writes
+
+======================================================================
+FAIL: test_charset_normalization_preserves_row_bytes (__main__.IndependentStagingOpsProbes.test_charset_normalization_preserves_row_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 107, in test_charset_normalization_preserves_row_bytes
+    self.assertNotEqual(normalize(original), normalize(altered),
+AssertionError: "INSERT INTO `terms` VALUES ('A COLLATE utf8mb4_unicode_ci');\n" == "INSERT INTO `terms` VALUES ('A COLLATE utf8mb4_unicode_ci');\n" : global charset normalization equates different retained INSERT row data
+
+======================================================================
+FAIL: test_detach_refuses_symlink_to_nonrelease_mount (__main__.IndependentStagingOpsProbes.test_detach_refuses_symlink_to_nonrelease_mount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 62, in test_detach_refuses_symlink_to_nonrelease_mount
+    self.assertFalse(trace.exists(), "helper dispatched umount through an app-writable symlink to /proc")
+AssertionError: True is not false : helper dispatched umount through an app-writable symlink to /proc
+
+======================================================================
+FAIL: test_validator_refuses_effective_quoted_production_flag (__main__.IndependentStagingOpsProbes.test_validator_refuses_effective_quoted_production_flag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 97, in test_validator_refuses_effective_quoted_production_flag
+    self.assertNotEqual(run.returncode, 0, "validator accepted a Laravel-effective enabled production checkout flag")
+AssertionError: 0 == 0 : validator accepted a Laravel-effective enabled production checkout flag
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.100s
+
+FAILED (failures=4)

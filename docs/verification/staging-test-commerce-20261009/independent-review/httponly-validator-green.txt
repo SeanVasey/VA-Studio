@@ -1,0 +1,35 @@
+Reviewed source: 1b2d0aa85b00b55d36e71eae66d61340dfc0b820
+PHP 8.4.26 SAPI cli
+PASS explicit-true: exit=0, checks=36, failed=none
+PASS missing-uses-safe-default: exit=0, checks=36, failed=none
+PASS quoted-true: exit=0, checks=36, failed=none
+PASS false-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS quoted-false-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS parenthesized-false-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS empty-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS unresolved-interpolation-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS file-interpolation-true: exit=0, checks=36, failed=none
+PASS file-interpolation-false-refuses-probe: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS default-ignores-inherited-false: exit=0, checks=36, failed=none
+PASS getenv-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS getenv-quoted-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS getenv-interpolated-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS getenv-explicit-true-ignores-false: exit=0, checks=36, failed=none
+PASS getenv-missing-default-ignores-false: exit=0, checks=36, failed=none
+PASS getenv-inherited-interpolation-refused: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS getenv-local-interpolation-ignores-export: exit=0, checks=36, failed=none
+PASS _ENV-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _ENV-quoted-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _ENV-interpolated-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _ENV-explicit-true-ignores-false: exit=0, checks=36, failed=none
+PASS _ENV-missing-default-ignores-false: exit=0, checks=36, failed=none
+PASS _ENV-inherited-interpolation-refused: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _ENV-local-interpolation-ignores-export: exit=0, checks=36, failed=none
+PASS _SERVER-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _SERVER-quoted-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _SERVER-interpolated-false-mask: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _SERVER-explicit-true-ignores-false: exit=0, checks=36, failed=none
+PASS _SERVER-missing-default-ignores-false: exit=0, checks=36, failed=none
+PASS _SERVER-inherited-interpolation-refused: exit=1, checks=37, failed=runtime.session_http_only,stripe.probe_account
+PASS _SERVER-local-interpolation-ignores-export: exit=0, checks=36, failed=none
+RESULT: 32 independent HttpOnly/default/interpolation/adapter/privacy checks passed; no provider request attempted

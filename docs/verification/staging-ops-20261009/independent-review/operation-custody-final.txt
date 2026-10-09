@@ -1,0 +1,16 @@
+Exact assessed source: 9cc584c471a90bacac8979c185496d0cc412a292
+test_existing_identity_refuses_ambiguous_private_credentials_without_rotation (__main__.DatabaseCredentialProbe.test_existing_identity_refuses_ambiguous_private_credentials_without_rotation) ... ok
+test_new_identity_never_overwrites_orphan_credentials_or_uses_bad_generation (__main__.DatabaseCredentialProbe.test_new_identity_never_overwrites_orphan_credentials_or_uses_bad_generation) ... ok
+test_actual_public_operations_keep_marker_when_application_child_survives (__main__.OperationProbe.test_actual_public_operations_keep_marker_when_application_child_survives) ... ok
+test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state (__main__.OperationProbe.test_actual_requiesce_uses_stopped_proof_and_refuses_partial_host_state) ... ok
+test_fixed_helper_refuses_writable_links_and_nonregular_files_before_operation (__main__.OperationProbe.test_fixed_helper_refuses_writable_links_and_nonregular_files_before_operation) ... ok
+test_killed_activation_parent_blocks_every_mutator_but_allows_inspection (__main__.OperationProbe.test_killed_activation_parent_blocks_every_mutator_but_allows_inspection) ... ok
+test_prepare_keeps_build_and_sealing_under_one_lease (__main__.OperationProbe.test_prepare_keeps_build_and_sealing_under_one_lease) ... ok
+test_refresh_retains_leases_through_configuration_child_and_resume (__main__.OperationProbe.test_refresh_retains_leases_through_configuration_child_and_resume) ... ok
+test_resume_readonly_refusal_never_creates_operation_custody (__main__.OperationProbe.test_resume_readonly_refusal_never_creates_operation_custody) ... ok
+test_standalone_configure_cannot_leave_an_unfenced_orphan (__main__.OperationProbe.test_standalone_configure_cannot_leave_an_unfenced_orphan) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.125s
+
+OK

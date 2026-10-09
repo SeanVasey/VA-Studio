@@ -1,0 +1,26 @@
+Exact assessed source: ee9d1af29a2cd4c8e19a357f9a5091135e6df125
+Composer version 2.8.8 2025-04-04 16:56:46
+PHP version 8.4.26 (/workspace/.va-studio-toolchain/standalone/bin/php8.4)
+Run the "diagnose" command to get more detailed diagnostics output.
+test_native_package_discovery_hook_reads_frozen_candidate_before_npm (__main__.ComposerOrderingProbe.test_native_package_discovery_hook_reads_frozen_candidate_before_npm) ... FAIL
+
+======================================================================
+FAIL: test_native_package_discovery_hook_reads_frozen_candidate_before_npm (__main__.ComposerOrderingProbe.test_native_package_discovery_hook_reads_frozen_candidate_before_npm)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/composer-ordering-probe.py", line 96, in test_native_package_discovery_hook_reads_frozen_candidate_before_npm
+    self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+AssertionError: 23 != 0 : Installing dependencies from lock file
+Verifying lock file contents can be installed on current platform.
+Package operations: 1 install, 0 updates, 0 removals
+  - Installing independent/local-hook-fixture (1.0.0): Mirroring from local-package
+Generating optimized autoload files
+> @php artisan package:discover --ansi
+frozen environment was not available at package discovery
+Script @php artisan package:discover --ansi handling the post-autoload-dump event returned with error code 23
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.303s
+
+FAILED (failures=1)

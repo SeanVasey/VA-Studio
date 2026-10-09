@@ -1,0 +1,10 @@
+FAIL reconcile save: runner exit=0
+FAIL reconcile clear: runner exit=0
+FAIL finalize save: runner exit=0
+FAIL finalize clear: runner exit=0
+FAIL contracts save: runner exit=0
+FAIL contracts clear: runner exit=0
+FAIL activate save: runner exit=0
+FAIL activate clear: runner exit=0
+FAIL reconcile timestamp: runner exit=0
+RESULT: 9 of 9 state failure checks failed

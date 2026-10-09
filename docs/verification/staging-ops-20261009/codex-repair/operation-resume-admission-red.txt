@@ -1,0 +1,21 @@
+test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries (test_staging_operation_lease.OperationLeaseTest.test_failed_migration_keeps_marker_closed_and_refuses_mutating_retries) ... ok
+test_fresh_activation_can_requiesce_an_already_stopped_served_release (test_staging_operation_lease.OperationLeaseTest.test_fresh_activation_can_requiesce_an_already_stopped_served_release) ... ok
+test_killed_root_parent_blocks_resume_while_migration_child_survives (test_staging_operation_lease.OperationLeaseTest.test_killed_root_parent_blocks_resume_while_migration_child_survives) ... ok
+test_migration_holds_control_and_writer_locks_until_switch_and_resume (test_staging_operation_lease.OperationLeaseTest.test_migration_holds_control_and_writer_locks_until_switch_and_resume) ... ok
+test_prepare_retains_control_lease_until_writable_build_child_is_reaped (test_staging_operation_lease.OperationLeaseTest.test_prepare_retains_control_lease_until_writable_build_child_is_reaped) ... ok
+test_public_stop_and_start_keep_recovery_marker_after_root_parent_death (test_staging_operation_lease.OperationLeaseTest.test_public_stop_and_start_keep_recovery_marker_after_root_parent_death) ... ok
+test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume (test_staging_operation_lease.OperationLeaseTest.test_refresh_keeps_one_root_lease_through_snapshot_configuration_and_resume) ... ok
+test_resume_refuses_an_open_gate_without_poisoning_recovery_custody (test_staging_operation_lease.OperationLeaseTest.test_resume_refuses_an_open_gate_without_poisoning_recovery_custody) ... FAIL
+
+======================================================================
+FAIL: test_resume_refuses_an_open_gate_without_poisoning_recovery_custody (test_staging_operation_lease.OperationLeaseTest.test_resume_refuses_an_open_gate_without_poisoning_recovery_custody)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_lease.py", line 287, in test_resume_refuses_an_open_gate_without_poisoning_recovery_custody
+    self.assertFalse(self.operation.exists(), "readonly resume refusal poisoned a healthy operation boundary")
+AssertionError: True is not false : readonly resume refusal poisoned a healthy operation boundary
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.843s
+
+FAILED (failures=1)

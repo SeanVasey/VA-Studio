@@ -1,0 +1,49 @@
+test_environment_capture_refuses_links_escapes_and_writable_ancestry (test_staging_release_sealing.ReleaseSealingTest.test_environment_capture_refuses_links_escapes_and_writable_ancestry) ... ok
+test_external_and_runtime_code_symlinks_refuse (test_staging_release_sealing.ReleaseSealingTest.test_external_and_runtime_code_symlinks_refuse) ... ok
+test_hard_links_refuse_without_mutating_the_external_inode (test_staging_release_sealing.ReleaseSealingTest.test_hard_links_refuse_without_mutating_the_external_inode) ... ok
+test_internal_code_symlinks_and_executable_bits_are_preserved (test_staging_release_sealing.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved) ... ok
+test_old_open_writer_cannot_change_the_published_inode (test_staging_release_sealing.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode) ... ok
+test_post_seal_revision_check_detects_source_changed_during_build (test_staging_release_sealing.ReleaseSealingTest.test_post_seal_revision_check_detects_source_changed_during_build) ... ok
+test_privileged_cli_refuses_root_as_the_application_account (test_staging_release_sealing.ReleaseSealingTest.test_privileged_cli_refuses_root_as_the_application_account) ... FAIL
+test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (test_staging_release_sealing.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable) ... ok
+test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer (test_staging_release_sealing.ReleaseSealingTest.test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer) ... FAIL
+
+======================================================================
+FAIL: test_privileged_cli_refuses_root_as_the_application_account (test_staging_release_sealing.ReleaseSealingTest.test_privileged_cli_refuses_root_as_the_application_account)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 199, in test_privileged_cli_refuses_root_as_the_application_account
+    with self.assertRaises(ValueError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer (test_staging_release_sealing.ReleaseSealingTest.test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 182, in test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer
+    run = subprocess.run(["python3", "-c", driver, str(SEALER), str(evidence), str(source), str(output)],
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['python3', '-c', "import importlib.util, os, sys\nspec = importlib.util.spec_from_file_location('fifo_sealer', sys.argv[1])\nmodule = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)\nmodule.ROOT_UID = os.getuid(); module.ROOT_GID = os.getgid()\ntry:\n    module.stage_environment(sys.argv[2], sys.argv[3], sys.argv[4], os.getuid(), os.getgid())\nexcept (ValueError, OSError):\n    sys.exit(0)\nsys.exit(1)\n", '/workspace/VA-Studio-ops/ops/staging/seal-release.py', '/tmp/tmpuqqjus_6/evidence', '/tmp/tmpuqqjus_6/evidence/candidate', '/tmp/tmpuqqjus_6/protected-output']' timed out after 1 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 185, in test_untrusted_environment_fifo_refuses_without_waiting_for_a_writer
+    self.fail("untrusted FIFO blocked before regular-file admission")
+AssertionError: untrusted FIFO blocked before regular-file admission
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.025s
+
+FAILED (failures=2)

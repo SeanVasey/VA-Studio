@@ -1,0 +1,9 @@
+test_composer_hooks_receive_frozen_environment_before_bootstrap (test_staging_build_admission.BuildAdmissionTest.test_composer_hooks_receive_frozen_environment_before_bootstrap)
+Run the actual helper; Composer/npm/runtime effects are bounded fixtures. ... ok
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (test_staging_build_admission.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... ok
+test_running_application_cannot_inject_ignored_vendor_before_sealing (test_staging_build_admission.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.382s
+
+OK

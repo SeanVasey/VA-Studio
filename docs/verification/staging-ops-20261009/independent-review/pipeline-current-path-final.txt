@@ -1,0 +1,7 @@
+Assessed source: ca7e3ae46b312e1673a2067bb5d122e8aa9bc11e
+test_current_script_default_root_runs_on_the_selected_physical_release (__main__.AdmissionProbe.test_current_script_default_root_runs_on_the_selected_physical_release) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.063s
+
+OK
