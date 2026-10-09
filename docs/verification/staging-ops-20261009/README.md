@@ -200,3 +200,5 @@ Bash5 separately andShellcheck `-x` PASS. Native28 signature proof remains at112
 diff; it was not relabeled or rerun. The first current ops attempt lacked RELEASES in its new fixture,
 failed1 case, and is retained as `build-admission-ops-harness-attempt.txt`. Corrected intermediate45 PASS
 and the exact committed45 PASS remain separate. No privileged host operation or provider call occurred.
+
+Independent [build admission addendum](independent-review/BUILD-ADMISSION-ADDENDUM.md) **APPROVES exact7bced5ec**, carried to34b8d2dc by empty runtime-source diff and inspected prose. Six delta probes pass; oldc9 selected2methods reproduce11 safety failures. The publication wording now explicitly limits closed admission to activation failures before a healthy resume. Final evidence-only successor source remains unchanged.
