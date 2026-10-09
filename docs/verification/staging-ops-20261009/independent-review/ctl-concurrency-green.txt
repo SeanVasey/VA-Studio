@@ -1,0 +1,9 @@
+test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal (__main__.ControlConcurrencyProbe.test_concurrent_attach_cannot_rebind_between_prune_proof_and_removal) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.679s
+
+OK
+Independent competing attach waited while prune held its final read.
+rm-while-mounted=no
+attach

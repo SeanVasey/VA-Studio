@@ -1,0 +1,97 @@
+Assessed exact source: c378295c16310a64ff4f729d7d6480b6778fb998
+test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) ...
+  test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='tmp/php-upload') ... FAIL
+  test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='tmp/php-sys') ... FAIL
+  test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='private/branding') ... FAIL
+test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) ...
+  test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) (state='evidence') ... FAIL
+  test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) (state='tmp') ... FAIL
+test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) ...
+  test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) (state='fastcgi') ... FAIL
+  test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) (state='gitignore-dangling') ... FAIL
+
+======================================================================
+FAIL: test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='tmp/php-upload')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 87, in test_application_owned_child_directory_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 77, in probe_symlink
+    self.assertNotEqual(result.returncode, 0, "unsafe runtime symlink was admitted")
+AssertionError: 0 == 0 : unsafe runtime symlink was admitted
+
+======================================================================
+FAIL: test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='tmp/php-sys')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 87, in test_application_owned_child_directory_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 77, in probe_symlink
+    self.assertNotEqual(result.returncode, 0, "unsafe runtime symlink was admitted")
+AssertionError: 0 == 0 : unsafe runtime symlink was admitted
+
+======================================================================
+FAIL: test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) (state='private/branding')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 87, in test_application_owned_child_directory_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 77, in probe_symlink
+    self.assertNotEqual(result.returncode, 0, "unsafe runtime symlink was admitted")
+AssertionError: 0 == 0 : unsafe runtime symlink was admitted
+
+======================================================================
+FAIL: test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) (state='evidence')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 82, in test_direct_application_owned_directory_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 74, in probe_symlink
+    self.assertEqual((now.st_dev, now.st_ino, now.st_mode),
+AssertionError: Tuples differ: (33, 86254, 16872) != (33, 86254, 16832)
+
+First differing element 2:
+16872
+16832
+
+- (33, 86254, 16872)
+?                ^
+
++ (33, 86254, 16832)
+?                ^
+ : root initializer changed the symlink's protected target
+
+======================================================================
+FAIL: test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) (state='tmp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 82, in test_direct_application_owned_directory_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 77, in probe_symlink
+    self.assertNotEqual(result.returncode, 0, "unsafe runtime symlink was admitted")
+AssertionError: 0 == 0 : unsafe runtime symlink was admitted
+
+======================================================================
+FAIL: test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) (state='fastcgi')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 92, in test_nginx_directory_and_gitignore_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 77, in probe_symlink
+    self.assertNotEqual(result.returncode, 0, "unsafe runtime symlink was admitted")
+AssertionError: 0 == 0 : unsafe runtime symlink was admitted
+
+======================================================================
+FAIL: test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) (state='gitignore-dangling')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 92, in test_nginx_directory_and_gitignore_links
+    self.probe_symlink(state)
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/runtime-dir-probe.py", line 71, in probe_symlink
+    self.assertFalse(target.exists(), "root initializer followed a dangling .gitignore into protected storage")
+AssertionError: True is not false : root initializer followed a dangling .gitignore into protected storage
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.098s
+
+FAILED (failures=7)

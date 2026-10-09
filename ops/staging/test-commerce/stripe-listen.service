@@ -1,0 +1,42 @@
+# FALLBACK ONLY. The primary event path is the Stripe Dashboard test-mode webhook endpoint
+# https://<STAGING_HOST>/webhooks/stripe (docs/ops/staging-test-purchase.md, "Stripe events").
+# Use this unit only when that endpoint cannot reach the host. Never run both at once: the
+# application accepts one STRIPE_WEBHOOK_SECRET, so events signed by the other path are refused (400).
+#
+# What it does: the Stripe CLI opens an outbound connection to Stripe with the TEST key and
+# forwards the four checkout events to the staging receiver, signed with the CLI's own whsec_.
+#
+# Install (root), after replacing <STAGING_HOST> and installing the Stripe CLI at /usr/bin/stripe:
+#   install -d -m 0700 /etc/vasey
+#   install -m 0600 /dev/null /etc/vasey/stripe-listen.env
+#   # put exactly one line in it:  STRIPE_API_KEY=sk_test_...   (the same TEST key as the app)
+#   install -m 0644 stripe-listen.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now stripe-listen.service
+# Then, as root, read the forwarding secret once and put it in the app .env as STRIPE_WEBHOOK_SECRET:
+#   ( set -a; . /etc/vasey/stripe-listen.env; HOME="$(mktemp -d)" stripe listen --print-secret )
+# It prints only the whsec_ value. Re-run validate-test-commerce-profile.php after the change.
+# Disable the Dashboard endpoint while this fallback is in use.
+# Check on the host that this CLI version reads STRIPE_API_KEY (`stripe listen --help`).
+[Unit]
+Description=VASEY.AUDIO staging: Stripe CLI test-mode event forwarder (fallback)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+User=vasey-stripe-listen
+StateDirectory=stripe-listen
+Environment=HOME=/var/lib/stripe-listen
+Environment=XDG_CONFIG_HOME=/var/lib/stripe-listen
+EnvironmentFile=/etc/vasey/stripe-listen.env
+# Only the four events the receiver handles. TLS verification stays on (never --skip-verify).
+ExecStart=/usr/bin/stripe listen \
+  --forward-to https://<STAGING_HOST>/webhooks/stripe \
+  --events checkout.session.completed,checkout.session.async_payment_succeeded,checkout.session.async_payment_failed,checkout.session.expired
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes

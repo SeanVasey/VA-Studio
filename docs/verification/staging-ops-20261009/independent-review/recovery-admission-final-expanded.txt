@@ -1,0 +1,11 @@
+Exact assessed source: a44664f4afffb8780093ba247b616b5375ed86e7
+test_actual_python_wrapper_failure_already_propagates (__main__.RecoveryAdmissionProbe.test_actual_python_wrapper_failure_already_propagates) ... ok
+test_health_proof_rejects_each_partial_state_without_mutation (__main__.RecoveryAdmissionProbe.test_health_proof_rejects_each_partial_state_without_mutation) ... ok
+test_initial_and_existing_deploy_require_snapshot_before_migration (__main__.RecoveryAdmissionProbe.test_initial_and_existing_deploy_require_snapshot_before_migration) ... ok
+test_interrupted_mounted_attach_persists_exact_entry_or_refuses (__main__.RecoveryAdmissionProbe.test_interrupted_mounted_attach_persists_exact_entry_or_refuses) ... ok
+test_same_sha_equal_environment_requires_health_without_repair (__main__.RecoveryAdmissionProbe.test_same_sha_equal_environment_requires_health_without_repair) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.218s
+
+OK

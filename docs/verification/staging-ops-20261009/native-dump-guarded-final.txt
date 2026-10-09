@@ -1,0 +1,2 @@
+{"version":"8.4.11","performance_schema":1,"socket":"","bind_address":"127.0.0.1","isolation":"REPEATABLE-READ"}
+{"version":"8.4.11","first_and_redump_bytes_equal":false,"normalized_dump_equal":true,"restored_row_exact":true,"changed_insert_refused":true,"trigger_count":1}

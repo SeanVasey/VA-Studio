@@ -1,0 +1,23 @@
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... FAIL
+test_running_application_cannot_inject_ignored_vendor_before_sealing (__main__.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... FAIL
+
+======================================================================
+FAIL: test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_build_admission.py", line 113, in test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes
+    self.assertNotEqual(probe(str(parent)).returncode, 0, "app-owned existing parent admitted")
+AssertionError: 0 == 0 : app-owned existing parent admitted
+
+======================================================================
+FAIL: test_running_application_cannot_inject_ignored_vendor_before_sealing (__main__.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_build_admission.py", line 80, in test_running_application_cannot_inject_ignored_vendor_before_sealing
+    self.assertFalse(injected.exists(), "live application injected ignored vendor bytes that Git accepted")
+AssertionError: True is not false : live application injected ignored vendor bytes that Git accepted
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.283s
+
+FAILED (failures=2)

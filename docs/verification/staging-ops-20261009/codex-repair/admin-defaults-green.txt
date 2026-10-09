@@ -1,0 +1,8 @@
+test_default_socket_path_does_not_require_a_defaults_file (__main__.AdminDefaultsCustodyTest.test_default_socket_path_does_not_require_a_defaults_file) ... ok
+test_protected_admin_defaults_reach_the_first_query (__main__.AdminDefaultsCustodyTest.test_protected_admin_defaults_reach_the_first_query) ... ok
+test_unsafe_admin_defaults_refuse_before_the_first_query (__main__.AdminDefaultsCustodyTest.test_unsafe_admin_defaults_refuse_before_the_first_query) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.295s
+
+OK

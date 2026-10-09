@@ -1,0 +1,33 @@
+Assessed source: e898282d5606b5e9c824c4cd4e3a8b9611c13777
+test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry (__main__.AdmissionProbe.test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry) ... FAIL
+test_manual_pipeline_command_is_caught_by_actual_process_scan (__main__.AdmissionProbe.test_manual_pipeline_command_is_caught_by_actual_process_scan) ... FAIL
+test_orphan_artisan_child_retains_admission_until_it_finishes (__main__.AdmissionProbe.test_orphan_artisan_child_retains_admission_until_it_finishes) ... FAIL
+
+======================================================================
+FAIL: test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry (__main__.AdmissionProbe.test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/pipeline-admission-probe.py", line 227, in test_admitted_sweep_refuses_quiesce_and_future_starts_until_retry
+    self.assertNotEqual(quiesce.returncode, 0, "active admitted sweep was not drained")
+AssertionError: 0 == 0 : active admitted sweep was not drained
+
+======================================================================
+FAIL: test_manual_pipeline_command_is_caught_by_actual_process_scan (__main__.AdmissionProbe.test_manual_pipeline_command_is_caught_by_actual_process_scan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/pipeline-admission-probe.py", line 367, in test_manual_pipeline_command_is_caught_by_actual_process_scan
+    self.assertNotEqual(run.returncode, 0, "snapshot ignored a standalone pipeline command")
+AssertionError: 0 == 0 : snapshot ignored a standalone pipeline command
+
+======================================================================
+FAIL: test_orphan_artisan_child_retains_admission_until_it_finishes (__main__.AdmissionProbe.test_orphan_artisan_child_retains_admission_until_it_finishes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/pipeline-admission-probe.py", line 421, in test_orphan_artisan_child_retains_admission_until_it_finishes
+    self.assertNotEqual(quiesce.returncode, 0, "runner death released its live child's admission")
+AssertionError: 0 == 0 : runner death released its live child's admission
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.221s
+
+FAILED (failures=3)

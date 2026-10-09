@@ -1,0 +1,106 @@
+Exact assessed source: c9ff14349707ca860aeb3ccf07c91b1a99207be8
+test_controlled_live_actor_cannot_modify_ignored_vendor (__main__.BuildAdmissionProbe.test_controlled_live_actor_cannot_modify_ignored_vendor) ... FAIL
+test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) ...
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='app owned ancestor') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='app owned existing root') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='symlink ancestor') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='dangling ancestor') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='double slash') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='trailing slash') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='dot under absent directory') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o775') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o757') ... FAIL
+  test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o777') ... FAIL
+
+======================================================================
+FAIL: test_controlled_live_actor_cannot_modify_ignored_vendor (__main__.BuildAdmissionProbe.test_controlled_live_actor_cannot_modify_ignored_vendor)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 133, in test_controlled_live_actor_cannot_modify_ignored_vendor
+    self.assertFalse(result["injected"], "actual ignored vendor was injected while Git accepted the candidate")
+AssertionError: True is not false : actual ignored vendor was injected while Git accepted the candidate
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='app owned ancestor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : app owned ancestor was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='app owned existing root')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : app owned existing root was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='symlink ancestor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : symlink ancestor was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='dangling ancestor')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : dangling ancestor was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='double slash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : double slash was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='trailing slash')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : trailing slash was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (name='dot under absent directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 202, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(root_path, bad_owner).returncode, 0, name + " was admitted")
+AssertionError: 0 == 0 : dot under absent directory was admitted
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o775')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 206, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(str(parent / "absent")).returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o757')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 206, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(str(parent / "absent")).returncode, 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) (mode='0o777')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/build-admission-probe.py", line 206, in test_provision_refuses_ownership_modes_links_and_noncanonical_roots
+    self.assertNotEqual(probe(str(parent / "absent")).returncode, 0)
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.277s
+
+FAILED (failures=11)

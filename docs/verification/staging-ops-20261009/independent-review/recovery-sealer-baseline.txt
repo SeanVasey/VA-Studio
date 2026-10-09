@@ -1,0 +1,7 @@
+Exact assessed source: 3b7d1b9c2b763847a5922ca558610638eaaf0308
+test_actual_python_wrapper_failure_already_propagates (__main__.RecoveryAdmissionProbe.test_actual_python_wrapper_failure_already_propagates) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.023s
+
+OK

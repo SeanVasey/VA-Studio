@@ -1,0 +1,43 @@
+test_external_and_runtime_code_symlinks_refuse (__main__.ReleaseSealingTest.test_external_and_runtime_code_symlinks_refuse) ... ok
+test_hard_links_refuse_without_mutating_the_external_inode (__main__.ReleaseSealingTest.test_hard_links_refuse_without_mutating_the_external_inode) ... ok
+test_internal_code_symlinks_and_executable_bits_are_preserved (__main__.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved) ... ERROR
+test_old_open_writer_cannot_change_the_published_inode (__main__.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode) ... ERROR
+test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (__main__.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable) ... ERROR
+
+======================================================================
+ERROR: test_internal_code_symlinks_and_executable_bits_are_preserved (__main__.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 103, in test_internal_code_symlinks_and_executable_bits_are_preserved
+    self.seal()
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 53, in seal
+    raise RuntimeError(run.stderr)
+RuntimeError: privileged directory ancestry must not be group/world writable
+
+
+======================================================================
+ERROR: test_old_open_writer_cannot_change_the_published_inode (__main__.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 69, in test_old_open_writer_cannot_change_the_published_inode
+    self.seal()
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 53, in seal
+    raise RuntimeError(run.stderr)
+RuntimeError: privileged directory ancestry must not be group/world writable
+
+
+======================================================================
+ERROR: test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (__main__.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 59, in test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable
+    self.seal()
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_release_sealing.py", line 53, in seal
+    raise RuntimeError(run.stderr)
+RuntimeError: privileged directory ancestry must not be group/world writable
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.042s
+
+FAILED (errors=3)

@@ -1,0 +1,17 @@
+test_delimiter_looking_line_inside_routine_literal_is_not_a_directive (__main__.DumpContextProbe.test_delimiter_looking_line_inside_routine_literal_is_not_a_directive) ... FAIL
+test_mysql_dump_procedure_body_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_procedure_body_remains_byte_exact) ... ok
+test_mysql_dump_routine_literal_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_routine_literal_remains_byte_exact) ... ok
+test_top_level_schema_attribute_can_normalize (__main__.DumpContextProbe.test_top_level_schema_attribute_can_normalize) ... ok
+
+======================================================================
+FAIL: test_delimiter_looking_line_inside_routine_literal_is_not_a_directive (__main__.DumpContextProbe.test_delimiter_looking_line_inside_routine_literal_is_not_a_directive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/normalizer-context-probe.py", line 40, in test_delimiter_looking_line_inside_routine_literal_is_not_a_directive
+    self.assertEqual(normalize(data), data, "a literal line reset delimiter context and exposed literal bytes to normalization")
+AssertionError: b"DEL[150 chars]ext COLLATE utf8mb4_unicode_ci\n);\n';\nEND;;\nDELIMITER ;\n" != b"DEL[150 chars]ext CHARACTER SET utf8mb4 COLLATE utf8mb4_unic[32 chars] ;\n" : a literal line reset delimiter context and exposed literal bytes to normalization
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (failures=1)

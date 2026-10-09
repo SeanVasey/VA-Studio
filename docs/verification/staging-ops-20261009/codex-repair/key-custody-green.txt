@@ -1,0 +1,11 @@
+test_absent_or_ambiguous_manifest_refuses (__main__.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses) ... ok
+test_dangling_outside_and_non_symlink_current_cannot_become_first_install (__main__.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install) ... ok
+test_genuine_first_install_admission_is_explicit (__main__.BackupKeyCustodyTest.test_genuine_first_install_admission_is_explicit) ... ok
+test_genuine_no_current_snapshot_records_none (__main__.BackupKeyCustodyTest.test_genuine_no_current_snapshot_records_none) ... ok
+test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) ... ok
+test_served_release_missing_env_refuses_before_publishing_any_snapshot (__main__.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.103s
+
+OK

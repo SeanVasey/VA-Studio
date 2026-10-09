@@ -1,0 +1,55 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-commerce/phpunit.xml
+
+FFF                                                                 3 / 3 (100%)
+
+Time: 00:00.322, Memory: 24.50 MB
+
+There were 3 failures:
+
+1) Tests\Unit\TestCommercePipelineRunnerTest::test_page_bounded_retained_rows_do_not_starve_later_work_and_are_revisited@finalize retries with data ('finalize', 'vasey:finalize-test-payments', 'retry')
+Failed asserting that '2026-10-09T00:23:58Z test-commerce-pipeline sweep start\n
+2026-10-09T00:23:59Z test-commerce-pipeline receipts done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline reconcile done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline finalize 11111111-1111-4111-8111-111111111111 retry\n
+2026-10-09T00:23:59Z test-commerce-pipeline finalize page bound reached items=1 pages=1; the next sweep continues\n
+2026-10-09T00:23:59Z test-commerce-pipeline contracts done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline activate done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline sweep end status=0\n
+' [ASCII](length: 627) contains "finalize 22222222-2222-4222-8222-222222222222 ready" [ASCII](length: 51).
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:187
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Unit\TestCommercePipelineRunnerTest::test_page_bounded_retained_rows_do_not_starve_later_work_and_are_revisited@contract retries with data ('contracts', 'vasey:issue-test-contracts', 'retry')
+Failed asserting that '2026-10-09T00:23:59Z test-commerce-pipeline sweep start\n
+2026-10-09T00:23:59Z test-commerce-pipeline receipts done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline reconcile done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline finalize done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline contracts 11111111-1111-4111-8111-111111111111 retry\n
+2026-10-09T00:23:59Z test-commerce-pipeline contracts page bound reached items=1 pages=1; the next sweep continues\n
+2026-10-09T00:23:59Z test-commerce-pipeline activate done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline sweep end status=0\n
+' [ASCII](length: 628) contains "contracts 22222222-2222-4222-8222-222222222222 ready" [ASCII](length: 52).
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:187
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Unit\TestCommercePipelineRunnerTest::test_page_bounded_retained_rows_do_not_starve_later_work_and_are_revisited@activation blocked with data ('activate', 'vasey:activate-test-fulfillment', 'pending_contracts')
+Failed asserting that '2026-10-09T00:23:59Z test-commerce-pipeline sweep start\n
+2026-10-09T00:23:59Z test-commerce-pipeline receipts done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline reconcile done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline finalize done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline contracts done items=0 pages=1\n
+2026-10-09T00:23:59Z test-commerce-pipeline activate 11111111-1111-4111-8111-111111111111 pending_contracts\n
+2026-10-09T00:23:59Z test-commerce-pipeline activate page bound reached items=1 pages=1; the next sweep continues\n
+2026-10-09T00:23:59Z test-commerce-pipeline sweep end status=0\n
+' [ASCII](length: 639) contains "activate 22222222-2222-4222-8222-222222222222 ready" [ASCII](length: 51).
+
+/workspace/VA-Studio-commerce/tests/Unit/TestCommercePipelineRunnerTest.php:187
+/workspace/VA-Studio-commerce/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 3, Assertions: 9, Failures: 3.

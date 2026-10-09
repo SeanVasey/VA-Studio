@@ -1,0 +1,27 @@
+test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate) ... ok
+test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) ...
+  test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) (healthy='0') ... FAIL
+  test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) (healthy='1') ... FAIL
+
+======================================================================
+FAIL: test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) (healthy='0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_deploy_refresh.py", line 33, in test_same_sha_unchanged_environment_requires_a_successful_health_proof
+    self.assertEqual(run.returncode == 0, healthy == "1", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_same_sha_unchanged_environment_requires_a_successful_health_proof (__main__.EnvironmentRefreshTest.test_same_sha_unchanged_environment_requires_a_successful_health_proof) (healthy='1')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_deploy_refresh.py", line 34, in test_same_sha_unchanged_environment_requires_a_successful_health_proof
+    self.assertEqual(trace.read_text().strip() if trace.exists() else "", "healthy")
+AssertionError: '' != 'healthy'
++ healthy
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.020s
+
+FAILED (failures=2)
