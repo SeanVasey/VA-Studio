@@ -39,7 +39,8 @@ handoff; no earlier Foundation baseline exists for this tree.
   `migrate:fresh` runs, `evidence/migration-recompilation-red.txt`), green with the fix
   (`evidence/migration-recompilation-green.txt`). With the fix, `CatalogWriterAuthorityTest` declares no new classes
   after warm-up (previously 18 per test).
-- Full SQLite shards with the fix: see Results.
+- Full SQLite shards with the fix pass locally under 512M with CI's 2-shard partition: 3,924 and 3,710 cases, 0 failures or
+  errors (`evidence/sqlite-shard-*-fixed-512M.txt`). Their receipts still failed until F below.
 
 ## B. License-draft browser fixture — fixed here (test-only)
 
@@ -94,6 +95,20 @@ runs a full `migrate:fresh` before each test and `db:wipe` after it. On a privat
 timings file also lacks 322 test files, so the partition's 61-minute estimate was wrong. This is not caused by the PRs
 merged today; migrations and per-test-migrating suites have grown across the batch since the timings were last measured.
 
+## F. Receipt verifier refused reviewed skips that report setUp assertions — fixed here (CI scripts)
+
+Found while checking the fixed shards against Foundation's receipt verifier (`scripts/ci/database-receipts.py`). It required
+every skipped case to report 0 assertions, but PHPUnit 12.5 counts assertions made in `setUp` before a test skips itself
+(for example `ProductionIdentityFixture::identitySetup()` asserting `migrate:fresh` succeeded). Eight reviewed SQLite skips
+report 1–2 such assertions (`evidence/sqlite-shard-*-fixed-512M.txt`), so both SQLite receipts would have been rejected even
+after A. No Foundation run reached that step on this tree (the shards ran out of memory first).
+
+The verifier now accepts setUp assertions on a skipped case and still refuses duplicate skip nodes. Which cases may skip is
+unchanged: the skipped identities must equal the reviewed SQLite skip census exactly, and the collector still requires every
+SQLite skip to have executed on MySQL. A self-test covers both. The real verifier rejects the local JUnit before the change and
+accepts both shards after it (`evidence/sqlite-receipt-junit-check.txt`). The same applies to MySQL once a reviewed MySQL skip
+census exists (the native-selection change).
+
 ## Results
 
 | Run | Source | Result | Evidence |
@@ -104,7 +119,8 @@ merged today; migrations and per-test-migrating suites have grown across the bat
 | License-draft fixture red / green (relaxed harness) | `0f9b39ce` / + fix | refused / prepared and verified | `evidence/license-draft-fixture-local.txt` |
 | Focused browser feedback `37938110858` (informative) | `e2b3906` | stopped by the workflow's own 720 s command budget before WebKit; Chromium: license-draft spec produced all three recovery screenshots with no failure capture (B fixed in CI); inquiry-conversation failed again (C) | GitHub run artifact |
 | Chromium stream-response reproduction | pinned Playwright 1.63 / Chromium 1243 | 16/85 stream-reader runs hung, 0/22 `response.json()` | `evidence/chromium-stream-response-repro.*` |
-| Local SQLite shards with the fix, CI partition, 512M | this branch | FIXED_PLACEHOLDER | `evidence/sqlite-shard-*-fixed-512M.txt` |
+| Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
+| Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
 
 ## Not tested
 

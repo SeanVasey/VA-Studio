@@ -1,0 +1,26 @@
+# scripts/ci/database-receipts.py junit() applied to the local shard JUnit above against each shard's listed tests
+# (phpunit-ci-local-<n>-tests.xml) and the reviewed SQLite skip policy. Harness: run_junit.py below.
+## Before the verifier change (dcf983e):
+shard 1: REJECTED: Skipped case has assertions or duplicate result nodes
+shard 2: REJECTED: Skipped case has assertions or duplicate result nodes
+## Same verifier with only the zero-assertion clause removed in memory: both accepted (388 and 235 skips, exactly the reviewed census).
+## After the verifier change (this commit):
+shard 1: accepted {'reported_cases': 3924, 'executed_cases': 3536, 'skipped_cases': 388}
+shard 2: accepted {'reported_cases': 3710, 'executed_cases': 3475, 'skipped_cases': 235}
+
+## run_junit.py
+# Run database-receipts.py's own junit() check on local SQLite shard JUnit, against the shard's listed tests.
+import importlib.util, sys
+from pathlib import Path
+root = Path.cwd()
+spec = importlib.util.spec_from_file_location("receipts", root / "scripts/ci/database-receipts.py")
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+skip_pairs = m.sqlite_skip_pairs(root)
+for shard, junit_path in zip((1, 2), sys.argv[1:3]):
+    expected = m.inventory((root / f"phpunit-ci-local-{shard}-tests.xml").read_bytes(), str(root))
+    raw = Path(junit_path).read_bytes()
+    try:
+        r = m.junit(raw, expected, str(root), "sqlite", skip_pairs)
+        print(f"shard {shard}: accepted", {k: r[k] for k in ("reported_cases", "executed_cases", "skipped_cases")})
+    except m.ReceiptError as e:
+        print(f"shard {shard}: REJECTED: {e}")
