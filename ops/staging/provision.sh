@@ -85,7 +85,7 @@ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
 MIRROR=${MIRROR:-$APP_HOME/$HOST}
 KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-delivery.conf \
-         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php; do
+         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 
@@ -235,6 +235,7 @@ mysql_q() { "${MYSQL[@]}" -N -e "$1"; }
 user_exists() { [ "$(mysql_q "SELECT COUNT(*) FROM mysql.user WHERE user='$1' AND host='127.0.0.1'")" = 1 ]; }
 new_secret() { openssl rand -base64 33 | tr -d '\n/+=' | cut -c1-40; }
 SECRETS=/root/vasey-staging-secrets
+root_ancestry "$SECRETS"
 install -d -m 0700 -o root -g root "$SECRETS"
 
 mysql_q "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
@@ -244,13 +245,31 @@ mysql_q "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLAT
 # its own schema, which only shows triggers on tables the reader holds TRIGGER on. Grants are schema-scoped;
 # no global privilege, no SUPER, no CREATE ROUTINE, no FILE. Host is 127.0.0.1 only: set DB_HOST=127.0.0.1
 # (not localhost) so every connection and every trigger DEFINER is this exact account.
+app_credential_custody() {
+  local file=$SECRETS/db-app.env
+  local -a credential
+  [ -f "$file" ] && [ ! -L "$file" ] && [ "$(stat -c '%u %a %h' "$file")" = '0 600 1' ] \
+    && [ "$(stat -c %s "$file")" -le 256 ] || die "vasey_app credential file missing or untrusted; restore it privately or perform an explicit account rotation"
+  mapfile -t credential < "$file"
+  [ "${#credential[@]}" = 2 ] && [ "${credential[0]}" = DB_USERNAME=vasey_app ] \
+    && [[ "${credential[1]}" =~ ^DB_PASSWORD=[A-Za-z0-9]{20,40}$ ]] \
+    && cmp -s -- "$file" <(printf '%s\n' "${credential[@]}") \
+    || die "vasey_app credential file incomplete; restore it privately or perform an explicit account rotation"
+  unset credential
+}
+
 if ! user_exists vasey_app; then
+  [ ! -e "$SECRETS/db-app.env" ] && [ ! -L "$SECRETS/db-app.env" ] \
+    || die "app credential file exists without its database account; inspect privately and recover explicitly"
   pw=$(new_secret)
+  [[ "$pw" =~ ^[A-Za-z0-9]{20,40}$ ]] || die "credential generation failed"
   mysql_q "CREATE USER 'vasey_app'@'127.0.0.1' IDENTIFIED BY '$pw'"
-  umask 077; printf 'DB_USERNAME=vasey_app\nDB_PASSWORD=%s\n' "$pw" > "$SECRETS/db-app.env"; umask 022
+  (umask 077; set -C; printf 'DB_USERNAME=vasey_app\nDB_PASSWORD=%s\n' "$pw" > "$SECRETS/db-app.env") \
+    || die "app credential persistence failed; recover the database identity explicitly"
   unset pw
   info "created MySQL account vasey_app@127.0.0.1; its password is in $SECRETS/db-app.env (root only)"
 fi
+app_credential_custody
 mysql_q "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES, TRIGGER, CREATE TEMPORARY TABLES, LOCK TABLES ON \`$DB_NAME\`.* TO 'vasey_app'@'127.0.0.1'"
 
 # Backup-only account (docs/ops/backup-restore-proof.md): read, triggers, events, routines; no writes.
@@ -324,6 +343,7 @@ install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-b
 install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
+install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644

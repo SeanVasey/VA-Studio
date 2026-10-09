@@ -38,6 +38,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
 | `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
+| `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
 | `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes | run from each selected release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
@@ -88,6 +89,20 @@ This serializes attach/detach/prune/switch/resume/snapshot across concurrent sud
 entire pre-deploy backup. It is separate from the outer deploy lock, and application subprocesses do not
 inherit its descriptor. Re-provisioning preserves its inode. Nightly snapshots use this same helper action
 and fresh stopped-writer proof, so direct `ctl resume` cannot restart writers during a private-file copy.
+
+Forge uses `ctl prepare <sha> <private-env> <evidence-dir>` for the entire writable build and sealing,
+then `ctl activate <sha> <evidence-dir>` for a fresh quiesce, snapshot/proof, migration/cache/doctor,
+switch and healthy resume. Each invocation retains the root control lock and writer barrier throughout
+its critical child. `ctl refresh <sha> <private-env>` similarly encloses the configuration refresh.
+The fixed root-owned `release-step.sh` runs only as the application user with a scrubbed environment;
+application children receive neither privileged lock descriptor. Root never writes application evidence paths.
+
+Each operation creates root-only `/etc/vasey-staging/operation-in-progress` before quiesce and removes it
+only after its child has completed and sealing or healthy activation succeeds. A failure or killed root
+parent leaves it present, even if an application child survives. Public mutating helper actions, including
+`resume`, refuse that state; only `quiesce` and `status` remain available after obtaining the control lock.
+Root recovery must stop/reap every surviving build/migration/helper process and inspect/restore state
+before clearing the marker. There is no application-user reset or automatic failed-operation resume.
 
 The independent test-commerce runner shares `/etc/vasey-staging/writer.lock` and the root-owned
 `writer-admission` marker. Both start with admission closed; re-provision preserves their state and the
@@ -143,6 +158,11 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    - `vasey_backup@127.0.0.1`, the backup account, with `SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT` plus global `SHOW_ROUTINE`;
    - `SET PERSIST log_bin_trust_function_creators = ON`.
    It never rotates an existing password.
+   `/root/vasey-staging-secrets` must have canonical protected ancestry. An existing app account requires
+   a regular root-owned 0600 single-link `db-app.env` containing exactly the generated username/password
+   format. Missing, linked, writable or incomplete custody refuses with private recovery instructions.
+   If the account is absent but its credential file exists, provisioning refuses rather than overwriting
+   it or following a link. Do not paste credential contents into chat or the repository.
 4. **Host files:** the two FPM pools (it runs `php-fpm8.4 -t` and reloads), the supervisor programs, the `vasey-staging-ctl` and `vasey-staging-backup` helpers, `/etc/sudoers.d/vasey-staging` (checked with `visudo -c`), the backup cron (03:17 UTC) and logrotate.
 5. **Access:** the basic-auth file (SHA-512 crypt) and a root-only netrc that the quiesce and resume probes use. It also renders the nginx site.
 
@@ -175,36 +195,38 @@ renaming that account breaks every guarded write.
    settings and foreign configuration caches excluded. Duplicate keys, DB URL/socket overrides, production
    credentials and an `APP_KEY` change from the served release refuse before quiesce. The temporary copy is
    removed on exit; a later Forge edit waits for the next deploy attempt.
-2. It quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
+2. `ctl prepare` holds one root lease while it quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
    app-writable candidate**. It then makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves
    it clean (status and tree hash). Downtime includes dependency installation and asset compilation.
 3. It runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, then `npm ci && npm run build`. The Vite manifest must exist.
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
-5. The early `vasey-staging-ctl quiesce` established:
+5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
-6. `vasey-staging-ctl snapshot` takes a backup and **restore proof** before anything is migrated,
+6. Still inside that invocation, snapshot takes a backup and **restore proof** before anything is migrated,
    including a first-install retry. A no-current set explicitly has no historical environment/key.
-7. In the new release:
+7. The fixed helper runs these steps as the application user in the new release while root retains both locks:
    - `artisan down`, then `migrate --pretend` (evidence only; see the runbook), then `migrate --force`;
    - `config:cache`, `route:cache`, `view:cache`, `event:cache` (all verified to work with this codebase);
    - `vasey:doctor`, plus redacted `commerce-readiness` and `stripe-preflight` JSON.
-8. `vasey-staging-ctl switch` requires stopped web/workers, maintenance and attached private storage, then switches `current` atomically. `vasey-staging-ctl resume` then:
+8. The same root invocation verifies stopped web/workers, maintenance and attached private storage, then switches `current` atomically. Its internal resume then:
    - starts PHP-FPM and proves a 503;
    - starts the workers and proves each one runs in the new release (`/proc/<pid>/cwd`);
    - runs `artisan up` and requires `GET /` to answer 200, or re-enters maintenance.
 9. It prunes to the newest 3 releases, detaching storage first. **Never `rm -rf` a release by hand**: while
    attached, its `storage/app/private` *is* the persistent store.
 
-Every activation failure after early quiesce and before a healthy resume leaves durable writer admission closed for inspected recovery. This
-stops controlled services and runner starts before build exposure; already-running rogue processes or
-manual scripts outside that census must be stopped separately. It does not attest an uncompromised builder.
+A failure inside prepare, activate or refresh retains the operation marker and closed writer admission
+before healthy resume. Between successful phases, another authorized helper can run; activate always
+establishes fresh quiesce and a new verified snapshot under its own retained lease. Inspect state after
+failures outside those phases or after a healthy resume. Already-running rogue processes or manual scripts
+outside the controlled census must be stopped separately. This does not attest an uncompromised builder.
 
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
-real admission and unchanged key, quiesce, snapshot and restore proof, `ctl configure` captures the private
+real admission and unchanged key, then one `ctl refresh` invocation holds quiesce, snapshot and restore proof, protected capture of the private
 evidence file through anchored no-follow descriptors, revalidates it against real Laravel configuration,
 atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
 A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect

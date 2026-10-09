@@ -16,7 +16,7 @@
 #   2. composer install --no-dev from composer.lock, npm ci && npm run build, Vite manifest present;
 #   3. persistent private storage attached by bind mount (never a symlink), proven by inode;
 #   4. the Forge .env validated for the staging profile and installed 0600;
-#   5. the already-quiesced host stays stopped through build, sealing and activation;
+#   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
 #   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
 #   7. maintenance in the new release, migrate --pretend, migrate --force, config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
@@ -52,10 +52,9 @@ REL=$RELEASES/$SHA
 CURRENT=$ROOT/current
 RUNTIME_ENV=$VASEY_MIRROR/.env
 PHP=$VASEY_PHP
-COMPOSER_BIN=$(command -v composer) || die "composer not found"
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 EVIDENCE=$ROOT/evidence/$STAMP-${SHA:0:12}
-QUIESCED=0
+ACTIVATION_STARTED=0
 ENV_SNAPSHOT=''
 
 # Composer's artisan hooks and every cache/migration command must use the candidate .env, not
@@ -77,8 +76,6 @@ runtime_gate() {
     || die "runtime profile refused"
 }
 
-art() { (cd "$REL" && env -i PATH="$PATH" LC_ALL=C "$PHP" artisan "$@" --no-interaction --no-ansi); }
-
 freeze_runtime_environment() {
   # Forge may edit its mirror .env while a build or snapshot runs. Admit and install one private copy.
   ENV_SNAPSHOT=$(mktemp "$ROOT/evidence/.candidate-env.XXXXXXXX") || die "cannot stage candidate environment"
@@ -94,7 +91,7 @@ on_exit() {
   local code=$?
   [ -z "$ENV_SNAPSHOT" ] || rm -f -- "$ENV_SNAPSHOT"
   [ "$code" = 0 ] && return 0
-  if [ "$QUIESCED" = 1 ]; then
+  if [ "$ACTIVATION_STARTED" = 1 ]; then
     echo "forge-deploy: FAILED (exit $code) during an activation/configuration attempt; service and writer state is unconfirmed." >&2
     echo "forge-deploy: inspect ctl status and establish quiesce before recovery: docs/ops/staging-runbook.md#rollback" >&2
   else
@@ -149,14 +146,9 @@ if [ -e "$REL" ]; then
     runtime_gate "$REL" "$RUNTIME_ENV"
     [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
       || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
-    QUIESCED=1
-    "${CTL[@]}" quiesce
-    "${CTL[@]}" snapshot
-    [ -f "$REL/.env" ] && [ ! -L "$REL/.env" ] || die "served .env must be a regular file"
-    "${CTL[@]}" configure "$SHA" "$RUNTIME_ENV"
+    ACTIVATION_STARTED=1
+    "${CTL[@]}" refresh "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
-    "${CTL[@]}" resume
-    QUIESCED=0
     step "configuration refreshed on $SHA"; exit 0
   fi
   die "release $SHA already exists but is not current; to return to it follow the runbook's rollback, never rebuild in place"
@@ -171,37 +163,10 @@ if [ -L "$CURRENT" ]; then
   runtime_gate "$previous_release" "$RUNTIME_ENV"
   FIRST_INSTALL=0
 fi
-step "quiesce before exposing a writable candidate or generated build artifacts"
-QUIESCED=1
-"${CTL[@]}" quiesce
+step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
+ACTIVATION_STARTED=1
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
-step "checkout $SHA"
-"${CTL[@]}" allocate "$SHA"
-git clone --quiet --no-checkout --no-hardlinks -- "$VASEY_MIRROR" "$REL"
-git -C "$REL" -c advice.detachedHead=false checkout --quiet --detach "$SHA"
-[ "$(git -C "$REL" rev-parse HEAD)" = "$SHA" ] || die "checkout is not $SHA"
-[ -z "$(git -C "$REL" status --porcelain --untracked-files=all --ignored)" ] || die "dirty checkout"
-[ "$(git -C "$REL" rev-parse 'HEAD^{tree}')" = "$(git -C "$REL" write-tree)" ] || die "checkout differs from $SHA"
-chmod 0755 "$REL"
-
-# ---------------------------------------------------------------- 2. dependencies and build
-step "composer install --no-dev (composer.lock is frozen)"
-(cd "$REL" && "$PHP" "$COMPOSER_BIN" install --no-dev --no-interaction --no-progress --prefer-dist --classmap-authoritative)
-# `php <composer>` "succeeds" silently when composer is a shell wrapper rather than the phar; prove the result.
-[ -f "$REL/vendor/autoload.php" ] && [ -f "$REL/vendor/composer/installed.json" ] || die "composer install produced no vendor/ (is $COMPOSER_BIN the composer phar?)"
-step "npm ci && npm run build"
-(cd "$REL" && npm ci --no-audit --no-fund --loglevel=error && npm run build --silent)
-[ -f "$REL/public/build/manifest.json" ] || die "no Vite manifest"
-sha256sum "$REL/composer.lock" "$REL/package-lock.json" "$REL/public/build/manifest.json" | sed "s#$REL/##" > "$EVIDENCE/build.sha256"
-
-# ---------------------------------------------------------------- 3. install environment before ctl seals release ancestry
-install -m 0600 "$RUNTIME_ENV" "$REL/.env"
-cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
-runtime_gate "$REL" "$REL/.env"
-
-# ---------------------------------------------------------------- 4. attach persistent private storage
-step "attach private storage (bind mount)"
-"${CTL[@]}" attach "$SHA"
+"${CTL[@]}" prepare "$SHA" "$RUNTIME_ENV" "$EVIDENCE"
 [ "$(stat -c %d:%i "$REL/storage/app/private")" = "$(stat -c %d:%i "$ROOT/private")" ] && [ ! -L "$REL/storage/app/private" ] \
   || die "private storage not attached"
 # Recheck tracked source after protection, not only before the app-owned build window.
@@ -210,51 +175,10 @@ SEALED_GIT=(env -i PATH=/usr/bin:/bin LC_ALL=C GIT_NO_REPLACE_OBJECTS=1 GIT_CONF
 [ "$("${SEALED_GIT[@]}" rev-parse HEAD)" = "$SHA" ] || die "sealed checkout is not the requested SHA"
 "${SEALED_GIT[@]}" diff --quiet --no-ext-diff --no-textconv HEAD -- || die "tracked source changed before sealing"
 
-# ---------------------------------------------------------------- 5-6. already quiesced: back up and prove the restore
-step "backup and isolated restore proof before migrating (including first install)"
-"${CTL[@]}" snapshot
-
-# ---------------------------------------------------------------- 7. migrate and cache in the new release
-art down >/dev/null
-QUIESCED=1
-art migrate:status > "$EVIDENCE/migrate-status-before.txt" 2>&1 || true   # a first install has no migrations table yet
-# The activation packet treats a failed preview as fatal. In this codebase it cannot be: several migrations
-# verify their own triggers with queries, which return nothing under --pretend (observed on a fresh MySQL 8.4
-# schema: 2026_10_01_000032 throws "Site release image insert protection is missing"). The preview is kept as
-# evidence; the gate before a destructive migration is the verified backup and restore proof above.
-art migrate --pretend > "$EVIDENCE/migrate-pretend.sql.txt" 2>&1 \
-  || step "WARNING: migrate --pretend failed (self-verifying migrations cannot run under --pretend); recorded in evidence"
-step "migrate --force"
-art migrate --force > "$EVIDENCE/migrate.txt" 2>&1 || die "migration failed: restore from the pre-deploy backup before retrying (runbook)"
-art migrate:status > "$EVIDENCE/migrate-status-after.txt" 2>&1
-step "config, route, view and event caches"
-art config:cache >/dev/null
-art route:cache >/dev/null
-art view:cache >/dev/null
-art event:cache >/dev/null
-
-step "vasey:doctor"
-art vasey:doctor --json > "$EVIDENCE/doctor.json" 2>/dev/null || true
-# shellcheck disable=SC2016  # PHP source, not shell expansions
-failed=$("$PHP" -r '$d = json_decode(file_get_contents($argv[1]), true); if (! is_array($d) || ! isset($d["checks"])) { echo "unreadable"; exit; }
-  echo implode(",", array_column(array_filter($d["checks"], fn ($c) => $c["status"] === "fail"), "id"));' "$EVIDENCE/doctor.json")
-if [ -n "$failed" ]; then
-  # On a first install the operator accounts cannot exist yet (vasey:create-admin needs the migrated schema).
-  if [ "$FIRST_INSTALL" = 1 ] && [ "$failed" = operator ]; then
-    step "doctor: only 'operator' fails (expected on first install; create the two operators next)"
-  else
-    die "vasey:doctor failed checks: $failed (see $EVIDENCE/doctor.json)"
-  fi
-fi
-art vasey:commerce-readiness --json > "$EVIDENCE/commerce-readiness.json" 2>/dev/null || true
-art vasey:stripe-preflight --json > "$EVIDENCE/stripe-preflight.json" 2>/dev/null || true   # no provider I/O; exit 1 while unconfigured
-
-# ---------------------------------------------------------------- 8. switch, start, prove, leave maintenance
-step "switch current -> $SHA"
-"${CTL[@]}" switch "$SHA"
+# ---------------------------------------------------------------- 5-6. activation holds one root lease across fresh quiesce and snapshot
+step "activate under one root-held lease (fresh quiesce, snapshot/proof, migrate/cache, switch, healthy resume)"
+"${CTL[@]}" activate "$SHA" "$EVIDENCE"
 [ "$(readlink -f "$CURRENT")" = "$REL" ] || die "current does not point at $SHA"
-"${CTL[@]}" resume
-QUIESCED=0
 {
   echo "sha=$SHA"
   echo "deployed_utc=$(date -u +%FT%TZ)"

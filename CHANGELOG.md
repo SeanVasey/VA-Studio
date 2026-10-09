@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Forge staging build, activation and configuration refresh now retain privileged operation locks through their fixed unprivileged children. A persistent root-only recovery marker blocks independent resume and mutating retries after interruption. Provisioning refuses absent, linked, writable or incomplete app credential custody and requires explicit private recovery instead of silently succeeding or rotating an existing account.
+
 - Private Laravel Forge staging kit with protected release activation, isolated runtime admission, test-only nginx/FPM/workers, least-privilege MySQL provisioning and recoverable database/private-file/environment backups. A root-owned admission gate and shared writer lock pause independent test-commerce sweeps through quiesce, snapshot and switch until healthy resume. Hosting credentials, real content and the first Stripe TEST purchase remain operator inputs.
 
 - Private Stripe TEST rehearsal profile, policy validator, bounded post-payment pipeline runner and purchase walkthrough. Cursor progress covers retained work across sweeps; failed state persistence is reported without private paths. Templates enable nothing until the operator supplies and validates the private host configuration.

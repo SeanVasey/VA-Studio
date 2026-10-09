@@ -284,6 +284,15 @@ all checks and disposable-server cleanup succeed. A failed reproof cannot retain
 
 ## 9. Rollback
 
+If `/etc/vasey-staging/operation-in-progress` exists, a prepare/activate/refresh operation is active or
+interrupted. Helper actions serialize on the root control lock; after an interruption, mutating actions
+refuse the marker. As root, inspect the process tree and stop/reap all surviving fixed release helpers,
+Composer/npm, Artisan migrations/caches/doctor and their descendants. Establish quiesce, inspect the
+snapshot and migration evidence, and choose the recovery below before removing the root-only marker.
+Never clear it while a child might still write. Marker removal is an explicit root recovery action;
+the application account cannot perform it and no script auto-clears a failed operation. A healthy resume
+followed by a later marker-cleanup/evidence failure needs inspection, rather than an assumed closed gate.
+
 Decide which case applies by comparing `migrate-status-before.txt` and `migrate-status-after.txt` in the
 failed deploy's evidence directory.
 
@@ -390,7 +399,8 @@ generate a new `APP_KEY` or overwrite the saved environment to make a failed ref
 | Workers not on the new release | `vasey-staging-ctl resume` proves `/proc/<pid>/cwd`; a failure there keeps the site in maintenance by design. |
 
 Release source/vendor/build files are root-owned read-only after attachment; `.env` is root:app-group
-0440. Configuration refresh uses `ctl configure <sha> <private evidence file>` after quiesce/snapshot.
+0440. Ordinary configuration refresh uses one `ctl refresh <sha> <private evidence file>` operation.
+Direct `ctl configure` is an inspected recovery primitive; it does not replace the enclosing refresh lease.
 Do not restore app write permission on code or `.env`. Runtime-generated PHP under `bootstrap/cache`
 and `storage/framework` remains an explicit application trust exception, as described in the kit README.
 Backups refuse missing/invalid served environments and invalid `current`; recovery needs the verified

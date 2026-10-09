@@ -9,8 +9,10 @@ REPO = Path(__file__).resolve().parents[2]
 
 class BuildAdmissionTest(unittest.TestCase):
     def test_running_application_cannot_inject_ignored_vendor_before_sealing(self):
-        source = (REPO / "ops/staging/forge-deploy.sh").read_text()
-        body = source[source.index('if [ -e "$REL" ]; then'):source.index('# ---------------------------------------------------------------- 7.')]
+        source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        body = source[source.index('cmd_prepare()'):source.index('cmd_activate()')]
+        helper = (REPO / "ops/staging/release-step.sh").read_text()
+        build = helper[helper.index('    [ "$#" = 4 ]'):helper.index('    ;;\n  activate)')]
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             mirror = root / "mirror"
@@ -50,6 +52,16 @@ while True:
                 shell = '''step() { :; }
 die() { echo "$*" >&2; exit 1; }
 runtime_gate() { :; }
+valid_sha() { return 0; }
+protected_dir() { :; }
+release_step_file() { :; }
+operation_evidence() { :; }
+operation_begin() { :; }
+operation_finish() { :; }
+seal_tool() { cp -- "$3" "$4"; }
+chown() { :; }
+composer() { :; }
+env() { :; }
 ctl_fixture() {
   echo "$1" >> "$TRACE"
   case "$1" in
@@ -59,6 +71,9 @@ ctl_fixture() {
   esac
 }
 CTL=(ctl_fixture)
+cmd_quiesce() { ctl_fixture quiesce; }
+cmd_allocate() { ctl_fixture allocate; }
+cmd_attach() { ctl_fixture attach; }
 php_fixture() {
   mkdir -p "$REL/vendor/composer"
   printf 'approved ignored artifact' > "$REL/vendor/autoload.php"
@@ -68,16 +83,22 @@ php_fixture() {
 npm() { mkdir -p "$REL/public/build"; printf '{}' > "$REL/public/build/manifest.json"; }
 stat() { if [ "$2" = %d:%i ]; then echo 1:1; else command stat "$@"; fi; }
 '''
+                shell += 'unprivileged_build() {\n' + build + '\n}\nas_app() { unprivileged_build build "$SHA" "$EVIDENCE" "${@: -1}"; }\n'
                 environment = {"PATH": "/usr/bin:/bin", "ROOT": str(root), "REL": str(release),
                                "RELEASES": str(root / "releases"),
                                "CURRENT": str(root / "current"), "RUNTIME_ENV": str(env), "SHA": sha,
                                "VASEY_MIRROR": str(mirror), "STAMP": "synthetic", "EVIDENCE": str(root / ("evidence/synthetic-" + sha[:12])),
                                "PHP": "php_fixture", "COMPOSER_BIN": "synthetic-composer", "LIVE": str(live),
+                               "VASEY_ROOT": str(root), "VASEY_EXPECTED_APP_ENV": "local", "VASEY_STAGING_HOST": "fixture.invalid",
+                               "VASEY_DB_NAME": "fixture_database", "VASEY_APP_USER": "fixture-app", "VASEY_APP_GROUP": "fixture-group",
+                               "RELEASE_STEP": "fixture-helper",
                                "ACTOR_PID": str(child.pid), "TRACE": str(root / "trace")}
-                run = subprocess.run(["bash", "-eu", "-c", shell + body], env=environment, capture_output=True, text=True)
+                Path(environment["EVIDENCE"]).mkdir()
+                run = subprocess.run(["bash", "-eu", "-c", shell + body + '\ncmd_prepare "$SHA" "$RUNTIME_ENV" "$EVIDENCE"'], env=environment, capture_output=True, text=True)
                 self.assertEqual(run.returncode, 0, run.stderr)
                 self.assertFalse(injected.exists(), "live application injected ignored vendor bytes that Git accepted")
                 self.assertEqual((release / "vendor/autoload.php").read_text(), "approved ignored artifact")
+                self.assertTrue((Path(environment["EVIDENCE"]) / "build.sha256").is_file())
                 trace = (root / "trace").read_text().splitlines()
                 self.assertLess(trace.index("quiesce"), trace.index("allocate"))
             finally:

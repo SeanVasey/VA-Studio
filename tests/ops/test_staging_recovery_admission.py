@@ -24,13 +24,28 @@ class RecoveryAdmissionTest(unittest.TestCase):
             self.assertNotEqual(run.returncode, 0, "failed sealer was swallowed by command substitution")
 
     def test_first_install_also_takes_the_pre_migration_snapshot(self):
-        source = (REPO / "ops/staging/forge-deploy.sh").read_text()
-        body = source[source.index('# ---------------------------------------------------------------- 5-6.'):source.index('# ---------------------------------------------------------------- 7.')]
-        shell = 'step() { :; }; ctl_fixture() { echo "$1"; }; CTL=(ctl_fixture)\n'
-        run = subprocess.run(["bash", "-eu", "-c", shell + body], capture_output=True, text=True,
-                             env={"PATH": "/usr/bin:/bin", "FIRST_INSTALL": "1"})
-        self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertEqual(run.stdout.strip(), "snapshot")
+        source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        body = source[source.index('cmd_activate()'):source.index('cmd_refresh()')]
+        shell = '''die() { exit 1; }
+valid_sha() { return 0; }
+release_step_file() { :; }
+operation_evidence() { :; }
+sealed_release() { :; }
+operation_begin() { :; }
+cmd_quiesce() { :; }
+cmd_snapshot() { echo snapshot; [ "$SNAPSHOT_OK" = 1 ]; }
+as_app() { echo migration; }
+cmd_switch() { :; }
+cmd_resume() { :; }
+operation_finish() { :; }
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            for snapshot_ok in ('0', '1'):
+                run = subprocess.run(["bash", "-eu", "-c", shell + body + '\ncmd_activate "$SHA" "$EVIDENCE"'], capture_output=True, text=True,
+                                     env={"PATH": "/usr/bin:/bin", "CURRENT": str(Path(directory) / 'absent-current'),
+                                          "SHA": 'a' * 40, "EVIDENCE": directory, "RELEASE_STEP": 'fixture-step', "SNAPSHOT_OK": snapshot_ok})
+                self.assertEqual(run.returncode == 0, snapshot_ok == '1', run.stderr)
+                self.assertEqual(run.stdout.splitlines(), ['snapshot', 'migration'] if snapshot_ok == '1' else ['snapshot'])
 
     def test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair(self):
         source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()

@@ -18,6 +18,9 @@
 #   vasey-staging-ctl resume                  start PHP-FPM and workers on `current`, prove it, leave maintenance
 #   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
 #   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof (requires quiesce first)
+#   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
+#   vasey-staging-ctl activate <SHA> <evidence>        root lease across quiesce, snapshot, migration, switch/resume
+#   vasey-staging-ctl refresh <SHA> <env>             root lease across snapshot, protected config and resume
 #   vasey-staging-ctl prune                   detach and delete releases beyond VASEY_KEEP_RELEASES
 #   vasey-staging-ctl status                  print service, worker and release state
 #
@@ -51,6 +54,8 @@ PRIVATE=$ROOT/private
 PROGRAMS=(vasey-staging-media vasey-staging-payments vasey-staging-contracts vasey-staging-default vasey-staging-scheduler)
 BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
 SEALER=/usr/local/libexec/vasey-staging/seal-release.py
+RELEASE_STEP=/usr/local/libexec/vasey-staging/release-step.sh
+OPERATION_MARKER=/etc/vasey-staging/operation-in-progress
 
 valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
 
@@ -376,6 +381,82 @@ cmd_configure() {
   echo "configured $sha; admission remains closed until healthy resume"
 }
 
+operation_begin() {
+  [ ! -e "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ] || die "operation interrupted; root recovery required"
+  (umask 077; set -C; printf '%s %s %s\n' "$1" "$2" "$$" > "$OPERATION_MARKER") \
+    || die "cannot publish operation recovery marker"
+}
+
+operation_finish() {
+  [ -f "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ] \
+    && [ "$(stat -c '%u %a %h' "$OPERATION_MARKER")" = '0 600 1' ] || die "untrusted operation recovery marker"
+  rm -- "$OPERATION_MARKER" || die "cannot clear completed operation marker"
+}
+
+release_step_file() {
+  protected_dir /usr/local/libexec/vasey-staging
+  [ -f "$RELEASE_STEP" ] && [ ! -L "$RELEASE_STEP" ] \
+    && [ "$(stat -c '%u %a %h' "$RELEASE_STEP")" = '0 644 1' ] || die "missing or untrusted release-step helper"
+}
+
+operation_evidence() {
+  [[ "$1" =~ ^"$ROOT/evidence/"[A-Za-z0-9_-]+$ ]] && [ -d "$1" ] && [ ! -L "$1" ] \
+    && [ "$(readlink -f -- "$1")" = "$1" ] || die "evidence must be a canonical directory directly under staging evidence"
+  # Root never writes here: only the explicitly unprivileged fixed child uses this application-owned path.
+}
+
+cmd_prepare() {
+  local sha=$1 candidate=$2 evidence=$3
+  valid_sha "$sha" || die "prepare needs a 40-hex SHA"
+  protected_dir "$ROOT"
+  release_step_file
+  operation_evidence "$evidence"
+  operation_begin prepare "$sha"
+  cmd_quiesce
+  OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
+  trap 'rm -f -- "$OPERATION_ENV"' EXIT
+  seal_tool stage-env "$ROOT/evidence" "$candidate" "$OPERATION_ENV" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  chown "root:$VASEY_APP_GROUP" "$OPERATION_ENV"; chmod 0440 "$OPERATION_ENV"
+  cmd_allocate "$sha"
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" build "$sha" "$evidence" "$OPERATION_ENV" \
+    || die "build failed; admission remains closed and root recovery is required"
+  cmd_attach "$sha"
+  rm -- "$OPERATION_ENV"
+  trap - EXIT
+  operation_finish
+}
+
+cmd_activate() {
+  local sha=$1 evidence=$2 first_install=1
+  valid_sha "$sha" || die "activate needs a 40-hex SHA"
+  release_step_file
+  operation_evidence "$evidence"
+  sealed_release "$sha"
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then
+    served_release >/dev/null || die "served release is invalid"
+    first_install=0
+  fi
+  operation_begin activate "$sha"
+  cmd_quiesce
+  cmd_snapshot
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" activate "$sha" "$evidence" "$first_install" \
+    || die "activation failed; remain quiesced, stop surviving children and recover the verified snapshot as root"
+  cmd_switch "$sha"
+  cmd_resume
+  operation_finish
+}
+
+cmd_refresh() {
+  local sha=$1 candidate=$2
+  valid_sha "$sha" || die "refresh needs a 40-hex SHA"
+  operation_begin refresh "$sha"
+  cmd_quiesce
+  cmd_snapshot
+  cmd_configure "$sha" "$candidate"
+  cmd_resume
+  operation_finish
+}
+
 cmd_prune() {
   local cur=''
   if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
@@ -402,6 +483,7 @@ cmd_status() {
   echo "current: $(served_release 2>/dev/null || echo none)"
   echo "php-fpm: $(systemctl is-active "$VASEY_PHP_FPM_SERVICE" 2>/dev/null || true)"
   echo "test-commerce admission: $(writer_gate_value)"
+  if [ -e "$OPERATION_MARKER" ] || [ -L "$OPERATION_MARKER" ]; then echo "operation: interrupted or active; root recovery required"; fi
   local p; for p in "${PROGRAMS[@]}"; do echo "$p: $(program_state "$p")"; done
   echo "GET /: $(probe)"
 }
@@ -416,9 +498,17 @@ CONTROL_LOCK=/etc/vasey-staging/ctl.lock
 exec 8>>"$CONTROL_LOCK"
 flock -x 8 || die "cannot lock helper action"
 
+# A killed root parent can leave an application child alive after its lock descriptors close.
+# Only root recovery may clear this marker after stopping/reaping those children and inspecting state.
+if [ -e "$OPERATION_MARKER" ] || [ -L "$OPERATION_MARKER" ]; then
+  case "${1:-}" in quiesce|status) ;; *) die "operation marker present; inspect status, quiesce and recover explicitly as root" ;; esac
+fi
+
 case "${1:-}" in
   allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
   configure) [ "$#" = 3 ] || die "configure requires exactly a SHA and private evidence file" ;;
+  prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
+  activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
   quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
 esac
 case "${1:-}" in
@@ -431,7 +521,10 @@ case "${1:-}" in
   switch)   cmd_switch "${2:-}" ;;
   snapshot) cmd_snapshot ;;
   configure) cmd_configure "${2:-}" "${3:-}" ;;
+  prepare) cmd_prepare "$2" "$3" "$4" ;;
+  activate) cmd_activate "$2" "$3" ;;
+  refresh) cmd_refresh "$2" "$3" ;;
   prune)    cmd_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh|configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
 esac
