@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `b72c8efcb48ea433c58659b824ad32d4c174bf6d` (public-link admission and backup credential proof, following Composer ordering and operation custody). The kit integrates main's CI
+Current tested functional source: `381d116bbea46f9f3dd5a7bc05f80b147d77ca8e` (app credential authentication, following public-link/backup proof, Composer ordering and operation custody). The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -339,3 +339,34 @@ bytes. Owner receipt progress and empty assertion-message trailing spaces are
 normalized only for diff checks; results are unchanged. Actual Forge credentials,
 grants, backup/restore/shipping and provider purchase remain unproved. The exact
 publication still requires explicit empty-source-diff carry and final merge gates.
+
+## Persisted app authentication, exact source `381d116b`
+
+Codex on `444131c5` found 4226910300: a well-formed stale app password could pass
+file-custody admission. Provisioning now authenticates before grants using a mode0600
+temporary defaults file under protected secrets ancestry, a scrubbed client environment,
+disabled login paths, TCP and a five-second connection timeout. The required identity
+is exactly `vasey_app@127.0.0.1`. A subshell EXIT trap removes the temporary file and
+preserves the original status; cleanup failure refuses grants. Credentials are never
+process arguments or environment values, and existing passwords are never rotated.
+
+Owner [old-source red](codex-repair/app-auth-red-444131c5.txt): **3 methods /3 failing
+states**; [focused green](codex-repair/app-auth-green.txt): **3 PASS**. Exact committed
+source receipts: [operations](codex-repair/final-ops-381d116b.txt) **68 PASS**, genuine
+PHP8.4.26 [runtime](codex-repair/final-runtime-381d116b.txt) **13 tests /63 assertions
+PASS**. Six Bash scripts parse separately, Shellcheck0.10 `-x` and whitespace pass.
+Trailing spaces in new owner unittest progress/assertion lines are normalized only
+for diff checks; failure details and outcomes are unchanged.
+
+Independent [app authentication addendum](independent-review/APP-CREDENTIAL-AUTH-ADDENDUM.md)
+**APPROVES exact `381d116bbea46f9f3dd5a7bc05f80b147d77ca8e`**. One independent method
+passes five states: correct credential, failed authentication, wrong user, wrong host
+and forced cleanup failure. Old `444131c5` retains four failing states. The
+[genuine MySQL8.4.11 proof](independent-review/app-credential-auth-native.txt) accepts
+the correct private credential, rejects a stale password and rejects a raw-client-proved
+authenticated `vasey_app@localhost` identity. Temporary client files are removed after
+all three ordinary outcomes; private fixtures/server are cleaned. Root ownership is
+modeled, while native client/server authentication, bytes/modes and cleanup are genuine.
+Actual Forge credentials/grants, SIGKILL cleanup, backup shipping and Stripe TEST
+purchase remain unverified. Publication still requires explicit source-equivalence
+carry and final exact-head preflight/code-review gates before merge.
