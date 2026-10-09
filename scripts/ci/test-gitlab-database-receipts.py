@@ -43,7 +43,8 @@ def env():
             'CI_API_V4_URL': native.API, 'CI_COMMIT_SHA': 'a' * 40, 'CI_PIPELINE_ID': '123',
             'CI_PIPELINE_SOURCE': 'merge_request_event', 'CI_MERGE_REQUEST_IID': '1',
             'CI_MERGE_REQUEST_PROJECT_ID': str(native.PROJECT), 'CI_MERGE_REQUEST_EVENT_TYPE': 'detached',
-            'CI_JOB_ID': '13', 'CI_JOB_NAME': 'backend', 'CI_RUNNER_ID': '513'}
+            # FakeGitlab numbers jobs from 1 with the aggregate 'backend' job last.
+            'CI_JOB_ID': str(len(native.UPSTREAM) + 1), 'CI_JOB_NAME': 'backend', 'CI_RUNNER_ID': str(500 + len(native.UPSTREAM) + 1)}
 
 
 def runtime(engine):
@@ -116,15 +117,18 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
-    def test_native_policy_stays_four_plus_two_when_github_uses_eight_plus_two(self):
-        self.assertEqual({'mysql': 4, 'sqlite': 2}, native.COUNTS)
-        self.assertEqual({'mysql': 8, 'sqlite': 2}, proof.COUNTS)
-        self.assertEqual(6, len(native.DATABASE_JOBS))
+    def test_native_policy_matches_githubs_eight_plus_two_under_the_hosted_three_hour_cap(self):
+        self.assertEqual({'mysql': 8, 'sqlite': 2}, native.COUNTS)
+        self.assertEqual(proof.COUNTS, native.COUNTS)
+        self.assertEqual(10, len(native.DATABASE_JOBS))
         workflow = (Path(__file__).parents[2] / '.gitlab-ci.yml').read_text()
         for engine, count in native.COUNTS.items():
             block = workflow.split(f'backend-{engine}:\n', 1)[1].split('\n\n', 1)[0]
             self.assertIn('SHARD: [' + ', '.join(repr(str(n)) for n in range(1, count + 1)) + ']', block)
             self.assertIn(f"SHARD_COUNT: '{count}'", block)
+        # GitLab.com hosted runners stop any job at 3 hours, so the MySQL limit must stay below 180 minutes.
+        mysql_block = workflow.split('backend-mysql:\n', 1)[1].split('\n\n', 1)[0]
+        self.assertIn('\n  timeout: 175m\n', mysql_block)
         # The shared template narrows only MySQL to the reviewed native selection.
         template = workflow.split('.database:\n', 1)[1].split('\n\n', 1)[0]
         self.assertIn('if [ "$DB_CONNECTION" = mysql ]; then set -- --mysql-native-selection; else set --; fi', template)
@@ -166,10 +170,10 @@ class NativeCollectorTests(unittest.TestCase):
                 patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
             return native.collect(ROOT, env(), api)
 
-    def test_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
+    def test_ten_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
         value = self.collect(FakeGitlab())
-        self.assertEqual(6, len(value['database_receipts']))
-        self.assertEqual(12, len(value['upstream_jobs']))
+        self.assertEqual(10, len(value['database_receipts']))
+        self.assertEqual(16, len(value['upstream_jobs']))
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
@@ -294,7 +298,7 @@ class NativeCollectorTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
         api = FakeGitlab(); metadata = api.rows[0]['artifacts'][0]
         api.rows[0]['artifacts_file'] = {'filename':metadata['filename'],'size':metadata['size']}
-        self.assertEqual(6,len(self.collect(api)['artifacts']))
+        self.assertEqual(10,len(self.collect(api)['artifacts']))
 
     def test_receipt_wrong_source_job_runner_runtime_dependencies_time_or_start_rejects(self):
         for mutation in ('source','job','runner','image','mysql_version','mysql_schema','mysql_isolation','php','dependencies','runtime_hash','time','start'):
@@ -327,6 +331,19 @@ class NativeCollectorTests(unittest.TestCase):
             elif mutation == 'unknown': case.set('name','test_unselected')
             files['phpunit-ci-mysql-1-results.xml'] = ET.tostring(tree); api.replace(1,files)
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
+
+    def test_old_four_shard_or_mixed_shard_count_mysql_archives_reject(self):
+        # A 4-shard archive from before the move to 8 shards cannot pass, alone (mixed counts) or in the first
+        # four MySQL slots: its per-shard config and listing members are named for 4 shards, not 8.
+        mysql_jobs = [row for row in FakeGitlab().rows if native.DATABASE_JOBS.get(row['name'], ('',))[0] == 'mysql']
+        for scope in ('one', 'all_first_four'):
+            api = FakeGitlab()
+            for row in mysql_jobs[:1] if scope == 'one' else mysql_jobs[:4]:
+                engine, shard = native.DATABASE_JOBS[row['name']]
+                with patch.dict(native.COUNTS, {'mysql': 4}):
+                    api.replace(row['id'], evidence(engine, shard, api.rows[row['id'] - 1]))
+            with self.subTest(scope=scope), self.assertRaisesRegex(proof.ReceiptError, 'unexpected ZIP entry'):
+                self.collect(api)
 
     def test_inconsistent_partition_manifest_rejects(self):
         api = FakeGitlab(); api.replace(1,evidence('mysql',1,api.rows[0],alternate=True))

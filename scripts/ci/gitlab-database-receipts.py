@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("database_proofs", ROOT / "scripts/ci/database-receipts.py")
 proof = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(proof)
-COUNTS = {"mysql": 4, "sqlite": 2}
+# Eight MySQL shards keep each GitLab job under the hosted 3-hour cap; the partition matches GitHub's.
+COUNTS = {"mysql": 8, "sqlite": 2}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"
@@ -416,7 +417,7 @@ def main() -> int:
                 print("Native current-project/pipeline job-token provenance API is available.")
             else:
                 proof.write_json(ROOT / "phpunit-ci-gitlab-collection.json", collect(ROOT, env, api))
-                print("All mandatory native upstream jobs and six complete database receipts verified; outer acceptance pending; reuse disabled.")
+                print(f"All mandatory native upstream jobs and {sum(COUNTS.values())} complete database receipts verified; outer acceptance pending; reuse disabled.")
         else:
             proof.require(args.engine in COUNTS and args.shard is not None and 1 <= args.shard <= COUNTS[args.engine], "Invalid database shard")
             (start if args.command == "start" else finish)(ROOT, args.engine, args.shard, env)
