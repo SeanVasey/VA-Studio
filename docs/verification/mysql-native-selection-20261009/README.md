@@ -455,6 +455,15 @@ GitHub shards 2 and 4.
   run passes on hosted MySQL 8.4: MySQL-native coverage of the selection, exactness of the MySQL skip
   census, or closure of the attachment-consumer blocker. The local MySQL 8.0 runs above do not count.
 
+- **Indirect driver branching is not counted in the 47 residual files.** The delta review of `2ac0f3d`
+  found 26 further test files that are neither selected nor residual but call listed branching helpers
+  (`branching_helper_files`); 20 of them are `PaidGrant*` tests using `PaidGrantDependencyFixtures`.
+  Most of those helper branches are guard assertions, but `PaidGrantCommitFrameProbe` (lines 51 and 83)
+  behaves differently on MySQL, so that path runs only on SQLite. The residual figure therefore
+  understates the driver-branching code MySQL never executes. The scan also does not recognise
+  `getConfig('driver')` or a `config('database.default')` comparison; neither occurs in an uncovered
+  file today. Both are follow-ups, not enforced by this change.
+
 ## Next steps
 
 1. Dispatch one exact-SHA Foundation run on hosted MySQL 8.4 for the reviewed candidate.
@@ -463,6 +472,8 @@ GitHub shards 2 and 4.
    revisit the 210-minute GitHub and 240-minute GitLab limits.
 3. Resolve the GitLab blocker above.
 4. Sean decides whether any of the 47 residual files should join the selection.
+5. Follow-up CI change: require every test file that names a listed branching helper to be selected or
+   residual (one level), and add `getConfig('driver')` and `database.default` comparison patterns to the scan.
 
 ## Self-tests
 
