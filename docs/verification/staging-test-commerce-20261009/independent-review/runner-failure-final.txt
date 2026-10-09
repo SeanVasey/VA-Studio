@@ -1,0 +1,16 @@
+PASS reconcile: failure clears saved cursor, later stages continue, next sweep restarts
+PASS reconcile: successful short page clears saved cursor
+PASS reconcile: malformed saved cursor is ignored without exposing its contents
+PASS finalize: failure clears saved cursor, later stages continue, next sweep restarts
+PASS finalize: successful short page clears saved cursor
+PASS finalize: malformed saved cursor is ignored without exposing its contents
+PASS contracts: failure clears saved cursor, later stages continue, next sweep restarts
+PASS contracts: successful short page clears saved cursor
+PASS contracts: malformed saved cursor is ignored without exposing its contents
+PASS activate: failure clears saved cursor, later stages continue, next sweep restarts
+PASS activate: successful short page clears saved cursor
+PASS activate: malformed saved cursor is ignored without exposing its contents
+PASS activate: one-second timeout fails sweep, clears cursor, redacts diagnostics
+PASS lock: held lock skips all artisan work
+PASS state: fresh cursor mode 0600 and state directory mode 0700
+RESULT: 15 independent runner failure/reset/privacy probes passed

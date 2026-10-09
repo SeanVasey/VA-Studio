@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-rights/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 00:03.676, Memory: 96.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\RightsScopeCommandUnknownOutcomeTest::test_output_failure_after_a_committed_write_reports_uncertainty_and_exact_retry_is_safe@register with data ('register')
+Failed asserting that 'Rights scope management is unavailable. No changes were made.\n
+' [ASCII](length: 62) does not contain "No changes were made" [ASCII](length: 20).
+
+/workspace/VA-Studio-rights/tests/Feature/RightsScopeCommandUnknownOutcomeTest.php:71
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeCommandUnknownOutcomeTest::test_output_failure_after_a_committed_write_reports_uncertainty_and_exact_retry_is_safe@link with data ('link')
+Failed asserting that 'Rights scope management is unavailable. No changes were made.\n
+' [ASCII](length: 62) does not contain "No changes were made" [ASCII](length: 20).
+
+/workspace/VA-Studio-rights/tests/Feature/RightsScopeCommandUnknownOutcomeTest.php:71
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 18[0m[37;41m, Failures: 2[0m[37;41m.[0m

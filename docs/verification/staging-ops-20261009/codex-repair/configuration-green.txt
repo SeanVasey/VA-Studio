@@ -1,0 +1,8 @@
+test_open_admission_or_active_writer_refuses_before_environment_changes (__main__.ProtectedConfigurationTest.test_open_admission_or_active_writer_refuses_before_environment_changes) ... ok
+test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache (__main__.ProtectedConfigurationTest.test_unsafe_flags_or_key_rotation_keep_original_environment_and_do_not_build_cache) ... ok
+test_valid_configuration_installs_fresh_read_only_environment_after_real_admission (__main__.ProtectedConfigurationTest.test_valid_configuration_installs_fresh_read_only_environment_after_real_admission) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.696s
+
+OK

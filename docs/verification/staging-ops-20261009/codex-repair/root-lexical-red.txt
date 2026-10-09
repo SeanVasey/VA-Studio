@@ -1,0 +1,25 @@
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ...
+  test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) (root='/tmp/tmpyguscjct/parent//new-root') ... FAIL
+  test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) (root='/tmp/tmpyguscjct/parent/new-root/') ... FAIL
+test_running_application_cannot_inject_ignored_vendor_before_sealing (__main__.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
+
+======================================================================
+FAIL: test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) (root='/tmp/tmpyguscjct/parent//new-root')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_build_admission.py", line 119, in test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes
+    self.assertNotEqual(probe(root_value=value).returncode, 0, "noncanonical new root admitted")
+AssertionError: 0 == 0 : noncanonical new root admitted
+
+======================================================================
+FAIL: test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (__main__.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) (root='/tmp/tmpyguscjct/parent/new-root/')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_build_admission.py", line 119, in test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes
+    self.assertNotEqual(probe(root_value=value).returncode, 0, "noncanonical new root admitted")
+AssertionError: 0 == 0 : noncanonical new root admitted
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.319s
+
+FAILED (failures=2)

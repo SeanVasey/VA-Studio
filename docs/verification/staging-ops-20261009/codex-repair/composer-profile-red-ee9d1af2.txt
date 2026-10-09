@@ -1,0 +1,19 @@
+test_composer_hooks_receive_frozen_environment_before_bootstrap (test_staging_build_admission.BuildAdmissionTest.test_composer_hooks_receive_frozen_environment_before_bootstrap)
+Run the actual helper; Composer/npm/runtime effects are bounded fixtures. ... FAIL
+test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes (test_staging_build_admission.BuildAdmissionTest.test_provision_refuses_app_owned_or_writable_ancestors_before_host_changes) ... ok
+test_running_application_cannot_inject_ignored_vendor_before_sealing (test_staging_build_admission.BuildAdmissionTest.test_running_application_cannot_inject_ignored_vendor_before_sealing) ... ok
+
+======================================================================
+FAIL: test_composer_hooks_receive_frozen_environment_before_bootstrap (test_staging_build_admission.BuildAdmissionTest.test_composer_hooks_receive_frozen_environment_before_bootstrap)
+Run the actual helper; Composer/npm/runtime effects are bounded fixtures.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_build_admission.py", line 73, in test_composer_hooks_receive_frozen_environment_before_bootstrap
+    self.assertEqual(run.returncode, 0, run.stderr)
+AssertionError: 23 != 0 : Composer hooks booted without the frozen private staging profile
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.337s
+
+FAILED (failures=1)

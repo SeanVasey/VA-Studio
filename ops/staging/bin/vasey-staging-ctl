@@ -1,0 +1,556 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2015  # `test && test || die` is intended: die whenever any test fails.
+# vasey-staging-ctl: the only privileged entry point the deploy user may call (via sudo).
+#
+# Installed by provision.sh as /usr/local/sbin/vasey-staging-ctl (root:root 0755). The sudoers entry
+# /etc/sudoers.d/vasey-staging lets the application user run exactly this file as root without a
+# password; every argument is validated here. It implements the privileged steps of the activation
+# packet's S1 sequence (docs/ops/production-activation-packet.md §4): attaching persistent private
+# storage to a release by bind mount, the quiesce (maintenance + stop workers + stop PHP-FPM + proof),
+# the resume (start PHP-FPM + start workers + proof + leave maintenance), the pre-deploy backup and
+# restore proof, and release pruning.
+#
+# Usage:
+#   vasey-staging-ctl allocate <40-hex SHA>   create an app-writable checkout slot under protected releases/
+#   vasey-staging-ctl attach <40-hex SHA>     bind-mount <ROOT>/private onto releases/<SHA>/storage/app/private
+#   vasey-staging-ctl detach <40-hex SHA>     undo attach (unmount and drop the fstab line)
+#   vasey-staging-ctl quiesce                 maintenance in the served release, stop every writer, prove it
+#   vasey-staging-ctl resume                  start PHP-FPM and workers on `current`, prove it, leave maintenance
+#   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
+#   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof (requires quiesce first)
+#   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
+#   vasey-staging-ctl activate <SHA> <evidence>        root lease across quiesce, snapshot, migration, switch/resume
+#   vasey-staging-ctl refresh <SHA> <env>             root lease across snapshot, protected config and resume
+#   vasey-staging-ctl prune                   detach and delete releases beyond VASEY_KEEP_RELEASES
+#   vasey-staging-ctl status                  print service, worker and release state
+#
+# Never delete a release directory by hand: while attached, its storage/app/private IS the persistent
+# private store, and `rm -rf` follows a bind mount. Use `prune`.
+set -euo pipefail
+umask 077
+export LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+CONF=/etc/vasey-staging/staging.conf
+
+die() { echo "vasey-staging-ctl: $*" >&2; exit 1; }
+
+[ "$(id -u)" -eq 0 ] || die "must run as root (sudo -n /usr/local/sbin/vasey-staging-ctl ...)"
+
+# The configuration is trusted only when root owns it and nobody else can write it.
+[ -f "$CONF" ] && [ ! -L "$CONF" ] || die "missing $CONF (run provision.sh)"
+[ "$(stat -c %u "$CONF")" = 0 ] || die "$CONF must be owned by root"
+case "$(stat -c %a "$CONF")" in 600|640|644|400|440|444) ;; *) die "$CONF must not be group/world writable" ;; esac
+# shellcheck source=/dev/null
+. "$CONF"
+
+: "${VASEY_STAGING_HOST:?}" "${VASEY_APP_USER:?}" "${VASEY_APP_GROUP:?}" "${VASEY_ROOT:?}" "${VASEY_PHP:?}" \
+  "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_PROBE_NETRC:?}" "${VASEY_KEEP_RELEASES:=3}"
+[ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
+
+ROOT=$VASEY_ROOT
+RELEASES=$ROOT/releases
+CURRENT=$ROOT/current
+PRIVATE=$ROOT/private
+PROGRAMS=(vasey-staging-media vasey-staging-payments vasey-staging-contracts vasey-staging-default vasey-staging-scheduler)
+BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
+SEALER=/usr/local/libexec/vasey-staging/seal-release.py
+RELEASE_STEP=/usr/local/libexec/vasey-staging/release-step.sh
+OPERATION_MARKER=/etc/vasey-staging/operation-in-progress
+
+valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
+
+WRITER_LOCK=/etc/vasey-staging/writer.lock
+WRITER_GATE=/etc/vasey-staging/writer-admission
+
+writer_files() {
+  protected_dir /etc/vasey-staging
+  local file
+  for file in "$WRITER_LOCK" "$WRITER_GATE"; do
+    [ -f "$file" ] && [ ! -L "$file" ] && [ "$(stat -c '%u %a' -- "$file")" = '0 644' ] \
+      || die "missing or untrusted staging writer admission"
+  done
+}
+
+writer_gate_value() {
+  writer_files
+  [ "$(stat -c %s -- "$WRITER_GATE")" -le 7 ] || die "invalid staging writer admission"
+  if cmp -s -- "$WRITER_GATE" <(printf 'open\n'); then printf 'open\n'; return; fi
+  if cmp -s -- "$WRITER_GATE" <(printf 'closed\n'); then printf 'closed\n'; return; fi
+  die "invalid staging writer admission"
+}
+
+writer_gate_write() {
+  writer_files
+  local scratch
+  scratch=$(mktemp /etc/vasey-staging/.writer-admission.XXXXXXXX) || die "cannot stage writer admission"
+  if ! { printf '%s\n' "$1" > "$scratch" && chmod 0644 "$scratch" && mv -T -- "$scratch" "$WRITER_GATE"; }; then
+    rm -f -- "$scratch"; die "cannot publish writer admission"
+  fi
+}
+
+writer_barrier() {
+  writer_files
+  exec 7<"$WRITER_LOCK"
+  flock -xn 7 || die "an admitted test-commerce sweep is still active; gate stays closed, retry quiesce after it finishes"
+  [ "$(writer_gate_value)" = closed ] || die "writer admission must be closed (run quiesce first)"
+}
+
+# Every ancestor of a privileged path must remain outside the application's rename authority.
+# The default /srv/vasey-staging ancestry is root-owned; custom roots must meet the same boundary.
+protected_dir() {
+  local path=$1 mode
+  [ -d "$path" ] && [ ! -L "$path" ] && [ "$(readlink -f -- "$path")" = "$path" ] \
+    || die "privileged directory is missing or contains a symlink"
+  while :; do
+    [ "$(stat -c %u -- "$path")" = 0 ] || die "privileged directory ancestry must be root-owned"
+    mode=$(stat -c %a -- "$path")
+    (( (8#$mode & 8#022) == 0 )) || die "privileged directory ancestry must not be group/world writable"
+    [ "$path" = / ] && break
+    path=$(dirname -- "$path")
+  done
+}
+
+sealed_release() {
+  local sha=$1 rel=$RELEASES/$1
+  valid_sha "$sha" || die "release needs a 40-hex SHA"
+  protected_dir "$RELEASES"
+  protected_dir "$rel/storage/app"
+  [ -d "$rel/storage/app/private" ] && [ ! -L "$rel/storage/app/private" ] \
+    && [ "$(readlink -f -- "$rel/storage/app/private")" = "$rel/storage/app/private" ] \
+    || die "private mount target is missing or contains a symlink"
+  seal_tool verify "$rel" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+}
+
+seal_tool() {
+  protected_dir /usr/local/libexec/vasey-staging
+  [ -f "$SEALER" ] && [ ! -L "$SEALER" ] && [ "$(stat -c '%u %a' -- "$SEALER")" = '0 644' ] \
+    || die "missing or untrusted release sealer"
+  /usr/bin/python3 -I "$SEALER" "$@" || die "protected release operation refused"
+}
+
+cmd_allocate() {
+  local sha=${1:-}; valid_sha "$sha" || die "allocate needs a 40-hex SHA"
+  protected_dir "$RELEASES"
+  [ ! -e "$RELEASES/$sha" ] && [ ! -L "$RELEASES/$sha" ] || die "release slot already exists"
+  install -d -m 0755 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$RELEASES/$sha"
+  echo "allocated $sha"
+}
+
+seal_release() {
+  local sha=$1 expected=$RELEASES/$1 part
+  protected_dir "$RELEASES"
+  # The protected releases parent prevents the app from renaming the release itself. Seal each
+  # directory before following its child, so the app cannot swap the next component after checking.
+  cd -P -- "$expected" 2>/dev/null || die "release not found"
+  for part in release storage app; do
+    [ "$(pwd -P)" = "$expected" ] || die "release ancestry contains a symlink"
+    case "$(stat -c %U .)" in "$VASEY_APP_USER"|root) ;; *) die "release ancestry has an unexpected owner" ;; esac
+    chown root:root .; chmod 0755 .
+    case "$part" in
+      release) expected=$expected/storage; cd -P -- storage 2>/dev/null || die "release storage missing" ;;
+      storage) expected=$expected/app; cd -P -- app 2>/dev/null || die "release storage/app missing" ;;
+    esac
+  done
+  cd /
+  seal_tool seal "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  sealed_release "$sha"
+}
+
+# HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
+# nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
+# credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
+probe() {
+  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 --netrc-file "$VASEY_PROBE_NETRC" \
+    --resolve "$VASEY_STAGING_HOST:443:127.0.0.1" "https://$VASEY_STAGING_HOST/" 2>/dev/null || true
+}
+
+as_app() { runuser -u "$VASEY_APP_USER" -- "$@" 8>&- 7<&-; }
+
+served_release() {
+  [ -L "$CURRENT" ] || return 1
+  local target
+  target=$(readlink -f "$CURRENT") || return 1
+  valid_sha "$(basename "$target")" || die "current does not point at a SHA-named release"
+  [ "$target" = "$RELEASES/$(basename "$target")" ] || die "current points outside the release container"
+  sealed_release "$(basename "$target")" || return 1
+  printf '%s\n' "$target"
+}
+
+program_state() {  # prints RUNNING/STOPPED/EXITED/FATAL/... for one program
+  supervisorctl status "vasey-staging:$1" 2>/dev/null | awk '{print $2}' || true
+}
+
+workers_stopped() {
+  local p s
+  for p in "${PROGRAMS[@]}"; do
+    s=$(program_state "$p")
+    case "$s" in STOPPED|EXITED|FATAL) ;; *) return 1 ;; esac
+  done
+  # Nothing of the application user may still run artisan workers outside supervisor either.
+  ! pgrep -u "$VASEY_APP_USER" -f 'artisan (queue:work|queue:listen|schedule:work|schedule:run|horizon|vasey:(process-stripe-receipts|reconcile-test-payments|finalize-test-payments|issue-test-contracts|activate-test-fulfillment))' >/dev/null
+}
+
+web_stopped() {
+  ! systemctl is-active --quiet "$VASEY_PHP_FPM_SERVICE" \
+    && ! pgrep -u "$VASEY_APP_USER" -f 'php-fpm|artisan serve|octane' >/dev/null
+}
+
+persist_private_bind() {
+  local line="$PRIVATE $1 none bind 0 0"
+  grep -qxF -- "$line" /etc/fstab || printf '%s\n' "$line" >> /etc/fstab \
+    || die "cannot persist private bind entry"
+  grep -qxF -- "$line" /etc/fstab || die "private bind entry not persisted"
+}
+
+cmd_attach() {
+  local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
+  local rel=$RELEASES/$sha target=$RELEASES/$sha/storage/app/private
+  seal_release "$sha"
+  [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "persistent private root missing"
+  [ "$(stat -c '%U %a' "$PRIVATE")" = "$VASEY_APP_USER 700" ] || die "persistent private root must be $VASEY_APP_USER 0700"
+  if mountpoint -q "$target"; then
+    [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "$target is mounted from something else"
+    persist_private_bind "$target"
+    echo "attached (already) $sha"; return 0
+  fi
+  # The sealed parent ancestry prevents app renames. Pin the private leaf as an additional boundary:
+  # mount(8) does not canonicalize, so the kernel resolves /proc/self/cwd to the checked directory itself.
+  [ -d "$rel" ] && [ ! -L "$rel" ] || die "release $sha not found"
+  cd -P -- "$target" 2>/dev/null || die "release has no storage/app/private directory"
+  [ "$(pwd -P)" = "$target" ] || die "storage/app/private path contains a symlink"
+  [ "$(stat -c %U .)" = "$VASEY_APP_USER" ] || die "release storage/app/private is not owned by $VASEY_APP_USER"
+  local entries; entries=$(find . -mindepth 1 -maxdepth 1 ! -name .gitignore -print -quit)
+  [ -z "$entries" ] || die "release storage/app/private is not empty; refusing to hide data under a mount"
+  mount --no-canonicalize --bind -- "$PRIVATE" /proc/self/cwd
+  cd /
+  [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] && [ ! -L "$target" ] || die "attach did not take effect"
+  persist_private_bind "$target"
+  echo "attached $sha"
+}
+
+cmd_detach() {
+  local sha=${1:-}; valid_sha "$sha" || die "detach needs a 40-hex SHA"
+  sealed_release "$sha"
+  local target=$RELEASES/$sha/storage/app/private
+  local cur=''
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
+  [ "$cur" != "$RELEASES/$sha" ] || die "refusing to detach the served release"
+  while mountpoint -q "$target" 2>/dev/null; do
+    [ "$(stat -c %d:%i "$target")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "refusing to detach an unrelated mount"
+    umount --no-canonicalize -- "$target"
+  done
+  local line="$PRIVATE $target none bind 0 0" tmp
+  if grep -qxF -- "$line" /etc/fstab; then
+    tmp=$(mktemp /etc/fstab.vasey.XXXXXX)
+    grep -vxF -- "$line" /etc/fstab > "$tmp" || true
+    chmod 644 "$tmp"; mv -f -- "$tmp" /etc/fstab
+  fi
+  echo "detached $sha"
+}
+
+cmd_quiesce() {
+  # Close future scheduled invocations before checking the stable shared lock. An already admitted
+  # sweep makes this action fail before snapshot/migration; the durable closed gate remains for retry.
+  writer_gate_write closed
+  writer_barrier
+  local cur
+  if [ ! -e "$CURRENT" ] && [ ! -L "$CURRENT" ]; then
+    echo "no served release; nothing to quiesce"
+    if ! workers_stopped; then supervisorctl stop 'vasey-staging:*' >/dev/null || die "supervisorctl stop failed"; fi
+    workers_stopped || die "a worker or the scheduler is still running"
+    systemctl stop "$VASEY_PHP_FPM_SERVICE" || die "could not stop $VASEY_PHP_FPM_SERVICE"
+    web_stopped || die "PHP processes still serving"
+    return 0
+  fi
+  cur=$(served_release) || die "served release is invalid; refusing a first-install fallback"
+  # 1. New requests: maintenance in the release that actually serves traffic, proven by marker and exact 503.
+  as_app "$VASEY_PHP" "$cur/artisan" down --no-interaction >/dev/null || die "artisan down failed; nothing stopped"
+  [ -f "$cur/storage/framework/maintenance.php" ] || die "no maintenance marker after artisan down"
+  # A successful prepare already stopped FPM. Re-quiesce must prove stopped services rather than
+  # demanding an HTTP503 from a deliberately absent FastCGI backend (which normally answers502).
+  if ! web_stopped; then
+    [ "$(probe)" = 503 ] || die "served release is not answering 503 after artisan down"
+  fi
+  # 2. Workers and scheduler (supervisor waits for the current job; up to stopwaitsecs).
+  if ! workers_stopped; then
+    as_app "$VASEY_PHP" "$cur/artisan" queue:restart --no-interaction >/dev/null || true
+    supervisorctl stop 'vasey-staging:*' >/dev/null || die "supervisorctl stop failed"
+  fi
+  workers_stopped || die "a worker or the scheduler is still running"
+  # 3. Requests admitted before `down` may still be writing (uploads): stop PHP-FPM and prove no PHP serves.
+  systemctl stop "$VASEY_PHP_FPM_SERVICE" || die "could not stop $VASEY_PHP_FPM_SERVICE"
+  web_stopped || die "PHP processes still serving"
+  echo "quiesced $(basename "$cur")"
+}
+
+cmd_switch() {
+  writer_barrier
+  local sha=${1:-}; valid_sha "$sha" || die "switch needs a 40-hex SHA"
+  sealed_release "$sha"
+  workers_stopped && web_stopped || die "switch requires a quiesced host"
+  local rel=$RELEASES/$sha scratch
+  [ -f "$rel/storage/framework/maintenance.php" ] || die "new release is not in maintenance"
+  [ "$(stat -c %d:%i "$rel/storage/app/private")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "new release private storage is not attached"
+  [ ! -e "$CURRENT" ] || [ -L "$CURRENT" ] || die "current is not a release symlink"
+  scratch=$(mktemp -d "$ROOT/.activate.XXXXXXXX")
+  if ! { ln -s -- "$rel" "$scratch/current" && mv -T -- "$scratch/current" "$CURRENT"; }; then
+    rm -f -- "$scratch/current"; rmdir -- "$scratch"; die "release switch is unconfirmed"
+  fi
+  rmdir -- "$scratch"
+  [ "$(served_release)" = "$rel" ] || die "release switch is unconfirmed"
+  echo "switched $sha"
+}
+
+cmd_resume() {
+  writer_barrier
+  local cur; cur=$(served_release) || die "no served release to resume"
+  [ -f "$cur/storage/framework/maintenance.php" ] || die "served release is not in maintenance; resume expects it to be"
+  local sha; sha=$(basename "$cur")
+  [ "$(stat -c %d:%i "$cur/storage/app/private")" = "$(stat -c %d:%i "$PRIVATE")" ] || die "private storage is not attached to $sha"
+  systemctl start "$VASEY_PHP_FPM_SERVICE" && systemctl is-active --quiet "$VASEY_PHP_FPM_SERVICE" || die "PHP-FPM did not start"
+  [ "$(probe)" = 503 ] || die "release $sha is not in maintenance after PHP-FPM start (expected 503)"
+  supervisorctl start 'vasey-staging:*' >/dev/null || true
+  sleep 5
+  local p s pid cwd
+  for p in "${PROGRAMS[@]}"; do
+    s=$(program_state "$p"); [ "$s" = RUNNING ] || die "$p is $s after start; site stays in maintenance"
+    pid=$(supervisorctl pid "vasey-staging:$p")
+    [[ "$pid" =~ ^[0-9]+$ ]] || die "$p has no pid"
+    cwd=$(readlink -f "/proc/$pid/cwd")
+    [ "$cwd" = "$cur" ] || die "$p runs in $cwd, not $cur"
+  done
+  as_app "$VASEY_PHP" "$cur/artisan" up --no-interaction >/dev/null || die "artisan up failed; site stays in maintenance"
+  local code; code=$(probe)
+  if [ "$code" != 200 ]; then
+    # Never leave a broken release serving errors: re-enter maintenance and prove it, else stop PHP-FPM.
+    if ! as_app "$VASEY_PHP" "$cur/artisan" down --no-interaction >/dev/null \
+       || [ ! -f "$cur/storage/framework/maintenance.php" ] || [ "$(probe)" != 503 ]; then
+      systemctl stop "$VASEY_PHP_FPM_SERVICE" || true
+      die "GET / answered $code after artisan up AND maintenance could not be proven: PHP-FPM stopped"
+    fi
+    die "GET / answered $code after artisan up: back in maintenance (marker and 503 proven); fix or roll back"
+  fi
+  writer_gate_write open
+  echo "resumed $sha (GET / 200, test-commerce admission open)"
+}
+
+cmd_healthy() {
+  local sha=${1:-} cur p pid
+  valid_sha "$sha" || die "healthy needs a 40-hex SHA"
+  cur=$(served_release) || die "no sealed served release"
+  [ "$cur" = "$RELEASES/$sha" ] || die "another SHA is served"
+  writer_files
+  cmp -s -- "$WRITER_GATE" <(printf 'open\n') || die "writer admission is not open"
+  [ ! -e "$cur/storage/framework/maintenance.php" ] && [ ! -L "$cur/storage/framework/maintenance.php" ] \
+    && [ ! -e "$cur/storage/framework/down" ] && [ ! -L "$cur/storage/framework/down" ] || die "served release is in maintenance"
+  [ ! -L "$cur/storage/app/private" ] && mountpoint -q "$cur/storage/app/private" \
+    && [ "$(stat -c %d:%i "$cur/storage/app/private")" = "$(stat -c %d:%i "$PRIVATE")" ] \
+    && grep -qxF -- "$PRIVATE $cur/storage/app/private none bind 0 0" /etc/fstab || die "served private bind is not persistent"
+  systemctl is-active --quiet "$VASEY_PHP_FPM_SERVICE" || die "PHP-FPM is not active"
+  for p in "${PROGRAMS[@]}"; do
+    [ "$(program_state "$p")" = RUNNING ] || die "a supervised worker is not running"
+    pid=$(supervisorctl pid "vasey-staging:$p")
+    [[ "$pid" =~ ^[0-9]+$ ]] && [ "$(readlink -f "/proc/$pid/cwd")" = "$cur" ] || die "worker is not on the served release"
+  done
+  [ "$(probe)" = 200 ] || die "served release does not answer HTTP 200"
+  echo "healthy $sha"
+}
+
+cmd_snapshot() {
+  writer_barrier
+  workers_stopped && web_stopped || die "snapshot requires a quiesced host (run quiesce first)"
+  [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
+  "$BACKUP_BIN" predeploy
+}
+
+cmd_configure() {
+  local sha=${1:-} candidate=${2:-} cur
+  valid_sha "$sha" || die "configure needs a 40-hex SHA"
+  writer_barrier
+  workers_stopped && web_stopped || die "configure requires a quiesced host"
+  cur=$(served_release) || die "configure requires a served release"
+  [ "$cur" = "$RELEASES/$sha" ] && [ -f "$cur/storage/framework/maintenance.php" ] \
+    || die "configure requires the served release in maintenance"
+  : "${VASEY_EXPECTED_APP_ENV:?}" "${VASEY_DB_NAME:?}"
+  # Capture through anchored no-follow descriptors. The app cannot use an evidence symlink
+  # to make this root action copy an unrelated root-readable file.
+  ENV_CANDIDATE=$(mktemp "$cur/.env-candidate.XXXXXXXX") || die "cannot stage protected environment"
+  trap 'rm -f -- "$ENV_CANDIDATE"' EXIT
+  seal_tool stage-env "$ROOT/evidence" "$candidate" "$ENV_CANDIDATE" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/ops/staging/validate-runtime.php" \
+    "$ENV_CANDIDATE" "$VASEY_EXPECTED_APP_ENV" "$VASEY_STAGING_HOST" "$VASEY_DB_NAME" "$cur/.env" \
+    >/dev/null 2>&1 || die "protected runtime profile refused; original environment retained"
+  mv -T -- "$ENV_CANDIDATE" "$cur/.env" || die "cannot install protected environment"
+  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" config:cache \
+    --no-interaction --no-ansi >/dev/null 2>&1 || die "configuration cache failed; remain quiesced and restore the snapshot"
+  sealed_release "$sha"
+  echo "configured $sha; admission remains closed until healthy resume"
+}
+
+operation_begin() {
+  [ ! -e "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ] || die "operation interrupted; root recovery required"
+  (umask 077; set -C; printf '%s %s %s\n' "$1" "$2" "$$" > "$OPERATION_MARKER") \
+    || die "cannot publish operation recovery marker"
+}
+
+operation_finish() {
+  [ -f "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ] \
+    && [ "$(stat -c '%u %a %h' "$OPERATION_MARKER")" = '0 600 1' ] || die "untrusted operation recovery marker"
+  rm -- "$OPERATION_MARKER" || die "cannot clear completed operation marker"
+}
+
+release_step_file() {
+  protected_dir /usr/local/libexec/vasey-staging
+  [ -f "$RELEASE_STEP" ] && [ ! -L "$RELEASE_STEP" ] \
+    && [ "$(stat -c '%u %a %h' "$RELEASE_STEP")" = '0 644 1' ] || die "missing or untrusted release-step helper"
+}
+
+operation_evidence() {
+  [[ "$1" =~ ^"$ROOT/evidence/"[A-Za-z0-9_-]+$ ]] && [ -d "$1" ] && [ ! -L "$1" ] \
+    && [ "$(readlink -f -- "$1")" = "$1" ] || die "evidence must be a canonical directory directly under staging evidence"
+  # Root never writes here: only the explicitly unprivileged fixed child uses this application-owned path.
+}
+
+cmd_prepare() {
+  local sha=$1 candidate=$2 evidence=$3
+  valid_sha "$sha" || die "prepare needs a 40-hex SHA"
+  protected_dir "$ROOT"
+  release_step_file
+  operation_evidence "$evidence"
+  operation_begin prepare "$sha"
+  cmd_quiesce
+  OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
+  trap 'rm -f -- "$OPERATION_ENV"' EXIT
+  seal_tool stage-env "$ROOT/evidence" "$candidate" "$OPERATION_ENV" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  chown "root:$VASEY_APP_GROUP" "$OPERATION_ENV"; chmod 0440 "$OPERATION_ENV"
+  cmd_allocate "$sha"
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" build "$sha" "$evidence" "$OPERATION_ENV" \
+    || die "build failed; admission remains closed and root recovery is required"
+  cmd_attach "$sha"
+  rm -- "$OPERATION_ENV"
+  trap - EXIT
+  operation_finish
+}
+
+cmd_activate() {
+  local sha=$1 evidence=$2 first_install=1
+  valid_sha "$sha" || die "activate needs a 40-hex SHA"
+  release_step_file
+  operation_evidence "$evidence"
+  sealed_release "$sha"
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then
+    served_release >/dev/null || die "served release is invalid"
+    first_install=0
+  fi
+  operation_begin activate "$sha"
+  cmd_quiesce
+  cmd_snapshot
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" activate "$sha" "$evidence" "$first_install" \
+    || die "activation failed; remain quiesced, stop surviving children and recover the verified snapshot as root"
+  cmd_switch "$sha"
+  cmd_resume
+  operation_finish
+}
+
+cmd_refresh() {
+  local sha=$1 candidate=$2
+  valid_sha "$sha" || die "refresh needs a 40-hex SHA"
+  operation_begin refresh "$sha"
+  cmd_quiesce
+  cmd_snapshot
+  cmd_configure "$sha" "$candidate"
+  cmd_resume
+  operation_finish
+}
+
+public_quiesce() {
+  local own_marker=0
+  if [ ! -e "$OPERATION_MARKER" ] && [ ! -L "$OPERATION_MARKER" ]; then
+    operation_begin quiesce none
+    own_marker=1
+  fi
+  cmd_quiesce
+  # Recovery may quiesce an interrupted operation, but must never clear that operation's marker.
+  if [ "$own_marker" = 1 ]; then operation_finish; fi
+}
+
+public_resume() {
+  # Queued or mistaken resume on a healthy host must refuse before creating recovery state.
+  # These readonly preconditions run under ctl.lock, before any application child can start.
+  writer_barrier
+  local cur; cur=$(served_release) || die "no served release to resume"
+  [ -f "$cur/storage/framework/maintenance.php" ] || die "served release is not in maintenance"
+  operation_begin resume none
+  cmd_resume
+  operation_finish
+}
+
+cmd_prune() {
+  local cur=''
+  if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
+  local keep=$VASEY_KEEP_RELEASES n=0 d sha
+  protected_dir "$RELEASES"
+  # Newest first by directory mtime; always keep `current`.
+  while IFS= read -r d; do
+    sha=$(basename "$d"); valid_sha "$sha" || continue
+    [ "$d" = "$cur" ] && continue
+    n=$((n + 1))
+    [ "$n" -lt "$keep" ] && continue
+    sealed_release "$sha"
+    cmd_detach "$sha"
+    mountpoint -q "$d/storage/app/private" && die "refusing to delete $sha: still mounted"
+    [ "$(stat -c %d:%i "$d/storage/app/private" 2>/dev/null || echo none)" != "$(stat -c %d:%i "$PRIVATE")" ] \
+      || die "refusing to delete $sha: private storage still visible inside it"
+    rm -rf --one-file-system -- "$d"
+    echo "pruned $sha"
+  done < <(find "$RELEASES" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' | sort -rn | cut -d' ' -f2-)
+}
+
+cmd_status() {
+  echo "host: $VASEY_STAGING_HOST"
+  echo "current: $(served_release 2>/dev/null || echo none)"
+  echo "php-fpm: $(systemctl is-active "$VASEY_PHP_FPM_SERVICE" 2>/dev/null || true)"
+  echo "test-commerce admission: $(writer_gate_value)"
+  if [ -e "$OPERATION_MARKER" ] || [ -L "$OPERATION_MARKER" ]; then echo "operation: interrupted or active; root recovery required"; fi
+  local p; for p in "${PROGRAMS[@]}"; do echo "$p: $(program_state "$p")"; done
+  echo "GET /: $(probe)"
+}
+
+# The sudo entry point is independently callable by concurrent app processes. Serialize its full
+# actions separately from the deploy lock (which callers already hold). Recursive prune -> detach
+# stays inside this invocation. Never pass this lock descriptor to application-user subprocesses.
+protected_dir /etc/vasey-staging
+CONTROL_LOCK=/etc/vasey-staging/ctl.lock
+[ -f "$CONTROL_LOCK" ] && [ ! -L "$CONTROL_LOCK" ] && [ "$(stat -c '%u %a' "$CONTROL_LOCK")" = '0 600' ] \
+  || die "missing or untrusted helper action lock"
+exec 8>>"$CONTROL_LOCK"
+flock -x 8 || die "cannot lock helper action"
+
+# A killed root parent can leave an application child alive after its lock descriptors close.
+# Only root recovery may clear this marker after stopping/reaping those children and inspecting state.
+if [ -e "$OPERATION_MARKER" ] || [ -L "$OPERATION_MARKER" ]; then
+  case "${1:-}" in quiesce|status) ;; *) die "operation marker present; inspect status, quiesce and recover explicitly as root" ;; esac
+fi
+
+case "${1:-}" in
+  allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
+  prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
+  activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
+  quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+esac
+case "${1:-}" in
+  allocate) cmd_allocate "${2:-}" ;;
+  attach)   cmd_attach "${2:-}" ;;
+  detach)   cmd_detach "${2:-}" ;;
+  quiesce)  public_quiesce ;;
+  resume)   public_resume ;;
+  healthy)  cmd_healthy "${2:-}" ;;
+  switch)   cmd_switch "${2:-}" ;;
+  snapshot) cmd_snapshot ;;
+  prepare) cmd_prepare "$2" "$3" "$4" ;;
+  activate) cmd_activate "$2" "$3" ;;
+  refresh) cmd_refresh "$2" "$3" ;;
+  prune)    cmd_prune ;;
+  status)   cmd_status ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
+esac

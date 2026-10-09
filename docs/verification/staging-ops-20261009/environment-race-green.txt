@@ -1,0 +1,6 @@
+test_forge_edit_after_admission_does_not_replace_validated_candidate (__main__.EnvironmentRefreshTest.test_forge_edit_after_admission_does_not_replace_validated_candidate) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.012s
+
+OK

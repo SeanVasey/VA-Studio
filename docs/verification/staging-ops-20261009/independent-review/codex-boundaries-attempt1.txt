@@ -1,0 +1,99 @@
+Exact assessed source: 11cf2dcc568975eedec434862807b45d301d014f
+test_code_changed_during_capture_refuses_before_installing_a_staged_file (__main__.CodexBoundaryProbes.test_code_changed_during_capture_refuses_before_installing_a_staged_file) ... ok
+test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery (__main__.CodexBoundaryProbes.test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery) ... FAIL
+test_environment_changed_during_capture_keeps_the_protected_target (__main__.CodexBoundaryProbes.test_environment_changed_during_capture_keeps_the_protected_target) ... ok
+test_environment_hash_must_cover_environment_not_another_valid_file (__main__.CodexBoundaryProbes.test_environment_hash_must_cover_environment_not_another_valid_file) ... FAIL
+test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) ...
+  test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) (quote='"') ... FAIL
+  test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) (quote="'") ... FAIL
+test_old_source_and_environment_descriptors_cannot_change_fresh_inodes (__main__.CodexBoundaryProbes.test_old_source_and_environment_descriptors_cannot_change_fresh_inodes) ... ok
+test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) ...
+  test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='seal') ... FAIL
+  test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='verify') ... FAIL
+  test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='stage-env') ... FAIL
+test_runtime_file_bytes_inodes_and_modes_are_not_traversed_by_sealing (__main__.CodexBoundaryProbes.test_runtime_file_bytes_inodes_and_modes_are_not_traversed_by_sealing) ... ok
+test_special_candidate_is_refused_without_blocking_on_fifo_open (__main__.CodexBoundaryProbes.test_special_candidate_is_refused_without_blocking_on_fifo_open) ... FAIL
+
+======================================================================
+FAIL: test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery (__main__.CodexBoundaryProbes.test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 240, in test_configuration_cache_failure_retains_protected_new_env_for_snapshot_recovery
+    self.assertIn("configuration cache failed", run.stderr)
+AssertionError: 'configuration cache failed' not found in 'protected runtime profile refused; original environment retained\n'
+
+======================================================================
+FAIL: test_environment_hash_must_cover_environment_not_another_valid_file (__main__.CodexBoundaryProbes.test_environment_hash_must_cover_environment_not_another_valid_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 76, in test_environment_hash_must_cover_environment_not_another_valid_file
+    self.assertNotEqual(run.returncode, 0, "env.backup.sha256 verified database.sql and skipped the environment")
+AssertionError: 0 == 0 : env.backup.sha256 verified database.sql and skipped the environment
+
+======================================================================
+FAIL: test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) (quote='"')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 59, in test_multiline_value_cannot_supply_a_fake_effective_key
+    self.assertNotEqual(run.returncode, 0, "text inside another value was admitted as recoverable APP_KEY")
+AssertionError: 0 == 0 : text inside another value was admitted as recoverable APP_KEY
+
+======================================================================
+FAIL: test_multiline_value_cannot_supply_a_fake_effective_key (__main__.CodexBoundaryProbes.test_multiline_value_cannot_supply_a_fake_effective_key) (quote="'")
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 57, in test_multiline_value_cannot_supply_a_fake_effective_key
+    self.assertEqual(dotenv.returncode, 0, "real Dotenv must confirm this is only another value")
+AssertionError: 255 != 0 : real Dotenv must confirm this is only another value
+
+======================================================================
+FAIL: test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='seal')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 118, in test_privileged_cli_never_delegates_to_a_root_application_account
+    self.assertFalse(run.called or capture.called, "root was accepted as the application identity")
+AssertionError: True is not false : root was accepted as the application identity
+
+======================================================================
+FAIL: test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='verify')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 118, in test_privileged_cli_never_delegates_to_a_root_application_account
+    self.assertFalse(run.called or capture.called, "root was accepted as the application identity")
+AssertionError: True is not false : root was accepted as the application identity
+
+======================================================================
+FAIL: test_privileged_cli_never_delegates_to_a_root_application_account (__main__.CodexBoundaryProbes.test_privileged_cli_never_delegates_to_a_root_application_account) (action='stage-env')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 118, in test_privileged_cli_never_delegates_to_a_root_application_account
+    self.assertFalse(run.called or capture.called, "root was accepted as the application identity")
+AssertionError: True is not false : root was accepted as the application identity
+
+======================================================================
+FAIL: test_special_candidate_is_refused_without_blocking_on_fifo_open (__main__.CodexBoundaryProbes.test_special_candidate_is_refused_without_blocking_on_fifo_open)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 96, in test_special_candidate_is_refused_without_blocking_on_fifo_open
+    _, error = process.communicate(timeout=0.5)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3', '-c', 'import importlib.util,os,sys; s=importlib.util.spec_from_file_location("actual",sys.argv[1]); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.ROOT_UID=os.getuid();m.ROOT_GID=os.getgid(); m.stage_environment(sys.argv[2],sys.argv[3],sys.argv[4],os.getuid(),os.getgid())', '/tmp/vasey-codex-independent.j34vq8nr/actual-sealer.py', '/tmp/vasey-codex-independent.j34vq8nr/evidence', '/tmp/vasey-codex-independent.j34vq8nr/evidence/candidate', '/tmp/vasey-codex-independent.j34vq8nr/protected-output']' timed out after 0.5 seconds
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/codex-boundaries-probe.py", line 100, in test_special_candidate_is_refused_without_blocking_on_fifo_open
+    self.fail("root capture blocked before its regular-file refusal; owned process killed")
+AssertionError: root capture blocked before its regular-file refusal; owned process killed
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.791s
+
+FAILED (failures=8)

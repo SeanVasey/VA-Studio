@@ -180,7 +180,15 @@ fi
 # never exposes a release without a marker.
 php artisan down || exit 1
 php artisan migrate:status
-php artisan migrate --pretend || { echo 'migration preview failed: nothing applied; host stays in maintenance'; exit 1; }   # review the SQL; a preview that fails never proceeds to the real migration
+# The gate before a destructive migration is the verified pre-migration backup and restore proof above:
+# backup-restore-proof.md steps 1-4 all passing, recorded as the line result=RESTORE_VERIFIED in
+# <BACKUP_DIR>/RESTORE_CHECK (ops/staging/backup.sh restore-check writes it; by hand, the operator writes it
+# only after step 4's last check passes). <BACKUP_DIR> is operator-only (0700), so the operator runs the
+# check. The preview is evidence only, never a gate: on a fresh schema migration 2026_10_01_000032 throws
+# under --pretend because its trigger self-checks return nothing, and --pretend also creates the migrations
+# table. <EVIDENCE_DIR> is this stage's evidence directory (§7).
+grep -qx 'result=RESTORE_VERIFIED' <BACKUP_DIR>/RESTORE_CHECK || { echo 'no verified pre-migration backup: nothing applied; host stays in maintenance'; exit 1; }   # operator
+php artisan migrate --pretend > <EVIDENCE_DIR>/migrate-pretend.txt 2>&1 || echo 'migration preview failed: recorded as evidence, not a gate'   # review the SQL it did print
 php artisan migrate --force || { echo 'migration failed: host stays in maintenance; restore from the backup before retrying'; exit 1; }
 php artisan config:cache || exit 1
 php artisan vasey:doctor || exit 1

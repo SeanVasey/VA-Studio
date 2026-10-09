@@ -1,0 +1,10 @@
+Assessed exact source: fd9dd035dc9069db3727bd12960bb5952eb28399
+test_canonical_path (__main__.AdminDefaultsReview.test_canonical_path) ... ok
+test_leaf_custody (__main__.AdminDefaultsReview.test_leaf_custody) ... ok
+test_parent_authority (__main__.AdminDefaultsReview.test_parent_authority) ... ok
+test_protected_profiles_and_socket_default (__main__.AdminDefaultsReview.test_protected_profiles_and_socket_default) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.648s
+
+OK

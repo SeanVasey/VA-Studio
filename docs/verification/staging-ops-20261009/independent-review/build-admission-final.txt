@@ -1,0 +1,12 @@
+Exact assessed source: 7bced5ecb91593e28854297a2ca14247931c3448
+test_build_failure_keeps_durable_admission_closed (__main__.BuildAdmissionProbe.test_build_failure_keeps_durable_admission_closed) ... ok
+test_controlled_live_actor_cannot_modify_ignored_vendor (__main__.BuildAdmissionProbe.test_controlled_live_actor_cannot_modify_ignored_vendor) ... ok
+test_current_admission_refusal_precedes_quiesce_and_allocation (__main__.BuildAdmissionProbe.test_current_admission_refusal_precedes_quiesce_and_allocation) ... ok
+test_first_install_quiesces_before_allocation (__main__.BuildAdmissionProbe.test_first_install_quiesces_before_allocation) ... ok
+test_provision_refuses_ownership_modes_links_and_noncanonical_roots (__main__.BuildAdmissionProbe.test_provision_refuses_ownership_modes_links_and_noncanonical_roots) ... ok
+test_root_guard_precedes_host_mutations (__main__.BuildAdmissionProbe.test_root_guard_precedes_host_mutations) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.607s
+
+OK

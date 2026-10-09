@@ -1,0 +1,2 @@
+{"version":"8.4.11","performance_schema":1,"socket":"","bind_address":"127.0.0.1","isolation":"REPEATABLE-READ"}
+{"source":"b72c8efcb48ea433c58659b824ad32d4c174bf6d","server_version":"8.4.11","valid_credential_authenticates":true,"wrong_password_refused":true,"unexpected_identity_refused":true,"native_client":true,"root_ownership_modeled":true,"host_acceptance":false}
