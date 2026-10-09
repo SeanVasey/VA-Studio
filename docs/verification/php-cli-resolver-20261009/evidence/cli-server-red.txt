@@ -1,0 +1,4 @@
+# source 0f5890f0c4687debdc9b17aa0ff58ceb4d7308d4 + test file only (PhpCliBinaryTest sha256 098edc3d5a0fb385); PhpCliBinary unchanged
+1) Tests\Unit\PhpCliBinaryTest::test_the_built_in_server_runs_its_own_cli_binary_without_configuration
+Tests: 13, Assertions: 98, Failures: 1.
+rc=1

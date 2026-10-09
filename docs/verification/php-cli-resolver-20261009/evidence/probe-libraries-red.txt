@@ -1,0 +1,21 @@
+# Red: probe without the sibling library path (Codex P2 4228948830); source fc779d0 + new unit test only
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt-m16/phpunit.xml
+
+Time: 00:00.076, Memory: 24.50 MB
+
+There was 1 error:
+
+1) Tests\Unit\PhpCliBinaryTest::test_the_probe_runs_with_the_renderers_sibling_library_path
+App\Support\PhpCliBinaryUnavailable: A validated CLI PHP binary is unavailable.
+
+/home/user/wt-m16/app/Support/PhpCliBinary.php:121
+/home/user/wt-m16/app/Support/PhpCliBinary.php:82
+/home/user/wt-m16/tests/Unit/PhpCliBinaryTest.php:194
+/home/user/wt-m16/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 14, Assertions: 99, Errors: 1.
+rc=2

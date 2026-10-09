@@ -1,0 +1,6 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/cli-server.sh /home/user/rv-m16-main 8201 '' free generic
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:14:33Z
+# cli-server root=/home/user/rv-m16-main (86e22f1add4e) VASEY_PHP_CLI_BINARY=<unset>
+{"family":"free","sapi":"cli-server","php_binary":"/usr/bin/php8.4","php_version":"8.4.26","configured_cli":null,"renderer_class":"App\\Domain\\Grants\\Free\\FreeGrantRendererProcess","ok":true,"sha256":"c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b"}
+{"family":"generic","sapi":"cli-server","php_binary":"/usr/bin/php8.4","php_version":"8.4.26","configured_cli":null,"renderer_class":"App\\Domain\\Contracts\\IsolatedContractRenderer","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf"}
+# rc=0

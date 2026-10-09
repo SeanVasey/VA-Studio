@@ -1,0 +1,20 @@
+# FPM smoke after the probe library-path fix: source fc779d0 + working tree; payloads: independent-review/capture
+# pool m16lib: php-fpm8.4 8.4.26, root=/home/user/wt-m16, VASEY_PHP_CLI_BINARY=/usr/bin/php8.4
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"c4e812cfa40bb96a1f6d37b1161c237af55d4b46107cdacdf07d89ece697de3b","size_bytes":760378,"composed":false}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"208411902445f55a0c6d59994d02b5ae089dcfc804757557b5042e50bbdb6d2c","size_bytes":809234,"composed":false}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"790fd79695a52b8578305c0cbd2c44c9e776c723200db59536f6394653ed1daf","size_bytes":751516,"composed":false}
+## family=production-free
+{"family":"production-free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":false,"reason":"render_failed"}
+## family=production-free-composed
+{"family":"production-free-composed","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"/usr/bin/php8.4","app_env":"local","ok":true,"sha256":"024b4fc926fd3edf23173b729c06005f966f6b174d0fb237adc2ff565532b11d","size_bytes":759094,"composed":true}
+# unset
+# pool m16libu: php-fpm8.4 8.4.26, root=/home/user/wt-m16, VASEY_PHP_CLI_BINARY=<unset>
+## family=free
+{"family":"free","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}
+## family=generic
+{"family":"generic","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}

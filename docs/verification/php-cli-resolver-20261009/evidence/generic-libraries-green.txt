@@ -1,0 +1,49 @@
+# Green after the generic-renderer library-path fix: source 11d9070 + working tree; php 8.4.26
+## tests/Feature/TestIsolatedContractRendererTest.php
+
+OK (23 tests, 93 assertions)
+rc=0
+## tests/Feature/IsolatedContractRendererAcceptanceTest.php
+
+OK (1 test, 25 assertions)
+rc=0
+## tests/Feature/TestContractIssuanceTest.php
+
+OK (52 tests, 498 assertions)
+rc=0
+## tests/Feature/TestContractProfileSuccessorTest.php
+
+OK (16 tests, 29 assertions)
+rc=0
+## tests/Feature/TestContractSuccessorActivationTest.php
+
+OK (4 tests, 39 assertions)
+rc=0
+## tests/Unit/PhpCliBinaryTest.php
+
+OK (14 tests, 100 assertions)
+rc=0
+## tests/Feature/FreeGrantCliRendererTest.php
+
+OK (3 tests, 14 assertions)
+rc=0
+## tests/Feature/PaidGrantCliRendererTest.php
+
+OK (3 tests, 45 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantCliRendererTest.php
+
+OK (3 tests, 15 assertions)
+rc=0
+## tests/Unit/StagingRuntimeValidatorTest.php
+
+OK (17 tests, 79 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php
+
+OK (3 tests, 103 assertions)
+rc=0
+## tests/Feature/ProductionFreeGrants/ProductionFreeGrantApprovalTest.php
+
+OK (11 tests, 74 assertions)
+rc=0

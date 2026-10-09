@@ -55,6 +55,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Contract and grant PDFs no longer fail with `render_failed` when the request is served by PHP-FPM. Under FPM, `PHP_BINARY` is the FPM daemon, so renderer children now run the CLI PHP named by the new `VASEY_PHP_CLI_BINARY` (for example `/usr/bin/php8.4`), proven by a bounded probe to be the `cli` SAPI of the exact running version and build. The frozen pinned renderers are unchanged: the free and paid renderers receive a process factory outside the CLI; family 256 (production free grants) ships unbound until it is composed. The CLI and `php -S` / `artisan serve` keep using their own binary. Evidence: `docs/verification/php-cli-resolver-20261009/`.
+  - **Upgrade note:** set `VASEY_PHP_CLI_BINARY` on any host that serves the app through PHP-FPM. Unset there, every in-request render fails closed. The staging deploy's `ops/staging/validate-runtime.php` now refuses a candidate environment whose binary is unset or fails the probe (`runtime.php_cli_binary`); `ops/staging/env.staging.example` sets `/usr/bin/php8.4`.
+- `ProductionFreeGrantFrozenBytesTest` no longer fails on main since the paid lane (#56) landed: it kept asserting that `app/Domain/Grants/Paid` does not exist. It still refuses any family-256 import of the paid or old free family and now also refuses a byte copy of one of their files.
+
 - `PublicTrackEmbedTest` no longer fails when an earlier test in the same PHPUnit process renders a Livewire component through a real HTTP request: the base test case flushes Livewire's static asset-injection state before each test, and a regression test covers it. Test-only. Evidence: `docs/verification/embed-order-leak-20261009/`.
 
 - Install the captured private staging environment before Composer's Laravel hooks boot package discovery and Filament upgrade.

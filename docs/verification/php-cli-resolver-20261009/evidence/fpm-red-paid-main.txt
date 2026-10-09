@@ -1,0 +1,5 @@
+# pool rp: php-fpm8.4 8.4.26, root=/home/user/VA-Studio, VASEY_PHP_CLI_BINARY=<unset>
+## family=raw
+{"family":"raw","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","exit":64,"stdout_head":"Usage: php-fpm8.4 [-n] [-e] [-h] [-i] [-m] [-v] [-t] [-p <pr","stderr_head":""}
+## family=paid
+{"family":"paid","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":null,"app_env":"local","ok":false,"reason":"render_failed"}

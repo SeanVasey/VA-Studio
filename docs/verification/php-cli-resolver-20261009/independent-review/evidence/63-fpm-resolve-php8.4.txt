@@ -1,0 +1,6 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/run-fpm.sh r63 /home/user/rv-m16 php8.4 family=resolve
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:11:39Z
+# pool r63: PHP 8.4.26 (fpm-fcgi), root=/home/user/rv-m16 (dac1a79c7e26), VASEY_PHP_CLI_BINARY=php8.4
+## family=resolve
+{"family":"resolve","sapi":"fpm-fcgi","php_binary":"/usr/sbin/php-fpm8.4","php_version":"8.4.26","configured_cli":"php8.4","root":"/home/user/rv-m16","reason":"invalid_path","message":"A validated CLI PHP binary is unavailable.","previous":null}
+# rc=0

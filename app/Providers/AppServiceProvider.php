@@ -10,8 +10,12 @@ use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\IsolatedContractRenderer;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
+use App\Domain\Grants\Free\FreeGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
+use App\Support\PhpCliBinary;
+use App\Support\PhpCliProcess;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -31,6 +35,19 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(MediaWorkflowBudget::class);
         $this->app->bind(ContractRenderer::class,
             IsolatedContractRenderer::class);
+        $this->app->bind(PhpCliBinary::class,
+            fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));
+        // The pinned grant renderers spawn PHP_BINARY, which is the FPM daemon outside the CLI; there they get a
+        // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
+        // Family 256 (production free grants) is deliberately absent: nothing ships binding it, and the step that
+        // composes and mounts it adds its renderer here after review.
+        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class] as $renderer) {
+            $this->app->bind($renderer, function ($app) use ($renderer) {
+                $binary = $app->make(PhpCliBinary::class);
+
+                return $binary->isCli() ? new $renderer : new $renderer(PhpCliProcess::factory($binary));
+            });
+        }
         $this->app->bind(StripeCheckoutGateway::class,
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripePaymentGateway::class,

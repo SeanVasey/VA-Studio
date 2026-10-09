@@ -1,0 +1,15 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/phpunit.sh tests/Feature/TestIsolatedContractRendererTest.php
+# cwd: /home/user/rv-m16  date: 2026-10-09T08:59:04Z
+# source: dac1a79c7e263487dd503df4298e2836280a6622 root=/home/user/rv-m16 public/build present: no
+# git status --short (product paths): 
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/rv-m16/phpunit.xml
+
+......................                                            22 / 22 (100%)
+
+Time: 00:01.724, Memory: 65.00 MB
+
+OK (22 tests, 92 assertions)
+# rc=0

@@ -1,0 +1,16 @@
+$ php docs/verification/php-cli-resolver-20261009/independent-review/probes/cache-identity-probe.php
+# cwd: /home/user/rv-m16  date: 2026-10-09T09:12:33Z
+1a first:            ok php-cli probes=1
+1b cached:           ok php-cli probes=1
+1c renamed-over 8.4.99: refused version_mismatch probes=1
+2a restored:         ok php-cli
+2b in-place rewrite: size same=yes mtime same=yes ctime same=yes -> ok php-cli
+3a link->good:       ok good
+3b link->bad:        refused version_mismatch
+4 factory refused  ["\/bin\/sh","-n","-c","id"] reason=unexpected_command
+4 factory refused  ["\/usr\/sbin\/php-fpm8.4","-r","echo 1;"] reason=unexpected_command
+4 factory refused  ["\/usr\/sbin\/php-fpm8.4"] reason=unexpected_command
+4 factory refused  [] reason=unexpected_command
+4 factory built: ["\/usr\/bin\/php8.4","-n","-d","x=1","\/script.php"] cwd=/cwd timeout=60 input=stdin-bytes env={"A":"b","LD_LIBRARY_PATH":"\/usr\/lib\/x86_64-linux-gnu","Z":false}
+4 libraries(realpath(PHP_BINARY))=["\/usr\/lib\/x86_64-linux-gnu"] libraries(/opt/none/bin/php)=[]
+# rc=0

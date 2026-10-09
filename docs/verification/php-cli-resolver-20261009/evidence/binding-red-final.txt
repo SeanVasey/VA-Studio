@@ -1,0 +1,10 @@
+# source af232a80dd7b9786217deea1b682812cb2a5c050 + working tree EXCEPT app/Providers/AppServiceProvider.php from origin/main e5e500c (no PhpCliBinary binding, no renderer bindings)
+1) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_the_document_renders_through_the_configured_cli_with_the_pinned_arguments
+2) Tests\Feature\PaidGrantCliRendererTest::test_outside_the_cli_the_original_renders_through_the_configured_cli_with_the_pinned_arguments
+1) Tests\Feature\FreeGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+2) Tests\Feature\FreeGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_the_render_fails_closed_before_any_child
+3) Tests\Feature\PaidGrantCliRendererTest::test_the_cli_builds_the_pinned_renderer_without_a_process_factory
+4) Tests\Feature\PaidGrantCliRendererTest::test_outside_the_cli_without_a_configured_cli_no_original_is_published
+ERRORS!
+Tests: 9, Assertions: 61, Errors: 2, Failures: 4.
+rc=2

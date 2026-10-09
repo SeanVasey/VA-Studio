@@ -1,0 +1,33 @@
+$ docs/verification/php-cli-resolver-20261009/independent-review/probes/pinned-blobs.sh
+# cwd: /home/user/rv-m16  date: 2026-10-09T08:57:12Z
+app/Domain/Grants/Free/FreeGrantRendererProcess.php
+  86e22f1a=9d6378cb9f44514ae5f363dc9005fe1114413cd6
+  e5e500ca=9d6378cb9f44514ae5f363dc9005fe1114413cd6
+  dac1a79 =9d6378cb9f44514ae5f363dc9005fe1114413cd6
+  worktree=9d6378cb9f44514ae5f363dc9005fe1114413cd6
+app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php
+  86e22f1a=20b4ba4c20545b8cd6cf06ff063e9774eea0268f
+  e5e500ca=20b4ba4c20545b8cd6cf06ff063e9774eea0268f
+  dac1a79 =20b4ba4c20545b8cd6cf06ff063e9774eea0268f
+  worktree=20b4ba4c20545b8cd6cf06ff063e9774eea0268f
+app/Domain/Grants/Paid/PaidGrantRendererProcess.php
+  86e22f1a=95feefff17e58ab7af61a56a699fe7cebdc83baf
+  e5e500ca=95feefff17e58ab7af61a56a699fe7cebdc83baf
+  dac1a79 =95feefff17e58ab7af61a56a699fe7cebdc83baf
+  worktree=95feefff17e58ab7af61a56a699fe7cebdc83baf
+scripts/render-free-grant.php
+  86e22f1a=c0c36e902f3d645cb45249bddd65c52788a171f1
+  e5e500ca=c0c36e902f3d645cb45249bddd65c52788a171f1
+  dac1a79 =c0c36e902f3d645cb45249bddd65c52788a171f1
+  worktree=c0c36e902f3d645cb45249bddd65c52788a171f1
+scripts/render-production-free-grant.php
+  86e22f1a=117003aad28238a6693625cc8db2cd0c7968f591
+  e5e500ca=117003aad28238a6693625cc8db2cd0c7968f591
+  dac1a79 =117003aad28238a6693625cc8db2cd0c7968f591
+  worktree=117003aad28238a6693625cc8db2cd0c7968f591
+scripts/render-paid-grant.php
+  86e22f1a=937f0a962483c229f74a3f0a16945f6fa9042b4e
+  e5e500ca=937f0a962483c229f74a3f0a16945f6fa9042b4e
+  dac1a79 =937f0a962483c229f74a3f0a16945f6fa9042b4e
+  worktree=937f0a962483c229f74a3f0a16945f6fa9042b4e
+# rc=0
