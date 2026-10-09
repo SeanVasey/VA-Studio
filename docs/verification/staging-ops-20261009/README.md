@@ -1,13 +1,14 @@
 # PR #63 current verification
 
-Current tested functional source: `ca7e3ae46b312e1673a2067bb5d122e8aa9bc11e`. The kit integrates main's CI
+Current tested functional source: `11248aa3ee924cb3d4f3d1f8fe48bda39089cc2a`. The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
 sweeps escaped the stopped-writer boundary and the Forge example targeted the mirror. The current repair
 adds durable root admission and a shared writer barrier. The fresh [repair decision](independent-review/PIPELINE-ADMISSION-ADDENDUM.md)
 **APPROVES exact `ca7e3ae4`**: I-1/I-2 closed within the controlled-runner boundary. Publication requires
-an explicit source-equivalence check. Actual host activation remains external.
+an explicit source-equivalence check. The later Codex repair below changes helper/sealing/backup/HTTP
+boundaries and requires its own independent approval. Actual host activation remains external.
 
 ## Actual local evidence
 
@@ -102,3 +103,72 @@ hostname, real staff/catalog/rights/terms/tag and backup target remain Sean's in
 staging preparation; live checkout and paid-route mounting retain their separate conditions.
 
 Publication formatting also removes trailing whitespace from unittest progress lines in new admission receipts: `pipeline-admission-red-corrected.txt` (1), `pipeline-admission-red.txt` (1). Assertions, failure details and outcomes are unchanged.
+
+## Later Codex repair at `11cf2dcc`
+
+Codex code review on published `3c0050bc` raised 4226007102 (signature), 4226007106 (mutable release files)
+and 4226007111 (missing served key). Security review also completed on that prior source. All new source
+must be independently reviewed and rechecked by the cheap preflight before merge.
+
+The native baseline disproves the claim that the original nginx default drops the signature: exact
+Stripe header and UTF-8 body arrive at genuine FPM, **28 checks pass**. An inherited
+`fastcgi_pass_request_headers off` instead fails the signature assertion. The explicit signature parameter
+repairs that boundary; default and inherited-off runs both pass 28. These are synthetic signed-body/header
+transport checks, not Stripe SDK verification, Laravel receipt persistence or a real provider purchase.
+
+| Current exact committed receipt (`codex-repair/`) | Actual result |
+| --- | --- |
+| `committed-ops-tests.txt` | **39 methods pass**, exit 0: parser12, refresh1, admission9, sealing7, backup7, protected configure3 |
+| `committed-runtime-tests.txt` | Genuine PHP 8.4.26, **13 tests / 63 assertions**, exit 0 |
+| `committed-signature-inherited-off.txt` | Genuine nginx1.26.3/FPM8.4.26, **28 checks pass**, exit 0 |
+| `sealing-red.txt` | Corrected old-source authority fixture, **5 product safety failures**: writable bytes, held writer descriptor, hard links, unsafe symlinks and executable protection |
+| `key-custody-red.txt` | **6 methods / 5 failures** before repair: invalid current, missing env/hash/manifest admission |
+| `signature-default-baseline.txt`, `signature-inherited-off-red.txt` | Original default **28 PASS**; actual parent-off signature failure, exit1 |
+
+Each of five Bash scripts parsed independently; Shellcheck0.10 `-x` exits0. No app/config/database,
+contract asset/profile, #62 validator or runner source changed. The 89/876 commerce/runtime selection,
+prior native dump/migration and old independent admission counts remain historical at their named source;
+the changed HTTP boundary has fresh native proof. No full matrix was launched.
+
+The sealer freezes parents before opening children and replaces regular code/vendor/build/environment
+files on fresh root-owned read-only inodes, so an old app descriptor cannot modify their installed bytes.
+It rejects hard links, special files and external/runtime code symlinks and preserves executables/public
+readability. Only explicit application-owned 0700 runtime paths are skipped; retained private bind contents
+are never traversed. Generated PHP caches/views/maintenance remain writable trust exceptions. This is
+post-sealing source protection, not builder attestation or immutable runtime execution.
+
+`configure` requires closed admission, stopped web/writers, the selected served release in maintenance,
+a safely captured private evidence file, real Laravel admission and unchanged key before replacing
+root:app-group0440 `.env`. Cache creation runs as the app; failures stay quiesced for verified recovery.
+Root recovery installs the hash-verified env on a fresh protected inode. Served snapshots refuse invalid
+current/key before publishing `.last`; restore removes old success before demanding the release manifest
+and mandatory env/hash. Only explicit `release_sha=none` first-install sets omit a historical key.
+
+Retained harness errors are not product reds: `signature-harness-unicode-attempt.txt` used Python's
+Latin-1 string-body default for a snowman before correction to UTF-8 bytes; `sealing-harness-ancestry-attempt.txt`
+forgot to model protected ancestry through this sandbox's writable `/tmp`; `configuration-first-run.txt`
+forgot root ancestry authority at the final verification. Corrected runs preserve real inode/mode/link/FD,
+byte and PHP configuration behavior. Ownership authority, services, cache-command side effects and installed
+root tools are bounded fixtures; no host root, real backup/restore shipping, Forge service or database was
+exercised. Real host acceptance remains open.
+
+## Independent finding repairs at `11248aa3`
+
+The reviewer independently reproduced three further failures at `11cf2dcc`: a key-looking line inside
+another multiline value was admitted, a candidate FIFO blocked before regular-file admission, and an
+environment hash manifest checking a different file was accepted. The reviewer also required explicit
+nonroot application identity. Canonical regression runs on the old source retain **9 key methods / 3
+failures** and **9 file methods / 2 failures** in `independent-findings-{key,files}-red.txt`.
+
+The repair requires one complete assignment per line before literal key extraction, compares the exact
+single `env.backup` checksum record, opens untrusted candidates nonblocking before regular-file checks,
+and rejects UID 0 at privileged application entry points. Quoted/plain valid keys, genuine first install
+and the served key with its correct hash remain covered positive cases.
+
+Exact committed receipts: `final-ops-11248aa3.txt` **43 PASS**; `final-runtime-11248aa3.txt` **13/63 PASS**;
+`final-signature-11248aa3.txt` **28 native nginx/FPM checks PASS** with inherited request headers disabled.
+Five scripts parsed separately and Shellcheck `-x` passed. Ownership/root/service boundaries and real-host
+limits above still apply. The independent final decision is recorded separately; these owner checks are
+not a substitute for that decision.
+
+Publication formatting removes trailing whitespace only from new unittest progress lines; assertions, failure details and outcomes are unchanged.

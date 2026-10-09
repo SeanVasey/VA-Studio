@@ -1,0 +1,12 @@
+test_environment_capture_refuses_links_escapes_and_writable_ancestry (__main__.ReleaseSealingTest.test_environment_capture_refuses_links_escapes_and_writable_ancestry) ... ok
+test_external_and_runtime_code_symlinks_refuse (__main__.ReleaseSealingTest.test_external_and_runtime_code_symlinks_refuse) ... ok
+test_hard_links_refuse_without_mutating_the_external_inode (__main__.ReleaseSealingTest.test_hard_links_refuse_without_mutating_the_external_inode) ... ok
+test_internal_code_symlinks_and_executable_bits_are_preserved (__main__.ReleaseSealingTest.test_internal_code_symlinks_and_executable_bits_are_preserved) ... ok
+test_old_open_writer_cannot_change_the_published_inode (__main__.ReleaseSealingTest.test_old_open_writer_cannot_change_the_published_inode) ... ok
+test_post_seal_revision_check_detects_source_changed_during_build (__main__.ReleaseSealingTest.test_post_seal_revision_check_detects_source_changed_during_build) ... ok
+test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable (__main__.ReleaseSealingTest.test_source_vendor_build_and_env_are_read_only_and_runtime_paths_stay_writable) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.021s
+
+OK
