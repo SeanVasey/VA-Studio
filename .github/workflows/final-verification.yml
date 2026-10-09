@@ -243,7 +243,7 @@ jobs:
     name: backend-sqlite (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
     # Foundation 37967128232 measured 47.5 minutes for shard 1; shard 2 was cut off by the former 60-minute
-    # limit at about 92% (about 65 minutes projected). 100 minutes leaves about 50% headroom until the
+    # limit at 3,294 of 3,725 tests (88%, about 67 minutes projected). 100 minutes leaves about 45% headroom until the
     # SQLite timings are regenerated. A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 100
     strategy:
