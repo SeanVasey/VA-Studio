@@ -1,0 +1,1 @@
+# B2 final affected selection shard 0 at 0b88d78 (main b9cb7b67 merged), php 8.4.26, SQLite in memory, public/build absent

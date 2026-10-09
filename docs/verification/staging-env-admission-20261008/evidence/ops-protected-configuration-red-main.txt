@@ -1,0 +1,10 @@
+# tests/ops/test_staging_protected_configuration.py at e07da62 (= #67 head, main b9cb7b67 product)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : protected runtime profile refused; original environment retained
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.546s
+
+FAILED (failures=1)
+rc=1

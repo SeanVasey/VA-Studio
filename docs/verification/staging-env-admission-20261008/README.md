@@ -173,6 +173,9 @@ PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, `public/build` absent.
 | Red: configure rebuilds the route cache (C1) | `56efbb7` + updated ops test | 1 failure: only `config:cache` ran; rc 1 | `evidence/configure-route-cache-red.txt` |
 | Green: all ops kit tests after the C1 fix | working tree | 13 files, 74 tests OK | `evidence/configure-route-cache-green.txt` |
 | Real route cache across `APP_ENV` | working tree | built under `local`, served under `staging`: no MFA middleware; rebuilt under `staging`: present | `evidence/configure-route-cache-real.txt` |
+| Ops fixture after merging main `b9cb7b67` (#67): `test_staging_protected_configuration` red on main, its candidate env lacking the newly required `VASEY_PHP_CLI_BINARY` | `e07da62` (#67 head) | 1 failure, rc 1 | `evidence/ops-protected-configuration-red-main.txt` |
+| Same with the fixture supplying the running CLI PHP | integrated head + fix | 3 tests OK | `evidence/ops-protected-configuration-green.txt` |
+| All ops kit tests + private-server preflight self-test | integrated head + fix | 13 files, 74 tests OK; preflight 20 OK | `evidence/final-ops-tests.txt` |
 | Final affected selection | FINAL_PLACEHOLDER | FINAL_PLACEHOLDER | `evidence/final-*.txt` |
 
 ## Not tested

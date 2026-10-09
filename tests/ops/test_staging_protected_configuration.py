@@ -32,7 +32,9 @@ class ProtectedConfigurationTest(unittest.TestCase):
             "CACHE_STORE=database", "QUEUE_CONNECTION=database", "DB_QUEUE_RETRY_AFTER=1200",
             "DB_CONNECTION=mysql", "DB_HOST=127.0.0.1", "DB_DATABASE=vasey_staging",
             "DB_USERNAME=vasey_app", "DB_PASSWORD=SyntheticPrivateRuntimeMarker",
-            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test", "",
+            "FILESYSTEM_DISK=local", "MAIL_MAILER=log", "STRIPE_MODE=test",
+            # The validator requires a probe-proven CLI PHP for FPM renderer children (M-16, runtime.php_cli_binary).
+            "VASEY_PHP_CLI_BINARY=" + os.path.realpath(PHP), "",
         ])
         (self.release / ".env").write_text(self.previous)
         (self.release / ".env").chmod(0o600)

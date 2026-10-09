@@ -1,0 +1,16 @@
+# Ops kit tests at 0b88d78 + ops fixture fix (main b9cb7b67 merged)
+tests/ops/test_staging_admin_defaults_custody.py: Ran 3 tests in 0.838s  OK 
+tests/ops/test_staging_backup_credential_custody.py: Ran 4 tests in 0.331s  OK 
+tests/ops/test_staging_backup_key_custody.py: Ran 9 tests in 0.887s  OK 
+tests/ops/test_staging_build_admission.py: Ran 3 tests in 0.992s  OK 
+tests/ops/test_staging_deploy_refresh.py: Ran 2 tests in 0.073s  OK 
+tests/ops/test_staging_dump_normalization.py: Ran 12 tests in 0.035s  OK 
+tests/ops/test_staging_operation_custody.py: Ran 3 tests in 0.343s  OK 
+tests/ops/test_staging_operation_lease.py: Ran 8 tests in 2.350s  OK 
+tests/ops/test_staging_pipeline_admission.py: Ran 9 tests in 1.672s  OK 
+tests/ops/test_staging_protected_configuration.py: Ran 3 tests in 1.415s  OK 
+tests/ops/test_staging_recovery_admission.py: Ran 4 tests in 0.569s  OK 
+tests/ops/test_staging_release_sealing.py: Ran 11 tests in 0.865s  OK 
+tests/ops/test_staging_runtime_directory_custody.py: Ran 3 tests in 1.170s  OK 
+## scripts/ops/test-private-server-preflight.py
+Ran 20 tests in 5.429s  OK 
