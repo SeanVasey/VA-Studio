@@ -1,0 +1,13 @@
+# Local SQLite shard 2 of 2 with the MigrationDefinitions fix (branch harness/foundation-fixes-20261009 at e2b3906 test/app tree; dcf983e changes docs only).
+# Partition: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-local (CI's SQLite sharding, recomputed with the new test file).
+# Command: env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync \
+#   php -d memory_limit=512M vendor/bin/phpunit --configuration=phpunit-ci-local-2.xml --log-junit=... --log-events-text=... --fail-on-phpunit-warning --display-warnings
+# PHP 8.4.26, PHPUnit 12.5.34. laravel/pao prints one JSON summary. Run 2026-10-09 13:36-15:16 UTC, both shards concurrently on a shared container.
+{"tool":"phpunit","result":"passed","tests":3710,"passed":3475,"assertions":37034,"duration_ms":5712046,"skipped":235}
+rc=0
+# JUnit census (scratch file, not committed, 1.4-1.5 MB):
+fixed-sqlite-2-junit.xml: cases=3710 skipped=235 failures+errors=0 skipped_with_assertions=6
+  Tests\Feature\CustomerSuppressionKeyAdmissionTest: 2
+  Tests\Feature\ProductionFreeGrants\ProductionFreeGrantSchemaTest: 2
+  Tests\Feature\ProductionIdentityAdapters\IdentityHistoricalCommittedReceiptTest: 1
+  Tests\Feature\ProductionIdentity\ProductionIdentityMigrationTest: 1

@@ -470,7 +470,8 @@ def junit(raw: bytes, expected: dict, checkout_root: str, engine: str, skip_pair
             require(math.isfinite(time) and time >= 0, "Invalid JUnit time")
             seen.add(identifier_)
             if node.find("skipped") is not None:
-                require(int(value) == 0 and sum(child.tag == "skipped" for child in node) == 1, "Skipped case has assertions or duplicate result nodes")
+                # A skip may carry setUp assertions (PHPUnit counts them); the exact reviewed skip census below bounds which cases skip.
+                require(sum(child.tag == "skipped" for child in node) == 1, "Skipped case has duplicate result nodes")
                 skipped.append(identifier_)
         elif node.tag in {"testsuite", "testsuites"}:
             require(all(child.tag in {"testsuite", "testcase", "system-out", "system-err"} for child in node), "Unknown JUnit suite result")

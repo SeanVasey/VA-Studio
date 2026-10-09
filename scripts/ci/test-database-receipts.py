@@ -229,6 +229,15 @@ class ParsingTests(unittest.TestCase):
                 receipt.junit(results(ROWS, "sqlite"), expected, ROOT, engine, policy)
         with self.assertRaises(receipt.ReceiptError):
             receipt.junit(results(ROWS), expected, ROOT, "sqlite", {SKIP})
+        # PHPUnit counts setUp assertions (for example a migrate:fresh exit code) on a case that then skips itself.
+        root = ET.fromstring(results(ROWS, "sqlite"))
+        suite = next(item for item in root if item[0].find("skipped") is not None)
+        suite.set("assertions", "1"); suite[0].set("assertions", "1")
+        self.assertEqual(1, receipt.junit(ET.tostring(root), expected, ROOT, "sqlite", {SKIP})["skipped_cases"])
+        # The suite counter counts cases, so it stays 1: only the duplicate-node rule can refuse this.
+        ET.SubElement(suite[0], "skipped")
+        with self.assertRaises(receipt.ReceiptError):
+            receipt.junit(ET.tostring(root), expected, ROOT, "sqlite", {SKIP})
         with self.assertRaises(receipt.ReceiptError):
             receipt.database_evidence(evidence("mysql", 1), source(), "mysql", 1, {SKIP, ("RemovedTest", "test_removed")},
                                       shard_count=receipt.COUNTS["mysql"], selection=SELECTION, mysql_skips={MYSQL_SKIP})

@@ -1,0 +1,3 @@
+PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 32768 bytes) in /home/user/wt-b2/database/migrations/2026_10_07_250000_customer_consent.php on line 78
+Fatal error: Premature end of PHP process when running Tests\Feature\InquiryNotificationMigrationTest::test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table.
+rc=2

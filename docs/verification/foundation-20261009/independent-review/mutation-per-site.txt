@@ -1,0 +1,4 @@
+site1 app/Domain/Customers/Preferences/ConsentMigrationAdmission.php -> require database_path('migrations/2026_10_06_000040_customer_accounts.php'): rc=1 Failed asserting that 2425 is identical to 2409
+site2 app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php -> require database_path('migrations/2026_10_07_250000_customer_consent.php'): rc=1 Failed asserting that 2402 is identical to 2398
+site3 app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php -> require database_path('migrations/2026_10_07_250000_customer_consent.php'): rc=1 Failed asserting that 2410 is identical to 2402
+site4 app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php -> require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php'): rc=1 Failed asserting that 2409 is identical to 2401

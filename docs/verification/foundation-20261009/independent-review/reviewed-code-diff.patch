@@ -1,0 +1,201 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index a633a0d..30ee297 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -55,6 +55,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
+ 
+ ### Fixed
+ 
++- Running the migrations repeatedly in one process no longer leaks memory. Three customer-schema admission checks (`ConsentMigrationAdmission`, `SuppressionSchema`, `ProductionFeatureSchema`) re-required approved earlier migration files on every run, recompiling them and declaring their anonymous classes again; PHP never frees those, so a test process grew by about 1 MB per database refresh and Foundation's SQLite shards hit their 512 MB limit about 1,100 tests in. `App\Support\MigrationDefinitions` compiles each such file once per process and returns a copy, as Laravel's migrator does. A regression test covers it. Evidence: `docs/verification/foundation-20261009/`.
++- The license-draft browser fixture (`tests/browser/prepare-license-draft.php`) no longer refuses its own setup: creating a license draft legitimately advances the discovery epoch (migration 240), which the fixture treated as a forbidden change to an existing row. It now checks the epoch only moves forward, as the offer-draft and bulk-license fixtures already do. Test-only.
+ - Contract and grant PDFs no longer fail with `render_failed` when the request is served by PHP-FPM. Under FPM, `PHP_BINARY` is the FPM daemon, so renderer children now run the CLI PHP named by the new `VASEY_PHP_CLI_BINARY` (for example `/usr/bin/php8.4`), proven by a bounded probe to be the `cli` SAPI of the exact running version and build. The frozen pinned renderers are unchanged: the free and paid renderers receive a process factory outside the CLI; family 256 (production free grants) ships unbound until it is composed. The CLI and `php -S` / `artisan serve` keep using their own binary. Evidence: `docs/verification/php-cli-resolver-20261009/`.
+   - **Upgrade note:** set `VASEY_PHP_CLI_BINARY` on any host that serves the app through PHP-FPM. Unset there, every in-request render fails closed. The staging deploy's `ops/staging/validate-runtime.php` now refuses a candidate environment whose binary is unset or fails the probe (`runtime.php_cli_binary`); `ops/staging/env.staging.example` sets `/usr/bin/php8.4`.
+ - `ProductionFreeGrantFrozenBytesTest` no longer fails on main since the paid lane (#56) landed: it kept asserting that `app/Domain/Grants/Paid` does not exist. It still refuses any family-256 import of the paid or old free family and now also refuses a byte copy of one of their files.
+diff --git a/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php b/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
+index 12a0d2e..4f7b2ce 100644
+--- a/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
++++ b/app/Domain/Customers/Preferences/ConsentMigrationAdmission.php
+@@ -3,6 +3,7 @@
+ namespace App\Domain\Customers\Preferences;
+ 
+ use App\Domain\Catalog\Discovery\DiscoveryEpoch;
++use App\Support\MigrationDefinitions;
+ use LogicException;
+ use PDO;
+ use PDOException;
+@@ -44,7 +45,7 @@ final class ConsentMigrationAdmission
+         if ((int) $this->pdo->query($this->driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
+             $this->refuse();
+         }
+-        $migration = require database_path('migrations/2026_10_06_000040_customer_accounts.php');
++        $migration = MigrationDefinitions::load('2026_10_06_000040_customer_accounts.php');
+         // Reuse the unchanged authoritative guard definitions without running up/down or DDL.
+         $guards = [];
+         foreach ((new ReflectionMethod($migration, 'guards'))->invoke($migration) as $name => $guard) {
+diff --git a/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php b/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
+index 20c0705..5d70518 100644
+--- a/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
++++ b/app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php
+@@ -3,6 +3,7 @@
+ namespace App\Domain\Customers\Preferences\Suppression;
+ 
+ use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
++use App\Support\MigrationDefinitions;
+ use Illuminate\Support\Facades\DB;
+ use LogicException;
+ use PDO;
+@@ -195,7 +196,7 @@ final class SuppressionSchema
+     {
+         $admission->dependencies();
+         // Read-only exact ownership proof of the approved predecessor; never invoke its DDL.
+-        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
++        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
+         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
+         $namespace = [];
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {
+diff --git a/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php b/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
+index d196cb1..17b3d1c 100644
+--- a/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
++++ b/app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php
+@@ -4,6 +4,7 @@ namespace App\Domain\Customers\ProductionFeatures;
+ 
+ use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
+ use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
++use App\Support\MigrationDefinitions;
+ use Illuminate\Support\Facades\DB;
+ use LogicException;
+ use PDO;
+@@ -340,7 +341,7 @@ final class ProductionFeatureSchema
+ 
+     private function legacyDependencies(PDO $pdo, string $driver, string $database, ConsentMigrationAdmission $admission): void
+     {
+-        $prior = require database_path('migrations/2026_10_07_250000_customer_consent.php');
++        $prior = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
+         $triggers = (new ReflectionMethod($prior, 'triggers'))->invoke($prior, $driver);
+         $namespace = [];
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states', 'customer_saved_tracks'] as $table) {
+@@ -361,7 +362,7 @@ final class ProductionFeatureSchema
+             $sql = $type === 'table' ? (new ReflectionMethod($prior, 'definition'))->invoke($prior, $driver, $name) : $triggers[$name]['sql'];
+             (new ReflectionMethod($prior, 'owned'))->invoke($prior, $pdo, $driver, $type, $name, $sql);
+         }
+-        $legacy = require database_path('migrations/2026_10_07_242000_customer_saved_tracks.php');
++        $legacy = MigrationDefinitions::load('2026_10_07_242000_customer_saved_tracks.php');
+         (new ReflectionMethod($legacy, 'owned'))->invoke($legacy, $pdo, $driver);
+         foreach (['customer_consent_policies', 'customer_consent_events', 'customer_consent_states'] as $table) {
+             $statement = $pdo->prepare($driver === 'sqlite' ? "SELECT name FROM main.sqlite_master WHERE type='trigger' AND tbl_name=? ORDER BY name" : 'SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME');
+diff --git a/app/Support/MigrationDefinitions.php b/app/Support/MigrationDefinitions.php
+new file mode 100644
+index 0000000..db46280
+--- /dev/null
++++ b/app/Support/MigrationDefinitions.php
+@@ -0,0 +1,23 @@
++<?php
++
++namespace App\Support;
++
++/**
++ * Read-only access to an approved migration's own definitions (guards, triggers, table SQL, ownership checks).
++ *
++ * Requiring a migration file again recompiles it and declares its anonymous classes again, which PHP never frees. Each
++ * file is therefore compiled at most once per process, as Laravel's migrator does, and callers get a copy.
++ */
++final class MigrationDefinitions
++{
++    /** @var array<string, object> */
++    private static array $loaded = [];
++
++    /** The migration object declared by `database/migrations/{$file}`. */
++    public static function load(string $file): object
++    {
++        $path = database_path('migrations/'.$file);
++
++        return clone (self::$loaded[$path] ??= require $path);
++    }
++}
+diff --git a/tests/Feature/MigrationRecompilationTest.php b/tests/Feature/MigrationRecompilationTest.php
+new file mode 100644
+index 0000000..af9fd11
+--- /dev/null
++++ b/tests/Feature/MigrationRecompilationTest.php
+@@ -0,0 +1,27 @@
++<?php
++
++namespace Tests\Feature;
++
++use Tests\TestCase;
++
++/**
++ * Admission and ownership checks read definitions from approved earlier migrations. Requiring a migration file again
++ * recompiles it and declares its anonymous classes again, which PHP never frees, so every database refresh grew the
++ * process by about 1 MB. Foundation's SQLite shards, which refresh an in-memory database for each test, exhausted their
++ * 512 MB limit about 1,100 tests in. A repeated refresh must not declare new classes.
++ */
++final class MigrationRecompilationTest extends TestCase
++{
++    public function test_repeated_migrations_do_not_recompile_migration_files(): void
++    {
++        // The first two runs compile everything the migrations and their admission checks load.
++        $this->artisan('migrate:fresh')->assertSuccessful();
++        $this->artisan('migrate:fresh')->assertSuccessful();
++        $declared = count(get_declared_classes());
++
++        $this->artisan('migrate:fresh')->assertSuccessful();
++        $this->artisan('migrate:fresh')->assertSuccessful();
++
++        $this->assertSame($declared, count(get_declared_classes()));
++    }
++}
+diff --git a/tests/browser/prepare-license-draft.php b/tests/browser/prepare-license-draft.php
+index 32456da..e2eb054 100644
+--- a/tests/browser/prepare-license-draft.php
++++ b/tests/browser/prepare-license-draft.php
+@@ -1,5 +1,6 @@
+ <?php
+ 
++use App\Domain\Catalog\Discovery\DiscoveryEpoch;
+ use App\Domain\Rights\CreateLicenseDraft;
+ use App\Domain\Rights\Models\LicenseVersion;
+ use App\Domain\Rights\SaveLicenseTemplate;
+@@ -41,7 +42,13 @@ try {
+             'structured_terms' => ['schema_version' => 1, 'features' => ['Nonbinding browser verification only'],
+                 'required_asset_roles' => ['master_wav']]], $actor);
+         $after = rows();
++        // The discovery epoch (migration 240) is a monotonic invalidation counter that every license
++        // write legitimately advances; its identity stays exact and it may never move backwards.
++        UnpaidReleaseBrowserFixture::check(epoch($after) >= epoch($before));
+         foreach ($before as $table => $records) {
++            if ($table === DiscoveryEpoch::TABLE) {
++                continue;
++            }
+             foreach ($records as $key => $record) {
+                 UnpaidReleaseBrowserFixture::check(($after[$table][$key] ?? null) === $record);
+             }
+@@ -92,6 +99,10 @@ try {
+             UnpaidReleaseBrowserFixture::check($context['changed_fields'] === ['authored_source']);
+             unset($actual['audit_events'][$id]);
+         }
++        // A no-op phase must not write at all, so the epoch is exact; saved edits may only advance it.
++        $epoch = epoch($actual);
++        UnpaidReleaseBrowserFixture::check($expectedCount === 0 ? $epoch === epoch($original) : $epoch >= epoch($original));
++        unset($actual[DiscoveryEpoch::TABLE], $original[DiscoveryEpoch::TABLE]);
+         UnpaidReleaseBrowserFixture::check($actual === $original && guards() === $fixture['guards']);
+         echo json_encode(['verified' => true, 'phase' => $phase, 'versionId' => $draft->id,
+             'source' => $draft->authored_source, 'updates' => $expectedCount, 'originalsUnchanged' => true,
+@@ -122,6 +133,17 @@ function rows(): array
+     return $result;
+ }
+ 
++function epoch(array $rows): int
++{
++    $records = $rows[DiscoveryEpoch::TABLE] ?? null;
++    UnpaidReleaseBrowserFixture::check(is_array($records) && count($records) === 1 && isset($records['1']));
++    $row = json_decode($records['1'], true, 4, JSON_THROW_ON_ERROR);
++    UnpaidReleaseBrowserFixture::check(is_array($row) && array_keys($row) === ['id', 'epoch', 'schema_version']
++        && $row['id'] === 1 && $row['schema_version'] === 1 && is_int($row['epoch']));
++
++    return $row['epoch'];
++}
++
+ function guards(): string
+ {
+     return hash('sha256', json_encode(DB::select("SELECT type, name, tbl_name, sql FROM sqlite_master WHERE type IN ('trigger', 'index') ORDER BY type, name"), JSON_THROW_ON_ERROR));
