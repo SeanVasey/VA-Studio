@@ -1,5 +1,6 @@
 // Standalone: does response.finished() resolve for a route.continue()d POST whose body the page reads
 // with a ReadableStream reader and then cancels (as privateInquiryJson does)? Pinned Playwright 1.63 + Chromium 1243.
+// This is the Run D script (30 x continue, 30 x fetch+fulfill); runs A-C used earlier edits with other variants.
 import http from 'node:http';
 import { chromium } from '/home/user/VA-Studio/node_modules/playwright-core/index.mjs';
 

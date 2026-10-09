@@ -13,6 +13,8 @@ Run B (1 sample each):   reader-cancel routed: resolved; reader-nocancel routed:
 Run C (10 each):         reader-cancel routed 1/10 hung; reader-nocancel unrouted 0/10; response-json routed 0/10; response-json unrouted 0/10
 Run D (30 each):         reader-cancel routed (continue) 7/30 hung; reader-cancel routed (fetch+fulfill) 5/30 hung;
                          all 48 non-hung responses parsed as {state: saved}
-Totals: stream-reader consumption 13 hung of 82; response.json() consumption 0 of 22.
+Totals: stream-reader consumption 16 hung of 85 (A 1/1, B 2/4, C 1/20, D 12/60); response.json() consumption 0 of 22.
+The committed .mjs is the Run D script only (the A–C variants and the response.json()/unrouted controls were earlier
+edits of it); it imports playwright-core from the main checkout by absolute path.
 Conclusion: on Chromium, Playwright cannot reliably observe completion or body of a response the page consumes through a
 stream reader, whatever the routing. Page-side evidence is reliable.

@@ -56,17 +56,16 @@ the harness identity checks skipped: unfixed → refused at the row check (the o
 `prepare` succeeds and `verify prepared` reports 0 updates with originals and guards unchanged. The real browser spec
 still needs CI.
 
-## C. Chromium inquiry retry timeout — fixed here (test-only)
+## C. Chromium inquiry retry timeout — patched here (test-only), awaiting CI
 
 `inquiry-conversation.spec.ts` ran 120.8 s against its 120 s budget. The report's step timeline shows the retried POST
 answered at 36.4 s with 200 and the test then waiting in `await linkedReplay.finished()` (line 164) until the timeout.
-It failed the same way in the focused browser run `37938110858` on this branch (a second failure, so not a flake); it
-passed on WebKit (30.8 s).
+It failed the same way in the focused browser run `37938110858` on this branch; it passed on WebKit (30.8 s).
 
 The order-linked form reads its response through the bounded stream reader `privateInquiryJson`. A standalone
 reproduction with the pinned Playwright 1.63 and its Chromium 1243 (`evidence/chromium-stream-response-repro.{mjs,txt}`)
 shows that when a page consumes a response through a stream reader, Playwright intermittently never observes it finish
-(`finished()` unresolved) and cannot read its body ("No data found for resource"): 13 of 82 runs, with `route.continue()`
+(`finished()` unresolved) and cannot read its body ("No data found for resource"): 16 of 85 runs, with `route.continue()`
 and with `route.fetch()` + `route.fulfill()` alike, against 0 of 22 when the page uses `response.json()`. The page itself
 always received the JSON. This is a tooling limitation, not an application defect.
 
@@ -104,7 +103,7 @@ merged today; migrations and per-test-migrating suites have grown across the bat
 | Regression test red / green | `0f9b39ce` + test / + fix | 1 failure / OK | `evidence/migration-recompilation-*.txt` |
 | License-draft fixture red / green (relaxed harness) | `0f9b39ce` / + fix | refused / prepared and verified | `evidence/license-draft-fixture-local.txt` |
 | Focused browser feedback `37938110858` (informative) | `e2b3906` | stopped by the workflow's own 720 s command budget before WebKit; Chromium: license-draft spec produced all three recovery screenshots with no failure capture (B fixed in CI); inquiry-conversation failed again (C) | GitHub run artifact |
-| Chromium stream-response reproduction | pinned Playwright 1.63 / Chromium 1243 | 13/82 stream-reader runs hung, 0/22 `response.json()` | `evidence/chromium-stream-response-repro.*` |
+| Chromium stream-response reproduction | pinned Playwright 1.63 / Chromium 1243 | 16/85 stream-reader runs hung, 0/22 `response.json()` | `evidence/chromium-stream-response-repro.*` |
 | Local SQLite shards with the fix, CI partition, 512M | this branch | FIXED_PLACEHOLDER | `evidence/sqlite-shard-*-fixed-512M.txt` |
 
 ## Not tested
