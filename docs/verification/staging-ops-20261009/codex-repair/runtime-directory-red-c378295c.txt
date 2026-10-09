@@ -1,0 +1,181 @@
+test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) ...
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='evidence') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='tmp') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='php-upload') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='php-sys') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='private') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='branding') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='nginx') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-link') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-dangling') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-hardlink') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-fifo') ... FAIL
+  test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-directory') ... FAIL
+test_regular_runtime_directories_and_existing_gitignore_are_preserved (__main__.RuntimeDirectoryCustodyTest.test_regular_runtime_directories_and_existing_gitignore_are_preserved) ... ok
+test_replacement_after_open_cannot_redirect_descriptor_metadata_changes (__main__.RuntimeDirectoryCustodyTest.test_replacement_after_open_cannot_redirect_descriptor_metadata_changes) ... skipped 'descriptor-only race proof applies to the new initializer'
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='evidence')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 105, in probe
+    self.assertEqual(after, before, "root initialization followed a link into the external target")
+AssertionError: Tuples differ: (16872, 33184, b'owned protected-target fixture\n', ['unchanged']) != (16832, 33184, b'owned protected-target fixture\n', ['unchanged'])
+
+First differing element 0:
+16872
+16832
+
+- (16872, 33184, b'owned protected-target fixture\n', ['unchanged'])
+?     ^
+
++ (16832, 33184, b'owned protected-target fixture\n', ['unchanged'])
+?     ^
+ : root initialization followed a link into the external target
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='tmp')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 105, in probe
+    self.assertEqual(after, before, "root initialization followed a link into the external target")
+AssertionError: Tuples differ: (1683[23 chars]cted-target fixture\n', ['php-sys', 'php-upload', 'unchanged']) != (1683[23 chars]cted-target fixture\n', ['unchanged'])
+
+First differing element 3:
+['php-sys', 'php-upload', 'unchanged']
+['unchanged']
+
++ (16832, 33184, b'owned protected-target fixture\n', ['unchanged'])
+- (16832,
+-  33184,
+-  b'owned protected-target fixture\n',
+-  ['php-sys', 'php-upload', 'unchanged']) : root initialization followed a link into the external target
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='php-upload')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='php-sys')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='private')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 105, in probe
+    self.assertEqual(after, before, "root initialization followed a link into the external target")
+AssertionError: Tuples differ: (1683[24 chars]ted-target fixture\n', ['.gitignore', 'branding', 'unchanged']) != (1683[24 chars]ted-target fixture\n', ['unchanged'])
+
+First differing element 3:
+['.gitignore', 'branding', 'unchanged']
+['unchanged']
+
++ (16832, 33184, b'owned protected-target fixture\n', ['unchanged'])
+- (16832,
+-  33184,
+-  b'owned protected-target fixture\n',
+-  ['.gitignore', 'branding', 'unchanged']) : root initialization followed a link into the external target
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='branding')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='nginx')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-link')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-dangling')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 105, in probe
+    self.assertEqual(after, before, "root initialization followed a link into the external target")
+AssertionError: Tuples differ: (1683[15 chars]ed protected-target fixture\n', ['new-root-file', 'unchanged']) != (1683[15 chars]ed protected-target fixture\n', ['unchanged'])
+
+First differing element 3:
+['new-root-file', 'unchanged']
+['unchanged']
+
++ (16832, 33184, b'owned protected-target fixture\n', ['unchanged'])
+- (16832,
+-  33184,
+-  b'owned protected-target fixture\n',
+-  ['new-root-file', 'unchanged']) : root initialization followed a link into the external target
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-hardlink')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-fifo')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) (state='ignore-directory')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 122, in test_links_and_special_files_refuse_without_touching_the_external_target
+    self.probe(state)
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_runtime_directory_custody.py", line 106, in probe
+    self.assertEqual(run.returncode == 0, state in ("valid", "existing"), run.stdout + run.stderr)
+AssertionError: True != False :
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.259s
+
+FAILED (failures=12, skipped=1)

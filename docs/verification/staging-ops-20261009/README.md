@@ -1,6 +1,6 @@
 # PR #63 current verification
 
-Current tested functional source: `fd9dd035dc9069db3727bd12960bb5952eb28399` (administrator defaults custody, following app authentication, public-link/backup proof, Composer ordering and operation custody). The kit integrates main's CI
+Current tested functional source: `69a405a6480edd031aad9f40e9f83c32e8adcc24` (no-follow runtime directory initialization, following admin defaults custody, app authentication, public-link/backup proof, Composer ordering and operation custody). The kit integrates main's CI
 cost policy, reviewed D1/#62 and both prior merge ledgers. The original component
 [decision](independent-review/DECISION.md) approved `2c91f8e`, closing nine runtime defects. The subsequent
 [integration addendum](independent-review/INTEGRATION-ADDENDUM.md) blocked `e898282d`: standalone pipeline
@@ -405,3 +405,46 @@ Only three independent red progress-line trailing spaces are normalized. Prior
 source approvals carry on unchanged paths. This publication also corrects prose
 spacing in ops README/CHANGELOG; explicit reviewed source equivalence and final
 exact-head preflight/Codex gates remain required before merge.
+
+## Runtime directory custody, exact source `69a405a6`
+
+Codex on `c378295c` found 4227097077: root `install -d` could follow an app-placed
+runtime directory link and change its target's ownership/mode. App/nginx runtime
+initialization now opens every path component with `O_DIRECTORY|O_NOFOLLOW`, retains
+parent descriptors for relative child creation/open, and uses `fchown`/`fchmod` on
+the pinned child descriptor. Entry/inode mismatch refuses after initialization.
+New private `.gitignore` uses exclusive no-follow creation and descriptor writes/
+metadata; an existing ordinary single-link file is preserved, links and special
+files refuse. Failure can leave partial changes inside admitted runtime directories.
+A concurrent rename is not claimed to leave a healthy visible path.
+
+Owner [immutable old-source red](codex-repair/runtime-directory-red-c378295c.txt):
+**3 methods /12 failures /1 skip** at `c378295c`; the skip is explicitly the new-only
+post-open descriptor race. The old GNU installer genuinely changes owned external
+fixture modes or creates a file through a dangling link. Privileged ownership is
+modeled by substituting the fixture UID. [Focused green](codex-repair/runtime-directory-green.txt):
+**3 methods /15 states PASS**, including ordinary/existing file preservation and a
+post-open rename/link before real descriptor metadata changes. No external fixture
+bytes/modes/entries change. The fixed nginx parent is redirected to an owned prefix;
+all other actual initializer control flow and native filesystem operations remain.
+Exact committed [operations](codex-repair/final-ops-69a405a6.txt) **74 PASS**, genuine
+PHP8.4.26 [runtime](codex-repair/final-runtime-69a405a6.txt) **13 tests /63 assertions
+PASS**, Bash6 separately/Shellcheck/whitespace PASS. Trailing receipt whitespace is
+normalized only for diff checks. Independent approval, publication equivalence and
+final exact-head gates remain required. Actual root/Forge permissions and services
+are unexecuted; earlier native authentication and transport receipts stay historical.
+
+Independent [runtime directory addendum](independent-review/RUNTIME-DIRECTORY-ADDENDUM.md)
+**APPROVES exact `69a405a6480edd031aad9f40e9f83c32e8adcc24`**. Final **6 methods
+/18 filesystem states PASS**, plus actual stage-call assertion. Expanded old
+`c378295c` reproduces **12 failures /2 explicit new-only skips**; the initial
+seven-failure observation remains separately bounded. Four concrete replacement
+races preserve protected targets, including safe captured-inode writes after
+`.gitignore` pathname replacement. That last case may succeed while an independent
+writer changes the visible entry; it does not certify persistent pathname health.
+Detected directory replacement refuses. Root ownership is modeled with the fixture
+UID; actual kernel paths/modes/links/descriptor operations are exercised. Owner74/
+PHP13-63 receipts inspected; Bash/Shellcheck pass. Three progress-line trailing
+spaces in each independent red are normalized only for diff checks. Publication
+also clarifies ops README wording without a product-source change. Exact reviewed
+publication equivalence and final preflight/Codex gates remain required.
