@@ -49,6 +49,7 @@ CURRENT=$ROOT/current
 PRIVATE=$ROOT/private
 PROGRAMS=(vasey-staging-media vasey-staging-payments vasey-staging-contracts vasey-staging-default vasey-staging-scheduler)
 BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
+SEALER=/usr/local/libexec/vasey-staging/seal-release.py
 
 valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
 
@@ -111,6 +112,14 @@ sealed_release() {
   [ -d "$rel/storage/app/private" ] && [ ! -L "$rel/storage/app/private" ] \
     && [ "$(readlink -f -- "$rel/storage/app/private")" = "$rel/storage/app/private" ] \
     || die "private mount target is missing or contains a symlink"
+  seal_tool verify "$rel" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+}
+
+seal_tool() {
+  protected_dir /usr/local/libexec/vasey-staging
+  [ -f "$SEALER" ] && [ ! -L "$SEALER" ] && [ "$(stat -c '%u %a' -- "$SEALER")" = '0 644' ] \
+    || die "missing or untrusted release sealer"
+  /usr/bin/python3 -I "$SEALER" "$@" || die "protected release operation refused"
 }
 
 cmd_allocate() {
@@ -137,6 +146,7 @@ seal_release() {
     esac
   done
   cd /
+  seal_tool seal "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
   sealed_release "$sha"
 }
 
@@ -312,6 +322,30 @@ cmd_snapshot() {
   "$BACKUP_BIN" predeploy
 }
 
+cmd_configure() {
+  local sha=${1:-} candidate=${2:-} cur
+  valid_sha "$sha" || die "configure needs a 40-hex SHA"
+  writer_barrier
+  workers_stopped && web_stopped || die "configure requires a quiesced host"
+  cur=$(served_release) || die "configure requires a served release"
+  [ "$cur" = "$RELEASES/$sha" ] && [ -f "$cur/storage/framework/maintenance.php" ] \
+    || die "configure requires the served release in maintenance"
+  : "${VASEY_EXPECTED_APP_ENV:?}" "${VASEY_DB_NAME:?}"
+  # Capture through anchored no-follow descriptors. The app cannot use an evidence symlink
+  # to make this root action copy an unrelated root-readable file.
+  ENV_CANDIDATE=$(mktemp "$cur/.env-candidate.XXXXXXXX") || die "cannot stage protected environment"
+  trap 'rm -f -- "$ENV_CANDIDATE"' EXIT
+  seal_tool stage-env "$ROOT/evidence" "$candidate" "$ENV_CANDIDATE" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/ops/staging/validate-runtime.php" \
+    "$ENV_CANDIDATE" "$VASEY_EXPECTED_APP_ENV" "$VASEY_STAGING_HOST" "$VASEY_DB_NAME" "$cur/.env" \
+    >/dev/null 2>&1 || die "protected runtime profile refused; original environment retained"
+  mv -T -- "$ENV_CANDIDATE" "$cur/.env" || die "cannot install protected environment"
+  as_app env -i PATH=/usr/bin:/bin LC_ALL=C "$VASEY_PHP" "$cur/artisan" config:cache \
+    --no-interaction --no-ansi >/dev/null 2>&1 || die "configuration cache failed; remain quiesced and restore the snapshot"
+  sealed_release "$sha"
+  echo "configured $sha; admission remains closed until healthy resume"
+}
+
 cmd_prune() {
   local cur=''
   if [ -e "$CURRENT" ] || [ -L "$CURRENT" ]; then cur=$(served_release) || die "served release is invalid"; fi
@@ -354,6 +388,7 @@ flock -x 8 || die "cannot lock helper action"
 
 case "${1:-}" in
   allocate|attach|detach|switch) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
+  configure) [ "$#" = 3 ] || die "configure requires exactly a SHA and private evidence file" ;;
   quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
 esac
 case "${1:-}" in
@@ -364,7 +399,8 @@ case "${1:-}" in
   resume)   cmd_resume ;;
   switch)   cmd_switch "${2:-}" ;;
   snapshot) cmd_snapshot ;;
+  configure) cmd_configure "${2:-}" "${3:-}" ;;
   prune)    cmd_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch <sha> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch <sha> | configure <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
 esac

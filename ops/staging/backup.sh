@@ -44,12 +44,38 @@ mycnf_ok() {
   [ -f "$VASEY_BACKUP_MYCNF" ] && [ ! -L "$VASEY_BACKUP_MYCNF" ] && [ "$(stat -c '%u %a' "$VASEY_BACKUP_MYCNF")" = "0 600" ]
 }
 
+valid_env_key() {
+  [ -f "$1" ] && [ ! -L "$1" ] && [ "$(stat -c %h -- "$1")" = 1 ] || return 1
+  # Parse only one literal key, without loading application PHP or inheriting ini hooks.
+  # Runtime admission separately proves the complete effective Laravel environment.
+  # shellcheck disable=SC2016  # Embedded PHP variables must remain literal shell text.
+  "$VASEY_PHP" -n -r '
+    $data = file_get_contents($argv[1], false, null, 0, 1048577);
+    if ($data === false || strlen($data) > 1048576 || str_contains($data, "\0")) exit(1);
+    if (preg_match_all("/^[\t ]*(?:export[\t ]+)?APP_KEY[\t ]*=(.*)$/m", $data, $matches) !== 1) exit(1);
+    $value = trim($matches[1][0]);
+    $pattern = "~^(?:([\"\\x27])(base64:[A-Za-z0-9+/]{43}=)\\1|(base64:[A-Za-z0-9+/]{43}=))(?:[ \t]*(?:\\#.*)?)?$~";
+    if (preg_match($pattern, $value, $key) !== 1) exit(1);
+    $encoded = ($key[2] ?? "") !== "" ? $key[2] : ($key[3] ?? "");
+    $bytes = base64_decode(substr($encoded, 7), true);
+    exit($bytes !== false && strlen($bytes) === 32 ? 0 : 1);
+  ' -- "$1" >/dev/null 2>&1
+}
+
 # ---- snapshot: assumes every writer is stopped (docs/ops/backup-restore-proof.md step 0b) ----
 snapshot() {
   mycnf_ok || die "$VASEY_BACKUP_MYCNF must exist, root-owned, mode 0600"
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
-  local sha=none cur
-  if cur=$(readlink -f "$VASEY_ROOT/current" 2>/dev/null) && [ -d "$cur" ]; then sha=$(basename "$cur"); fi
+  rm -f -- "$VASEY_BACKUP_DIR/.last" || die "cannot invalidate previous snapshot pointer"
+  local sha=none cur=''
+  if [ -e "$VASEY_ROOT/current" ] || [ -L "$VASEY_ROOT/current" ]; then
+    [ -L "$VASEY_ROOT/current" ] || die "current must be a served release symlink"
+    cur=$(readlink -f -- "$VASEY_ROOT/current") || die "current is invalid"
+    sha=$(basename "$cur")
+    [[ "$sha" =~ ^[0-9a-f]{40}$ ]] && [ "$cur" = "$VASEY_ROOT/releases/$sha" ] && [ -d "$cur" ] \
+      || die "current is not a canonical served release"
+    valid_env_key "$cur/.env" || die "served release lacks a recoverable environment/key; no snapshot published"
+  fi
   local out
   out="$VASEY_BACKUP_DIR/$(date -u +%Y%m%dT%H%M%SZ)-${sha:0:12}"
   mkdir -m 700 -- "$out" || die "cannot create backup directory"
@@ -71,11 +97,11 @@ snapshot() {
   (cd "$out" && sha256sum private.tar > private.tar.sha256)
 
   # 3. Key custody: the served release's .env carries APP_KEY. Without it encrypted columns are unreadable.
-  if [ "$sha" != none ] && [ -f "$cur/.env" ]; then
+  if [ "$sha" != none ]; then
     install -m 0600 -o root -g root -- "$cur/.env" "$out/env.backup"
     (cd "$out" && sha256sum env.backup > env.backup.sha256)
   else
-    log "WARNING: no served release .env to back up (first deploy?)"
+    log "WARNING: first-install snapshot with no served release/environment"
   fi
   {
     echo "created_utc=$(date -u +%FT%TZ)"
@@ -106,9 +132,22 @@ restore_check() {
   # A success marker describes this proof attempt, never an earlier attempt that now fails.
   rm -f -- "$bk/RESTORE_CHECK" || die "cannot invalidate previous restore proof"
   [ -d "$bk" ] && [ -f "$bk/database.sql" ] && [ -f "$bk/private.tar" ] || die "not a backup directory"
+  [ -f "$bk/MANIFEST" ] && [ ! -L "$bk/MANIFEST" ] \
+    && [ "$(grep -c '^release_sha=' "$bk/MANIFEST")" = 1 ] || die "backup has no unambiguous release manifest"
+  local release_sha
+  release_sha=$(sed -n 's/^release_sha=//p' "$bk/MANIFEST")
+  if [ "$release_sha" = none ]; then
+    [ ! -e "$bk/env.backup" ] && [ ! -L "$bk/env.backup" ] \
+      && [ ! -e "$bk/env.backup.sha256" ] && [ ! -L "$bk/env.backup.sha256" ] \
+      || die "first-install manifest cannot carry a served environment"
+  else
+    [[ "$release_sha" =~ ^[0-9a-f]{40}$ ]] || die "invalid served release manifest"
+    valid_env_key "$bk/env.backup" \
+      && [ -f "$bk/env.backup.sha256" ] && [ ! -L "$bk/env.backup.sha256" ] \
+      || die "served backup requires its environment/key and hash"
+    (cd "$bk" && sha256sum --check --quiet env.backup.sha256) || die "env.backup hash mismatch"
+  fi
   (cd "$bk" && sha256sum --check --quiet database.sql.sha256 private.tar.sha256) || die "backup files do not match their recorded hashes"
-  [ ! -f "$bk/env.backup.sha256" ] || (cd "$bk" && sha256sum --check --quiet env.backup.sha256) || die "env.backup hash mismatch"
-  grep -q '^APP_KEY=base64:' "$bk/env.backup" 2>/dev/null || [ ! -f "$bk/env.backup" ] || die "env.backup has no APP_KEY"
 
   install -d -m 0711 -o root -g root -- "$VASEY_RESTORE_CHECK_DIR"
   # Globals, so the EXIT trap still sees them when die() exits from inside this function.

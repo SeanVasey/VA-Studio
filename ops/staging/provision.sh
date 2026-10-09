@@ -64,7 +64,7 @@ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
 MIRROR=${MIRROR:-$APP_HOME/$HOST}
 KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-delivery.conf \
-         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py validate-runtime.php; do
+         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 
@@ -302,6 +302,7 @@ install -m 0755 -o root -g root "$KIT/bin/vasey-staging-ctl" /usr/local/sbin/vas
 install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-backup
 install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644

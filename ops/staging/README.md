@@ -37,6 +37,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
 | `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
 | `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
+| `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
 | `validate-runtime.php` | Isolated real Laravel configuration admission before quiesce; rejects key changes | run from the built release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
@@ -47,7 +48,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 ```
 /home/forge/<STAGING_HOST>/          Forge site checkout: git mirror + Forge-managed .env. Never served.
 /srv/vasey-staging/
-  releases/<40-hex SHA>/             one immutable checkout per deploy (composer, npm build, .env 0600)
+  releases/<40-hex SHA>/             protected checkout per deploy (composer, npm build, .env root:app 0440)
     storage/app/private  ──bind──►   /srv/vasey-staging/private (never a symlink: the app refuses symlinks)
   current -> releases/<SHA>          what nginx, PHP-FPM and the workers run
   private/                           masters, stems, contracts, seller tag, site images, uploads (forge 0700)
@@ -64,7 +65,18 @@ One OS user, Forge's `forge`, runs PHP-FPM, every worker and the scheduler. It a
 
 The root and `releases/` parents remain root-owned and unwritable by the app. `ctl allocate` creates a
 checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
-before mounting. Framework/cache/log subdirectories and the private leaf remain writable by the app.
+before mounting. The sealer walks through no-follow directory descriptors, closes each parent before
+opening children and copies regular code/vendor/build files onto fresh root-owned read-only inodes.
+Hard links, external/runtime code symlinks and special files refuse; an old writable descriptor cannot
+change the newly installed inode. Executable bits remain executable and nginx can read public build files.
+The protected `.env` is root:app-group 0440. Only `ctl configure` performs ordinary environment refresh,
+under closed writer admission, after real runtime admission and unchanged-key validation.
+
+Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `storage/logs` and
+`storage/app/private`: application-owned 0700 directories. Generated PHP caches, compiled views and
+maintenance files remain application writable. This protects deployed source/vendor/build/environment
+bytes after sealing; it does not certify an uncompromised builder or immutable runtime PHP execution.
+Private bind-mounted contents are never traversed or changed by sealing.
 Only the root helper switches `current`. Custom roots must have canonical, root-owned ancestry without
 group/world write permission. Re-provisioning an existing kit does not certify its previously built releases;
 use a fresh reviewed release and prove sealing/attachment before activation.
@@ -163,7 +175,7 @@ renaming that account breaks every guarded write.
    removed on exit; a later Forge edit waits for the next deploy attempt.
 2. It makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves it clean (status and tree hash).
 3. It runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, then `npm ci && npm run build`. The Vite manifest must exist.
-4. The validated `.env` is installed `0600`; `vasey-staging-ctl attach` seals privileged ancestry and bind-mounts private storage.
+4. The validated `.env` starts as 0600; `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime exceptions and bind-mounts private storage.
 5. If a release is serving, `vasey-staging-ctl quiesce`:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
@@ -181,8 +193,10 @@ renaming that account breaks every guarded write.
    attached, its `storage/app/private` *is* the persistent store.
 
 Deploying the served SHA again with a changed Forge `.env` refreshes configuration only:
-real admission and unchanged key, quiesce, snapshot and restore proof, install the exact validated `.env`,
-`config:cache`, resume. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
+real admission and unchanged key, quiesce, snapshot and restore proof, `ctl configure` captures the private
+evidence file through anchored no-follow descriptors, revalidates it against real Laravel configuration,
+atomically installs root:app-group 0440 `.env`, then builds the runtime configuration cache as the app.
+A cache failure leaves admission closed for recovery; a healthy `resume` reopens it. A failed quiesce or partial resume leaves writer/service state unconfirmed; inspect
 `ctl status` and establish quiesce before recovery. The failure phase flag is not stopped-writer evidence.
 
 `storage:link` is not run: no code uses the public disk. Previews, artwork and site images stream through
@@ -245,3 +259,9 @@ There is no global CSP: the application sets CSP on the responses that need one.
    runs prune old local sets. A failed resume remains an explicit recovery condition.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
+
+A served release must have a singly linked regular environment with one valid literal 32-byte APP_KEY
+before any snapshot is published. Invalid/dangling/outside `current` never becomes a first install.
+Restore reproof invalidates old success first, requires an unambiguous release manifest, and requires
+both `env.backup` and its hash for a served release. Only an explicit `release_sha=none` bootstrap set
+may omit the key; such a set cannot claim recovery of previously encrypted columns.

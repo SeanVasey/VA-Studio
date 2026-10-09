@@ -151,11 +151,8 @@ if [ -e "$REL" ]; then
     "${CTL[@]}" quiesce
     "${CTL[@]}" snapshot
     [ -f "$REL/.env" ] && [ ! -L "$REL/.env" ] || die "served .env must be a regular file"
-    # Parent ancestry is sealed by ctl; truncate the existing app-owned file while writers are stopped.
-    cat -- "$RUNTIME_ENV" > "$REL/.env"
-    chmod 0600 "$REL/.env"
+    "${CTL[@]}" configure "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
-    art config:cache >/dev/null
     "${CTL[@]}" resume
     QUIESCED=0
     step "configuration refreshed on $SHA"; exit 0
@@ -192,6 +189,11 @@ step "attach private storage (bind mount)"
 "${CTL[@]}" attach "$SHA"
 [ "$(stat -c %d:%i "$REL/storage/app/private")" = "$(stat -c %d:%i "$ROOT/private")" ] && [ ! -L "$REL/storage/app/private" ] \
   || die "private storage not attached"
+# Recheck tracked source after protection, not only before the app-owned build window.
+SEALED_GIT=(env -i PATH=/usr/bin:/bin LC_ALL=C GIT_NO_REPLACE_OBJECTS=1 GIT_CONFIG_GLOBAL=/dev/null
+  git -c safe.directory="$REL" -c core.fsmonitor=false --git-dir="$REL/.git" --work-tree="$REL")
+[ "$("${SEALED_GIT[@]}" rev-parse HEAD)" = "$SHA" ] || die "sealed checkout is not the requested SHA"
+"${SEALED_GIT[@]}" diff --quiet --no-ext-diff --no-textconv HEAD -- || die "tracked source changed before sealing"
 
 # ---------------------------------------------------------------- 5-6. quiesce, back up, prove the restore
 FIRST_INSTALL=1

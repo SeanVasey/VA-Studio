@@ -332,9 +332,11 @@ install -d -m 0700 -o forge -g forge "/srv/vasey-staging/private.pre-rollback-$S
 APP bash -c 'shopt -s dotglob nullglob; for e in /srv/vasey-staging/private/*; do mv -- "$e" "$1/"; done' _ "/srv/vasey-staging/private.pre-rollback-$STAMP"
 APP tar --extract --file=- --directory=/srv/vasey-staging/private --no-same-owner --preserve-permissions < "$SET/private.tar" || exit 1
 (cd /srv/vasey-staging/private && sha256sum --check --strict --quiet "$SET/private.sha256") || exit 1
-# 4. Recheck/seal its attachment and restore the verified environment/key into its existing app-owned file.
+# 4. Recheck/seal its attachment. As root, restore the hash-verified key/env on a fresh protected inode.
 /usr/local/sbin/vasey-staging-ctl attach "$PREV"
-cat "$SET/env.backup" | APP bash -eu -c '[ -f "$1/.env" ] && [ ! -L "$1/.env" ]; cat > "$1/.env"; chmod 0600 "$1/.env"' _ "/srv/vasey-staging/releases/$PREV"
+ENV_RESTORE=$(mktemp "/srv/vasey-staging/releases/$PREV/.env-restore.XXXXXXXX")
+install -m 0440 -o root -g forge -- "$SET/env.backup" "$ENV_RESTORE"
+mv -T -- "$ENV_RESTORE" "/srv/vasey-staging/releases/$PREV/.env"
 cmp -s "$SET/env.backup" "/srv/vasey-staging/releases/$PREV/.env" || exit 1
 # 5. Maintenance in the previous release BEFORE pointing current at it, then switch and resume:
 APP php8.4 "/srv/vasey-staging/releases/$PREV/artisan" down
@@ -353,7 +355,7 @@ Never check another SHA out inside an existing release directory: it would keep 
 
 **D. Same-SHA environment refresh failed after replacement.** Its pre-change snapshot includes the served
 environment and key. As root in a `sudo bash -euo pipefail` shell, select that exact pre-refresh set and current
-SHA; establish quiesce, re-prove the set and verify `env.backup.sha256` as in B. Use B's existing-file environment
+SHA; establish quiesce, re-prove the set and verify `env.backup.sha256` as in B. Use B's root-owned fresh-inode environment
 restore, compare, `artisan down` and `config:cache` commands, then `ctl resume`; `current` stays on the same SHA.
 Inspect application behavior before deciding whether a database/private-file restore is also needed. Do not
 generate a new `APP_KEY` or overwrite the saved environment to make a failed refresh appear successful.
@@ -376,3 +378,10 @@ generate a new `APP_KEY` or overwrite the saved environment to make a failed ref
 | `disposable mysqld --initialize failed` in a backup | AppArmor confinement: `provision.sh` adds `/var/lib/mysql-restore-check/` to `/etc/apparmor.d/local/usr.sbin.mysqld` when that profile exists. Check `dmesg \| grep DENIED`. |
 | `restored tree fail (... outside 0600/0400 ...)` | A private file or directory has a wider mode than the backup proof allows. Inspect with the printed `find`. Set `VASEY_RESTORE_STRICT_MODES=0` in `staging.conf` only temporarily, with a recorded reason. |
 | Workers not on the new release | `vasey-staging-ctl resume` proves `/proc/<pid>/cwd`; a failure there keeps the site in maintenance by design. |
+
+Release source/vendor/build files are root-owned read-only after attachment; `.env` is root:app-group
+0440. Configuration refresh uses `ctl configure <sha> <private evidence file>` after quiesce/snapshot.
+Do not restore app write permission on code or `.env`. Runtime-generated PHP under `bootstrap/cache`
+and `storage/framework` remains an explicit application trust exception, as described in the kit README.
+Backups refuse missing/invalid served environments and invalid `current`; recovery needs the verified
+manifest, `env.backup` and its hash. A first-install `release_sha=none` set has no historical encryption key.

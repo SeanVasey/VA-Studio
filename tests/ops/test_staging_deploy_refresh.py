@@ -33,6 +33,7 @@ art() { :; }
 ctl_stub() {
   printf '%s\\n' "$1" >> "$TRACE"
   if [ "$1" = snapshot ]; then printf 'APP_DEBUG=true\\n' >> "$MIRROR_ENV"; fi
+  if [ "$1" = configure ]; then cp -- "$3" "$REL/.env"; fi
 }
 CTL=(ctl_stub)
 '''
@@ -48,7 +49,7 @@ CTL=(ctl_stub)
             self.assertEqual(run.returncode, 0, run.stderr)
             self.assertEqual((release / ".env").read_text(), candidate,
                              "refresh installed a later Forge edit instead of the profile it validated")
-            self.assertEqual((root / "trace").read_text().splitlines(), ["quiesce", "snapshot", "resume"])
+            self.assertEqual((root / "trace").read_text().splitlines(), ["quiesce", "snapshot", "configure", "resume"])
 
 
 if __name__ == "__main__":
