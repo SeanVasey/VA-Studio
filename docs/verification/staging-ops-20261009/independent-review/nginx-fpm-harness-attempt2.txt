@@ -1,0 +1,17 @@
+nginx version: nginx/1.26.3
+PHP 8.4.26 (fpm-fcgi) (built: Sep 24 2026 17:16:18) (NTS)
+scope=owned prefix; transport=loopback TLS; app=synthetic FastCGI responder; no Forge activation or provider I/O
+nginx: the configuration file /tmp/vao-ng-rokrbd2x/nginx.conf syntax is ok
+2026/10/09 00:22:05 [emerg] 29470#29470: mkdir() "/var/lib/nginx/proxy" failed (2: No such file or directory)
+nginx: configuration file /tmp/vao-ng-rokrbd2x/nginx.conf test failed
+
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 188, in <module>
+    main()
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 118, in main
+    run([NGINX, "-t", "-p", scratch + "/", "-c", str(root / "nginx.conf")])
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/nginx_fpm_probe.py", line 30, in run
+    result.check_returncode()
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 502, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['/workspace/.va-studio-toolchain/root/usr/sbin/nginx', '-t', '-p', '/tmp/vao-ng-rokrbd2x/', '-c', '/tmp/vao-ng-rokrbd2x/nginx.conf']' returned non-zero exit status 1.

@@ -1,0 +1,8 @@
+test_links_and_special_files_refuse_without_touching_the_external_target (__main__.RuntimeDirectoryCustodyTest.test_links_and_special_files_refuse_without_touching_the_external_target) ... ok
+test_regular_runtime_directories_and_existing_gitignore_are_preserved (__main__.RuntimeDirectoryCustodyTest.test_regular_runtime_directories_and_existing_gitignore_are_preserved) ... ok
+test_replacement_after_open_cannot_redirect_descriptor_metadata_changes (__main__.RuntimeDirectoryCustodyTest.test_replacement_after_open_cannot_redirect_descriptor_metadata_changes) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.343s
+
+OK

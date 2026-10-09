@@ -1,0 +1,46 @@
+test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) ...
+  test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='stale') ... FAIL
+  test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='wrong-identity') ... FAIL
+  test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='valid') ... FAIL
+test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ... ok
+test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (test_staging_operation_custody.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... ok
+
+======================================================================
+FAIL: test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='stale')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 89, in test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file
+    self.assertEqual(run.returncode == 0, outcome == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='wrong-identity')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 89, in test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file
+    self.assertEqual(run.returncode == 0, outcome == "valid", run.stdout + run.stderr)
+AssertionError: True != False :
+
+======================================================================
+FAIL: test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) (outcome='valid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_operation_custody.py", line 91, in test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file
+    self.assertEqual(trace, ["auth", "grant"] if outcome == "valid" else ["auth"])
+AssertionError: Lists differ: ['grant'] != ['auth', 'grant']
+
+First differing element 0:
+'grant'
+'auth'
+
+Second list contains 1 additional elements.
+First extra element 1:
+'grant'
+
+- ['grant']
++ ['auth', 'grant']
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.081s
+
+FAILED (failures=3)

@@ -1,0 +1,8 @@
+test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file (test_staging_operation_custody.OperationCustodyTest.test_app_profile_requires_authentication_identity_before_grants_and_cleans_client_file) ... ok
+test_existing_database_identity_requires_private_complete_credential_custody (test_staging_operation_custody.OperationCustodyTest.test_existing_database_identity_requires_private_complete_credential_custody) ... ok
+test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration (test_staging_operation_custody.OperationCustodyTest.test_forge_uses_one_privileged_activation_instead_of_releasing_before_migration) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.091s
+
+OK

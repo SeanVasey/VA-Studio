@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-ops/phpunit.xml
+
+................................................................. 65 / 89 ( 73%)
+........................                                          89 / 89 (100%)
+
+Time: 00:37.463, Memory: 101.00 MB
+
+OK (89 tests, 876 assertions)

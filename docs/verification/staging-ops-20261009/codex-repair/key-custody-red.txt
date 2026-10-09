@@ -1,0 +1,60 @@
+test_absent_or_ambiguous_manifest_refuses (__main__.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses) ... FAIL
+test_dangling_outside_and_non_symlink_current_cannot_become_first_install (__main__.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install) ... FAIL
+test_genuine_first_install_admission_is_explicit (__main__.BackupKeyCustodyTest.test_genuine_first_install_admission_is_explicit) ... ok
+test_genuine_no_current_snapshot_records_none (__main__.BackupKeyCustodyTest.test_genuine_no_current_snapshot_records_none) ... ok
+test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) ...
+  test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) (env_present=False) ... FAIL
+  test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) (env_present=True) ... FAIL
+test_served_release_missing_env_refuses_before_publishing_any_snapshot (__main__.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot) ... FAIL
+
+======================================================================
+FAIL: test_absent_or_ambiguous_manifest_refuses (__main__.BackupKeyCustodyTest.test_absent_or_ambiguous_manifest_refuses)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 95, in test_absent_or_ambiguous_manifest_refuses
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : ACCEPTED
+
+
+======================================================================
+FAIL: test_dangling_outside_and_non_symlink_current_cannot_become_first_install (__main__.BackupKeyCustodyTest.test_dangling_outside_and_non_symlink_current_cannot_become_first_install)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 53, in test_dangling_outside_and_non_symlink_current_cannot_become_first_install
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : WARNING: no served release .env to back up (first deploy?)
+snapshot written: 20261009T022925Z-none
+
+
+======================================================================
+FAIL: test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) (env_present=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 90, in test_served_backup_requires_env_and_its_hash
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : ACCEPTED
+
+
+======================================================================
+FAIL: test_served_backup_requires_env_and_its_hash (__main__.BackupKeyCustodyTest.test_served_backup_requires_env_and_its_hash) (env_present=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 90, in test_served_backup_requires_env_and_its_hash
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : ACCEPTED
+
+
+======================================================================
+FAIL: test_served_release_missing_env_refuses_before_publishing_any_snapshot (__main__.BackupKeyCustodyTest.test_served_release_missing_env_refuses_before_publishing_any_snapshot)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/tests/ops/test_staging_backup_key_custody.py", line 44, in test_served_release_missing_env_refuses_before_publishing_any_snapshot
+    self.assertNotEqual(run.returncode, 0, run.stdout)
+AssertionError: 0 == 0 : WARNING: no served release .env to back up (first deploy?)
+snapshot written: 20261009T022925Z-aaaaaaaaaaaa
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.109s
+
+FAILED (failures=5)

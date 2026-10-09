@@ -95,14 +95,22 @@ It never enables downloads and never re-sends Checkout Session creation. It make
 
 Choose one way to run it, as the application user (the owner of `storage/app/private` and the queue workers):
 
-- **systemd:** install `ops/staging/test-commerce/vasey-test-commerce-pipeline.service` and `.timer` after replacing `<APP_USER>` and `<APP_ROOT>` (instructions inside the unit). Logs: `journalctl -u vasey-test-commerce-pipeline.service -f`.
+With the Forge kit, use the reviewed script from `/srv/vasey-staging/current`, never the Forge mirror
+or an older copied runner. Each sweep takes the kit's shared writer lock before reading its root-owned
+admission gate. `ctl quiesce` closes the gate durably; future timer/cron invocations skip without touching
+private state until a healthy `ctl resume` reopens it. If a sweep is already active, quiesce refuses and
+leaves admission closed: wait for it to finish, inspect `ctl status`, then retry quiesce. Do not bypass the
+gate or resume after a failed backup/migration. For this kit, choose the current-based oneshot service/timer
+or scheduler; avoid a daemon that retains old script code across release switches.
+
+- **systemd:** install `ops/staging/test-commerce/vasey-test-commerce-pipeline.service` and `.timer` after replacing `<APP_USER>` and `<APP_ROOT>` (for the kit, `forge` and `/srv/vasey-staging/current`; instructions inside the unit). Logs: `journalctl -u vasey-test-commerce-pipeline.service -f`.
 - **Forge scheduler:** add a job that runs every minute as the site user:
 
   ```sh
-  bash /home/forge/<site>/scripts/ops/run-test-commerce-pipeline.sh >> /home/forge/<site>/storage/logs/test-commerce-pipeline.log 2>&1
+  PHP_BIN=/usr/bin/php8.4 bash /srv/vasey-staging/current/scripts/ops/run-test-commerce-pipeline.sh >> /srv/vasey-staging/current/storage/logs/test-commerce-pipeline.log 2>&1
   ```
 
-- **Forge daemon (alternative):** `bash scripts/ops/run-test-commerce-pipeline.sh --loop` runs 60 sweeps a minute apart, then exits so the daemon restarts it with fresh code and configuration.
+- **Daemon for other installations:** `bash scripts/ops/run-test-commerce-pipeline.sh --loop` runs 60 sweeps a minute apart, then exits. The Forge kit uses the current-based choices above.
 
 A non-blocking lock prevents overlapping sweeps. The log shows only opaque IDs and bounded outcomes, for example:
 

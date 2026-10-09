@@ -1,0 +1,14 @@
+test_deploy_does_not_claim_stopped_writers_from_phase_flag (__main__.IndependentStagingOpsProbes.test_deploy_does_not_claim_stopped_writers_from_phase_flag) ... FAIL
+
+======================================================================
+FAIL: test_deploy_does_not_claim_stopped_writers_from_phase_flag (__main__.IndependentStagingOpsProbes.test_deploy_does_not_claim_stopped_writers_from_phase_flag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/review_probes.py", line 133, in test_deploy_does_not_claim_stopped_writers_from_phase_flag
+    self.assertNotIn("writers are stopped", run.stderr,
+AssertionError: 'writers are stopped' unexpectedly found in 'forge-deploy: FAILED (exit 73) after the quiesce: the site is in maintenance and writers are stopped.\nforge-deploy: fix and redeploy, or roll back: docs/ops/staging-runbook.md#rollback\n' : phase flag alone falsely reports proven quiescence after failed quiesce/resume
+
+----------------------------------------------------------------------
+Ran 1 test in 0.003s
+
+FAILED (failures=1)

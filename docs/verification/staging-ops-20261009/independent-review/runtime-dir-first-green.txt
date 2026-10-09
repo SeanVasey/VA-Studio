@@ -1,0 +1,12 @@
+Assessed exact source: 69a405a6480edd031aad9f40e9f83c32e8adcc24
+test_application_owned_child_directory_links (__main__.RuntimeDirectoryReview.test_application_owned_child_directory_links) ... ok
+test_direct_application_owned_directory_links (__main__.RuntimeDirectoryReview.test_direct_application_owned_directory_links) ... ok
+test_initializer_is_invoked_in_the_real_provisioning_stage (__main__.RuntimeDirectoryReview.test_initializer_is_invoked_in_the_real_provisioning_stage) ... ok
+test_nginx_directory_and_gitignore_links (__main__.RuntimeDirectoryReview.test_nginx_directory_and_gitignore_links) ... ok
+test_normal_initialization_and_existing_gitignore (__main__.RuntimeDirectoryReview.test_normal_initialization_and_existing_gitignore) ... ok
+test_replacement_races_keep_metadata_and_writes_on_pinned_inodes (__main__.RuntimeDirectoryReview.test_replacement_races_keep_metadata_and_writes_on_pinned_inodes) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.020s
+
+OK

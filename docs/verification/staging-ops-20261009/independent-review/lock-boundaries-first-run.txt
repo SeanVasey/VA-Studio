@@ -1,0 +1,19 @@
+test_application_subprocess_does_not_inherit_root_action_descriptor (__main__.LockBoundaries.test_application_subprocess_does_not_inherit_root_action_descriptor) ... ok
+test_lock_symlink_directory_or_wide_mode_is_refused (__main__.LockBoundaries.test_lock_symlink_directory_or_wide_mode_is_refused) ... ok
+test_nightly_uses_serialized_snapshot_and_resumes_after_failure (__main__.LockBoundaries.test_nightly_uses_serialized_snapshot_and_resumes_after_failure) ... ok
+test_reprovision_keeps_existing_lock_inode (__main__.LockBoundaries.test_reprovision_keeps_existing_lock_inode) ... FAIL
+test_resume_waits_for_the_entire_snapshot_action (__main__.LockBoundaries.test_resume_waits_for_the_entire_snapshot_action) ... ok
+
+======================================================================
+FAIL: test_reprovision_keeps_existing_lock_inode (__main__.LockBoundaries.test_reprovision_keeps_existing_lock_inode)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-ops/docs/verification/staging-ops-20261009/independent-review/lock-boundaries-probe.py", line 86, in test_reprovision_keeps_existing_lock_inode
+    self.assertEqual(run.returncode, 0, run.stderr)
+AssertionError: 1 != 0 : untrusted staging control lock
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.337s
+
+FAILED (failures=1)

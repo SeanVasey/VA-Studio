@@ -1,0 +1,9 @@
+test_delimiter_looking_line_inside_routine_literal_is_not_a_directive (__main__.DumpContextProbe.test_delimiter_looking_line_inside_routine_literal_is_not_a_directive) ... ok
+test_mysql_dump_procedure_body_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_procedure_body_remains_byte_exact) ... ok
+test_mysql_dump_routine_literal_remains_byte_exact (__main__.DumpContextProbe.test_mysql_dump_routine_literal_remains_byte_exact) ... ok
+test_top_level_schema_attribute_can_normalize (__main__.DumpContextProbe.test_top_level_schema_attribute_can_normalize) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK
