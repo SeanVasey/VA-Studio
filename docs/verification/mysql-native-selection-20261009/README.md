@@ -162,23 +162,21 @@ They still run on SQLite.
 
 ## MySQL skip signals (C2)
 
-### Attachment consumers and other MySQL skips (C2): configured, not yet proven on hosted MySQL
+### Attachment consumers and other MySQL skips (C2): proven on hosted MySQL in Foundation run 38077166247
 
 - `tests/Feature/SupportAttachmentsTest.php` (28 cases) and `tests/Feature/ServiceSupportAttachmentsTest.php`
   (8 cases) are now selected. Their `setUp` skips on MySQL only when `ATTACHMENT_NATIVE_ISOLATED` is not
   `1`. The MySQL jobs (and only they) now set it, so on CI these cases are configured to run their
-  native paths instead of skipping. No hosted run has confirmed this yet. The flag is environment-gated, so it is deliberately not in the census: any skip
+  native paths instead of skipping. Foundation run 38077166247 confirmed this on hosted MySQL 8.4.11. The flag is environment-gated, so it is deliberately not in the census: any skip
   of these cases on CI MySQL is refused as an unlisted skip.
 - The two SQLite-only methods,
   `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`
   and `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`,
   are now in the MySQL skip census, and their files are selected.
 
-**The native attachment-consumer release blocker stays open until an exact-SHA Foundation run passes
-on hosted MySQL 8.4.** Only then does it close for Foundation. The local MySQL 8.0 evidence below does
-not close it.
-
-**Closed for Foundation on 2026-10-10** by run [38077166247](https://github.com/SeanVasey/VA-Studio/actions/runs/38077166247)
+**The native attachment-consumer release blocker is closed for Foundation.** It was to stay open until an
+exact-SHA Foundation run passed on hosted MySQL 8.4 (the local MySQL 8.0 evidence below could not close it). It closed
+on 2026-10-10 with run [38077166247](https://github.com/SeanVasey/VA-Studio/actions/runs/38077166247)
 on the exact SHA `0f23e63f`: both files ran on hosted MySQL 8.4.11 with no unlisted skip, all 26 receipts were verified and
 the run succeeded (`docs/verification/foundation-20261009/`, fourth run).
 

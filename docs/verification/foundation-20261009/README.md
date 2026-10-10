@@ -248,8 +248,8 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 ## Fourth run: Foundation `38077166247` on `0f23e63f` — complete pass
 
 Dispatched manually on main `0f23e63f62da9c4ea5b1a8651094c88cafe849bf` (the #86 merge, carrying H1–H4 and the regenerated
-timings) at 18:46 UTC on 2026-10-10 with that exact `expected_sha`. **Every job passed, the aggregate gate passed, and the
-run concluded `success` at 21:06 UTC.** This is the first complete Foundation pass on an exact integrated SHA.
+timings) at 18:46 UTC on 2026-10-10 with that exact `expected_sha`. **Every required job passed (the docs-only `documentation` job
+is skipped by design in a full run), the aggregate gate passed, and the run concluded `success` at 21:06 UTC.** This is the first complete Foundation pass on an exact integrated SHA.
 
 | Job | Result | Minutes |
 | --- | --- | --- |
@@ -292,7 +292,7 @@ residual files that run on SQLite only (Sean's decision); GitLab (not dispatched
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
 | Foundation `38037183233` | `bd84978e` | failed on 4 of 24 MySQL shards, everything else passed: see the third-run section | GitHub run; `run3/jobs.tsv`, `run3/junit-summary.txt`, `run3/mysql-shard-*` |
-| Foundation `38077166247` | `0f23e63f` | **success**: every job and the aggregate gate passed; 26 receipts verified | GitHub run; `run4/` |
+| Foundation `38077166247` | `0f23e63f` | **success**: every required job and the aggregate gate passed (`documentation` skipped by design); 26 receipts verified | GitHub run; `run4/` |
 | `MembershipSchemaPreparationTest` shadow-floor case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: "There is no active transaction" at line 186, as in CI | `run3/membership-schema-mysql80-red.txt` |
 | `CustomerSuppressionMigrationTest` non-prefix case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: SQLSTATE 1824 at line 128, as in CI | `run3/customer-suppression-mysql80-red.txt` |
 | `MembershipSchemaPreparationTest`, whole file, private MySQL 8.0.46, green | `914d757` | 13 tests, 40 assertions OK | `run3/membership-schema-mysql80-green.txt` |
