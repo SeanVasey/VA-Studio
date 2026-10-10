@@ -153,7 +153,8 @@ MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-my
 and each of them must have run on SQLite. GitHub and the GitLab workflow both split that selection
 into 24 MySQL shards, weighted by hosted timings from Foundation run 37967128232. GitLab's 175-minute
 job limit stays under its hosted runners' 3-hour cap; whether every shard finishes inside the GitHub
-and GitLab limits is unproven until the next hosted run.
+and GitLab limits is unproven until the next hosted run. Dispatch GitLab only after a hosted GitHub run
+has measured MySQL shard 1 (`BulkReplaceLicenseDraftSourceTest` alone, about 122 minutes on GitHub).
 All browser checks remain. Do not re-enable the retired `ci.yml` or `focused.yml` workflows. See
 [CI cadence and coordination](docs/verification/ci-trigger-efficiency.md).
 A preflight or focused pass is not a full-suite pass or launch approval; real

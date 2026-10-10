@@ -528,9 +528,48 @@ selection on hosted MySQL 8.4.11 in 8 shards with a 210-minute limit:
 | --- | --- | --- | --- |
 | 2 | 208 | 166 | Passed in 185.6 min of test time (11,137.8 s); receipt accepted |
 | 3 | 209 | 159 | Ran all 209 in 186.5 min (11,191.4 s); 8 errors, all in `CustomerInquiryMigrationTest`, fixed in `5ffcc97` |
-| 1 | 257 | 241 | Cancelled at 210 min after 126 tests passed |
+| 1 | 257 | 241 | Cancelled at 210 min. At least 148 cases had completed (144 passed, 4 skipped, no failures); case 126 at 174.1 min, case 148 by 203.6 min |
 | 4, 5, 6, 7 | 208, 243, 211, 218 | 171, 177, 174, 160 | Cancelled at 210 min |
-| 8 | 211 | 124 | Cancelled at 210 min after 126 tests passed |
+| 8 | 211 | 124 | Cancelled at 210 min after 126 cases at 188.5 min: 90 passed, 35 skipped and 1 error at case 89 (`ProductionFeatureMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair`, SQLSTATE 1824) |
+
+An earlier revision of this note said shards 1 and 8 had "passed 126 tests each". That was wrong.
+Shard 1 had completed at least 148 cases, and shard 8's 126 included the error above. The figures
+come from the progress lines of the job logs; GitHub job setup (job start to the PHPUnit step) was
+59.6 to 72.6 s in shards 1, 2, 3 and 8, about 1.2 minutes at most.
+
+**Native-only test bugs.** Four test files fail on MySQL but not on SQLite, because MySQL refuses to
+drop or create a table against a missing or remaining foreign-key partner:
+- `CustomerInquiryMigrationTest`: 8 errors in shard 3, fixed in `5ffcc97`.
+- `ProductionFeatureMigrationTest`: the shard 8 error above (SQLSTATE 1824), fixed in `466ea46`.
+- `CustomerAccountMigrationTest`: SQLSTATE 3730, fixed in `8ffea7d`. The independent review of
+  `bed64ee` reproduced 2 errors (the shard holding it was cancelled). Its setUp left 46 empty newer
+  dependents of `customer_accounts` in place, not only `customer_saved_tracks`, because MySQL names
+  only the first blocking constraint.
+- `SharedInventoryMigrationTest`: SQLSTATE 3730, fixed in `a994c79`. The scan below found it.
+
+Red and green runs on a private MySQL 8.0.46, plus the SQLite runs before and after, are in
+[`docs/verification/foundation-20261009/run2/`](../foundation-20261009/run2/):
+`customer-account-migration-*`, `production-feature-migration-*` and `shared-inventory-migration-*`
+(`-mysql80-red.txt`, `-mysql80-green.txt`, `-sqlite.txt`), and
+`customer-account-migration-mysql80-green-all.txt` for the whole account file (7 tests, 481 assertions).
+
+**Parent-rollback scan.** Every selected test file that rolls back a migration or drops a table was
+checked against the real foreign-key graph, not regular expressions:
+- **Inputs.** The 360 constraints come from a fully migrated MySQL 8.0.46 database. Table ownership
+  comes from applying the 80 migrations one file at a time and diffing the catalog after each; all
+  191 tables are attributed.
+- **Rule.** A newer child of a removed parent counts as handled only when the test also removes it.
+- **Results.** 28 files remove a parent (35 when every migration a file references is treated as
+  possibly rolled back).
+  - `SharedInventoryMigrationTest` was a real gap, confirmed on MySQL as SQLSTATE 3730 at
+    `free_definitions_scope`.
+  - The other flags are not gaps on MySQL:
+    - `CustomerSuppressionMigrationTest` drops `customer_accounts` only in a SQLite-only method with
+      foreign keys off.
+    - `PrivateProductDraftSchemaTest` drops a prefixed fixture `users` table.
+    - `SupportAttachmentsTest` drops temporary shadow tables.
+    - `CustomerAccountMigrationTest` was flagged only through its comment naming
+      `CapabilityRollbackFixture`.
 
 The 35 s per case used for the earlier estimates (measured on the whole suite in run 37921309772) was
 too low for this selection. In the two complete JUnit logs the 417 cases average 53.5 s: the 325
@@ -561,54 +600,70 @@ gives about 105 minutes on the same model.
 **24 shards (current).** Real discovery with the refreshed timings splits the selection as below.
 All columns are estimates; none is a measurement of these shards.
 
-| Shard | Cases | Finalization cases | Minutes at 68 s per Finalization case | Sharder estimate (min) | Projected minutes (k = 1.0 / 1.72 / 2.03) |
+| Shard | Cases | Finalization cases | Minutes at 68 s per Finalization case | Sharder estimate (min) | Projected minutes (k = 1.0 / 1.48 / 1.88) |
 | --- | --- | --- | --- | --- | --- |
-| 1 (`BulkReplaceLicenseDraftSourceTest` alone) | 85 | 85 | 96 | 76 | 82 / 141 / 166 |
-| 2 | 74 | 73 | 83 | 65 | 69 / 116 / 136 |
-| 3 | 65 | 65 | 74 | 65 | 67 / 78 / 83 |
-| 4 | 73 | 23 | 26 | 65 | 55 / 94 / 111 |
-| 5 | 71 | 56 | 63 | 65 | 62 / 75 / 81 |
-| 6 | 68 | 62 | 70 | 65 | 65 / 79 / 85 |
-| 7 | 72 | 64 | 73 | 65 | 70 / 114 / 133 |
-| 8 | 73 | 73 | 83 | 65 | 70 / 113 / 132 |
-| 9 | 73 | 73 | 83 | 65 | 70 / 121 / 143 |
-| 10 | 73 | 38 | 43 | 65 | 59 / 101 / 118 |
-| 11 | 73 | 65 | 74 | 65 | 67 / 106 / 123 |
-| 12 | 73 | 42 | 48 | 65 | 60 / 96 / 111 |
-| 13 | 73 | 59 | 67 | 65 | 67 / 112 / 132 |
-| 14 | 93 | 62 | 70 | 65 | 64 / 81 / 88 |
-| 15 | 73 | 42 | 48 | 65 | 61 / 104 / 123 |
-| 16 | 73 | 71 | 80 | 65 | 70 / 120 / 141 |
-| 17 | 70 | 66 | 75 | 66 | 68 / 106 / 122 |
-| 18 | 70 | 36 | 41 | 65 | 59 / 83 / 94 |
-| 19 | 75 | 28 | 32 | 65 | 66 / 72 / 75 |
-| 20 | 73 | 55 | 62 | 65 | 64 / 109 / 129 |
-| 21 | 77 | 26 | 29 | 65 | 56 / 95 / 112 |
-| 22 | 73 | 73 | 83 | 65 | 70 / 120 / 142 |
-| 23 | 69 | 63 | 71 | 65 | 66 / 100 / 115 |
-| 24 | 73 | 72 | 82 | 65 | 68 / 103 / 118 |
+| 1 (`BulkReplaceLicenseDraftSourceTest` alone; measured) | 85 | 85 | 96 | 76 | 122 / 122 / 122 |
+| 2 | 74 | 73 | 83 | 65 | 69 / 100 / 126 |
+| 3 | 65 | 65 | 74 | 65 | 67 / 74 / 81 |
+| 4 | 73 | 23 | 26 | 65 | 55 / 81 / 103 |
+| 5 | 71 | 56 | 63 | 65 | 62 / 71 / 78 |
+| 6 | 68 | 62 | 70 | 65 | 65 / 74 / 82 |
+| 7 | 72 | 64 | 73 | 65 | 70 / 99 / 124 |
+| 8 | 73 | 73 | 83 | 65 | 70 / 99 / 123 |
+| 9 | 73 | 73 | 83 | 65 | 70 / 104 / 132 |
+| 10 | 73 | 38 | 43 | 65 | 59 / 87 / 110 |
+| 11 | 73 | 65 | 74 | 65 | 67 / 93 / 115 |
+| 12 | 73 | 42 | 48 | 65 | 60 / 84 / 104 |
+| 13 | 73 | 59 | 67 | 65 | 67 / 97 / 122 |
+| 14 | 93 | 62 | 70 | 65 | 64 / 75 / 84 |
+| 15 | 73 | 42 | 48 | 65 | 61 / 90 / 114 |
+| 16 | 73 | 71 | 80 | 65 | 70 / 103 / 131 |
+| 17 | 70 | 66 | 75 | 66 | 68 / 93 / 114 |
+| 18 | 70 | 36 | 41 | 65 | 59 / 75 / 89 |
+| 19 | 75 | 28 | 32 | 65 | 66 / 70 / 74 |
+| 20 | 73 | 55 | 62 | 65 | 64 / 94 / 120 |
+| 21 | 77 | 26 | 29 | 65 | 56 / 82 / 103 |
+| 22 | 73 | 73 | 83 | 65 | 70 / 104 / 131 |
+| 23 | 69 | 63 | 71 | 65 | 66 / 89 / 108 |
+| 24 | 73 | 72 | 82 | 65 | 68 / 92 / 111 |
 
 - **Columns.** "Minutes at 68 s" counts Finalization cases only, the coordinator's measure; the
-  busiest shard is about 96 minutes. "Projected" uses the measured time for the 39 measured files.
-  For every other file it uses 57.7 s per Finalization case and 39.0 s per other case, multiplied by
-  k.
+  busiest shard is about 96 minutes. "Projected" uses the measured time for the 39 measured files and
+  for `BulkReplaceLicenseDraftSourceTest` (below). For every other file it uses 57.7 s per Finalization
+  case and 39.0 s per other case, multiplied by k.
 - **Calibrating k.** k = 1.0 assumes unmeasured files run like the measured ones. The cancelled shards
-  say they do not. Old shard 1 and old shard 8 each passed 126 tests in about 203 minutes of test time.
-  On the model, shard 1's first 126 cases are 118 minutes (k ≈ 1.72) and shard 8's are 100 minutes
-  (k ≈ 2.03); both values were recomputed for this revision. Old shards 4, 6 and 7 were modelled at
-  188–192 minutes and still did not finish (k > 1.06).
+  say they do not.
+  - In shard 1, case 126 completed 174.1 minutes into the test step. In shard 8 it completed at
+    188.5 minutes.
+  - On the model those first 126 cases are 117.7 and 100.0 minutes, so k ≈ 1.48 and 1.88.
+  - Shard 8's 35 skipped cases are counted, because they skip in the test body after `setUp()` has
+    prepared the database.
+  - An earlier revision used about 203 minutes for both shards, which gave k ≈ 1.72 and 2.03. That
+    overstated both: 203.6 minutes is when shard 1 had completed case 148.
+- **`BulkReplaceLicenseDraftSourceTest`, measured.** Old shard 1 ran it as cases 21 to 105.
+  - The first file prints a timestamped line per case. Cases 21 to 63 took at most 63.1 minutes:
+    about 86–88 s each, against 57.7 s in the model.
+  - At about 86 s the 85 cases take about 122 minutes. The log bounds the file at no more than about
+    138 minutes; the review gave 116 to 137.
+  - The table uses 122 minutes for shard 1 at every k.
 - **The projection is rough.** k is fitted on two shards and applied to every unmeasured file.
-- **Why 24.** The 16-shard projection (historical table below) put the busiest job at about 179–210
-  minutes: over GitLab's 175-minute limit and up to GitHub's 210.
-  - With 24 shards the busiest projected job is shard 1 at about 141–166 minutes. Shard 1 holds only
-    `BulkReplaceLicenseDraftSourceTest` (85 Finalization cases), so it is the whole-file floor: more
-    shards cannot shorten it.
-  - Every other shard projects at 136 minutes or less at k = 2.03.
-- **GitHub.** The busiest projection (141–166 minutes) is under the 210-minute limit, which stays.
-- **GitLab.** The busiest projection is under the 175-minute limit, but the timeout counts the whole
-  job, including image pull, package and Composer installation before the tests. At k = 2.03 the
-  margin is about 9 minutes before that setup. The 3-hour hosted cap leaves no room to raise the
-  limit; if shard 1 times out, the remaining remedy is to split that file.
+  Shard 1's k is dominated by `BulkReplaceLicenseDraftSourceTest` itself.
+- **Why 24.** The 16-shard projection (historical table below, as computed then) put the busiest job
+  over GitLab's 175-minute limit. That still holds with the corrected k and the measured
+  `BulkReplaceLicenseDraftSourceTest`:
+  - 16 shards: busiest job about 154–195 minutes;
+  - 20 shards: about 126–158 minutes;
+  - 24 shards: about 122–132 minutes.
+  - With 24 shards, shard 1 holds only `BulkReplaceLicenseDraftSourceTest` (about 122 minutes
+    measured), the whole-file floor.
+  - The busiest other shard projects at about 104 minutes (k = 1.48) to 132 minutes (k = 1.88,
+    shard 9).
+- **GitHub.** The busiest job (about 122–132 minutes, plus about 1.2 minutes of setup) is well under
+  the 210-minute limit, which stays.
+- **GitLab.** At GitHub's speed the busiest job leaves about 40 minutes under the 175-minute limit.
+  GitLab's small hosted runners are smaller than GitHub's and unmeasured here, so that margin is not
+  established. The 3-hour hosted cap leaves no room to raise the limit. See Open blockers for the
+  dispatch order.
 - **`MigrationRecompilationTest`.** Selected through the migration pattern since the merge of main. It
   is not in the Finalization counts: it runs `migrate:fresh` four times itself, which adds a few minutes
   to shard 2. It compares counts of declared classes, which is independent of the driver, so it should
@@ -623,18 +678,20 @@ All columns are estimates; none is a measurement of these shards.
 - Nothing runs on push, merge request or schedule.
 
 The figures:
-- **MySQL test time.** About 41 hours at k = 1.72 and 47 hours at k = 2.03 (26 at k = 1.0). The shard
-  count does not change this; it is the same 1,765 cases.
-- **Job setup.** Per-job setup comes on top and was not measured. At an assumed 5–10 minutes per job,
-  24 jobs add about 2–4 hours. Every shard beyond 8 adds one more setup.
+- **MySQL test time.** About 36 hours at k = 1.48 and 43 hours at k = 1.88 (27 at k = 1.0), with
+  `BulkReplaceLicenseDraftSourceTest` at its measured 122 minutes. The shard count does not change
+  this; it is the same 1,765 cases. (An earlier revision said 41–47 hours, from the overstated k.)
+- **Job setup.** GitHub job setup measured 1.0–1.2 minutes per job, so 24 jobs add about half an hour.
+  Every shard beyond 8 adds one more setup.
 - **GitLab compute minutes.** GitLab.com's documentation gives a cost factor of 1 for small Linux
   hosted runners (compute minutes = job seconds / 60 × cost factor). The `.gitlab-ci.yml` jobs carry no
   runner tags.
-  - The 24 MySQL jobs would use about 2,600–3,100 compute minutes per pipeline.
-  - The 2 SQLite jobs (GitHub's SQLite shard 1 took 47.5 minutes) and the other jobs add more, so the
-    total is roughly 2,700–3,200 minutes.
+  - At GitHub's speed the 24 MySQL jobs would use about 2,200–2,650 compute minutes per pipeline.
+  - The 2 SQLite jobs (48.2 and 60.3 minutes on GitHub) and the other jobs add more, so the total is
+    roughly 2,300–2,800 minutes.
+  - GitLab's small runners are unmeasured. If they are slower, minutes rise in proportion.
   - GitLab's documented Free quota is 400 compute minutes a month, so one full pipeline would need
-    roughly 7–8 months of a Free quota.
+    roughly 6–7 months of a Free quota.
   - The namespace's plan, its remaining quota and any purchased minutes were not checked.
   - A job cancelled at its timeout still consumes its minutes.
 - **GitHub billing.** `SeanVasey/VA-Studio` is public. GitHub's billing documentation says Actions
@@ -644,7 +701,8 @@ The figures:
   not checked. Under 20, some of the 24 MySQL shards wait for others to finish. That lengthens wall
   time but not the per-job limit, because waiting does not count against `timeout-minutes`.
 
-**16 shards (historical, `fa6d89f`).** The same refreshed timings split 16 ways:
+**16 shards (historical, `fa6d89f`).** The same refreshed timings split 16 ways. These projections used
+the overstated k (1.72 / 2.03) and are kept as computed then:
 
 | Shard | Cases | Finalization cases | Minutes at 68 s per Finalization case | Sharder estimate (min) | Projected minutes (k = 1.0 / 1.72 / 2.03) |
 | --- | --- | --- | --- | --- | --- |
@@ -679,17 +737,19 @@ cases only):
 
 ## Open blockers
 
-- **GitLab's busiest MySQL job has little margin.** Run 37967128232 measured hosted MySQL at about
-  54 s per selected case. Six of its 8 shards were cancelled at 210 minutes.
-  - With 24 shards the busiest job projects to about 141–166 minutes: shard 1, which is
-    `BulkReplaceLicenseDraftSourceTest` alone.
-  - That is under GitHub's 210-minute limit. Under GitLab's 175-minute limit, job setup must fit in the
-    remaining roughly 9 minutes at k = 2.03.
-  - More shards cannot help this job. If it times out, split that test file.
-  - GitLab durations stay unmeasured until a hosted GitLab run.
-- **GitLab compute minutes.** A full GitLab pipeline is projected at roughly 2,700–3,200 compute
-  minutes, against a documented Free quota of 400 a month. The namespace's plan and quota were not
-  checked. Sean's cost policy applies before any GitLab dispatch.
+- **GitLab is dispatched only after GitHub has measured shard 1.** At GitHub's speed the busiest
+  24-shard job is about 122–132 minutes. Shard 1, `BulkReplaceLicenseDraftSourceTest` alone, was
+  measured at about 122 minutes.
+  - GitLab's small hosted runners are smaller than GitHub's and unmeasured, and the 175-minute limit
+    cannot rise under the 3-hour hosted cap.
+  - Mitigation: GitLab is dispatched only after a hosted GitHub Foundation run has measured shard 1's
+    duration. If that measurement shows GitLab's runners would exceed 175 minutes, the next step is to
+    split `BulkReplaceLicenseDraftSourceTest` into two files (a floor of about 60 minutes). It is not
+    split now.
+  - More shards cannot help shard 1.
+- **GitLab compute minutes.** At GitHub's speed a full GitLab pipeline is projected at roughly
+  2,300–2,800 compute minutes, against a documented Free quota of 400 a month. The namespace's plan
+  and quota were not checked. Sean's cost policy applies before any GitLab dispatch.
 - **No MySQL claims before a passing hosted run.** Run 37967128232 is not acceptance: only shard 2
   passed. None of these may be claimed until one exact-SHA Foundation run passes on hosted MySQL 8.4:
   - MySQL-native coverage of the selection;
@@ -715,8 +775,8 @@ cases only):
    shard count and the 210-minute GitHub and 175-minute GitLab limits.
 3. Regenerate `scripts/ci/phpunit-timings-sqlite.json` from complete SQLite JUnit (run 37967128232's
    shard 1 log is complete) in a separate change.
-4. Measure the GitLab shard durations on the first hosted GitLab run and confirm they stay under
-   175 minutes.
+4. Dispatch GitLab only after step 1 measures shard 1 on GitHub (see Open blockers), then measure the
+   GitLab shard durations and confirm they stay under 175 minutes.
 5. Sean decides whether any of the 47 residual files should join the selection.
 6. Follow-up CI change: require every test file that names a listed branching helper to be selected or
    residual (one level), and add `getConfig('driver')` and `database.default` comparison patterns to the scan.
