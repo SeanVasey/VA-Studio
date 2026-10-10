@@ -149,7 +149,7 @@ Both causes were reproduced locally on Playwright's WebKit 2359 (`run2/webkit-*-
 ### SQLite job limit — fixed here (CI)
 
 GitHub and GitLab SQLite shards now have 100 minutes (about 45% headroom over the projected 67). Regenerating
-`scripts/ci/phpunit-timings-sqlite.json` from the complete shard 1 JUnit to rebalance the two shards is a follow-up.
+`scripts/ci/phpunit-timings-sqlite.json` to rebalance the two shards was a follow-up; #86 did it from run 38037183233.
 
 ### G1. `CustomerInquiryMigrationTest` on MySQL — fixed here (test-only)
 
