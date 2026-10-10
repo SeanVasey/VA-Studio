@@ -1,6 +1,8 @@
 # Foundation CI on the integrated handoff candidate: failures, diagnosis and fixes
 
-Development evidence from the Claude Code harness, 2026-10-09. Not Foundation acceptance.
+Development evidence from the Claude Code harness, 2026-10-09 and 2026-10-10. Status: Foundation run `38077166247` on
+`0f23e63f` passed (fourth run, below), the first complete Foundation pass on an exact integrated SHA. The sections for
+the first three runs record failures and fixes as found at the time; each now notes where a later run confirmed it.
 
 ## The run
 
@@ -42,7 +44,7 @@ handoff; no earlier Foundation baseline exists for this tree.
 - Full SQLite shards with the fix pass locally under 512M with CI's 2-shard partition: 3,924 and 3,710 cases, 0 failures or
   errors (`evidence/sqlite-shard-*-fixed-512M.txt`). Their receipts still failed until F below.
 
-## B. License-draft browser fixture — fixed here (test-only)
+## B. License-draft browser fixture — fixed here (test-only); confirmed in Foundation runs 37967128232, 38037183233 and 38077166247
 
 `tests/browser/prepare-license-draft.php` refuses any change to a pre-existing row while it creates a synthetic license
 draft. Since migration 240 (`7ecaa7e`, Oct 7) every license write advances `catalog_discovery_epoch.epoch` through its
@@ -55,9 +57,10 @@ without Playwright (no matching Chromium, no WebKit, and ClamAV signatures canno
 at `installation_diagnostics` after migrations, operator and catalog fixtures). Scratch copies of the fixture with only
 the harness identity checks skipped: unfixed → refused at the row check (the only changed row is the epoch); fixed →
 `prepare` succeeds and `verify prepared` reports 0 updates with originals and guards unchanged. The real browser spec
-still needs CI.
+passed on CI later: Chromium in focused run `37938110858`, then both browsers in Foundation runs 37967128232 (B on
+Chromium and WebKit), 38037183233 and 38077166247.
 
-## C. Chromium inquiry retry timeout — fixed here (test-only); passed on Chromium in focused CI
+## C. Chromium inquiry retry timeout — fixed here (test-only); confirmed in Foundation runs 37967128232, 38037183233 and 38077166247
 
 `inquiry-conversation.spec.ts` ran 120.8 s against its 120 s budget. The report's step timeline shows the retried POST
 answered at 36.4 s with 200 and the test then waiting in `await linkedReplay.finished()` (line 164) until the timeout.
@@ -76,7 +79,8 @@ replayed receipt from the page, which renders it only after validating exactly `
 originals unchanged) and the identical-body/same-receipt checks are unchanged. The other Playwright body reads in the
 spec are on responses the page reads with `response.json()` or on direct `page.request` calls. Typecheck passes. The
 spec passed on Chromium in focused browser run `37951869517` at `5a8f6e2` (Results); one pass is not proof the
-intermittent stall cannot recur, and WebKit and the full Foundation browser jobs have not run it yet.
+intermittent stall cannot recur. The full Foundation browser jobs later passed it on both engines in runs 37967128232
+(Chromium; WebKit failed only on D), 38037183233 and 38077166247.
 
 ## D. WebKit preview playback and offline reload — diagnosed and fixed in the second run (below)
 
@@ -127,7 +131,7 @@ fixes (B, C), the receipt rule (F) and the narrowed MySQL selection (E, #82). De
 | backend-mysql 3/8 | 209 tests in 186.5 min, 8 errors | all `CustomerInquiryMigrationTest` (G1) |
 | backend-mysql 1, 4–8 | cancelled at the 210-minute limit, about half done | shard 1 completed at least 148 of 257; shard 8 reached 126 of 211 including one error (G3); timing in G2 |
 
-### D. WebKit — fixed here (test-only), awaiting a hosted run
+### D. WebKit — fixed here (test-only); confirmed on hosted WebKit by runs 38037183233 and 38077166247
 
 Both causes were reproduced locally on Playwright's WebKit 2359 (`run2/webkit-*-repro.cjs`) and reviewed
 (`run2/independent-review-2fd7ccb-DECISION.md`, APPROVE WITH CONDITIONS, conditions applied):
@@ -145,7 +149,7 @@ Both causes were reproduced locally on Playwright's WebKit 2359 (`run2/webkit-*-
 ### SQLite job limit — fixed here (CI)
 
 GitHub and GitLab SQLite shards now have 100 minutes (about 45% headroom over the projected 67). Regenerating
-`scripts/ci/phpunit-timings-sqlite.json` from the complete shard 1 JUnit to rebalance the two shards is a follow-up.
+`scripts/ci/phpunit-timings-sqlite.json` to rebalance the two shards was a follow-up; #86 did it from run 38037183233.
 
 ### G1. `CustomerInquiryMigrationTest` on MySQL — fixed here (test-only)
 
@@ -154,7 +158,7 @@ parent rollback must do on MySQL", but `inquiry_notification_intents` (migration
 added; its restricting foreign key made MySQL refuse every drop (SQLSTATE 3730). SQLite does not enforce the drop, so
 only the native selection could show it. `setUp` now rolls back 243000 first. On a fresh private MySQL 8.0.46 database the old test file gives 27 tests with
 the same 8 errors as CI and the fixed one passes 27 tests / 302 assertions (`run2/inquiry-migration-mysql80-{red,green}.txt`);
-CI's MySQL 8.4 has not run it yet.
+CI's MySQL 8.4 later passed it (runs 38037183233 and 38077166247).
 
 ### G3. Three more native-only test defects — found by independent review and a foreign-key scan
 
@@ -168,7 +172,7 @@ selection is about 41–47 compute-hours. MySQL now runs in 24 shards on GitHub 
 from the two complete shards; the receipt archive bound was raised to fit 24-shard archives (the old 32-member bound would
 have refused a 16- or 24-shard archive). Projected busiest shard: shard 1 (`BulkReplaceLicenseDraftSourceTest` alone)
 about 141–166 minutes, under GitHub's 210 and GitLab's 175 (tight once GitLab job setup is counted). Details, partition and
-cost: `docs/verification/mysql-native-selection-20261009/`. Nothing has run at 24 shards yet.
+cost: `docs/verification/mysql-native-selection-20261009/`. Run 38037183233 was the first at 24 shards; run 38077166247 passed all 24.
 
 ## Third run: Foundation `38037183233` on `bd84978e` (after #84; #85, docs only, merged nine minutes after the dispatch)
 
@@ -245,6 +249,37 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 210 and 100 minutes on GitHub (175 and 100 on GitLab); the workflow comments carry the measurements. Splitting
 `BulkReplaceLicenseDraftSourceTest` remains a follow-up only if GitLab needs it.
 
+## Fourth run: Foundation `38077166247` on `0f23e63f` — complete pass
+
+Dispatched manually on main `0f23e63f62da9c4ea5b1a8651094c88cafe849bf` (the #86 merge, carrying H1–H4 and the regenerated
+timings) at 18:46 UTC on 2026-10-10 with that exact `expected_sha`. **Every required job passed (the docs-only `documentation` job
+is skipped by design in a full run), the aggregate gate passed, and the run concluded `success` at 21:06 UTC.** This is the first complete Foundation pass on an exact integrated SHA.
+
+| Job | Result | Minutes |
+| --- | --- | --- |
+| scope, backend-quality, frontend, related-browser | success | 0.1, 7.4, 1.3, 7.5 |
+| operator-browser chromium-desktop, webkit-mobile | success (D confirmed a second time) | 12.4, 20.8 |
+| backend-sqlite 1/2, 2/2 | success: 3,717 + 3,302 executed, 268 + 355 census skips, 0 errors or failures | 73.8, 60.6 |
+| backend-mysql 1–24 on hosted MySQL 8.4.11 | success: 1,707 executed, 58 census skips, 0 errors or failures | 56.1–131.8 (shard 1: 123.3; shard 23: 131.8) |
+| backend (aggregate) | success: "26 current-run database receipts verified" | 0.4 |
+
+- Totals from the 26 verified receipts (`run4/receipts-summary.txt`): SQLite ran all 7,642 discovered cases in 557 files
+  except exactly the 623 reviewed MySQL-only skips; MySQL ran exactly the 1,765-case native selection except exactly the
+  58 reviewed SQLite-only skips; every skipped case executed on the other engine. Every receipt records a clean tracked
+  checkout, so H4 holds on hosted CI.
+- H1–H3 passed on MySQL 8.4 inside the selection, and the receipt verifier accepted every shard.
+- The attachment-consumer blocker of `docs/verification/mysql-native-selection-20261009/` closes for Foundation:
+  `SupportAttachmentsTest` and `ServiceSupportAttachmentsTest` ran their native paths with no unlisted skip in an
+  exact-SHA run that passed as a whole.
+- Partition: shard 23 (10 files, 102 cases) took 131.8 minutes against the partitioner's 87-minute estimate, and shard 4
+  took 56.1. The shard spread is wider than the regenerated timings predicted, but all 24 stayed well inside the
+  210-minute limit; refreshing the timings from this run is optional.
+- Evidence: `run4/jobs.tsv`, `run4/receipts-summary.txt`, `run4/aggregate-and-shadow.txt`.
+
+What this pass does not establish: anything about a host, live payments, production configuration or DNS (no such step
+runs in Foundation); MySQL behaviour of the 394 files outside the native selection, including the 47 driver-branching
+residual files that run on SQLite only (Sean's decision); GitLab (not dispatched).
+
 ## Results
 
 | Run | Source | Result | Evidence |
@@ -261,6 +296,7 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
 | Foundation `38037183233` | `bd84978e` | failed on 4 of 24 MySQL shards, everything else passed: see the third-run section | GitHub run; `run3/jobs.tsv`, `run3/junit-summary.txt`, `run3/mysql-shard-*` |
+| Foundation `38077166247` | `0f23e63f` | **success**: every required job and the aggregate gate passed (`documentation` skipped by design); 26 receipts verified | GitHub run; `run4/` |
 | `MembershipSchemaPreparationTest` shadow-floor case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: "There is no active transaction" at line 186, as in CI | `run3/membership-schema-mysql80-red.txt` |
 | `CustomerSuppressionMigrationTest` non-prefix case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: SQLSTATE 1824 at line 128, as in CI | `run3/customer-suppression-mysql80-red.txt` |
 | `MembershipSchemaPreparationTest`, whole file, private MySQL 8.0.46, green | `914d757` | 13 tests, 40 assertions OK | `run3/membership-schema-mysql80-green.txt` |
@@ -274,5 +310,5 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 
 ## Not tested
 
-The third-run fixes on hosted CI (H1–H4 on MySQL 8.4 and the regenerated partitions), a host. The second-run fixes were
-confirmed by the third run (D on WebKit, SQLite at 100 minutes, G1–G3 on MySQL 8.4).
+A host, live payments, production configuration and DNS; the 394 files outside the MySQL native selection on MySQL
+(they run on SQLite); GitLab. The third-run fixes were confirmed by the fourth run, and the second-run fixes by the third.
