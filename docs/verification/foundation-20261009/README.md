@@ -245,6 +245,37 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 210 and 100 minutes on GitHub (175 and 100 on GitLab); the workflow comments carry the measurements. Splitting
 `BulkReplaceLicenseDraftSourceTest` remains a follow-up only if GitLab needs it.
 
+## Fourth run: Foundation `38077166247` on `0f23e63f` — complete pass
+
+Dispatched manually on main `0f23e63f62da9c4ea5b1a8651094c88cafe849bf` (the #86 merge, carrying H1–H4 and the regenerated
+timings) at 18:46 UTC on 2026-10-10 with that exact `expected_sha`. **Every job passed, the aggregate gate passed, and the
+run concluded `success` at 21:06 UTC.** This is the first complete Foundation pass on an exact integrated SHA.
+
+| Job | Result | Minutes |
+| --- | --- | --- |
+| scope, backend-quality, frontend, related-browser | success | 0.1, 7.4, 1.3, 7.5 |
+| operator-browser chromium-desktop, webkit-mobile | success (D confirmed a second time) | 12.4, 20.8 |
+| backend-sqlite 1/2, 2/2 | success: 3,717 + 3,302 executed, 268 + 355 census skips, 0 errors or failures | 73.8, 60.6 |
+| backend-mysql 1–24 on hosted MySQL 8.4.11 | success: 1,707 executed, 58 census skips, 0 errors or failures | 56.1–131.8 (shard 1: 123.3; shard 23: 131.8) |
+| backend (aggregate) | success: "26 current-run database receipts verified" | 0.4 |
+
+- Totals from the 26 verified receipts (`run4/receipts-summary.txt`): SQLite ran all 7,642 discovered cases in 557 files
+  except exactly the 623 reviewed MySQL-only skips; MySQL ran exactly the 1,765-case native selection except exactly the
+  58 reviewed SQLite-only skips; every skipped case executed on the other engine. Every receipt records a clean tracked
+  checkout, so H4 holds on hosted CI.
+- H1–H3 passed on MySQL 8.4 inside the selection, and the receipt verifier accepted every shard.
+- The attachment-consumer blocker of `docs/verification/mysql-native-selection-20261009/` closes for Foundation:
+  `SupportAttachmentsTest` and `ServiceSupportAttachmentsTest` ran their native paths with no unlisted skip in an
+  exact-SHA run that passed as a whole.
+- Partition: shard 23 (10 files, 102 cases) took 131.8 minutes against the partitioner's 87-minute estimate, and shard 4
+  took 56.1. The shard spread is wider than the regenerated timings predicted, but all 24 stayed well inside the
+  210-minute limit; refreshing the timings from this run is optional.
+- Evidence: `run4/jobs.tsv`, `run4/receipts-summary.txt`, `run4/aggregate-and-shadow.txt`.
+
+What this pass does not establish: anything about a host, live payments, production configuration or DNS (no such step
+runs in Foundation); MySQL behaviour of the 394 files outside the native selection, including the 47 driver-branching
+residual files that run on SQLite only (Sean's decision); GitLab (not dispatched).
+
 ## Results
 
 | Run | Source | Result | Evidence |
@@ -261,6 +292,7 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
 | Foundation `38037183233` | `bd84978e` | failed on 4 of 24 MySQL shards, everything else passed: see the third-run section | GitHub run; `run3/jobs.tsv`, `run3/junit-summary.txt`, `run3/mysql-shard-*` |
+| Foundation `38077166247` | `0f23e63f` | **success**: every job and the aggregate gate passed; 26 receipts verified | GitHub run; `run4/` |
 | `MembershipSchemaPreparationTest` shadow-floor case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: "There is no active transaction" at line 186, as in CI | `run3/membership-schema-mysql80-red.txt` |
 | `CustomerSuppressionMigrationTest` non-prefix case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: SQLSTATE 1824 at line 128, as in CI | `run3/customer-suppression-mysql80-red.txt` |
 | `MembershipSchemaPreparationTest`, whole file, private MySQL 8.0.46, green | `914d757` | 13 tests, 40 assertions OK | `run3/membership-schema-mysql80-green.txt` |
@@ -274,5 +306,5 @@ files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minute
 
 ## Not tested
 
-The third-run fixes on hosted CI (H1–H4 on MySQL 8.4 and the regenerated partitions), a host. The second-run fixes were
-confirmed by the third run (D on WebKit, SQLite at 100 minutes, G1–G3 on MySQL 8.4).
+A host, live payments, production configuration and DNS; the 394 files outside the MySQL native selection on MySQL
+(they run on SQLite); GitLab. The third-run fixes were confirmed by the fourth run, and the second-run fixes by the third.

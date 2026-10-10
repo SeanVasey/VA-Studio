@@ -178,6 +178,10 @@ They still run on SQLite.
 on hosted MySQL 8.4.** Only then does it close for Foundation. The local MySQL 8.0 evidence below does
 not close it.
 
+**Closed for Foundation on 2026-10-10** by run [38077166247](https://github.com/SeanVasey/VA-Studio/actions/runs/38077166247)
+on the exact SHA `0f23e63f`: both files ran on hosted MySQL 8.4.11 with no unlisted skip, all 26 receipts were verified and
+the run succeeded (`docs/verification/foundation-20261009/`, fourth run).
+
 ### MySQL skip census (`scripts/ci/database-mysql-skips.json`)
 
 The census mirrors `scripts/ci/database-sqlite-skips.json`. It holds sorted, unique
