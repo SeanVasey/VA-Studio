@@ -83,6 +83,13 @@ The review's non-blocking recommendations are not applied in this lane: a findin
 derivation drops non-ASCII letters, and refusing duplicate keys in the mapping JSON. They are
 returned to the integrator as remaining work.
 
+## Delta review of b329686
+
+An independent delta review of the condition commits `ae1db1e..b329686` returned APPROVE with no
+conditions (`independent-review-b329686-DECISION.md`). Its LOW finding stands as follow-up work: no
+test pins the 1,048,576 / 1,048,577-byte snapshot boundary, so two boundary mutants survive, and the
+normalizer's limit is a separate literal from the decoder's. Every such failure mode fails closed.
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,
@@ -91,8 +98,7 @@ returned to the integrator as remaining work.
 - MySQL: the dry run opens no database connection on any driver, so no MySQL run was made and
   none would add evidence. The container's mysqld is 8.0.46 (CI: 8.4.11); it was not started.
 - The Feature suite as a whole, browser specs and Foundation CI. The independent migration
-  review assessed `ae1db1e` (addendum above). Its conditional fixes in `fa34fd5` have not been
-  re-reviewed.
+  review assessed `ae1db1e` (addendum above), and the delta review assessed `b329686` (above).
 - Applying the snapshot through `CatalogDraftImporter` (separately authorized; not run).
 - `composer audit` / `npm audit`: no dependency was added or changed.
 
