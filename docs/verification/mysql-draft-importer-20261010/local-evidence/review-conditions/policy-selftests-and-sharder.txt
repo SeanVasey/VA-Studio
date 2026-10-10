@@ -1,0 +1,26 @@
+$ python3 scripts/ci/test-phpunit-shards.py (tail)
+----------------------------------------------------------------------
+Ran 52 tests in 0.351s
+
+OK
+rc=0
+
+$ python3 scripts/ci/test-focused-tests.py (tail)
+----------------------------------------------------------------------
+Ran 50 tests in 0.107s
+
+OK
+rc=0
+
+$ python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+warning: 79 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/CustomerConsentMigrationTest.php, tests/Feature/CustomerListeningFreshnessTest.php, tests/Feature/CustomerListeningMigrationTest.php, tests/Feature/CustomerPurchaseClaimConcurrencyTest.php, tests/Feature/CustomerPurchaseClaimMigrationTest.php, ...
+Proved 1816 selected MySQL-native tests in 164 files (of 7646 discovered tests in 557 files) across 8 nonempty shards.
+Shard 1: 254 tests; 20 complete files; estimated 19m 32s.
+Shard 2: 205 tests; 19 complete files; estimated 19m 29s.
+Shard 3: 193 tests; 20 complete files; estimated 19m 30s.
+Shard 4: 236 tests; 20 complete files; estimated 19m 30s.
+Shard 5: 228 tests; 20 complete files; estimated 19m 29s.
+Shard 6: 233 tests; 20 complete files; estimated 19m 29s.
+Shard 7: 252 tests; 21 complete files; estimated 19m 29s.
+Shard 8: 215 tests; 24 complete files; estimated 19m 29s.
+rc=0

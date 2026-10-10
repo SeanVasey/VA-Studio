@@ -1,0 +1,9 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:10.757, Memory: 89.00 MB
+
+OK (51 tests, 293 assertions)
+rc=0 elapsed=71s

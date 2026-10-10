@@ -28,7 +28,7 @@ strings (three `True` results, second session).
 | --- | --- | --- |
 | Dry run before apply | `review()` writes nothing; the digest binds source, actor, release, schema and target | Same code path; `rows()` locking reads release at the end of the read-only transaction |
 | Immutable evidence | UPDATE/DELETE triggers, unique indexes, BEFORE INSERT replacement guards | `SIGNAL` triggers on UPDATE and DELETE; `REPLACE` and `INSERT ... ON DUPLICATE KEY UPDATE` delete or update first, so the same triggers refuse them (probe below) |
-| Refusal on schema drift | exact `sqlite_master` rows, `foreign_keys=1`, `writable_schema=0`, `ignore_check_constraints=0` | exact `information_schema` TABLES, COLUMNS, STATISTICS, REFERENTIAL_CONSTRAINTS+KEY_COLUMN_USAGE, CHECK_CONSTRAINTS and TRIGGERS rows for the owned tables; `foreign_key_checks=1`, `unique_checks=1`, `autocommit=1`, strict `sql_mode`, `REPEATABLE-READ`, `DATABASE()` equal to the configured database, native PDO fetches |
+| Refusal on schema drift | exact `sqlite_master` rows, `foreign_keys=1`, `writable_schema=0`, `ignore_check_constraints=0` | exact `information_schema` TABLES, COLUMNS, STATISTICS, REFERENTIAL_CONSTRAINTS+KEY_COLUMN_USAGE (including `REFERENCED_TABLE_SCHEMA`, which must equal `DATABASE()`; third session), CHECK_CONSTRAINTS and TRIGGERS rows for the owned tables; `foreign_key_checks=1`, `unique_checks=1`, `autocommit=1`, strict `sql_mode`, `REPEATABLE-READ`, `DATABASE()` equal to the configured database, native PDO fetches |
 | Refusal on data drift | target snapshot of `tracks`, `catalog_import_mappings`, `audit_events` with per-row sha256 of attributes and `typeof()` classes | same snapshot with the declared `DATA_TYPE` as the class; reads are `FOR SHARE`, so no other session can insert into or update a read table until commit |
 | Idempotent re-run | retained mappings form an exact prefix; replay creates nothing | same code path, proved on MySQL by the resume and overlapping-apply cases |
 | No partial writes | one transaction per segment; any exception rolls back | same, proved by the audit-failure and mapping-failure cases; see the DDL difference below |
@@ -81,7 +81,7 @@ Run against a freshly migrated database on the private server before the MySQL b
 | PDO fetch types (`query()` and prepared) | ints as `int`, strings as `string`, `NULL` as null; `ATTR_STRINGIFY_FETCHES=false`, `ATTR_EMULATE_PREPARES=false` |
 | `REPLACE INTO` same id, `REPLACE INTO` same digest, `INSERT ... ON DUPLICATE KEY UPDATE`, `UPDATE`, `DELETE` on a batch row | all refused: `SQLSTATE[45000] 1644 Catalog import evidence is immutable` |
 | `TRUNCATE TABLE catalog_import_batches` | refused: `1701 Cannot truncate a table referenced in a foreign key constraint` |
-| Session B `DROP TRIGGER`, `ALTER TABLE ... ADD COLUMN`, `INSERT INTO tracks`, `UPDATE users` while session A holds an open transaction after `FOR SHARE` reads | each waits and times out: `1205 Lock wait timeout exceeded` (2 s timeout); a plain `SELECT` is admitted |
+| Session B `DROP TRIGGER`, `ALTER TABLE ... ADD COLUMN`, `INSERT INTO tracks`, `UPDATE users` while session A holds an open transaction after `FOR SHARE` reads | each waits and times out: `1205 Lock wait timeout exceeded` (2 s timeout); a plain `SELECT` is admitted. The probe did not separate the locks; the independent review showed that none of these four waits depends on `FOR SHARE` (see "Independent review conditions" below for the lock behind each) |
 | Session A `DROP TRIGGER` inside its own transaction after an insert | admitted; `rollBack()` reports no active transaction; the inserted row is committed |
 | `SET SESSION foreign_key_checks = 0, unique_checks = 0` | `SELECT @@session...` returns `int(0)`, `int(0)` |
 | `CREATE TEMPORARY TABLE catalog_import_mappings` | `information_schema.TABLES` still lists only the base table; the shadowed name resolves to the temporary table |
@@ -177,33 +177,110 @@ and their PHP processes shared the four cores; load average about 10), so they a
 
 What the MySQL run proves beyond the SQLite run, by case:
 
-- `test_foreign_or_incomplete_live_owned_schema` (9 data sets): each InnoDB drift (`DROP TRIGGER`, a
-  no-op foreign trigger, `DROP INDEX`, `ADD COLUMN`, `foreign_key_checks = 0`, `unique_checks = 0`,
-  non-strict `sql_mode`, `ON DELETE CASCADE` on the actor foreign key, nullable `actor_id`) is refused by
-  both `review()` and `apply()` with `catalog_target_schema_invalid` and leaves the evidence unchanged.
+- `test_foreign_or_incomplete_live_owned_schema` (9 data sets in this run; 10 since the third session):
+  each InnoDB drift (`DROP TRIGGER`, a no-op foreign trigger, `DROP INDEX`, `ADD COLUMN`,
+  `foreign_key_checks = 0`, `unique_checks = 0`, non-strict `sql_mode`, `ON DELETE CASCADE` on the actor
+  foreign key, nullable `actor_id`, and since the third session the actor foreign key repointed at another
+  schema's `users`) is refused by both `review()` and `apply()` with `catalog_target_schema_invalid` and
+  leaves the evidence unchanged.
 - `test_raw_replace_cannot` (5 data sets): `REPLACE INTO` on either owned table, by primary key or by
   any unique identity, is refused with `Catalog import evidence is immutable` by the `SIGNAL` triggers.
 - `test_schema_changes_after_review` and `test_final_direct_schema_proof`: DDL from a callback inside
   the importer's own session commits implicitly; the drift is still refused, the committed rows are an
   exact retained prefix, and a replay creates nothing (the engine difference above).
 - `test_nested_importers_and`: with a segment open, a nested importer in the same process is refused,
-  and a second session's `DROP TRIGGER`, `ALTER TABLE ... ADD COLUMN`, `INSERT INTO tracks` and
-  `UPDATE users` each time out with error 1205 on the open transaction's metadata and next-key locks.
+  and a second session's writes each time out with error 1205, each on a different lock of the open
+  transaction:
+  - `DROP TRIGGER` and `ALTER TABLE ... ADD COLUMN`: the metadata locks the transaction holds on the
+    tables it has read or written.
+  - `INSERT INTO tracks`: the `catalog_discovery_epoch` row that the tracks insert trigger `cde_1_insert`
+    updates, which the importer's own track insert has already locked.
+  - `UPDATE users`: the exclusive row lock `CatalogDraftImporter` takes on the actor (`lockForUpdate`).
+  - `INSERT INTO audit_events` (added in the third session): only the `FOR SHARE` next-key locks taken by
+    `CatalogDatabaseEvidence::rows()`. `audit_events` has no trigger and the insert's null `actor_id`
+    needs no `users` check. This is the only outcome that fails when `FOR SHARE` is removed (red/green
+    below).
+  The second-session run of this case predates the `audit_events` write; its four 1205 outcomes came from
+  the first three locks, not from `FOR SHARE`, which this README originally misattributed.
 - `test_partial_failure_while` and `test_overlapping_duplicate`: a failure while the second mapping is
   created rolls back every row of the segment on InnoDB; overlapping and repeated applies create exactly
   one draft, mapping and audit set per record.
 - `test_final_direct_current_proof` (5 data sets): the MySQL `UPDATE ... ORDER BY id LIMIT 1` late
   mutation is refused by the final direct proof like the SQLite subquery form.
 
-## Policy self-tests (second session)
+## Independent review conditions (third session)
+
+The independent review of `fc67774` returned APPROVE WITH CONDITIONS
+([independent-review-fc67774-DECISION.md](independent-review-fc67774-DECISION.md), copied verbatim). The
+three conditions are applied in three commits on this branch; logs are in
+`local-evidence/review-conditions/` (worktree and scratch prefixes stripped).
+
+| Condition | Commit | Change |
+| --- | --- | --- |
+| 1. A foreign write that only `FOR SHARE` can block | `test(migration): prove the FOR SHARE evidence reads block foreign audit inserts on MySQL` | The nested-importer case's second session also runs `INSERT INTO audit_events (actor_id, action, subject_type, subject_id, context, created_at)` with a null `actor_id` and expects 1205; its comment and the bullet above name the lock behind each outcome. On the migrated MySQL schema `audit_events` has no trigger (`information_schema.TRIGGERS` count 0), while `tracks` has eleven, including `cde_1_insert`. |
+| 2. Cross-schema foreign-key drift | `fix(migration): refuse owned foreign keys that reference another schema on MySQL` | The `foreign_keys` query reads `k.REFERENCED_TABLE_SCHEMA`, and each expected row requires it to equal `DATABASE()`, which `mysqlSchema()` has already proved equal to the configured database. New drift data set `foreign-referenced-table`: on MySQL it creates `<database>_catalog_peer` (only after proving that schema absent) with `users` copied by `CREATE TABLE ... LIKE`, re-creates `catalog_import_mappings_actor_id_foreign` against it with the same name, column and rules, and on teardown drops that key and then the peer schema. SQLite foreign keys cannot name a schema, so on SQLite the counterpart repoints the key at another `users` table in the same database. |
+| 3. Unused `OWNED` constant | `refactor(migration): drop the unused owned-table constant from the catalog evidence reader` | Removed. No statement, expected row or digest changes. |
+
+The MySQL schema digest now includes the referenced schema, so it differs from `fc67774`'s for the same
+database; the SQLite branch is untouched.
+
+### Red and green (MySQL 8.0.46, private disposable server, third session)
+
+The red runs used the branch's final test file and swapped only `CatalogDatabaseEvidence` for the named
+variant, through a scratch PHPUnit bootstrap that registers a Composer class-map entry for that class before
+the suite loads (not committed). Each run used its own CI-marker-admitted disposable database.
+The server was a fresh private `mysqld` 8.0.46 on `127.0.0.1:33114` with its own data directory, socket and
+pid file (default `sql_mode`, `REPEATABLE-READ`), shut down after the runs.
+
+| Run | `CatalogDatabaseEvidence` | Filter | Result | Log |
+| --- | --- | --- | --- | --- |
+| Condition 1 red | final file with `FOR SHARE` removed from the `rows()` query (one-line `sed`, the only diff) | `test_nested_importers_and` | rc 1, "Tests: 1, Assertions: 3, Failures: 1": the outcomes differ only in `'audit' => 'admitted'` (expected 1205) | `mysql80-cond1-red-no-for-share.txt` |
+| Condition 1 green | final | `test_nested_importers_and` | rc 0, OK (1 test, 14 assertions) | `mysql80-cond1-green.txt` |
+| Condition 2 red | `fc67774` (`git show`) | `..._without_repairs#9` (`foreign-referenced-table`) | rc 1, "Tests: 1, Assertions: 7, Failures: 1": `'Foreign installed schema admitted: foreign-referenced-table review'` | `mysql80-cond2-red-fc67774.txt` |
+| Condition 2 green, all drift data sets | final | `test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs` | rc 0, OK (10 tests, 63 assertions); every data set has zero failures | `mysql80-cond2-green-drift.txt`, `.junit.xml` |
+
+After every run, `information_schema.SCHEMATA` listed no `*_catalog_peer` schema, including after the failing red
+run (the cleanup is registered with `beforeApplicationDestroyed`, so it runs on failure too).
+
+### Re-run of the whole suite on the final code (third session)
+
+Commits `e84d489` and `4ff80d9` change the MySQL schema digest and the nested case, so the whole suite was
+re-run on the final test file and `CatalogDatabaseEvidence` (branch head before this docs commit).
+
+| Engine | How | Result | Log |
+| --- | --- | --- | --- |
+| SQLite in memory | one invocation, whole file | rc 0, OK (51 tests, 293 assertions), no skips, 71 s | `sqlite-final-suite.txt`, `.junit.xml` |
+| MySQL 8.0.46 | 19 invocations, one per test method (the two condition-green runs above plus 17 more), four parallel queues on four disposable databases | every invocation rc 0; aggregate of the 19 JUnit files: **51 tests, 365 assertions, 0 errors, 0 failures, 0 skipped, 51 distinct case names** | `mysql80-final-suite.txt`, `mysql80-final-suite.junit.xml` (the 19 suites merged) |
+
+The first attempt at three of the MySQL groups (`test_exact_review_source_and_current_target_binding`,
+`test_raw_replace_cannot`, `test_final_direct_schema_proof`) lost its server: the private `mysqld` ran
+as a session background job, the harness stopped it at its 30-minute limit, and five cases errored with
+`1053 Server shutdown in progress` or `2002 Connection refused` during `migrate:fresh`. Those outputs were
+set aside, not cited. The server was restarted on the same data directory with a longer job limit and
+`innodb_redo_log_capacity=1G`, and the three groups were re-run in full. The results above are from that re-run.
+
+### Lock scope to state before any staging MySQL run
+
+While a segment is open, `CatalogDatabaseEvidence::rows()` holds share next-key locks on every row and gap
+of each table it has read: `users`, `tracks`, `audit_events`, `catalog_import_batches` and
+`catalog_import_mappings`, plus `media_assets`, `rights_declarations`, `offers` and `offer_revisions`
+through the childless check. Until the segment commits or rolls back, every other session's insert, update
+or delete on those tables waits (and times out after `innodb_lock_wait_timeout`). Plain reads are
+admitted. A segment holds at most 25 records and each read is capped at 100,000 rows. This is acceptable
+for private staging, but the staging run must be scheduled when no other writer, such as the admin panel,
+queue workers or another import, is expected to touch those tables.
+
+## Policy self-tests (second session; third-session re-runs marked)
 
 | Command | Result |
 | --- | --- |
 | `python3 scripts/ci/test-phpunit-shards.py` | rc 0, "Ran 52 tests", OK (`local-evidence/policy-selftests.txt`) |
 | `python3 scripts/ci/test-focused-tests.py` | rc 0, "Ran 50 tests", OK (the focused-suite census is untouched) |
 | `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection` | rc 0: "Proved 1815 selected MySQL-native tests in 164 files (of 7645 discovered tests in 557 files) across 8 nonempty shards" (main: 1,765 in 163 of 7,642); the suite is in `phpunit-ci-mysql-8.xml`; the generated `phpunit-ci-mysql-*` files and manifest were deleted (`git status` clean of them) |
+| Third session: `python3 scripts/ci/test-phpunit-shards.py` and `python3 scripts/ci/test-focused-tests.py` | rc 0, "Ran 52 tests", OK; rc 0, "Ran 50 tests", OK (`local-evidence/review-conditions/policy-selftests-and-sharder.txt`) |
+| Third session: the same sharder command | rc 0: "Proved 1816 selected MySQL-native tests in 164 files (of 7646 discovered tests in 557 files) across 8 nonempty shards"; the suite is now in `phpunit-ci-mysql-7.xml`; generated files deleted |
 
-The selection grows by exactly this file's 50 cases. The sharder warns that the file has no entry in
+The selection grows by exactly this file's cases (50, and 51 since the third session's drift data set). The sharder warns that the file has no entry in
 `phpunit-timings-mysql.json` and uses the fallback weight; at CI's measured 35 s per `migrate:fresh` case
 the file adds about 30 minutes to one MySQL shard. Fresh timings from the first hosted run should replace
 the weight.
@@ -219,6 +296,9 @@ the weight.
   `scripts/dev/persistent-content-bootstrap.php` pins `DB_CONNECTION=sqlite` and is outside this lane.
   A staging (MySQL) entry point is remaining work.
 - Real source data, staging's host, privileges and network were not exercised.
+- The session guards for isolation level, `autocommit`, `DATABASE()` and `ATTR_STRINGIFY_FETCHES` still
+  have no test case (review finding 3, LOW, not a condition); the reviewer's probe showed READ COMMITTED
+  and `autocommit=0` refused with `catalog_target_schema_invalid`.
 - Concurrency between two importer processes on MySQL was proved only for the lock waits a second
   session experiences while one segment is open (DDL, insert and update all time out); two importers
   racing for the same batch were not run as separate processes.
