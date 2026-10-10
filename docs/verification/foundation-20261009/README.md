@@ -127,7 +127,7 @@ fixes (B, C), the receipt rule (F) and the narrowed MySQL selection (E, #82). De
 | backend-mysql 3/8 | 209 tests in 186.5 min, 8 errors | all `CustomerInquiryMigrationTest` (G1) |
 | backend-mysql 1, 4–8 | cancelled at the 210-minute limit, about half done | shard 1 completed at least 148 of 257; shard 8 reached 126 of 211 including one error (G3); timing in G2 |
 
-### D. WebKit — fixed here (test-only), awaiting a hosted run
+### D. WebKit — fixed here (test-only); confirmed on hosted WebKit by runs 38037183233 and 38077166247
 
 Both causes were reproduced locally on Playwright's WebKit 2359 (`run2/webkit-*-repro.cjs`) and reviewed
 (`run2/independent-review-2fd7ccb-DECISION.md`, APPROVE WITH CONDITIONS, conditions applied):
@@ -154,7 +154,7 @@ parent rollback must do on MySQL", but `inquiry_notification_intents` (migration
 added; its restricting foreign key made MySQL refuse every drop (SQLSTATE 3730). SQLite does not enforce the drop, so
 only the native selection could show it. `setUp` now rolls back 243000 first. On a fresh private MySQL 8.0.46 database the old test file gives 27 tests with
 the same 8 errors as CI and the fixed one passes 27 tests / 302 assertions (`run2/inquiry-migration-mysql80-{red,green}.txt`);
-CI's MySQL 8.4 has not run it yet.
+CI's MySQL 8.4 later passed it (runs 38037183233 and 38077166247).
 
 ### G3. Three more native-only test defects — found by independent review and a foreign-key scan
 
@@ -168,7 +168,7 @@ selection is about 41–47 compute-hours. MySQL now runs in 24 shards on GitHub 
 from the two complete shards; the receipt archive bound was raised to fit 24-shard archives (the old 32-member bound would
 have refused a 16- or 24-shard archive). Projected busiest shard: shard 1 (`BulkReplaceLicenseDraftSourceTest` alone)
 about 141–166 minutes, under GitHub's 210 and GitLab's 175 (tight once GitLab job setup is counted). Details, partition and
-cost: `docs/verification/mysql-native-selection-20261009/`. Nothing has run at 24 shards yet.
+cost: `docs/verification/mysql-native-selection-20261009/`. Run 38037183233 was the first at 24 shards; run 38077166247 passed all 24.
 
 ## Third run: Foundation `38037183233` on `bd84978e` (after #84; #85, docs only, merged nine minutes after the dispatch)
 
