@@ -148,7 +148,7 @@ jobs:
     name: backend-mysql (${{ matrix.shard }}/24)
     runs-on: ubuntu-latest
     # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
-    # SQLite-skipped methods, migration test files and a reviewed include list, 1765 of 7642 cases in 163 files.
+    # SQLite-skipped methods, migration test files and a reviewed include list, 1816 of 7646 cases in 164 files (1765 in 163 when run 38037183233 ran).
     # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes, and run 37967128232 showed
     # 8 shards of this selection cannot either (186 minutes for the two that finished). Run 38037183233 ran
     # all 24 shards to completion on hosted MySQL 8.4: 58 to 109 minutes each, 124.5 minutes for shard 1
