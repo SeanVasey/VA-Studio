@@ -49,6 +49,40 @@ admitted by `PrivateSourceFiles::snapshot` with `source_sha256` equal to the rep
 "Red first" does not apply: this lane adds a new capability rather than fixing a refusal or
 defect; the CLI and classes did not exist before commit `3519dc09`.
 
+## Independent review of ae1db1e and fixes (addendum)
+
+The independent review returned **APPROVE WITH CONDITIONS**
+(`independent-review-ae1db1e-DECISION.md`, copied verbatim). Both conditions are applied in
+`fa34fd5bc6689d174815955b97c5f1b6a1170ae8`:
+
+1. An oversize snapshot is no longer `internal_error`. A clean sheet whose drafts-v1 snapshot
+   would exceed the decoder's 1,048,576-byte cap is now the sheet finding `snapshot_too_large`
+   ("N bytes, maximum 1048576"). Every row is withheld, both reports are written, no
+   `catalog.json` is written, and the CLI exits 3. The limit and the split-the-export remedy
+   are in `docs/migration/beatstars-export-normalization.md`. New unit test: over the limit
+   (120 rows) and under it (40 rows, admitted by the decoder). New feature test: the real CLI on
+   a 617,530-byte synthetic sheet.
+2. New unit cases for one-decimal and sub-dollar prices: `12.5` gives 1250, `$0.5` gives 50,
+   `$29.9` gives 2990 and `0.05` gives 5. Mutation M6 now fails exactly this test (1 of 73).
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Red: new tests against the unchanged normalizer | the oversize unit test errors with `normalizer_output_rejected`; the feature test gets `dry_run_refused`/`internal_error`, exit 1 | `evidence/review-fixes-red-green.txt` |
+| Red: M6 mutant | 1 failure in 73 (1205 for 1250, 5 for 50) | `evidence/review-fixes-red-green.txt` |
+| Normalizer unit test | OK, 73 tests, 662 assertions | `evidence/review-fixes-red-green.txt` |
+| Dry-run command feature test | OK, 14 tests, 121 assertions | `evidence/review-fixes-red-green.txt` |
+| Pint on lane PHP files | passed | `evidence/review-fixes-red-green.txt` |
+| Adjacent onboarding tests | OK, 132 tests, 836 assertions | `evidence/review-fixes-regression.txt` |
+| Whole Unit suite | OK, 1072 tests, 6866 assertions, 1 skip (same count as before; not listed) | `evidence/review-fixes-regression.txt` |
+| Real CLI | the clean fixture outputs are byte-identical to the earlier run (`catalog.json` `bd893c40…83968`); findings copy exit 3; oversize sheet exit 3 with `snapshot_too_large`, 2 files at mode 0600 | `evidence/cli-review-fixes.txt` |
+
+The Markdown note under sheet findings now names each remedy. This changes the findings copy's
+`beatstars-dry-run.md` hash (`f17e8372…`), but not the clean run's outputs.
+
+The review's non-blocking recommendations are not applied in this lane: a finding when slug
+derivation drops non-ASCII letters, and refusing duplicate keys in the mapping JSON. They are
+returned to the integrator as remaining work.
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,
@@ -56,8 +90,9 @@ defect; the CLI and classes did not exist before commit `3519dc09`.
   mapping. Only the synthetic sheet was exercised.
 - MySQL: the dry run opens no database connection on any driver, so no MySQL run was made and
   none would add evidence. The container's mysqld is 8.0.46 (CI: 8.4.11); it was not started.
-- The Feature suite as a whole, browser specs, Foundation CI and independent migration review
-  (M-09 is marked **migration** review in the Monday plan).
+- The Feature suite as a whole, browser specs and Foundation CI. The independent migration
+  review assessed `ae1db1e` (addendum above). Its conditional fixes in `fa34fd5` have not been
+  re-reviewed.
 - Applying the snapshot through `CatalogDraftImporter` (separately authorized; not run).
 - `composer audit` / `npm audit`: no dependency was added or changed.
 

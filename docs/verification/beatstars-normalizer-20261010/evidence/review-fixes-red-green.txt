@@ -1,0 +1,58 @@
+# Review fixes, red then green. Tested source: fa34fd5bc6689d174815955b97c5f1b6a1170ae8 (red runs: the new tests against the unchanged normalizer at ae1db1e)
+
+## Red: new tests against the unchanged normalizer at ae1db1e
+$ <phpunit direct, SQLite env, PAO_DISABLE=1> --filter 'test_one_decimal|test_a_snapshot_over' -- tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+.E                                                                  2 / 2 (100%)
+Time: 00:00.050, Memory: 36.50 MB
+There was 1 error:
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_a_snapshot_over_the_decoder_limit_is_a_sheet_finding_and_a_large_sheet_under_it_still_normalizes
+RuntimeException: normalizer_output_rejected
+<worktree>/app/Domain/Migration/BeatStars/BeatStarsExportNormalizer.php:412
+<worktree>/app/Domain/Migration/BeatStars/BeatStarsExportNormalizer.php:135
+<worktree>/tests/Unit/Migration/BeatStarsExportNormalizerTest.php:438
+<worktree>/tests/Unit/Migration/BeatStarsExportNormalizerTest.php:291
+ERRORS!
+Tests: 2, Assertions: 4, Errors: 1.
+(the price test passes on the unchanged code, which is correct; its red is the M6 mutant below)
+
+$ <phpunit direct, SQLite env, PAO_DISABLE=1> --filter test_a_sheet_whose_snapshot -- tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+F                                                                   1 / 1 (100%)
+Time: 00:01.670, Memory: 77.00 MB
+There was 1 failure:
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_a_sheet_whose_snapshot_exceeds_the_limit_exits_three_with_a_report_naming_the_finding
+{"code":"dry_run_refused","reason":"internal_error","database_writes":0}
+Failed asserting that 1 is identical to 3.
+<worktree>/tests/Feature/Migration/BeatStarsDryRunCommandTest.php:148
+FAILURES!
+Tests: 1, Assertions: 2, Failures: 1.
+
+## Red: mutation M6 (str_pad replaced by (int) ($match[2] ?? '0'), applied temporarily to the fixed normalizer, then restored byte for byte)
+$ <phpunit direct, SQLite env, PAO_DISABLE=1> --colors=never -- tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+There was 1 failure:
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_one_decimal_and_sub_dollar_prices_convert_exactly_to_minor_units
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 1250,
+-    1 => 50,
++    0 => 1205,
++    1 => 5,
+ ]
+<worktree>/tests/Unit/Migration/BeatStarsExportNormalizerTest.php:283
+FAILURES!
+Tests: 73, Assertions: 660, Failures: 1.
+(the same mutant against the unchanged code, new price test only: 1250 expected, 1205 actual; 50 expected, 5 actual)
+
+## Green: fixed normalizer
+$ <phpunit direct, SQLite env, PAO_DISABLE=1> --colors=never -- tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+Runtime:       PHP 8.4.26
+Time: 00:00.201, Memory: 28.50 MB
+OK (73 tests, 662 assertions)
+$ <phpunit direct, SQLite env, PAO_DISABLE=1> --colors=never -- tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+Runtime:       PHP 8.4.26
+Time: 00:02.916, Memory: 81.00 MB
+OK (14 tests, 121 assertions)
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars scripts/migration/beatstars-dry-run.php tests/Unit/Migration/BeatStarsExportNormalizerTest.php tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+{"tool":"pint","result":"passed"}
