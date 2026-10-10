@@ -44,7 +44,7 @@ Every response in this chain is labelled `testOnly: true` and `payable: false` u
 
 ## 6. Accounts (test-only today)
 
-Accounts are optional test fixtures today: enrollment and recovery run only in `local`/`testing` with a private message capture, passwords need 12–72 bytes with letters and numbers, and production enrollment, recovery and notice policy remain open (`docs/customer-test-self-service.md`, "Customer journey"; `config/production-customer-identity.php`). A signed-in customer gets a private library (saved tracks, playlists, lyric notes, export and clear), communication preferences and purchase-claim pages (`routes/customer.php`). Access can be withdrawn by the operator; withdrawal keeps the account's orders, contracts and files (`docs/verification/customer-account-test-journey.md`, "Ownership and withdrawal").
+Accounts are optional test fixtures today: enrollment and recovery run only where test customer accounts are admitted (`local`, `testing` or the hosted `staging` rehearsal) with a private message capture, passwords need at least 12 characters with letters and numbers and at most 72 UTF-8 bytes, and production enrollment, recovery and notice policy remain open (`app/Domain/Customers/CustomerIdentityPolicy.php`; `app/Domain/Customers/CustomerAccessPolicy.php`; `docs/customer-test-self-service.md`, "Customer journey"; `config/production-customer-identity.php`). A signed-in customer gets a private library (saved tracks, playlists, lyric notes, export and clear), communication preferences and purchase-claim pages (`routes/customer.php`). Access can be withdrawn by the operator; withdrawal keeps the account's orders, contracts and files (`docs/verification/customer-account-test-journey.md`, "Ownership and withdrawal").
 
 ## 7. Contact and support
 
@@ -56,7 +56,7 @@ The code records refund and dispute observations retrieved from Stripe against t
 
 ## 9. Memberships, services and other products
 
-Memberships, service projects, sound kits and other product families exist in the source as default-off development work and are not sold: memberships block on C2–C5 and Billing259 (`docs/ops/production-activation-packet.md`, section 1); service briefs and quotes run only for synthetic customers in `local`/`testing` (`docs/service-projects.md`); sound-kit intake is private operator work (`docs/sound-kit-intake.md`). Terms for these are not drafted here.
+Memberships, service projects, sound kits and other product families exist in the source as default-off development work and are not sold: memberships block on C2–C5 and Billing259 (`docs/ops/production-activation-packet.md`, section 1); service briefs and quotes run only for synthetic customers in `local`, `testing` or the hosted `staging` rehearsal, behind a default-off flag (`app/Domain/Services/Projects/ServiceProjectPolicy.php`; `docs/service-projects.md`); sound-kit intake is private operator work (`docs/sound-kit-intake.md`). Terms for these are not drafted here.
 
 ## 10. Changes to published content and terms
 
