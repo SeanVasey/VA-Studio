@@ -187,11 +187,16 @@ class RightsScopeStaffMfaTest extends TestCase
             $this->assertSame(User::class, $record->subject_type);
             $this->assertSame($operator->id, $record->subject_id);
             $this->assertTrue($record->created_at->equalTo(now()));
-            $this->assertSame([
+            // MySQL's JSON type normalizes object-key order, so compare key-sorted copies; values stay strict.
+            $expected = [
                 'schema_version' => 1, 'authority' => 'trusted_interactive_console', 'command' => 'vasey:rights-scope',
                 'action' => 'register', 'scope_key' => 'synthetic-attested', 'offer_revision_id' => null,
                 'attested_at' => now()->utc()->toIso8601String(), 'environment' => 'staging', 'mfa_required' => true, 'mfa_enrolled' => false,
-            ], $record->context);
+            ];
+            $context = $record->context;
+            ksort($expected, SORT_STRING);
+            ksort($context, SORT_STRING);
+            $this->assertSame($expected, $context);
 
             $scope = $manage->register('synthetic-attested', 'SYNTHETIC-SCOPE', $operator, $attestation);
             $registered = AuditEvent::where('action', 'commerce.inventory.scope_registered')->firstOrFail();
