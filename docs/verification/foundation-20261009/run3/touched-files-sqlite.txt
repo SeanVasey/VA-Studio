@@ -1,0 +1,15 @@
+Direct PHPUnit on SQLite in-memory (APP_ENV=testing, DB_CONNECTION=sqlite, DB_DATABASE=:memory:) of the four touched files on this branch:
+tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php tests/Feature/CustomerSuppressionMigrationTest.php tests/Feature/CustomerConsentMigrationTest.php tests/Feature/SupportAttachmentNativeConcurrencyTest.php
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+...SSS........................................................S   63 / 63 (100%)
+
+Time: 02:35.070, Memory: 87.00 MB
+
+OK, but some tests were skipped!
+Tests: 63, Assertions: 363, Skipped: 4.
+exit 0

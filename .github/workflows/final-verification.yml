@@ -149,13 +149,13 @@ jobs:
     runs-on: ubuntu-latest
     # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
     # SQLite-skipped methods, migration test files and a reviewed include list, 1765 of 7642 cases in 163 files.
-    # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes. Run 37967128232 then ran this
-    # selection in 8 shards: shards 2 and 3 took 186 minutes each (about 54 s per case, not the 35 s assumed
-    # before) and the other six were cancelled at 210 minutes. Twenty-four shards split the 1372
-    # FinalizationDatabaseMigrations cases 23 to 85 per shard, about 26 to 96 minutes at 68 s each; scaling
-    # the files without measured timings by the cancelled shards' pace (1.48 to 1.88 times) projects the
-    # busiest shard at about 122 to 132 minutes; shard 1 is BulkReplaceLicenseDraftSourceTest alone, measured
-    # at about 122 minutes. The limit stays 210 minutes. A hung test still cannot hold a runner for 6 hours.
+    # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes, and run 37967128232 showed
+    # 8 shards of this selection cannot either (186 minutes for the two that finished). Run 38037183233 ran
+    # all 24 shards to completion on hosted MySQL 8.4: 58 to 109 minutes each, 124.5 minutes for shard 1
+    # (BulkReplaceLicenseDraftSourceTest alone, which no partition can shorten), 127,466 s of test time in
+    # all. scripts/ci/phpunit-timings-mysql.json is regenerated from those 24 JUnit logs, so every selected
+    # file is now measured and the other 23 shards balance at about 87 minutes. The limit stays 210 minutes.
+    # A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 210
     strategy:
       fail-fast: false
@@ -245,9 +245,10 @@ jobs:
     if: needs.scope.outputs.mode != 'docs'
     name: backend-sqlite (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    # Foundation 37967128232 measured 47.5 minutes for shard 1; shard 2 was cut off by the former 60-minute
-    # limit at 3,294 of 3,725 tests (88%, about 67 minutes projected). 100 minutes leaves about 45% headroom until the
-    # SQLite timings are regenerated. A hung test still cannot hold a runner for 6 hours.
+    # Foundation 38037183233 measured 80.2 minutes for shard 1 (3,917 tests) and 43.4 for shard 2 (3,725) on
+    # the stale timings; scripts/ci/phpunit-timings-sqlite.json is regenerated from both JUnit logs, which
+    # balances the two shards at about 61 minutes each: about 25% headroom over the busiest measured shard
+    # (80.2) and about 40% over the balanced estimate. A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 100
     strategy:
       fail-fast: false

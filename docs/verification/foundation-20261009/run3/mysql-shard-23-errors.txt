@@ -1,0 +1,145 @@
+Foundation CI run 38037183233, backend-mysql (23/24), phpunit-ci-mysql-23-results.xml: error texts (trimmed, runner paths shortened)
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 1" (error, 134.8 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 1"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 2" (error, 99.1 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 2"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 3" (error, 71.5 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 3"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 4" (error, 122.2 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 4"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 5" (error, 109.6 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 5"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 6" (error, 106.4 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 6"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 7" (error, 64.0 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 7"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 8" (error, 102.9 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 8"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 9" (error, 90.5 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 9"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 10" (error, 99.2 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 10"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 11" (error, 84.2 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 11"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53
+
+Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 12" (error, 93.7 s)
+  Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 12"
+  Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: vaseyaudio_test, SQL: drop table `customer_consent_events`)
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+  vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+  vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/CustomerConsentMigrationTest.php:53

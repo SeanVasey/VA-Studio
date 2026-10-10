@@ -170,6 +170,81 @@ have refused a 16- or 24-shard archive). Projected busiest shard: shard 1 (`Bulk
 about 141–166 minutes, under GitHub's 210 and GitLab's 175 (tight once GitLab job setup is counted). Details, partition and
 cost: `docs/verification/mysql-native-selection-20261009/`. Nothing has run at 24 shards yet.
 
+## Third run: Foundation `38037183233` on `bd84978e` (after #84; #85, docs only, merged nine minutes after the dispatch)
+
+Dispatched manually on main `bd84978e294ec31ff0b78285deb786d443a5e283` at 08:14 UTC on 2026-10-10, the first run with the
+second-run fixes (D, the SQLite limit, G1–G3) and the 24-shard MySQL partition. Development evidence only; the run failed
+on four of its 24 MySQL shards and passed everything else. Job table and per-shard JUnit summary: `run3/jobs.tsv`,
+`run3/junit-summary.txt`.
+
+| Job | Result | Notes |
+| --- | --- | --- |
+| scope, backend-quality, frontend, related-browser | success | — |
+| operator-browser chromium-desktop (13.8 min), webkit-mobile (18.7 min) | success | D confirmed on hosted WebKit: both audio specs and the offline spec pass |
+| backend-sqlite 1/2 | success, 80.2 min, 3,917 tests, 345 skipped | receipt accepted; the stale timings put 79 min of test time here |
+| backend-sqlite 2/2 | success, 43.4 min, 3,725 tests, 278 skipped | receipt accepted; the 100-minute limit was sized right |
+| backend-mysql 1/24 | success, 124.5 min, 85 tests | `BulkReplaceLicenseDraftSourceTest` alone; no partition can shorten it |
+| backend-mysql 2–9, 11–14, 16–21, 24 | success, 58–109 min | 19 more accepted native-selection receipts on hosted MySQL 8.4.11 (20 with shard 1); G1 and G3 confirmed |
+| backend-mysql 10/24 | 73 tests, 1 error, 67.4 min | `MembershipSchemaPreparationTest` (H1) |
+| backend-mysql 15/24 | 73 tests, 1 error, 2 skipped, 102.8 min | `CustomerSuppressionMigrationTest` (H2) |
+| backend-mysql 22/24 | 73 tests OK, receipt refused, 108.0 min | "Probe failed: clean tracked checkout" (H4) |
+| backend-mysql 23/24 | 69 tests, 12 errors, 101.1 min | `CustomerConsentMigrationTest`, all 12 interruption cases (H3) |
+
+All four are test-side defects that only a native engine can show; no application code changes. The SQLite-only census,
+the MySQL skip census and the selection are unchanged, and every selected test executed on exactly one engine as before.
+
+### H1. `MembershipSchemaPreparationTest` shadow-floor case — fixed here (test-only)
+
+`test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows` creates a temporary table inside `DB::transaction` and
+drops it in a `finally` with plain `DROP TABLE`. On MySQL `DROP TABLE` commits implicitly even for a temporary table
+(only `DROP TEMPORARY TABLE` does not), so the surrounding transaction had already ended when the closure returned and
+`commit()` raised `PDOException: There is no active transaction` (`run3/mysql-shard-10-errors.txt`). SQLite has no implicit
+commit, so the test passed there. The drop now uses `DROP TEMPORARY TABLE` on MySQL and the unchanged `DROP TABLE temp.…`
+on SQLite; the assertions are unchanged.
+
+### H2. `CustomerSuppressionMigrationTest` non-prefix gap — fixed here (test-only)
+
+`test_non_prefix_or_recorded_missing_guard_is_refused_without_repair` simulated a non-prefix installation by creating the
+second owned table alone. `customer_suppression_intents` keys on `customer_suppression_targets` (and
+`customer_consent_events`), so MySQL refused to create it before its parent (SQLSTATE 1824,
+`run3/mysql-shard-15-errors.txt`); SQLite accepts a dangling reference. Like `ProductionFeatureMigrationTest` in the second
+run, the case now installs the first and third tables without the second: every created table's parent exists, the set is
+still not a prefix, and admission must still refuse before its first DDL.
+
+### H3. `CustomerConsentMigrationTest` interruption cases — fixed here (test-only)
+
+All 12 `test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history` cases drop the three
+consent tables to replay an interrupted install. `customer_suppression_intents` (migration `2026_10_07_251000`) references
+`customer_consent_events` with a restricting key, so MySQL refused the drop (SQLSTATE 3730,
+`run3/mysql-shard-23-errors.txt`); SQLite does not enforce it. The test now disposes of every empty dependent of the owned
+tables leaves-first from the live foreign-key catalog (`CapabilityRollbackFixture::dropEmptyLeavesFirst`, the second run's
+G3 pattern) and asserts that `customer_suppression_intents` is among them, so a later dependent neither re-breaks the
+fixture nor passes unnoticed. The migration under test, its data-preservation assertions and the retained-snapshot check
+are unchanged.
+
+### H4. `SupportAttachmentNativeConcurrencyTest` rewrote a tracked file — fixed here (test-only)
+
+Shard 22 passed all 73 tests, then the receipt verifier refused the shard because `git diff --quiet HEAD --` found the
+checkout dirty (`run3/mysql-shard-22-receipt-refused.txt`). The native attachment race test wrote its receipt into
+`docs/verification/support-attachments-20261007/native-reservation-receipt.json`, a tracked evidence file; on hosted
+MySQL 8.4.11 the `mysql` field differs from the committed 8.0.46 receipt, so the file changed. The test is MySQL-only,
+which is why no SQLite receipt ever saw it. The receipt is now written under the ignored `storage/framework/testing/`
+tree, and the committed evidence file stays as it was: an operator refreshes it by copying the new file in, never a test
+run. This is a separate defect from the "attachment-consumer blocker" of `docs/verification/mysql-native-selection-20261009/`
+(`SupportAttachmentsTest` and `ServiceSupportAttachmentsTest` on the job's disposable database): those two files ran with
+0 skips and passed in shards 18 and 7, whose receipts were accepted, and that blocker closes only with a passing exact-SHA
+run. With H4, 24 of 24 native receipts are expected to be accepted; shards 10, 15 and 23 stopped at the test failure before
+the verifier reached its clean-checkout probe, so the expectation for them rests on inspection, not a run.
+
+### Timings regenerated from the complete run (CI)
+
+With all 24 MySQL and both SQLite JUnit logs, `scripts/ci/phpunit-timings-mysql.json` now measures every one of the 163
+selected files (124 used the fallback weight before) and `scripts/ci/phpunit-timings-sqlite.json` every one of the 557
+files. The partitioner's estimate is 123 minutes for shard 1 and about 87 minutes for each of the other 23 MySQL shards
+(the run's spread was 58–109), and about 61 minutes for each SQLite shard (the run's 80 and 43). The job limits stay at
+210 and 100 minutes on GitHub (175 and 100 on GitLab); the workflow comments carry the measurements. Splitting
+`BulkReplaceLicenseDraftSourceTest` remains a follow-up only if GitLab needs it.
+
 ## Results
 
 | Run | Source | Result | Evidence |
@@ -185,7 +260,19 @@ cost: `docs/verification/mysql-native-selection-20261009/`. Nothing has run at 2
 | `CustomerInquiryMigrationTest`, private MySQL 8.0.46, red / green | `f57e725` test / `5ffcc97` | 27 tests, 8 errors / 27 tests, 302 assertions OK | `run2/inquiry-migration-mysql80-*.txt` |
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
+| Foundation `38037183233` | `bd84978e` | failed on 4 of 24 MySQL shards, everything else passed: see the third-run section | GitHub run; `run3/jobs.tsv`, `run3/junit-summary.txt`, `run3/mysql-shard-*` |
+| `MembershipSchemaPreparationTest` shadow-floor case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: "There is no active transaction" at line 186, as in CI | `run3/membership-schema-mysql80-red.txt` |
+| `CustomerSuppressionMigrationTest` non-prefix case, private MySQL 8.0.46, red | `590ed36` test | 1 test, 1 error: SQLSTATE 1824 at line 128, as in CI | `run3/customer-suppression-mysql80-red.txt` |
+| `MembershipSchemaPreparationTest`, whole file, private MySQL 8.0.46, green | `914d757` | 13 tests, 40 assertions OK | `run3/membership-schema-mysql80-green.txt` |
+| `CustomerSuppressionMigrationTest`, whole file, private MySQL 8.0.46, green | `914d757` | 29 tests, 122 assertions OK, 2 reviewed SQLite-only skips | `run3/customer-suppression-mysql80-green.txt` |
+| Independent review of `5e15e78` | `5e15e78` | APPROVE WITH CONDITIONS; the reviewer re-ran the four touched files on SQLite (63/363/4) and the four cases on MySQL 8.0.46, regenerated both timing files byte-identically and reproduced the partition; the five conditions (all documentation and comment corrections) are applied in the commit after it | `run3/independent-review-5e15e78-DECISION.md` |
+| `CustomerConsentMigrationTest` interruption cases, private MySQL 8.0.46, red / green | `590ed36` test (steps 1 and 12) / `914d757` (all 12) | 2 tests, 2 errors, SQLSTATE 3730 as in CI / 12 tests, 168 assertions OK | `run3/customer-consent-mysql80-{red,green}.txt` |
+| `SupportAttachmentNativeConcurrencyTest`, private MySQL 8.0.46, red / green | `590ed36` test / `914d757` | 1 test OK and the tracked receipt rewritten (byte-identical in that one run, 8.0.46 to 8.0.46 with the same worker order; the reviewer's 8.0.46 run wrote the workers in the other order, and the 8.4.11 run differed in the version field) / 1 test, 19 assertions OK, tracked evidence directory unchanged, receipt under `storage/framework/testing/` | `run3/support-attachments-mysql80-{red,green}.txt` |
+| The four touched files on SQLite in-memory | `914d757` | 63 tests, 363 assertions, 4 census skips, no change in behaviour | `run3/touched-files-sqlite.txt` |
+| Partition balance on the regenerated timings | `4934987` | MySQL: shard 1 at 123 min, shards 2–24 at about 87; SQLite: both shards at about 61; no file uses the fallback weight | `run3/partition-balance-after-timings.txt` |
+| scripts/ci self-tests (`test-phpunit-shards`, `test-database-receipts`, `test-gitlab-database-receipts`, `test-workflow-cadence`, `test-ci-scope`, `test-gitlab-setup`) | `4934987` | 52, 61 and the rest OK | local |
 
 ## Not tested
 
-The second-run fixes on hosted CI (WebKit specs, SQLite at 100 minutes, MySQL at 24 shards, the inquiry fix on MySQL 8.4), a host.
+The third-run fixes on hosted CI (H1–H4 on MySQL 8.4 and the regenerated partitions), a host. The second-run fixes were
+confirmed by the third run (D on WebKit, SQLite at 100 minutes, G1–G3 on MySQL 8.4).
