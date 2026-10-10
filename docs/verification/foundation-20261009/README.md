@@ -78,14 +78,14 @@ spec are on responses the page reads with `response.json()` or on direct `page.r
 spec passed on Chromium in focused browser run `37951869517` at `5a8f6e2` (Results); one pass is not proof the
 intermittent stall cannot recur, and WebKit and the full Foundation browser jobs have not run it yet.
 
-## D. WebKit preview playback and offline reload — open
+## D. WebKit preview playback and offline reload — diagnosed and fixed in the second run (below)
 
 `public-install.spec.ts` and `test-checkout.spec.ts` poll `window.__nativePreviews[0].currentTime > 0` after Play and it
 stays 0 for 10 s; other WebKit specs that play previews passed in the same run (`player-controls`, `storefront`).
 `storefront-offline.spec.ts` fails on `page.reload()` after `context.setOffline(true)` with "WebKit encountered an
 internal error". No WebKit is available here.
 
-## E. MySQL matrix cannot finish within its budget — open, needs Sean's decision
+## E. MySQL matrix cannot finish within its budget — Sean chose option 1 (native selection, #82); budget revised in the second run (below)
 
 Shard 1 ran its first 126 (unit) tests in 7 s, then 63 tests in 36 minutes and 63 more in 39 minutes before the limit.
 307 test files (at least 2,036 test methods before data-provider expansion) use `FinalizationDatabaseMigrations`, which
@@ -111,6 +111,65 @@ two skip nodes; removing either rule fails it. The real verifier rejects the loc
 shards after it (`evidence/sqlite-receipt-junit-check.txt`). Local evidence only: no Foundation run has produced accepted
 SQLite receipts on this tree yet. MySQL still allows no skips at all; a reviewed MySQL skip census is separate, unmerged work.
 
+## Second run: Foundation `37967128232` on `f57e725` (after #70, #82 and #83)
+
+Dispatched manually on main `f57e7256891d0d3c117e151a36f7fb967c724ab7`, the first run with the memory fix (A), the browser
+fixes (B, C), the receipt rule (F) and the narrowed MySQL selection (E, #82). Development evidence only; the run failed.
+
+| Job | Result | Notes |
+| --- | --- | --- |
+| scope, backend-quality, frontend, related-browser | success | — |
+| operator-browser chromium-desktop | success | B and C confirmed in Foundation |
+| operator-browser webkit-mobile | 64 passed, 3 failed, 2 skipped | B confirmed on WebKit; the 3 failures are D (below) |
+| backend-sqlite 1/2 | success, 47.5 min, 3,917 tests, peak 332.6 MB | A confirmed on CI; receipt accepted |
+| backend-sqlite 2/2 | cancelled by the 60-minute job limit at 3,294 of 3,725 tests (88%), no failure or error | limit sized from stale 37-minute estimates; about 67 min projected |
+| backend-mysql 2/8 | success, 185.6 min, 208 tests (166 rebuild the schema) | first accepted native-selection receipt on hosted MySQL 8.4 |
+| backend-mysql 3/8 | 209 tests in 186.5 min, 8 errors | all `CustomerInquiryMigrationTest` (G1) |
+| backend-mysql 1, 4–8 | cancelled at the 210-minute limit, about half done | shard 1 completed at least 148 of 257; shard 8 reached 126 of 211 including one error (G3); timing in G2 |
+
+### D. WebKit — fixed here (test-only), awaiting a hosted run
+
+Both causes were reproduced locally on Playwright's WebKit 2359 (`run2/webkit-*-repro.cjs`) and reviewed
+(`run2/independent-review-2fd7ccb-DECISION.md`, APPROVE WITH CONDITIONS, conditions applied):
+
+- `public-install` and `test-checkout`: the store's real service worker controlled the page, and WebKit does not send
+  requests that a controlling worker passes through to `page.route`, so the synthetic preview never loaded
+  (`NotSupportedError`, `currentTime` 0). Every passing audio spec already blocks workers. Both files now block service
+  workers on WebKit only; Chromium keeps the real worker. Neither spec asserts worker behaviour.
+- `storefront-offline`: WebKit's offline emulation fails every navigation before a controlling service worker can answer,
+  with the original and the backported SDK alike. On WebKit the outage is now real: the page loads through a loopback
+  forwarder to the test server (port from the project's `baseURL`) that the test unplugs and re-plugs. Every assertion is
+  unchanged; Chromium still uses `context.setOffline`. The reviewer ran the forwarder against WebKit 2359 5/5 and a
+  byte-integrity stress test 15/15.
+
+### SQLite job limit — fixed here (CI)
+
+GitHub and GitLab SQLite shards now have 100 minutes (about 45% headroom over the projected 67). Regenerating
+`scripts/ci/phpunit-timings-sqlite.json` from the complete shard 1 JUnit to rebalance the two shards is a follow-up.
+
+### G1. `CustomerInquiryMigrationTest` on MySQL — fixed here (test-only)
+
+The test drops `customer_inquiries` to simulate partial installs. Its `setUp` rolls back the child tables first "as a
+parent rollback must do on MySQL", but `inquiry_notification_intents` (migration `2026_10_07_243000`, Oct 7) was never
+added; its restricting foreign key made MySQL refuse every drop (SQLSTATE 3730). SQLite does not enforce the drop, so
+only the native selection could show it. `setUp` now rolls back 243000 first. On a fresh private MySQL 8.0.46 database the old test file gives 27 tests with
+the same 8 errors as CI and the fixed one passes 27 tests / 302 assertions (`run2/inquiry-migration-mysql80-{red,green}.txt`);
+CI's MySQL 8.4 has not run it yet.
+
+### G3. Three more native-only test defects — found by independent review and a foreign-key scan
+
+The review of the shard and inquiry commits found two more MySQL-only failures, and the implementer's scan of the real foreign-key graph (360 constraints, 191 tables attributed to their migrations) found a third. `ProductionFeatureMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair` errored in shard 8 of this run (SQLSTATE 1824, a table created before its foreign-key parent). The cancelled shard's progress line shows it, and the first write-up of this run missed it. `CustomerAccountMigrationTest` drops `customer_accounts` while 46 newer dependents (not only `customer_saved_tracks`, migration 242000, but service projects, grant origins, consent, suppression and the production families) still reference it (SQLSTATE 3730); it was in a cancelled shard and never reached. `SharedInventoryMigrationTest` rolls back `rights_scopes` while `free_definitions` (245000, whose rollback always refuses) still references it. All three are fixed on this branch: the two account and inventory tests now dispose of every empty dependent leaves-first from the live catalog (`CapabilityRollbackFixture::dropEmptyLeavesFirst`), and the production-feature test simulates its non-prefix gap with tables MySQL can create. MySQL 8.0.46 red/green evidence for each is under `run2/`. No other selected test rolls back a parent with an unhandled newer child.
+
+### G2. MySQL budget — 24 shards (CI)
+
+Hosted MySQL 8.4 took about 67–70 s per schema-rebuilding test (shard 2: 166 in 185.6 min; shard 3: 159 in 186.5 min),
+about twice the 35 s the selection's estimates assumed, and the unmeasured files ran slower still (shards 1 and 8). The
+selection is about 41–47 compute-hours. MySQL now runs in 24 shards on GitHub and GitLab; the timings file was regenerated
+from the two complete shards; the receipt archive bound was raised to fit 24-shard archives (the old 32-member bound would
+have refused a 16- or 24-shard archive). Projected busiest shard: shard 1 (`BulkReplaceLicenseDraftSourceTest` alone)
+about 141–166 minutes, under GitHub's 210 and GitLab's 175 (tight once GitLab job setup is counted). Details, partition and
+cost: `docs/verification/mysql-native-selection-20261009/`. Nothing has run at 24 shards yet.
+
 ## Results
 
 | Run | Source | Result | Evidence |
@@ -122,9 +181,11 @@ SQLite receipts on this tree yet. MySQL still allows no skips at all; a reviewed
 | Focused browser feedback `37938110858` (informative) | `e2b3906` | stopped by the workflow's own 720 s command budget before WebKit; Chromium: license-draft spec produced all three recovery screenshots with no failure capture (B fixed in CI); inquiry-conversation failed again (C) | GitHub run artifact |
 | Focused browser feedback `37951869517` (informative) | `5a8f6e2` | all 59 Chromium tests ran with no failure capture, including `inquiry-conversation` (42 s; its server proof records `exactRetry`, one inquiry, originals unchanged); stopped by the workflow's 720 s budget at WebKit test 60 of 118 | GitHub run artifact `focused-browser-37951869517-1` |
 | Chromium stream-response reproduction | pinned Playwright 1.63 / Chromium 1243 | 16/85 stream-reader runs hung, 0/22 `response.json()` | `evidence/chromium-stream-response-repro.*` |
+| Foundation `37967128232` | `f57e725` | failed: see the second-run section | GitHub run |
+| `CustomerInquiryMigrationTest`, private MySQL 8.0.46, red / green | `f57e725` test / `5ffcc97` | 27 tests, 8 errors / 27 tests, 302 assertions OK | `run2/inquiry-migration-mysql80-*.txt` |
 | Local SQLite shards with the fix, CI's 2-shard partition, 512M | `e2b3906` PHP tree | both pass: 3,924 cases (388 skipped) and 3,710 (235 skipped), 0 failures or errors, 7,634 in total | `evidence/sqlite-shard-*-fixed-512M.txt` |
 | Receipt verifier `junit()` on that JUnit | `dcf983e` / this branch | rejected ("Skipped case has assertions") / both accepted, skips exactly the reviewed census | `evidence/sqlite-receipt-junit-check.txt` |
 
 ## Not tested
 
-Browser specs (CI only), MySQL matrix, a host.
+The second-run fixes on hosted CI (WebKit specs, SQLite at 100 minutes, MySQL at 24 shards, the inquiry fix on MySQL 8.4), a host.

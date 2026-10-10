@@ -1,0 +1,75 @@
+# CustomerInquiryMigrationTest on a fresh private MySQL 8.0.46 database (CI uses 8.4), direct PHPUnit, CI env (APP_ENV=testing, root, array cache/session, sync queue).
+# Test file from f57e725 (before 5ffcc97); app tree 5ffcc97.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+E......E.......EEEEE.E.....                                       27 / 27 (100%)
+Time: 53:43.897, Memory: 95.00 MB
+There were 8 errors:
+1) Tests\Feature\CustomerInquiryMigrationTest::test_every_committed_installation_prefix_can_resume_and_repeated_up_preserves_all_guards
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:76
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:76
+2) Tests\Feature\CustomerInquiryMigrationTest::test_every_empty_rollback_prefix_and_absent_table_can_resume_without_changing_parent_evidence
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:142
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:142
+3) Tests\Feature\CustomerInquiryMigrationTest::test_unrelated_table_with_an_owned_schema_wide_name_is_refused_before_creating_inquiries
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:219
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:219
+4) Tests\Feature\CustomerInquiryMigrationTest::test_foreign_minimal_table_is_not_repaired_or_dropped_as_an_owned_partial_table
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:248
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:248
+5) Tests\Feature\CustomerInquiryMigrationTest::test_differently_cased_foreign_table_is_neither_adopted_nor_dropped
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:284
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:284
+6) Tests\Feature\CustomerInquiryMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create@SQLite global index or MySQL global foreign key with data ('index')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:333
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:333
+7) Tests\Feature\CustomerInquiryMigrationTest::test_differently_cased_schema_wide_names_are_refused_before_any_create@global trigger with data ('trigger')
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:333
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:333
+8) Tests\Feature\CustomerInquiryMigrationTest::test_empty_rollback_and_reapply_preserve_site_and_operator_evidence_and_restore_guards
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33092, Database: inq_red, SQL: drop table if exists `customer_inquiries`)
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:526
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_inquiries' referenced by a foreign key constraint 'inquiry_notification_intents_customer_inquiry_id_foreign' on table 'inquiry_notification_intents'.
+database/migrations/2026_10_01_000031_customer_inquiries.php:358
+tests/Feature/CustomerInquiryMigrationTest.php:526
+ERRORS!
+Tests: 27, Assertions: 174, Errors: 8.
+rc=2

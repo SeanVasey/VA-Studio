@@ -154,7 +154,7 @@ Synthetic membership test setup is explicitly approved. Live credentials/payment
 
 ### Adaptations of §1–§12 (pending Sean's confirmation)
 
-- **§3 gate:** no linter is enforced yet. SQLite runs skip MySQL-only race tests by design; the twenty-four MySQL CI shards run them with zero skips.
+- **§3 gate:** no linter is enforced yet. SQLite runs skip MySQL-only race tests by design (reviewed census `scripts/ci/database-sqlite-skips.json`); the twenty-four MySQL CI shards run the reviewed native selection and skip only the reviewed SQLite-only census (`scripts/ci/database-mysql-skips.json`), each engine's skips exactly matching its census.
 - **§5 auth:** staff sign in through Filament's built-in auth with TOTP MFA (required in production); customer accounts don't exist yet (U-07). MySQL has no row-level security, so authorization lives in server-side domain policies and owner checks.
 - **§6 audit:** `npm audit` stays at `--audit-level=high`, stricter than the critical-only minimum.
 - **§7 license and layout:** the project is proprietary, so `LICENSE` reserves all rights instead of granting MIT. `docs/architecture/` (README plus D-xx decision records) holds architecture and ADRs; runbooks are `docs/migration/cutover_runbook.md` and the operator guides.
