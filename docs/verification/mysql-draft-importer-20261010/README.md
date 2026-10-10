@@ -81,7 +81,7 @@ Run against a freshly migrated database on the private server before the MySQL b
 | PDO fetch types (`query()` and prepared) | ints as `int`, strings as `string`, `NULL` as null; `ATTR_STRINGIFY_FETCHES=false`, `ATTR_EMULATE_PREPARES=false` |
 | `REPLACE INTO` same id, `REPLACE INTO` same digest, `INSERT ... ON DUPLICATE KEY UPDATE`, `UPDATE`, `DELETE` on a batch row | all refused: `SQLSTATE[45000] 1644 Catalog import evidence is immutable` |
 | `TRUNCATE TABLE catalog_import_batches` | refused: `1701 Cannot truncate a table referenced in a foreign key constraint` |
-| Session B `DROP TRIGGER`, `ALTER TABLE ... ADD COLUMN`, `INSERT INTO tracks`, `UPDATE users` while session A holds an open transaction after `FOR SHARE` reads | each waits and times out: `1205 Lock wait timeout exceeded` (2 s timeout); a plain `SELECT` is admitted. The probe did not separate the locks; the independent review showed that none of these four waits depends on `FOR SHARE` (see "Independent review conditions" below for the lock behind each) |
+| Session B `DROP TRIGGER`, `ALTER TABLE ... ADD COLUMN`, `INSERT INTO tracks`, `UPDATE users` while session A holds an open transaction after `FOR SHARE` reads | each waits and times out: `1205 Lock wait timeout exceeded` (2 s timeout); a plain `SELECT` is admitted. The probe did not record how session A was set up, so it does not separate the locks. The delta review of `6137ec9` ran a read-only session A and showed the split: after `FOR SHARE` reads the tracks insert, the users update and the DDL each return 1205; after plain reads the insert and the update are admitted and only the DDL waits (`local-evidence/delta-review/lock-probe.txt`). The earlier review's per-lock analysis ("Independent review conditions" below) applies to the nested test case, where the importer has also inserted a track and called `lockForUpdate`, not to this probe |
 | Session A `DROP TRIGGER` inside its own transaction after an insert | admitted; `rollBack()` reports no active transaction; the inserted row is committed |
 | `SET SESSION foreign_key_checks = 0, unique_checks = 0` | `SELECT @@session...` returns `int(0)`, `int(0)` |
 | `CREATE TEMPORARY TABLE catalog_import_mappings` | `information_schema.TABLES` still lists only the base table; the shadowed name resolves to the temporary table |
@@ -270,6 +270,15 @@ admitted. A segment holds at most 25 records and each read is capped at 100,000 
 for private staging, but the staging run must be scheduled when no other writer, such as the admin panel,
 queue workers or another import, is expected to touch those tables.
 
+## Delta review of `6137ec9`
+
+An independent delta review of the condition commits `fc67774..6137ec9` returned APPROVE WITH CONDITIONS
+(`independent-review-6137ec9-DECISION.md`). Its two conditions were documentation only and are applied
+in this README: the probe row under "InnoDB behaviour probes" now carries the reviewer's read-only lock
+split, and "Not verified" records the drift case's database privileges and leftover-schema failure mode.
+Its LOW finding that `FOR SHARE` is not proved table by table stands: mutant mC, which keeps `FOR SHARE`
+only on `audit_events`, survives the MySQL nested case. No code changed after `6137ec9`.
+
 ## Policy self-tests (second session; third-session re-runs marked)
 
 | Command | Result |
@@ -299,6 +308,10 @@ the weight.
 - The session guards for isolation level, `autocommit`, `DATABASE()` and `ATTR_STRINGIFY_FETCHES` still
   have no test case (review finding 3, LOW, not a condition); the reviewer's probe showed READ COMMITTED
   and `autocommit=0` refused with `catalog_target_schema_invalid`.
+- The foreign-referenced-table drift case needs `CREATE DATABASE` and `DROP DATABASE` on the MySQL user.
+  CI connects as root (`final-verification.yml`), as `NativeSchemaIsolationTest` already relies on, but
+  this case has not run in hosted CI. If a run is killed before teardown, the `<db>_catalog_peer` schema
+  stays behind and the next run fails its absence assertion until someone drops it by hand.
 - Concurrency between two importer processes on MySQL was proved only for the lock waits a second
   session experiences while one segment is open (DDL, insert and update all time out); two importers
   racing for the same batch were not run as separate processes.
