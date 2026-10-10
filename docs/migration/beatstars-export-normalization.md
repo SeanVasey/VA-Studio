@@ -17,7 +17,11 @@ rights, prices or license terms. Every value in the output comes from the sheet 
 1. **The export**, as a UTF-8 CSV file (comma-separated, double-quote quoted, one header
    line). XLSX is out of scope: no spreadsheet dependency is added, so save or export the sheet
    as CSV first. A UTF-8 byte-order mark and CRLF line endings are accepted. Limits: 8 MiB,
-   1,000 data rows, 200 columns, unique non-blank headers.
+   1,000 data rows, 200 columns, unique non-blank headers. The resulting `catalog.json` must
+   also fit the drafts-v1 decoder's 1 MiB (1,048,576 bytes) cap. Each row's text is stored
+   twice in the snapshot (raw and normalized), so a sheet of about 0.6 MB with long
+   descriptions can exceed it; that is reported as `snapshot_too_large` (below), and the fix is
+   to split the export into smaller sheets.
 2. **The mapping**, a JSON file that names every column and declares every vocabulary. Write
    it from the real export's header row; the template below mirrors the synthetic fixture.
 
@@ -140,11 +144,12 @@ A **finding** (exit `3`) is recorded in the report and withholds rows; nothing i
 | Scope | Code | Effect |
 | --- | --- | --- |
 | sheet | `unmapped_column`, `mapped_column_missing`, `blank_record` | Every row withheld: the sheet is not fully understood. Map or ignore the column, fix the mapping, or remove the blank line, then rerun. |
+| sheet | `snapshot_too_large` | Every row passed its checks, but the snapshot would exceed 1,048,576 bytes; the detail gives its size. Every row is withheld and no `catalog.json` is written. Split the export into smaller sheets (each its own snapshot and output directory), then rerun. |
 | row | `column_count_mismatch`, `missing_source_id`, `invalid_source_id`, `duplicate_source_id`, `duplicate_row_content`, `duplicate_slug` | The row (and every row sharing the duplicate) is withheld. |
 | row | `missing_title`, `invalid_title`, `synthetic_title_required`, `missing_slug`, `invalid_slug`, `slug_underivable`, `missing_artist`, `invalid_artist`, `invalid_bpm`, `invalid_musical_key`, `invalid_genre`, `invalid_mood`, `invalid_tags`, `invalid_description` | The row is withheld; the detail says which bound failed. BPM must be an integer 20–400; `0095` is `95`, `95.0` is not. |
 | row | `missing_visibility`, `unknown_visibility_value` | The row is withheld until the value is declared in `visibility_values`. |
 | row | `missing_rights_reference`, `invalid_rights_reference` | The row is withheld. A reference is required on every row; it is not checked against any evidence store. |
-| row | `currency_mismatch`, `missing_license_name`, `unknown_license_name`, `missing_price`, `non_numeric_price` | The row is withheld. Prices accept `12`, `12.5`, `12.50` and `$12.50`; `Negotiable`, `1,299.00` and negatives are not numbers here. |
+| row | `currency_mismatch`, `missing_license_name`, `unknown_license_name`, `missing_price`, `non_numeric_price` | The row is withheld. Prices accept `12`, `12.5`, `12.50`, `$12.50` and `$0.5` (USD cents: 1200, 1250, 1250, 1250, 50); `Negotiable`, `1,299.00` and negatives are not numbers here. |
 
 Any finding at all also withholds `catalog.json`: the snapshot is produced only for a sheet
 the operator has fully reconciled. Sold rows pass through as `sold`; the importer review, not

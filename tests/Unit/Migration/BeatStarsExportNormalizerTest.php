@@ -271,6 +271,52 @@ class BeatStarsExportNormalizerTest extends TestCase
         $this->assertSame('Été — Track 01 (Remix)', $result['entries'][0]['metadata']['title']);
     }
 
+    public function test_one_decimal_and_sub_dollar_prices_convert_exactly_to_minor_units(): void
+    {
+        $rows = $this->rows();
+        $rows[0][10] = '12.5';
+        $rows[0][11] = '$0.5';
+        $rows[1][10] = '0.05';
+        $rows[1][11] = '$29.9';
+        $result = $this->normalize($rows);
+        $this->assertSame([], $result['findings']);
+        $this->assertSame([1250, 50], array_column($result['entries'][0]['offers'], 'price_minor_units'));
+        $this->assertSame([5, 2990], array_column($result['entries'][1]['offers'], 'price_minor_units'));
+        $this->assertSame(['USD', 'USD'], array_column($result['entries'][0]['offers'], 'currency'));
+    }
+
+    public function test_a_snapshot_over_the_decoder_limit_is_a_sheet_finding_and_a_large_sheet_under_it_still_normalizes(): void
+    {
+        // 120 rows with 5,000-character descriptions: a 0.6 MB sheet whose snapshot (raw and normalized metadata) exceeds 1 MiB.
+        $result = $this->normalize($this->largeRows(120));
+        $this->assertCount(1, $result['findings']);
+        $finding = $result['findings'][0];
+        $this->assertSame(['sheet', null, null, 'snapshot_too_large', null], [$finding['scope'], $finding['row'], $finding['source_id'],
+            $finding['code'], $finding['column']]);
+        $this->assertMatchesRegularExpression('/\A([0-9]+) bytes, maximum 1048576\z/D', $finding['detail']);
+        $this->assertGreaterThan(BeatStarsExportNormalizer::MAX_SNAPSHOT_BYTES, (int) $finding['detail']);
+        $this->assertContains('snapshot_too_large', BeatStarsExportNormalizer::SHEET_CODES);
+        $this->assertSame(['rows' => 120, 'normalized' => 0, 'withheld' => 120, 'findings' => 1, 'sheet_findings' => 1, 'row_findings' => 0],
+            $result['counts']);
+        $this->assertNull($result['snapshot']);
+        $this->assertNull($result['snapshot_sha256']);
+        foreach ($result['entries'] as $position => $entry) {
+            $this->assertSame([sprintf('bs-synthetic-large-%04d', $position + 1), 'withheld', [], null],
+                [$entry['source_id'], $entry['disposition'], $entry['findings'], $entry['metadata']]);
+            $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/', $entry['row_sha256']);
+        }
+
+        // The same rows at a third of the count stay under the limit: no finding, and the decoder admits the snapshot.
+        $result = $this->normalize($this->largeRows(40));
+        $this->assertSame([], $result['findings']);
+        $this->assertSame(40, $result['counts']['normalized']);
+        $bytes = CanonicalJson::encode($result['snapshot'])."\n";
+        $this->assertGreaterThan(400000, strlen($bytes));
+        $this->assertLessThanOrEqual(BeatStarsExportNormalizer::MAX_SNAPSHOT_BYTES, strlen($bytes));
+        $this->assertSame(hash('sha256', $bytes), $result['snapshot_sha256']);
+        $this->assertSame(CanonicalJson::encode($result['snapshot']), CanonicalJson::encode((new NormalizedSourceSnapshot)->decode($bytes)));
+    }
+
     public function test_byte_order_mark_and_crlf_are_accepted_and_raw_cells_keep_their_spacing(): void
     {
         $rows = $this->rows();
@@ -372,6 +418,19 @@ class BeatStarsExportNormalizerTest extends TestCase
             ['bs-synthetic-0003', 'SYNTHETIC Track 03', '', '', 'Synthetic', '', '', '', 'Draft', 'SYNTHETIC Basic', '$3', '30.00', 'SYNTHETIC-RIGHTS-0003', '7'],
             ['bs-synthetic-0004', 'SYNTHETIC Track 04', '0088', 'A minor', 'Synthetic', 'Dark', 'synthetic; fixture ;dark', 'SYNTHETIC sold item', 'Sold', 'SYNTHETIC Premium', '4.99', '40.00', 'SYNTHETIC-RIGHTS-0004', '3'],
         ];
+    }
+
+    /** Distinct, clean synthetic rows with long descriptions, for the snapshot size limit. */
+    private function largeRows(int $count): array
+    {
+        $rows = [];
+        for ($index = 1; $index <= $count; $index++) {
+            $rows[] = [sprintf('bs-synthetic-large-%04d', $index), sprintf('SYNTHETIC Large %04d', $index), '95', 'C minor', 'Synthetic', '',
+                'synthetic', 'SYNTHETIC '.str_repeat('d', 4990), 'Public', 'SYNTHETIC Basic', '1.00', '10.00',
+                sprintf('SYNTHETIC-RIGHTS-L%04d', $index), '0'];
+        }
+
+        return $rows;
     }
 
     private function normalize(array $rows, array $headers = self::HEADERS, array $overrides = []): array

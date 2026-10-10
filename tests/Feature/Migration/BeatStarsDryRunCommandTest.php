@@ -129,6 +129,38 @@ class BeatStarsDryRunCommandTest extends TestCase
         $this->assertSame($bytes, $this->bytes($this->outputDirectory('findings-again')));
     }
 
+    public function test_a_sheet_whose_snapshot_exceeds_the_limit_exits_three_with_a_report_naming_the_finding(): void
+    {
+        // A clean synthetic sheet of about 0.6 MB whose drafts snapshot would exceed the 1 MiB decoder cap.
+        $handle = fopen($this->base.'/large.csv', 'xb');
+        fputcsv($handle, ['Track ID', 'Title', 'BPM', 'Key', 'Genre', 'Mood', 'Tags', 'Description', 'Status', 'Lease Name',
+            'Lease Price', 'Exclusive Price', 'Rights Reference', 'Plays'], ',', '"', '');
+        for ($index = 1; $index <= 120; $index++) {
+            fputcsv($handle, [sprintf('bs-synthetic-large-%04d', $index), sprintf('SYNTHETIC Large %04d', $index), '95', 'C minor',
+                'Synthetic', '', 'synthetic', 'SYNTHETIC '.str_repeat('d', 4990), 'Public', 'SYNTHETIC Basic', '1.00', '10.00',
+                sprintf('SYNTHETIC-RIGHTS-L%04d', $index), '0'], ',', '"', '');
+        }
+        fclose($handle);
+        $this->assertLessThan(700000, filesize($this->base.'/large.csv'));
+
+        $output = $this->outputDirectory('large');
+        $result = $this->invoke(['--export', $this->base.'/large.csv', '--mapping', $this->fixtures.'/mapping.json', '--output', $output]);
+        $this->assertSame(3, $result['exit'], $result['stdout'].$result['stderr']);
+        $this->assertSame(['code' => 'dry_run_findings', 'rows' => 120, 'normalized' => 0, 'withheld' => 120, 'findings' => 1,
+            'snapshot' => 'none', 'written' => ['beatstars-dry-run.json', 'beatstars-dry-run.md'], 'unchanged' => [], 'database_writes' => 0],
+            $result['summary']);
+        $this->assertSame('', $result['stderr']);
+        foreach (['SYNTHETIC', $this->base, $this->fixtures] as $private) {
+            $this->assertStringNotContainsString($private, $result['stdout']);
+        }
+        $this->assertSame(['.', '..', 'beatstars-dry-run.json', 'beatstars-dry-run.md'], scandir($output));
+        $bytes = $this->bytes($output);
+        $this->assertMatchesRegularExpression('/\| sheet \| — \| — \| `snapshot_too_large` \| — \| [0-9]+ bytes, maximum 1048576 \|/',
+            $bytes['beatstars-dry-run.md']);
+        $this->assertStringContainsString('No draft snapshot was produced', $bytes['beatstars-dry-run.md']);
+        $this->assertSame('snapshot_too_large', json_decode($bytes['beatstars-dry-run.json'], true, 64)['findings'][0]['code']);
+    }
+
     public static function refusals(): array
     {
         return ['missing option' => ['usage'], 'repeated option' => ['usage'], 'missing export' => ['path'], 'empty export' => ['input_file'],

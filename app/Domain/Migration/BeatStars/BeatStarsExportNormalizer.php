@@ -30,6 +30,9 @@ final class BeatStarsExportNormalizer
 
     public const MAX_EXPORT_BYTES = 8388608;
 
+    /** The drafts-v1 decoder's cap on snapshot bytes (`NormalizedSourceSnapshot::decode`); a larger snapshot is a sheet finding. */
+    public const MAX_SNAPSHOT_BYTES = 1048576;
+
     /** Row findings that withhold only their own row. Sheet findings withhold every row. */
     public const ROW_CODES = ['column_count_mismatch', 'missing_source_id', 'invalid_source_id', 'duplicate_source_id',
         'duplicate_row_content', 'missing_title', 'invalid_title', 'synthetic_title_required', 'missing_slug', 'invalid_slug',
@@ -38,7 +41,7 @@ final class BeatStarsExportNormalizer
         'missing_rights_reference', 'invalid_rights_reference', 'currency_mismatch', 'missing_license_name',
         'unknown_license_name', 'missing_price', 'non_numeric_price'];
 
-    public const SHEET_CODES = ['unmapped_column', 'mapped_column_missing', 'blank_record'];
+    public const SHEET_CODES = ['unmapped_column', 'mapped_column_missing', 'blank_record', 'snapshot_too_large'];
 
     /**
      * Normalize one export. Throws InvalidArgumentException with a `mapping_*` or `export_*`
@@ -108,6 +111,19 @@ final class BeatStarsExportNormalizer
         }
 
         $this->duplicates($entries, $findings);
+        $snapshot = null;
+        if ($findings === []) {
+            // Clean rows can still add up to more than the decoder admits; that is the operator's sheet, so it is a finding.
+            $snapshot = $this->snapshot($mapping, $exportBytes, $exportName, $entries);
+            $bytes = strlen(CanonicalJson::encode($snapshot)."\n");
+            if ($bytes > self::MAX_SNAPSHOT_BYTES) {
+                $findings[] = $this->finding('sheet', null, null, 'snapshot_too_large', null,
+                    sprintf('%d bytes, maximum %d', $bytes, self::MAX_SNAPSHOT_BYTES));
+                $snapshot = null;
+            } else {
+                $this->admitted($snapshot);
+            }
+        }
         $findings = $this->sort($findings);
         $sheetFindings = array_values(array_filter($findings, static fn (array $finding): bool => $finding['scope'] === 'sheet'));
         $withheldRows = [];
@@ -132,7 +148,6 @@ final class BeatStarsExportNormalizer
         }
         unset($entry);
 
-        $snapshot = $findings === [] ? $this->snapshot($mapping, $exportBytes, $exportName, $entries) : null;
         $snapshotBytes = $snapshot === null ? null : CanonicalJson::encode($snapshot)."\n";
 
         return ['schema_version' => 1, 'mode' => self::MODE, 'transform_version' => self::TRANSFORM,
@@ -387,8 +402,8 @@ final class BeatStarsExportNormalizer
         }
     }
 
-    /** Build the exact drafts-v1 object for a sheet with zero findings, then prove the snapshot decoder accepts it. */
-    private function snapshot(array $mapping, string $exportBytes, string $exportName, array $entries): ?array
+    /** Build the exact drafts-v1 object for a sheet with zero findings. */
+    private function snapshot(array $mapping, string $exportBytes, string $exportName, array $entries): array
     {
         $records = [];
         foreach ($entries as $entry) {
@@ -402,17 +417,22 @@ final class BeatStarsExportNormalizer
             'artifacts' => [['artifact_id' => self::ARTIFACT_ID, 'relative_path' => 'raw/'.$exportName,
                 'sha256' => hash('sha256', $exportBytes), 'bytes' => strlen($exportBytes)]],
             'records' => $records];
+
+        return $snapshot;
+    }
+
+    /** Prove the snapshot decoder accepts a within-limit snapshot unchanged. */
+    private function admitted(array $snapshot): void
+    {
         try {
             $decoded = (new NormalizedSourceSnapshot)->decode(CanonicalJson::encode($snapshot)."\n");
             if (CanonicalJson::encode($decoded) !== CanonicalJson::encode($snapshot)) {
                 throw new RuntimeException('normalizer_output_rejected');
             }
         } catch (Throwable) {
-            // A row that passed every finding check must decode; anything else is a normalizer defect, not operator input.
+            // Within the size limit, rows that passed every finding check must decode; anything else is a normalizer defect.
             throw new RuntimeException('normalizer_output_rejected');
         }
-
-        return $snapshot;
     }
 
     private function payload(array $raw, array $metadata, string $visibility): array

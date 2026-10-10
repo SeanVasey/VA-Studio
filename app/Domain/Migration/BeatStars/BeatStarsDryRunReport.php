@@ -97,7 +97,8 @@ final class BeatStarsDryRunReport
             }
             if ($counts['sheet_findings'] > 0) {
                 $lines[] = '';
-                $lines[] = 'Sheet findings withhold every row: the sheet cannot be interpreted until each column is mapped or explicitly ignored.';
+                $lines[] = 'Sheet findings withhold every row: map or explicitly ignore each column, remove blank records, and split a sheet '
+                    .'whose snapshot is too large into smaller exports, then rerun.';
             }
         }
         $lines[] = '';
