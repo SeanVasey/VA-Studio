@@ -129,9 +129,10 @@ final class ManageRightsScope
         Gate::forUser($actor)->authorize('administer-catalog', [true]);
         InventoryPolicy::requireTestEnvironment();
         // Scope keys are immutable identities, so a plain read after the actor lock binds an attestation by id
-        // without touching the ordered catalog locks taken later. Without an attestation nothing extra is read.
+        // without touching the ordered catalog locks taken later. Without an attestation nothing extra is read:
+        // the panel rule is evaluated on the actor row locked above, keeping the writer's lock sequence unchanged.
         $scopeKey = is_string($scope) ? $scope : ($attestation === null ? null : RightsScope::whereKey($scope)->value('scope_key'));
-        StaffWriteAuthority::requireFor($actor, $attestation, $action, $scopeKey, $revisionId, lockForUpdate: true);
+        StaffWriteAuthority::requireFor($actor, $attestation, $action, $scopeKey, $revisionId);
         if (! preg_match('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]{0,191}\z/D', $reference)) {
             throw new QuoteException('INVALID_QUOTE_REQUEST', 422);
         }

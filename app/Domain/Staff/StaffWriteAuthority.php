@@ -3,11 +3,11 @@
 namespace App\Domain\Staff;
 
 use App\Models\User;
-use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\Environment\TestEnvironment;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
+use Filament\Panel;
 use Illuminate\Auth\Access\AuthorizationException;
 
 /**
@@ -16,10 +16,11 @@ use Illuminate\Auth\Access\AuthorizationException;
  *
  * The panel challenges the TOTP code inside its login page and, where its rule is required, forces enrollment
  * before any page; it records no further per-request or per-session flag. The state a verified panel session
- * leaves behind is therefore enrollment under the panel's required rule, which `AdminMultiFactor` already
- * evaluates for staff-attributed domain actions. `require()` reuses it: required in staging and production
- * (`TestEnvironment::requiresStaffMfa()` drives the panel rule), optional in local and testing, with no
- * environment variable of its own.
+ * leaves behind is therefore enrollment under the panel's required rule: `EnsureMultiFactorAuthenticationIsEnabled`
+ * checks exactly that on every panel request, and `AdminMultiFactor` evaluates it (with its own re-read) for
+ * staff-attributed domain actions. `require()` applies the same panel rule to the row the calling service has
+ * already read under its own lock: required in staging and production (`TestEnvironment::requiresStaffMfa()`
+ * drives the panel rule), optional in local and testing, with no environment variable of its own.
  *
  * A trusted interactive console has no challenge. `attest()` is its only alternative: it records the operator's
  * explicit attestation as append-only audit evidence (who, when, which scope and action) before the write and
@@ -66,10 +67,7 @@ final class StaffWriteAuthority
             throw new AuthorizationException(self::REFUSAL);
         }
         $panel = Filament::getPanel(self::ADMIN_PANEL);
-        $enrolled = false;
-        foreach ($panel->getMultiFactorAuthenticationProviders() as $provider) {
-            $enrolled = $enrolled || $provider->isEnabled($current);
-        }
+        $enrolled = self::enrolled($panel, $current);
         $at = CarbonImmutable::now()->utc()->startOfSecond();
         $record = AuditEvent::create([
             'actor_id' => $current->id, 'action' => self::ATTESTATION_ACTION,
@@ -87,12 +85,18 @@ final class StaffWriteAuthority
     }
 
     /**
-     * Panel-session rule: the current, persisted staff user must satisfy the admin panel's multi-factor rule.
-     * Callers that already hold a lock on the user row pass `$lockForUpdate` so the rule's own re-read is current.
+     * Panel-session rule: the persisted staff row must satisfy the admin panel's multi-factor rule, exactly as
+     * `EnsureMultiFactorAuthenticationIsEnabled` checks it on every panel request (rule required by the panel; an
+     * enabled provider on the row). `$current` is the row the calling service read moments ago inside its own
+     * transaction, under its own lock where it writes: a locking read returns the committed row and holds it until
+     * that transaction ends, so no further read is made here. A locked re-read would add a third `users` lock to
+     * the rights-scope writer's audited lock sequence, and a non-locking one could return an older REPEATABLE READ
+     * snapshot in which a withdrawn enrollment still appears.
      */
-    public static function require(User $current, bool $lockForUpdate = false): void
+    public static function require(User $current): void
     {
-        if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: $lockForUpdate)) {
+        $panel = Filament::getPanel(self::ADMIN_PANEL);
+        if (! $current->exists || ($panel->isMultiFactorAuthenticationRequired() && ! self::enrolled($panel, $current))) {
             throw new AuthorizationException(self::REFUSAL);
         }
     }
@@ -101,10 +105,10 @@ final class StaffWriteAuthority
      * A write that a console may reach: without an attestation the panel-session rule applies; with one, the
      * attestation must be recorded, current and bound to this operator, action, scope key and revision.
      */
-    public static function requireFor(User $current, ?self $attestation, string $action, ?string $scopeKey, ?int $revisionId = null, bool $lockForUpdate = false): void
+    public static function requireFor(User $current, ?self $attestation, string $action, ?string $scopeKey, ?int $revisionId = null): void
     {
         if ($attestation === null) {
-            self::require($current, $lockForUpdate);
+            self::require($current);
 
             return;
         }
@@ -126,6 +130,18 @@ final class StaffWriteAuthority
             && $scopeKey !== null && hash_equals($this->scopeKey, $scopeKey)
             && $this->revisionId === $revisionId
             && CarbonImmutable::now()->utc()->lessThanOrEqualTo($this->attestedAt->addSeconds(self::ATTESTATION_LIFETIME_SECONDS));
+    }
+
+    /** The panel's own enrollment test: any configured provider enabled on this row. */
+    private static function enrolled(Panel $panel, User $user): bool
+    {
+        foreach ($panel->getMultiFactorAuthenticationProviders() as $provider) {
+            if ($provider->isEnabled($user)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** The record must still exist: an attestation written inside a rolled-back transaction admits nothing. */

@@ -182,8 +182,8 @@ final class PromotionAdministration
         $current = $actor->exists ? $query->find($actor->getKey()) : null;
         if ($current === null) { throw new AuthorizationException; }
         Gate::forUser($current)->authorize('administer-catalog');
-        // The shared lock above keeps the row current for the rule's own re-read; an exclusive lock would let two
-        // panel requests of the same operator deadlock on their shared locks.
+        // The panel rule is evaluated on the row read under the shared lock above, with no further read; an
+        // exclusive lock would let two panel requests of the same operator deadlock on their shared locks.
         StaffWriteAuthority::require($current);
 
         return $current;
