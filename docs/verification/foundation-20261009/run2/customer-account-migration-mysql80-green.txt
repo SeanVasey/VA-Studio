@@ -1,0 +1,9 @@
+# CustomerAccountMigrationTest on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file with the fix (setUp disposes of every empty dependent of customer_accounts); --filter the same two methods.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+..                                                                  2 / 2 (100%)
+Time: 04:17.027, Memory: 91.00 MB
+OK (2 tests, 134 assertions)
+# exit code 0; wall time 257 s

@@ -1,0 +1,37 @@
+Partition balance after regenerating both timing files from run 38037183233 (python3 scripts/ci/phpunit-shards.py on this branch; generated phpunit-ci-* files deleted afterwards):
+
+$ python3 scripts/ci/phpunit-shards.py --shards=24 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+Proved 1765 selected MySQL-native tests in 163 files (of 7642 discovered tests in 557 files) across 24 nonempty shards.
+Shard 1: 85 tests; 1 complete files; estimated 122m 57s.
+Shard 2: 74 tests; 4 complete files; estimated 87m 23s.
+Shard 3: 96 tests; 7 complete files; estimated 86m 50s.
+Shard 4: 63 tests; 5 complete files; estimated 86m 55s.
+Shard 5: 64 tests; 6 complete files; estimated 86m 55s.
+Shard 6: 63 tests; 6 complete files; estimated 86m 52s.
+Shard 7: 59 tests; 6 complete files; estimated 86m 59s.
+Shard 8: 85 tests; 7 complete files; estimated 87m 06s.
+Shard 9: 66 tests; 6 complete files; estimated 86m 52s.
+Shard 10: 85 tests; 11 complete files; estimated 86m 50s.
+Shard 11: 54 tests; 6 complete files; estimated 86m 53s.
+Shard 12: 66 tests; 6 complete files; estimated 86m 56s.
+Shard 13: 78 tests; 7 complete files; estimated 87m 00s.
+Shard 14: 78 tests; 7 complete files; estimated 87m 20s.
+Shard 15: 76 tests; 8 complete files; estimated 86m 50s.
+Shard 16: 91 tests; 8 complete files; estimated 87m 13s.
+Shard 17: 62 tests; 7 complete files; estimated 86m 50s.
+Shard 18: 59 tests; 7 complete files; estimated 86m 53s.
+Shard 19: 76 tests; 7 complete files; estimated 87m 15s.
+Shard 20: 66 tests; 7 complete files; estimated 86m 54s.
+Shard 21: 82 tests; 8 complete files; estimated 87m 11s.
+Shard 22: 63 tests; 8 complete files; estimated 87m 12s.
+Shard 23: 102 tests; 10 complete files; estimated 86m 50s.
+Shard 24: 72 tests; 8 complete files; estimated 87m 19s.
+
+$ python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
+Proved 7642 expanded tests in 557 files across 2 nonempty shards.
+Shard 1: 3985 tests; 279 complete files; estimated 60m 44s.
+Shard 2: 3657 tests; 278 complete files; estimated 60m 44s.
+
+Timing files written by scripts/ci/phpunit-timings.py from the 24 phpunit-ci-mysql-*-results.xml and 2 phpunit-ci-sqlite-*-results.xml artifacts of run 38037183233:
+  mysql: 163 files, 1765 cases, 127466 s of mysql test time
+  sqlite: 557 files, 7642 cases, 7288 s of sqlite test time

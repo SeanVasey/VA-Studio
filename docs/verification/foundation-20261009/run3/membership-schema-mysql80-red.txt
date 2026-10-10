@@ -1,0 +1,25 @@
+MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows on the unfixed test (main 590ed36), private disposable MySQL 8.0.46 (port 33094, database fnd3_red), direct PHPUnit:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 04:41.600, Memory: 81.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows
+PDOException: There is no active transaction
+
+vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:54
+vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:186
+vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 2, Errors: 1.
+exit 2

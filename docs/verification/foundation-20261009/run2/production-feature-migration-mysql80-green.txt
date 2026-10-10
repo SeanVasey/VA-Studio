@@ -1,0 +1,9 @@
+# ProductionFeatureMigrationTest on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file with the fix (non-prefix state: first and third tables, without the second); --filter the same method.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 01:57.464, Memory: 85.00 MB
+OK (1 test, 14 assertions)
+# exit code 0; wall time 118 s

@@ -1,0 +1,14 @@
+CustomerSuppressionMigrationTest, whole file, on the fixed test (this branch), private disposable MySQL 8.0.46 (port 33094, database fnd3_green2), direct PHPUnit (the 2 skips are the file's reviewed SQLite-only cases):
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+....................S......S.                                     29 / 29 (100%)
+
+Time: 01:00:46.089, Memory: 89.00 MB
+
+OK, but some tests were skipped!
+Tests: 29, Assertions: 122, Skipped: 2.
+exit 0

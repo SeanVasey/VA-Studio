@@ -191,7 +191,9 @@ class MembershipSchemaPreparationTest extends TestCase
                 $this->refuses(fn () => $r->assertCurrent());
                 $this->assertSame($plan['id'], DB::table(MembershipSchema::TABLES[0])->value('id'));
             } finally {
-                $pdo->exec('DROP TABLE '.(DB::getDriverName() === 'sqlite' ? 'temp.' : '').'production_membership_paid_periods');
+                // Plain DROP TABLE commits implicitly on MySQL even for a temporary table and would end
+                // the surrounding transaction before its own commit; DROP TEMPORARY TABLE does not.
+                $pdo->exec(DB::getDriverName() === 'sqlite' ? 'DROP TABLE temp.production_membership_paid_periods' : 'DROP TEMPORARY TABLE production_membership_paid_periods');
             }
         });
     }
