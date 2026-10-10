@@ -1,0 +1,16 @@
+# source: de7202a (product: db5add2 + PHPDoc-only de7202a)
+# note: FIRST MySQL attempt at de7202a, combined selection. PHPUnit printed four failures (the four lock-sequence cases of RightsScopeWriterConcurrencyTest; see mysql8046-red-lock-sequence.txt for the same failure with its assertion diff) and was then SIGTERMed (rc=143) before printing any detail, by a process outside this lane (the shared container runs other lanes' identically named PHPUnit processes as root). Retained as the first red signal only; superseded by the per-suite runs at f0cf472.
+# native MySQL server facts (private disposable server on 127.0.0.1:33113, own datadir, removed afterwards):
+#   version=8.0.46-0ubuntu0.24.04.4 transaction_isolation=REPEATABLE-READ performance_schema=1 sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+#   container packaging: mysqld  Ver 8.0.46-0ubuntu0.24.04.4 for Linux on x86_64 ((Ubuntu))
+#   CI runs MySQL 8.4.11; this run is NOT 8.4 evidence.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33113 DB_USERNAME=root DB_PASSWORD= DB_DATABASE=vasey_mfa_run1 DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeWriterConcurrencyTest.php tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeCommandTest.php tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+FFFFrc=143

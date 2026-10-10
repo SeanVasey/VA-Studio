@@ -1,0 +1,8 @@
+# source: f0cf472 (product: db5add2 + de7202a + f0cf472)
+# vendor/bin/pint --test on the changed files other than PromotionAdministration.php:
+{"tool":"pint","result":"passed"}
+# vendor/bin/pint --test app/Domain/Commerce/PromotionAdministration.php (this lane changed 9 lines of it; the file's compact one-line guard style predates the lane):
+{"tool":"pint","result":"fail","files":[{"path":"app/Domain/Commerce/PromotionAdministration.php","fixers":["unary_operator_spaces","no_multiple_statements_per_line","braces_position","statement_indentation","not_operator_with_successor_space"]}]}
+# the same file at the base commit f57e725 (scratch copy), identical fixer set, so no new style finding was introduced:
+{"tool":"pint","result":"fail","files":[{"path":"<scratch>/PromotionAdministration.php","fixers":["unary_operator_spaces","no_multiple_statements_per_line","braces_position","statement_indentation","not_operator_with_successor_space"]}]}
+# reformatting would touch 44 lines in 9 hunks of a file this lane changed in 9 lines; left as is under CLAUDE.md section 1.1 (no style churn) and the open lint-gate adoption gap.

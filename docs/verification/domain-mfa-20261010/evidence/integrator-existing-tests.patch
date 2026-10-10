@@ -1,0 +1,30 @@
+--- a/tests/Feature/RightsScopeCommandTest.php	2026-10-10 08:07:47.907721602 +0000
++++ b/tests/Feature/RightsScopeCommandTest.php	2026-10-10 08:30:24.837080836 +0000
+@@ -128,9 +128,13 @@
+             ->expectsOutputToContain('unlinked revision='.$f['revision']->id.' offer='.$f['offer']->id.' track='.$f['track']->slug)
+             ->assertExitCode(0);
+ 
+-        $this->register($f['actor'])->expectsOutputToContain('scope=synthetic-track-scope id=')->assertExitCode(0);
++        // C2 (#68): a console write where the panel requires the staff factor carries an explicit, recorded attestation.
++        $attest = $environment === 'staging' ? ['--attest' => true] : [];
++        $this->write(['action' => 'register', '--scope' => 'synthetic-track-scope', '--reference' => self::SCOPE_REFERENCE] + $attest, $f['actor'])
++            ->expectsOutputToContain('scope=synthetic-track-scope id=')->assertExitCode(0);
+         $this->assertSame('synthetic-track-scope', DB::table('rights_scopes')->value('scope_key'));
+-        $this->link($f['actor'], $f['revision']->id)
++        $this->write(['action' => 'link', '--scope' => 'synthetic-track-scope', '--revision' => (string) $f['revision']->id,
++            '--reference' => self::LINK_REFERENCE] + $attest, $f['actor'])
+             ->expectsOutputToContain('revision='.$f['revision']->id.' scope=synthetic-track-scope status=linked')->assertExitCode(0);
+ 
+         $order = $this->prepare($f['quote']);
+--- a/tests/Feature/StagingEnvironmentAdmissionTest.php	2026-10-10 08:07:47.911721602 +0000
++++ b/tests/Feature/StagingEnvironmentAdmissionTest.php	2026-10-10 08:30:24.837286227 +0000
+@@ -300,7 +300,9 @@
+             'test promotion usage' => fn () => self::completes(fn () => DB::transaction(
+                 fn () => self::invokePrivate(app(PromotionUsage::class), 'requireTransaction'))),
+             'test promotion administration' => function (): bool {
++                // C2 (#68): the service applies the panel's staff factor itself; this gate proves only the environment.
+                 $admin = LicenseFixtures::admin();
++                $admin->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+                 try {
+                     return self::invokePrivate(app(PromotionAdministration::class), 'actor', $admin)->is($admin);
+                 } catch (AuthorizationException) {

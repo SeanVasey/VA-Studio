@@ -1,0 +1,21 @@
+# source: f0cf472 (product: db5add2 + de7202a + f0cf472; HEAD of this branch when run, third session)
+# note: GREEN after the lock-sequence fix: the whole RightsScopeWriterConcurrencyTest suite (10 cases, including the four lock-sequence cases that were red at de7202a) on native MySQL. The container had been rebooted; load average was 1.2 to 1.8 on four cores during the run (the earlier red run took 14 minutes under load 8 to 13; this run took 19 minutes with no other lane active because the suite's lock-wait cases are slow by design).
+# native MySQL server facts (private disposable server on 127.0.0.1:33113, own datadir, removed afterwards):
+#   version=8.0.46-0ubuntu0.24.04.4 transaction_isolation=REPEATABLE-READ performance_schema=1 sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+#   container packaging: /usr/sbin/mysqld  Ver 8.0.46-0ubuntu0.24.04.4 for Linux on x86_64 ((Ubuntu))
+#   CI runs MySQL 8.4.11; this run is NOT 8.4 evidence.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33113 DB_USERNAME=root DB_PASSWORD= DB_DATABASE=vasey_mfa_m1 DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeWriterConcurrencyTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+..........                                                        10 / 10 (100%)
+
+Time: 19:03.429, Memory: 96.00 MB
+
+OK (10 tests, 558 assertions)
+rc=0

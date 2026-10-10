@@ -1,0 +1,208 @@
+# source: 3399657 (product files identical to f57e725; first draft of the three new suites)
+# note: Red run before the change. The 'Class not found' errors and the exit code 0 are the product signal; the four '1 is identical to 0' failures were a harness mistake in the draft suites (RefreshDatabase's wrapping transaction), corrected before the green run. A second red run with the final suites against the base product files follows in red-final-suites-on-base-product.txt.
+# command (from the worktree root, public/build absent, SQLite in memory):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+E.FF.EEFFEEEFEEEEE                                                18 / 18 (100%)
+
+Time: 00:18.930, Memory: 96.00 MB
+
+There were 11 errors:
+
+1) Tests\Feature\PromotionAdministrationStaffMfaTest::test_staging_refuses_writes_and_reads_for_an_admin_without_the_panel_factor
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:86
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:39
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:85
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeStaffMfaTest::test_staging_refuses_register_link_and_block_for_an_admin_without_the_panel_factor
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:59
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:91
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:90
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeStaffMfaTest::test_staging_admits_an_enrolled_admin_without_an_attestation
+App\Domain\Commerce\QuoteException: A selection has changed or is unavailable. Choose it again.
+
+<worktree>/app/Domain/Commerce/Inventory/ManageRightsScope.php:55
+<worktree>/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+<worktree>/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+<worktree>/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+<worktree>/app/Domain/Commerce/Inventory/ManageRightsScope.php:47
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:106
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:104
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeStaffMfaTest::test_a_recorded_console_attestation_admits_the_bound_write_in_staging_and_is_linked_from_its_audit
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:166
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:165
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_bound_elsewhere_or_without_its_record_is_refused_without_effect
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:213
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:212
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\RightsScopeStaffMfaTest::test_local_and_testing_keep_enrollment_optional_without_an_attestation
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:253
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\RightsScopeCommandAttestationTest::test_staging_admits_attested_writes_and_records_who_when_and_which_scope
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:113
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:43
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:108
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\RightsScopeCommandAttestationTest::test_an_attestation_is_recorded_only_after_identity_and_environment_are_confirmed
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:162
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:43
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:160
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:188
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:43
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:186
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\RightsScopeCommandAttestationTest::test_attest_does_not_apply_to_the_read_only_list_action
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:204
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\RightsScopeCommandAttestationTest::test_testing_keeps_writes_optional_and_records_an_explicit_attestation
+Error: Class "App\Domain\Staff\StaffWriteAuthority" not found
+
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:78
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:217
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 5 failures:
+
+1) Tests\Feature\PromotionAdministrationStaffMfaTest::test_production_still_refuses_every_admin_before_the_factor_check
+Failed asserting that 1 is identical to 0.
+
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:75
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:124
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:39
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:122
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PromotionAdministrationStaffMfaTest::test_non_staff_users_are_refused_in_every_environment_even_when_enrolled
+Failed asserting that 1 is identical to 0.
+
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:75
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:142
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:39
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:141
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeStaffMfaTest::test_production_still_refuses_every_admin_with_inventory_unavailable
+Failed asserting that 1 is identical to 0.
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:79
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:129
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:128
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeStaffMfaTest::test_non_staff_users_are_refused_in_every_environment_even_when_enrolled
+Failed asserting that 1 is identical to 0.
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:67
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:150
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:41
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:149
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsScopeCommandAttestationTest::test_staging_refuses_writes_without_an_attestation_and_records_nothing
+Expected status code 1 but received 0.
+Failed asserting that 0 matches expected 1.
+
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:464
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:92
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:43
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:87
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 18, Assertions: 52, Errors: 11, Failures: 5.
+rc=2

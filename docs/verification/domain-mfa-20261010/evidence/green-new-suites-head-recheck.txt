@@ -1,0 +1,17 @@
+# source: f0cf472 (product: db5add2 + de7202a + f0cf472; HEAD of this branch when run, third session)
+# note: Re-confirmation of the three new suites on SQLite at the branch head by the third session, after the container reboot, before the evidence commit. Same result as evidence/green-new-suites.txt.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+..................                                                18 / 18 (100%)
+
+Time: 00:15.217, Memory: 96.00 MB
+
+OK (18 tests, 307 assertions)
+rc=0
