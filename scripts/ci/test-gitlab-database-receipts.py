@@ -117,10 +117,10 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
-    def test_native_policy_matches_githubs_eight_plus_two_under_the_hosted_three_hour_cap(self):
-        self.assertEqual({'mysql': 8, 'sqlite': 2}, native.COUNTS)
+    def test_native_policy_matches_githubs_twenty_four_plus_two_under_the_hosted_three_hour_cap(self):
+        self.assertEqual({'mysql': 24, 'sqlite': 2}, native.COUNTS)
         self.assertEqual(proof.COUNTS, native.COUNTS)
-        self.assertEqual(10, len(native.DATABASE_JOBS))
+        self.assertEqual(26, len(native.DATABASE_JOBS))
         workflow = (Path(__file__).parents[2] / '.gitlab-ci.yml').read_text()
         for engine, count in native.COUNTS.items():
             block = workflow.split(f'backend-{engine}:\n', 1)[1].split('\n\n', 1)[0]
@@ -170,10 +170,10 @@ class NativeCollectorTests(unittest.TestCase):
                 patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
             return native.collect(ROOT, env(), api)
 
-    def test_ten_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
+    def test_twenty_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
         value = self.collect(FakeGitlab())
-        self.assertEqual(10, len(value['database_receipts']))
-        self.assertEqual(16, len(value['upstream_jobs']))
+        self.assertEqual(26, len(value['database_receipts']))
+        self.assertEqual(32, len(value['upstream_jobs']))
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
@@ -283,6 +283,17 @@ class NativeCollectorTests(unittest.TestCase):
             elif mutation == 'before_pipeline': row['created_at'] = at(-80)
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
 
+    def test_missing_late_or_out_of_range_mysql_shard_job_rejects(self):
+        # Every one of the 24 MySQL jobs is mandatory; a missing late shard or a job named for shard 25 cannot pass.
+        for mutation in ('missing_seventeen', 'missing_twenty_four', 'renamed_twenty_five'):
+            api = FakeGitlab()
+            target = 'backend-mysql: [17]' if mutation == 'missing_seventeen' else 'backend-mysql: [24]'
+            index = next(i for i, row in enumerate(api.rows) if row['name'] == target)
+            if mutation.startswith('missing'): api.rows.pop(index)
+            else: api.rows[index]['name'] = 'backend-mysql: [25]'
+            with self.subTest(mutation=mutation), self.assertRaisesRegex(proof.ReceiptError, 'Missing or unexpected full acceptance job'):
+                self.collect(api)
+
     def test_missing_ambiguous_wrong_format_size_name_expired_or_conflicting_archive_rejects(self):
         for mutation in ('missing','duplicate','format','name','zero','oversized','download_size','expired','legacy_conflict'):
             api = FakeGitlab(); row = api.rows[0]; metadata = row['artifacts'][0]
@@ -298,7 +309,7 @@ class NativeCollectorTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
         api = FakeGitlab(); metadata = api.rows[0]['artifacts'][0]
         api.rows[0]['artifacts_file'] = {'filename':metadata['filename'],'size':metadata['size']}
-        self.assertEqual(10,len(self.collect(api)['artifacts']))
+        self.assertEqual(26,len(self.collect(api)['artifacts']))
 
     def test_receipt_wrong_source_job_runner_runtime_dependencies_time_or_start_rejects(self):
         for mutation in ('source','job','runner','image','mysql_version','mysql_schema','mysql_isolation','php','dependencies','runtime_hash','time','start'):
@@ -332,15 +343,21 @@ class NativeCollectorTests(unittest.TestCase):
             files['phpunit-ci-mysql-1-results.xml'] = ET.tostring(tree); api.replace(1,files)
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
 
-    def test_old_four_shard_or_mixed_shard_count_mysql_archives_reject(self):
-        # A 4-shard archive from before the move to 8 shards cannot pass, alone (mixed counts) or in the first
-        # four MySQL slots: its per-shard config and listing members are named for 4 shards, not 8.
+    def test_old_four_eight_or_sixteen_shard_or_mixed_shard_count_mysql_archives_reject(self):
+        # Archives from the earlier 4-, 8- and 16-shard splits cannot pass: alone among 24-shard archives,
+        # filling their old slots, or mixed with each other. Their per-shard config and listing members are
+        # named for the old count, not 24.
         mysql_jobs = [row for row in FakeGitlab().rows if native.DATABASE_JOBS.get(row['name'], ('',))[0] == 'mysql']
-        for scope in ('one', 'all_first_four'):
+        scopes = {'one_four': [(mysql_jobs[0], 4)], 'one_eight': [(mysql_jobs[0], 8)], 'one_sixteen': [(mysql_jobs[0], 16)],
+                  'last_sixteen': [(mysql_jobs[15], 16)],
+                  'all_first_four': [(row, 4) for row in mysql_jobs[:4]], 'all_first_eight': [(row, 8) for row in mysql_jobs[:8]],
+                  'all_first_sixteen': [(row, 16) for row in mysql_jobs[:16]],
+                  'mixed_four_eight_and_sixteen': [(mysql_jobs[0], 4), (mysql_jobs[1], 8), (mysql_jobs[2], 16)]}
+        for scope, replacements in scopes.items():
             api = FakeGitlab()
-            for row in mysql_jobs[:1] if scope == 'one' else mysql_jobs[:4]:
+            for row, count in replacements:
                 engine, shard = native.DATABASE_JOBS[row['name']]
-                with patch.dict(native.COUNTS, {'mysql': 4}):
+                with patch.dict(native.COUNTS, {'mysql': count}):
                     api.replace(row['id'], evidence(engine, shard, api.rows[row['id'] - 1]))
             with self.subTest(scope=scope), self.assertRaisesRegex(proof.ReceiptError, 'unexpected ZIP entry'):
                 self.collect(api)

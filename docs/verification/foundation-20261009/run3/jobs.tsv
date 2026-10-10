@@ -1,0 +1,35 @@
+job	conclusion	started_at	completed_at	minutes
+backend	failure	2026-10-10T10:26:41Z	2026-10-10T10:26:49Z	0.1
+backend-mysql (1/24)	success	2026-10-10T08:22:09Z	2026-10-10T10:26:39Z	124.5
+backend-mysql (2/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:53:14Z	91.1
+backend-mysql (3/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:57:07Z	95.0
+backend-mysql (4/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:31:58Z	69.8
+backend-mysql (5/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:52:27Z	90.3
+backend-mysql (6/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:47:13Z	85.1
+backend-mysql (7/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:30:54Z	68.8
+backend-mysql (8/24)	success	2026-10-10T08:22:08Z	2026-10-10T10:02:44Z	100.6
+backend-mysql (9/24)	success	2026-10-10T08:22:08Z	2026-10-10T10:01:52Z	99.7
+backend-mysql (10/24)	failure	2026-10-10T08:22:08Z	2026-10-10T09:29:33Z	67.4
+backend-mysql (11/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:59:30Z	97.3
+backend-mysql (12/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:47:45Z	85.6
+backend-mysql (13/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:20:09Z	58.0
+backend-mysql (14/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:54:32Z	92.4
+backend-mysql (15/24)	failure	2026-10-10T08:22:08Z	2026-10-10T10:04:58Z	102.8
+backend-mysql (16/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:27:14Z	65.1
+backend-mysql (17/24)	success	2026-10-10T08:22:09Z	2026-10-10T10:00:33Z	98.4
+backend-mysql (18/24)	success	2026-10-10T08:22:09Z	2026-10-10T10:07:20Z	105.2
+backend-mysql (19/24)	success	2026-10-10T08:22:08Z	2026-10-10T10:11:28Z	109.3
+backend-mysql (20/24)	success	2026-10-10T08:22:08Z	2026-10-10T09:25:47Z	63.6
+backend-mysql (21/24)	success	2026-10-10T08:22:09Z	2026-10-10T09:31:46Z	69.6
+backend-mysql (22/24)	failure	2026-10-10T08:22:09Z	2026-10-10T10:10:07Z	108.0
+backend-mysql (23/24)	failure	2026-10-10T08:22:09Z	2026-10-10T10:03:15Z	101.1
+backend-mysql (24/24)	success	2026-10-10T08:22:09Z	2026-10-10T10:10:20Z	108.2
+backend-quality	success	2026-10-10T08:14:34Z	2026-10-10T08:22:05Z	7.5
+backend-sqlite (1/2)	success	2026-10-10T08:22:09Z	2026-10-10T09:42:22Z	80.2
+backend-sqlite (2/2)	success	2026-10-10T08:22:08Z	2026-10-10T09:05:29Z	43.4
+documentation	skipped	2026-10-10T08:14:32Z	2026-10-10T08:14:31Z	-0.0
+frontend	success	2026-10-10T08:14:34Z	2026-10-10T08:15:58Z	1.4
+operator-browser (webkit-mobile)	success	2026-10-10T08:22:08Z	2026-10-10T08:40:52Z	18.7
+operator-browser (chromium-desktop)	success	2026-10-10T08:22:08Z	2026-10-10T08:35:58Z	13.8
+related-browser	success	2026-10-10T08:22:08Z	2026-10-10T08:29:57Z	7.8
+scope	success	2026-10-10T08:14:25Z	2026-10-10T08:14:31Z	0.1

@@ -47,3 +47,7 @@ python3 scripts/ci/test-related-browser-stage.py RelatedBrowserStageSafeguards B
 ```
 
 `browser-worker-webkit-evidence/source-preservation.json` records exact subtraction/protected-byte equality. `tested-source.json` binds the final commit, upstream evidence, original/final SDK digests and executed receipts. Independent exact-commit review and every fresh full Foundation gate, including both ordinary engines, genuine PWA/related journeys and all startup methods, remain required before merge.
+
+## Update, October 9, 2026: the WebKit offline journey no longer depends on the backport
+
+Foundation runs 37921309772 and 37967128232 still failed `storefront-offline.spec.ts` on WebKit at `page.reload()` after `setOffline(true)` with `WebKit encountered an internal error`, with this backport applied. A local reproduction on Playwright's WebKit 2359 showed that WebKit's offline emulation fails every navigation before a controlling service worker can answer, even one that never touches the network, with the original and the backported SDK alike. The backport only changes page initialization. On WebKit the spec now creates a real outage instead: the page loads through a loopback forwarder to the test server, which the test unplugs and re-plugs on the same port; Chromium still uses `context.setOffline`. The backport stays in place for its initialization fix and remains subject to the reassessment above on any SDK upgrade. Evidence: `docs/verification/foundation-20261009/`.

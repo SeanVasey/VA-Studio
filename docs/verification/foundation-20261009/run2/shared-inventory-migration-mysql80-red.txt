@@ -1,0 +1,19 @@
+# SharedInventoryMigrationTest (one method) on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file at bed64ee (before the fix); whole file.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+E                                                                   1 / 1 (100%)
+Time: 02:17.461, Memory: 94.00 MB
+There was 1 error:
+1) Tests\Feature\SharedInventoryMigrationTest::test_empty_inventory_tables_roundtrip_without_changing_quotes
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'rights_scopes' referenced by a foreign key constraint 'free_definitions_scope' on table 'free_definitions'. (Connection: mysql, Host: 127.0.0.1, Port: 33963, Database: c1_red_inv, SQL: drop table if exists `rights_scopes`)
+database/migrations/2026_09_17_000015_shared_rights_inventory.php:74
+tests/Feature/SharedInventoryMigrationTest.php:56
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'rights_scopes' referenced by a foreign key constraint 'free_definitions_scope' on table 'free_definitions'.
+database/migrations/2026_09_17_000015_shared_rights_inventory.php:74
+tests/Feature/SharedInventoryMigrationTest.php:56
+ERRORS!
+Tests: 1, Assertions: 14, Errors: 1.
+# exit code 2; wall time 138 s

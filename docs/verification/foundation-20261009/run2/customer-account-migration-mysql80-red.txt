@@ -1,0 +1,27 @@
+# CustomerAccountMigrationTest on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file at bed64ee (before the fix); --filter the two methods that reach the customer_accounts drop.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+EE                                                                  2 / 2 (100%)
+Time: 04:05.654, Memory: 83.00 MB
+There were 2 errors:
+1) Tests\Feature\CustomerAccountMigrationTest::test_empty_owned_rollback_and_reinstallation_preserve_the_expected_guard_set
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'customer_saved_tracks_account_fk' on table 'customer_saved_tracks'. (Connection: mysql, Host: 127.0.0.1, Port: 33963, Database: c1_red_acct, SQL: drop table `customer_accounts`)
+database/migrations/2026_10_06_000040_customer_accounts.php:79
+tests/Feature/CustomerAccountMigrationTest.php:112
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'customer_saved_tracks_account_fk' on table 'customer_saved_tracks'.
+database/migrations/2026_10_06_000040_customer_accounts.php:79
+tests/Feature/CustomerAccountMigrationTest.php:112
+2) Tests\Feature\CustomerAccountMigrationTest::test_foreign_guard_name_is_preserved_before_creation_and_when_owned_table_is_absent
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'customer_saved_tracks_account_fk' on table 'customer_saved_tracks'. (Connection: mysql, Host: 127.0.0.1, Port: 33963, Database: c1_red_acct, SQL: drop table `customer_accounts`)
+database/migrations/2026_10_06_000040_customer_accounts.php:79
+tests/Feature/CustomerAccountMigrationTest.php:148
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_accounts' referenced by a foreign key constraint 'customer_saved_tracks_account_fk' on table 'customer_saved_tracks'.
+database/migrations/2026_10_06_000040_customer_accounts.php:79
+tests/Feature/CustomerAccountMigrationTest.php:148
+ERRORS!
+Tests: 2, Assertions: 20, Errors: 2.
+# exit code 2; wall time 249 s
