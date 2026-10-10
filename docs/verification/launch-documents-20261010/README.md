@@ -12,19 +12,25 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass2.txt` | Third run, after the second-pass corrections below: 214 citations across 3 documents, `RESULT PASS`, exit 0. |
 | `pass2-source-checks.txt` | Source greps behind the second pass: zero analytics/tracker matches in `resources/js`, `resources/views`, `app`, `config`; the customer-account, identity and service-project gates call `TestEnvironment::admitsTestCommerce()` (`local`, `testing`, `staging`). |
 | `green-contradictions.txt` | The same greps after the edits, showing each corrected line with its citation, plus the three new `docs/legal/` files. |
+| `independent-review-58cc803-DECISION.md` | The independent review of `58cc803`: REQUEST CHANGES, with four conditions (copied verbatim). |
+| `pass3-source-checks.txt` | Third pass, for the review conditions: the false IP claim and missing sections at `58cc803` (red), the session, attachment, service-project and free-grant sources, and the corrected headings and retention rows (green). |
+| `green-check-citations-pass3.txt` | Final run, after the third pass: 236 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
 ```
 $ python3 -I docs/verification/launch-documents-20261010/check-citations.py
 docs/legal/README.md: 95 distinct cited paths
-docs/legal/PRIVACY.md: 62 distinct cited paths
-docs/legal/TERMS.md: 52 distinct cited paths
-checked 209 citations across 3 documents
+docs/legal/PRIVACY.md: 86 distinct cited paths
+docs/legal/TERMS.md: 55 distinct cited paths
+checked 236 citations across 3 documents
 RESULT PASS
+exit 0
 $ git diff --check
-(no output)
+(exit 0)
 ```
+
+This is the final run (`green-check-citations-pass3.txt`). The earlier 209- and 214-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -51,9 +57,25 @@ A review of the drafts against the source found three statements that repeated p
 | `docs/legal/TERMS.md`, section 6 | enrollment and recovery only in `local`/`testing`; passwords "12–72 bytes" | admitted wherever test accounts are; passwords at least 12 characters with letters and numbers and at most 72 UTF-8 bytes | `app/Domain/Customers/CustomerIdentityPolicy.php`; `docs/customer-test-self-service.md`, "Customer journey" |
 | `docs/legal/TERMS.md`, section 9 | service briefs and quotes only in `local`/`testing` | `local`, `testing` or `staging`, behind a default-off flag | `app/Domain/Services/Projects/ServiceProjectPolicy.php`; `config/services-projects.php` |
 
+## Third pass (independent review of `58cc803`)
+
+The review (`independent-review-58cc803-DECISION.md`) returned REQUEST CHANGES. Applied in `docs/legal/PRIVACY.md`:
+
+| Condition | Was | Now | Citation |
+| --- | --- | --- | --- |
+| 1 (HIGH) | Section 2.1: "The application reads the visitor's IP address only for rate limiting"; the retention table listed only the 120-minute cookie | Every browser session is stored server-side in the `sessions` table with the user ID, IP address, user agent and payload; the payload is encrypted when `SESSION_ENCRYPT` is true, but the IP and user-agent columns are not. "Only for rate limiting" is removed. A new section 4 row says the rows expire after `SESSION_LIFETIME` and are deleted by probabilistic garbage collection (2 in 100 requests), with no fixed purge schedule | `config/session.php` (`driver`, `lifetime`, `encrypt`, `lottery`); `database/migrations/0001_01_01_000000_create_users_table.php`; `ops/staging/env.staging.example`; `ops/staging/forge-deploy.sh`; Laravel `DatabaseSessionHandler::addRequestInformation` and `gc` (vendor, quoted in `pass3-source-checks.txt`) |
+| 2 (MEDIUM) | No section for support attachments, service-project briefs or free-license name and assent | New sections 2.6, 2.7 and 2.8, each marked default-off and cited, with matching section 4 rows. Attachments are admitted only in `local`/`testing`, not `staging`; their row records the 24-hour access expiry, no automatic deletion, and explicit tombstone and physical cleanup. Email and staff sections are renumbered 2.9 and 2.10 | `routes/support-attachments.php`; `config/support-attachments.php`; `app/Domain/SupportAttachments/FixtureAttachmentPolicy.php`; `docs/verification/support-attachments-20261007.md`; `routes/services.php`; `app/Domain/Services/Projects/ServiceProjectPolicy.php`; `database/migrations/2026_10_07_244000_service_projects.php`; `docs/service-projects.md`; `docs/free-grants.md`; `config/free-grants.php`; `database/migrations/2026_10_07_245000_free_grant_origins.php` |
+| INFO | Section 2.2 step 3 deferred to Stripe's notices | It also says that no `customer_email` is passed, so Stripe's page asks the buyer for an email address and payment details | `app/Domain/Commerce/Checkout/CheckoutEvidence.php` |
+| 3 (LOW) | "Commands and results" showed the 209-citation run | It shows the final 236-citation run | `green-check-citations-pass3.txt` |
+
+Condition 4, re-review of the changed `PRIVACY.md` text, is open. This lane cannot satisfy it; an independent reviewer must assess the new head before merge.
+
+The `check-citations.py` script is unchanged. The review's LOW finding on its scope (it checks paths and headers, not facts) is recorded above under "Commands and results", not fixed.
+
 ## Contradictions reported, not edited
 
 - `CLAUDE.md`, Project Notes, "§5 auth": "customer accounts don't exist yet (U-07)". Test customer accounts exist and are documented (`docs/verification/customer-account-test-journey.md`; `docs/customer-test-self-service.md`; `routes/customer.php`); production identity remains default-off (`config/production-customer-identity.php`). U-07 (production enrollment, recovery and claim policy) is still open, so the accurate statement is that production customer accounts do not exist yet.
 - `resources/contracts/test-v2/PROVENANCE.md`: "current issuance profile and policy still select v1". The registry selects v2 (`app/Domain/Contracts/ContractRenderProfileRegistry.php`, `CURRENT_VERSION = 'test-buyer-pdf-v2'`; `app/Domain/Contracts/ContractIssuancePolicy.php`, `profile => 'test-buyer-pdf-v2'`; `docs/test-contract-issuance.md`, "The current development runtime selects v2"). The file is frozen and was not changed.
 - `docs/architecture/decision-register.md`, D-02: "Target GitHub repository name is VASEYAUDIO". Left as history; the 2026-10-10 entry records the current repository beside it.
+- `docs/service-projects.md` ("activates it only in `local` or `testing`") and `docs/free-grants.md` ("mint only `test_only: true` definitions in `local` or `testing`") also predate PR #68: `ServiceProjectPolicy`, `FreeGrantPolicy` and `FreeGrantDefinitions` call `TestEnvironment::admitsTestCommerce()`. `PRIVACY.md` sections 2.7 and 2.8 follow the code. Outside this lane's owned files.
 - `docs/verification/customer-account-test-journey.md` ("enables the feature only in `local` or `testing`") and `docs/customer-test-self-service.md` ("The environment must be `local` or `testing`") predate PR #68: the code admits `staging` through `TestEnvironment::admitsTestCommerce()`. Outside this lane's owned files; reported for the integrator.

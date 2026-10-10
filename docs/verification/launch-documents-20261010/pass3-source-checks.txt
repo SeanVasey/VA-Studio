@@ -1,0 +1,128 @@
+# Pass 3 (review conditions 1-2): red claim at 58cc803, the sources, and the corrected text
+# Produced 2026-10-10 in /home/user/wt-docs. Trimmed grep output; commands shown with $.
+
+## RED: the reviewed draft at 58cc803
+$ git show 58cc803:docs/legal/PRIVACY.md | grep -n "only for rate limiting\|Session cookie |"
+22:- **IP address.** The application reads the visitor's IP address only for rate limiting. Public embed routes are budgeted per IP (`app/Providers/AppServiceProvider.php`, `public-track-embed` and `public-track-embed-au
+96:| Session cookie | 120 minutes by default | `config/session.php` |
+$ git show 58cc803:docs/legal/PRIVACY.md | grep -c "sessions\` table\|support-attachments\|routes/services.php\|free_grant_origins"
+0
+
+## Sources: sessions
+$ grep -n "'driver'\|'lifetime'\|'encrypt'\|'lottery'" config/session.php
+21:    'driver' => env('SESSION_DRIVER', 'database'),
+35:    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+50:    'encrypt' => env('SESSION_ENCRYPT', false),
+117:    'lottery' => [2, 100],
+$ grep -n "SESSION_DRIVER\|SESSION_LIFETIME\|SESSION_ENCRYPT\|CACHE_STORE" .env.example ops/staging/env.staging.example
+.env.example:40:SESSION_DRIVER=database
+.env.example:41:SESSION_LIFETIME=120
+.env.example:42:SESSION_ENCRYPT=true
+.env.example:73:CACHE_STORE=database
+ops/staging/env.staging.example:58:SESSION_DRIVER=database
+ops/staging/env.staging.example:60:SESSION_LIFETIME=480
+ops/staging/env.staging.example:61:SESSION_ENCRYPT=true
+ops/staging/env.staging.example:99:CACHE_STORE=database
+$ grep -n "need SESSION\|need CACHE_STORE" ops/staging/forge-deploy.sh
+112:need SESSION_SECURE_COOKIE true
+113:need SESSION_DRIVER database
+114:need CACHE_STORE database          # per-buyer heavy-work lock and queue:restart need a shared lock-capable store
+$ sed -n 30,37p database/migrations/0001_01_01_000000_create_users_table.php
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+$ sed -n 250,256p vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php   (vendor, not committed; read for the claim only)
+    protected function addRequestInformation(&$payload)
+    {
+        if ($this->container->bound('request')) {
+            $payload = array_merge($payload, [
+                'ip_address' => $this->ipAddress(),
+                'user_agent' => $this->userAgent(),
+            ]);
+$ grep -n "function gc" -A3 vendor/laravel/framework/src/Illuminate/Session/DatabaseSessionHandler.php
+299:    public function gc($lifetime): int
+300-    {
+301-        return $this->getQuery()->where('last_activity', '<=', $this->currentTime() - $lifetime)->delete();
+302-    }
+$ grep -n "_quote_owner" app/Support/QuoteOwner.php
+14:        $owner = $request->session()->get('_quote_owner');
+20:            $request->session()->put('_quote_owner', $owner);
+$ grep -rn "session" routes/console.php   (no scheduled session purge)
+(no match)
+
+## Sources: support attachments
+$ grep -n "support-attachments" routes/web.php
+18:require __DIR__.'/support-attachments.php';
+$ grep -n "fixture_enabled" config/support-attachments.php
+5:    'fixture_enabled' => env('VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED', false),
+$ grep -n "environment\|max_bytes\|return 52\|return 10;\|return 86400\|types" app/Domain/SupportAttachments/FixtureAttachmentPolicy.php
+14:        return ['version' => 'support-fixture-policy-v1', 'provenance' => 'synthetic_technical_policy', 'max_bytes' => 5242880, 'max_files' => 10, 'lifetime_seconds' => 86400,
+20:        AttachmentException::require(app()->environment(['local', 'testing']) && config('support-attachments.fixture_enabled') === true
+26:        return 5242880;
+31:        return 10;
+36:        return 86400;
+46:        return $engine === 'clamav' || ($engine === 'test-only' && app()->environment('testing'));
+$ grep -n "FixtureAttachmentPolicy" app/Providers/SupportAttachmentServiceProvider.php
+7:use App\Domain\SupportAttachments\FixtureAttachmentPolicy;
+17:            ['original_inquiry_session_v1' => new FixtureAttachmentPolicy, 'test_service_project_v1' => new FixtureAttachmentPolicy],
+$ grep -n "24-hour\|automatic deletion\|Encrypted original manifest\|pending" docs/verification/support-attachments-20261007.md
+95:24-hour access expiry; PNG/JPEG/PDF/UTF-8 text only**. These are technical fixture
+147:reports `pending`; explicit deletion retry can finish it. Encrypted original
+148:manifest and source history remain. This is not automatic deletion after 24 hours
+
+## Sources: service projects
+$ grep -n "admitsTestCommerce" app/Domain/Services/Projects/ServiceProjectPolicy.php; grep -n test_enabled config/services-projects.php
+11:        return TestEnvironment::admitsTestCommerce() && config('services-projects.test_enabled') === true;
+5:    'test_enabled' => env('VASEY_TEST_SERVICE_PROJECTS_ENABLED', false),
+$ grep -n "TEST_COMMERCE = " app/Support/Environment/TestEnvironment.php
+20:    public const TEST_COMMERCE = ['local', 'testing', self::STAGING];
+$ grep -n "services.php" routes/web.php; grep -n "Route::post" routes/services.php | cut -c1-120
+67:require __DIR__.'/services.php';
+13:        Route::post('/services/projects', [ServiceProjectController::class, 'store'])->middleware('throttle:10,1,serv
+14:        Route::post('/services/projects/{project}/commands', [ServiceProjectController::class, 'command'])->middlewar
+
+## Sources: free grants
+$ grep -n "_enabled" config/free-grants.php; grep -n "'enabled'" config/production-free-grants.php
+4:    'test_enabled' => env('VASEY_TEST_FREE_GRANTS_ENABLED', false),
+6:    'operative_enabled' => env('VASEY_OPERATIVE_FREE_GRANTS_ENABLED', false),
+8:    'enabled' => false,
+$ grep -n "admitsTestCommerce" app/Domain/Grants/Free/FreeGrantPolicy.php app/Domain/Grants/Free/FreeGrantDefinitions.php
+app/Domain/Grants/Free/FreeGrantPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true
+app/Domain/Grants/Free/FreeGrantPolicy.php:32:            FreeGrantException::require(TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true, 404);
+app/Domain/Grants/Free/FreeGrantDefinitions.php:19:        FreeGrantException::require(TestEnvironment::admitsTestCommerce(), 404);
+$ grep -n "free-grants.php" routes/web.php; grep -n "down()" -A3 database/migrations/2026_10_07_245000_free_grant_origins.php
+72:require __DIR__.'/free-grants.php';
+13:    public function down(): void
+14-    {
+15-        throw new LogicException('Free origins, assent and originals are retained. Use a reviewed forward successor.');
+16-    }
+
+## Stripe customer_email (INFO finding)
+$ grep -c customer_email app/Domain/Commerce/Checkout/CheckoutEvidence.php
+0
+
+## GREEN: the corrected draft
+$ grep -c "only for rate limiting" docs/legal/PRIVACY.md
+0
+$ grep -n "^### 2\.\|Server-side session\|^| Session cookie\|^| Server-side session rows\|^| Support attachments\|^| Service-project\|^| Free-license" docs/legal/PRIVACY.md | cut -c1-160
+18:### 2.1 Visiting the storefront (live-shaped)
+20:- **Server-side session record.** Every browser that requests a page through the web routes gets a server session, and every session is stored server-side. T
+28:### 2.2 Buying a license (test-only today)
+42:### 2.3 Customer accounts (test-only today; production identity default-off)
+54:### 2.4 Email marketing consent (default-off)
+61:### 2.5 Contact inquiries and conversations (default-off)
+68:### 2.6 Support attachments (default-off; local and testing only)
+74:### 2.7 Service-project briefs (default-off; test-only)
+80:### 2.8 Free licenses: declared name and assent (default-off)
+86:### 2.9 Email the application sends
+90:### 2.10 Staff and operators
+115:| Session cookie | Expires after `SESSION_LIFETIME` minutes of inactivity: 120 by default, 480 in the staging template | `config/session.php`; `ops/staging/
+116:| Server-side session rows (`sessions` table: user ID, IP address, user agent, payload) | A row expires after `SESSION_LIFETIME` minutes without activity. E
+124:| Support attachments | Access expires 24 hours after the upload is reserved, and downloads and scans stop at that deadline; the file is not deleted automat
+125:| Service-project briefs, quotes and events | Immutable and never deleted when access or preparation is withdrawn; schema rollback refuses and keeps the row
+126:| Free-license origins (declared name, assent), PDFs and download records | Immutable; rollback refuses and keeps origins, assent and originals | `docs/free
