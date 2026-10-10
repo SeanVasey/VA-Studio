@@ -1,0 +1,5 @@
+baseline (base commit f57e725, original suite) cases: 47 | new suite cases: 50
+base cases missing from new: []
+original cases differing in assertions or status: []
+added cases: {'test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly': ('19', 'passed'), 'test_overlapping_duplicate_applies_create_exactly_one_draft_mapping_and_audit_set_per_record': ('24', 'passed'), 'test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open': ('13', 'passed')}
+all 47 original cases identical by name, assertion count and status: True

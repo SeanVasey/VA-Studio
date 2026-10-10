@@ -1,0 +1,4 @@
+# Reviewer's read-only lock probe (delta review of 6137ec9, MySQL 8.0.46, 2 s lock wait timeout)
+# Session A opens a transaction and reads; session B tries each write. Results by session-A read mode:
+FOR SHARE: {"insert tracks":1205,"update users":1205,"drop trigger-like DDL":1205}
+plain read: {"insert tracks":"admitted","update users":"admitted","drop trigger-like DDL":1205}

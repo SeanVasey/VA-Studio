@@ -110,7 +110,7 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Twenty-four shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
+  # Twenty-four shards of the reviewed native selection (1816 cases; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub
   # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for
   # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the
   # timings regenerated from that run the other shards balance at about 87 minutes at GitHub's speed.

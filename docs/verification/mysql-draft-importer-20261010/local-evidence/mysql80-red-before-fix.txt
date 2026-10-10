@@ -1,0 +1,28 @@
+# Red run: new suite against the unchanged importer (base commit f57e725 app/ files), MySQL 8.0.46, dedicated schema vaseyaudio_catalog_import
+# Command: PHPUnit as in README.md with --filter 'test_dry_run_is_read_only|test_partial_failure_while|test_mysql_metadata_and|test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs.*missing-trigger'
+# (the fourth alternative matched no data set under PHPUnit's naming, so three cases ran; stack frames trimmed to repository paths)
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+Time: 07:16.945, Memory: 87.00 MB
+There were 3 errors:
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits
+RuntimeException: catalog_target_invalid
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:80
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:118
+tests/Feature/PersistentCatalogDraftImportTest.php:868
+tests/Feature/PersistentCatalogDraftImportTest.php:61
+2) Tests\Feature\PersistentCatalogDraftImportTest::test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly
+Illuminate\Validation\ValidationException: Private catalog import evidence changed or is invalid. Review the current source and target before applying.
+vendor/laravel/framework/src/Illuminate/Validation/ValidationException.php:70
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:432
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:425
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:32
+tests/Feature/PersistentCatalogDraftImportTest.php:621
+3) Tests\Feature\PersistentCatalogDraftImportTest::test_mysql_metadata_and_next_key_locks_hold_foreign_session_ddl_and_writes_while_a_segment_is_open
+RuntimeException: catalog_target_schema_invalid
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:25
+tests/Feature/PersistentCatalogDraftImportTest.php:692
+ERRORS!
+Tests: 3, Assertions: 6, Errors: 3.
+rc=2 elapsed=437s
