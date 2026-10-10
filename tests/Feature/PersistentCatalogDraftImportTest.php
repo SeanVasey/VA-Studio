@@ -702,13 +702,21 @@ class PersistentCatalogDraftImportTest extends TestCase
             if (! $this->mysql()) {
                 return;
             }
-            // On MySQL a second session also tries to change the owned schema and the evidence tables; each
-            // attempt waits on the open transaction's metadata and next-key locks and times out (1205).
+            // On MySQL a second session also tries to change the owned schema and the evidence tables; each attempt
+            // times out (1205) on a different lock of the open transaction:
+            // - trigger, column: the metadata locks the transaction holds on every table it has read or written;
+            // - track: the catalog_discovery_epoch row that the tracks insert trigger updates, which the
+            //   importer's own track insert has already locked;
+            // - actor: the exclusive row lock CatalogDraftImporter takes on the actor (lockForUpdate);
+            // - audit: only the CatalogDatabaseEvidence::rows() FOR SHARE next-key locks on audit_events. The
+            //   table has no trigger and a null actor_id needs no users check, so without those locks the
+            //   insert would be admitted and hidden from the final proof by the REPEATABLE READ snapshot.
             $foreign = $this->foreignSession();
             foreach (['trigger' => 'DROP TRIGGER catalog_import_mappings_immutable_delete',
                 'column' => 'ALTER TABLE catalog_import_mappings ADD COLUMN unreviewed TEXT',
                 'track' => "INSERT INTO tracks (title, slug, artist, created_at, updated_at) VALUES ('SYNTHETIC foreign', 'synthetic-foreign', 'SYNTHETIC', '2026-10-10 00:00:00', '2026-10-10 00:00:00')",
-                'actor' => 'UPDATE users SET is_admin = 0 WHERE id = '.(int) $actor->id] as $label => $sql) {
+                'actor' => 'UPDATE users SET is_admin = 0 WHERE id = '.(int) $actor->id,
+                'audit' => "INSERT INTO audit_events (actor_id, action, subject_type, subject_id, context, created_at) VALUES (NULL, 'synthetic.foreign', 'synthetic', 1, '{}', '2026-10-10 00:00:00')"] as $label => $sql) {
                 try {
                     $foreign->exec($sql);
                     $outcomes[$label] = 'admitted';
@@ -718,7 +726,7 @@ class PersistentCatalogDraftImportTest extends TestCase
             }
             unset($foreign);
         });
-        $this->assertSame($this->mysql() ? ['nested' => 'refused', 'trigger' => 1205, 'column' => 1205, 'track' => 1205, 'actor' => 1205]
+        $this->assertSame($this->mysql() ? ['nested' => 'refused', 'trigger' => 1205, 'column' => 1205, 'track' => 1205, 'actor' => 1205, 'audit' => 1205]
             : ['nested' => 'refused'], $outcomes);
         $this->assertTrue($result['complete']);
         $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
