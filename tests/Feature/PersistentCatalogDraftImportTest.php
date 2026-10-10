@@ -19,8 +19,11 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use PDO;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\DisposableNativeDatabase;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\NormalizedCatalogFixtures;
 use Tests\TestCase;
@@ -33,12 +36,19 @@ class PersistentCatalogDraftImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // This private retained-workspace surface has an explicit SQLite contract, even when
-        // the surrounding application suite selects MySQL. It is not MySQL lock evidence.
-        config(['database.connections.catalog_private_fixture' => array_replace(config('database.connections.sqlite'),
-            ['database' => ':memory:', 'url' => null])]);
-        DB::setDefaultConnection('catalog_private_fixture');
-        // Each application owns an isolated in-memory database; no outer testing transaction masks standalone admission.
+        if (DB::getDriverName() === 'mysql') {
+            // The InnoDB contract is proved on the suite's own MySQL connection. Every case rebuilds the whole
+            // database, so only the dedicated synthetic schema or the CI job's disposable database is admitted.
+            $this->assertTrue(DisposableNativeDatabase::isAdmitted('vaseyaudio_catalog_import'),
+                'A dedicated synthetic catalog-import schema, or the CI job\'s disposable database, is required.');
+        } else {
+            // This private retained-workspace surface keeps its explicit SQLite contract under every other
+            // surrounding suite driver. It is not MySQL lock evidence.
+            config(['database.connections.catalog_private_fixture' => array_replace(config('database.connections.sqlite'),
+                ['database' => ':memory:', 'url' => null])]);
+            DB::setDefaultConnection('catalog_private_fixture');
+        }
+        // Each application owns an isolated database; no outer testing transaction masks standalone admission.
         $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
         config(['app.key' => 'base64:'.base64_encode(str_repeat('s', 32))]);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -218,7 +228,9 @@ class PersistentCatalogDraftImportTest extends TestCase
         $mutate = function () use ($case, $source, $actor): void {
             $pdo = DB::connection()->getPdo();
             if (in_array($case, ['prior-track', 'query-observer'], true)) {
-                $pdo->exec("UPDATE tracks SET description='SYNTHETIC late mutation' WHERE id=(SELECT min(id) FROM tracks)");
+                // MySQL refuses a subquery on the updated table (error 1093); SQLite has no UPDATE ... LIMIT.
+                $pdo->exec($this->mysql() ? "UPDATE tracks SET description='SYNTHETIC late mutation' ORDER BY id LIMIT 1"
+                    : "UPDATE tracks SET description='SYNTHETIC late mutation' WHERE id=(SELECT min(id) FROM tracks)");
             }
             if ($case === 'actor') {
                 $pdo->exec('UPDATE users SET is_admin=0 WHERE id='.(int) $actor->id);
@@ -233,7 +245,7 @@ class PersistentCatalogDraftImportTest extends TestCase
         $mapped = 0;
         if ($case === 'query-observer') {
             DB::listen(function (QueryExecuted $query) use (&$mapped, $mutate): void {
-                if (str_starts_with($query->sql, 'insert into "audit_events"') && in_array('migration.catalog_draft.mapped', $query->bindings, true) && ++$mapped === 2) {
+                if (str_starts_with($query->sql, 'insert into '.$this->identifier('audit_events')) && in_array('migration.catalog_draft.mapped', $query->bindings, true) && ++$mapped === 2) {
                     $mutate();
                 }
             });
@@ -484,6 +496,12 @@ class PersistentCatalogDraftImportTest extends TestCase
         } catch (RuntimeException $error) {
             $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
         }
+        if ($this->mysql()) {
+            // MySQL DDL commits implicitly, so the dropped trigger outlives the refused dry run and the live
+            // digest keeps refusing until the owned trigger is restored; SQLite rolled the DDL back.
+            $this->assertSchemaRefused();
+            $this->restoreOwnedDeleteTrigger();
+        }
         $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
         $this->assertSame($before, $this->evidence());
         $review = $importer->review($source, $this->release, $actor);
@@ -498,8 +516,13 @@ class PersistentCatalogDraftImportTest extends TestCase
         } catch (RuntimeException $error) {
             $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
         }
-        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
-        $this->assertSame($before, $this->evidence());
+        if (! $this->mysql()) {
+            $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+            $this->assertSame($before, $this->evidence());
+
+            return;
+        }
+        $this->assertCommittedPrefixAfterCallbackDdl($importer, $source, $review, $actor, $schema);
     }
 
     public function test_final_direct_schema_proof_rejects_late_query_observer_and_target_mutations(): void
@@ -519,7 +542,7 @@ class PersistentCatalogDraftImportTest extends TestCase
         $this->assertSame($before, $this->evidence());
         $review = $importer->review($source, $this->release, $actor);
         DB::listen(function (QueryExecuted $query): void {
-            if (str_starts_with($query->sql, 'insert into "audit_events"') && in_array('migration.catalog_draft.mapped', $query->bindings, true)) {
+            if (str_starts_with($query->sql, 'insert into '.$this->identifier('audit_events')) && in_array('migration.catalog_draft.mapped', $query->bindings, true)) {
                 $this->changeSchema('foreign-trigger');
             }
         });
@@ -529,8 +552,13 @@ class PersistentCatalogDraftImportTest extends TestCase
         } catch (RuntimeException $error) {
             $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
         }
-        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
-        $this->assertSame($before, $this->evidence());
+        if (! $this->mysql()) {
+            $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+            $this->assertSame($before, $this->evidence());
+
+            return;
+        }
+        $this->assertCommittedPrefixAfterCallbackDdl($importer, $source, $review, $actor, $schema);
     }
 
     public static function replacementIdentity(): array
@@ -549,8 +577,14 @@ class PersistentCatalogDraftImportTest extends TestCase
         $table = str_starts_with($case, 'batch') ? 'catalog_import_batches' : 'catalog_import_mappings';
         $row = (new CatalogDatabaseEvidence)->rows($table)[1]['attributes'];
         $pdo = DB::connection()->getPdo();
-        $pdo->exec('PRAGMA recursive_triggers=OFF');
-        $this->assertSame(0, $pdo->query('PRAGMA recursive_triggers')->fetchColumn());
+        if ($this->mysql()) {
+            // MySQL REPLACE deletes the conflicting row before inserting, which fires the immutable delete trigger.
+            $verb = 'REPLACE INTO';
+        } else {
+            $pdo->exec('PRAGMA recursive_triggers=OFF');
+            $this->assertSame(0, $pdo->query('PRAGMA recursive_triggers')->fetchColumn());
+            $verb = 'INSERT OR REPLACE INTO';
+        }
         if (! str_ends_with($case, '-id')) {
             $row['id'] = 999;
         }
@@ -570,18 +604,203 @@ class PersistentCatalogDraftImportTest extends TestCase
         $row[str_starts_with($case, 'batch') ? 'review_ciphertext' : 'evidence_ciphertext'] = 'SYNTHETIC attempted replacement';
         $before = $this->evidence();
         try {
-            $statement = $pdo->prepare('INSERT OR REPLACE INTO "'.$table.'" ("'.implode('", "', array_keys($row)).'") VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+            $statement = $pdo->prepare($verb.' '.$this->identifier($table).' ('.implode(', ', array_map($this->identifier(...), array_keys($row))).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
             $statement->execute(array_values($row));
             $this->fail('Retained evidence replaced: '.$case);
-        } catch (\PDOException $error) {
+        } catch (PDOException $error) {
             $this->assertStringContainsString('Catalog import evidence is immutable', $error->getMessage());
         }
         $this->assertSame($before, $this->evidence());
     }
 
+    public function test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(3));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        $before = $this->evidence();
+        $failing = true;
+        $created = 0;
+        CatalogImportMapping::creating(function () use (&$failing, &$created): void {
+            if ($failing && ++$created === 2) {
+                throw new RuntimeException('SYNTHETIC mapping failure');
+            }
+        });
+        try {
+            $importer->apply($source, $this->release, $review, $review['review_sha256'], 3, $actor);
+            $this->fail('Mapping failure committed.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('SYNTHETIC mapping failure', $error->getMessage());
+        }
+        // The first draft, its audits, the accepted batch and the first mapping all roll back together.
+        $this->assertSame($before, $this->evidence());
+        foreach (['tracks', 'catalog_import_batches', 'catalog_import_mappings', 'audit_events'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $failing = false;
+        $result = $importer->apply($source, $this->release, $review, $review['review_sha256'], 3, $actor);
+        $this->assertTrue($result['complete']);
+        $this->assertCount(3, $result['created_track_ids']);
+        $this->assertExactlyOneRowSetPerRecord(3);
+        $complete = $this->evidence();
+        $replay = $importer->apply($source, $this->release, $review, $review['review_sha256'], 25, $actor);
+        $this->assertSame([], $replay['created_track_ids']);
+        $this->assertSame($complete, $this->evidence());
+    }
+
+    public function test_overlapping_duplicate_applies_create_exactly_one_draft_mapping_and_audit_set_per_record(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(3));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        $first = $importer->apply($source, $this->release, $review, $review['review_sha256'], 2, $actor);
+        $this->assertSame(2, $first['processed']);
+        $this->assertCount(2, $first['created_track_ids']);
+        // The same segment request again: the retained prefix is honoured and only the third record is created.
+        $second = $importer->apply($source, $this->release, $review, $review['review_sha256'], 2, $actor);
+        $this->assertSame(3, $second['processed']);
+        $this->assertTrue($second['complete']);
+        $this->assertCount(1, $second['created_track_ids']);
+        $complete = $this->evidence();
+        $third = $importer->apply($source, $this->release, $review, $review['review_sha256'], 2, $actor);
+        $this->assertSame([], $third['created_track_ids']);
+        $this->assertSame($complete, $this->evidence());
+        $this->assertExactlyOneRowSetPerRecord(3);
+        // A fresh review of the completed source records exact skips; applying it adds its own batch evidence only.
+        $next = $importer->review($source, $this->release, $actor);
+        $this->assertSame(['create_draft' => 0, 'skip' => 3, 'conflict' => 0], $next['counts']);
+        $applied = $importer->apply($source, $this->release, $next, $next['review_sha256'], 25, $actor);
+        $this->assertSame([], $applied['created_track_ids']);
+        $this->assertTrue($applied['complete']);
+        $this->assertDatabaseCount('catalog_import_batches', 2);
+        $this->assertDatabaseCount('audit_events', 8);
+        $this->assertSame(CatalogImportBatch::query()->min('id'), CatalogImportMapping::query()->distinct()->pluck('batch_id')->sole());
+        $this->assertSame($complete[0]['tracks'], $this->evidence()[0]['tracks']);
+        $this->assertSame($complete[2], $this->evidence()[2]);
+    }
+
+    public function test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $schema = (new CatalogDatabaseEvidence)->schema();
+        $review = $importer->review($source, $this->release, $actor);
+        $outcomes = [];
+        $result = $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor, function () use (&$outcomes, $actor, $source): void {
+            // After the segment's writes and before its final proofs, another importer in this process fails
+            // standalone admission (the transaction is open) before it reads or writes anything.
+            try {
+                (new CatalogDraftImporter)->review($source, $this->release, $actor);
+                $outcomes['nested'] = 'admitted';
+            } catch (ValidationException) {
+                $outcomes['nested'] = 'refused';
+            }
+            if (! $this->mysql()) {
+                return;
+            }
+            // On MySQL a second session also tries to change the owned schema and the evidence tables; each
+            // attempt waits on the open transaction's metadata and next-key locks and times out (1205).
+            $foreign = $this->foreignSession();
+            foreach (['trigger' => 'DROP TRIGGER catalog_import_mappings_immutable_delete',
+                'column' => 'ALTER TABLE catalog_import_mappings ADD COLUMN unreviewed TEXT',
+                'track' => "INSERT INTO tracks (title, slug, artist, created_at, updated_at) VALUES ('SYNTHETIC foreign', 'synthetic-foreign', 'SYNTHETIC', '2026-10-10 00:00:00', '2026-10-10 00:00:00')",
+                'actor' => 'UPDATE users SET is_admin = 0 WHERE id = '.(int) $actor->id] as $label => $sql) {
+                try {
+                    $foreign->exec($sql);
+                    $outcomes[$label] = 'admitted';
+                } catch (PDOException $error) {
+                    $outcomes[$label] = (int) ($error->errorInfo[1] ?? 0);
+                }
+            }
+            unset($foreign);
+        });
+        $this->assertSame($this->mysql() ? ['nested' => 'refused', 'trigger' => 1205, 'column' => 1205, 'track' => 1205, 'actor' => 1205]
+            : ['nested' => 'refused'], $outcomes);
+        $this->assertTrue($result['complete']);
+        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        $this->assertExactlyOneRowSetPerRecord(1);
+        $this->assertSame(1, (new CatalogDatabaseEvidence)->rows('users')[$actor->id]['attributes']['is_admin']);
+    }
+
+    private function mysql(): bool
+    {
+        return DB::getDriverName() === 'mysql';
+    }
+
+    private function identifier(string $name): string
+    {
+        return $this->mysql() ? '`'.$name.'`' : '"'.$name.'"';
+    }
+
+    /** A second connection with one-second lock waits, so a blocked attempt reports 1205 instead of stalling the segment. */
+    private function foreignSession(): PDO
+    {
+        $config = DB::connection()->getConfig();
+        $address = ($config['unix_socket'] ?? '') !== '' ? 'unix_socket='.$config['unix_socket'] : 'host='.$config['host'].';port='.$config['port'];
+        $pdo = new PDO('mysql:'.$address.';dbname='.$config['database'], $config['username'], $config['password'] ?? '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $pdo->exec('SET SESSION lock_wait_timeout = 1, innodb_lock_wait_timeout = 1');
+
+        return $pdo;
+    }
+
+    private function assertSchemaRefused(): void
+    {
+        try {
+            (new CatalogDatabaseEvidence)->schema();
+            $this->fail('Drifted owned schema admitted.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
+        }
+    }
+
+    private function restoreOwnedDeleteTrigger(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec('DROP TRIGGER IF EXISTS catalog_import_mappings_immutable_delete');
+        $pdo->exec("CREATE TRIGGER catalog_import_mappings_immutable_delete BEFORE DELETE ON catalog_import_mappings FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Catalog import evidence is immutable'");
+    }
+
+    /**
+     * MySQL DDL inside the importer's own session commits implicitly, so a callback's schema change commits the
+     * segment written before it. The drift is still refused; once the owned trigger is restored, the committed
+     * rows form the exact retained prefix and a replay creates nothing. Another session's DDL waits instead.
+     */
+    private function assertCommittedPrefixAfterCallbackDdl(CatalogDraftImporter $importer, array $source, array $review, $actor, string $schema): void
+    {
+        $this->assertSchemaRefused();
+        $this->restoreOwnedDeleteTrigger();
+        $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        $this->assertExactlyOneRowSetPerRecord(1);
+        $committed = $this->evidence();
+        $replay = $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+        $this->assertSame([], $replay['created_track_ids']);
+        $this->assertTrue($replay['complete']);
+        $this->assertSame($committed, $this->evidence());
+    }
+
+    private function assertExactlyOneRowSetPerRecord(int $records): void
+    {
+        $this->assertDatabaseCount('tracks', $records);
+        $this->assertDatabaseCount('catalog_import_batches', 1);
+        $this->assertDatabaseCount('catalog_import_mappings', $records);
+        $this->assertDatabaseCount('audit_events', 2 * $records + 1);
+        foreach (['catalog.track.created' => $records, 'migration.catalog_batch.accepted' => 1, 'migration.catalog_draft.mapped' => $records] as $action => $count) {
+            $this->assertSame($count, AuditEvent::query()->where('action', $action)->count());
+        }
+        $this->assertSame($records, CatalogImportMapping::query()->distinct()->count('track_id'));
+    }
+
     private function changeSchema(string $case): void
     {
         $pdo = DB::connection()->getPdo();
+        if ($this->mysql()) {
+            $this->changeMysqlSchema($pdo, $case);
+
+            return;
+        }
         switch ($case) {
             case 'missing-trigger': $pdo->exec('DROP TRIGGER catalog_import_mappings_immutable_delete');
                 break;
@@ -601,7 +820,7 @@ class PersistentCatalogDraftImportTest extends TestCase
                 break;
             case 'foreign-key-cascade':
             case 'nullable-column':
-                $rows = $pdo->query("SELECT type, sql FROM sqlite_master WHERE tbl_name='catalog_import_mappings' ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END")->fetchAll(\PDO::FETCH_ASSOC);
+                $rows = $pdo->query("SELECT type, sql FROM sqlite_master WHERE tbl_name='catalog_import_mappings' ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END")->fetchAll(PDO::FETCH_ASSOC);
                 $pdo->exec('DROP TABLE catalog_import_mappings');
                 foreach ($rows as $row) {
                     $sql = $row['sql'];
@@ -612,6 +831,27 @@ class PersistentCatalogDraftImportTest extends TestCase
                     $pdo->exec($sql);
                 }
                 break;
+        }
+    }
+
+    /** The InnoDB counterpart of each SQLite drift: owned objects, then the session switches the importer requires. */
+    private function changeMysqlSchema(PDO $pdo, string $case): void
+    {
+        $statements = match ($case) {
+            'missing-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete'],
+            'foreign-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete',
+                'CREATE TRIGGER catalog_import_mappings_immutable_delete BEFORE DELETE ON catalog_import_mappings FOR EACH ROW SET @catalog_import_noop = 1'],
+            'missing-unique' => ['ALTER TABLE catalog_import_mappings DROP INDEX catalog_import_mappings_record_key_unique'],
+            'extra-column' => ['ALTER TABLE catalog_import_mappings ADD COLUMN unreviewed TEXT'],
+            'foreign-keys-disabled' => ['SET SESSION foreign_key_checks = 0'],
+            'writable-schema' => ['SET SESSION unique_checks = 0'],
+            'ignored-checks' => ["SET SESSION sql_mode = ''"],
+            'foreign-key-cascade' => ['ALTER TABLE catalog_import_mappings DROP FOREIGN KEY catalog_import_mappings_actor_id_foreign',
+                'ALTER TABLE catalog_import_mappings ADD CONSTRAINT catalog_import_mappings_actor_id_foreign FOREIGN KEY (actor_id) REFERENCES users (id) ON DELETE CASCADE'],
+            'nullable-column' => ['ALTER TABLE catalog_import_mappings MODIFY actor_id BIGINT UNSIGNED NULL'],
+        };
+        foreach ($statements as $sql) {
+            $pdo->exec($sql);
         }
     }
 
