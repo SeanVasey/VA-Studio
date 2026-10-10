@@ -4,6 +4,10 @@ import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
 import { releaseRow } from './site-release-row';
 import { execFileSync } from 'node:child_process';
 
+// Synthetic page routes own the preview transport. WebKit does not route requests that a
+// controlling service worker passes through (see storefront.spec.ts); Chromium keeps the real worker.
+test.use({ serviceWorkers: async ({ browserName }, use) => { await use(browserName === 'webkit' ? 'block' : 'allow'); } });
+
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
 function fixtureEvidence(mode: 'before' | 'after-setup' | 'verify', project: string) {

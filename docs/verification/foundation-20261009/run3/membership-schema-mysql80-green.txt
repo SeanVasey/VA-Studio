@@ -1,0 +1,13 @@
+MembershipSchemaPreparationTest, whole file, on the fixed test (this branch), private disposable MySQL 8.0.46 (port 33094, database fnd3_green), direct PHPUnit:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+.............                                                     13 / 13 (100%)
+
+Time: 40:08.936, Memory: 87.00 MB
+
+OK (13 tests, 40 assertions)
+exit 0

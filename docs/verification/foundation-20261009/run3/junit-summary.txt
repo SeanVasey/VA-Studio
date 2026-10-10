@@ -1,0 +1,40 @@
+shard 1: 85 cases, 0 errors/failures, 0 skipped, 123.0 min test time
+shard 2: 74 cases, 0 errors/failures, 0 skipped, 89.4 min test time
+shard 3: 65 cases, 0 errors/failures, 0 skipped, 93.6 min test time
+shard 4: 73 cases, 0 errors/failures, 39 skipped, 68.7 min test time
+shard 5: 71 cases, 0 errors/failures, 1 skipped, 88.8 min test time
+shard 6: 68 cases, 0 errors/failures, 1 skipped, 83.8 min test time
+shard 7: 72 cases, 0 errors/failures, 0 skipped, 67.4 min test time
+shard 8: 73 cases, 0 errors/failures, 0 skipped, 99.4 min test time
+shard 9: 73 cases, 0 errors/failures, 0 skipped, 97.9 min test time
+shard 10: 73 cases, 1 errors/failures, 0 skipped, 66.1 min test time
+   - Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows: error: Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows
+shard 11: 73 cases, 0 errors/failures, 8 skipped, 96.1 min test time
+shard 12: 73 cases, 0 errors/failures, 0 skipped, 84.3 min test time
+shard 13: 73 cases, 0 errors/failures, 0 skipped, 56.8 min test time
+shard 14: 93 cases, 0 errors/failures, 1 skipped, 91.1 min test time
+shard 15: 73 cases, 1 errors/failures, 2 skipped, 101.6 min test time
+   - Tests\Feature\CustomerSuppressionMigrationTest::test_non_prefix_or_recorded_missing_guard_is_refused_without_repair: error: Tests\Feature\CustomerSuppressionMigrationTest::test_non_prefix_or_recorded_missing_guard_is_refused_without_repair
+shard 16: 73 cases, 0 errors/failures, 0 skipped, 63.6 min test time
+shard 17: 70 cases, 0 errors/failures, 0 skipped, 96.9 min test time
+shard 18: 70 cases, 0 errors/failures, 1 skipped, 103.5 min test time
+shard 19: 75 cases, 0 errors/failures, 0 skipped, 108.2 min test time
+shard 20: 73 cases, 0 errors/failures, 4 skipped, 62.6 min test time
+shard 21: 77 cases, 0 errors/failures, 0 skipped, 68.1 min test time
+shard 22: 73 cases, 0 errors/failures, 0 skipped, 106.7 min test time
+shard 23: 69 cases, 12 errors/failures, 0 skipped, 99.9 min test time
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 1": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 1"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 2": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 2"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 3": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 3"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 4": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 4"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 5": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 5"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 6": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 6"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 7": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 7"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 8": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 8"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 9": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 9"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 10": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 10"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 11": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 11"
+   - Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 12": error: Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history with data set "after DDL step 12"
+shard 24: 73 cases, 0 errors/failures, 1 skipped, 106.9 min test time
+sqlite shard 1: 3917 cases, 0 errors/failures, 345 skipped, 79.1 min test time
+sqlite shard 2: 3725 cases, 0 errors/failures, 278 skipped, 42.4 min test time

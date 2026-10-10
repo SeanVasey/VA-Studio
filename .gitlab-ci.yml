@@ -110,20 +110,22 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Eight shards of the reviewed native selection (1765 cases), the same partition as GitHub's: 124 to 241
-  # FinalizationDatabaseMigrations cases per shard, about 72 to 141 minutes at the 35 s measured on GitHub,
-  # before the other 16 to 87 cases. GitLab.com hosted runners kill any job at 3 hours regardless of this
-  # setting, so the limit is 175 minutes: under that cap, with about 24% headroom over the busiest estimate.
-  # Shard durations on GitLab stay unmeasured until a hosted run.
+  # Twenty-four shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
+  # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for
+  # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the
+  # timings regenerated from that run the other shards balance at about 87 minutes at GitHub's speed.
+  # GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the limit stays
+  # 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after this measured shard 1 is
+  # judged to fit them, and split that test file if GitLab would exceed this limit.
   timeout: 175m
   parallel:
     matrix:
-      - SHARD: ['1', '2', '3', '4', '5', '6', '7', '8']
+      - SHARD: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
   services:
     - name: mysql:8.4
       alias: mysql
   variables:
-    SHARD_COUNT: '8'
+    SHARD_COUNT: '24'
     DB_CONNECTION: mysql
     MYSQL_DATABASE: vaseyaudio_test
     MYSQL_ROOT_PASSWORD: disposable-gitlab-test-only
@@ -144,7 +146,9 @@ backend-mysql:
 
 backend-sqlite:
   extends: .database
-  timeout: 60m
+  # Same 2-shard partition as GitHub, where the busiest shard measured 80 minutes (Foundation 38037183233)
+  # and the regenerated timings balance both at about 61; 100 minutes stays under GitLab.com's hosted 3-hour cap.
+  timeout: 100m
   parallel:
     matrix:
       - SHARD: ['1', '2']
