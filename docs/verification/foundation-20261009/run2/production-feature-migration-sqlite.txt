@@ -1,0 +1,3 @@
+# ProductionFeatureMigrationTest on SQLite (phpunit.xml defaults: in-memory database), direct PHPUnit, whole file.
+# Before (test file at bed64ee): Time: 01:00.812, Memory: 83.00 MB OK (30 tests, 427 assertions) 
+# After (with the fix): Time: 00:58.090, Memory: 83.00 MB OK (30 tests, 427 assertions) 

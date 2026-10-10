@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { fixtureTrack, query, storefrontFixture } from './storefront-fixture';
 
+// Synthetic page routes own the preview transport. WebKit does not route requests that a
+// controlling service worker passes through (see storefront.spec.ts); Chromium keeps the real worker.
+test.use({ serviceWorkers: async ({ browserName }, use) => { await use(browserName === 'webkit' ? 'block' : 'allow'); } });
+
 /** Synthetic HTTP transport exercises built React and native controls only.
  * PHP feature/race tests prove authorization, durable intent and provider semantics.
  * No request reaches Stripe and no payment or fulfillment is simulated as verified.

@@ -145,19 +145,22 @@ jobs:
     # Do not start costly suites for a candidate that already fails preflight.
     needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
-    name: backend-mysql (${{ matrix.shard }}/8)
+    name: backend-mysql (${{ matrix.shard }}/24)
     runs-on: ubuntu-latest
     # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
     # SQLite-skipped methods, migration test files and a reviewed include list, 1765 of 7642 cases in 163 files.
-    # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes (about 35 s per migrate:fresh
-    # test). The selection's duration on hosted MySQL is unmeasured: 1372 selected cases use
-    # FinalizationDatabaseMigrations (124 to 241 per shard), about 72 to 141 minutes at 35 s each, so the limit
-    # is 210 minutes (about 50% headroom) until fresh MySQL timings exist. A hung test still cannot hold a runner for 6 hours.
+    # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes. Run 37967128232 then ran this
+    # selection in 8 shards: shards 2 and 3 took 186 minutes each (about 54 s per case, not the 35 s assumed
+    # before) and the other six were cancelled at 210 minutes. Twenty-four shards split the 1372
+    # FinalizationDatabaseMigrations cases 23 to 85 per shard, about 26 to 96 minutes at 68 s each; scaling
+    # the files without measured timings by the cancelled shards' pace (1.48 to 1.88 times) projects the
+    # busiest shard at about 122 to 132 minutes; shard 1 is BulkReplaceLicenseDraftSourceTest alone, measured
+    # at about 122 minutes. The limit stays 210 minutes. A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     services:
       mysql:
         image: mysql:8.4
@@ -216,7 +219,7 @@ jobs:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
         run: python3 scripts/ci/database-receipts.py start --engine=mysql --shard=${{ matrix.shard }}
       - name: Prove the native-selection MySQL test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+        run: python3 scripts/ci/phpunit-shards.py --shards=24 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
       - name: Run all tests assigned to this MySQL shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-mysql-${{ matrix.shard }}.xml --log-junit=phpunit-ci-mysql-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
@@ -242,8 +245,10 @@ jobs:
     if: needs.scope.outputs.mode != 'docs'
     name: backend-sqlite (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    # A shard takes 7 to 20 minutes; a slow runner and a slow package mirror together could take it past 40.
-    timeout-minutes: 60
+    # Foundation 37967128232 measured 47.5 minutes for shard 1; shard 2 was cut off by the former 60-minute
+    # limit at 3,294 of 3,725 tests (88%, about 67 minutes projected). 100 minutes leaves about 45% headroom until the
+    # SQLite timings are regenerated. A hung test still cannot hold a runner for 6 hours.
+    timeout-minutes: 100
     strategy:
       fail-fast: false
       matrix:
@@ -318,7 +323,7 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
-      - name: Verify all ten current-run database receipts without enabling reuse
+      - name: Verify all twenty-six current-run database receipts without enabling reuse
         if: needs.scope.outputs.mode == 'full'
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}
