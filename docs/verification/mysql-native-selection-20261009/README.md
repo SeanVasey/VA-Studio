@@ -966,10 +966,12 @@ byte-identical afterwards:
 
 ## Not verified
 
-- Only 2 of 8 shards of hosted run 37967128232 completed, so most selected files have no measured
-  hosted time and no hosted pass. Only a MySQL run of the whole selection proves the census exact.
-- The 24-shard durations are estimates. The "projected" range rests on a factor fitted to two
-  cancelled shards' progress counts and applied uniformly to the unmeasured files.
+- When written, only 2 of 8 shards of hosted run 37967128232 had completed, so most selected files had
+  no measured hosted time and no hosted pass. Since then run 38037183233 measured every selected file
+  and run 38077166247 passed the whole selection on hosted MySQL 8.4.11 with the census exact (1,707
+  executed, exactly the 58 census skips); see `docs/verification/foundation-20261009/`.
+- The 24-shard durations were estimates when written; run 38077166247 measured 56–132 minutes per
+  shard.
 - No 16- or 24-shard run exists on either provider. Per-job setup time and GitLab runner speed were
   not measured, and the GitLab namespace's plan and compute quota were not checked.
 - The local MySQL evidence used Oracle MySQL 8.0.46, not CI's 8.4. It ran only the option A files and

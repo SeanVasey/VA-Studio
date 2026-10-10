@@ -1,6 +1,8 @@
 # Foundation CI on the integrated handoff candidate: failures, diagnosis and fixes
 
-Development evidence from the Claude Code harness, 2026-10-09. Not Foundation acceptance.
+Development evidence from the Claude Code harness, 2026-10-09 and 2026-10-10. Status: Foundation run `38077166247` on
+`0f23e63f` passed (fourth run, below), the first complete Foundation pass on an exact integrated SHA. The sections for
+the first three runs record failures and fixes as found at the time; each now notes where a later run confirmed it.
 
 ## The run
 
@@ -42,7 +44,7 @@ handoff; no earlier Foundation baseline exists for this tree.
 - Full SQLite shards with the fix pass locally under 512M with CI's 2-shard partition: 3,924 and 3,710 cases, 0 failures or
   errors (`evidence/sqlite-shard-*-fixed-512M.txt`). Their receipts still failed until F below.
 
-## B. License-draft browser fixture — fixed here (test-only)
+## B. License-draft browser fixture — fixed here (test-only); confirmed in Foundation runs 37967128232, 38037183233 and 38077166247
 
 `tests/browser/prepare-license-draft.php` refuses any change to a pre-existing row while it creates a synthetic license
 draft. Since migration 240 (`7ecaa7e`, Oct 7) every license write advances `catalog_discovery_epoch.epoch` through its
@@ -55,9 +57,10 @@ without Playwright (no matching Chromium, no WebKit, and ClamAV signatures canno
 at `installation_diagnostics` after migrations, operator and catalog fixtures). Scratch copies of the fixture with only
 the harness identity checks skipped: unfixed → refused at the row check (the only changed row is the epoch); fixed →
 `prepare` succeeds and `verify prepared` reports 0 updates with originals and guards unchanged. The real browser spec
-still needs CI.
+passed on CI later: Chromium in focused run `37938110858`, then both browsers in Foundation runs 37967128232 (B on
+Chromium and WebKit), 38037183233 and 38077166247.
 
-## C. Chromium inquiry retry timeout — fixed here (test-only); passed on Chromium in focused CI
+## C. Chromium inquiry retry timeout — fixed here (test-only); confirmed in Foundation runs 37967128232, 38037183233 and 38077166247
 
 `inquiry-conversation.spec.ts` ran 120.8 s against its 120 s budget. The report's step timeline shows the retried POST
 answered at 36.4 s with 200 and the test then waiting in `await linkedReplay.finished()` (line 164) until the timeout.
@@ -76,7 +79,8 @@ replayed receipt from the page, which renders it only after validating exactly `
 originals unchanged) and the identical-body/same-receipt checks are unchanged. The other Playwright body reads in the
 spec are on responses the page reads with `response.json()` or on direct `page.request` calls. Typecheck passes. The
 spec passed on Chromium in focused browser run `37951869517` at `5a8f6e2` (Results); one pass is not proof the
-intermittent stall cannot recur, and WebKit and the full Foundation browser jobs have not run it yet.
+intermittent stall cannot recur. The full Foundation browser jobs later passed it on both engines in runs 37967128232
+(Chromium; WebKit failed only on D), 38037183233 and 38077166247.
 
 ## D. WebKit preview playback and offline reload — diagnosed and fixed in the second run (below)
 
