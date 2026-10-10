@@ -7,7 +7,8 @@ resource authors the quote and records milestone progress and cancellation
 review. These are mounted buyer and operator workflows, advancing T28/WP-10.
 
 The workflow is disabled by default. `VASEY_TEST_SERVICE_PROJECTS_ENABLED=true`
-activates it only in `local` or `testing`, and requires existing synthetic customer
+activates it only in `local`, `testing` or `staging` (`TestEnvironment::admitsTestCommerce()`;
+staging was admitted by PR #68), and requires existing synthetic customer
 accounts. The buyer page is `/services/projects`; staff opens `/admin/service-projects`.
 The default-off flag and production environment barrier apply to reads and writes.
 Retained records are never deleted when access or preparation is withdrawn.

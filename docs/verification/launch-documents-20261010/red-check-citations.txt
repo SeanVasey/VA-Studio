@@ -1,0 +1,11 @@
+$ python3 -I docs/verification/launch-documents-20261010/check-citations.py   # first run, before the check and index fixes
+docs/legal/README.md: 95 distinct cited paths
+docs/legal/PRIVACY.md: 62 distinct cited paths
+docs/legal/TERMS.md: 52 distinct cited paths
+checked 209 citations across 3 documents
+FAIL header missing in docs/legal/README.md
+FAIL docs/legal/README.md cites missing path: docs/verification/membership-*.md
+FAIL header missing in docs/legal/PRIVACY.md
+FAIL header missing in docs/legal/TERMS.md
+RESULT FAIL
+exit=1

@@ -1,0 +1,31 @@
+# Contradicting lines before the edits (base f57e7256891d0d3c117e151a36f7fb967c724ab7)
+
+$ grep -n "require .local./.testing.\|hosted staging test mode is refused\|S2a\|S2b\|refuses S2" docs/ops/production-activation-packet.md
+26:| A1b: frame admission for intent/basis/authority writes and `initiate()` re-proof | S2b, S3 | CLAUDE-PLAN §3 A1b (release blocker) |
+30:| Production checkout isn't registered: `ProductionCheckoutServiceProvider` isn't in `bootstrap/providers.php` and `routes/production-checkout.php` isn't mounted, so the env flags have no HTTP effect yet | S2b, S3 | root composition step |
+31:| `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`, and the test checkout/processing policies require `local`/`testing` | Hosted test-mode payments on a staging host (S2) | `ExecutionContextV1::make`, `CheckoutPolicy`, `PaymentProcessingPolicy` |
+32:| There is no operator command for production reconciliation (only `HostedCheckout::reconcile` behind HTTP) | S2b, S3 recovery drills | `app/Domain/Commerce/ProductionCheckout/HostedCheckout.php` |
+56:| Review lifetime (30–3600 s) | S2b, S3 | `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS` |
+321:**Finding: the current source refuses S2 on a hosted staging environment.** Test checkout
+327:- **S2a: isolated local rehearsal.** A dedicated machine with `APP_ENV=local`, no customer
+329:- **S2b: hosted test mode.** This needs a reviewed code change that admits a named staging
+351:# 3. Test-mode receiver drills (S2a), with STRIPE_WEBHOOK_ENABLED=true and test flags on:
+476:- Whether S2 runs as an isolated local rehearsal (S2a) or through a reviewed staging
+477:  admission change (S2b).
+
+$ grep -n "hosted staging test mode is refused" docs/live-payment-and-production-preparation-queue.md
+20:| `harness/production-preparation-1` (Claude Code lane, PR #46) | None. Synthetic, read-only preparation from `main` `3716324a` | Delivered: `vasey:stripe-preflight` (configuration shape, `funds_mode_environment`, SDK 21.3.2 / API `2026-08-26.dahlia` pins, and a confirmed read-only account/capability probe tested only against synthetic fixtures); webhook signature, replay, ordering and unknown-outcome checks; synthetic backup/restore proof, with the MySQL procedure documented and not run; `ops/production/env.production.example`, with a coverage test; `docs/ops/production-activation-packet.md`, prepared and not executed. Architecture findings: (1) there is no live webhook receiver; (2) test-mode payments require `APP_ENV` local or testing, so hosted staging test mode is refused; (3) the production checkout provider and routes are unregistered; (4) there is no operator command for production reconciliation | Independent review: APPROVE WITH CONDITIONS for `01a2590d`. The R-1/R-2 fixes are in `3d615162` and need re-review. Evidence: `docs/verification/production-preparation-1-20261007/`. Nothing was activated |
+
+$ grep -n "admits only .local./.testing. today\|at least 4 GB RAM" docs/handoff/2026-10-08/MONDAY-PLAN.md
+57:| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admits only `local`/`testing` today. | Claude; **confirmed by Sean** (S-1) |
+105:| S-2 | Forge account and DigitalOcean VPS (at least 4 GB RAM), and SSH access for deploys | M-01 | **blocking:** Forge + VPS reconfirmed; Sean expects access tomorrow, 2026-10-10 |
+
+$ grep -n "^| U-01\|^| U-02\|Forge\|SeanVasey/VA-Studio" docs/architecture/decision-register.md
+73:| U-01 | GitHub owner namespace, repository creation and access; inspect authenticated account and create/read back exact repo | Sean / implementation agent with available GitHub capability | Remote issue/PR publication and cloud agent handoff | Prepare commit-ready project and issue bodies. |
+74:| U-02 | Production host, region, deployment topology, secrets, backups and incident ownership; compare deployable options with actual workload | Sean + operator | Public production deployment | Local development, CI configuration, containers and deployment checklist. |
+
+$ grep -n "4 vCPU / 8 GB RAM" ops/staging/README.md
+129:| 1 | **Sean, Forge** | **Create the server.** Provider Hetzner or DigitalOcean; type *App server*; **Ubuntu 24.04 LTS**; **PHP 8.4**; database **MySQL 8.4**. Size it at **4 vCPU / 8 GB RAM** (absolute minimum 4 GB: one `clamscan` may use 3 GiB of address space, and MySQL, PHP-FPM and ffmpeg run alongside it). Use at least 160 GB of disk: each master is stored with its derivatives, and stems ZIPs run up to 200 MiB. Save the sudo and database passwords Forge shows once. Leave the Forge firewall at 22/80/443. |
+
+$ test -e docs/legal/README.md docs/legal/PRIVACY.md docs/legal/TERMS.md; echo exit=$?
+exit=1

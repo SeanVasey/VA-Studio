@@ -28,7 +28,7 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption; that alternative itself needs the exemption-authoring step in §6 (a reviewed owner allowlist commit plus `PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED`), because every new order's review requires a `basis_public_id` | CLAUDE-PLAN §3 A3; `HostedCheckout::prepare()`, `TaxExemptions::basis()` |
 | No live webhook receiver. `VerifyStripeWebhook` refuses production environments and any mode other than test; production checkout reconciles only by authoritative retrieval | S3 webhook drills | `app/Domain/Commerce/Payments/VerifyStripeWebhook.php`; `vasey:stripe-preflight` check `production_webhook_receiver` |
 | Production checkout isn't registered: `ProductionCheckoutServiceProvider` isn't in `bootstrap/providers.php` and `routes/production-checkout.php` isn't mounted, so the env flags have no HTTP effect yet | S2b, S3 | root composition step |
-| `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`, and the test checkout/processing policies require `local`/`testing` | Hosted test-mode payments on a staging host (S2) | `ExecutionContextV1::make`, `CheckoutPolicy`, `PaymentProcessingPolicy` |
+| `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`. The test checkout/processing policies no longer refuse a staging host: since PR #68 at `d8aba146` they admit `APP_ENV=staging` through `App\Support\Environment\TestEnvironment`, which requires staff MFA and refuses live mode (corrected 2026-10-10; `docs/private-server-readiness.md`, "First sale and cutover remain separate gates") | Production-checkout test funds on a staging host (S2b) | `ExecutionContextV1::make`; `TestEnvironment::admitsTestCommerce` in `CheckoutPolicy`, `PaymentProcessingPolicy` |
 | There is no operator command for production reconciliation (only `HostedCheckout::reconcile` behind HTTP) | S2b, S3 recovery drills | `app/Domain/Commerce/ProductionCheckout/HostedCheckout.php` |
 | A5: refunds and disputes (T21) | S3 refunds | CLAUDE-PLAN §3 A5 |
 | Production entitlements, delivery, identity, contracts and refunds are still test-only | S3 | `vasey:commerce-readiness` `implementation` checks (all `blocked`) |
@@ -318,17 +318,22 @@ Production DNS and BeatStars aren't touched at S1.
 **Requires:** S1 accepted; Sean's authorization for test-mode provider I/O on a named
 Stripe test account; a test webhook endpoint that Sean creates; no real money.
 
-**Finding: the current source refuses S2 on a hosted staging environment.** Test checkout
-(`CheckoutPolicy`), test processing (`PaymentProcessingPolicy`) and production checkout test
-funds (`ExecutionContextV1`) all require `APP_ENV` `local` or `testing`. The receiver alone
-also accepts `staging`, and it only stores receipts. So S2 has two paths. Sean decides
-which one, and this lane has not changed any runtime code to support either:
+**Finding at base `3716324a`, superseded.** At that base, test checkout (`CheckoutPolicy`),
+test processing (`PaymentProcessingPolicy`) and production checkout test funds
+(`ExecutionContextV1`) all required `APP_ENV` `local` or `testing`, and only the receiver
+accepted `staging`. Corrected 2026-10-10: PR #68 at `d8aba146` admits the Stripe-test commerce
+chain on `APP_ENV=staging` with required staff MFA and live mode refused
+(`App\Support\Environment\TestEnvironment`; `docs/private-server-readiness.md`, "First sale
+and cutover remain separate gates"). `ExecutionContextV1` still refuses `funds_mode=test`
+outside `local`/`testing`. So S2 has two paths. Sean decides which one; this packet changed
+no runtime code:
 
 - **S2a: isolated local rehearsal.** A dedicated machine with `APP_ENV=local`, no customer
   data and a test key. This runs today's test pipeline against Stripe test mode.
-- **S2b: hosted test mode.** This needs a reviewed code change that admits a named staging
-  environment, along with the gates in §1 (A1b, provider/route registration, an operator
-  reconciliation command).
+- **S2b: hosted test mode.** The staging admission is merged (PR #68 at `d8aba146`), so the
+  test checkout chain runs on the hosted `staging` environment; production-checkout test funds
+  still need the gates in §1 (A1b, provider/route registration, an operator reconciliation
+  command) and an `ExecutionContextV1` admission that does not exist yet.
 
 **Inputs (both paths):** `STRIPE_MODE=test`, `STRIPE_ACCOUNT_ID`, `STRIPE_WEBHOOK_SECRET`
 (test endpoint) and `STRIPE_TEST_SECRET_KEY` from the secret store. For production checkout
@@ -473,8 +478,9 @@ php artisan vasey:commerce-readiness --json
 
 - The host, region, storage and backup custody (U-02/U-03), the observed restore time, and
   off-host retention.
-- Whether S2 runs as an isolated local rehearsal (S2a) or through a reviewed staging
-  admission change (S2b).
+- Whether S2 runs as an isolated local rehearsal (S2a) or on the hosted `staging`
+  environment (S2b). The admission itself is no longer unknown: PR #68 at `d8aba146`
+  (`docs/private-server-readiness.md`, "First sale and cutover remain separate gates").
 - How live webhooks are received: a new receiver, or retrieval-only.
 - Every merchant, tax, legal, price and term fact listed in §2.
 - Real account capabilities. The probe has only run against synthetic fixtures.
