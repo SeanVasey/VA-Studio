@@ -22,8 +22,6 @@ final class CatalogDatabaseEvidence
     private const TABLES = ['users', 'tracks', 'audit_events', 'catalog_import_batches', 'catalog_import_mappings',
         'media_assets', 'rights_declarations', 'offers', 'offer_revisions'];
 
-    private const OWNED = ['catalog_import_batches', 'catalog_import_mappings'];
-
     private const IMMUTABLE = "SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Catalog import evidence is immutable'";
 
     /** The pinned owned schema is actual live SQL, not a migrations-history claim. */
