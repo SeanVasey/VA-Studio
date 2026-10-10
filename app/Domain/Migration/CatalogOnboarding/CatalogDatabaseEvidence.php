@@ -110,7 +110,7 @@ final class CatalogDatabaseEvidence
             throw new RuntimeException('catalog_target_schema_invalid');
         }
         $current = $this->mysqlObjects($pdo);
-        if ($current !== $this->expectedMysqlObjects($collation)) {
+        if ($current !== $this->expectedMysqlObjects($collation, $session[5])) {
             throw new RuntimeException('catalog_target_schema_invalid');
         }
 
@@ -128,7 +128,8 @@ final class CatalogDatabaseEvidence
                 ." FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN $owned", ['TABLE_NAME', 'ORDINAL_POSITION']],
             'indexes' => ['SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME FROM information_schema.STATISTICS'
                 ." WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN $owned", ['TABLE_NAME', 'INDEX_NAME', 'SEQ_IN_INDEX']],
-            'foreign_keys' => ['SELECT k.TABLE_NAME, k.CONSTRAINT_NAME, k.ORDINAL_POSITION, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME,'
+            // The referenced schema is read too: an owned foreign key repointed at another schema's same-named table is drift.
+            'foreign_keys' => ['SELECT k.TABLE_NAME, k.CONSTRAINT_NAME, k.ORDINAL_POSITION, k.COLUMN_NAME, k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME,'
                 .' r.UPDATE_RULE, r.DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS r JOIN information_schema.KEY_COLUMN_USAGE k'
                 .' ON k.CONSTRAINT_SCHEMA = r.CONSTRAINT_SCHEMA AND k.CONSTRAINT_NAME = r.CONSTRAINT_NAME AND k.TABLE_NAME = r.TABLE_NAME'
                 ." WHERE r.CONSTRAINT_SCHEMA = DATABASE() AND r.TABLE_NAME IN $owned", ['TABLE_NAME', 'CONSTRAINT_NAME', 'ORDINAL_POSITION']],
@@ -160,8 +161,8 @@ final class CatalogDatabaseEvidence
         return $current;
     }
 
-    /** The rows the reviewed migration produces on InnoDB for the connection's configured collation. */
-    private function expectedMysqlObjects(string $collation): array
+    /** The rows the reviewed migration produces on InnoDB for the connection's configured collation and database. */
+    private function expectedMysqlObjects(string $collation, string $database): array
     {
         $tables = ['catalog_import_batches' => [
             'columns' => [['review_sha256', 'char(64)', 'UNI'], ['source_sha256', 'char(64)', ''], ['source_identity_sha256', 'char(64)', ''],
@@ -200,7 +201,7 @@ final class CatalogDatabaseEvidence
                     $indexes[] = [$name, 1, $column];
                 }
                 $expected['foreign_keys'][] = ['TABLE_NAME' => $table, 'CONSTRAINT_NAME' => $name, 'ORDINAL_POSITION' => 1,
-                    'COLUMN_NAME' => $column, 'REFERENCED_TABLE_NAME' => $referenced, 'REFERENCED_COLUMN_NAME' => 'id',
+                    'COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $database, 'REFERENCED_TABLE_NAME' => $referenced, 'REFERENCED_COLUMN_NAME' => 'id',
                     'UPDATE_RULE' => 'NO ACTION', 'DELETE_RULE' => 'RESTRICT'];
             }
             foreach ($indexes as [$name, $nonUnique, $column]) {

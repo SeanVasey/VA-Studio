@@ -459,7 +459,8 @@ class PersistentCatalogDraftImportTest extends TestCase
     public static function schemaDrift(): array
     {
         return array_map(static fn (string $case): array => [$case], ['missing-trigger', 'foreign-trigger', 'missing-unique',
-            'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks']);
+            'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks',
+            'foreign-referenced-table']);
     }
 
     #[DataProvider('schemaDrift')]
@@ -820,13 +821,21 @@ class PersistentCatalogDraftImportTest extends TestCase
                 break;
             case 'foreign-key-cascade':
             case 'nullable-column':
+            case 'foreign-referenced-table':
+                // SQLite foreign keys cannot name another schema; the counterpart repoints at another users table.
+                if ($case === 'foreign-referenced-table') {
+                    $pdo->exec('CREATE TABLE "catalog_peer_users" ("id" integer primary key autoincrement not null)');
+                }
                 $rows = $pdo->query("SELECT type, sql FROM sqlite_master WHERE tbl_name='catalog_import_mappings' ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END")->fetchAll(PDO::FETCH_ASSOC);
                 $pdo->exec('DROP TABLE catalog_import_mappings');
                 foreach ($rows as $row) {
                     $sql = $row['sql'];
                     if ($row['type'] === 'table') {
-                        $sql = $case === 'foreign-key-cascade' ? str_replace('on delete restrict', 'on delete cascade', $sql)
-                            : str_replace('"actor_id" integer not null', '"actor_id" integer', $sql);
+                        $sql = match ($case) {
+                            'foreign-key-cascade' => str_replace('on delete restrict', 'on delete cascade', $sql),
+                            'nullable-column' => str_replace('"actor_id" integer not null', '"actor_id" integer', $sql),
+                            default => str_replace('foreign key("actor_id") references "users"("id")', 'foreign key("actor_id") references "catalog_peer_users"("id")', $sql),
+                        };
                     }
                     $pdo->exec($sql);
                 }
@@ -837,6 +846,7 @@ class PersistentCatalogDraftImportTest extends TestCase
     /** The InnoDB counterpart of each SQLite drift: owned objects, then the session switches the importer requires. */
     private function changeMysqlSchema(PDO $pdo, string $case): void
     {
+        $peer = $case === 'foreign-referenced-table' ? $this->peerSchemaWithUsers($pdo) : null;
         $statements = match ($case) {
             'missing-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete'],
             'foreign-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete',
@@ -849,10 +859,38 @@ class PersistentCatalogDraftImportTest extends TestCase
             'foreign-key-cascade' => ['ALTER TABLE catalog_import_mappings DROP FOREIGN KEY catalog_import_mappings_actor_id_foreign',
                 'ALTER TABLE catalog_import_mappings ADD CONSTRAINT catalog_import_mappings_actor_id_foreign FOREIGN KEY (actor_id) REFERENCES users (id) ON DELETE CASCADE'],
             'nullable-column' => ['ALTER TABLE catalog_import_mappings MODIFY actor_id BIGINT UNSIGNED NULL'],
+            // Same constraint name, column, referenced table name, column and rules: only the referenced schema differs.
+            'foreign-referenced-table' => ['ALTER TABLE catalog_import_mappings DROP FOREIGN KEY catalog_import_mappings_actor_id_foreign',
+                'ALTER TABLE catalog_import_mappings ADD CONSTRAINT catalog_import_mappings_actor_id_foreign FOREIGN KEY (actor_id) REFERENCES `'.$peer.'`.`users` (id) ON DELETE RESTRICT'],
         };
         foreach ($statements as $sql) {
             $pdo->exec($sql);
         }
+    }
+
+    /** A disposable sibling schema holding its own users table; it and any foreign key into it are removed when the case ends. */
+    private function peerSchemaWithUsers(PDO $pdo): string
+    {
+        $peer = $pdo->query('SELECT DATABASE()')->fetchColumn().'_catalog_peer';
+        $this->assertLessThanOrEqual(64, strlen($peer));
+        $existing = $pdo->prepare('SELECT COUNT(*) FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?');
+        $existing->execute([$peer]);
+        $this->assertSame(0, (int) $existing->fetchColumn(), 'The disposable peer schema must not already exist.');
+        // Registered only after proving absence, so this never drops a schema it did not create. The foreign key into
+        // the peer goes first, because InnoDB refuses to drop a parent table that another table's foreign key references.
+        $this->beforeApplicationDestroyed(static function () use ($peer): void {
+            $pdo = DB::connection()->getPdo();
+            $keys = $pdo->prepare('SELECT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_SCHEMA = ?');
+            $keys->execute([$peer]);
+            foreach ($keys->fetchAll(PDO::FETCH_NUM) as [$table, $constraint]) {
+                $pdo->exec('ALTER TABLE `'.$table.'` DROP FOREIGN KEY `'.$constraint.'`');
+            }
+            $pdo->exec('DROP DATABASE IF EXISTS `'.$peer.'`');
+        });
+        $pdo->exec('CREATE DATABASE `'.$peer.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $pdo->exec('CREATE TABLE `'.$peer.'`.`users` LIKE `users`');
+
+        return $peer;
     }
 
     private function source(array $snapshot): array
