@@ -34,7 +34,9 @@ final class CatalogDatabaseEvidence
         if (DB::getDriverName() !== 'sqlite' || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite'
             || $pdo->query('PRAGMA foreign_keys')->fetchColumn() !== 1
             || $pdo->query('PRAGMA writable_schema')->fetchColumn() !== 0
-            || $pdo->query('PRAGMA ignore_check_constraints')->fetchColumn() !== 0) {
+            || $pdo->query('PRAGMA ignore_check_constraints')->fetchColumn() !== 0
+            // With the rollback journal off, a failed segment cannot roll back its earlier writes.
+            || strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off') {
             throw new RuntimeException('catalog_target_schema_invalid');
         }
         $expected = $this->expectedSchema();
@@ -107,6 +109,14 @@ final class CatalogDatabaseEvidence
         if (! is_array($session) || $session[0] !== 1 || $session[1] !== 1 || $session[2] !== 1
             || (! in_array('STRICT_TRANS_TABLES', $modes, true) && ! in_array('STRICT_ALL_TABLES', $modes, true))
             || $session[4] !== 'REPEATABLE-READ' || $session[5] !== $connection->getDatabaseName()) {
+            throw new RuntimeException('catalog_target_schema_invalid');
+        }
+        // Every write in a segment must roll back together. A non-transactional table (MyISAM, MEMORY, ...)
+        // anywhere in the schema could keep part of a failed segment, such as its audit rows, so the whole
+        // schema must be InnoDB, not only the two owned tables compared below.
+        $nonTransactional = $pdo->query('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
+            ." AND TABLE_TYPE = 'BASE TABLE' AND (ENGINE IS NULL OR ENGINE <> 'InnoDB')")->fetchColumn();
+        if ((int) $nonTransactional !== 0) {
             throw new RuntimeException('catalog_target_schema_invalid');
         }
         $current = $this->mysqlObjects($pdo);

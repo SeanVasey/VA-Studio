@@ -460,7 +460,7 @@ class PersistentCatalogDraftImportTest extends TestCase
     {
         return array_map(static fn (string $case): array => [$case], ['missing-trigger', 'foreign-trigger', 'missing-unique',
             'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks',
-            'foreign-referenced-table']);
+            'foreign-referenced-table', 'non-transactional-storage']);
     }
 
     #[DataProvider('schemaDrift')]
@@ -827,6 +827,12 @@ class PersistentCatalogDraftImportTest extends TestCase
                 break;
             case 'ignored-checks': $pdo->exec('PRAGMA ignore_check_constraints=ON');
                 break;
+            case 'non-transactional-storage':
+                // SQLite has one storage engine; its counterpart of a non-rollback table is a connection
+                // whose rollback journal is off.
+                $pdo->exec('PRAGMA journal_mode=OFF');
+                $this->assertSame('off', strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()));
+                break;
             case 'foreign-key-cascade':
             case 'nullable-column':
             case 'foreign-referenced-table':
@@ -854,6 +860,19 @@ class PersistentCatalogDraftImportTest extends TestCase
     /** The InnoDB counterpart of each SQLite drift: owned objects, then the session switches the importer requires. */
     private function changeMysqlSchema(PDO $pdo, string $case): void
     {
+        if ($case === 'non-transactional-storage') {
+            // A participating table that cannot roll back: audit_events loses its foreign keys (InnoDB refuses
+            // an engine change on a table in a foreign key) and moves to MyISAM.
+            $keys = $pdo->query('SELECT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE()'
+                ." AND (TABLE_NAME = 'audit_events' OR REFERENCED_TABLE_NAME = 'audit_events')")->fetchAll(PDO::FETCH_NUM);
+            foreach ($keys as [$table, $constraint]) {
+                $pdo->exec('ALTER TABLE `'.$table.'` DROP FOREIGN KEY `'.$constraint.'`');
+            }
+            $pdo->exec('ALTER TABLE audit_events ENGINE=MyISAM');
+            $this->assertSame('MyISAM', $pdo->query("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'audit_events'")->fetchColumn());
+
+            return;
+        }
         $peer = $case === 'foreign-referenced-table' ? $this->peerSchemaWithUsers($pdo) : null;
         $statements = match ($case) {
             'missing-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete'],
