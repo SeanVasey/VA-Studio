@@ -1,0 +1,6 @@
+Track ID,Title,BPM,Key,Genre,Mood,Tags,Description,Status,Lease Name,Lease Price,Exclusive Price,Rights Reference,Plays
+bs-synthetic-0001,SYNTHETIC Track 01,95,C minor,Synthetic,,synthetic;fixture,"SYNTHETIC description, with a comma and ""quotes"".",Public,SYNTHETIC Basic,1.00,10.00,SYNTHETIC-RIGHTS-0001,12
+bs-synthetic-0002,SYNTHETIC Track 02,140,F# major,Synthetic,Calm,synthetic,"SYNTHETIC two-line
+description",Private,SYNTHETIC Premium,2.50,20.00,SYNTHETIC-RIGHTS-0002,0
+bs-synthetic-0003,SYNTHETIC Track 03,,,Synthetic,,,,Draft,SYNTHETIC Basic,$3,30.00,SYNTHETIC-RIGHTS-0003,7
+bs-synthetic-0004,SYNTHETIC Track 04,0088,A minor,Synthetic,Dark,synthetic; fixture ;dark,SYNTHETIC sold item,Sold,SYNTHETIC Premium,4.99,40.00,SYNTHETIC-RIGHTS-0004,3

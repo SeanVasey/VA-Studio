@@ -1,0 +1,23 @@
+# Codex P2s on PR #89 (review of 144ee1d): export boundary and exact categorical values
+
+## Red (fix stashed; new tests only)
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_each_row_defect_is_a_finding_on_that_row_only@padded visibility with data ([1, 8, ' Private '], 'unknown_visibility_value', 'Status')
+2) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_each_row_defect_is_a_finding_on_that_row_only@padded license name with data ([1, 9, 'SYNTHETIC Premium '], 'unknown_license_name', 'Lease Name')
+3) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_explicit_slug_and_currency_columns_are_checked_exactly
+FAILURES!
+Tests: 77, Assertions: 675, Failures: 3.
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@export inside repository without a synthetic mapping with data ('input_inside_repository')
+2) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@group-readable export with data ('input_not_private')
+3) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@hard-linked export with data ('input_not_private')
+FAILURES!
+Tests: 17, Assertions: 124, Failures: 3.
+
+## Green (after the fix)
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (77 tests, 692 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (17 tests, 139 assertions)
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars <changed tests>
+{"tool":"pint","result":"passed"}

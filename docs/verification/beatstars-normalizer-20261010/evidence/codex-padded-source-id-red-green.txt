@@ -1,0 +1,29 @@
+# Codex P2 on PR #89: padded source ids were trimmed instead of refused
+
+## Red (fix not applied; new data sets only)
+$ phpunit --filter "source id" tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+..FF                                                                4 / 4 (100%)
+There were 2 failures:
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_each_row_defect_is_a_finding_on_that_row_only@padded source id with data ([3, 0, ' bs-synthetic-padded '], 'invalid_source_id', 'Track ID')
+Failed asserting that actual size 0 matches expected size 1.
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php:165
+vendor/phpunit/phpunit/phpunit:104
+2) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_each_row_defect_is_a_finding_on_that_row_only@trailing-space source id with data ([3, 0, 'bs-synthetic-padded	'], 'invalid_source_id', 'Track ID')
+Failed asserting that actual size 0 matches expected size 1.
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php:165
+vendor/phpunit/phpunit/phpunit:104
+FAILURES!
+Tests: 4, Assertions: 14, Failures: 2.
+
+## Green (after the fix)
+$ phpunit --filter "source id" tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (4 tests, 24 assertions)
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (75 tests, 674 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (14 tests, 121 assertions)
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+{"tool":"pint","result":"passed"}
