@@ -76,7 +76,11 @@ class SupportAttachmentNativeConcurrencyTest extends TestCase
             foreach ($objects as $path) {
                 $this->assertSame(hash_file('sha256', $input), hash_file('sha256', $path));
             }
-            file_put_contents(base_path('docs/verification/support-attachments-20261007/native-reservation-receipt.json'), json_encode(['mysql' => DB::selectOne('SELECT VERSION() AS version')->version,
+            // The receipt is operator evidence copied into docs/verification/support-attachments-20261007/ by
+            // hand; a test run must leave every tracked file untouched (the CI database receipt verifier
+            // refuses a dirty checkout), so it is written under the ignored storage/framework/testing tree.
+            @mkdir(storage_path('framework/testing'), 0700, true);
+            file_put_contents(storage_path('framework/testing/support-attachments-native-reservation-receipt.json'), json_encode(['mysql' => DB::selectOne('SELECT VERSION() AS version')->version,
                 'isolation' => DB::selectOne('SELECT @@transaction_isolation AS isolation')->isolation, 'observed_waits' => $waits, 'results' => $results, 'retained_manifests' => 10, 'retained_originals' => 10], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR).PHP_EOL);
         } finally {
             file_put_contents($sync.'/release', 'release');
