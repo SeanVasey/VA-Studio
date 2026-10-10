@@ -1,0 +1,9 @@
+# SharedInventoryMigrationTest (one method) on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file with the fix (empty 245000 free-grant tables disposed of before the 000015 rollback); whole file.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 02:55.314, Memory: 98.00 MB
+OK (1 test, 31 assertions)
+# exit code 0; wall time 175 s
