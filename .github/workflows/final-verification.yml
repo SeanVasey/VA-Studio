@@ -153,9 +153,9 @@ jobs:
     # selection in 8 shards: shards 2 and 3 took 186 minutes each (about 54 s per case, not the 35 s assumed
     # before) and the other six were cancelled at 210 minutes. Twenty-four shards split the 1372
     # FinalizationDatabaseMigrations cases 23 to 85 per shard, about 26 to 96 minutes at 68 s each; scaling
-    # the files without measured timings by the cancelled shards' pace projects the busiest shard
-    # (BulkReplaceLicenseDraftSourceTest alone) at about 141 to 166 minutes. The limit stays 210 minutes.
-    # A hung test still cannot hold a runner for 6 hours.
+    # the files without measured timings by the cancelled shards' pace (1.48 to 1.88 times) projects the
+    # busiest shard at about 122 to 132 minutes; shard 1 is BulkReplaceLicenseDraftSourceTest alone, measured
+    # at about 122 minutes. The limit stays 210 minutes. A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 210
     strategy:
       fail-fast: false

@@ -113,10 +113,11 @@ backend-mysql:
   # Twenty-four shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
   # Foundation run 37967128232 measured hosted MySQL 8.4 at about 54 s per selected case (shards 2 and 3:
   # 186 minutes each), and its cancelled shards ran slower still. Scaling the untimed files by the cancelled
-  # shards' pace (1.72 to 2.03 times) projects the busiest shard at about 141 to 166 minutes. That shard is
-  # BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it. GitLab.com hosted runners
-  # kill any job at 3 hours regardless of this setting, so the limit stays 175 minutes; job setup counts
-  # against it, so the upper projection leaves little room. Shard durations on GitLab stay unmeasured.
+  # shards' pace (1.48 to 1.88 times) projects the busiest shard at about 122 to 132 minutes at GitHub's
+  # speed; shard 1 is BulkReplaceLicenseDraftSourceTest alone (measured at about 122 minutes), so more
+  # shards cannot shorten it. GitLab.com hosted runners kill any job at 3 hours regardless of this setting,
+  # so the limit stays 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after a
+  # hosted GitHub run has measured shard 1, and split that test file if GitLab would exceed this limit.
   timeout: 175m
   parallel:
     matrix:

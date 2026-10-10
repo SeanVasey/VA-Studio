@@ -491,6 +491,11 @@ class NativeSelectionTests(unittest.TestCase):
         with patch.object(receipt, "MAX_FILE", 1), self.assertRaises(receipt.ReceiptError):
             receipt.archive(zipped({"evidence.json": b"{}"}), expected)
 
+    def test_archive_member_bound_is_the_largest_committed_archive_plus_a_margin_of_three(self):
+        # A loose bound (for example 1000) would still pass the exact-name check, so pin it tightly.
+        largest = max(len(receipt.evidence_names(engine, count, shard_count=count)) for engine, count in receipt.COUNTS.items())
+        self.assertEqual(largest + 3, receipt.MAX_ZIP_MEMBERS)
+
     def test_archive_member_bound_fits_every_committed_shard_count_and_refuses_more(self):
         # Every committed provider count must fit the member bound, or its own archives would be refused.
         for engine, count in receipt.COUNTS.items():

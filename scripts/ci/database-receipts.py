@@ -42,6 +42,7 @@ MAX_UNPACKED = 16 * 1024 * 1024
 MAX_JSON = 1024 * 1024
 # Members read from one artifact before the exact expected-name check. A 24-shard MySQL archive holds 53: the
 # manifest, the source listing, 24 configurations, 24 listings, and the shard's results, start and receipt.
+# The bound is that largest committed archive plus a margin of 3, pinned by test-database-receipts.py.
 MAX_ZIP_MEMBERS = 56
 MAX_XML_DEPTH = 32
 MAX_XML_NODES = 50000
