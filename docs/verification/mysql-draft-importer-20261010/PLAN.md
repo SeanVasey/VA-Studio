@@ -152,3 +152,40 @@ remaining work.
   kept absent so the seven HTTP tests do not 409, and the `.mjs` files are unchanged.
 - Real source data, staging's actual MySQL host, privileges or network: the importer is proved on a
   disposable server with the CI environment variables only.
+
+## Outcome notes (added after execution)
+
+- The cross-session lock proof was not written as a MySQL-only skipped method: registering the skip in
+  `scripts/ci/database-sqlite-skips.json` makes `scripts/ci/test-focused-tests.py` fail, because that
+  self-test pins the census count of the `store-foundations` focused suite, and editing it is outside
+  this lane. The proof is instead a MySQL-only branch of a both-engine case
+  (`test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open`), whose
+  SQLite half proves that a second importer in the same process is refused mid-segment. No case skips
+  on either engine, so the censuses are unchanged.
+- `docs/content-onboarding-readiness.md` was left untouched: it describes the content pack and the
+  operator sequence, not the importer. The importer's own record,
+  `docs/verification/persistent-catalog-draft-import.md`, is outside this lane and still says the
+  command rejects non-SQLite targets; see the integrator notes.
+- The MySQL `ALTER TABLE ... ENGINE` drift case was not added: MySQL itself refuses an engine change
+  on a table that participates in a foreign key (error 3776, probe in README.md).
+
+## Second-session notes (resumed after a usage-limit cut-off)
+
+- The first session left the domain change, the test suite, the selection entry, the plan, the
+  evidence README, the SQLite runs and the MySQL red run; its MySQL green run had been started as four
+  shards and was cut off before any shard produced a result. The second session kept all of that work,
+  re-verified it (SQLite blocks unchanged by string comparison, Pint, both policy self-tests, the
+  sharder dry run, the SQLite suite, a first-hand base-commit baseline, a first-hand red re-run) and
+  completed the MySQL green run; see README.md for each result and which session produced it.
+- The second session's first MySQL attempt (four shards as one background job) was terminated by the
+  container after 972 s: all four PHP processes received SIGTERM at once while the runner shell and
+  `mysqld` survived, and no shard had written a result. The run was repeated as four detached queues in
+  which every test method is its own PHPUnit invocation with its own JUnit file, so a repeated
+  termination could lose at most one group. The queues finished: 19 invocations, 50 tests, 356
+  assertions, no errors, failures or skips, on both `DisposableNativeDatabase` admission paths
+  (README.md, "MySQL 8.0.46: green after the fix").
+- Acceptance criteria 1–6 are met for this container: SQLite 50/288 with the 47 original cases
+  identical to the base-commit baseline (47/232, reproduced first-hand); MySQL 8.0.46 50/356; red
+  before green reproduced first-hand at the three former refusal sites; policy self-tests and the
+  sharder dry run pass with the file in `include_files`; Pint passes; evidence carries no absolute
+  paths or secrets. MySQL 8.4 remains CI's to prove.

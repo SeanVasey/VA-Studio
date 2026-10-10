@@ -1,0 +1,28 @@
+# Red re-run (second session): the new test file against the base commit f57e725 app/ files in a scratch git-archive checkout
+# of that commit with its own Composer autoloader; MySQL 8.0.46, CI-marker-admitted disposable database importer_red_rerun;
+# --filter 'test_dry_run_is_read_only|test_partial_failure_while|test_nested_importers_and'; vendor frames and blank lines trimmed.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+EEE                                                                 3 / 3 (100%)
+Time: 22:04.178, Memory: 95.00 MB
+There were 3 errors:
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits
+RuntimeException: catalog_target_invalid
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:80
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:118
+tests/Feature/PersistentCatalogDraftImportTest.php:877
+tests/Feature/PersistentCatalogDraftImportTest.php:61
+2) Tests\Feature\PersistentCatalogDraftImportTest::test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly
+Illuminate\Validation\ValidationException: Private catalog import evidence changed or is invalid. Review the current source and target before applying.
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:432
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:425
+app/Domain/Migration/CatalogOnboarding/CatalogDraftImporter.php:32
+tests/Feature/PersistentCatalogDraftImportTest.php:621
+3) Tests\Feature\PersistentCatalogDraftImportTest::test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open
+RuntimeException: catalog_target_schema_invalid
+app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php:25
+tests/Feature/PersistentCatalogDraftImportTest.php:689
+ERRORS!
+Tests: 3, Assertions: 6, Errors: 3.
+rc=2 elapsed=1325s db=importer_red_rerun (base app files, new test file)
