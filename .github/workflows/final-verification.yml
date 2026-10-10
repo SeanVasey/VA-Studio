@@ -247,8 +247,8 @@ jobs:
     runs-on: ubuntu-latest
     # Foundation 38037183233 measured 80.2 minutes for shard 1 (3,917 tests) and 43.4 for shard 2 (3,725) on
     # the stale timings; scripts/ci/phpunit-timings-sqlite.json is regenerated from both JUnit logs, which
-    # balances the two shards at about 61 minutes each. 100 minutes keeps about 40% headroom over the busiest
-    # measured shard. A hung test still cannot hold a runner for 6 hours.
+    # balances the two shards at about 61 minutes each: about 25% headroom over the busiest measured shard
+    # (80.2) and about 40% over the balanced estimate. A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 100
     strategy:
       fail-fast: false

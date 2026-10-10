@@ -13,4 +13,4 @@ OK (1 test, 19 assertions)
 exit 0
 === git status after (tracked docs)
 
-No diff locally: the committed receipt (571cf5f) was produced on this same MySQL 8.0.46 with the same outcome, so the rewrite was byte-identical; the file's mtime moved from the 2026-10-07 commit to the run time. On hosted MySQL 8.4.11 the 'mysql' field differs, which is the dirty checkout shard 22 reported (mysql-shard-22-receipt-refused.txt).
+No diff locally: the committed receipt (571cf5f) was produced on this same MySQL 8.0.46 with the same outcome, so the rewrite was byte-identical in this run (the worker order varies between runs, and the test records the workers unsorted, so another 8.0.46 run can rewrite it differently: the reviewer's did); the file's mtime moved from the 2026-10-07 commit to the run time. On hosted MySQL 8.4.11 the 'mysql' field differs, which is the dirty checkout shard 22 reported (mysql-shard-22-receipt-refused.txt).
