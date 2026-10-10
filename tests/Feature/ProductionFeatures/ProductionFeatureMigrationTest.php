@@ -157,7 +157,11 @@ class ProductionFeatureMigrationTest extends TestCase
         DB::unprepared('DROP TRIGGER production_consent_states_retain_delete');
         $this->refusesBeforeDDL();
         $this->resetProduction();
-        DB::unprepared($this->steps()[1][2]);
+        // A non-prefix installation: the first and third tables without the second. Every created table's
+        // foreign-key parent exists, so native MySQL can hold this state as well as SQLite; the second table
+        // alone cannot be created on MySQL before its parent (SQLSTATE 1824).
+        DB::unprepared($this->steps()[0][2]);
+        DB::unprepared($this->steps()[2][2]);
         $this->refusesBeforeDDL();
     }
 
