@@ -141,6 +141,7 @@ class BeatStarsDryRunCommandTest extends TestCase
                 sprintf('SYNTHETIC-RIGHTS-L%04d', $index), '0'], ',', '"', '');
         }
         fclose($handle);
+        chmod($this->base.'/large.csv', 0600);
         $this->assertLessThan(700000, filesize($this->base.'/large.csv'));
 
         $output = $this->outputDirectory('large');
@@ -167,7 +168,8 @@ class BeatStarsDryRunCommandTest extends TestCase
             'symlinked mapping' => ['path'], 'output inside repository' => ['output_inside_repository'],
             'shared output directory' => ['output_directory'], 'foreign file in output' => ['output_directory_not_empty'],
             'different retained report' => ['output_differs'], 'retained snapshot without findings-free run' => ['output_differs'],
-            'bad mapping' => ['mapping_json']];
+            'bad mapping' => ['mapping_json'], 'export inside repository without a synthetic mapping' => ['input_inside_repository'],
+            'group-readable export' => ['input_not_private'], 'hard-linked export' => ['input_not_private']];
     }
 
     #[DataProvider('refusals')]
@@ -218,6 +220,23 @@ class BeatStarsDryRunCommandTest extends TestCase
             case 'mapping_json':
                 file_put_contents($this->base.'/mapping.json', '{');
                 $arguments[3] = $this->base.'/mapping.json';
+                break;
+            case 'input_inside_repository':
+                // The checkout's synthetic export with a mapping that claims a real acquisition.
+                $mapping = json_decode((string) file_get_contents($this->fixtures.'/mapping.json'), true, 16);
+                $mapping['acquisition_method'] = 'official_export';
+                file_put_contents($this->base.'/mapping.json', json_encode($mapping));
+                $arguments[3] = $this->base.'/mapping.json';
+                break;
+            case 'input_not_private':
+                copy($this->fixtures.'/export.csv', $this->base.'/export.csv');
+                if ($this->dataName() === 'group-readable export') {
+                    chmod($this->base.'/export.csv', 0640);
+                } else {
+                    chmod($this->base.'/export.csv', 0600);
+                    link($this->base.'/export.csv', $this->base.'/export-second-link.csv');
+                }
+                $arguments[1] = $this->base.'/export.csv';
                 break;
         }
         $result = $this->invoke($arguments);

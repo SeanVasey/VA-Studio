@@ -135,6 +135,8 @@ class BeatStarsExportNormalizerTest extends TestCase
             'missing license' => [[1, 9, ''], 'missing_license_name', 'Lease Name'],
             'unknown visibility' => [[1, 8, 'Archived'], 'unknown_visibility_value', 'Status'],
             'missing visibility' => [[1, 8, ''], 'missing_visibility', 'Status'],
+            'padded visibility' => [[1, 8, ' Private '], 'unknown_visibility_value', 'Status'],
+            'padded license name' => [[1, 9, 'SYNTHETIC Premium '], 'unknown_license_name', 'Lease Name'],
             'float bpm' => [[0, 2, '95.0'], 'invalid_bpm', 'BPM'],
             'low bpm' => [[0, 2, '10'], 'invalid_bpm', 'BPM'],
             'word bpm' => [[0, 2, 'fast'], 'invalid_bpm', 'BPM'],
@@ -254,10 +256,12 @@ class BeatStarsExportNormalizerTest extends TestCase
         $rows[0][14] = 'Bad Slug';
         $rows[1][14] = '';
         $rows[2][15] = 'EUR';
+        $rows[3][15] = ' USD';
         $result = $this->normalize($rows, $headers, $overrides);
-        $this->assertSame([[1, 'invalid_slug', 'Bad Slug'], [2, 'missing_slug', null], [3, 'currency_mismatch', 'EUR']],
+        $this->assertSame([[1, 'invalid_slug', 'Bad Slug'], [2, 'missing_slug', null], [3, 'currency_mismatch', 'EUR'],
+            [4, 'currency_mismatch', ' USD']],
             array_map(static fn (array $finding): array => [$finding['row'], $finding['code'], $finding['detail']], $result['findings']));
-        $this->assertSame(['withheld', 'withheld', 'withheld', 'normalized'], array_column($result['entries'], 'disposition'));
+        $this->assertSame(['withheld', 'withheld', 'withheld', 'withheld'], array_column($result['entries'], 'disposition'));
     }
 
     public function test_slug_derivation_is_ascii_only_and_reports_an_underivable_title(): void

@@ -98,6 +98,16 @@ normalizer now validates the cell as exported, so a padded id is `invalid_source
 withheld. Two data sets cover a space-padded and a tab-suffixed id; red before the fix and green after
 (`evidence/codex-padded-source-id-red-green.txt`: 75 unit tests, 14 feature tests, Pint clean).
 
+Codex's second review (of `144ee1d`) raised two more P2s, both fixed with red/green evidence
+(`evidence/codex-export-boundary-and-exact-values-red-green.txt`):
+
+- The export was admitted on type and size alone, so a real export inside the checkout or a
+  group-readable copy was read without complaint. The export must now be a caller-owned, owner-only,
+  single-link file outside the checkout (`input_not_private`); only a mapping declaring
+  `synthetic_fixture` may read one from inside it (`input_inside_repository`).
+- Visibility values were trimmed before lookup, so ` Public ` matched `Public`. Visibility, license
+  names and a currency column are now matched exactly as exported; padding is a finding.
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,

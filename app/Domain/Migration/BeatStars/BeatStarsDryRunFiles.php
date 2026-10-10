@@ -9,6 +9,9 @@ use InvalidArgumentException;
 /**
  * Private file boundary for the dry run: read two inputs, write at most three outputs, nothing else.
  *
+ * The export must be a caller-owned, owner-only, single-link file outside this checkout; only a
+ * mapping declaring a synthetic fixture may read one from inside it.
+ *
  * The output directory must be absolute, symlink-free, owned by the caller, mode 0700, outside
  * this checkout, and hold nothing but earlier outputs of this tool. Existing identical outputs are
  * left in place; different ones are refused, so a report is never silently replaced.
@@ -28,8 +31,8 @@ final class BeatStarsDryRunFiles
      */
     public function run(string $exportPath, string $mappingPath, string $outputDirectory): array
     {
-        $export = $this->input($exportPath, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
         $mapping = $this->input($mappingPath, BeatStarsExportMapping::MAX_BYTES);
+        $export = $this->export($exportPath, $mapping);
         $this->directory($outputDirectory);
         $result = (new BeatStarsExportNormalizer)->normalize($export, basename($exportPath), $mapping);
         $report = new BeatStarsDryRunReport;
@@ -61,6 +64,27 @@ final class BeatStarsDryRunFiles
         }
 
         return ['result' => $result, 'written' => $written, 'unchanged' => $unchanged];
+    }
+
+    /**
+     * A real export is private source material: it must live outside this checkout as a caller-owned,
+     * owner-only file with a single link. Only a mapping that declares a synthetic fixture may read
+     * an export from inside the checkout.
+     */
+    private function export(string $path, string $mapping): string
+    {
+        $bytes = $this->input($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
+        $repository = dirname(__DIR__, 4);
+        if ($path === $repository || str_starts_with($path, $repository.'/')) {
+            $this->require((new BeatStarsExportMapping)->decode($mapping)['acquisition_method'] === 'synthetic_fixture',
+                'input_inside_repository');
+        } else {
+            $stat = $this->path($path);
+            $this->require(function_exists('posix_geteuid') && $stat['uid'] === posix_geteuid()
+                && ($stat['mode'] & 0077) === 0 && $stat['nlink'] === 1, 'input_not_private');
+        }
+
+        return $bytes;
     }
 
     private function input(string $path, int $maximum): string

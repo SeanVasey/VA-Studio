@@ -303,9 +303,11 @@ final class BeatStarsExportNormalizer
             }
         }
 
+        // Categorical cells (visibility, currency, license names) are matched exactly as exported: the mapping
+        // declares exact source values, so padding is an unknown value rather than a silent match.
         if (isset($columns['visibility'])) {
-            $value = trim($cells[$columns['visibility']]);
-            if ($value === '') {
+            $value = $cells[$columns['visibility']];
+            if (trim($value) === '') {
                 $findings[] = $this->finding('row', $row, $sourceId, 'missing_visibility', $columns['visibility'], null);
                 $visibility = null;
             } elseif (! isset($mapping['visibility_values'][$value])) {
@@ -327,16 +329,16 @@ final class BeatStarsExportNormalizer
             $rights = null;
         }
 
-        if (isset($columns['currency']) && trim($cells[$columns['currency']]) !== $mapping['currency']) {
+        if (isset($columns['currency']) && $cells[$columns['currency']] !== $mapping['currency']) {
             $findings[] = $this->finding('row', $row, $sourceId, 'currency_mismatch', $columns['currency'],
-                CellText::detail(trim($cells[$columns['currency']])));
+                CellText::detail($cells[$columns['currency']]));
         }
 
         $offers = [];
         foreach ($mapping['offers'] as $offer) {
-            $name = $offer['license'] ?? trim($cells[$offer['license_column']]);
+            $name = $offer['license'] ?? $cells[$offer['license_column']];
             $label = null;
-            if ($name === '') {
+            if (trim($name) === '') {
                 $findings[] = $this->finding('row', $row, $sourceId, 'missing_license_name', $offer['license_column'], null);
                 $name = null;
             } elseif (! isset($mapping['licenses'][$name])) {
