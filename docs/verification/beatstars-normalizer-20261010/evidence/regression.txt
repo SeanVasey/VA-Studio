@@ -1,0 +1,14 @@
+# Adjacent catalog-onboarding tests (unchanged files, run to show no interference)
+$ <phpunit direct, SQLite env> -- tests/Feature/PersistentCatalogDraftImportTest.php tests/Unit/NormalizedCatalogSourceTest.php tests/Unit/CatalogDryRunTest.php tests/Unit/CatalogDryRunCommandTest.php
+......                                                          132 / 132 (100%)
+Time: 01:39.654, Memory: 89.00 MB
+OK (132 tests, 836 assertions)
+
+# Whole Unit suite on SQLite (includes the new tests/Unit/Migration/BeatStarsExportNormalizerTest.php)
+$ <phpunit direct, SQLite env> -- --testsuite Unit
+Time: 02:13.070, Memory: 127.00 MB
+OK, but some tests were skipped!
+Tests: 1070, Assertions: 6607, Skipped: 1.
+# The one skip is pre-existing and native-MySQL-only, unrelated to this lane:
+# Tests\Unit\MysqlConnectionTimezoneTest::test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical
+# "Native MySQL session time zone and TIMESTAMP conversion; SQLite stores text."
