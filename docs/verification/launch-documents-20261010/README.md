@@ -14,23 +14,25 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-contradictions.txt` | The same greps after the edits, showing each corrected line with its citation, plus the three new `docs/legal/` files. |
 | `independent-review-58cc803-DECISION.md` | The independent review of `58cc803`: REQUEST CHANGES, with four conditions (copied verbatim). |
 | `pass3-source-checks.txt` | Third pass, for the review conditions: the false IP claim and missing sections at `58cc803` (red), the session, attachment, service-project and free-grant sources, and the corrected headings and retention rows (green). |
-| `green-check-citations-pass3.txt` | Final run, after the third pass: 236 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass3.txt` | Run after the third pass: 236 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass4.txt` | Final run, after the delta review's conditions: 239 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `independent-review-8838dd7-DECISION.md` | The delta review of the third pass. |
 
 ## Commands and results
 
 ```
 $ python3 -I docs/verification/launch-documents-20261010/check-citations.py
 docs/legal/README.md: 95 distinct cited paths
-docs/legal/PRIVACY.md: 86 distinct cited paths
+docs/legal/PRIVACY.md: 89 distinct cited paths
 docs/legal/TERMS.md: 55 distinct cited paths
-checked 236 citations across 3 documents
+checked 239 citations across 3 documents
 RESULT PASS
 exit 0
 $ git diff --check
 (exit 0)
 ```
 
-This is the final run (`green-check-citations-pass3.txt`). The earlier 209- and 214-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+This is the final run (`green-check-citations-pass4.txt`), after the delta review's conditions. The earlier 209-, 214- and 236-citation runs are kept in `green-check-citations.txt`, `green-check-citations-pass2.txt` and `green-check-citations-pass3.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -68,7 +70,17 @@ The review (`independent-review-58cc803-DECISION.md`) returned REQUEST CHANGES. 
 | INFO | Section 2.2 step 3 deferred to Stripe's notices | It also says that no `customer_email` is passed, so Stripe's page asks the buyer for an email address and payment details | `app/Domain/Commerce/Checkout/CheckoutEvidence.php` |
 | 3 (LOW) | "Commands and results" showed the 209-citation run | It shows the final 236-citation run | `green-check-citations-pass3.txt` |
 
-Condition 4, re-review of the changed `PRIVACY.md` text, is open. This lane cannot satisfy it; an independent reviewer must assess the new head before merge.
+Condition 4, re-review of the changed `PRIVACY.md` text, was met by an independent delta review of `8838dd7` (`independent-review-8838dd7-DECISION.md`, APPROVE WITH CONDITIONS).
+
+## Fourth pass (delta review of `8838dd7`)
+
+| Condition | Change |
+| --- | --- |
+| Section 3 malware row said uploads are scanned "before they are stored or served" | Uploads are scanned before they are promoted, served or downloaded; staff media stays private until a clean scan; support-attachment originals are stored first and scanned before any download. Cites `docs/media-processing.md` and `docs/verification/support-attachments-20261007.md`, "Effects, retry and retention" |
+| Section 2.1 named only the embed and contact limiters | Names the other per-IP (guest) and per-user throttles in `routes/web.php`, `routes/customer.php`, `routes/free-grants.php`, `routes/inquiry-conversations.php` and `routes/discovery-track-sitemaps.php`, and says the counters are stored under hashed keys in the database cache; section 4 adds a row saying expired counters have no scheduled purge (`routes/console.php` registers no cache prune), listed under U-13 |
+| Re-run `check-citations.py` | 239 citations across 3 documents, `RESULT PASS`, exit 0 (`green-check-citations-pass4.txt`) |
+
+The review's INFO items are not conditions and stay open for the owner's privacy review: no trusted proxies are configured, so a CDN or proxy in front would make the stored session IP the proxy's; Stripe's email collection is inferred from the absent `customer_email`; the free-grant `payload_hash` is a hash of the plaintext. The contradiction it found in `docs/service-projects.md` and `config/services-projects.php` (no attachment authority, against the registered `test_service_project_v1` attachment family) is added below.
 
 The `check-citations.py` script is unchanged. The review's LOW finding on its scope (it checks paths and headers, not facts) is recorded above under "Commands and results", not fixed.
 
@@ -79,3 +91,4 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 - `docs/architecture/decision-register.md`, D-02: "Target GitHub repository name is VASEYAUDIO". Left as history; the 2026-10-10 entry records the current repository beside it.
 - `docs/service-projects.md` ("activates it only in `local` or `testing`") and `docs/free-grants.md` ("mint only `test_only: true` definitions in `local` or `testing`") also predate PR #68: `ServiceProjectPolicy`, `FreeGrantPolicy` and `FreeGrantDefinitions` call `TestEnvironment::admitsTestCommerce()`. `PRIVACY.md` sections 2.7 and 2.8 follow the code. Outside this lane's owned files.
 - `docs/verification/customer-account-test-journey.md` ("enables the feature only in `local` or `testing`") and `docs/customer-test-self-service.md` ("The environment must be `local` or `testing`") predate PR #68: the code admits `staging` through `TestEnvironment::admitsTestCommerce()`. Outside this lane's owned files; reported for the integrator.
+- `docs/service-projects.md` ("No private file intake/scanning") and the comment in `config/services-projects.php` (no attachment authority) contradict the registered `test_service_project_v1` attachment family (`app/Providers/SupportAttachmentServiceProvider.php`). `PRIVACY.md` section 2.6 follows the code. Outside this lane's owned files.
