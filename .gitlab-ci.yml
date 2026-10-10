@@ -111,13 +111,12 @@ backend-quality:
 backend-mysql:
   extends: .database
   # Twenty-four shards of the reviewed native selection (1765 cases), the same partition as GitHub's. GitHub
-  # Foundation run 37967128232 measured hosted MySQL 8.4 at about 54 s per selected case (shards 2 and 3:
-  # 186 minutes each), and its cancelled shards ran slower still. Scaling the untimed files by the cancelled
-  # shards' pace (1.48 to 1.88 times) projects the busiest shard at about 122 to 132 minutes at GitHub's
-  # speed; shard 1 is BulkReplaceLicenseDraftSourceTest alone (measured at about 122 minutes), so more
-  # shards cannot shorten it. GitLab.com hosted runners kill any job at 3 hours regardless of this setting,
-  # so the limit stays 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after a
-  # hosted GitHub run has measured shard 1, and split that test file if GitLab would exceed this limit.
+  # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for
+  # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the
+  # timings regenerated from that run the other shards balance at about 87 minutes at GitHub's speed.
+  # GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the limit stays
+  # 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after this measured shard 1 is
+  # judged to fit them, and split that test file if GitLab would exceed this limit.
   timeout: 175m
   parallel:
     matrix:
@@ -147,8 +146,8 @@ backend-mysql:
 
 backend-sqlite:
   extends: .database
-  # Same 2-shard partition as GitHub, where one shard needs about 67 minutes (Foundation 37967128232);
-  # 100 minutes stays under GitLab.com's hosted 3-hour cap.
+  # Same 2-shard partition as GitHub, where the busiest shard measured 80 minutes (Foundation 38037183233)
+  # and the regenerated timings balance both at about 61; 100 minutes stays under GitLab.com's hosted 3-hour cap.
   timeout: 100m
   parallel:
     matrix:
