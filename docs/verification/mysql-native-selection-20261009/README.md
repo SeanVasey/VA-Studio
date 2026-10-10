@@ -16,7 +16,10 @@ moved both providers to 16 MySQL shards using the hosted timings of Foundation r
 [Duration estimates](#duration-estimates-c3).
 
 This note records partition and self-test evidence. Foundation run 37967128232 executed the selection
-on hosted MySQL in 8 shards. Only shard 2 passed, so the run is not Foundation acceptance.
+on hosted MySQL in 8 shards; only shard 2 passed, so that run was not Foundation acceptance. **Current status:**
+Foundation run 38077166247 on the exact SHA `0f23e63f` passed the whole selection in 24 shards on hosted MySQL 8.4.11
+(`docs/verification/foundation-20261009/`, fourth run); the sections below record the state as reviewed and note where
+later runs changed it.
 
 ## Why
 
@@ -162,21 +165,23 @@ They still run on SQLite.
 
 ## MySQL skip signals (C2)
 
-### Attachment consumers and other MySQL skips (C2): configured, not yet proven on hosted MySQL
+### Attachment consumers and other MySQL skips (C2): proven on hosted MySQL in Foundation run 38077166247
 
 - `tests/Feature/SupportAttachmentsTest.php` (28 cases) and `tests/Feature/ServiceSupportAttachmentsTest.php`
   (8 cases) are now selected. Their `setUp` skips on MySQL only when `ATTACHMENT_NATIVE_ISOLATED` is not
   `1`. The MySQL jobs (and only they) now set it, so on CI these cases are configured to run their
-  native paths instead of skipping. No hosted run has confirmed this yet. The flag is environment-gated, so it is deliberately not in the census: any skip
+  native paths instead of skipping. Foundation run 38077166247 confirmed this on hosted MySQL 8.4.11. The flag is environment-gated, so it is deliberately not in the census: any skip
   of these cases on CI MySQL is refused as an unlisted skip.
 - The two SQLite-only methods,
   `CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main`
   and `FreeGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target`,
   are now in the MySQL skip census, and their files are selected.
 
-**The native attachment-consumer release blocker stays open until an exact-SHA Foundation run passes
-on hosted MySQL 8.4.** Only then does it close for Foundation. The local MySQL 8.0 evidence below does
-not close it.
+**The native attachment-consumer release blocker is closed for Foundation.** It was to stay open until an
+exact-SHA Foundation run passed on hosted MySQL 8.4 (the local MySQL 8.0 evidence below could not close it). It closed
+on 2026-10-10 with run [38077166247](https://github.com/SeanVasey/VA-Studio/actions/runs/38077166247)
+on the exact SHA `0f23e63f`: both files ran on hosted MySQL 8.4.11 with no unlisted skip, all 26 receipts were verified and
+the run succeeded (`docs/verification/foundation-20261009/`, fourth run).
 
 ### MySQL skip census (`scripts/ci/database-mysql-skips.json`)
 
@@ -369,7 +374,7 @@ In `.gitlab-ci.yml`, only the MySQL jobs pass the flag.
 
 ## Real discovery (no database)
 
-### 24 shards (current)
+### 24 shards (as reviewed; the timings were regenerated afterwards in #86)
 
 Run in `/home/user/wt-b2` on `harness/foundation2-fixes` (base `fa6d89f`) with the refreshed timings,
 PHPUnit discovery only:
@@ -520,6 +525,9 @@ afterwards.
 
 ### Duration estimates (C3)
 
+These estimates predate the 24-shard runs. Measured: run 38077166247 took 56–132 minutes per MySQL shard
+(`docs/verification/foundation-20261009/run4/jobs.tsv`).
+
 **Measured on hosted MySQL.** Foundation run 37967128232 (attempt 1, `workflow_dispatch`, commit
 `f57e7256891d0d3c117e151a36f7fb967c724ab7`, tree `c6a982f7f84cc661d9ab2ac39837072318e62e37`) ran this
 selection on hosted MySQL 8.4.11 in 8 shards with a 210-minute limit:
@@ -595,9 +603,9 @@ gives about 105 minutes on the same model.
   raised toward 68 s by hand.
 - The MySQL timings file feeds only the MySQL native-selection partition on GitHub and GitLab. SQLite
   reads `phpunit-timings-sqlite.json`, which is unchanged. Regenerating it from the complete SQLite
-  shard 1 log of the same run (47.5 min) is a follow-up.
+  shard 1 log of the same run (47.5 min) was a follow-up; #86 regenerated both files from run 38037183233.
 
-**24 shards (current).** Real discovery with the refreshed timings splits the selection as below.
+**24 shards (as reviewed; the timings were regenerated afterwards in #86).** Real discovery with the refreshed timings splits the selection as below.
 All columns are estimates; none is a measurement of these shards.
 
 | Shard | Cases | Finalization cases | Minutes at 68 s per Finalization case | Sharder estimate (min) | Projected minutes (k = 1.0 / 1.48 / 1.88) |
@@ -737,27 +745,20 @@ cases only):
 
 ## Open blockers
 
-- **GitLab is dispatched only after GitHub has measured shard 1.** At GitHub's speed the busiest
-  24-shard job is about 122–132 minutes. Shard 1, `BulkReplaceLicenseDraftSourceTest` alone, was
-  measured at about 122 minutes.
-  - GitLab's small hosted runners are smaller than GitHub's and unmeasured, and the 175-minute limit
-    cannot rise under the 3-hour hosted cap.
-  - Mitigation: GitLab is dispatched only after a hosted GitHub Foundation run has measured shard 1's
-    duration. If that measurement shows GitLab's runners would exceed 175 minutes, the next step is to
-    split `BulkReplaceLicenseDraftSourceTest` into two files (a floor of about 60 minutes). It is not
-    split now.
-  - More shards cannot help shard 1.
-- **GitLab compute minutes.** At GitHub's speed a full GitLab pipeline is projected at roughly
-  2,300–2,800 compute minutes, against a documented Free quota of 400 a month. The namespace's plan
-  and quota were not checked. Sean's cost policy applies before any GitLab dispatch.
-- **No MySQL claims before a passing hosted run.** Run 37967128232 is not acceptance: only shard 2
-  passed. None of these may be claimed until one exact-SHA Foundation run passes on hosted MySQL 8.4:
-  - MySQL-native coverage of the selection;
-  - exactness of the MySQL skip census;
-  - closure of the attachment-consumer blocker.
+Status after Foundation run [38077166247](https://github.com/SeanVasey/VA-Studio/actions/runs/38077166247)
+(exact SHA `0f23e63f`, passed): the GitHub-side blockers recorded here when this note was written are closed. The
+MySQL-native coverage of the selection, the exactness of the MySQL skip census and the attachment-consumer blocker were
+proven by that run (`docs/verification/foundation-20261009/`, fourth run). What remains open:
 
-  The local MySQL 8.0 runs above do not count.
-
+- **GitLab has not been dispatched.** GitHub has now measured shard 1 (`BulkReplaceLicenseDraftSourceTest` alone) at
+  123–124 minutes in runs 38037183233 and 38077166247.
+  - GitLab's small hosted runners are smaller than GitHub's and unmeasured, and the 175-minute limit cannot rise under
+    the 3-hour hosted cap. If GitLab's runners would exceed 175 minutes on shard 1, the next step is to split
+    `BulkReplaceLicenseDraftSourceTest` into two files (a floor of about 60 minutes). It is not split now. More shards
+    cannot help shard 1.
+- **GitLab compute minutes.** At GitHub's speed a full GitLab pipeline is projected at roughly 2,300–2,800 compute
+  minutes, against a documented Free quota of 400 a month. The namespace's plan and quota were not checked. Sean's cost
+  policy applies before any GitLab dispatch.
 - **Indirect driver branching is not counted in the 47 residual files.** The delta review of `2ac0f3d`
   found 26 further test files that are neither selected nor residual but call listed branching helpers
   (`branching_helper_files`); 20 of them are `PaidGrant*` tests using `PaidGrantDependencyFixtures`.
@@ -769,16 +770,14 @@ cases only):
 
 ## Next steps
 
-1. Dispatch one exact-SHA Foundation run of the 24-shard candidate on hosted MySQL 8.4.
-2. Regenerate `scripts/ci/phpunit-timings-mysql.json` from every complete shard JUnit of that run
-   with `scripts/ci/phpunit-timings.py`, so the 124 untimed files get real weights. Then revisit the
-   shard count and the 210-minute GitHub and 175-minute GitLab limits.
-3. Regenerate `scripts/ci/phpunit-timings-sqlite.json` from complete SQLite JUnit (run 37967128232's
-   shard 1 log is complete) in a separate change.
-4. Dispatch GitLab only after step 1 measures shard 1 on GitHub (see Open blockers), then measure the
-   GitLab shard durations and confirm they stay under 175 minutes.
-5. Sean decides whether any of the 47 residual files should join the selection.
-6. Follow-up CI change: require every test file that names a listed branching helper to be selected or
+Done since this note was written: the exact-SHA 24-shard Foundation run on hosted MySQL 8.4 (runs 38037183233, failed
+on four test defects fixed in #86, and 38077166247, passed), and both timing files regenerated from run 38037183233's
+complete JUnit logs (#86). Remaining:
+
+1. Dispatch GitLab only when Sean approves the compute cost (see Open blockers), then measure the GitLab shard
+   durations and confirm they stay under 175 minutes.
+2. Sean decides whether any of the 47 residual files should join the selection.
+3. Follow-up CI change: require every test file that names a listed branching helper to be selected or
    residual (one level), and add `getConfig('driver')` and `database.default` comparison patterns to the scan.
 
 ## Self-tests
@@ -964,12 +963,15 @@ byte-identical afterwards:
 
 ## Not verified
 
-- Only 2 of 8 shards of hosted run 37967128232 completed, so most selected files have no measured
-  hosted time and no hosted pass. Only a MySQL run of the whole selection proves the census exact.
-- The 24-shard durations are estimates. The "projected" range rests on a factor fitted to two
-  cancelled shards' progress counts and applied uniformly to the unmeasured files.
-- No 16- or 24-shard run exists on either provider. Per-job setup time and GitLab runner speed were
-  not measured, and the GitLab namespace's plan and compute quota were not checked.
+- When written, only 2 of 8 shards of hosted run 37967128232 had completed, so most selected files had
+  no measured hosted time and no hosted pass. Since then run 38037183233 measured every selected file
+  and run 38077166247 passed the whole selection on hosted MySQL 8.4.11 with the census exact (1,707
+  executed, exactly the 58 census skips); see `docs/verification/foundation-20261009/`.
+- The 24-shard durations were estimates when written; run 38077166247 measured 56–132 minutes per
+  shard.
+- When written, no 16- or 24-shard run existed. GitHub has since run 24 shards twice (runs 38037183233 and
+  38077166247). GitLab runner speed has not been measured, and the GitLab namespace's plan and compute quota were not
+  checked.
 - The local MySQL evidence used Oracle MySQL 8.0.46, not CI's 8.4. It ran only the option A files and
   `MigrationRecompilationTest`.
 - The collectors ran only against synthetic fixtures.
