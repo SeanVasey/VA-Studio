@@ -86,6 +86,8 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 
 ## Contradictions reported, not edited
 
+Integration update: the `CLAUDE.md` Project Notes line and the four guides that said `local`/`testing` only (`docs/service-projects.md`, `docs/free-grants.md`, `docs/verification/customer-account-test-journey.md`, `docs/customer-test-self-service.md`) were corrected at integration, after checking that each gate calls `TestEnvironment::admitsTestCommerce()`. The other items below remain as reported.
+
 - `CLAUDE.md`, Project Notes, "§5 auth": "customer accounts don't exist yet (U-07)". Test customer accounts exist and are documented (`docs/verification/customer-account-test-journey.md`; `docs/customer-test-self-service.md`; `routes/customer.php`); production identity remains default-off (`config/production-customer-identity.php`). U-07 (production enrollment, recovery and claim policy) is still open, so the accurate statement is that production customer accounts do not exist yet.
 - `resources/contracts/test-v2/PROVENANCE.md`: "current issuance profile and policy still select v1". The registry selects v2 (`app/Domain/Contracts/ContractRenderProfileRegistry.php`, `CURRENT_VERSION = 'test-buyer-pdf-v2'`; `app/Domain/Contracts/ContractIssuancePolicy.php`, `profile => 'test-buyer-pdf-v2'`; `docs/test-contract-issuance.md`, "The current development runtime selects v2"). The file is frozen and was not changed.
 - `docs/architecture/decision-register.md`, D-02: "Target GitHub repository name is VASEYAUDIO". Left as history; the 2026-10-10 entry records the current repository beside it.

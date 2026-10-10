@@ -10,6 +10,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Owner-review drafts in `docs/legal/`: a privacy notice and terms of service that cite the source file behind every statement, and a launch-documents index giving each buyer-facing document's and template's location, where it is seen today and its status. Not published. Not legal advice. Open owner decisions are listed in each draft's "Sean to decide" section.
+
 - A real `staging` environment. One helper, `App\Support\Environment\TestEnvironment`, admits the Stripe-test commerce chain and the synthetic test-customer and test-delivery capabilities in `local`, `testing` and `staging`. Staging requires staff MFA, refuses Stripe live mode, live or restricted keys, live production-checkout funds, production customer identity and verified-production membership provenance, and keeps development fixtures and production-lane rehearsals local/testing. `vasey:doctor` reports a `profile` and applies hosted URL, debug and cookie checks plus a test-mode-only check in staging; the private-server preflight gains `--profile=staging`. A same-SHA configuration refresh (`ctl refresh`) now also rebuilds the route cache, so switching a host from `local` to `staging` cannot keep serving panel routes cached without the MFA middleware; the runbook adds a `route:list` check.
 
 - Forge staging build, activation and configuration refresh now retain privileged operation locks through their fixed unprivileged children. A persistent root-only recovery marker blocks independent resume and mutating retries after interruption. Provisioning refuses absent, linked, writable or incomplete app credential custody and requires explicit private recovery instead of silently succeeding or rotating an existing account.
@@ -37,6 +39,9 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - CI fails when the built client bundle contains a server secret name from `.env.example` or a Stripe secret, restricted or webhook key prefix.
 
 ### Changed
+
+- The production activation packet, the preparation queue and the Monday plan's interim-environment row now reflect that PR #68 admits Stripe-test commerce on `APP_ENV=staging` (staff MFA required, live mode refused); production-checkout test funds still require `local`/`testing`. The customer-account, self-service identity, service-project and free-grant guides no longer say those test features run only in `local`/`testing`.
+- Decision register: U-01 resolved as `SeanVasey/VA-Studio`. Forge plus a DigitalOcean VPS is recorded as the staging-host decision, not U-02, and the staging sizing specification is `ops/staging/README.md` step 1.
 
 - Foundation CI and the GitLab native workflow run the MySQL native selection in 24 shards instead of 8, using hosted timings (16 in `fa6d89f`, raised to 24 for timeout headroom).
   - **What run 37967128232 measured** (hosted MySQL 8.4, 8 shards, 210-minute limit, commit `f57e725`):
