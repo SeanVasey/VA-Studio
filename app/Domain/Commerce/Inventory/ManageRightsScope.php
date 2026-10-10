@@ -24,6 +24,12 @@ use Illuminate\Support\Str;
  */
 final class ManageRightsScope
 {
+    /**
+     * Registers a scope key once; a repeat with the same reference is unchanged, another reference conflicts.
+     *
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this key; null
+     *                                                 applies the panel's staff multi-factor rule to `$actor` instead.
+     */
     public function register(string $key, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScope
     {
         return DB::transaction(function () use ($key, $reference, $actor, $attestation) {
@@ -48,6 +54,12 @@ final class ManageRightsScope
         }, 5);
     }
 
+    /**
+     * Links a current, publishable offer revision to a scope; the link is immutable once made.
+     *
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this scope key
+     *                                                 and revision; null applies the panel's staff multi-factor rule.
+     */
     public function link(int $scopeId, int $revisionId, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScopeOffer
     {
         return DB::transaction(function () use ($scopeId, $revisionId, $reference, $actor, $attestation) {
@@ -78,6 +90,12 @@ final class ManageRightsScope
         }, 5);
     }
 
+    /**
+     * Blocks or unblocks a scope under optimistic control versioning.
+     *
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this scope key;
+     *                                                 null applies the panel's staff multi-factor rule to `$actor`.
+     */
     public function block(int $scopeId, bool $blocked, int $expectedVersion, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScope
     {
         return DB::transaction(function () use ($scopeId, $blocked, $expectedVersion, $reference, $actor, $attestation) {
