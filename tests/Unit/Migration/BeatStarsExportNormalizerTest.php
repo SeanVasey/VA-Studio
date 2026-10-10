@@ -144,6 +144,8 @@ class BeatStarsExportNormalizerTest extends TestCase
             'untagged synthetic title' => [[2, 1, 'Plain title'], 'synthetic_title_required', 'Title'],
             'missing source id' => [[3, 0, ''], 'missing_source_id', 'Track ID'],
             'long source id' => [[3, 0, str_repeat('i', 191)], 'invalid_source_id', 'Track ID'],
+            'padded source id' => [[3, 0, ' bs-synthetic-padded '], 'invalid_source_id', 'Track ID'],
+            'trailing-space source id' => [[3, 0, "bs-synthetic-padded\t"], 'invalid_source_id', 'Track ID'],
             'duplicate tag' => [[3, 6, 'dark;dark'], 'invalid_tags', 'Tags'],
             'too many tags' => [[3, 6, implode(';', range(1, 21))], 'invalid_tags', 'Tags'],
             'long key' => [[3, 3, str_repeat('k', 25)], 'invalid_musical_key', 'Key'],

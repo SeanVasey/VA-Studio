@@ -90,6 +90,14 @@ conditions (`independent-review-b329686-DECISION.md`). Its LOW finding stands as
 test pins the 1,048,576 / 1,048,577-byte snapshot boundary, so two boundary mutants survive, and the
 normalizer's limit is a separate literal from the decoder's. Every such failure mode fails closed.
 
+## Codex review on PR #89
+
+Codex (P2) found that a padded source id such as `" bs-synthetic-0001 "` was trimmed with no finding.
+Because the row hash excludes the source-id cell, neither the exact id nor its bytes survived. The
+normalizer now validates the cell as exported, so a padded id is `invalid_source_id` and the row is
+withheld. Two data sets cover a space-padded and a tab-suffixed id; red before the fix and green after
+(`evidence/codex-padded-source-id-red-green.txt`: 75 unit tests, 14 feature tests, Pint clean).
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,

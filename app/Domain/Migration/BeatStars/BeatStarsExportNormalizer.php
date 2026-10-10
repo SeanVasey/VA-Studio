@@ -170,8 +170,10 @@ final class BeatStarsExportNormalizer
     private function interpret(int $row, array $cells, array $content, array $mapping, array &$findings): array
     {
         $columns = $mapping['columns'];
-        $sourceId = trim($cells[$columns['source_id']]);
-        if ($sourceId === '') {
+        // Validate the cell as exported: a padded identifier is refused, not trimmed, because the row hash
+        // excludes this cell and a silently changed id could bind the draft to a different legacy record.
+        $sourceId = $cells[$columns['source_id']];
+        if (trim($sourceId) === '') {
             $findings[] = $this->finding('row', $row, null, 'missing_source_id', $columns['source_id'], null);
             $sourceId = null;
         } elseif (! CellText::identity($sourceId)) {
