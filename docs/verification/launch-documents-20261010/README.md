@@ -27,7 +27,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `route-table-unthrottled-production.txt` | The production route table filtered to routes without a throttle (sixth Codex review). |
 | `green-check-citations-pass10.txt` | Run after the sixth Codex review: 246 citations, `RESULT PASS`, exit 0. |
 | `green-check-citations-pass11.txt` | Run after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass12.txt` | Final run, after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass12.txt` | Run after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass13.txt` | Final run, after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -128,6 +129,10 @@ Citation check after this pass: `green-check-citations-pass11.txt`.
 | `docs/customer-test-self-service.md` was titled and introduced as local/testing only, and `docs/verification/customer-account-test-journey.md` called it the "local test self-service child" | The title, opening and link text now name `local`, `testing` and `staging`, matching the activation section; the link in `docs/ops/staging-test-purchase.md` follows the new title |
 
 Citation check after this pass: `green-check-citations-pass12.txt`.
+
+| PRIVACY section 2 and the README's identity-messages row said no transport is bound for production identity email | The identity SMTP adapter is bound (`AppServiceProvider` to `IdentitySmtpFactory`), separate from Laravel's mailer; it is unconfigured (null settings in `config/production-identity-smtp.php`, so the factory refuses) and disabled (`notifications_enabled` false). Section 3's email row says the same |
+
+Citation check after this pass: `green-check-citations-pass13.txt`.
 
 ## Contradictions resolved at integration
 
