@@ -195,6 +195,13 @@ directory, pin behaviour that surviving mutants could otherwise break. Evidence:
 suggested variant found no admitted misparse and no refusal outside the whitespace-before-quote class. An
 operator whose home directory is itself a Git repository (`~/.git`) cannot use an output directory under it.
 
+The delta re-review of `82993ff..67d7a89` returned APPROVE (`independent-review-67d7a89-DECISION.md`): all
+three conditions met, no new defects. Its fuzzing of the committed check over 300k inputs per alphabet
+admitted no quote misparse and refused nothing outside the whitespace-before-quote class; the remaining
+differences between `fgetcsv` and a strict parser all involve bare CR in unquoted cells and predate this lane.
+Removing CR from the whitespace set survives the tests (VT and FF are not tested individually); the fuzz
+covers those bytes.
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the
