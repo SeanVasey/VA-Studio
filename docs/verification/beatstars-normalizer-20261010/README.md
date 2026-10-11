@@ -298,9 +298,15 @@ splitting the row. (The docs items above landed in `0e84364`, the second commit 
   with visibility codes `"0"` and `"1"`, or numeric license names, was reported as a JSON list in
   `mapping.visibility_values` or `mapping.licenses`, which lost the declared source labels. Lookups were
   unaffected. The effective mapping in the result now carries both maps as JSON objects, and the Markdown report
-  reads them as objects. Before the fix, the same input would also have made the Markdown report fail on
-  integer license names under strict types. Evidence: `evidence/codex-numeric-source-labels-red-green.txt` (red
+  reads them as objects. Evidence: `evidence/codex-numeric-source-labels-red-green.txt` (red
   on `0e84364`; 91 unit and 28 feature tests green).
+
+The delta review of `0e84364..b95afc1` returned APPROVE WITH CONDITIONS (`independent-review-b95afc1-DECISION.md`).
+Its one condition, a false README claim that the old Markdown report would throw a TypeError on integer license
+names, is met by removing that sentence: `array_map` converts the keys to strings, and only the JSON list
+collapse was a defect. Informational, unchanged: a mapping without a visibility column now reports
+`"visibility_values": {}` instead of `[]`, so a report retained from before this change differs on rerun
+(`output_differs`, by design), and an empty `constants` map still encodes as `[]`.
 
 ## Integration scope and accepted gaps
 
