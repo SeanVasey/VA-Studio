@@ -31,7 +31,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass13.txt` | Run after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass14.txt` | Run after the tenth Codex review: checked 260 citations across 3 documents (PRIVACY.md: 103 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass15.txt` | Run after the eleventh Codex review: checked 261 citations across 3 documents (PRIVACY.md: 104 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass16.txt` | Final run, after the twelfth Codex review: checked 261 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass16.txt` | Run after the twelfth Codex review: checked 261 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass17.txt` | Final run, after the follow-up batch (2026-10-11): checked 272 citations across 3 documents (TERMS.md: 70 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -152,12 +153,25 @@ Citation check after this pass: `green-check-citations-pass15.txt`.
 
 Citation check after this pass: `green-check-citations-pass16.txt`.
 
+## Follow-up batch (2026-10-11)
+
+Four Codex findings deferred from the review passes above, each re-read against its source.
+
+| Finding | Change | Source |
+| --- | --- | --- |
+| `docs/legal/README.md`, paid-grant row: gave the production `Scope` text for both profiles, including `rehearsal-paid-grant-pdf-v1` | Lists both variants: `verified_production` selects `verified-paid-grant-pdf-v1` with header `PAID LICENSE ORIGINAL` and the verified-payment scope; `synthetic_rehearsal` selects `rehearsal-paid-grant-pdf-v1` with header `SYNTHETIC PAID GRANT — REHEARSAL ONLY` and the scope "Original affirmative assent and synthetic payment evidence. Rehearsal does not establish operative merchant, payment or legal facts." | `app/Domain/Grants/Paid/PaidGrantText.php`, `document()`; `app/Domain/Grants/Paid/PaidGrantRenderProfile.php`, `current()` |
+| `docs/legal/TERMS.md`, section 6: described accounts only as test fixtures | Adds the mounted production identity flow, consistent with PRIVACY section 2.3: implemented, disabled by default and unconfigured; pages and actions answer 404 unless `IdentityPolicy::enabled()`; it would collect an email address on request and a name and password on completion; no production account is offered (U-07) | `routes/production-customer-identity.php`; `routes/web.php`; `app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php`; `app/Domain/Customers/ProductionIdentity/IdentityPolicy.php`; `config/production-customer-identity.php`; `config/production-identity-smtp.php`; `app/Domain/Customers/ProductionIdentity/IdentityRequests.php`; `app/Domain/Customers/ProductionIdentity/CompleteIdentity.php` |
+| `docs/legal/TERMS.md`, section 4 item 2: "the only policy the application accepts today is a fixed test zero" | The pricing policy accepts `fixed_test` tax at 0–10,000 basis points or `provider_calculated`; an order review accepts any resulting fixed test tax amount and refuses provider-pending tax; only the step that starts hosted test Checkout requires zero rate and zero tax | `app/Domain/Commerce/PricingPolicy.php`, `validate()`; `app/Support/Money/MinorUnits.php`, `rate()`; `app/Domain/Commerce/Orders/ReviewOrder.php`, `capture()`; `app/Domain/Commerce/PricingSnapshotV3.php`; `app/Domain/Commerce/Checkout/CheckoutEvidence.php`, `request()` |
+| This record, "Contradictions resolved at integration": still said `CLAUDE.md` reports that production customer accounts don't exist | Records the integration wording as history and the current "§5 auth" line: implemented but default-off and unconfigured, policy U-07 | `CLAUDE.md`, Project Notes, "§5 auth" |
+
+Citation check after this batch: `green-check-citations-pass17.txt`.
+
 ## Contradictions resolved at integration
 
 These were reported by the lane and corrected in the integration commit, after checking that each gate calls
 `TestEnvironment::admitsTestCommerce()`, which admits `staging`:
 
-- `CLAUDE.md`, Project Notes, "§5 auth": now says production customer accounts don't exist yet (U-07) and synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`.
+- `CLAUDE.md`, Project Notes, "§5 auth": now says synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`. Its production-account clause, written at integration as "production customer accounts don't exist yet (U-07)", was corrected in the sixteenth pass and now says the production customer account path (`routes/production-customer-identity.php`, `CompleteIdentity`) is implemented but default-off and unconfigured, with its production policy under U-07.
 - `docs/service-projects.md`, `docs/free-grants.md`, `docs/verification/customer-account-test-journey.md` and `docs/customer-test-self-service.md`: each now names `staging` with its gate.
 
 ## Contradictions reported, not edited
