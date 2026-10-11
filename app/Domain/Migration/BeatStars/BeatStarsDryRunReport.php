@@ -67,8 +67,8 @@ final class BeatStarsDryRunReport
             $lines[] = sprintf('| %d | %s | `%s` |', $position + 1, $license, $this->cell($offer['price_column']));
         }
         $lines[] = '';
-        $lines[] = sprintf('Known license names: %s.', $this->names(array_keys($mapping['licenses'])));
-        $lines[] = sprintf('Visibility values: %s.', $this->pairs($mapping['visibility_values']));
+        $lines[] = sprintf('Known license names: %s.', $this->names(array_map('strval', array_keys(get_object_vars($mapping['licenses'])))));
+        $lines[] = sprintf('Visibility values: %s.', $this->pairs(get_object_vars($mapping['visibility_values'])));
         $lines[] = sprintf('Ignored columns: %s.', $this->names($mapping['ignored_columns']));
         $lines[] = sprintf('Export columns: %s.', $this->names($result['export']['columns']));
         $lines[] = '';

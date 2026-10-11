@@ -24,7 +24,8 @@ class BeatStarsExportNormalizerTest extends TestCase
         $export = file_get_contents(self::FIXTURES.'/export.csv');
         $mapping = file_get_contents(self::FIXTURES.'/mapping.json');
         $result = (new BeatStarsExportNormalizer)->normalize($export, 'export.csv', $mapping);
-        $this->assertSame($result, (new BeatStarsExportNormalizer)->normalize($export, 'export.csv', $mapping));
+        // Byte-identical rather than object-identical: the source-value maps are JSON objects (stdClass).
+        $this->assertSame(CanonicalJson::encode($result), CanonicalJson::encode((new BeatStarsExportNormalizer)->normalize($export, 'export.csv', $mapping)));
         $this->assertSame(['rows' => 4, 'normalized' => 4, 'withheld' => 0, 'findings' => 0, 'sheet_findings' => 0, 'row_findings' => 0], $result['counts']);
         $this->assertSame([], $result['findings']);
         $this->assertFalse($result['applied']);
@@ -447,6 +448,26 @@ class BeatStarsExportNormalizerTest extends TestCase
             ['license' => 'SYNTHETIC Exclusive', 'license_column' => null, 'price_column' => 'Exclusive Price']], $mapping['offers']);
         $this->assertNotContains('marketing_consent', BeatStarsExportMapping::FIELDS);
         $this->assertNotContains('email', BeatStarsExportMapping::FIELDS);
+    }
+
+    public function test_numeric_source_labels_stay_object_keys_in_the_reports(): void
+    {
+        $rows = array_map(static function (array $row, int $index): array {
+            $row[8] = $index % 2 === 0 ? '1' : '0';
+            $row[9] = $index % 2 === 0 ? '10' : '11';
+
+            return $row;
+        }, $this->rows(), array_keys($this->rows()));
+        $mapping = $this->mapping(['visibility_values' => (object) ['0' => 'draft', '1' => 'public'],
+            'licenses' => (object) ['10' => 'synthetic-basic', '11' => 'synthetic-premium', 'SYNTHETIC Exclusive' => 'synthetic-exclusive']]);
+        $result = (new BeatStarsExportNormalizer)->normalize($this->csv($rows), 'export.csv', $mapping);
+        $report = new BeatStarsDryRunReport;
+        $json = json_decode($report->json($result), false, 64, JSON_THROW_ON_ERROR);
+        $this->assertEquals((object) ['0' => 'draft', '1' => 'public'], $json->mapping->visibility_values);
+        $this->assertEquals((object) ['10' => 'synthetic-basic', '11' => 'synthetic-premium', 'SYNTHETIC Exclusive' => 'synthetic-exclusive'], $json->mapping->licenses);
+        $markdown = $report->markdown($result);
+        $this->assertStringContainsString('Visibility values: `0` → `draft`, `1` → `public`.', $markdown);
+        $this->assertStringContainsString('Known license names: `10`, `11`, `SYNTHETIC Exclusive`.', $markdown);
     }
 
     public function test_markdown_table_cells_keep_backslashes_and_pipes_inside_their_cell(): void

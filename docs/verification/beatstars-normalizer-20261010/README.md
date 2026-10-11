@@ -286,6 +286,22 @@ probe); bare CRs, including old Mac line endings, report as `export_csv_quotes`.
   a doubled backslash displays as two; the JSON report stays the authoritative copy. Evidence:
   `evidence/codex-markdown-backslash-red-green.txt` (red on `20f5dc9`; 90 unit and 28 feature tests green).
 
+The delta review of `20f5dc9..0e84364` returned APPROVE (`independent-review-0e84364-DECISION.md`). Its renders
+through `league/commonmark` and pandoc GFM keep every table's cell count for values with backslashes, pipes,
+backticks, HTML and a leading `#`. Informational, unchanged: inline Markdown or HTML in an operator's own value
+renders in plain cells of the private local report, and a backtick in a value ends its code span early without
+splitting the row. (The docs items above landed in `0e84364`, the second commit after `20f5dc9`.)
+
+## Codex round on `0e84364`
+
+- **Numeric source labels (P2).** PHP turns a numeric-string key such as `"0"` into an integer, so a mapping
+  with visibility codes `"0"` and `"1"`, or numeric license names, was reported as a JSON list in
+  `mapping.visibility_values` or `mapping.licenses`, which lost the declared source labels. Lookups were
+  unaffected. The effective mapping in the result now carries both maps as JSON objects, and the Markdown report
+  reads them as objects. Before the fix, the same input would also have made the Markdown report fail on
+  integer license names under strict types. Evidence: `evidence/codex-numeric-source-labels-red-green.txt` (red
+  on `0e84364`; 91 unit and 28 feature tests green).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the

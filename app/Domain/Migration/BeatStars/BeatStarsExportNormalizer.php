@@ -160,7 +160,10 @@ final class BeatStarsExportNormalizer
             'applied' => false, 'database_writes' => 0,
             'export' => ['name' => $exportName, 'sha256' => hash('sha256', $exportBytes), 'bytes' => strlen($exportBytes),
                 'columns' => $headers, 'records' => count($sheet['records'])],
-            'mapping' => ['sha256' => hash('sha256', $mappingBytes)] + $mapping,
+            // Source-value maps stay JSON objects: PHP turns numeric-string keys such as "0" into integers, and a
+            // contiguous integer-keyed array would otherwise encode as a list and lose the declared source labels.
+            'mapping' => ['sha256' => hash('sha256', $mappingBytes)] + array_replace($mapping, [
+                'visibility_values' => (object) $mapping['visibility_values'], 'licenses' => (object) $mapping['licenses']]),
             'counts' => ['rows' => count($entries), 'normalized' => $normalized, 'withheld' => count($entries) - $normalized,
                 'findings' => count($findings), 'sheet_findings' => count($sheetFindings),
                 'row_findings' => count($findings) - count($sheetFindings)],
