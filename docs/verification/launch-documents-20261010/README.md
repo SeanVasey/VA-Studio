@@ -21,7 +21,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `independent-review-58cc803-second-DECISION.md` | A second independent review of `58cc803`: REQUEST CHANGES, five conditions (copied verbatim). Its conditions on session and IP handling, the missing sections and the scanning order had already been met by `8838dd7` and `96db5ff`; pass 6 adds the quarantine wording to the scanning row and applies the rest. |
 | `pass6-source-checks.txt` | Pass 6, for the second review: the remaining statements at `7468661` (red), the sources the corrections cite (the unthrottled Stripe webhook route, the test-account gate, the quarantined media source record), and the corrected lines (green). |
 | `green-check-citations-pass6.txt` | Run after pass 6 and the guest-download correction. Pass 6 first recorded 244 citations here; the guest-download commit re-ran the check and overwrote the file with its 245-citation result (README 96 paths), which is what it now holds. `RESULT PASS`, exit 0. |
-| `green-check-citations-pass7.txt` | Final run, after the third Codex review: 245 citations across 3 documents (README 96, PRIVACY 90, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass7.txt` | Run after the third Codex review: 245 citations across 3 documents (README 96, PRIVACY 90, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass8.txt` | Final run, after the fourth Codex review (stale pre-#68 notes removed): the same 245 citations and path counts, `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -37,7 +38,7 @@ $ git diff --check
 (exit 0)
 ```
 
-The block above is the final run, `green-check-citations-pass7.txt`, after the third Codex review. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+The block above is `green-check-citations-pass7.txt`; the final run, `green-check-citations-pass8.txt`, after the fourth Codex review, has the same counts. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -105,13 +106,16 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 
 Citation check after this pass: `green-check-citations-pass7.txt`.
 
+## Contradictions resolved at integration
+
+These were reported by the lane and corrected in the integration commit, after checking that each gate calls
+`TestEnvironment::admitsTestCommerce()`, which admits `staging`:
+
+- `CLAUDE.md`, Project Notes, "§5 auth": now says production customer accounts don't exist yet (U-07) and synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`.
+- `docs/service-projects.md`, `docs/free-grants.md`, `docs/verification/customer-account-test-journey.md` and `docs/customer-test-self-service.md`: each now names `staging` with its gate.
+
 ## Contradictions reported, not edited
 
-Integration update: the `CLAUDE.md` Project Notes line and the four guides that said `local`/`testing` only (`docs/service-projects.md`, `docs/free-grants.md`, `docs/verification/customer-account-test-journey.md`, `docs/customer-test-self-service.md`) were corrected at integration, after checking that each gate calls `TestEnvironment::admitsTestCommerce()`. The other items below remain as reported.
-
-- `CLAUDE.md`, Project Notes, "§5 auth": "customer accounts don't exist yet (U-07)". Test customer accounts exist and are documented (`docs/verification/customer-account-test-journey.md`; `docs/customer-test-self-service.md`; `routes/customer.php`); production identity remains default-off (`config/production-customer-identity.php`). U-07 (production enrollment, recovery and claim policy) is still open, so the accurate statement is that production customer accounts do not exist yet.
 - `resources/contracts/test-v2/PROVENANCE.md`: "current issuance profile and policy still select v1". The registry selects v2 (`app/Domain/Contracts/ContractRenderProfileRegistry.php`, `CURRENT_VERSION = 'test-buyer-pdf-v2'`; `app/Domain/Contracts/ContractIssuancePolicy.php`, `profile => 'test-buyer-pdf-v2'`; `docs/test-contract-issuance.md`, "The current development runtime selects v2"). The file is frozen and was not changed.
 - `docs/architecture/decision-register.md`, D-02: "Target GitHub repository name is VASEYAUDIO". Left as history; the 2026-10-10 entry records the current repository beside it.
-- `docs/service-projects.md` ("activates it only in `local` or `testing`") and `docs/free-grants.md` ("mint only `test_only: true` definitions in `local` or `testing`") also predate PR #68: `ServiceProjectPolicy`, `FreeGrantPolicy` and `FreeGrantDefinitions` call `TestEnvironment::admitsTestCommerce()`. `PRIVACY.md` sections 2.7 and 2.8 follow the code. Outside this lane's owned files.
-- `docs/verification/customer-account-test-journey.md` ("enables the feature only in `local` or `testing`") and `docs/customer-test-self-service.md` ("The environment must be `local` or `testing`") predate PR #68: the code admits `staging` through `TestEnvironment::admitsTestCommerce()`. Outside this lane's owned files; reported for the integrator.
 - `docs/service-projects.md` ("No private file intake/scanning") and the comment in `config/services-projects.php` (no attachment authority) contradict the registered `test_service_project_v1` attachment family (`app/Providers/SupportAttachmentServiceProvider.php`). `PRIVACY.md` section 2.6 follows the code. Outside this lane's owned files.
