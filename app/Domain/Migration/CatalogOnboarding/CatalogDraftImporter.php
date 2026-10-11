@@ -63,6 +63,8 @@ final class CatalogDraftImporter
         (new PrivateSourceFiles)->unchanged($source);
 
         return (new PrivateSourceFiles)->leased($source, fn (): array => DB::transaction(function () use ($source, $release, $review, $limit, $actor, $verifyExternal): array {
+            // Storage is pinned before any lock or write, so no engine change can land between admission and the first write.
+            (new CatalogDatabaseEvidence)->lockedStorage();
             [$current, $authority] = $this->actor($actor);
             $this->require($review['actor_id'] === (int) $current->id && $review['actor_sha256'] === $authority['sha256']);
             // Staff is fenced first; batch/mapping locks precede all ordinary track writer locks.

@@ -472,6 +472,16 @@ class PersistentCatalogDraftImportTest extends TestCase
         $review = $importer->review($source, $this->release, $actor);
         $this->changeSchema($case);
         $before = $this->evidence();
+        if ($case === 'non-transactional-storage') {
+            // The in-transaction pin refuses the same drift on its own, so a change that lands after admission
+            // but before the first write is refused too.
+            try {
+                DB::transaction(static fn () => (new CatalogDatabaseEvidence)->lockedStorage());
+                $this->fail('Non-transactional storage pinned');
+            } catch (RuntimeException $error) {
+                $this->assertSame('catalog_target_invalid', $error->getMessage());
+            }
+        }
         foreach (['review', 'apply'] as $operation) {
             try {
                 $operation === 'review' ? $importer->review($source, $this->release, $actor)

@@ -314,6 +314,41 @@ final class CatalogDatabaseEvidence
         return $rows;
     }
 
+    /**
+     * Pin the storage of every evidence table for the caller's open transaction, before its first write.
+     *
+     * schema() runs before the transaction, so another session could change a table's engine in between.
+     * On MySQL, opening each table inside the transaction takes a shared metadata lock that an engine change
+     * must wait for until commit; the engines are then required to be InnoDB. On SQLite the journal mode
+     * cannot change while a transaction is open, so it is required not to be off.
+     */
+    public function lockedStorage(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        if (DB::transactionLevel() < 1) {
+            throw new RuntimeException('catalog_target_invalid');
+        }
+        if (DB::getDriverName() === 'sqlite') {
+            if (strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off') {
+                throw new RuntimeException('catalog_target_invalid');
+            }
+
+            return;
+        }
+        if (DB::getDriverName() !== 'mysql') {
+            throw new RuntimeException('catalog_target_invalid');
+        }
+        foreach (self::TABLES as $table) {
+            $pdo->query('SELECT 1 FROM `'.$table.'` LIMIT 0')->fetchAll();
+        }
+        $statement = $pdo->query("SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'"
+            ." AND TABLE_NAME IN ('".implode("', '", self::TABLES)."')");
+        $engines = $statement->fetchAll(PDO::FETCH_KEY_PAIR);
+        if (count($engines) !== count(self::TABLES) || array_unique(array_values($engines)) !== ['InnoDB']) {
+            throw new RuntimeException('catalog_target_invalid');
+        }
+    }
+
     public function target(array $excludeTracks = [], array $excludeMappings = [], array $excludeAudits = []): array
     {
         $snapshot = [];
