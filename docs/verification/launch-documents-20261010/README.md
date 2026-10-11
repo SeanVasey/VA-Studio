@@ -22,23 +22,24 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `pass6-source-checks.txt` | Pass 6, for the second review: the remaining statements at `7468661` (red), the sources the corrections cite (the unthrottled Stripe webhook route, the test-account gate, the quarantined media source record), and the corrected lines (green). |
 | `green-check-citations-pass6.txt` | Run after pass 6 and the guest-download correction. Pass 6 first recorded 244 citations here; the guest-download commit re-ran the check and overwrote the file with its 245-citation result (README 96 paths), which is what it now holds. `RESULT PASS`, exit 0. |
 | `green-check-citations-pass7.txt` | Run after the third Codex review: 245 citations across 3 documents (README 96, PRIVACY 90, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass8.txt` | Final run, after the fourth Codex review (stale pre-#68 notes removed): the same 245 citations and path counts, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass8.txt` | Run after the fourth Codex review (stale pre-#68 notes removed): the same 245 citations and path counts, `RESULT PASS`, exit 0. |
+| `green-check-citations-pass9.txt` | Final run, after the fifth Codex review: 246 citations across 3 documents (README 96, PRIVACY 91, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
 ```
 $ python3 -I docs/verification/launch-documents-20261010/check-citations.py
 docs/legal/README.md: 96 distinct cited paths
-docs/legal/PRIVACY.md: 90 distinct cited paths
+docs/legal/PRIVACY.md: 91 distinct cited paths
 docs/legal/TERMS.md: 59 distinct cited paths
-checked 245 citations across 3 documents
+checked 246 citations across 3 documents
 RESULT PASS
 exit 0
 $ git diff --check
 (exit 0)
 ```
 
-The block above is `green-check-citations-pass7.txt`; the final run, `green-check-citations-pass8.txt`, after the fourth Codex review, has the same counts. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+The block above is the final run, `green-check-citations-pass9.txt`, after the fifth Codex review. The earlier 245-citation runs are `green-check-citations-pass6.txt` to `green-check-citations-pass8.txt`. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -104,7 +105,10 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 | TERMS said previews are "for listening and evaluation" | The sentence states no purpose; acceptable use of previews stays under Sean to decide, item 11 |
 | TERMS said the application retries session creation for 15 minutes | There is no automatic retry queue; caller-initiated start or reconciliation requests may retry only within the retained 15-minute window (`docs/hosted-test-checkout.md`) |
 
-Citation check after this pass: `green-check-citations-pass7.txt`.
+| PRIVACY section 5 said the Stripe webhook is the only unthrottled public endpoint | It also names the production customer-identity pages and sign-out (`routes/production-customer-identity.php`), a default-off feature; a statement-level scan of every route file found no other route without a throttle |
+| `CLAUDE.md` Working facts said commerce, contracts, delivery and promotions run only in local/testing | It now names the hosted `staging` rehearsal (Stripe test mode only, staff MFA; PR #68), matching the Project Notes auth line |
+
+Citation check after this pass: `green-check-citations-pass9.txt`.
 
 ## Contradictions resolved at integration
 
