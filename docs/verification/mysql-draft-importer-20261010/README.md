@@ -279,6 +279,23 @@ split, and "Not verified" records the drift case's database privileges and lefto
 Its LOW finding that `FOR SHARE` is not proved table by table stands: mutant mC, which keeps `FOR SHARE`
 only on `audit_events`, survives the MySQL nested case. No code changed after `6137ec9`.
 
+## Codex review on PR #90: non-transactional storage
+
+Codex (P1) found that MySQL admission compared the engine of the two owned tables only, so a participating
+table such as `audit_events` moved to MyISAM would keep a failed segment's audit rows after rollback. `1af8c94`
+refuses any non-InnoDB base table in the target schema, and on SQLite refuses `journal_mode=OFF`, the
+counterpart that disables rollback. A new `non-transactional-storage` schema-drift data set drops the foreign
+keys touching `audit_events` and moves it to MyISAM on MySQL, and turns the journal off on SQLite.
+
+| Run | Result |
+| --- | --- |
+| Red, fix stashed, data set `#10` only | SQLite and MySQL 8.0.46 both fail with `Foreign installed schema admitted: non-transactional-storage review` (`local-evidence/codex-p1/red.txt`) |
+| Green on `1af8c94`, SQLite, whole file | OK, 52 tests, 299 assertions |
+| Green on `1af8c94`, MySQL 8.0.46, every schema-drift data set plus the happy-path apply case | OK, 12 tests, 106 assertions, 26.5 minutes (`local-evidence/codex-p1/green.txt`) |
+
+The rest of the file was not re-run on MySQL after this change. The schema digest is unchanged, because the
+engine check is separate from the compared owned objects.
+
 ## Policy self-tests (second session; third-session re-runs marked)
 
 | Command | Result |
