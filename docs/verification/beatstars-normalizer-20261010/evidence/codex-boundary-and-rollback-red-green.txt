@@ -1,0 +1,23 @@
+# Codex P2s on PR #89 (review of ab17e80) and independent review conditions
+
+## Red (fix stashed; new tests only)
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_each_row_defect_is_a_finding_on_that_row_only@padded rights reference with data ([3, 12, 'SYNTHETIC-RIGHTS-0004 '], 'invalid_rights_reference', 'Rights Reference')
+2) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_explicit_slug_and_currency_columns_are_checked_exactly
+FAILURES!
+Tests: 79, Assertions: 695, Failures: 2.
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@export under another git checkout with data ('input_not_private')
+2) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@repository file outside the fixtures with a synthetic mapping with data ('input_inside_repository')
+FAILURES!
+Tests: 19, Assertions: 141, Failures: 2.
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@write failure leaves no partial output with data ('output_write')
++    2 => 'beatstars-dry-run.json.pending',
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+
+## Green
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (79 tests, 704 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (20 tests, 157 assertions)
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars <changed tests>
+{"tool":"pint","result":"passed"}

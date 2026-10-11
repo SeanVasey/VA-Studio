@@ -1,0 +1,324 @@
+# BeatStars export normalizer and dry run — lane evidence (2026-10-10)
+
+Branch `harness/beatstars-normalizer` from main `f57e7256891d0d3c117e151a36f7fb967c724ab7`.
+Tested commits: `3519dc09ff318c4c6f7ab2a9c3f776d72ddffdd8` (feature) and
+`8ceb96b8b01721a868a04f2629c7b151d6837767` (documentation, no code change).
+Development lane under Sean's 2026-10-06 CI cost policy: these are focused local checks on
+SQLite in the Claude Code container (PHP 8.4.26, PHPUnit 12.5.34), not Foundation CI and not
+final acceptance. The lane itself pushed nothing; the integrator pushed it as PR #89 and applied the
+review and Codex fixes recorded below. `PLAN.md` was committed before implementation.
+
+## What was built
+
+- `app/Domain/Migration/BeatStars/`: `BeatStarsExportMapping` (operator mapping admission),
+  `BeatStarsExportSheet` (CSV admission), `BeatStarsExportNormalizer` (pure mapping-driven
+  normalizer to `vasey-private-catalog-drafts-v1`), `BeatStarsDryRunReport` (deterministic
+  JSON/Markdown), `BeatStarsDryRunFiles` (private output boundary), `CellText` (shared bounds).
+- `scripts/migration/beatstars-dry-run.php`: autoload-only CLI; no Laravel boot, no database.
+- `tests/Fixtures/migration/beatstars-synthetic/`: synthetic sheet, findings copy, mapping, README.
+- `tests/Unit/Migration/BeatStarsExportNormalizerTest.php`, `tests/Feature/Migration/BeatStarsDryRunCommandTest.php`.
+- `docs/migration/beatstars-export-normalization.md`.
+
+## Acceptance criteria from PLAN.md
+
+| Criterion | Result | Evidence |
+| --- | --- | --- |
+| A1 synthetic sheet: zero findings, 4 normalized, decodable `catalog.json` | met | `evidence/unit-normalizer.txt`, `evidence/cli-fixture-runs.txt` (`dry_run_clean`, exit 0) |
+| A2 findings copy: exactly `unmapped_column` (sheet, `Likes`) and `missing_rights_reference` (row 3); no normalized rows | met | `evidence/cli-fixture-runs.txt` (`findings":2`, `normalized":0`, exit 3, no `catalog.json`); unit test `test_one_unmapped_column_and_one_missing_rights_reference_are_exactly_the_findings_and_withhold_rows` |
+| A3 source id, `row_sha256` and `source_record_sha256` preserved per normalized entry | met | unit test (fixture test asserts `record_key`, hashes, and equality with the decoded snapshot records) |
+| A4 missing/non-numeric price, unknown license, duplicate id, repeated row hash, unknown visibility, invalid metadata are findings, never defaults | met | unit test data providers `rowFindings` (24 cases), duplicate and sheet-structure tests |
+| A5 byte-identical JSON and Markdown across runs; identical rerun rewrites nothing; different existing files refused | met | `evidence/cli-fixture-runs.txt` (identical SHA-256 in two directories, rerun `written:[]`), feature test (`output_differs` refusal) |
+| A6 nothing written outside the output directory; zero SQL in-process; catalog/draft tables unchanged on SQLite | met for the tested paths | feature test: `QueryExecuted` listener records zero statements, `CatalogDatabaseEvidence` target unchanged, `tracks`/`catalog_import_*`/`audit_events` counts 0; refusal cases leave the directory listing unchanged |
+| A7 marketing consent never inferred | met | mapping has no consent field (`mapping_columns` refusal for `marketing_consent`/`customer_email`); report `statements.marketing_consent = not_inferred`; snapshot bytes contain no `consent` |
+
+Additional proof: the emitted `catalog.json`, staged with the export at `raw/export.csv`, is
+admitted by `PrivateSourceFiles::snapshot` with `source_sha256` equal to the report's
+`snapshot_sha256` (`bd893c40…83968`), in both the feature test and `evidence/cli-fixture-runs.txt`.
+
+## Commands and counts
+
+| Check | Command (SQLite env, direct PHPUnit) | Result |
+| --- | --- | --- |
+| Normalizer unit test (no database) | `-- tests/Unit/Migration/BeatStarsExportNormalizerTest.php` | OK, 71 tests, 403 assertions, 0 skipped (`evidence/unit-normalizer.txt`) |
+| Dry-run command feature test (SQLite, real CLI subprocess) | `-- tests/Feature/Migration/BeatStarsDryRunCommandTest.php` | OK, 13 tests, 110 assertions, 0 skipped (`evidence/feature-dry-run-command.txt`) |
+| Style, changed PHP files only | `vendor/bin/pint --test <6 domain files> scripts/migration/beatstars-dry-run.php <2 tests>` | passed (`evidence/pint.txt`) |
+| Adjacent onboarding tests, unchanged files | 4 files (`PersistentCatalogDraftImportTest`, `NormalizedCatalogSourceTest`, `CatalogDryRunTest`, `CatalogDryRunCommandTest`) | OK, 132 tests, 836 assertions (`evidence/regression.txt`) |
+| Whole Unit suite | `--testsuite Unit` | OK, 1070 tests, 6607 assertions, 1 pre-existing native-MySQL-only skip (`evidence/regression.txt`) |
+| Real CLI on the fixture | `php scripts/migration/beatstars-dry-run.php --export … --mapping … --output …` | clean: exit 0, 3 files mode 0600; findings copy: exit 3, 2 files (`evidence/cli-fixture-runs.txt`) |
+
+"Red first" does not apply: this lane adds a new capability rather than fixing a refusal or
+defect; the CLI and classes did not exist before commit `3519dc09`.
+
+## Independent review of ae1db1e and fixes (addendum)
+
+The independent review returned **APPROVE WITH CONDITIONS**
+(`independent-review-ae1db1e-DECISION.md`, copied verbatim). Both conditions are applied in
+`fa34fd5bc6689d174815955b97c5f1b6a1170ae8`:
+
+1. An oversize snapshot is no longer `internal_error`. A clean sheet whose drafts-v1 snapshot
+   would exceed the decoder's 1,048,576-byte cap is now the sheet finding `snapshot_too_large`
+   ("N bytes, maximum 1048576"). Every row is withheld, both reports are written, no
+   `catalog.json` is written, and the CLI exits 3. The limit and the split-the-export remedy
+   are in `docs/migration/beatstars-export-normalization.md`. New unit test: over the limit
+   (120 rows) and under it (40 rows, admitted by the decoder). New feature test: the real CLI on
+   a 617,530-byte synthetic sheet.
+2. New unit cases for one-decimal and sub-dollar prices: `12.5` gives 1250, `$0.5` gives 50,
+   `$29.9` gives 2990 and `0.05` gives 5. Mutation M6 now fails exactly this test (1 of 73).
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Red: new tests against the unchanged normalizer | the oversize unit test errors with `normalizer_output_rejected`; the feature test gets `dry_run_refused`/`internal_error`, exit 1 | `evidence/review-fixes-red-green.txt` |
+| Red: M6 mutant | 1 failure in 73 (1205 for 1250, 5 for 50) | `evidence/review-fixes-red-green.txt` |
+| Normalizer unit test | OK, 73 tests, 662 assertions | `evidence/review-fixes-red-green.txt` |
+| Dry-run command feature test | OK, 14 tests, 121 assertions | `evidence/review-fixes-red-green.txt` |
+| Pint on lane PHP files | passed | `evidence/review-fixes-red-green.txt` |
+| Adjacent onboarding tests | OK, 132 tests, 836 assertions | `evidence/review-fixes-regression.txt` |
+| Whole Unit suite | OK, 1072 tests, 6866 assertions, 1 skip (same count as before; not listed) | `evidence/review-fixes-regression.txt` |
+| Real CLI | the clean fixture outputs are byte-identical to the earlier run (`catalog.json` `bd893c40…83968`); findings copy exit 3; oversize sheet exit 3 with `snapshot_too_large`, 2 files at mode 0600 | `evidence/cli-review-fixes.txt` |
+
+The Markdown note under sheet findings now names each remedy. This changes the findings copy's
+`beatstars-dry-run.md` hash (`f17e8372…`), but not the clean run's outputs.
+
+The review's non-blocking recommendations are not applied in this lane: a finding when slug
+derivation drops non-ASCII letters, and refusing duplicate keys in the mapping JSON. They are
+returned to the integrator as remaining work.
+
+## Delta review of b329686
+
+An independent delta review of the condition commits `ae1db1e..b329686` returned APPROVE with no
+conditions (`independent-review-b329686-DECISION.md`). Its LOW finding stands as follow-up work: no
+test pins the 1,048,576 / 1,048,577-byte snapshot boundary, so two boundary mutants survive, and the
+normalizer's limit is a separate literal from the decoder's. Every such failure mode fails closed.
+
+## Codex review on PR #89
+
+Codex (P2) found that a padded source id such as `" bs-synthetic-0001 "` was trimmed with no finding.
+Because the row hash excludes the source-id cell, neither the exact id nor its bytes survived. The
+normalizer now validates the cell as exported, so a padded id is `invalid_source_id` and the row is
+withheld. Two data sets cover a space-padded and a tab-suffixed id; red before the fix and green after
+(`evidence/codex-padded-source-id-red-green.txt`: 75 unit tests, 14 feature tests, Pint clean).
+
+Codex's second review (of `144ee1d`) raised two more P2s, both fixed with red/green evidence
+(`evidence/codex-export-boundary-and-exact-values-red-green.txt`):
+
+- The export was admitted on type and size alone, so a real export inside the checkout or a
+  group-readable copy was read without complaint. The export must now be a caller-owned, owner-only,
+  single-link file outside the checkout (`input_not_private`); only a mapping declaring
+  `synthetic_fixture` may read one from inside it (`input_inside_repository`).
+- Visibility values were trimmed before lookup, so ` Public ` matched `Public`. Visibility, license
+  names and a currency column are now matched exactly as exported; padding is a finding.
+
+Codex's third review (of `1d744db`) raised two more P2s, fixed in the next commit:
+
+- When a mapped column is missing, the early path trimmed the source id, so a padded id was shortened
+  and could collide with another row as a false duplicate. That path now checks the id exactly as
+  `interpret()` does (`invalid_source_id` / `missing_source_id`). A new unit case was red before
+  (it reported `duplicate_source_id` on rows 1 and 2) and green after
+  (`evidence/codex-missing-column-source-id-red-green.txt`).
+- Inputs were read by path after a separate `lstat`, so a same-size rewrite during the read could be
+  hashed. Each input is now read through one descriptor whose device, inode, size, mtime and ctime must
+  match the named file before and after the read (`input_changed` otherwise), as
+  `PrivateSourceFiles::read` does. No test exercises the concurrent rewrite: it needs a second process
+  timed inside the read, which a deterministic test cannot arrange; the unchanged-file path is covered by
+  every CLI test.
+
+## Independent review of the Codex fixes (`58d16e2..ab17e80`) and the follow-up
+
+The independent review of `58d16e2..ab17e80` returned APPROVE WITH CONDITIONS
+(`independent-review-ab17e80-DECISION.md`). Codex's fourth review (of `ab17e80`) raised two more P2s.
+Both are fixed in the next commit with the review's conditions:
+
+| Item | Change |
+| --- | --- |
+| Codex: reuse the full private-source boundary; review L1, L4, I2 | An export outside the checkout now goes through `PrivateSourceFiles::protectedFile`: privacy (uid, `0600`, one link) is checked on the same stat it reads, the parent must be a caller-owned `0700` directory whose own parent is caller-owned and not group- or world-writable, every ancestor must be non-group/world-writable unless root-owned and sticky, and no ancestor may contain `.git`. New refusal case: a `0600` export under another checkout's `.git` (`input_not_private`). |
+| Codex: roll back partial outputs | All outputs are staged as synced `.pending` files, then renamed; any failure removes every file this run created. New refusal case runs the CLI under a 4 KiB file-size limit: before the fix it left `beatstars-dry-run.json.pending`; after it the directory is empty. |
+| Review optional | An export inside this checkout is admitted only under `tests/Fixtures/` with a `synthetic_fixture` mapping. New refusal case: `composer.json` with the fixture mapping. |
+| Review condition 3 | Rights references and slugs are now exact as well; padding is `invalid_rights_reference` / `invalid_slug`. Descriptive text stays trimmed, with the raw cells in `raw_metadata`. |
+| Review conditions 2 and 4 | Stated here: file times are whole seconds, so a same-size, same-inode rewrite within one second of the first `lstat` is not detected. No test drives a concurrent rewrite, so mutants of the three identity comparisons in `input()` survive (the review's I1); the uid mutant it found is moot now that `protectedFile` checks ownership. The guide now states the exact `0600` rule. |
+
+Red/green: `evidence/codex-boundary-and-rollback-red-green.txt` (79 unit tests, 20 feature tests).
+
+Codex's fifth review (of `7acdd5d`) raised a P1 and two P2s:
+
+- P1, fixed: `fgetcsv` accepts a quoted field that never closes (a truncated export) or text after a
+  closing quote, and returns a cell that differs from the source bytes. The sheet reader now refuses
+  both before parsing (`export_csv_quotes`).
+- P2, fixed: the output directory may not sit under any Git working tree (a `.git` in any ancestor
+  is `output_inside_repository`), not only this checkout.
+- P2, not changed: a `column_count_mismatch` row keeps `source_id` null and hashes every cell. When the
+  cell count does not match the header, nothing shows which cell moved, so the positional source id
+  could belong to a neighbouring column; taking it could report a wrong legacy identity or a false
+  duplicate. The row is withheld either way. The guide now states this rule.
+
+Red/green: `evidence/codex-quotes-and-output-git-red-green.txt` (81 unit tests, 21 feature tests); the
+clean fixture's `catalog.json` hash is unchanged (`bd893c40…`).
+
+The delta review of `7acdd5d` returned APPROVE WITH CONDITIONS (`independent-review-7acdd5d-DECISION.md`).
+Its conditions are met as follows:
+
+1. Run-level rollback test: the 4 KiB case fails inside the first staged file, so it only proves that
+   `stage()` removes its own `.pending`. A second feature case keeps an identical JSON report from an earlier
+   run, then runs a two-row sheet with long descriptions under a 6 KiB limit: the Markdown report stages and
+   `catalog.json` fails. With the run-level rollback loop deleted the case fails (it leaves
+   `beatstars-dry-run.md.pending`); with the code as committed only the earlier JSON report remains
+   (`evidence/rollback-run-level-red-green.txt`, 22 feature tests).
+2. Boundary wording: the guide, this README and the code comment now state the full rule (caller-owned parent,
+   the ancestor rule, root-owned sticky directories excepted) and tell operators to keep the export under their
+   home, not directly under `/tmp`.
+3. Surviving mutants, recorded as accepted gaps: in `run()`, recording a published path in `$created` and the
+   `! exists()` check before `rename` (the check is check-then-act; it matters only if the same user writes into
+   the `0700` output directory at the same moment); in `export()`, the comparison of the two reads' bytes. Also
+   still untested: the three identity comparisons in `input()` and a concurrent rewrite within one second.
+
+## Not verified here
+
+- Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,
+  per-license price layout and visibility vocabulary are unknown and must be declared in the
+  mapping. Only the synthetic sheet was exercised.
+- MySQL: the dry run opens no database connection on any driver, so no MySQL run was made and
+  none would add evidence. The container's mysqld is 8.0.46 (CI: 8.4.11); it was not started.
+- The Feature suite as a whole, browser specs and Foundation CI. The independent migration
+  review assessed `ae1db1e` (addendum above), and the delta review assessed `b329686` (above).
+- Applying the snapshot through `CatalogDraftImporter` (separately authorized; not run).
+- `composer audit` / `npm audit`: no dependency was added or changed.
+
+## Delta review of `7acdd5d..82993ff`
+
+REQUEST CHANGES (`independent-review-82993ff-DECISION.md`): `fgetcsv` skips space, tab, VT, FF and CR before
+a quote and then parses an enclosure, while the quote check read the same bytes as an unquoted field, so
+` "legacy-123` (unterminated) and a tab before `"x"-1` were still admitted. The check now refuses whitespace
+followed by a quote at the start of a field (`export_csv_quotes`). New unit cases: a space then an
+unterminated quote and a tab then a quote with text after its close (red before, green after); a bare carriage
+return after a closing quote, and a feature case with a `.git` file (not a directory) above the output
+directory, pin behaviour that surviving mutants could otherwise break. Evidence:
+`evidence/whitespace-quote-red-green.txt` (84 unit tests, 23 feature tests). The reviewer's fuzzing of the
+suggested variant found no admitted misparse and no refusal outside the whitespace-before-quote class. An
+operator whose home directory is itself a Git repository (`~/.git`) cannot use an output directory under it.
+
+The delta re-review of `82993ff..67d7a89` returned APPROVE (`independent-review-67d7a89-DECISION.md`): all
+three conditions met, no new defects. Its fuzzing of the committed check over 300k inputs per alphabet
+admitted no quote misparse and refused nothing outside the whitespace-before-quote class; the remaining
+differences between `fgetcsv` and a strict parser all involve bare CR in unquoted cells and predate this lane.
+Removing CR from the whitespace set survives the tests (VT and FF are not tested individually); the fuzz
+covers those bytes.
+
+## Codex round on `d880e3c`
+
+Two P2 findings, both fixed:
+
+- A header with leading or trailing whitespace (` Track ID `) was trimmed before the declared-column checks,
+  so a dry run could be clean against a header the operator never declared, and `export.columns` recorded
+  the sanitized name. Such a header is now refused (`export_header`), consistent with source ids and
+  constant values being matched exactly as exported.
+- Only the output directory itself was checked. Under a group- or world-writable, non-sticky parent another
+  local user could rename or replace it after admission. Every ancestor must now be owned by the caller or
+  root and not group- or world-writable unless root-owned and sticky (`/tmp`); otherwise `output_directory`.
+  The directory's dev/ino is also pinned from admission through publication.
+
+Evidence: `evidence/codex-padded-header-and-output-ancestors-red-green.txt` (red on the old source; 86 unit and
+24 feature tests green).
+
+The delta review of `d880e3c..65f6107` returned APPROVE WITH CONDITIONS
+(`independent-review-65f6107-DECISION.md`). L1: after a post-publication identity mismatch the rollback unlinked
+by path, so it could delete a file in the replacement directory. L2: one evidence sentence overstated coverage.
+Both are met in the next commit.
+
+## Codex round on `65f6107`
+
+Two P2 findings, both fixed, together with the delta review's conditions:
+
+- **A quote inside an unquoted field.** `fgetcsv` keeps such a quote literally. `id,x"foo,R1` followed by
+  `bar",z,R2` is read as two records, while a writer that meant the quote to open a multi-line field
+  wrote one. The sheet now follows strict RFC 4180 quoting and refuses any quote inside an unquoted field
+  (`export_csv_quotes`). This replaces the earlier whitespace-before-quote rule, which is a subset of it. It
+  reverses an earlier decision: in an earlier round, a bare quote mid-field (`12" vinyl`) was kept because
+  `fgetcsv` preserves it. A compliant export always quotes such a cell (`"12"" vinyl"`), and a non-compliant one
+  is now refused rather than read one way when it could have been meant another.
+- **Retained outputs no longer owner-only.** A retained output whose mode changed (for example to `0644`) was
+  still accepted as unchanged, and the importer's `PrivateSourceFiles` would then refuse that `catalog.json`.
+  Every retained output must now be a caller-owned `0600` file (`output_directory`).
+- **L1.** `stage()` records each file's device and inode. On rollback, a path is removed only while it still
+  names that inode. If the directory is swapped after publication, the run is refused, nothing in the
+  replacement is touched, and the published outputs stay in the moved original.
+- **L2.** The previous evidence file is corrected, and a parent writable by others (`0757`) is a new feature case.
+
+Evidence: `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt` (red on the old source; 88 unit
+and 26 feature tests green; the L1 swap probe).
+
+## Codex round on `3d6b755`
+
+- **Unchecked write into the sheet stream (P1).** The export bytes were written into `php://temp`
+  without checking the result. A short write after the stream spilled to disk would let `fgetcsv` parse a
+  prefix, and if that prefix ended on a record boundary the run could look complete. The sheet now uses
+  `php://memory`, which never spills, writes in a checked loop, and requires the stream size to equal the input
+  length (`export_unreadable`). No failure-injection test exists; see the evidence file.
+- **Real mappings were not held to the private boundary (P2).** The mapping names the BeatStars account and
+  the operator, but it was read with only the identity check. It now passes through the same
+  `PrivateSourceFiles` boundary as the export (`input_not_private`). It may be read from the checkout only
+  under `tests/Fixtures/` when it declares `synthetic_fixture` (`input_inside_repository`). Tests that used a
+  malformed or official mapping now write it as an owner-only file in the private test directory.
+
+Evidence: `evidence/codex-sheet-write-and-private-mapping-red-green.txt` (red on the old source; 88 unit and 28
+feature tests green).
+
+The delta review of `65f6107..3d6b755` returned APPROVE WITH CONDITIONS (`independent-review-3d6b755-DECISION.md`).
+Its 900k-input fuzz found no admitted quote in an unquoted cell and no refused RFC-valid input; L1 and L2 are met.
+Condition N1 (Low, older than that delta): a bare CR outside quotes was admitted, and `fgetcsv` strips it from
+the cell while another reader ends a record there. Outside quotes a CR must now begin a CRLF line ending
+(`export_csv_quotes`); evidence `evidence/review-3d6b755-bare-cr-red-green.txt` (red on `37b80be`; 89 unit and 28
+feature tests green). N3 is met by qualifying the guide's rollback sentence. Accepted, not changed: N2 (the
+rollback's inode match could hit a reused inode only if the caller or root deleted this run's file mid-run) and
+I1 (the inode-checked rollback, the retained-output uid check and exact `0600` versus `0400` have no killing
+test; the rollback is shown by the probe in `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt`).
+
+The delta review of `3d6b755..20f5dc9` returned APPROVE (`independent-review-20f5dc9-DECISION.md`). Its
+1.6M-input fuzz found the admitted set equal to strict RFC 4180 with LF or CRLF endings. Its two Low docs items
+are met in the next commit: `export_unreadable` is in the guide's reason codes, and the class docblock states
+that the mapping is private too. Informational, unchanged: a fixture-path mapping that does not declare
+`synthetic_fixture` and the `input_changed` byte comparison have no killing test (the code is correct by
+probe); bare CRs, including old Mac line endings, report as `export_csv_quotes`.
+
+## Codex round on `20f5dc9`
+
+- **Backslash before a pipe in a Markdown cell (P2).** The Markdown report escaped `|` but not `\`. A GFM
+  table reads a backslash and the next character as one escape, so `a\|b` became `a\\|b`, its pipe ended the
+  cell, and the rest of the row shifted. Backslashes are now doubled before pipes are escaped. Inside code spans
+  a doubled backslash displays as two; the JSON report stays the authoritative copy. Evidence:
+  `evidence/codex-markdown-backslash-red-green.txt` (red on `20f5dc9`; 90 unit and 28 feature tests green).
+
+The delta review of `20f5dc9..0e84364` returned APPROVE (`independent-review-0e84364-DECISION.md`). Its renders
+through `league/commonmark` and pandoc GFM keep every table's cell count for values with backslashes, pipes,
+backticks, HTML and a leading `#`. Informational, unchanged: inline Markdown or HTML in an operator's own value
+renders in plain cells of the private local report, and a backtick in a value ends its code span early without
+splitting the row. (The docs items above landed in `0e84364`, the second commit after `20f5dc9`.)
+
+## Codex round on `0e84364`
+
+- **Numeric source labels (P2).** PHP turns a numeric-string key such as `"0"` into an integer, so a mapping
+  with visibility codes `"0"` and `"1"`, or numeric license names, was reported as a JSON list in
+  `mapping.visibility_values` or `mapping.licenses`, which lost the declared source labels. Lookups were
+  unaffected. The effective mapping in the result now carries both maps as JSON objects, and the Markdown report
+  reads them as objects. Evidence: `evidence/codex-numeric-source-labels-red-green.txt` (red
+  on `0e84364`; 91 unit and 28 feature tests green).
+
+The delta review of `0e84364..b95afc1` returned APPROVE WITH CONDITIONS (`independent-review-b95afc1-DECISION.md`).
+Its one condition, a false README claim that the old Markdown report would throw a TypeError on integer license
+names, is met by removing that sentence: `array_map` converts the keys to strings, and only the JSON list
+collapse was a defect. Informational, unchanged: a mapping without a visibility column now reports
+`"visibility_values": {}` instead of `[]`, so a report retained from before this change differs on rerun
+(`output_differs`, by design), and an empty `constants` map still encodes as `[]`.
+
+## Integration scope and accepted gaps
+
+- `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the
+  lane's owned list. They are the integrator's edits, made deliberately at integration.
+- The snapshot cap has no test at exactly 1,048,576 and 1,048,577 bytes, so the boundary mutants (`>` to
+  `>=`, the newline counted or not) survive. Both directions fail closed: an over-cap snapshot is never
+  written. This boundary is deliberately left untested.
+
+## Lane hygiene
+
+The implementer left the worktree clean on `harness/beatstars-normalizer`. During integration the
+worktree also carried the integrator's uncommitted edits between commits, which one workflow re-review
+observed; the merged SHA is the one recorded in the handoff ledger. No `phpunit-ci-*` files were generated;
+no server was started; `vendor/` is a hard-link mirror of a sibling worktree and was not written.

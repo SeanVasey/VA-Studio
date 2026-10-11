@@ -1,0 +1,44 @@
+{
+    "schema_version": 1,
+    "purpose": "vasey-beatstars-export-mapping-v1",
+    "snapshot_id": "synthetic-beatstars-snapshot-1",
+    "source_system": "synthetic/beatstars-export:fixture",
+    "operator_reference": "SYNTHETIC mapping for automated tests only: no real account, catalog, prices, licenses or rights",
+    "acquisition_method": "synthetic_fixture",
+    "acquired_at": "2026-10-10T00:00:00Z",
+    "source_as_of": "2026-10-09T00:00:00Z",
+    "currency": "USD",
+    "slug_policy": "derive_from_title",
+    "columns": {
+        "source_id": "Track ID",
+        "title": "Title",
+        "bpm": "BPM",
+        "musical_key": "Key",
+        "genre": "Genre",
+        "mood": "Mood",
+        "tags": "Tags",
+        "description": "Description",
+        "visibility": "Status",
+        "rights_reference": "Rights Reference"
+    },
+    "constants": {
+        "artist": "SYNTHETIC Producer"
+    },
+    "visibility_values": {
+        "Public": "public",
+        "Private": "private",
+        "Draft": "draft",
+        "Sold": "sold"
+    },
+    "tag_separator": ";",
+    "licenses": {
+        "SYNTHETIC Basic": "synthetic-basic",
+        "SYNTHETIC Premium": "synthetic-premium",
+        "SYNTHETIC Exclusive": "synthetic-exclusive"
+    },
+    "offers": [
+        {"license_column": "Lease Name", "price_column": "Lease Price"},
+        {"license": "SYNTHETIC Exclusive", "price_column": "Exclusive Price"}
+    ],
+    "ignored_columns": ["Plays"]
+}

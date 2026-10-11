@@ -1,0 +1,40 @@
+# Real CLI after the review fixes at fa34fd5bc6689d174815955b97c5f1b6a1170ae8 (paths redacted; <fixtures> = tests/Fixtures/migration/beatstars-synthetic)
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export.csv --mapping <fixtures>/mapping.json --output <private>/clean-a
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"unchanged":[],"database_writes":0}
+exit=0
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export.csv --mapping <fixtures>/mapping.json --output <private>/clean-b
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"unchanged":[],"database_writes":0}
+exit=0
+$ sha256sum (clean-a, then clean-b)
+8f5965e3001f961edb72bc54fe4036b6128ef8fba82dbbd6ddaefa7eefa655d5  beatstars-dry-run.json
+6d760eea8ec66eb33889fccc120ac8a39da911bb6c35dcd75294062412b80672  beatstars-dry-run.md
+bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968  catalog.json
+8f5965e3001f961edb72bc54fe4036b6128ef8fba82dbbd6ddaefa7eefa655d5  beatstars-dry-run.json
+6d760eea8ec66eb33889fccc120ac8a39da911bb6c35dcd75294062412b80672  beatstars-dry-run.md
+bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968  catalog.json
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export.csv --mapping <fixtures>/mapping.json --output <private>/clean-a
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":[],"unchanged":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"database_writes":0}
+exit=0
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export-findings.csv --mapping <fixtures>/mapping.json --output <private>/findings
+{"code":"dry_run_findings","rows":4,"normalized":0,"withheld":4,"findings":2,"snapshot":"none","written":["beatstars-dry-run.json","beatstars-dry-run.md"],"unchanged":[],"database_writes":0}
+exit=3
+$ sha256sum <private>/findings/*
+55af5b1d97fee357ea1849c7a90d86fb443db58ce850bb25668995325e0d4b07  beatstars-dry-run.json
+f17e837293ec9dc3f4a2c215ab6014faf3166a7aea55145a13ffffcb1f331743  beatstars-dry-run.md
+$ wc -c <private>/large.csv (120 synthetic rows, 5,000-character descriptions)
+617530
+$ php scripts/migration/beatstars-dry-run.php --export <private>/large.csv --mapping <fixtures>/mapping.json --output <private>/large
+{"code":"dry_run_findings","rows":120,"normalized":0,"withheld":120,"findings":1,"snapshot":"none","written":["beatstars-dry-run.json","beatstars-dry-run.md"],"unchanged":[],"database_writes":0}
+exit=3
+$ ls -l <private>/large (mode, bytes, name)
+600 62468 beatstars-dry-run.json
+600 13115 beatstars-dry-run.md
+$ findings section of <private>/large/beatstars-dry-run.md
+## Findings
+
+| Scope | Row | Source id | Code | Column | Detail |
+| --- | --- | --- | --- | --- | --- |
+| sheet | — | — | `snapshot_too_large` | — | 1270425 bytes, maximum 1048576 |
+
+Sheet findings withhold every row: map or explicitly ignore each column, remove blank records, and split a sheet whose snapshot is too large into smaller exports, then rerun.
+
