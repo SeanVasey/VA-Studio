@@ -201,7 +201,8 @@ class BeatStarsDryRunCommandTest extends TestCase
             'symlinked mapping' => ['path'], 'output inside repository' => ['output_inside_repository'],
             'shared output directory' => ['output_directory'], 'foreign file in output' => ['output_directory_not_empty'],
             'different retained report' => ['output_differs'], 'retained snapshot without findings-free run' => ['output_differs'],
-            'bad mapping' => ['mapping_json'], 'export inside repository without a synthetic mapping' => ['input_inside_repository'],
+            'bad mapping' => ['mapping_json'], 'group-readable real mapping' => ['input_not_private'],
+            'repository file as the mapping' => ['input_inside_repository'], 'export inside repository without a synthetic mapping' => ['input_inside_repository'],
             'group-readable export' => ['input_not_private'], 'hard-linked export' => ['input_not_private'],
             'export under another git checkout' => ['input_not_private'],
             'repository file outside the fixtures with a synthetic mapping' => ['input_inside_repository'],
@@ -284,8 +285,8 @@ class BeatStarsDryRunCommandTest extends TestCase
                 chmod($output.'/'.$expected[2], 0600);
                 break;
             case 'mapping_json':
-                file_put_contents($this->base.'/mapping.json', '{');
-                $arguments[3] = $this->base.'/mapping.json';
+                // A real mapping must itself be private, so the malformed one is too.
+                $arguments[3] = $this->privateFile('mapping.json', '{');
                 break;
             case 'input_inside_repository':
                 if ($this->dataName() === 'repository file outside the fixtures with a synthetic mapping') {
@@ -293,13 +294,20 @@ class BeatStarsDryRunCommandTest extends TestCase
                     $arguments[1] = $this->repository.'/composer.json';
                     break;
                 }
-                // The checkout's synthetic export with a mapping that claims a real acquisition.
-                $mapping = json_decode((string) file_get_contents($this->fixtures.'/mapping.json'), true, 16);
-                $mapping['acquisition_method'] = 'official_export';
-                file_put_contents($this->base.'/mapping.json', json_encode($mapping));
-                $arguments[3] = $this->base.'/mapping.json';
+                if ($this->dataName() === 'repository file as the mapping') {
+                    // A mapping can name the account and the operator; only tests/Fixtures/ may hold one in the checkout.
+                    $arguments[3] = $this->repository.'/composer.json';
+                    break;
+                }
+                // The checkout's synthetic export with a private mapping that claims a real acquisition.
+                $arguments[3] = $this->privateFile('mapping.json', $this->officialMapping());
                 break;
             case 'input_not_private':
+                if ($this->dataName() === 'group-readable real mapping') {
+                    $arguments[3] = $this->privateFile('mapping.json', $this->officialMapping());
+                    chmod($arguments[3], 0640);
+                    break;
+                }
                 $directory = $this->privateDirectory();
                 if ($this->dataName() === 'export under another git checkout') {
                     // A private file inside some other Git working tree is still in Git.
@@ -350,6 +358,25 @@ class BeatStarsDryRunCommandTest extends TestCase
         }
 
         return $path;
+    }
+
+    /** An owner-only file in the private directory, as PrivateSourceFiles requires of real inputs. */
+    private function privateFile(string $name, string $bytes): string
+    {
+        $path = $this->privateDirectory().'/'.$name;
+        file_put_contents($path, $bytes);
+        chmod($path, 0600);
+
+        return $path;
+    }
+
+    /** The synthetic fixture mapping, claiming a real acquisition. */
+    private function officialMapping(): string
+    {
+        $mapping = json_decode((string) file_get_contents($this->fixtures.'/mapping.json'), true, 16);
+        $mapping['acquisition_method'] = 'official_export';
+
+        return (string) json_encode($mapping);
     }
 
     private function outputDirectory(string $name): string

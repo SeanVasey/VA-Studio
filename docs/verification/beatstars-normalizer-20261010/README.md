@@ -245,6 +245,22 @@ Two P2 findings, both fixed, together with the delta review's conditions:
 Evidence: `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt` (red on the old source; 88 unit
 and 26 feature tests green; the L1 swap probe).
 
+## Codex round on `3d6b755`
+
+- **Unchecked write into the sheet stream (P1).** The export bytes were written into `php://temp`
+  without checking the result. A short write after the stream spilled to disk would let `fgetcsv` parse a
+  prefix, and if that prefix ended on a record boundary the run could look complete. The sheet now uses
+  `php://memory`, which never spills, writes in a checked loop, and requires the stream size to equal the input
+  length (`export_unreadable`). No failure-injection test exists; see the evidence file.
+- **Real mappings were not held to the private boundary (P2).** The mapping names the BeatStars account and
+  the operator, but it was read with only the identity check. It now passes through the same
+  `PrivateSourceFiles` boundary as the export (`input_not_private`). It may be read from the checkout only
+  under `tests/Fixtures/` when it declares `synthetic_fixture` (`input_inside_repository`). Tests that used a
+  malformed or official mapping now write it as an owner-only file in the private test directory.
+
+Evidence: `evidence/codex-sheet-write-and-private-mapping-red-green.txt` (red on the old source; 88 unit and 28
+feature tests green).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the

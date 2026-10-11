@@ -27,14 +27,14 @@ rights, prices or license terms. Every value in the output comes from the sheet 
 
 Both files stay in private storage outside the repository, like every other source artifact
 (`docs/migration/README.md`). Only the report's hashes belong in Git. The dry run enforces this for
-the export through the same boundary as every other private source (`PrivateSourceFiles`): a
+the export and the mapping (which names the account and the operator) through the same boundary as every other private source (`PrivateSourceFiles`): a
 caller-owned, mode `0600`, single-link file in a caller-owned `0700` directory whose parent is also
 caller-owned and not group- or world-writable; every ancestor must be non-group/world-writable unless
 it is root-owned and sticky (like `/tmp`), and none may contain `.git` (so not inside any Git working
-tree). In practice: keep the export in a `0700` directory inside another `0700` directory under your
+tree). In practice: keep the export and the mapping in a `0700` directory inside another `0700` directory under your
 home, not directly under `/tmp`. The file is
 read through one descriptor whose identity must not change during the read (`input_not_private`
-or `input_changed` otherwise). An export inside this checkout is read only from `tests/Fixtures/`
+or `input_changed` otherwise). An export or mapping inside this checkout is read only from `tests/Fixtures/`
 with a mapping whose `acquisition_method` is `synthetic_fixture` (`input_inside_repository`
 otherwise). If writing any output fails, every file the run created is removed before it reports
 `output_write`.

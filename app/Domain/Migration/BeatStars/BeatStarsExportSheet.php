@@ -30,11 +30,19 @@ final class BeatStarsExportSheet
         }
         $this->require(mb_check_encoding($bytes, 'UTF-8') && ! str_contains($bytes, "\0"), 'export_encoding');
         $this->quotes($bytes);
-        $handle = fopen('php://temp', 'r+b');
+        // php://memory never spills to a temporary file, and every byte must land before parsing: a short
+        // write would let fgetcsv read a prefix that may end on a record boundary and look complete.
+        $handle = fopen('php://memory', 'r+b');
         $this->require($handle !== false, 'export_unreadable');
         try {
-            fwrite($handle, $bytes);
-            rewind($handle);
+            $offset = 0;
+            while ($offset < strlen($bytes)) {
+                $count = fwrite($handle, substr($bytes, $offset));
+                $this->require($count !== false && $count > 0, 'export_unreadable');
+                $offset += $count;
+            }
+            $stat = fstat($handle);
+            $this->require($stat !== false && $stat['size'] === strlen($bytes) && rewind($handle), 'export_unreadable');
             $headers = fgetcsv($handle, null, ',', '"', '');
             $this->require(is_array($headers) && $headers !== [null] && count($headers) <= self::MAX_COLUMNS, 'export_header');
             $headers = array_map(static fn (?string $header): string => (string) $header, $headers);

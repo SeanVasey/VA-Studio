@@ -33,8 +33,8 @@ final class BeatStarsDryRunFiles
      */
     public function run(string $exportPath, string $mappingPath, string $outputDirectory): array
     {
-        $mapping = $this->input($mappingPath, BeatStarsExportMapping::MAX_BYTES);
-        $export = $this->export($exportPath, $mapping);
+        $mapping = $this->source($mappingPath, null, BeatStarsExportMapping::MAX_BYTES);
+        $export = $this->source($exportPath, $mapping, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
         $pinned = $this->directory($outputDirectory);
         $result = (new BeatStarsExportNormalizer)->normalize($export, basename($exportPath), $mapping);
         $report = new BeatStarsDryRunReport;
@@ -91,17 +91,18 @@ final class BeatStarsDryRunFiles
     }
 
     /**
-     * A real export is private source material: it must live outside this checkout as a caller-owned,
-     * owner-only file with a single link. Only a mapping that declares a synthetic fixture may read
-     * an export from inside the checkout.
+     * A real export and its mapping are private source material (the mapping names the account and the
+     * operator): each must live outside this checkout as a caller-owned, owner-only file with a single link.
+     * Only a mapping that declares a synthetic fixture may be read, with its export, from tests/Fixtures/.
+     * $mapping is null when $path is the mapping itself.
      */
-    private function export(string $path, string $mapping): string
+    private function source(string $path, ?string $mapping, int $maximum): string
     {
-        $bytes = $this->input($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
+        $bytes = $this->input($path, $maximum);
         $repository = dirname(__DIR__, 4);
         if ($path === $repository || str_starts_with($path, $repository.'/')) {
             $this->require(str_starts_with($path, $repository.'/tests/Fixtures/')
-                && (new BeatStarsExportMapping)->decode($mapping)['acquisition_method'] === 'synthetic_fixture',
+                && (new BeatStarsExportMapping)->decode($mapping ?? $bytes)['acquisition_method'] === 'synthetic_fixture',
                 'input_inside_repository');
 
             return $bytes;
@@ -111,7 +112,7 @@ final class BeatStarsDryRunFiles
         // non-group/world-writable unless root-owned and sticky, and none may contain .git. The file is read
         // through one descriptor whose uid, mode, link count and identity are checked on the same stat it reads.
         try {
-            $proof = (new PrivateSourceFiles)->protectedFile($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
+            $proof = (new PrivateSourceFiles)->protectedFile($path, $maximum);
         } catch (InvalidArgumentException) {
             throw new InvalidArgumentException('input_not_private');
         }
@@ -124,7 +125,7 @@ final class BeatStarsDryRunFiles
      * Read one regular file whose identity cannot change across the read: the named file, the open
      * descriptor before reading and the descriptor afterwards must share device, inode, size, mtime and
      * ctime, so the hashed bytes are exactly the retained file's. This is only the identity half of
-     * PrivateSourceFiles::read; a real export's privacy goes through PrivateSourceFiles itself (export()).
+     * PrivateSourceFiles::read; a real input's privacy goes through PrivateSourceFiles itself (source()).
      */
     private function input(string $path, int $maximum): string
     {
