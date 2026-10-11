@@ -60,9 +60,11 @@ final class BeatStarsDryRunFiles
         if ($snapshot === null) {
             $this->require(! $this->exists($outputDirectory.'/'.self::SNAPSHOT), 'output_differs');
         }
-        $this->require($this->sameDirectory($pinned, $this->directory($outputDirectory)), 'output_directory');
+        $this->require($this->sameInode($pinned, $this->directory($outputDirectory)), 'output_directory');
         // Stage every output, then publish them; on any failure remove every file this run created, so a
-        // refusal never leaves a partial report set or a .pending file behind.
+        // refusal never leaves a partial report set or a .pending file behind. A file is removed only while
+        // its path still names the inode this run wrote: if the directory was swapped after publication,
+        // nothing in the replacement is touched and the published outputs stay in the moved original.
         $created = [];
         try {
             foreach ($written as $name) {
@@ -70,13 +72,17 @@ final class BeatStarsDryRunFiles
             }
             foreach ($written as $index => $name) {
                 $path = $outputDirectory.'/'.$name;
-                $this->require(! $this->exists($path) && @rename($created[$index], $path), 'output_write');
-                $created[$index] = $path;
+                $this->require(! $this->exists($path) && @rename($created[$index]['path'], $path), 'output_write');
+                $created[$index]['path'] = $path;
             }
-            $this->require($this->sameDirectory($pinned, $this->path($outputDirectory)), 'output_directory');
+            $this->require($this->sameInode($pinned, $this->path($outputDirectory)), 'output_directory');
         } catch (Throwable $error) {
-            foreach ($created as $path) {
-                @unlink($path);
+            foreach ($created as $file) {
+                clearstatcache(true, $file['path']);
+                $current = @lstat($file['path']);
+                if ($current !== false && $this->sameInode($file, $current)) {
+                    @unlink($file['path']);
+                }
             }
             throw $error;
         }
@@ -186,13 +192,15 @@ final class BeatStarsDryRunFiles
             }
             $this->require(in_array($entry, self::OUTPUTS, true), 'output_directory_not_empty');
             $entryStat = $this->path($path.'/'.$entry);
-            $this->require(($entryStat['mode'] & 0170000) === 0100000 && $entryStat['nlink'] === 1, 'output_directory');
+            // A retained output must still be private: a regular, single-link, caller-owned 0600 file.
+            $this->require(($entryStat['mode'] & 0170000) === 0100000 && $entryStat['nlink'] === 1
+                && ($entryStat['mode'] & 07777) === 0600 && $entryStat['uid'] === posix_geteuid(), 'output_directory');
         }
 
         return $stat;
     }
 
-    private function sameDirectory(array $left, array $right): bool
+    private function sameInode(array $left, array $right): bool
     {
         return $left['dev'] === $right['dev'] && $left['ino'] === $right['ino'];
     }
@@ -216,8 +224,12 @@ final class BeatStarsDryRunFiles
         return $stat;
     }
 
-    /** Write one complete, synced, 0600 `.pending` file next to $path and return its path. */
-    private function stage(string $path, string $bytes): string
+    /**
+     * Write one complete, synced, 0600 `.pending` file next to $path.
+     *
+     * @return array{path: string, dev: int, ino: int}
+     */
+    private function stage(string $path, string $bytes): array
     {
         $pending = $path.'.pending';
         $this->require(! $this->exists($pending), 'output_pending_exists');
@@ -242,9 +254,14 @@ final class BeatStarsDryRunFiles
             @unlink($pending);
             throw $error;
         }
+        $stat = fstat($handle);
         fclose($handle);
+        if ($stat === false) {
+            @unlink($pending);
+            $this->require(false, 'output_write');
+        }
 
-        return $pending;
+        return ['path' => $pending, 'dev' => $stat['dev'], 'ino' => $stat['ino']];
     }
 
     private function exists(string $path): bool

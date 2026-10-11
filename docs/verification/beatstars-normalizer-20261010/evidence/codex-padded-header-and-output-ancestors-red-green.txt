@@ -16,4 +16,5 @@ vendor/bin/pint --test (changed source and tests)        passed
 The directory identity re-check (dev/ino after the second admission and after publication) has no test: with
 the ancestor rule no other user can rename the directory mid-run, and nothing in the command offers a hook
 between admission and publication. An ancestor owned by another non-root user is not tested because the CI
-runner cannot chown; the group-writable case exercises the same check.
+runner cannot chown. The group-writable case does not exercise the owner clause: the independent delta review
+showed that removing it survives both files (correction recorded in the next round's evidence).

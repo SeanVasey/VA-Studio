@@ -218,6 +218,33 @@ Two P2 findings, both fixed:
 Evidence: `evidence/codex-padded-header-and-output-ancestors-red-green.txt` (red on the old source; 86 unit and
 24 feature tests green).
 
+The delta review of `d880e3c..65f6107` returned APPROVE WITH CONDITIONS
+(`independent-review-65f6107-DECISION.md`). L1: after a post-publication identity mismatch the rollback unlinked
+by path, so it could delete a file in the replacement directory. L2: one evidence sentence overstated coverage.
+Both are met in the next commit.
+
+## Codex round on `65f6107`
+
+Two P2 findings, both fixed, together with the delta review's conditions:
+
+- **A quote inside an unquoted field.** `fgetcsv` keeps such a quote literally. `id,x"foo,R1` followed by
+  `bar",z,R2` is read as two records, while a writer that meant the quote to open a multi-line field
+  wrote one. The sheet now follows strict RFC 4180 quoting and refuses any quote inside an unquoted field
+  (`export_csv_quotes`). This replaces the earlier whitespace-before-quote rule, which is a subset of it. It
+  reverses an earlier decision: in an earlier round, a bare quote mid-field (`12" vinyl`) was kept because
+  `fgetcsv` preserves it. A compliant export always quotes such a cell (`"12"" vinyl"`), and a non-compliant one
+  is now refused rather than read one way when it could have been meant another.
+- **Retained outputs no longer owner-only.** A retained output whose mode changed (for example to `0644`) was
+  still accepted as unchanged, and the importer's `PrivateSourceFiles` would then refuse that `catalog.json`.
+  Every retained output must now be a caller-owned `0600` file (`output_directory`).
+- **L1.** `stage()` records each file's device and inode. On rollback, a path is removed only while it still
+  names that inode. If the directory is swapped after publication, the run is refused, nothing in the
+  replacement is touched, and the published outputs stay in the moved original.
+- **L2.** The previous evidence file is corrected, and a parent writable by others (`0757`) is a new feature case.
+
+Evidence: `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt` (red on the old source; 88 unit
+and 26 feature tests green; the L1 swap probe).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the

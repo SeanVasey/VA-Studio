@@ -208,7 +208,9 @@ class BeatStarsDryRunCommandTest extends TestCase
             'write failure leaves no partial output' => ['output_write'],
             'output under another git checkout' => ['output_inside_repository'],
             'output under a .git file (worktree or submodule)' => ['output_inside_repository'],
-            'output under a group-writable parent' => ['output_directory']];
+            'output under a group-writable parent' => ['output_directory'],
+            'output under a parent writable by others' => ['output_directory'],
+            'retained report readable by others' => ['output_directory']];
     }
 
     #[DataProvider('refusals')]
@@ -249,12 +251,19 @@ class BeatStarsDryRunCommandTest extends TestCase
                 $arguments[5] = $output = $this->repositoryOutput;
                 break;
             case 'output_directory':
-                if ($this->dataName() === 'output under a group-writable parent') {
-                    // Another group member could rename the private output directory and swap the reports.
+                if (str_starts_with($this->dataName(), 'output under a')) {
+                    // Another group member, or any user, could rename the private output directory and swap the reports.
                     mkdir($this->base.'/shared', 0700);
-                    chmod($this->base.'/shared', 0770);
+                    chmod($this->base.'/shared', $this->dataName() === 'output under a group-writable parent' ? 0770 : 0757);
                     $arguments[5] = $output = $this->base.'/shared/out';
                     mkdir($output, 0700);
+                    break;
+                }
+                if ($this->dataName() === 'retained report readable by others') {
+                    // Identical bytes, but no longer owner-only: never counted as an unchanged private output.
+                    $this->assertSame(0, $this->invoke($arguments)['exit']);
+                    chmod($output.'/beatstars-dry-run.json', 0644);
+                    $expected = scandir($output);
                     break;
                 }
                 chmod($output, 0755);

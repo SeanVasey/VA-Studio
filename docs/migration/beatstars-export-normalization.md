@@ -93,7 +93,7 @@ php scripts/migration/beatstars-dry-run.php \
 
 Paths must be absolute without `.` or `..` components or symlinks. The output directory must be
 mode `0700`, owned by the caller, outside this checkout and every other Git working tree (no `.git` in any ancestor), under ancestors that no other user can rename (each owned by the caller or root and not group- or world-writable unless root-owned and sticky, like `/tmp`), and either empty or holding an earlier
-run of this tool. The export basename becomes the snapshot's artifact path (`raw/<basename>`),
+run of this tool whose outputs are still caller-owned `0600` files. The export basename becomes the snapshot's artifact path (`raw/<basename>`),
 so keep it to letters, digits, `.`, `_` and `-`.
 
 Standard output is one JSON line with the status code and counts: no title, value, path or
@@ -145,7 +145,7 @@ A **refusal** (exit `1`) means the inputs cannot be interpreted at all; nothing 
 Reason codes: `usage`, `path`, `input_file`, `input_changed` (the file's identity, size or times changed while it was read), `input_not_private`, `input_inside_repository`,
 `output_directory`, `output_inside_repository`,
 `output_directory_not_empty`, `output_differs`, `output_pending_exists`, `output_write`,
-`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (a quoted field that never closes, as in a truncated file, text after a closing quote, or whitespace before an opening quote), `export_header` (also a header with leading or trailing whitespace, which is refused rather than trimmed), `export_too_many_rows`,
+`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (strict RFC 4180 quoting: a quoted field that never closes, as in a truncated file, text after a closing quote, or any quote inside an unquoted field, including whitespace before an opening quote; a cell such as `12" vinyl` must be exported quoted, as `"12"" vinyl"`), `export_header` (also a header with leading or trailing whitespace, which is refused rather than trimmed), `export_too_many_rows`,
 `export_empty`, and `mapping_*` (`json`, `keys`, `purpose`, `identity`, `acquisition_method`,
 `timestamp`, `currency`, `slug_policy`, `columns`, `constants`, `required_field`,
 `visibility_values`, `tag_separator`, `licenses`, `offers`, `ignored_columns`,

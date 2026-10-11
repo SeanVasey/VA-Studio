@@ -1,0 +1,27 @@
+# Codex round on 65f6107 (PR #89) and the delta review's conditions (APPROVE WITH CONDITIONS on 65f6107)
+# Direct PHPUnit, SQLite in memory, this worktree's Composer autoload. Run as root in the container.
+## Red: the new tests against the 65f6107 source
+--filter 'quote after text|quote opening mid-field' tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+Failed asserting that exception of type "InvalidArgumentException" is thrown.
+Failed asserting that exception of type "InvalidArgumentException" is thrown.
+Tests: 2, Assertions: 2, Failures: 2.
+--filter 'readable by others' tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+Failed asserting that 0 is identical to 1.
+Tests: 1, Assertions: 2, Failures: 1.
+## Green: whole files with the fixes
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php   OK (88 tests, 722 assertions)
+tests/Feature/Migration/BeatStarsDryRunCommandTest.php   OK (26 tests, 196 assertions)
+vendor/bin/pint --test (changed source and tests)        passed
+## Delta-review condition L1: rollback after a post-publication directory swap (probe, not a committed test)
+# A scratch copy of BeatStarsDryRunFiles with a hook just before the post-publication identity check renames
+# the output directory away and puts a replacement with its own beatstars-dry-run.json in its place.
+swap after publication: refused:output_directory
+moved original holds: beatstars-dry-run.json,beatstars-dry-run.md,catalog.json
+replacement holds:    beatstars-dry-run.json
+replacement file intact: true
+# On 65f6107 the reviewer's same probe deleted the replacement's file. The published outputs stay in the moved
+# original by design: the rollback removes only paths that still name an inode this run wrote.
+## Delta-review condition L2
+The previous evidence file's claim that the group-writable case covers the other-owner clause was wrong and is
+corrected there. The other-owner clause stays untested (the CI runner cannot chown). A parent writable by others
+(0757) is now a feature case.

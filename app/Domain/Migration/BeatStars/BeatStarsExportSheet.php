@@ -57,9 +57,10 @@ final class BeatStarsExportSheet
     }
 
     /**
-     * fgetcsv accepts a quoted field that never closes (a truncated export) or text after a closing quote,
-     * and returns a cell that differs from the source bytes. Refuse both before parsing: a quoted field must
-     * close, and only a delimiter, a line ending or the end of the file may follow its closing quote.
+     * fgetcsv accepts a quoted field that never closes (a truncated export), text after a closing quote, and a
+     * quote inside an unquoted field, and returns cells or records that another reader could split differently.
+     * Refuse all three before parsing (RFC 4180): a quote may only open a field, a quoted field must close, and
+     * only a delimiter, a line ending or the end of the file may follow its closing quote.
      */
     private function quotes(string $bytes): void
     {
@@ -67,12 +68,11 @@ final class BeatStarsExportSheet
         $offset = 0;
         while ($offset < $length) {
             if ($bytes[$offset] !== '"') {
-                // fgetcsv skips leading space, tab, VT, FF and CR and then parses a quote as an enclosure, so
-                // whitespace followed by a quote is refused rather than read two different ways.
-                $leading = strspn($bytes, " \t\v\f\r", $offset);
-                $this->require($leading === 0 || ($bytes[$offset + $leading] ?? '') !== '"', 'export_csv_quotes');
-                // An unquoted field runs to the next delimiter or line feed.
-                $offset += strcspn($bytes, ",\n", $offset) + 1;
+                // An unquoted field runs to the next delimiter or line feed and holds no quote. This also covers
+                // whitespace before a quote, which fgetcsv skips and then parses as an enclosure.
+                $span = strcspn($bytes, "\",\n", $offset);
+                $this->require(($bytes[$offset + $span] ?? '') !== '"', 'export_csv_quotes');
+                $offset += $span + 1;
 
                 continue;
             }
