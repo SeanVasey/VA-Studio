@@ -201,17 +201,42 @@ class RightsScopeCommandAttestationTest extends TestCase
         $before = $this->evidence();
 
         $this->in('staging', function () use ($f): void {
+            // Codex P2 (r4240117095): the attestation row was written, so the refusal must not say nothing changed.
             $this->link($f['actor'], true, $f['revision']->id, 'unregistered-scope')
-                ->expectsOutputToContain('Rights scope unregistered-scope is not registered')->assertExitCode(1);
+                ->expectsOutputToContain('Rights scope unregistered-scope is not registered. Register it first. '
+                    .'No rights-scope write occurred; the attestation audit record (audit_event=')
+                ->doesntExpectOutputToContain('No changes were made')->assertExitCode(1);
             $this->register($f['actor'], true)->assertExitCode(0);
             DB::table('offers')->where('id', $f['offer']->id)->update(['is_active' => false]);
-            $this->link($f['actor'], true, $f['revision']->id)->expectsOutputToContain('SELECTION_CHANGED')->assertExitCode(1);
+            $this->link($f['actor'], true, $f['revision']->id)
+                ->expectsOutputToContain('Refused (SELECTION_CHANGED): the revision is not the current revision of an active offer on a published track '
+                    .'that passes publication readiness. No rights-scope write occurred; the attestation audit record (audit_event=')
+                ->doesntExpectOutputToContain('No changes were made')->assertExitCode(1);
         });
 
         $this->assertCount(3, $this->attestations());
         $this->assertSame(['link', 'register', 'link'], $this->attestations()->map(fn (AuditEvent $row) => $row->context['action'])->all());
         $this->assertSame(json_decode($before[1], true), json_decode($this->evidence()[1], true), 'No link was created.');
         $this->assertDatabaseCount('rights_scopes', 1);
+    }
+
+    public function test_a_refusal_without_an_attestation_keeps_the_original_wording(): void
+    {
+        $f = $this->selection();
+        $before = $this->evidence();
+
+        $this->link($f['actor'], false, $f['revision']->id, 'unregistered-scope')
+            ->expectsOutputToContain('Rights scope unregistered-scope is not registered. Register it first. No changes were made.')
+            ->doesntExpectOutputToContain('attestation')->assertExitCode(1);
+        $this->register($f['actor'], false)->assertExitCode(0);
+        DB::table('offers')->where('id', $f['offer']->id)->update(['is_active' => false]);
+        $this->link($f['actor'], false, $f['revision']->id)
+            ->expectsOutputToContain('Refused (SELECTION_CHANGED): the revision is not the current revision of an active offer on a published track '
+                .'that passes publication readiness. No changes were made.')
+            ->doesntExpectOutputToContain('attestation')->assertExitCode(1);
+
+        $this->assertSame(json_decode($before[1], true), json_decode($this->evidence()[1], true), 'No link was created.');
+        $this->assertCount(0, $this->attestations());
     }
 
     public function test_attest_does_not_apply_to_the_read_only_list_action(): void

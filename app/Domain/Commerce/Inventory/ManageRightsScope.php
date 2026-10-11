@@ -20,15 +20,17 @@ use Illuminate\Support\Str;
 /**
  * Internal test foundation. An explicit link does not establish legal ownership or publish an exclusive.
  * Every write applies the admin panel's staff multi-factor rule itself; a console caller may replace it only
- * with a recorded `StaffWriteAuthority` attestation bound to that exact write (#68 review condition C2).
+ * with a recorded `StaffWriteAuthority` attestation bound to that exact write and spent by it (#68 review
+ * condition C2).
  */
 final class ManageRightsScope
 {
     /**
      * Registers a scope key once; a repeat with the same reference is unchanged, another reference conflicts.
      *
-     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this key; null
-     *                                                 applies the panel's staff multi-factor rule to `$actor` instead.
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded, unused attestation for this key
+     *                                                 and reference; null applies the panel's staff multi-factor
+     *                                                 rule to `$actor` instead.
      */
     public function register(string $key, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScope
     {
@@ -57,8 +59,9 @@ final class ManageRightsScope
     /**
      * Links a current, publishable offer revision to a scope; the link is immutable once made.
      *
-     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this scope key
-     *                                                 and revision; null applies the panel's staff multi-factor rule.
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded, unused attestation for this scope
+     *                                                 key, revision and reference; null applies the panel's staff
+     *                                                 multi-factor rule.
      */
     public function link(int $scopeId, int $revisionId, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScopeOffer
     {
@@ -93,13 +96,14 @@ final class ManageRightsScope
     /**
      * Blocks or unblocks a scope under optimistic control versioning.
      *
-     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded attestation for this scope key;
-     *                                                 null applies the panel's staff multi-factor rule to `$actor`.
+     * @param  StaffWriteAuthority|null  $attestation  A console operator's recorded, unused attestation for this scope
+     *                                                 key, requested state, expected version and reference; null
+     *                                                 applies the panel's staff multi-factor rule to `$actor`.
      */
     public function block(int $scopeId, bool $blocked, int $expectedVersion, string $reference, User $actor, ?StaffWriteAuthority $attestation = null): RightsScope
     {
         return DB::transaction(function () use ($scopeId, $blocked, $expectedVersion, $reference, $actor, $attestation) {
-            $actor = $this->authorize($actor, $reference, $attestation, 'block', $scopeId);
+            $actor = $this->authorize($actor, $reference, $attestation, 'block', $scopeId, null, $blocked, $expectedVersion);
             $scope = RightsScope::whereKey($scopeId)->lockForUpdate()->firstOrFail();
             if ($scope->control_version !== $expectedVersion) {
                 throw new QuoteException('INVENTORY_CONTROL_CONFLICT', 409);
@@ -118,8 +122,12 @@ final class ManageRightsScope
         }, 5);
     }
 
-    /** `$scope` is the key being registered or the id of an existing scope; an attestation binds to the key. */
-    private function authorize(User $actor, string $reference, ?StaffWriteAuthority $attestation, string $action, int|string $scope, ?int $revisionId = null): User
+    /**
+     * `$scope` is the key being registered or the id of an existing scope; an attestation binds to the key, the
+     * reference and, for block, the requested state and expected version, and is spent inside this transaction.
+     */
+    private function authorize(User $actor, string $reference, ?StaffWriteAuthority $attestation, string $action, int|string $scope,
+        ?int $revisionId = null, ?bool $blocked = null, ?int $expectedVersion = null): User
     {
         $actor = $actor->exists ? User::query()->lockForUpdate()->find($actor->getKey()) : null;
         if (! $actor) {
@@ -132,7 +140,7 @@ final class ManageRightsScope
         // without touching the ordered catalog locks taken later. Without an attestation nothing extra is read:
         // the panel rule is evaluated on the actor row locked above, keeping the writer's lock sequence unchanged.
         $scopeKey = is_string($scope) ? $scope : ($attestation === null ? null : RightsScope::whereKey($scope)->value('scope_key'));
-        StaffWriteAuthority::requireFor($actor, $attestation, $action, $scopeKey, $revisionId);
+        StaffWriteAuthority::requireFor($actor, $attestation, $action, $scopeKey, $revisionId, $reference, $blocked, $expectedVersion);
         if (! preg_match('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]{0,191}\z/D', $reference)) {
             throw new QuoteException('INVALID_QUOTE_REQUEST', 422);
         }
