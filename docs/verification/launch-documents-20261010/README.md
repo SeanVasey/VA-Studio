@@ -28,7 +28,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass10.txt` | Run after the sixth Codex review: 246 citations, `RESULT PASS`, exit 0. |
 | `green-check-citations-pass11.txt` | Run after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass12.txt` | Run after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass13.txt` | Final run, after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass13.txt` | Run after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass14.txt` | Final run, after the tenth Codex review: checked 260 citations across 3 documents (PRIVACY.md: 103 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -133,6 +134,10 @@ Citation check after this pass: `green-check-citations-pass12.txt`.
 | PRIVACY section 2 and the README's identity-messages row said no transport is bound for production identity email | The identity SMTP adapter is bound (`AppServiceProvider` to `IdentitySmtpFactory`), separate from Laravel's mailer; it is unconfigured (null settings in `config/production-identity-smtp.php`, so the factory refuses) and disabled (`notifications_enabled` false). Section 3's email row says the same |
 
 Citation check after this pass: `green-check-citations-pass13.txt`.
+
+| PRIVACY section 2.3 described customer accounts as synthetic test accounts only | It now also documents the mounted production identity flow, which is implemented but disabled and unconfigured: when it is enabled, the collected email, name and password, the seven append-only tables it retains, and the refused rollback, with retention left to U-07 and U-13 |
+
+Citation check after this pass: `green-check-citations-pass14.txt`.
 
 ## Contradictions resolved at integration
 
