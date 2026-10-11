@@ -110,6 +110,10 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 
 Citation check after this pass: `green-check-citations-pass9.txt`.
 
+| PRIVACY section 5 listed two unthrottled public routes from a scan of the route files | The list now comes from the effective route table with `APP_ENV=production` (`route-table-unthrottled-production.txt`), which adds Laravel's `GET /up` health check (registered in `bootstrap/app.php`, not a route file) and the staff panel and framework routes; the claim of rate limiting is narrowed to the storefront's public browser and embed routes. The cited `vendor/filament/filament/src/Auth/Pages/Login.php` (`rateLimit(5)`, 60-second default window) is outside the checker's prefixes and was checked by hand |
+
+Citation check after this pass: `green-check-citations-pass10.txt`.
+
 ## Contradictions resolved at integration
 
 These were reported by the lane and corrected in the integration commit, after checking that each gate calls
