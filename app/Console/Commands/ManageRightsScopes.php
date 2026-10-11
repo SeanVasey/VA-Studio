@@ -42,6 +42,9 @@ final class ManageRightsScopes extends Command
         'list' => [],
     ];
 
+    /** The audit row of the attestation this invocation recorded, so a later refusal does not claim nothing changed. */
+    private ?int $attestationAuditId = null;
+
     public function handle(): int
     {
         $action = $this->argument('action');
@@ -131,9 +134,9 @@ final class ManageRightsScopes extends Command
 
     /**
      * A console has no multi-factor challenge, so an attestation is never implied: only an explicit `--attest`
-     * records one (who, when, which scope), after the password is confirmed and before the domain write, and the
-     * domain service verifies it against that exact write. Without the flag, local and testing keep the panel's
-     * optional rule and nothing is recorded.
+     * records one (who, when, which scope, revision and keyed reference hash), after the password is confirmed and
+     * before the domain write, and the domain service verifies it against that exact write and spends it there.
+     * Without the flag, local and testing keep the panel's optional rule and nothing is recorded.
      */
     private function attest(User $actor, string $action): ?StaffWriteAuthority
     {
@@ -141,7 +144,8 @@ final class ManageRightsScopes extends Command
             return null;
         }
         $attestation = StaffWriteAuthority::attest($actor, 'vasey:rights-scope', $action, (string) $this->option('scope'),
-            $action === 'link' ? (int) $this->option('revision') : null);
+            $action === 'link' ? (int) $this->option('revision') : null, (string) $this->option('reference'));
+        $this->attestationAuditId = $attestation->auditEventId;
         $this->line('attestation=recorded audit_event='.$attestation->auditEventId);
 
         return $attestation;
@@ -232,9 +236,11 @@ final class ManageRightsScopes extends Command
         return preg_match('/\A[a-z0-9][a-z0-9._:-]{0,95}\z/D', $key) === 1 ? $key : '(invalid key)';
     }
 
+    /** Once an attestation is on record, "no changes" would be untrue: say which write did not happen and what remains. */
     private function refuse(string $message, int $code = self::FAILURE): int
     {
-        $this->error($message.' No changes were made.');
+        $this->error($message.($this->attestationAuditId === null ? ' No changes were made.'
+            : ' No rights-scope write occurred; the attestation audit record (audit_event='.$this->attestationAuditId.') remains.'));
 
         return $code;
     }
