@@ -134,10 +134,12 @@ List the current published revisions that need linking, then register the actual
 
 ```sh
 php artisan vasey:rights-scope list
-php artisan vasey:rights-scope register --actor-id=STAFF_ID --scope=SCOPE_KEY --reference=EVIDENCE_REFERENCE
-php artisan vasey:rights-scope link --actor-id=STAFF_ID --scope=SCOPE_KEY --revision=REVISION_ID --reference=LINK_REFERENCE
+php artisan vasey:rights-scope register --actor-id=STAFF_ID --scope=SCOPE_KEY --reference=EVIDENCE_REFERENCE --attest
+php artisan vasey:rights-scope link --actor-id=STAFF_ID --scope=SCOPE_KEY --revision=REVISION_ID --reference=LINK_REFERENCE --attest
 php artisan vasey:rights-scope list
 ```
+
+- Staging requires staff multi-factor authentication, and a console has no code challenge, so each write needs `--attest`. Without it the command refuses the write and records nothing. With it, after the password check, the command writes an append-only `staff.console_attestation` audit event (operator, time, command, action, scope key, offer revision, environment, and whether the operator is enrolled in the panel factor), prints `attestation=recorded audit_event=N`, and the write's own audit event links to it through `attestation_audit_id`. The attestation stays on record even when the write is then refused. It records who made the write; it is not a second factor, so shell access to the host remains the controlling credential. `--attest` is invalid with `list`.
 
 - Each write confirms the staff password at a hidden prompt. Writes refuse `--no-interaction` and terminals that cannot hide input. Never pass passwords or evidence contents as arguments.
 - Related variants of the same actual right share a scope only after the operator verifies that relationship. Unrelated rights need distinct scopes. A quote cannot select two variants of one scope, and a reservation blocks every linked variant of that scope.

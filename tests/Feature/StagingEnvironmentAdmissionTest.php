@@ -300,7 +300,9 @@ class StagingEnvironmentAdmissionTest extends TestCase
             'test promotion usage' => fn () => self::completes(fn () => DB::transaction(
                 fn () => self::invokePrivate(app(PromotionUsage::class), 'requireTransaction'))),
             'test promotion administration' => function (): bool {
+                // C2 (#68): the service applies the panel's staff factor itself; this gate proves only the environment.
                 $admin = LicenseFixtures::admin();
+                $admin->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
                 try {
                     return self::invokePrivate(app(PromotionAdministration::class), 'actor', $admin)->is($admin);
                 } catch (AuthorizationException) {
