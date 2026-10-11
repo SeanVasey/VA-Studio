@@ -29,7 +29,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass11.txt` | Run after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass12.txt` | Run after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass13.txt` | Run after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass14.txt` | Final run, after the tenth Codex review: checked 260 citations across 3 documents (PRIVACY.md: 103 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass14.txt` | Run after the tenth Codex review: checked 260 citations across 3 documents (PRIVACY.md: 103 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass15.txt` | Final run, after the eleventh Codex review: checked 261 citations across 3 documents (PRIVACY.md: 104 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -138,6 +139,12 @@ Citation check after this pass: `green-check-citations-pass13.txt`.
 | PRIVACY section 2.3 described customer accounts as synthetic test accounts only | It now also documents the mounted production identity flow, which is implemented but disabled and unconfigured: when it is enabled, the collected email, name and password, the seven append-only tables it retains, and the refused rollback, with retention left to U-07 and U-13 |
 
 Citation check after this pass: `green-check-citations-pass14.txt`.
+
+| PRIVACY section 2.1 said the route throttles key a signed-in user by user ID | Only a staff member signed in through the default `web` guard gets a user-derived key; a customer signs in through the separate `customer` guard, so customer requests stay keyed by IP |
+| PRIVACY section 5 said staff access requires MFA without qualification | MFA is required in hosted `staging` and `production` only (`TestEnvironment::STAFF_MFA`), matching section 2.10 |
+| `docs/ops/production-activation-packet.md` listed the production-checkout gates as blocking all of S2b | They block only production-checkout test funds; the S2b test checkout chain (`docs/ops/staging-test-purchase.md`) needs the host and Stripe test inputs alone |
+
+Citation check after this pass: `green-check-citations-pass15.txt`.
 
 ## Contradictions resolved at integration
 
