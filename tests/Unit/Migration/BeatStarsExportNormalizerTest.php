@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Migration;
 
+use App\Domain\Migration\BeatStars\BeatStarsDryRunReport;
 use App\Domain\Migration\BeatStars\BeatStarsExportMapping;
 use App\Domain\Migration\BeatStars\BeatStarsExportNormalizer;
 use App\Domain\Migration\CatalogOnboarding\NormalizedSourceSnapshot;
@@ -446,6 +447,26 @@ class BeatStarsExportNormalizerTest extends TestCase
             ['license' => 'SYNTHETIC Exclusive', 'license_column' => null, 'price_column' => 'Exclusive Price']], $mapping['offers']);
         $this->assertNotContains('marketing_consent', BeatStarsExportMapping::FIELDS);
         $this->assertNotContains('email', BeatStarsExportMapping::FIELDS);
+    }
+
+    public function test_markdown_table_cells_keep_backslashes_and_pipes_inside_their_cell(): void
+    {
+        $rows = $this->rows();
+        $rows[0][1] = 'SYNTHETIC a\\|b \\\\|c';
+        $markdown = (new BeatStarsDryRunReport)->markdown((new BeatStarsExportNormalizer)->normalize($this->csv($rows), 'export.csv', $this->mapping()));
+        $line = array_values(array_filter(explode("\n", $markdown), static fn (string $line): bool => str_contains($line, 'SYNTHETIC a')));
+        $this->assertCount(1, $line);
+        $this->assertStringContainsString('SYNTHETIC a\\\\\\|b \\\\\\\\\\|c', $line[0]);
+        // A GFM table splits a row on every pipe that is not the second character of a backslash escape.
+        $delimiters = 0;
+        for ($offset = 0; $offset < strlen($line[0]); $offset++) {
+            if ($line[0][$offset] === '\\') {
+                $offset++;
+            } elseif ($line[0][$offset] === '|') {
+                $delimiters++;
+            }
+        }
+        $this->assertSame(10, $delimiters);
     }
 
     private function rows(): array

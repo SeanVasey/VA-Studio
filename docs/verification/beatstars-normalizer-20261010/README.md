@@ -271,6 +271,14 @@ rollback's inode match could hit a reused inode only if the caller or root delet
 I1 (the inode-checked rollback, the retained-output uid check and exact `0600` versus `0400` have no killing
 test; the rollback is shown by the probe in `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt`).
 
+## Codex round on `20f5dc9`
+
+- **Backslash before a pipe in a Markdown cell (P2).** The Markdown report escaped `|` but not `\`. A GFM
+  table reads a backslash and the next character as one escape, so `a\|b` became `a\\|b`, its pipe ended the
+  cell, and the rest of the row shifted. Backslashes are now doubled before pipes are escaped. Inside code spans
+  a doubled backslash displays as two; the JSON report stays the authoritative copy. Evidence:
+  `evidence/codex-markdown-backslash-red-green.txt` (red on `20f5dc9`; 90 unit and 28 feature tests green).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the
