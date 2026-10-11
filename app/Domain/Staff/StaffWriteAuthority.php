@@ -33,6 +33,8 @@ final class StaffWriteAuthority
 
     public const REFUSAL = 'Staff multi-factor authentication is required for this write.';
 
+    public const CONSOLE_ONLY = 'A staff attestation can only be recorded from the console.';
+
     /** An attestation covers the console invocation that recorded it, not a later one. */
     public const ATTESTATION_LIFETIME_SECONDS = 900;
 
@@ -59,9 +61,16 @@ final class StaffWriteAuthority
      * has been confirmed and outside the write transaction, so a refused write still leaves the attempt on record.
      * The record names the operator, the moment, the command, the action, the scope key and the offer revision,
      * and whether the panel rule was required and the operator enrolled at that moment.
+     *
+     * Only a console process may record one: an HTTP request has the panel and its challenge, so an attestation
+     * there could only bypass the panel rule. Queue workers and the scheduler also run in the console; the
+     * attestation records who made the write and is not a second factor (see the lane's threat note).
      */
     public static function attest(User $operator, string $command, string $action, string $scopeKey, ?int $revisionId = null): self
     {
+        if (! app()->runningInConsole()) {
+            throw new AuthorizationException(self::CONSOLE_ONLY);
+        }
         $current = $operator->exists ? User::find($operator->getKey()) : null;
         if ($current === null) {
             throw new AuthorizationException(self::REFUSAL);
@@ -144,14 +153,25 @@ final class StaffWriteAuthority
         return false;
     }
 
-    /** The record must still exist: an attestation written inside a rolled-back transaction admits nothing. */
+    /**
+     * The record must still exist and say what this value says: an attestation written inside a rolled-back
+     * transaction admits nothing, and neither does one whose record names another action, scope key or revision.
+     */
     private function recorded(): bool
     {
-        return AuditEvent::query()->whereKey($this->auditEventId)
+        $record = AuditEvent::query()->whereKey($this->auditEventId)
             ->where('action', self::ATTESTATION_ACTION)
             ->where('actor_id', $this->operatorId)
             ->where('subject_type', User::class)
             ->where('subject_id', $this->operatorId)
-            ->exists();
+            ->first();
+        $context = $record?->context;
+        if (! is_array($context) || ! is_string($context['action'] ?? null) || ! is_string($context['scope_key'] ?? null)) {
+            return false;
+        }
+
+        return $context['action'] === $this->action
+            && hash_equals($this->scopeKey, $context['scope_key'])
+            && ($context['offer_revision_id'] ?? null) === $this->revisionId;
     }
 }

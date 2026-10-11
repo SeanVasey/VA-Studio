@@ -12,6 +12,7 @@ use App\Support\Audit\AuditEvent;
 use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\LicenseFixtures;
@@ -257,6 +258,62 @@ class RightsScopeStaffMfaTest extends TestCase
         $this->assertSame(4, AuditEvent::where('action', StaffWriteAuthority::ATTESTATION_ACTION)->count(), 'Only the committed attestations remain.');
         $this->assertSame([$before[0], $before[1]], array_slice($this->evidence(), 0, 2), 'rights_scopes and rights_scope_offers unchanged');
         $this->assertSame(['synthetic-existing', 'synthetic-other'], RightsScope::orderBy('id')->pluck('scope_key')->all());
+    }
+
+    public function test_an_attestation_is_recorded_only_from_the_console(): void
+    {
+        $operator = $this->unenrolled();
+        $console = $this->app->runningInConsole();
+        $this->assertTrue($console, 'PHPUnit runs in the console.');
+        $setConsole = fn (bool $value) => Closure::bind(fn () => $this->isRunningInConsole = $value, $this->app, Application::class)();
+
+        foreach (['local', 'testing', 'staging', 'production'] as $environment) {
+            $this->in($environment, function () use ($operator, $setConsole, $console, $environment): void {
+                $setConsole(false);
+                try {
+                    StaffWriteAuthority::attest($operator, 'vasey:rights-scope', 'register', 'synthetic-http');
+                    $this->fail('An attestation was recorded outside the console ('.$environment.').');
+                } catch (AuthorizationException $exception) {
+                    $this->assertSame(StaffWriteAuthority::CONSOLE_ONLY, $exception->getMessage(), $environment);
+                } finally {
+                    $setConsole($console);
+                }
+            });
+        }
+
+        $this->assertSame(0, AuditEvent::where('action', StaffWriteAuthority::ATTESTATION_ACTION)->count());
+        $this->assertSame($this->restingLevel, DB::transactionLevel());
+    }
+
+    public function test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused(): void
+    {
+        $f = $this->selection();
+        $manage = app(ManageRightsScope::class);
+        $scope = $manage->register('synthetic-existing', 'SYNTHETIC-SCOPE', $f['actor']);
+        $operator = $this->unenrolled();
+        $before = $this->evidence();
+        $tampered = 0;
+
+        $this->in('staging', function () use ($manage, $scope, $f, $operator, &$tampered): void {
+            // The value object binds the write; the record it points to must say the same thing, so a record whose
+            // context was changed underneath (the model is append-only, the table is not) admits nothing.
+            $cases = [
+                'scope' => ['scope_key', 'synthetic-other'],
+                'action' => ['action', 'register'],
+                'revision' => ['offer_revision_id', $f['revision']->id + 1000],
+            ];
+            foreach ($cases as $case => [$field, $value]) {
+                $link = StaffWriteAuthority::attest($operator, 'vasey:rights-scope', 'link', 'synthetic-existing', $f['revision']->id);
+                $context = AuditEvent::findOrFail($link->auditEventId)->context;
+                DB::table('audit_events')->where('id', $link->auditEventId)->update(['context' => json_encode([$field => $value] + $context)]);
+                $tampered++;
+                $this->refused(fn () => $manage->link($scope->id, $f['revision']->id, 'SYNTHETIC-LINK', $operator, $link), case: $case);
+            }
+        });
+
+        $this->assertSame(3, $tampered);
+        $this->assertSame([$before[0], $before[1]], array_slice($this->evidence(), 0, 2), 'rights_scopes and rights_scope_offers unchanged');
+        $this->assertSame(0, AuditEvent::where('action', 'commerce.inventory.offer_linked')->count());
     }
 
     public function test_staging_refuses_a_stale_enrolled_actor_object_after_enrollment_was_withdrawn(): void
