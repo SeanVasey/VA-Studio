@@ -1,0 +1,246 @@
+=== full-q1-test_exact_review_source_and_current_target_binding db=imp_fix_q1 override=none filter=test_exact_review_source_and_current_target_binding
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 15:25.722, Memory: 99.00 MB
+
+OK (11 tests, 55 assertions)
+rc=0 elapsed=929s
+SCHEMA_NAME
+imp_fix_q1
+
+=== full-q2-test_conflicts_have_explicit db=imp_fix_q2 override=none filter=test_conflicts_have_explicit
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 15:59.776, Memory: 95.00 MB
+
+OK (6 tests, 24 assertions)
+rc=0 elapsed=960s
+SCHEMA_NAME
+imp_fix_q2
+
+=== full-q2-test_raw_replace_cannot db=imp_fix_q2 override=none filter=test_raw_replace_cannot
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 08:26.622, Memory: 99.00 MB
+
+OK (5 tests, 20 assertions)
+rc=0 elapsed=510s
+SCHEMA_NAME
+imp_fix_q2
+
+=== full-q3-test_audit_failure_after db=imp_fix_q3 override=none filter=test_audit_failure_after
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:51.761, Memory: 87.00 MB
+
+OK (1 test, 4 assertions)
+rc=0 elapsed=115s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_batch_evidence_is db=imp_fix_q3 override=none filter=test_batch_evidence_is
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:57.004, Memory: 93.00 MB
+
+OK (1 test, 4 assertions)
+rc=0 elapsed=180s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_current_revoked_authority db=imp_fix_q3 override=none filter=test_current_revoked_authority
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:46.159, Memory: 91.00 MB
+
+OK (1 test, 5 assertions)
+rc=0 elapsed=109s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_declared_media db=imp_fix_q3 override=none filter=test_declared_media
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:24.987, Memory: 91.00 MB
+
+OK (1 test, 15 assertions)
+rc=0 elapsed=89s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_dry_run_is_read_only db=imp_fix_q3 override=none filter=test_dry_run_is_read_only
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:22.824, Memory: 91.00 MB
+
+OK (1 test, 36 assertions)
+rc=0 elapsed=145s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_final_direct_current_proof db=imp_fix_q3 override=none filter=test_final_direct_current_proof
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 13:35.819, Memory: 97.00 MB
+
+OK (5 tests, 20 assertions)
+rc=0 elapsed=816s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q3-test_final_direct_schema_proof db=imp_fix_q3 override=none filter=test_final_direct_schema_proof
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:51.747, Memory: 91.00 MB
+
+OK (1 test, 17 assertions)
+rc=0 elapsed=114s
+SCHEMA_NAME
+imp_fix_q3
+
+=== full-q4-test_fresh_review_of db=imp_fix_q4 override=none filter=test_fresh_review_of
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 03:58.124, Memory: 91.00 MB
+
+OK (1 test, 9 assertions)
+rc=0 elapsed=238s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_mappings_are_immutable db=imp_fix_q4 override=none filter=test_mappings_are_immutable
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:25.328, Memory: 91.00 MB
+
+OK (1 test, 4 assertions)
+rc=0 elapsed=150s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_nested_transaction db=imp_fix_q4 override=none filter=test_nested_transaction
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:22.754, Memory: 89.00 MB
+
+OK (1 test, 4 assertions)
+rc=0 elapsed=148s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_overlapping_duplicate db=imp_fix_q4 override=none filter=test_overlapping_duplicate
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:29.854, Memory: 89.00 MB
+
+OK (1 test, 25 assertions)
+rc=0 elapsed=152s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_partial_failure_while db=imp_fix_q4 override=none filter=test_partial_failure_while
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:15.959, Memory: 89.00 MB
+
+OK (1 test, 20 assertions)
+rc=0 elapsed=139s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_schema_changes_after_review db=imp_fix_q4 override=none filter=test_schema_changes_after_review
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 02:01.349, Memory: 89.00 MB
+
+OK (1 test, 20 assertions)
+rc=0 elapsed=125s
+SCHEMA_NAME
+imp_fix_q4
+
+=== full-q4-test_source_os_lease db=imp_fix_q4 override=none filter=test_source_os_lease
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 03:02.687, Memory: 89.00 MB
+
+OK (1 test, 6 assertions)
+rc=0 elapsed=186s
+SCHEMA_NAME
+imp_fix_q4
+
+=== green-drift db=imp_fix_d override=none filter=test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 24:53.180, Memory: 97.00 MB
+
+OK (10 tests, 63 assertions)
+rc=0 elapsed=1493s
+SCHEMA_NAME
+imp_fix_d
+
+=== green-nested db=imp_fix_a override=none filter=test_nested_importers_and
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 03:07.092, Memory: 83.00 MB
+
+OK (1 test, 14 assertions)
+rc=0 elapsed=187s
+SCHEMA_NAME
+imp_fix_a

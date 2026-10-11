@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
-/** Trusted private SQLite staging. This command never updates, publishes or sells an existing track. */
+/** Trusted private SQLite or MySQL (InnoDB) staging. This command never updates, publishes or sells an existing track. */
 final class CatalogDraftImporter
 {
     public const MAX_SEGMENT = 25;
@@ -63,6 +63,8 @@ final class CatalogDraftImporter
         (new PrivateSourceFiles)->unchanged($source);
 
         return (new PrivateSourceFiles)->leased($source, fn (): array => DB::transaction(function () use ($source, $release, $review, $limit, $actor, $verifyExternal): array {
+            // Storage is pinned before any lock or write, so no engine change can land between admission and the first write.
+            (new CatalogDatabaseEvidence)->lockedStorage();
             [$current, $authority] = $this->actor($actor);
             $this->require($review['actor_id'] === (int) $current->id && $review['actor_sha256'] === $authority['sha256']);
             // Staff is fenced first; batch/mapping locks precede all ordinary track writer locks.
@@ -422,7 +424,9 @@ final class CatalogDraftImporter
 
     private function standalone(): void
     {
-        $this->require(DB::transactionLevel() === 0 && DB::getDriverName() === 'sqlite');
+        // Both engines are admitted; CatalogDatabaseEvidence refuses every other driver and any session that
+        // cannot prove the reviewed schema, so a refusal here never depends on the driver name alone.
+        $this->require(DB::transactionLevel() === 0 && in_array(DB::getDriverName(), ['sqlite', 'mysql'], true));
         (new CatalogDatabaseEvidence)->schema();
     }
 

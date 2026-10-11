@@ -132,6 +132,12 @@ The feature suite explicitly chooses an isolated named in-memory SQLite
 connection, including under a surrounding MySQL suite. This verifies this
 private SQLite contract and never represents MySQL row-lock evidence.
 
+Later change (2026-10-10): the importer also admits MySQL (InnoDB) targets, and
+the suite now runs on the suite's MySQL connection when one is selected, with
+InnoDB drift, duplicate-apply, partial-failure and cross-session lock cases. See
+`docs/verification/mysql-draft-importer-20261010/README.md`. The CLI wrapper is
+still bound to the SQLite persistent installation.
+
 The actual Node/PHP/PTY/SQLite command suite passed **10/10 native cases**, zero
 failures/skips/cancellations, in **32.688 seconds** on that exact successor:
 
@@ -178,7 +184,8 @@ Pint passed all affected PHP source, fixture and test files; Node syntax checks
 passed for both command and native test. No routine MySQL/full-matrix runs or
 hosted CI dispatch were performed. Migration's explicit InnoDB DDL and triggers
 have not received new MySQL runtime verification; this command rejects non-SQLite
-targets. The conditional required-MFA/TOTP CLI branch was source-reviewed;
+targets. (Superseded for the importer on 2026-10-10: it now admits MySQL; see
+`docs/verification/mysql-draft-importer-20261010/README.md`.) The conditional required-MFA/TOTP CLI branch was source-reviewed;
 the native local-workspace tests did not exercise a required authenticator-code
 operation. Source acquisition, real normalization approval/count reconciliation,
 private host/storage/scanner, restart/backup restore on the selected actual

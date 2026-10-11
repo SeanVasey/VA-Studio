@@ -1,0 +1,30 @@
+=== m1-nested db=imp_fix_b override=<scratch>/mut/m1-no-for-share.php filter=test_nested_importers_and
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 03:11.093, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+     'column' => 1205,
+     'track' => 1205,
+     'actor' => 1205,
+-    'audit' => 1205,
++    'audit' => 'admitted',
+ ]
+
+tests/Feature/PersistentCatalogDraftImportTest.php:729
+vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+rc=1 elapsed=191s
+SCHEMA_NAME
+imp_fix_b

@@ -1,0 +1,12 @@
+=== green-nested db=imp_fix_a override=none filter=test_nested_importers_and
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 03:07.092, Memory: 83.00 MB
+
+OK (1 test, 14 assertions)
+rc=0 elapsed=187s
+SCHEMA_NAME
+imp_fix_a

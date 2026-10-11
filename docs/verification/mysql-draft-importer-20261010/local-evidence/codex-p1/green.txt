@@ -1,0 +1,10 @@
+# Green on 1af8c94
+## SQLite in memory: whole file
+Time: 01:03.667, Memory: 87.00 MB
+OK (52 tests, 299 assertions)
+## MySQL 8.0.46: --filter 'test_foreign_or_incomplete_live_owned_schema|test_dry_run_is_read_only_and_atomic_segments_resume' (11 drift data sets + the happy-path apply case)
+............                                                      12 / 12 (100%)
+Time: 26:32.269, Memory: 89.00 MB
+OK (12 tests, 106 assertions)
+## vendor/bin/pint --test (changed PHP files)
+{"tool":"pint","result":"passed"}
