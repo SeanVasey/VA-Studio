@@ -97,12 +97,17 @@ final class BeatStarsExportNormalizer
             $sourceColumn = $mapping['columns']['source_id'];
             $content = $cells;
             unset($content[$sourceColumn]);
-            $sourceId = isset($cells[$sourceColumn]) ? trim($cells[$sourceColumn]) : null;
-            if ($sourceId === '') {
-                $sourceId = null;
-            }
             if (! $columnsPresent) {
                 // Without every declared column the row cannot be interpreted; the sheet findings already say why.
+                // The id is still checked exactly as exported, as interpret() does: a padded id is never shortened.
+                $sourceId = $cells[$sourceColumn] ?? null;
+                if ($sourceId !== null && trim($sourceId) === '') {
+                    $findings[] = $this->finding('row', $row, null, 'missing_source_id', $sourceColumn, null);
+                    $sourceId = null;
+                } elseif ($sourceId !== null && ! CellText::identity($sourceId)) {
+                    $findings[] = $this->finding('row', $row, null, 'invalid_source_id', $sourceColumn, null);
+                    $sourceId = null;
+                }
                 $entries[] = $this->entry($row, $sourceId, CanonicalJson::hash($content), null);
 
                 continue;

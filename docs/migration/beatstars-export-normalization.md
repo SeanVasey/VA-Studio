@@ -135,7 +135,7 @@ licenses into offers is separate, later, separately authorized work.
 ## What it refuses and what it reports
 
 A **refusal** (exit `1`) means the inputs cannot be interpreted at all; nothing is written.
-Reason codes: `usage`, `path`, `input_file`, `input_not_private`, `input_inside_repository`,
+Reason codes: `usage`, `path`, `input_file`, `input_changed` (the file's identity, size or times changed while it was read), `input_not_private`, `input_inside_repository`,
 `output_directory`, `output_inside_repository`,
 `output_directory_not_empty`, `output_differs`, `output_pending_exists`, `output_write`,
 `export_name`, `export_too_large`, `export_encoding`, `export_header`, `export_too_many_rows`,

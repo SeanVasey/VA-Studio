@@ -87,14 +87,40 @@ final class BeatStarsDryRunFiles
         return $bytes;
     }
 
+    /**
+     * Read one regular file whose identity cannot change across the read: the named file, the open
+     * descriptor before reading and the descriptor afterwards must share device, inode, size, mtime and
+     * ctime, so the hashed bytes are exactly the retained file's (as PrivateSourceFiles::read does).
+     */
     private function input(string $path, int $maximum): string
     {
         $stat = $this->path($path);
         $this->require(($stat['mode'] & 0170000) === 0100000 && $stat['size'] > 0 && $stat['size'] <= $maximum, 'input_file');
-        $bytes = @file_get_contents($path, false, null, 0, $maximum + 1);
-        $this->require(is_string($bytes) && strlen($bytes) === $stat['size'], 'input_file');
+        $handle = @fopen($path, 'rb');
+        $this->require($handle !== false, 'input_file');
+        try {
+            $before = fstat($handle);
+            $this->require($before !== false && $this->same($before, $stat), 'input_changed');
+            $bytes = stream_get_contents($handle, $maximum + 1);
+            $after = fstat($handle);
+            $this->require(is_string($bytes) && $after !== false && $this->same($after, $before), 'input_changed');
+        } finally {
+            fclose($handle);
+        }
+        $this->require($this->same($this->path($path), $after) && strlen($bytes) === $after['size'], 'input_changed');
 
         return $bytes;
+    }
+
+    private function same(array $left, array $right): bool
+    {
+        foreach (['dev', 'ino', 'size', 'mtime', 'ctime'] as $key) {
+            if ($left[$key] !== $right[$key]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function directory(string $path): void

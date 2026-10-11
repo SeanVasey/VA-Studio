@@ -108,6 +108,20 @@ Codex's second review (of `144ee1d`) raised two more P2s, both fixed with red/gr
 - Visibility values were trimmed before lookup, so ` Public ` matched `Public`. Visibility, license
   names and a currency column are now matched exactly as exported; padding is a finding.
 
+Codex's third review (of `1d744db`) raised two more P2s, fixed in the next commit:
+
+- When a mapped column is missing, the early path trimmed the source id, so a padded id was shortened
+  and could collide with another row as a false duplicate. That path now checks the id exactly as
+  `interpret()` does (`invalid_source_id` / `missing_source_id`). A new unit case was red before
+  (it reported `duplicate_source_id` on rows 1 and 2) and green after
+  (`evidence/codex-missing-column-source-id-red-green.txt`).
+- Inputs were read by path after a separate `lstat`, so a same-size rewrite during the read could be
+  hashed. Each input is now read through one descriptor whose device, inode, size, mtime and ctime must
+  match the named file before and after the read (`input_changed` otherwise), as
+  `PrivateSourceFiles::read` does. No test exercises the concurrent rewrite: it needs a second process
+  timed inside the read, which a deterministic test cannot arrange; the unchanged-file path is covered by
+  every CLI test.
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,

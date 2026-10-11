@@ -237,6 +237,27 @@ class BeatStarsExportNormalizerTest extends TestCase
         $this->assertSame(['normalized', 'normalized', 'withheld', 'normalized'], array_column($result['entries'], 'disposition'));
     }
 
+    public function test_source_ids_are_checked_as_exported_even_when_a_mapped_column_is_missing(): void
+    {
+        $rows = $this->rows();
+        $headers = self::HEADERS;
+        unset($headers[5]);
+        foreach ($rows as &$row) {
+            unset($row[5]);
+            $row = array_values($row);
+        }
+        unset($row);
+        // Row 1 pads row 2's id: trimmed, the two would collapse into a false duplicate of bs-synthetic-0002.
+        $rows[0][0] = ' '.$rows[1][0].' ';
+        $rows[2][0] = '';
+        $result = $this->normalize($rows, array_values($headers));
+        $this->assertSame([['sheet', null, 'mapped_column_missing', 'Mood'], ['row', 1, 'invalid_source_id', 'Track ID'],
+            ['row', 3, 'missing_source_id', 'Track ID']],
+            array_map(static fn (array $finding): array => [$finding['scope'], $finding['row'], $finding['code'], $finding['column']], $result['findings']));
+        $this->assertSame([null, 'bs-synthetic-0002', null, 'bs-synthetic-0004'], array_column($result['entries'], 'source_id'));
+        $this->assertSame(0, $result['counts']['normalized']);
+    }
+
     public function test_explicit_slug_and_currency_columns_are_checked_exactly(): void
     {
         $headers = [...self::HEADERS, 'Slug', 'Currency'];
