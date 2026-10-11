@@ -122,6 +122,22 @@ Codex's third review (of `1d744db`) raised two more P2s, fixed in the next commi
   timed inside the read, which a deterministic test cannot arrange; the unchanged-file path is covered by
   every CLI test.
 
+## Independent review of the Codex fixes (`58d16e2..ab17e80`) and the follow-up
+
+The independent review of `58d16e2..ab17e80` returned APPROVE WITH CONDITIONS
+(`independent-review-ab17e80-DECISION.md`). Codex's fourth review (of `ab17e80`) raised two more P2s.
+Both are fixed in the next commit with the review's conditions:
+
+| Item | Change |
+| --- | --- |
+| Codex: reuse the full private-source boundary; review L1, L4, I2 | An export outside the checkout now goes through `PrivateSourceFiles::protectedFile`: privacy (uid, `0600`, one link) is checked on the same stat it reads, the parent must be a caller-owned `0700` directory whose parent is not group- or world-writable, and no ancestor may contain `.git`. New refusal case: a `0600` export under another checkout's `.git` (`input_not_private`). |
+| Codex: roll back partial outputs | All outputs are staged as synced `.pending` files, then renamed; any failure removes every file this run created. New refusal case runs the CLI under a 4 KiB file-size limit: before the fix it left `beatstars-dry-run.json.pending`; after it the directory is empty. |
+| Review optional | An export inside this checkout is admitted only under `tests/Fixtures/` with a `synthetic_fixture` mapping. New refusal case: `composer.json` with the fixture mapping. |
+| Review condition 3 | Rights references and slugs are now exact as well; padding is `invalid_rights_reference` / `invalid_slug`. Descriptive text stays trimmed, with the raw cells in `raw_metadata`. |
+| Review conditions 2 and 4 | Stated here: file times are whole seconds, so a same-size, same-inode rewrite within one second of the first `lstat` is not detected. No test drives a concurrent rewrite, so mutants of the three identity comparisons in `input()` survive (the review's I1); the uid mutant it found is moot now that `protectedFile` checks ownership. The guide now states the exact `0600` rule. |
+
+Red/green: `evidence/codex-boundary-and-rollback-red-green.txt` (79 unit tests, 20 feature tests).
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,

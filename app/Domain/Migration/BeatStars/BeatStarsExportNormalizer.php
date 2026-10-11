@@ -204,9 +204,10 @@ final class BeatStarsExportNormalizer
         $raw['title'] = $cells[$columns['title']];
 
         if ($mapping['slug_policy'] === 'column') {
-            $slug = trim($cells[$columns['slug']]);
+            // Identifiers (slug, rights reference) are checked exactly as exported; padding is invalid, not trimmed.
+            $slug = $cells[$columns['slug']];
             $raw['slug'] = $cells[$columns['slug']];
-            if ($slug === '') {
+            if (trim($slug) === '') {
                 $findings[] = $this->finding('row', $row, $sourceId, 'missing_slug', $columns['slug'], null);
                 $slug = null;
             } elseif (! $this->slug($slug)) {
@@ -325,8 +326,8 @@ final class BeatStarsExportNormalizer
             $visibility = $mapping['constants']['visibility'];
         }
 
-        $rights = trim($cells[$columns['rights_reference']]);
-        if ($rights === '') {
+        $rights = $cells[$columns['rights_reference']];
+        if (trim($rights) === '') {
             $findings[] = $this->finding('row', $row, $sourceId, 'missing_rights_reference', $columns['rights_reference'], null);
             $rights = null;
         } elseif (! CellText::line($rights, 192)) {

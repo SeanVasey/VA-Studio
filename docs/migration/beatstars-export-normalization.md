@@ -27,10 +27,14 @@ rights, prices or license terms. Every value in the output comes from the sheet 
 
 Both files stay in private storage outside the repository, like every other source artifact
 (`docs/migration/README.md`). Only the report's hashes belong in Git. The dry run enforces this for
-the export: it must be outside the checkout, owned by the caller, mode `0600` (no group or other
-access) and a single link (`input_not_private` otherwise). It reads an export from inside the
-checkout only when the mapping's `acquisition_method` is `synthetic_fixture`
-(`input_inside_repository` otherwise).
+the export through the same boundary as every other private source (`PrivateSourceFiles`): a
+caller-owned, mode `0600`, single-link file in a caller-owned `0700` directory whose parent is not
+group- or world-writable, with no `.git` in any ancestor (so not inside any Git working tree), and
+read through one descriptor whose identity must not change during the read (`input_not_private`
+or `input_changed` otherwise). An export inside this checkout is read only from `tests/Fixtures/`
+with a mapping whose `acquisition_method` is `synthetic_fixture` (`input_inside_repository`
+otherwise). If writing any output fails, every file the run created is removed before it reports
+`output_write`.
 
 ```json
 {
@@ -67,7 +71,7 @@ checkout only when the mapping's `acquisition_method` is `synthetic_fixture`
 | `slug_policy` | `column` (a `slug` column holds the final lowercase hyphenated slug) or `derive_from_title` (ASCII letters and digits of the title, everything else becomes `-`). Derivation is shown in the report; a title that yields nothing is a finding. |
 | `columns` | Target field → header. Required: `source_id`, `title`, `rights_reference`, plus `artist` and `visibility` unless given as constants. Optional: `slug`, `bpm`, `musical_key`, `genre`, `mood`, `tags`, `description`, `currency` (checked against the declared currency). No other field exists; in particular there is no consent, e-mail or customer field. |
 | `constants` | Sheet-wide `artist` (text) and/or `visibility` (one of `draft`, `private`, `unlisted`, `public`, `sold`, `unknown`) when the export has no such column. |
-| `visibility_values` | Exact source value → visibility; a padded cell such as ` Public ` does not match `Public`. Required when `visibility` is a column. Any other value is a finding; map it to `unknown` explicitly if that is the truth. |
+| `visibility_values` | Exact source value → visibility; a padded cell such as ` Public ` does not match `Public`. Identifiers (source id, slug, rights reference) and categorical cells (visibility, license name, currency) are checked exactly as exported; descriptive text (title, artist, BPM, key, genre, mood, tags, description) is trimmed, and the raw cells are kept in `raw_metadata` under the record hash. Required when `visibility` is a column. Any other value is a finding; map it to `unknown` explicitly if that is the truth. |
 | `tag_separator` | One character; required when `tags` is a column. Tags are trimmed; empty pieces are dropped; duplicates, more than 20 tags or tags over 80 characters are findings. |
 | `licenses` | Source license name → operator label (`[a-z0-9-]`, up to 80). Labels only identify the name for later reconciliation; they are not store licenses. |
 | `offers` | 1–10 entries, each a `price_column` plus exactly one of `license` (a name from `licenses`) or `license_column`. Blank or non-numeric prices and unknown or blank license names are findings. License names and a `currency` column are matched exactly as exported, so padding is a finding. |

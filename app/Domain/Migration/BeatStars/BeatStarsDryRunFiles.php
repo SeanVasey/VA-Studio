@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Migration\BeatStars;
 
+use App\Domain\Migration\CatalogOnboarding\PrivateSourceFiles;
 use InvalidArgumentException;
+use Throwable;
 
 /**
  * Private file boundary for the dry run: read two inputs, write at most three outputs, nothing else.
@@ -59,8 +61,23 @@ final class BeatStarsDryRunFiles
             $this->require(! $this->exists($outputDirectory.'/'.self::SNAPSHOT), 'output_differs');
         }
         $this->directory($outputDirectory);
-        foreach ($written as $name) {
-            $this->write($outputDirectory.'/'.$name, $outputs[$name]);
+        // Stage every output, then publish them; on any failure remove every file this run created, so a
+        // refusal never leaves a partial report set or a .pending file behind.
+        $created = [];
+        try {
+            foreach ($written as $name) {
+                $created[] = $this->stage($outputDirectory.'/'.$name, $outputs[$name]);
+            }
+            foreach ($written as $index => $name) {
+                $path = $outputDirectory.'/'.$name;
+                $this->require(! $this->exists($path) && @rename($created[$index], $path), 'output_write');
+                $created[$index] = $path;
+            }
+        } catch (Throwable $error) {
+            foreach ($created as $path) {
+                @unlink($path);
+            }
+            throw $error;
         }
 
         return ['result' => $result, 'written' => $written, 'unchanged' => $unchanged];
@@ -76,21 +93,30 @@ final class BeatStarsDryRunFiles
         $bytes = $this->input($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
         $repository = dirname(__DIR__, 4);
         if ($path === $repository || str_starts_with($path, $repository.'/')) {
-            $this->require((new BeatStarsExportMapping)->decode($mapping)['acquisition_method'] === 'synthetic_fixture',
+            $this->require(str_starts_with($path, $repository.'/tests/Fixtures/')
+                && (new BeatStarsExportMapping)->decode($mapping)['acquisition_method'] === 'synthetic_fixture',
                 'input_inside_repository');
-        } else {
-            $stat = $this->path($path);
-            $this->require(function_exists('posix_geteuid') && $stat['uid'] === posix_geteuid()
-                && ($stat['mode'] & 0077) === 0 && $stat['nlink'] === 1, 'input_not_private');
-        }
 
-        return $bytes;
+            return $bytes;
+        }
+        // The shared private-source boundary: a caller-owned 0600 single-link file in a caller-owned 0700
+        // directory whose parent is not group- or world-writable, with no .git in any ancestor, read through
+        // one descriptor whose uid, mode, link count and identity are checked on the same stat it reads.
+        try {
+            $proof = (new PrivateSourceFiles)->protectedFile($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
+        } catch (InvalidArgumentException) {
+            throw new InvalidArgumentException('input_not_private');
+        }
+        $this->require($proof['bytes'] === $bytes, 'input_changed');
+
+        return $proof['bytes'];
     }
 
     /**
      * Read one regular file whose identity cannot change across the read: the named file, the open
      * descriptor before reading and the descriptor afterwards must share device, inode, size, mtime and
-     * ctime, so the hashed bytes are exactly the retained file's (as PrivateSourceFiles::read does).
+     * ctime, so the hashed bytes are exactly the retained file's. This is only the identity half of
+     * PrivateSourceFiles::read; a real export's privacy goes through PrivateSourceFiles itself (export()).
      */
     private function input(string $path, int $maximum): string
     {
@@ -161,7 +187,8 @@ final class BeatStarsDryRunFiles
         return $stat;
     }
 
-    private function write(string $path, string $bytes): void
+    /** Write one complete, synced, 0600 `.pending` file next to $path and return its path. */
+    private function stage(string $path, string $bytes): string
     {
         $pending = $path.'.pending';
         $this->require(! $this->exists($pending), 'output_pending_exists');
@@ -181,10 +208,14 @@ final class BeatStarsDryRunFiles
                 $offset += $count;
             }
             $this->require(@fflush($handle) && @fsync($handle), 'output_write');
-        } finally {
+        } catch (Throwable $error) {
             fclose($handle);
+            @unlink($pending);
+            throw $error;
         }
-        $this->require(! $this->exists($path) && @rename($pending, $path), 'output_write');
+        fclose($handle);
+
+        return $pending;
     }
 
     private function exists(string $path): bool

@@ -132,7 +132,7 @@ class BeatStarsDryRunCommandTest extends TestCase
     public function test_a_sheet_whose_snapshot_exceeds_the_limit_exits_three_with_a_report_naming_the_finding(): void
     {
         // A clean synthetic sheet of about 0.6 MB whose drafts snapshot would exceed the 1 MiB decoder cap.
-        $handle = fopen($this->base.'/large.csv', 'xb');
+        $handle = fopen($this->privateDirectory().'/large.csv', 'xb');
         fputcsv($handle, ['Track ID', 'Title', 'BPM', 'Key', 'Genre', 'Mood', 'Tags', 'Description', 'Status', 'Lease Name',
             'Lease Price', 'Exclusive Price', 'Rights Reference', 'Plays'], ',', '"', '');
         for ($index = 1; $index <= 120; $index++) {
@@ -141,11 +141,11 @@ class BeatStarsDryRunCommandTest extends TestCase
                 sprintf('SYNTHETIC-RIGHTS-L%04d', $index), '0'], ',', '"', '');
         }
         fclose($handle);
-        chmod($this->base.'/large.csv', 0600);
-        $this->assertLessThan(700000, filesize($this->base.'/large.csv'));
+        chmod($this->base.'/private/large.csv', 0600);
+        $this->assertLessThan(700000, filesize($this->base.'/private/large.csv'));
 
         $output = $this->outputDirectory('large');
-        $result = $this->invoke(['--export', $this->base.'/large.csv', '--mapping', $this->fixtures.'/mapping.json', '--output', $output]);
+        $result = $this->invoke(['--export', $this->base.'/private/large.csv', '--mapping', $this->fixtures.'/mapping.json', '--output', $output]);
         $this->assertSame(3, $result['exit'], $result['stdout'].$result['stderr']);
         $this->assertSame(['code' => 'dry_run_findings', 'rows' => 120, 'normalized' => 0, 'withheld' => 120, 'findings' => 1,
             'snapshot' => 'none', 'written' => ['beatstars-dry-run.json', 'beatstars-dry-run.md'], 'unchanged' => [], 'database_writes' => 0],
@@ -169,7 +169,10 @@ class BeatStarsDryRunCommandTest extends TestCase
             'shared output directory' => ['output_directory'], 'foreign file in output' => ['output_directory_not_empty'],
             'different retained report' => ['output_differs'], 'retained snapshot without findings-free run' => ['output_differs'],
             'bad mapping' => ['mapping_json'], 'export inside repository without a synthetic mapping' => ['input_inside_repository'],
-            'group-readable export' => ['input_not_private'], 'hard-linked export' => ['input_not_private']];
+            'group-readable export' => ['input_not_private'], 'hard-linked export' => ['input_not_private'],
+            'export under another git checkout' => ['input_not_private'],
+            'repository file outside the fixtures with a synthetic mapping' => ['input_inside_repository'],
+            'write failure leaves no partial output' => ['output_write']];
     }
 
     #[DataProvider('refusals')]
@@ -222,6 +225,11 @@ class BeatStarsDryRunCommandTest extends TestCase
                 $arguments[3] = $this->base.'/mapping.json';
                 break;
             case 'input_inside_repository':
+                if ($this->dataName() === 'repository file outside the fixtures with a synthetic mapping') {
+                    // Only tests/Fixtures/ may hold a synthetic export; nothing is written into the checkout.
+                    $arguments[1] = $this->repository.'/composer.json';
+                    break;
+                }
                 // The checkout's synthetic export with a mapping that claims a real acquisition.
                 $mapping = json_decode((string) file_get_contents($this->fixtures.'/mapping.json'), true, 16);
                 $mapping['acquisition_method'] = 'official_export';
@@ -229,17 +237,24 @@ class BeatStarsDryRunCommandTest extends TestCase
                 $arguments[3] = $this->base.'/mapping.json';
                 break;
             case 'input_not_private':
-                copy($this->fixtures.'/export.csv', $this->base.'/export.csv');
-                if ($this->dataName() === 'group-readable export') {
-                    chmod($this->base.'/export.csv', 0640);
-                } else {
-                    chmod($this->base.'/export.csv', 0600);
-                    link($this->base.'/export.csv', $this->base.'/export-second-link.csv');
+                $directory = $this->privateDirectory();
+                if ($this->dataName() === 'export under another git checkout') {
+                    // A private file inside some other Git working tree is still in Git.
+                    mkdir($this->base.'/checkout', 0700);
+                    mkdir($this->base.'/checkout/.git', 0700);
+                    $directory = $this->base.'/checkout/private';
+                    mkdir($directory, 0700);
                 }
-                $arguments[1] = $this->base.'/export.csv';
+                copy($this->fixtures.'/export.csv', $directory.'/export.csv');
+                chmod($directory.'/export.csv', $this->dataName() === 'group-readable export' ? 0640 : 0600);
+                if ($this->dataName() === 'hard-linked export') {
+                    link($directory.'/export.csv', $directory.'/export-second-link.csv');
+                }
+                $arguments[1] = $directory.'/export.csv';
                 break;
         }
-        $result = $this->invoke($arguments);
+        // A 4 KiB file-size limit (with SIGXFSZ ignored) makes the first staged report fail mid-write.
+        $result = $this->invoke($arguments, $reason === 'output_write' ? ['bash', '-c', 'trap "" XFSZ; ulimit -f 4; exec "$0" "$@"'] : []);
         $this->assertSame(1, $result['exit'], $result['stdout']);
         $this->assertSame(['code' => 'dry_run_refused', 'reason' => $reason, 'database_writes' => 0], $result['summary']);
         $this->assertSame($expected, scandir($output));
@@ -253,14 +268,25 @@ class BeatStarsDryRunCommandTest extends TestCase
         return $this->invoke(['--export', $this->fixtures.'/'.$export, '--mapping', $this->fixtures.'/mapping.json', '--output', $output]);
     }
 
-    private function invoke(array $arguments): array
+    private function invoke(array $arguments, array $wrapper = []): array
     {
-        $process = new Process([PHP_BINARY, $this->repository.'/scripts/migration/beatstars-dry-run.php', ...$arguments], null, [], null, 60);
+        $process = new Process([...$wrapper, PHP_BINARY, $this->repository.'/scripts/migration/beatstars-dry-run.php', ...$arguments], null, [], null, 60);
         $process->run();
         $stdout = $process->getOutput();
 
         return ['exit' => $process->getExitCode(), 'stdout' => $stdout, 'stderr' => $process->getErrorOutput(),
             'summary' => json_decode($stdout, true, 8)];
+    }
+
+    /** A caller-owned 0700 directory whose parent (the 0700 test base) is not group- or world-writable. */
+    private function privateDirectory(): string
+    {
+        $path = $this->base.'/private';
+        if (! is_dir($path)) {
+            mkdir($path, 0700);
+        }
+
+        return $path;
     }
 
     private function outputDirectory(string $name): string

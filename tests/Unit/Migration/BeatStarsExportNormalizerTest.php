@@ -153,6 +153,7 @@ class BeatStarsExportNormalizerTest extends TestCase
             'long key' => [[3, 3, str_repeat('k', 25)], 'invalid_musical_key', 'Key'],
             'long genre' => [[3, 4, str_repeat('g', 256)], 'invalid_genre', 'Genre'],
             'long rights reference' => [[3, 12, str_repeat('r', 193)], 'invalid_rights_reference', 'Rights Reference'],
+            'padded rights reference' => [[3, 12, 'SYNTHETIC-RIGHTS-0004 '], 'invalid_rights_reference', 'Rights Reference'],
             'control rights reference' => [[3, 12, "ref\x01"], 'invalid_rights_reference', 'Rights Reference'],
         ];
     }
@@ -274,12 +275,12 @@ class BeatStarsExportNormalizerTest extends TestCase
             array_map(static fn (array $entry): string => $entry['metadata']['slug'], $result['entries']));
         $this->assertSame('synthetic-explicit-1', $result['entries'][0]['raw_metadata']['slug']);
 
-        $rows[0][14] = 'Bad Slug';
+        $rows[0][14] = ' synthetic-explicit-1';
         $rows[1][14] = '';
         $rows[2][15] = 'EUR';
         $rows[3][15] = ' USD';
         $result = $this->normalize($rows, $headers, $overrides);
-        $this->assertSame([[1, 'invalid_slug', 'Bad Slug'], [2, 'missing_slug', null], [3, 'currency_mismatch', 'EUR'],
+        $this->assertSame([[1, 'invalid_slug', ' synthetic-explicit-1'], [2, 'missing_slug', null], [3, 'currency_mismatch', 'EUR'],
             [4, 'currency_mismatch', ' USD']],
             array_map(static fn (array $finding): array => [$finding['row'], $finding['code'], $finding['detail']], $result['findings']));
         $this->assertSame(['withheld', 'withheld', 'withheld', 'withheld'], array_column($result['entries'], 'disposition'));
