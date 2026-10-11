@@ -26,7 +26,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass9.txt` | Run after the fifth Codex review: 246 citations across 3 documents (README 96, PRIVACY 91, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `route-table-unthrottled-production.txt` | The production route table filtered to routes without a throttle (sixth Codex review). |
 | `green-check-citations-pass10.txt` | Run after the sixth Codex review: 246 citations, `RESULT PASS`, exit 0. |
-| `green-check-citations-pass11.txt` | Final run, after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass11.txt` | Run after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass12.txt` | Final run, after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -122,6 +123,11 @@ Citation check after this pass: `green-check-citations-pass10.txt`.
 | This record named pass 9 as the final citation run | Pass 11 is the final run (table above) |
 
 Citation check after this pass: `green-check-citations-pass11.txt`.
+
+| PRIVACY section 3 listed Forge/DigitalOcean hosting and host-local backups as processors today | Both are marked selected or planned and not yet provisioned: no host, account or SSH access has been supplied (S-2 to S-4), and backups run only on synthetic data (`docs/ops/backup-restore-proof.md`) |
+| `docs/customer-test-self-service.md` was titled and introduced as local/testing only, and `docs/verification/customer-account-test-journey.md` called it the "local test self-service child" | The title, opening and link text now name `local`, `testing` and `staging`, matching the activation section; the link in `docs/ops/staging-test-purchase.md` follows the new title |
+
+Citation check after this pass: `green-check-citations-pass12.txt`.
 
 ## Contradictions resolved at integration
 

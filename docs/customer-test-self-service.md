@@ -1,6 +1,6 @@
-# Local test customer enrollment and recovery
+# Test customer enrollment and recovery
 
-This T23/T24 child extends the existing account-first customer library with a usable local/testing enrollment and password-recovery journey. A visitor requests a test message, opens its private captured link, chooses a password and signs in separately. Recovery keeps the same account and owner key; existing orders, original contracts, purchased files and guest ownership are unchanged.
+This T23/T24 child extends the existing account-first customer library with a usable test enrollment and password-recovery journey for `local`, `testing` and the hosted `staging` rehearsal (see Activation below). A visitor requests a test message, opens its private captured link, chooses a password and signs in separately. Recovery keeps the same account and owner key; existing orders, original contracts, purchased files and guest ownership are unchanged.
 
 ## Activation and transport
 
