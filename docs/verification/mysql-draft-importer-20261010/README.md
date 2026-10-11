@@ -368,6 +368,37 @@ Results: `local-evidence/review-7476fc7/red-green.txt`. The Codex P2 on whole-sc
 covered by the engine admission) is deferred to the lane's follow-up batch under the owner's freeze-and-batch
 rule; the PR thread records it.
 
+## Follow-up batch (2026-10-11)
+
+The deferred Codex P2 on PR #90 (thread `discussion_r4240075127`): `lockedStorage()` opened only the evidence
+tables and the discovery epoch, but the engine admission in `mysqlSchema()` covers every base table. In the window
+before the pin, another privileged session could move an unlisted table such as `migrations` to MyISAM and add a
+`tracks` insert trigger that writes it. A resumed segment then wrote that table. The end-of-segment proof
+refused, but the MyISAM row survived the rollback. (A fresh batch was already safe, because `binding()` re-runs
+`schema()` inside the transaction before the first write.)
+
+The fix: on MySQL, the pin now lists every base table in `DATABASE()`, opens each one with
+`SELECT 1 FROM ... LIMIT 0` (backticks escaped), and lists them again. It refuses with `catalog_target_invalid`
+unless the set is unchanged, includes every evidence table and the epoch, and is all InnoDB. A table dropped
+between the listing and its open is mapped to the same refusal. The shadow check still runs first. SQLite is
+unchanged. The cost is one `LIMIT 0` open per table per segment. The trade-off is that DDL on any table in the
+schema now waits until the segment commits, not only DDL on the evidence tables.
+
+New test: `test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin`.
+It applies segment 1. In the `TransactionBeginning` window of segment 2, a foreign session moves `migrations` to
+MyISAM and adds the trigger. The test asserts that the evidence and the `migrations` row count are unchanged,
+then that the refusal is `catalog_target_invalid`. On main it is red with "A write to the unlisted table survived
+the rollback" (81 rows vs 80). After the fix it is green on MySQL. Its SQLite counterpart turns the journal off
+and passes on both sources. On MySQL, data sets #10 to #12, the earlier pin test, the dry-run/resume case and the
+foreign-session interleave case pass. The SQLite file passes with 56 tests. The MySQL-native selection is 1,821
+cases, and both CI comments are updated. Results: `local-evidence/followup-20261011/red-green.txt`.
+
+Residual, not closed and not tested: a trigger on a pinned table that names a table which does not exist at pin
+time. A foreign session could create that table as MyISAM after the pin, since creating a new table takes no lock
+the importer holds. The end-of-segment proof still refuses, but that write would survive. Closing it would need
+the triggers on the pinned tables compared inside the pin (triggers on `tracks` are not in the owned-object
+comparison today). This is an owner decision for a later batch.
+
 ## Policy self-tests (second session; third-session re-runs marked)
 
 | Command | Result |

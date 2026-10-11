@@ -1,0 +1,65 @@
+# Follow-up batch (2026-10-11): whole-schema storage pin (Codex P2 on PR #90, discussion_r4240075127)
+# Base: main 2f1cacc. Private MySQL 8.0.46 (lower_case_table_names=0) on 127.0.0.1:33140, database
+# vaseyaudio_catalog_import; SQLite in memory. Direct PHPUnit with the worktree's Composer autoload:
+# env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33140 DB_USERNAME=root
+#   DB_PASSWORD= DB_DATABASE=vaseyaudio_catalog_import DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array
+#   QUEUE_CONNECTION=sync php -d memory_limit=512M -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php";
+#   require "vendor/phpunit/phpunit/phpunit";' -- --filter '<name>' tests/Feature/PersistentCatalogDraftImportTest.php
+# (SQLite: DB_CONNECTION=sqlite DB_DATABASE=:memory:, no filter.) public/build absent throughout.
+
+## Setup note (not evidence)
+The first draft of the new test applied a fresh batch. It failed on main with 'catalog_target_schema_invalid'
+before any write, because a fresh batch calls binding(), which re-runs schema() inside the transaction. The
+reported gap is a resumed segment, so the test now applies segment 1, then changes storage before segment 2.
+
+## Red, MySQL 8.0.46, main's CatalogDatabaseEvidence.php (2f1cacc) with the new test
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin
+A write to the unlisted table survived the rollback.
+Failed asserting that 81 is identical to 80.
+Time: 01:37.677
+Tests: 1, Assertions: 7, Failures: 1.
+(The evidence snapshot assertion before it passed: the segment rolled back, and the end-of-segment proof
+refused because of the MyISAM table. The trigger's row in the MyISAM `migrations` table survived.)
+
+## Green, MySQL 8.0.46, after the fix
+### new test
+Time: 02:08.618, Memory: 81.00 MB
+OK (1 test, 8 assertions)
+### test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#10
+Time: 05:22.503, Memory: 81.00 MB
+OK (1 test, 8 assertions)
+### ...#11
+Time: 02:39.468, Memory: 81.00 MB
+OK (1 test, 9 assertions)
+### ...#12
+Time: 03:46.715, Memory: 81.00 MB
+OK (1 test, 6 assertions)
+### test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin
+Time: 04:25.947, Memory: 81.00 MB
+OK (1 test, 5 assertions)
+### test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits
+Time: 02:49.736, Memory: 85.00 MB
+OK (1 test, 36 assertions)
+### test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open
+Time: 03:53.733, Memory: 81.00 MB
+OK (1 test, 14 assertions)
+
+## Green, SQLite in memory, whole file, after the fix (run twice: right after the fix, and on the final tree)
+OK (56 tests, 324 assertions)
+(The SQLite branch of lockedStorage() is unchanged. The new test's SQLite counterpart turns the journal off,
+which is SQLite's only way to lose rollback for any table. It passes on main too, so it is not red evidence.)
+
+## Sharder, MySQL native selection
+python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+rc 0: Proved 1821 selected MySQL-native tests in 164 files (of 7792 discovered tests in 562 files) across 8 nonempty shards.
+Same warning as before: PersistentCatalogDraftImportTest.php has no timings entry. Generated phpunit-ci-mysql-* files deleted.
+(A first invocation in this session failed with 'File exists: phpunit-ci-mysql-1.xml' from a preceding
+invocation whose output was truncated; the files were deleted and the command re-run.)
+
+## Pint
+vendor/bin/pint --test app/Domain/Migration/CatalogOnboarding/CatalogDatabaseEvidence.php tests/Feature/PersistentCatalogDraftImportTest.php
+{"tool":"pint","result":"passed"}
+
+## Not run
+The rest of the file on MySQL; MySQL 8.4; lower_case_table_names=1; a dedicated probe for a trigger that
+references a table created after the pin (see README, residual).

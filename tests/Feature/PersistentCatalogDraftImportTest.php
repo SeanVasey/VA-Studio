@@ -504,6 +504,50 @@ class PersistentCatalogDraftImportTest extends TestCase
         $this->assertSame($before, $this->evidence());
     }
 
+    public function test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(2));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        // A fresh batch re-proves the whole schema inside the transaction before its first write; a resumed
+        // segment relies on admission and the pin, so the change lands before the second segment.
+        $this->assertSame(1, $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor)['processed']);
+        $before = $this->evidence();
+        $migrations = DB::table('migrations')->count();
+        $changed = false;
+        Event::listen(TransactionBeginning::class, function () use (&$changed): void {
+            if ($changed) {
+                return;
+            }
+            $changed = true;
+            if ($this->mysql()) {
+                // Another session moves a table the evidence set does not list to MyISAM and makes every track
+                // insert write it, so a write there would survive the segment's rollback.
+                $foreign = $this->foreignSession();
+                $foreign->exec('ALTER TABLE migrations ENGINE=MyISAM');
+                $foreign->exec("CREATE TRIGGER foreign_tracks_write_migrations AFTER INSERT ON tracks FOR EACH ROW INSERT INTO migrations (migration, batch) VALUES (CONCAT('foreign-', NEW.id), 999)");
+                $this->assertSame('MyISAM', $foreign->query("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'migrations'")->fetchColumn());
+            } else {
+                // SQLite has one storage engine per database; turning the journal off removes rollback for
+                // every table, listed or not, and is the only counterpart of a non-transactional table.
+                DB::connection()->getPdo()->exec('PRAGMA journal_mode=OFF');
+                $this->assertSame('off', strtolower((string) DB::connection()->getPdo()->query('PRAGMA journal_mode')->fetchColumn()));
+            }
+        });
+        $refusal = null;
+        try {
+            $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+        } catch (RuntimeException $error) {
+            $refusal = $error->getMessage();
+        }
+        $this->assertTrue($changed);
+        $this->assertSame($before, $this->evidence());
+        // Checked before the refusal code: a write that reached the unlisted table outlives the rollback.
+        $this->assertSame($migrations, DB::table('migrations')->count(), 'A write to the unlisted table survived the rollback.');
+        $this->assertSame('catalog_target_invalid', $refusal, 'Storage of an unlisted table changed after admission was admitted.');
+    }
+
     #[DataProvider('schemaDrift')]
     public function test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs(string $case): void
     {
