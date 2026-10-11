@@ -206,7 +206,8 @@ class BeatStarsDryRunCommandTest extends TestCase
             'export under another git checkout' => ['input_not_private'],
             'repository file outside the fixtures with a synthetic mapping' => ['input_inside_repository'],
             'write failure leaves no partial output' => ['output_write'],
-            'output under another git checkout' => ['output_inside_repository']];
+            'output under another git checkout' => ['output_inside_repository'],
+            'output under a .git file (worktree or submodule)' => ['output_inside_repository']];
     }
 
     #[DataProvider('refusals')]
@@ -233,9 +234,11 @@ class BeatStarsDryRunCommandTest extends TestCase
                 }
                 break;
             case 'output_inside_repository':
-                if ($this->dataName() === 'output under another git checkout') {
+                if (str_starts_with($this->dataName(), 'output under a')) {
                     mkdir($this->base.'/other-checkout', 0700);
-                    mkdir($this->base.'/other-checkout/.git', 0700);
+                    // A linked worktree or submodule has a .git file, not a directory.
+                    $this->dataName() === 'output under another git checkout' ? mkdir($this->base.'/other-checkout/.git', 0700)
+                        : file_put_contents($this->base.'/other-checkout/.git', "gitdir: elsewhere\n");
                     $arguments[5] = $output = $this->base.'/other-checkout/out';
                     mkdir($output, 0700);
                     break;

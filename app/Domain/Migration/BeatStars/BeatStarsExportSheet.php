@@ -66,6 +66,10 @@ final class BeatStarsExportSheet
         $offset = 0;
         while ($offset < $length) {
             if ($bytes[$offset] !== '"') {
+                // fgetcsv skips leading space, tab, VT, FF and CR and then parses a quote as an enclosure, so
+                // whitespace followed by a quote is refused rather than read two different ways.
+                $leading = strspn($bytes, " \t\v\f\r", $offset);
+                $this->require($leading === 0 || ($bytes[$offset + $leading] ?? '') !== '"', 'export_csv_quotes');
                 // An unquoted field runs to the next delimiter or line feed.
                 $offset += strcspn($bytes, ",\n", $offset) + 1;
 

@@ -182,6 +182,19 @@ Its conditions are met as follows:
 - Applying the snapshot through `CatalogDraftImporter` (separately authorized; not run).
 - `composer audit` / `npm audit`: no dependency was added or changed.
 
+## Delta review of `7acdd5d..82993ff`
+
+REQUEST CHANGES (`independent-review-82993ff-DECISION.md`): `fgetcsv` skips space, tab, VT, FF and CR before
+a quote and then parses an enclosure, while the quote check read the same bytes as an unquoted field, so
+` "legacy-123` (unterminated) and a tab before `"x"-1` were still admitted. The check now refuses whitespace
+followed by a quote at the start of a field (`export_csv_quotes`). New unit cases: a space then an
+unterminated quote and a tab then a quote with text after its close (red before, green after); a bare carriage
+return after a closing quote, and a feature case with a `.git` file (not a directory) above the output
+directory, pin behaviour that surviving mutants could otherwise break. Evidence:
+`evidence/whitespace-quote-red-green.txt` (84 unit tests, 23 feature tests). The reviewer's fuzzing of the
+suggested variant found no admitted misparse and no refusal outside the whitespace-before-quote class. An
+operator whose home directory is itself a Git repository (`~/.git`) cannot use an output directory under it.
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the
