@@ -96,7 +96,10 @@ The `check-citations.py` script is unchanged. The review's LOW finding on its sc
 | PRIVACY section 4 said browser locators clear on success | They stay for the tab session unless replaced or removed; the order locator deliberately keeps up to ten IDs after success (`useCart.ts`, `QuoteReview.tsx`, `OrderPreparation.tsx`) |
 | TERMS said every response carries `testOnly: true` and `payable: false` | It names the fields each response actually returns: quote `payable: false`, order review both, hosted checkout projection `testOnly: true`, errors a code only |
 
-Citation check after this pass: `green-check-citations-pass5.txt`.
+| TERMS said downloads require the original owning browser session | That is the guest-order rule; an account-owned test order is reachable after signing in from a fresh browser (`docs/verification/customer-account-test-journey.md`) |
+| README offered linking externally hosted legal text from the contact page | Removed as an existing mechanism: editorial and contact paragraphs render as plain text (`resources/js/Pages/Editorial.tsx`), so publication needs a code change |
+
+Citation check after this pass: `green-check-citations-pass6.txt`.
 
 ## Contradictions reported, not edited
 
