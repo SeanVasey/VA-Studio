@@ -54,7 +54,7 @@ Merges since the handoff are reviewed development merges with activation conditi
 | 2026-10-09 | Reconfirmed Laravel Forge + VPS after considering a plain VPS; DigitalOcean was selected earlier in the same session. Access is expected tomorrow (2026-10-10); no host/account/SSH access supplied yet. | Sean |
 | 2026-10-09 | Codex finishes #63 safely, then hands the remaining ordered development queue to Claude Code to save Codex usage; detailed handoff and prompt on `harness/claude-handoff-20261009`. | Sean |
 | 2026-10-08 | Conditions C11–C13 for paid downloads: runtime requirements doc, per-buyer heavy-work lock, page-driven continuation | Claude (delegated by Sean) |
-| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admits only `local`/`testing` today. | Claude; **confirmed by Sean** (S-1) |
+| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admitted only `local`/`testing` when this was decided; M-06 (PR #68 at `d8aba146`) has since admitted `staging` (`docs/private-server-readiness.md`, "First sale and cutover remain separate gates"). | Claude; **confirmed by Sean** (S-1) |
 | 2026-10-08 | Access: staging subdomain with TLS and basic auth (the Stripe webhook route is signature-checked and exempt from basic auth) | Sean |
 | 2026-10-08 | Environment, target: a reviewed `staging` environment that admits test commerce, requires staff MFA and refuses live mode (lane B2). Staging switches to it once merged. | Claude |
 
