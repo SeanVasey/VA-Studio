@@ -172,7 +172,8 @@ class BeatStarsDryRunCommandTest extends TestCase
             'group-readable export' => ['input_not_private'], 'hard-linked export' => ['input_not_private'],
             'export under another git checkout' => ['input_not_private'],
             'repository file outside the fixtures with a synthetic mapping' => ['input_inside_repository'],
-            'write failure leaves no partial output' => ['output_write']];
+            'write failure leaves no partial output' => ['output_write'],
+            'output under another git checkout' => ['output_inside_repository']];
     }
 
     #[DataProvider('refusals')]
@@ -199,6 +200,13 @@ class BeatStarsDryRunCommandTest extends TestCase
                 }
                 break;
             case 'output_inside_repository':
+                if ($this->dataName() === 'output under another git checkout') {
+                    mkdir($this->base.'/other-checkout', 0700);
+                    mkdir($this->base.'/other-checkout/.git', 0700);
+                    $arguments[5] = $output = $this->base.'/other-checkout/out';
+                    mkdir($output, 0700);
+                    break;
+                }
                 $this->repositoryOutput = $this->repository.'/storage/beatstars-dry-run-refused-'.bin2hex(random_bytes(4));
                 mkdir($this->repositoryOutput, 0700);
                 $arguments[5] = $output = $this->repositoryOutput;

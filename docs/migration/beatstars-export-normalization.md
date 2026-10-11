@@ -89,7 +89,7 @@ php scripts/migration/beatstars-dry-run.php \
 ```
 
 Paths must be absolute without `.` or `..` components or symlinks. The output directory must be
-mode `0700`, owned by the caller, outside the checkout, and either empty or holding an earlier
+mode `0700`, owned by the caller, outside this checkout and every other Git working tree (no `.git` in any ancestor), and either empty or holding an earlier
 run of this tool. The export basename becomes the snapshot's artifact path (`raw/<basename>`),
 so keep it to letters, digits, `.`, `_` and `-`.
 
@@ -142,7 +142,7 @@ A **refusal** (exit `1`) means the inputs cannot be interpreted at all; nothing 
 Reason codes: `usage`, `path`, `input_file`, `input_changed` (the file's identity, size or times changed while it was read), `input_not_private`, `input_inside_repository`,
 `output_directory`, `output_inside_repository`,
 `output_directory_not_empty`, `output_differs`, `output_pending_exists`, `output_write`,
-`export_name`, `export_too_large`, `export_encoding`, `export_header`, `export_too_many_rows`,
+`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (a quoted field that never closes, as in a truncated file, or text after a closing quote), `export_header`, `export_too_many_rows`,
 `export_empty`, and `mapping_*` (`json`, `keys`, `purpose`, `identity`, `acquisition_method`,
 `timestamp`, `currency`, `slug_policy`, `columns`, `constants`, `required_field`,
 `visibility_values`, `tag_separator`, `licenses`, `offers`, `ignored_columns`,
@@ -154,7 +154,7 @@ A **finding** (exit `3`) is recorded in the report and withholds rows; nothing i
 | --- | --- | --- |
 | sheet | `unmapped_column`, `mapped_column_missing`, `blank_record` | Every row withheld: the sheet is not fully understood. Map or ignore the column, fix the mapping, or remove the blank line, then rerun. |
 | sheet | `snapshot_too_large` | Every row passed its checks, but the snapshot would exceed 1,048,576 bytes; the detail gives its size. Every row is withheld and no `catalog.json` is written. Split the export into smaller sheets (each its own snapshot and output directory), then rerun. |
-| row | `column_count_mismatch`, `missing_source_id`, `invalid_source_id`, `duplicate_source_id`, `duplicate_row_content`, `duplicate_slug` | The row (and every row sharing the duplicate) is withheld. A source id is checked exactly as exported: leading or trailing spaces or tabs make it `invalid_source_id`, never a trimmed id. |
+| row | `column_count_mismatch` (the row's cells cannot be aligned to the header, so no source id is taken from it and its hash covers every cell), `missing_source_id`, `invalid_source_id`, `duplicate_source_id`, `duplicate_row_content`, `duplicate_slug` | The row (and every row sharing the duplicate) is withheld. A source id is checked exactly as exported: leading or trailing spaces or tabs make it `invalid_source_id`, never a trimmed id. |
 | row | `missing_title`, `invalid_title`, `synthetic_title_required`, `missing_slug`, `invalid_slug`, `slug_underivable`, `missing_artist`, `invalid_artist`, `invalid_bpm`, `invalid_musical_key`, `invalid_genre`, `invalid_mood`, `invalid_tags`, `invalid_description` | The row is withheld; the detail says which bound failed. BPM must be an integer 20–400; `0095` is `95`, `95.0` is not. |
 | row | `missing_visibility`, `unknown_visibility_value` | The row is withheld until the value is declared in `visibility_values`. |
 | row | `missing_rights_reference`, `invalid_rights_reference` | The row is withheld. A reference is required on every row; it is not checked against any evidence store. |

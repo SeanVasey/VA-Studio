@@ -29,6 +29,7 @@ final class BeatStarsExportSheet
             $bytes = substr($bytes, 3);
         }
         $this->require(mb_check_encoding($bytes, 'UTF-8') && ! str_contains($bytes, "\0"), 'export_encoding');
+        $this->quotes($bytes);
         $handle = fopen('php://temp', 'r+b');
         $this->require($handle !== false, 'export_unreadable');
         try {
@@ -52,6 +53,39 @@ final class BeatStarsExportSheet
         $this->require(array_any($records, static fn (?array $record): bool => $record !== null), 'export_empty');
 
         return ['headers' => array_values($headers), 'records' => $records];
+    }
+
+    /**
+     * fgetcsv accepts a quoted field that never closes (a truncated export) or text after a closing quote,
+     * and returns a cell that differs from the source bytes. Refuse both before parsing: a quoted field must
+     * close, and only a delimiter, a line ending or the end of the file may follow its closing quote.
+     */
+    private function quotes(string $bytes): void
+    {
+        $length = strlen($bytes);
+        $offset = 0;
+        while ($offset < $length) {
+            if ($bytes[$offset] !== '"') {
+                // An unquoted field runs to the next delimiter or line feed.
+                $offset += strcspn($bytes, ",\n", $offset) + 1;
+
+                continue;
+            }
+            $offset++;
+            while (true) {
+                $quote = strpos($bytes, '"', $offset);
+                $this->require($quote !== false, 'export_csv_quotes');
+                if (($bytes[$quote + 1] ?? '') !== '"') {
+                    $offset = $quote + 1;
+                    break;
+                }
+                $offset = $quote + 2;
+            }
+            $after = $bytes[$offset] ?? '';
+            $this->require(in_array($after, ['', ',', "\n"], true) || ($after === "\r" && ($bytes[$offset + 1] ?? '') === "\n"),
+                'export_csv_quotes');
+            $offset += $after === "\r" ? 2 : 1;
+        }
     }
 
     private function require(bool $condition, string $code): void

@@ -138,6 +138,21 @@ Both are fixed in the next commit with the review's conditions:
 
 Red/green: `evidence/codex-boundary-and-rollback-red-green.txt` (79 unit tests, 20 feature tests).
 
+Codex's fifth review (of `7acdd5d`) raised a P1 and two P2s:
+
+- P1, fixed: `fgetcsv` accepts a quoted field that never closes (a truncated export) or text after a
+  closing quote, and returns a cell that differs from the source bytes. The sheet reader now refuses
+  both before parsing (`export_csv_quotes`).
+- P2, fixed: the output directory may not sit under any Git working tree (a `.git` in any ancestor
+  is `output_inside_repository`), not only this checkout.
+- P2, not changed: a `column_count_mismatch` row keeps `source_id` null and hashes every cell. When the
+  cell count does not match the header, nothing shows which cell moved, so the positional source id
+  could belong to a neighbouring column; taking it could report a wrong legacy identity or a false
+  duplicate. The row is withheld either way. The guide now states this rule.
+
+Red/green: `evidence/codex-quotes-and-output-git-red-green.txt` (81 unit tests, 21 feature tests); the
+clean fixture's `catalog.json` hash is unchanged (`bd893c40…`).
+
 ## Not verified here
 
 - Behaviour on a real BeatStars export (S-9 not supplied): real column names, encodings,

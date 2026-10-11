@@ -410,6 +410,8 @@ class BeatStarsExportNormalizerTest extends TestCase
             'empty file' => ['', 'export.csv', 'export_header'],
             'header only' => ["Track ID,Title\n", 'export.csv', 'export_empty'],
             'blank records only' => ["Track ID,Title\n\n\n", 'export.csv', 'export_empty'],
+            'unterminated quoted field' => ["Track ID,Title\n\"legacy-123", 'export.csv', 'export_csv_quotes'],
+            'text after a closing quote' => ["Track ID,Title\n\"legacy\"-123,SYNTHETIC\n", 'export.csv', 'export_csv_quotes'],
             'too many rows' => ["Track ID\n".str_repeat("1\n", 1001), 'export.csv', 'export_too_many_rows'],
             'bad name' => ["Track ID\n1\n", 'export file.csv', 'export_name'],
             'dot name' => ["Track ID\n1\n", '..', 'export_name'],

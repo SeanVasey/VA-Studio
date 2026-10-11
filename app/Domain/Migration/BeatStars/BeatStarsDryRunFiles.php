@@ -156,6 +156,14 @@ final class BeatStarsDryRunFiles
             && function_exists('posix_geteuid') && $stat['uid'] === posix_geteuid(), 'output_directory');
         $repository = dirname(__DIR__, 4);
         $this->require($path !== $repository && ! str_starts_with($path, $repository.'/'), 'output_inside_repository');
+        // Reports hold source ids, raw metadata, prices and rights references: no Git working tree may hold them.
+        for ($ancestor = $path; ; $ancestor = dirname($ancestor)) {
+            clearstatcache(true, $ancestor.'/.git');
+            $this->require(@lstat($ancestor.'/.git') === false, 'output_inside_repository');
+            if ($ancestor === '/') {
+                break;
+            }
+        }
         $entries = @scandir($path);
         $this->require($entries !== false, 'output_directory');
         foreach ($entries as $entry) {
