@@ -1,0 +1,19 @@
+# Codex round on d880e3c (PR #89): padded headers, replaceable output-directory ancestors
+# Direct PHPUnit, SQLite in memory, this worktree's Composer autoload. Run as root in the container.
+## Red: the new tests against the d880e3c source
+--filter 'padded header|trailing tab' tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+Failed asserting that exception of type "InvalidArgumentException" is thrown.
+Failed asserting that exception of type "InvalidArgumentException" is thrown.
+Tests: 2, Assertions: 2, Failures: 2.
+--filter 'group-writable parent' tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+Failed asserting that 0 is identical to 1.
+Tests: 1, Assertions: 1, Failures: 1.
+## Green: whole files with the fix
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php   OK (86 tests, 718 assertions)
+tests/Feature/Migration/BeatStarsDryRunCommandTest.php   OK (24 tests, 183 assertions)
+vendor/bin/pint --test (changed source and tests)        passed
+## Not tested
+The directory identity re-check (dev/ino after the second admission and after publication) has no test: with
+the ancestor rule no other user can rename the directory mid-run, and nothing in the command offers a hook
+between admission and publication. An ancestor owned by another non-root user is not tested because the CI
+runner cannot chown; the group-writable case exercises the same check.

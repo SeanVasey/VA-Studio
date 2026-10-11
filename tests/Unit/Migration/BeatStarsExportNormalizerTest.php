@@ -407,6 +407,8 @@ class BeatStarsExportNormalizerTest extends TestCase
             'nul byte' => ["Track ID,Title\n\0,SYNTHETIC\n", 'export.csv', 'export_encoding'],
             'duplicate header' => ["Track ID,Track ID\n1,2\n", 'export.csv', 'export_header'],
             'blank header' => ["Track ID,\n1,2\n", 'export.csv', 'export_header'],
+            'padded header' => [" Track ID ,Title\n1,2\n", 'export.csv', 'export_header'],
+            'header with a trailing tab' => ["Track ID\t,Title\n1,2\n", 'export.csv', 'export_header'],
             'empty file' => ['', 'export.csv', 'export_header'],
             'header only' => ["Track ID,Title\n", 'export.csv', 'export_empty'],
             'blank records only' => ["Track ID,Title\n\n\n", 'export.csv', 'export_empty'],

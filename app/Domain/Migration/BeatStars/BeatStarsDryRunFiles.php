@@ -35,7 +35,7 @@ final class BeatStarsDryRunFiles
     {
         $mapping = $this->input($mappingPath, BeatStarsExportMapping::MAX_BYTES);
         $export = $this->export($exportPath, $mapping);
-        $this->directory($outputDirectory);
+        $pinned = $this->directory($outputDirectory);
         $result = (new BeatStarsExportNormalizer)->normalize($export, basename($exportPath), $mapping);
         $report = new BeatStarsDryRunReport;
         $outputs = [self::REPORT_JSON => $report->json($result), self::REPORT_MARKDOWN => $report->markdown($result)];
@@ -60,7 +60,7 @@ final class BeatStarsDryRunFiles
         if ($snapshot === null) {
             $this->require(! $this->exists($outputDirectory.'/'.self::SNAPSHOT), 'output_differs');
         }
-        $this->directory($outputDirectory);
+        $this->require($this->sameDirectory($pinned, $this->directory($outputDirectory)), 'output_directory');
         // Stage every output, then publish them; on any failure remove every file this run created, so a
         // refusal never leaves a partial report set or a .pending file behind.
         $created = [];
@@ -73,6 +73,7 @@ final class BeatStarsDryRunFiles
                 $this->require(! $this->exists($path) && @rename($created[$index], $path), 'output_write');
                 $created[$index] = $path;
             }
+            $this->require($this->sameDirectory($pinned, $this->path($outputDirectory)), 'output_directory');
         } catch (Throwable $error) {
             foreach ($created as $path) {
                 @unlink($path);
@@ -150,7 +151,12 @@ final class BeatStarsDryRunFiles
         return true;
     }
 
-    private function directory(string $path): void
+    /**
+     * The output directory must be a caller-owned 0700 directory outside every Git working tree, and no
+     * other local user may rename or replace it: each ancestor is owned by the caller or root and is not
+     * group- or world-writable unless it is a root-owned sticky directory such as /tmp.
+     */
+    private function directory(string $path): array
     {
         $stat = $this->path($path);
         $this->require(($stat['mode'] & 0170000) === 0040000 && ($stat['mode'] & 07777) === 0700
@@ -161,6 +167,13 @@ final class BeatStarsDryRunFiles
         for ($ancestor = $path; ; $ancestor = dirname($ancestor)) {
             clearstatcache(true, $ancestor.'/.git');
             $this->require(@lstat($ancestor.'/.git') === false, 'output_inside_repository');
+            if ($ancestor !== $path) {
+                clearstatcache(true, $ancestor);
+                $entry = @lstat($ancestor);
+                $this->require($entry !== false && ($entry['mode'] & 0170000) === 0040000
+                    && in_array($entry['uid'], [0, posix_geteuid()], true)
+                    && (($entry['mode'] & 0022) === 0 || ($entry['uid'] === 0 && ($entry['mode'] & 01000) !== 0)), 'output_directory');
+            }
             if ($ancestor === '/') {
                 break;
             }
@@ -175,6 +188,13 @@ final class BeatStarsDryRunFiles
             $entryStat = $this->path($path.'/'.$entry);
             $this->require(($entryStat['mode'] & 0170000) === 0100000 && $entryStat['nlink'] === 1, 'output_directory');
         }
+
+        return $stat;
+    }
+
+    private function sameDirectory(array $left, array $right): bool
+    {
+        return $left['dev'] === $right['dev'] && $left['ino'] === $right['ino'];
     }
 
     /** Reject relative paths, aliases and links in every component before touching a file. */

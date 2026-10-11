@@ -37,9 +37,10 @@ final class BeatStarsExportSheet
             rewind($handle);
             $headers = fgetcsv($handle, null, ',', '"', '');
             $this->require(is_array($headers) && $headers !== [null] && count($headers) <= self::MAX_COLUMNS, 'export_header');
-            $headers = array_map(static fn (?string $header): string => trim((string) $header), $headers);
+            $headers = array_map(static fn (?string $header): string => (string) $header, $headers);
             foreach ($headers as $header) {
-                $this->require(CellText::line($header, 255), 'export_header');
+                // A padded header is refused, not trimmed: the mapping must declare the exact exported header.
+                $this->require($header === trim($header) && CellText::line($header, 255), 'export_header');
             }
             $this->require(count(array_unique($headers, SORT_STRING)) === count($headers), 'export_header');
             $records = [];

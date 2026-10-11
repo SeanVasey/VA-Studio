@@ -202,6 +202,22 @@ differences between `fgetcsv` and a strict parser all involve bare CR in unquote
 Removing CR from the whitespace set survives the tests (VT and FF are not tested individually); the fuzz
 covers those bytes.
 
+## Codex round on `d880e3c`
+
+Two P2 findings, both fixed:
+
+- A header with leading or trailing whitespace (` Track ID `) was trimmed before the declared-column checks,
+  so a dry run could be clean against a header the operator never declared, and `export.columns` recorded
+  the sanitized name. Such a header is now refused (`export_header`), consistent with source ids and
+  constant values being matched exactly as exported.
+- Only the output directory itself was checked. Under a group- or world-writable, non-sticky parent another
+  local user could rename or replace it after admission. Every ancestor must now be owned by the caller or
+  root and not group- or world-writable unless root-owned and sticky (`/tmp`); otherwise `output_directory`.
+  The directory's dev/ino is also pinned from admission through publication.
+
+Evidence: `evidence/codex-padded-header-and-output-ancestors-red-green.txt` (red on the old source; 86 unit and
+24 feature tests green).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the

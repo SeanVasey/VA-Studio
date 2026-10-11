@@ -17,7 +17,7 @@ rights, prices or license terms. Every value in the output comes from the sheet 
 1. **The export**, as a UTF-8 CSV file (comma-separated, double-quote quoted, one header
    line). XLSX is out of scope: no spreadsheet dependency is added, so save or export the sheet
    as CSV first. A UTF-8 byte-order mark and CRLF line endings are accepted. Limits: 8 MiB,
-   1,000 data rows, 200 columns, unique non-blank headers. The resulting `catalog.json` must
+   1,000 data rows, 200 columns, unique non-blank headers without leading or trailing whitespace. The resulting `catalog.json` must
    also fit the drafts-v1 decoder's 1 MiB (1,048,576 bytes) cap. Each row's text is stored
    twice in the snapshot (raw and normalized), so a sheet of about 0.6 MB with long
    descriptions can exceed it; that is reported as `snapshot_too_large` (below), and the fix is
@@ -92,7 +92,7 @@ php scripts/migration/beatstars-dry-run.php \
 ```
 
 Paths must be absolute without `.` or `..` components or symlinks. The output directory must be
-mode `0700`, owned by the caller, outside this checkout and every other Git working tree (no `.git` in any ancestor), and either empty or holding an earlier
+mode `0700`, owned by the caller, outside this checkout and every other Git working tree (no `.git` in any ancestor), under ancestors that no other user can rename (each owned by the caller or root and not group- or world-writable unless root-owned and sticky, like `/tmp`), and either empty or holding an earlier
 run of this tool. The export basename becomes the snapshot's artifact path (`raw/<basename>`),
 so keep it to letters, digits, `.`, `_` and `-`.
 
@@ -145,7 +145,7 @@ A **refusal** (exit `1`) means the inputs cannot be interpreted at all; nothing 
 Reason codes: `usage`, `path`, `input_file`, `input_changed` (the file's identity, size or times changed while it was read), `input_not_private`, `input_inside_repository`,
 `output_directory`, `output_inside_repository`,
 `output_directory_not_empty`, `output_differs`, `output_pending_exists`, `output_write`,
-`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (a quoted field that never closes, as in a truncated file, text after a closing quote, or whitespace before an opening quote), `export_header`, `export_too_many_rows`,
+`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (a quoted field that never closes, as in a truncated file, text after a closing quote, or whitespace before an opening quote), `export_header` (also a header with leading or trailing whitespace, which is refused rather than trimmed), `export_too_many_rows`,
 `export_empty`, and `mapping_*` (`json`, `keys`, `purpose`, `identity`, `acquisition_method`,
 `timestamp`, `currency`, `slug_policy`, `columns`, `constants`, `required_field`,
 `visibility_values`, `tag_separator`, `licenses`, `offers`, `ignored_columns`,

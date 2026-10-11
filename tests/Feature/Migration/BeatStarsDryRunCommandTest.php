@@ -207,7 +207,8 @@ class BeatStarsDryRunCommandTest extends TestCase
             'repository file outside the fixtures with a synthetic mapping' => ['input_inside_repository'],
             'write failure leaves no partial output' => ['output_write'],
             'output under another git checkout' => ['output_inside_repository'],
-            'output under a .git file (worktree or submodule)' => ['output_inside_repository']];
+            'output under a .git file (worktree or submodule)' => ['output_inside_repository'],
+            'output under a group-writable parent' => ['output_directory']];
     }
 
     #[DataProvider('refusals')]
@@ -247,7 +248,16 @@ class BeatStarsDryRunCommandTest extends TestCase
                 mkdir($this->repositoryOutput, 0700);
                 $arguments[5] = $output = $this->repositoryOutput;
                 break;
-            case 'output_directory': chmod($output, 0755);
+            case 'output_directory':
+                if ($this->dataName() === 'output under a group-writable parent') {
+                    // Another group member could rename the private output directory and swap the reports.
+                    mkdir($this->base.'/shared', 0700);
+                    chmod($this->base.'/shared', 0770);
+                    $arguments[5] = $output = $this->base.'/shared/out';
+                    mkdir($output, 0700);
+                    break;
+                }
+                chmod($output, 0755);
                 break;
             case 'output_directory_not_empty':
                 file_put_contents($output.'/notes.txt', 'operator note');
