@@ -168,3 +168,41 @@ key not checked in `recorded()`). Not run: native MySQL for the new `recorded()`
 verification) and the other eleven existing suites. Two Codex P2s on the reviewed head are deferred to the lane's
 follow-up batch under the owner's freeze-and-batch rule: bind or consume the console attestation, and reword the
 "No changes were made" output after an attestation. The review judged neither blocking for a development merge.
+
+## Follow-up batch (2026-10-11)
+
+Branch `harness/followup-mfa-20261011` from main `2f1cacc`, product and tests in `772fff1`. It fixes the two Codex P2s
+deferred above (`docs/handoff/2026-10-07/codex-deferred-20261011.md`, #92). Evidence:
+`evidence/followup-20261011-red-green.txt` (SQLite only; no MySQL server was started).
+
+- **r4240117094, bind and spend the attestation.** Both remedies, because neither alone is complete without a schema
+  change. `attest()` now records a keyed hash (HMAC-SHA256 under the application key; the reference itself never
+  appears) of the evidence reference and, for `block`, the requested blocked state and expected control version
+  (context `schema_version` 2). `binds()` checks them against the write and `recorded()` checks them against the
+  audit row. `requireFor()` then spends the attestation: inside the write's transaction it refuses with `REFUSAL`
+  when a `staff.console_attestation_consumed` audit row already names it (subject: the attestation's own row) and
+  otherwise appends one. Audit rows stay append-only (`AuditEvent` forbids update and delete), so the marker is a
+  new row, not a change to the attestation, and there is no new table or migration. Every use of one attestation
+  first locks the same operator row FOR UPDATE in `ManageRightsScope::authorize()`, which serializes the
+  already-used check against a concurrent use. A write refused after admission (for example `SELECTION_CHANGED`)
+  rolls the marker back with it, so the attestation may then retry only the identical operation it binds.
+  `register`, `link` and `block` all go through this path. `PromotionAdministration` accepts no attestation (it
+  calls `require()` only), so it is unchanged.
+- **r4240117095, refusal wording.** Once `--attest` has recorded an attestation, `refuse()` ends with "No
+  rights-scope write occurred; the attestation audit record (audit_event=N) remains." instead of "No changes were
+  made."; without an attestation the original wording is kept. Runbook step 5 says so.
+
+| Run | Source | Result |
+| --- | --- | --- |
+| Red: new and changed cases against the product files of `2f1cacc` | tests of `772fff1`, product `2f1cacc` | 20 tests, 296 assertions, **6 failures**, rc 1: register replay admitted; retry with another reference admitted; another blocked state admitted; tampered `reference_hmac` admitted; attestation context lacks the new fields; command still says "No changes were made" after an attestation |
+| Green: the three lane suites | `772fff1` | OK, **26 tests, 419 assertions**, rc 0 |
+| The thirteen existing suites of the previous round | same tree | OK, **158 tests, 1,327 assertions**, rc 0 |
+| The six fixture-caller suites | same tree | OK, **160 tests, 2,432 assertions**, rc 0 |
+| MySQL-only suites on SQLite | same tree | 17 tests, **17 skipped** |
+| Mutants M20 to M31 | `772fff1` | M20 (already-used check removed), M21 (consume not called), M22 to M24 (reference, state, version unbound), M25 to M27 (`recorded()` ignores reference, state, version), M28 (`block` does not pass state and version), M29 and M30 (command wording fixed either way) are **killed**. M31 (the `transactionLevel() === 0` guard removed) **survives**: every test runs inside RefreshDatabase's transaction and the only caller always opens one, so the guard is defence in depth that no test reaches |
+| Pint `--test` on the five changed PHP files; `git diff --check` | `772fff1` | passed; clean |
+| `phpunit-shards.py --shards=8 ... --mysql-native-selection` | `772fff1` | rc 0: selection unchanged at 1,820 cases in 164 files; discovered total 7,791 to 7,795, so the comment in `.github/workflows/final-verification.yml` moves to 7795 |
+
+Not tested, not claimed: native MySQL of the new path (the already-used check is a plain read under the operator's
+row lock; see the THREAT-NOTE residual on an older REPEATABLE READ snapshot), MySQL's JSON round trip of the new
+`blocked` and `expected_version` fields in `recorded()`, a real staging console, and anything beyond focused checks.

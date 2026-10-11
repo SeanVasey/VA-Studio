@@ -1,0 +1,317 @@
+# Follow-up batch (2026-10-11): Codex P2 r4240117094 (spend/bind the console attestation) and r4240117095 (refusal wording)
+# product+tests commit: 772fff1d0e1407ad89f4d25e848758e7ca8b0757 (branch harness/followup-mfa-20261011, based on main 2f1cacc)
+# environment: PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, public/build absent. No MySQL server was started.
+# runner (from the worktree root; every run adds --colors=never --do-not-cache-result before the files):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array \
+#     SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- <files>
+# RED: the new and changed tests of 772fff1d0e1407ad89f4d25e848758e7ca8b0757 against the product files of 2f1cacc (working tree before the product edit;
+#   the tests call attest() positionally, so the old five-parameter signature ignores the extra arguments and each
+#   case fails on behaviour, not on a missing method).
+
+### RED: RightsScopeStaffMfaTest + RightsScopeCommandAttestationTest, product = 2f1cacc
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+....F..FFFF.....F...                                              20 / 20 (100%)
+
+Time: 00:28.785, Memory: 96.00 MB
+
+There were 6 failures:
+
+1) Tests\Feature\RightsScopeStaffMfaTest::test_a_recorded_console_attestation_admits_the_bound_write_in_staging_and_is_linked_from_its_audit
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+     'action' => 'register',
+     'attested_at' => '2026-10-11T17:41:29+00:00',
+     'authority' => 'trusted_interactive_console',
+-    'blocked' => null,
+     'command' => 'vasey:rights-scope',
+     'environment' => 'staging',
+-    'expected_version' => null,
+     'mfa_enrolled' => false,
+     'mfa_required' => true,
+     'offer_revision_id' => null,
+-    'reference_hmac' => '98adce327029bdc16bfa73528a004e879c5d9a9ca193f6a3af2e09f50a33260a',
+-    'schema_version' => 2,
++    'schema_version' => 1,
+     'scope_key' => 'synthetic-attested',
+ ]
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:204
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:50
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:186
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+The rights-scope write was admitted (reference).
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:84
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:316
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:50
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:302
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_admits_only_its_first_write_and_is_refused_on_reuse
+The rights-scope write was admitted (register replay).
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:84
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:346
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:50
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:343
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeStaffMfaTest::test_a_domain_refusal_rolls_back_the_consumption_and_admits_only_the_identical_retry
+The rights-scope write was admitted (retry with another reference).
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:84
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:398
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:50
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:386
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_binds_the_requested_state_version_and_reference
+The rights-scope write was admitted (another blocked state).
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:84
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:418
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:50
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:416
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write
+Output does not contain "Rights scope unregistered-scope is not registered. Register it first. No rights-scope write occurred; the attestation audit record (audit_event=".
+
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:532
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:475
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:208
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:49
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:203
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 20, Assertions: 296, Failures: 6.
+rc=1
+
+### GREEN: the three lane suites at 772fff1d0e1407ad89f4d25e848758e7ca8b0757
+files: tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+..........................                                        26 / 26 (100%)
+
+Time: 00:30.815, Memory: 96.00 MB
+
+OK (26 tests, 419 assertions)
+rc=0
+
+### EXISTING: the thirteen suites listed in review-conditions-red-green.txt, at the same source (run before the commit, identical tree)
+files: RightsScopeCommandTest RightsScopeCommandUnknownOutcomeTest RightsScopeWriterAuthorityTest SharedInventoryTest PromotionAdministrationTest PromotionAdminHttpTest PromotionAdministrationSettlementTest StagingEnvironmentAdmissionTest StagingOperatorMfaTest OperatorMfaTest PromotionPricingTest PromotionPricingHttpTest ExclusiveWriterAuthorityTest
+Time: 04:54.734, Memory: 136.00 MB
+
+OK (158 tests, 1327 assertions)
+rc=0
+
+### FIXTURE CALLERS: the six suites of sqlite-head-fixture-callers.txt, same source
+files: StagingTestCommerceProfileJourneyTest TestOrderFinalizationTest OrderPreparationTest ExclusiveSelectionTest ReservePricedQuoteTest CustomerOrderItemsTest
+Time: 09:50.935, Memory: 110.00 MB
+
+OK (160 tests, 2432 assertions)
+rc=0
+
+### MYSQL-ONLY suites on SQLite (expected to skip; no native MySQL evidence for this source)
+files: PromotionAdministrationMySqlConcurrencyTest RightsScopeWriterConcurrencyTest
+
+OK, but some tests were skipped!
+Tests: 17, Assertions: 0, Skipped: 17.
+rc=0
+
+### MUTANTS (applied in place to one committed file at a time, run, restored with git checkout HEAD --; sha256 and git diff --quiet checked)
+### MUTANT M20-consumed-check-removed -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..b70b1b4 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -231,3 +230,0 @@ final class StaffWriteAuthority
+-        if ($used) {
+-            return false;
+-        }
+Tests: 13, Assertions: 148, Failures: 2.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_admits_only_its_first_write_and_is_refused_on_reuse
+2) Tests\Feature\RightsScopeStaffMfaTest::test_a_domain_refusal_rolls_back_the_consumption_and_admits_only_the_identical_retry
+    The rights-scope write was admitted (register replay).
+    The rights-scope write was admitted (replay after the write).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M21-consume-not-called -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..47fcb4f 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -147 +147 @@ final class StaffWriteAuthority
+-            || ! $attestation->recorded() || ! $attestation->consume()) {
++            || ! $attestation->recorded()) {
+Tests: 13, Assertions: 148, Failures: 2.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_admits_only_its_first_write_and_is_refused_on_reuse
+2) Tests\Feature\RightsScopeStaffMfaTest::test_a_domain_refusal_rolls_back_the_consumption_and_admits_only_the_identical_retry
+    The rights-scope write was admitted (register replay).
+    The rights-scope write was admitted (replay after the write).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M22-reference-unbound -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..da1b7aa 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -164 +163,0 @@ final class StaffWriteAuthority
+-            && hash_equals($this->referenceHmac, self::referenceHmac($reference))
+Tests: 13, Assertions: 157, Failures: 2.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_a_domain_refusal_rolls_back_the_consumption_and_admits_only_the_identical_retry
+2) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_binds_the_requested_state_version_and_reference
+    The rights-scope write was admitted (retry with another reference).
+    The rights-scope write was admitted (block with another reference).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M23-blocked-unbound -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..5ff479e 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -165 +164,0 @@ final class StaffWriteAuthority
+-            && $this->blocked === $blocked
+Tests: 13, Assertions: 159, Failures: 1.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_binds_the_requested_state_version_and_reference
+    The rights-scope write was admitted (another blocked state).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M24-version-unbound -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..ecf289e 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -166 +165,0 @@ final class StaffWriteAuthority
+-            && $this->expectedVersion === $expectedVersion
+Tests: 13, Assertions: 160, Errors: 1.
+rc=2
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_binds_the_requested_state_version_and_reference
+    App\Domain\Commerce\QuoteException: A selection has changed or is unavailable. Choose it again.
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M25-recorded-reference-unchecked -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..7970381 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -213 +212,0 @@ final class StaffWriteAuthority
+-            && hash_equals($this->referenceHmac, $context['reference_hmac'])
+Tests: 13, Assertions: 163, Failures: 1.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+    The rights-scope write was admitted (reference).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M26-recorded-blocked-unchecked -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..6109177 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -214 +213,0 @@ final class StaffWriteAuthority
+-            && ($context['blocked'] ?? null) === $this->blocked
+Tests: 13, Assertions: 165, Failures: 1.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+    The rights-scope write was admitted (state).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M27-recorded-version-unchecked -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..6bd9582 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -215 +215 @@ final class StaffWriteAuthority
+-            && ($context['expected_version'] ?? null) === $this->expectedVersion;
++            ;
+Tests: 13, Assertions: 167, Failures: 1.
+rc=1
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+    The rights-scope write was admitted (version).
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M28-block-state-not-passed -> tests/Feature/RightsScopeStaffMfaTest.php: KILLED
+diff --git a/app/Domain/Commerce/Inventory/ManageRightsScope.php b/app/Domain/Commerce/Inventory/ManageRightsScope.php
+index cfea959..a46c1b7 100644
+--- a/app/Domain/Commerce/Inventory/ManageRightsScope.php
++++ b/app/Domain/Commerce/Inventory/ManageRightsScope.php
+@@ -106 +106 @@ final class ManageRightsScope
+-            $actor = $this->authorize($actor, $reference, $attestation, 'block', $scopeId, null, $blocked, $expectedVersion);
++            $actor = $this->authorize($actor, $reference, $attestation, 'block', $scopeId);
+Tests: 13, Assertions: 151, Errors: 3.
+rc=2
+1) Tests\Feature\RightsScopeStaffMfaTest::test_a_recorded_console_attestation_admits_the_bound_write_in_staging_and_is_linked_from_its_audit
+2) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_admits_only_its_first_write_and_is_refused_on_reuse
+3) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_binds_the_requested_state_version_and_reference
+    Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+    Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+    Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+restored app/Domain/Commerce/Inventory/ManageRightsScope.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M29-command-old-wording -> tests/Feature/RightsScopeCommandAttestationTest.php: KILLED
+diff --git a/app/Console/Commands/ManageRightsScopes.php b/app/Console/Commands/ManageRightsScopes.php
+index d1b108f..8808ad0 100644
+--- a/app/Console/Commands/ManageRightsScopes.php
++++ b/app/Console/Commands/ManageRightsScopes.php
+@@ -242 +242 @@ final class ManageRightsScopes extends Command
+-        $this->error($message.($this->attestationAuditId === null ? ' No changes were made.'
++        $this->error($message.(true ? ' No changes were made.'
+Tests: 7, Assertions: 182, Failures: 1.
+rc=1
+1) Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write
+    Output does not contain "Rights scope unregistered-scope is not registered. Register it first. No rights-scope write occurred; the attestation audit record (audit_event=".
+restored app/Console/Commands/ManageRightsScopes.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M30-command-always-new-wording -> tests/Feature/RightsScopeCommandAttestationTest.php: KILLED
+diff --git a/app/Console/Commands/ManageRightsScopes.php b/app/Console/Commands/ManageRightsScopes.php
+index d1b108f..13db625 100644
+--- a/app/Console/Commands/ManageRightsScopes.php
++++ b/app/Console/Commands/ManageRightsScopes.php
+@@ -242 +242 @@ final class ManageRightsScopes extends Command
+-        $this->error($message.($this->attestationAuditId === null ? ' No changes were made.'
++        $this->error($message.(false ? ' No changes were made.'
+Tests: 7, Assertions: 165, Failures: 2.
+rc=1
+1) Tests\Feature\RightsScopeCommandAttestationTest::test_staging_refuses_writes_without_an_attestation_and_records_nothing
+2) Tests\Feature\RightsScopeCommandAttestationTest::test_a_refusal_without_an_attestation_keeps_the_original_wording
+    Output does not contain "Re-run with --attest to record your attestation (who, when, which scope) in the audit log before the write. No changes were made.".
+    Output does not contain "Rights scope unregistered-scope is not registered. Register it first. No changes were made.".
+restored app/Console/Commands/ManageRightsScopes.php: sha256 MATCH git-diff-quiet=0
+
+### MUTANT M31-transaction-guard-removed -> tests/Feature/RightsScopeStaffMfaTest.php: SURVIVED
+diff --git a/app/Domain/Staff/StaffWriteAuthority.php b/app/Domain/Staff/StaffWriteAuthority.php
+index 0944a0f..8711fd0 100644
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -145 +145 @@ final class StaffWriteAuthority
+-        if (! TestEnvironment::admitsTestCommerce() || DB::transactionLevel() === 0
++        if (! TestEnvironment::admitsTestCommerce()
+OK (13 tests, 172 assertions)
+rc=0
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### PINT --test on the five changed PHP files: {"tool":"pint","result":"passed"} rc=0; git diff --check: clean
+
+### SHARDER: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+rc=0: Proved 1820 selected MySQL-native tests in 164 files (of 7795 discovered tests in 562 files) across 8 nonempty shards.
+Selection unchanged; discovered total 7791 -> 7795 (four new methods), comment in .github/workflows/final-verification.yml updated.
+Pre-existing warning (not this batch): tests/Feature/PersistentCatalogDraftImportTest.php has no timing entry. Generated phpunit-ci-mysql-* files deleted.
