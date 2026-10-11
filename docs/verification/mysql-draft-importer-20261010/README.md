@@ -297,12 +297,26 @@ Codex's next review found that the engine check still ran before the transaction
 switch a table between admission and the first write on a resumed apply. `76486ff` pins storage as the first
 statement of `apply()`'s transaction: on MySQL it opens every evidence table, taking shared metadata locks that
 an engine change must wait for until commit (`local-evidence/codex-p2/metadata-lock-probe.txt`: a concurrent
-`ALTER ... ENGINE` times out with 1205), then requires InnoDB; on SQLite, where the journal mode cannot change
-inside a transaction, it requires the journal not to be off. Data set `#10` also asserts the pin refuses on
+`ALTER ... ENGINE` times out with 1205), then requires InnoDB; on SQLite it requires the journal not to be off.
+(Corrected after review: SQLite's journal mode belongs to the connection and can still change inside a deferred
+transaction until its first write, so the pin checks it before that write; another connection cannot change it.) Data set `#10` also asserts the pin refuses on
 both engines. Results (`local-evidence/codex-p2/red-green.txt`): SQLite whole file 52 tests green; MySQL 8.0.46
 green for data set `#10` and the happy-path, nested/foreign-session, overlapping and partial-failure cases.
-Tables that `SaveTrackMetadata` may write outside the evidence list are covered only by the pre-transaction
-whole-schema check.
+`SaveTrackMetadata` itself writes only `tracks` and `audit_events`.
+
+The independent review of `0b4ff30..76486ff` returned APPROVE WITH CONDITIONS
+(`independent-review-76486ff-DECISION.md`). Its conditions are met in the next commit:
+
+1. An `apply()`-level test changes storage after admission but before the first write, from a
+   `TransactionBeginning` listener: on SQLite it turns the journal off on the importer's connection; on MySQL a
+   foreign session moves `audit_events` to MyISAM. `apply()` refuses with `catalog_target_invalid` and the
+   evidence is unchanged. With the pin call removed from `apply()` the test fails (the import writes and the
+   end-of-segment check refuses afterwards), which the earlier evidence could not show.
+2. The pin also covers `catalog_discovery_epoch`, which the tracks insert trigger updates; the review showed an
+   engine change to that table was not blocked by the evidence-table locks.
+3. The SQLite wording is corrected above.
+
+Results: `local-evidence/codex-p3/red-green.txt`.
 
 The rest of the file was not re-run on MySQL after this change. The schema digest is unchanged, because the
 engine check is separate from the compared owned objects.

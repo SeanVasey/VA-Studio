@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Migration\CatalogOnboarding;
 
+use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use RuntimeException;
@@ -319,8 +320,10 @@ final class CatalogDatabaseEvidence
      *
      * schema() runs before the transaction, so another session could change a table's engine in between.
      * On MySQL, opening each table inside the transaction takes a shared metadata lock that an engine change
-     * must wait for until commit; the engines are then required to be InnoDB. On SQLite the journal mode
-     * cannot change while a transaction is open, so it is required not to be off.
+     * must wait for until commit; the engines are then required to be InnoDB. The pinned set is every
+     * evidence table plus the discovery epoch, which the tracks insert trigger updates. On SQLite the journal
+     * mode belongs to this connection and can still change until the transaction's first write, so it is
+     * checked here, before that write; nothing in the importer sets a PRAGMA in between.
      */
     public function lockedStorage(): void
     {
@@ -338,13 +341,14 @@ final class CatalogDatabaseEvidence
         if (DB::getDriverName() !== 'mysql') {
             throw new RuntimeException('catalog_target_invalid');
         }
-        foreach (self::TABLES as $table) {
+        $pinned = [...self::TABLES, DiscoveryEpoch::TABLE];
+        foreach ($pinned as $table) {
             $pdo->query('SELECT 1 FROM `'.$table.'` LIMIT 0')->fetchAll();
         }
         $statement = $pdo->query("SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'"
-            ." AND TABLE_NAME IN ('".implode("', '", self::TABLES)."')");
+            ." AND TABLE_NAME IN ('".implode("', '", $pinned)."')");
         $engines = $statement->fetchAll(PDO::FETCH_KEY_PAIR);
-        if (count($engines) !== count(self::TABLES) || array_unique(array_values($engines)) !== ['InnoDB']) {
+        if (count($engines) !== count($pinned) || array_unique(array_values($engines)) !== ['InnoDB']) {
             throw new RuntimeException('catalog_target_invalid');
         }
     }

@@ -14,10 +14,12 @@ use App\Support\CanonicalJson;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\QueryException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use PDO;
 use PDOException;
@@ -461,6 +463,45 @@ class PersistentCatalogDraftImportTest extends TestCase
         return array_map(static fn (string $case): array => [$case], ['missing-trigger', 'foreign-trigger', 'missing-unique',
             'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks',
             'foreign-referenced-table', 'non-transactional-storage']);
+    }
+
+    public function test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
+        $importer = new CatalogDraftImporter;
+        $review = $importer->review($source, $this->release, $actor);
+        $before = $this->evidence();
+        $changed = false;
+        // Admission (schema()) has already passed when the apply transaction begins; the change lands in that gap.
+        Event::listen(TransactionBeginning::class, function () use (&$changed): void {
+            if ($changed) {
+                return;
+            }
+            $changed = true;
+            if ($this->mysql()) {
+                // Another session: no table is open in the importer's transaction yet, so nothing blocks it.
+                $foreign = $this->foreignSession();
+                $keys = $foreign->query('SELECT TABLE_NAME, CONSTRAINT_NAME FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE()'
+                    ." AND (TABLE_NAME = 'audit_events' OR REFERENCED_TABLE_NAME = 'audit_events')")->fetchAll(PDO::FETCH_NUM);
+                foreach ($keys as [$table, $constraint]) {
+                    $foreign->exec('ALTER TABLE `'.$table.'` DROP FOREIGN KEY `'.$constraint.'`');
+                }
+                $foreign->exec('ALTER TABLE audit_events ENGINE=MyISAM');
+            } else {
+                // Same connection, before the transaction's first write: SQLite still accepts the change.
+                DB::connection()->getPdo()->exec('PRAGMA journal_mode=OFF');
+                $this->assertSame('off', strtolower((string) DB::connection()->getPdo()->query('PRAGMA journal_mode')->fetchColumn()));
+            }
+        });
+        try {
+            $importer->apply($source, $this->release, $review, $review['review_sha256'], 1, $actor);
+            $this->fail('Storage changed after admission was admitted.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('catalog_target_invalid', $error->getMessage());
+        }
+        $this->assertTrue($changed);
+        $this->assertSame($before, $this->evidence());
     }
 
     #[DataProvider('schemaDrift')]

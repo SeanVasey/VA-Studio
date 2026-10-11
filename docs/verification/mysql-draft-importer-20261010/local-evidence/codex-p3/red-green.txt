@@ -1,0 +1,26 @@
+# Review conditions on PR #90 after 76486ff: apply()-level transaction-pin test and discovery-epoch pin
+# Source: 27453f06 plus the uncommitted condition changes recorded in the next commit. MySQL 8.0.46 on a private
+# disposable server (CI uses 8.4.11). Direct PHPUnit with this worktree's Composer autoload.
+## Red, SQLite in memory: new test, with the lockedStorage() call in CatalogDraftImporter::apply() removed
+Failed asserting that two strings are identical.
+-'catalog_target_invalid'
++'catalog_target_schema_invalid'
+Tests: 1, Assertions: 3, Failures: 1.
+## Red, MySQL 8.0.46: same mutant, same test
+Time: 02:30.055, Memory: 81.00 MB
+Failed asserting that two strings are identical.
+-'catalog_target_invalid'
++'catalog_target_schema_invalid'
+Tests: 1, Assertions: 3, Failures: 1.
+## Green, SQLite in memory, whole file (pin restored)
+OK (53 tests, 305 assertions)
+## Green, MySQL 8.0.46: new test, schema-drift data set #10, happy-path apply
+ ✔ Storage changed after admission but before the first write is refused by the transaction pin
+OK (1 test, 5 assertions)
+ ✔ Foreign or incomplete live owned schema refuses review and apply without repairs with data set 10
+OK (1 test, 8 assertions)
+ ✔ Dry run is read only and atomic segments resume without duplicate rows or audits
+OK (1 test, 36 assertions)
+## Not run
+The discovery-epoch addition has no dedicated red case; an engine change to catalog_discovery_epoch is covered
+only by the pinned list and the InnoDB check. The rest of the file was not re-run on MySQL after this change.
