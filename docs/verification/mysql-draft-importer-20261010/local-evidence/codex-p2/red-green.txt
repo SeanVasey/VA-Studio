@@ -1,0 +1,13 @@
+# Codex P2 on PR #90: storage pinned inside the apply transaction (76486ff)
+## Red, SQLite, data set #10 with the evidence-class change stashed
+Error: Call to undefined method App\Domain\Migration\CatalogOnboarding\CatalogDatabaseEvidence::lockedStorage()
+Tests: 1, Assertions: 2, Errors: 1.
+## Green, SQLite in memory, whole file
+OK (52 tests, 300 assertions)
+## Green, MySQL 8.0.46: the happy-path apply, nested-importer/foreign-session, overlapping duplicate and partial-failure cases
+Time: 05:50.143, Memory: 89.00 MB
+OK (4 tests, 95 assertions)
+## Green, MySQL 8.0.46: schema-drift data set #10 (non-transactional-storage), now also asserting the in-transaction pin
+Persistent Catalog Draft Import (Tests\Feature\PersistentCatalogDraftImport)
+ ✔ Foreign or incomplete live owned schema refuses review and apply without repairs with data set 10
+OK (1 test, 8 assertions)

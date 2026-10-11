@@ -293,6 +293,17 @@ keys touching `audit_events` and moves it to MyISAM on MySQL, and turns the jour
 | Green on `1af8c94`, SQLite, whole file | OK, 52 tests, 299 assertions |
 | Green on `1af8c94`, MySQL 8.0.46, every schema-drift data set plus the happy-path apply case | OK, 12 tests, 106 assertions, 26.5 minutes (`local-evidence/codex-p1/green.txt`) |
 
+Codex's next review found that the engine check still ran before the transaction, so another session could
+switch a table between admission and the first write on a resumed apply. `76486ff` pins storage as the first
+statement of `apply()`'s transaction: on MySQL it opens every evidence table, taking shared metadata locks that
+an engine change must wait for until commit (`local-evidence/codex-p2/metadata-lock-probe.txt`: a concurrent
+`ALTER ... ENGINE` times out with 1205), then requires InnoDB; on SQLite, where the journal mode cannot change
+inside a transaction, it requires the journal not to be off. Data set `#10` also asserts the pin refuses on
+both engines. Results (`local-evidence/codex-p2/red-green.txt`): SQLite whole file 52 tests green; MySQL 8.0.46
+green for data set `#10` and the happy-path, nested/foreign-session, overlapping and partial-failure cases.
+Tables that `SaveTrackMetadata` may write outside the evidence list are covered only by the pre-transaction
+whole-schema check.
+
 The rest of the file was not re-run on MySQL after this change. The schema digest is unchanged, because the
 engine check is separate from the compared owned objects.
 
