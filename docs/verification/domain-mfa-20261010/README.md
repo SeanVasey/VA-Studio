@@ -158,3 +158,13 @@ The review (`independent-review-d806d88-DECISION.md`, copied verbatim) returned 
 Not claimed for this round: native MySQL of `fb4dce8` (the `recorded()` JSON comparison has not run on MySQL), a real
 HTTP request against the console guard (the test flips the application's console flag), a job that records an
 attestation (queue workers count as console), and anything beyond focused checks.
+
+## Delta review of the review conditions
+
+The independent delta review of `d806d880..57a214d` returned APPROVE (`independent-review-57a214d-DECISION.md`). All
+four conditions of the `d806d88` review are met. It re-ran the three lane suites (22 tests) and the rights-scope
+command and staging-admission suites (25 tests) on SQLite, and re-killed mutants M9, M14 to M18 and a new M19 (scope
+key not checked in `recorded()`). Not run: native MySQL for the new `recorded()` path (left for the final integrated
+verification) and the other eleven existing suites. Two Codex P2s on the reviewed head are deferred to the lane's
+follow-up batch under the owner's freeze-and-batch rule: bind or consume the console attestation, and reword the
+"No changes were made" output after an attestation. The review judged neither blocking for a development merge.
