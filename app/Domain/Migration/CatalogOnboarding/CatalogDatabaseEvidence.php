@@ -37,7 +37,8 @@ final class CatalogDatabaseEvidence
             || $pdo->query('PRAGMA writable_schema')->fetchColumn() !== 0
             || $pdo->query('PRAGMA ignore_check_constraints')->fetchColumn() !== 0
             // With the rollback journal off, a failed segment cannot roll back its earlier writes.
-            || strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off') {
+            || strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off'
+            || $this->shadowed($pdo)) {
             throw new RuntimeException('catalog_target_schema_invalid');
         }
         $expected = $this->expectedSchema();
@@ -117,7 +118,7 @@ final class CatalogDatabaseEvidence
         // schema must be InnoDB, not only the two owned tables compared below.
         $nonTransactional = $pdo->query('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()'
             ." AND TABLE_TYPE = 'BASE TABLE' AND (ENGINE IS NULL OR ENGINE <> 'InnoDB')")->fetchColumn();
-        if ((int) $nonTransactional !== 0) {
+        if ((int) $nonTransactional !== 0 || $this->shadowed($pdo)) {
             throw new RuntimeException('catalog_target_schema_invalid');
         }
         $current = $this->mysqlObjects($pdo);
@@ -137,7 +138,8 @@ final class CatalogDatabaseEvidence
                 ." WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN $owned", ['TABLE_NAME']],
             'columns' => ['SELECT TABLE_NAME, ORDINAL_POSITION, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLUMN_KEY, COLLATION_NAME'
                 ." FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN $owned", ['TABLE_NAME', 'ORDINAL_POSITION']],
-            'indexes' => ['SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME FROM information_schema.STATISTICS'
+            // SUB_PART is null for a full-column index; a prefix index on a unique key would admit colliding keys.
+            'indexes' => ['SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, SUB_PART FROM information_schema.STATISTICS'
                 ." WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN $owned", ['TABLE_NAME', 'INDEX_NAME', 'SEQ_IN_INDEX']],
             // The referenced schema is read too: an owned foreign key repointed at another schema's same-named table is drift.
             'foreign_keys' => ['SELECT k.TABLE_NAME, k.CONSTRAINT_NAME, k.ORDINAL_POSITION, k.COLUMN_NAME, k.REFERENCED_TABLE_SCHEMA, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME,'
@@ -216,7 +218,7 @@ final class CatalogDatabaseEvidence
                     'UPDATE_RULE' => 'NO ACTION', 'DELETE_RULE' => 'RESTRICT'];
             }
             foreach ($indexes as [$name, $nonUnique, $column]) {
-                $expected['indexes'][] = ['TABLE_NAME' => $table, 'INDEX_NAME' => $name, 'NON_UNIQUE' => $nonUnique, 'SEQ_IN_INDEX' => 1, 'COLUMN_NAME' => $column];
+                $expected['indexes'][] = ['TABLE_NAME' => $table, 'INDEX_NAME' => $name, 'NON_UNIQUE' => $nonUnique, 'SEQ_IN_INDEX' => 1, 'COLUMN_NAME' => $column, 'SUB_PART' => null];
             }
             foreach (['update', 'delete'] as $operation) {
                 $expected['triggers'][] = ['TRIGGER_NAME' => $table.'_immutable_'.$operation, 'EVENT_MANIPULATION' => strtoupper($operation),
@@ -332,7 +334,7 @@ final class CatalogDatabaseEvidence
             throw new RuntimeException('catalog_target_invalid');
         }
         if (DB::getDriverName() === 'sqlite') {
-            if (strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off') {
+            if (strtolower((string) $pdo->query('PRAGMA journal_mode')->fetchColumn()) === 'off' || $this->shadowed($pdo)) {
                 throw new RuntimeException('catalog_target_invalid');
             }
 
@@ -342,6 +344,9 @@ final class CatalogDatabaseEvidence
             throw new RuntimeException('catalog_target_invalid');
         }
         $pinned = [...self::TABLES, DiscoveryEpoch::TABLE];
+        if ($this->shadowed($pdo)) {
+            throw new RuntimeException('catalog_target_invalid');
+        }
         foreach ($pinned as $table) {
             $pdo->query('SELECT 1 FROM `'.$table.'` LIMIT 0')->fetchAll();
         }
@@ -351,6 +356,30 @@ final class CatalogDatabaseEvidence
         if (count($engines) !== count($pinned) || array_unique(array_values($engines)) !== ['InnoDB']) {
             throw new RuntimeException('catalog_target_invalid');
         }
+    }
+
+    /**
+     * A temporary table with a participating table's name shadows it on this connection: information_schema
+     * describes the durable table while unqualified reads and writes reach the temporary one, which vanishes
+     * with the connection. SQLite also has temporary triggers on durable tables. Either is refused.
+     */
+    private function shadowed(PDO $pdo): bool
+    {
+        $tables = [...self::TABLES, DiscoveryEpoch::TABLE];
+        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $names = "('".implode("', '", $tables)."')";
+
+            return (int) $pdo->query("SELECT COUNT(*) FROM sqlite_temp_master WHERE name IN $names OR tbl_name IN $names")->fetchColumn() !== 0;
+        }
+        foreach ($tables as $table) {
+            // SHOW CREATE TABLE resolves the temporary table first, as every unqualified statement does.
+            $shown = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM);
+            if (! is_array($shown) || ! is_string($shown[1] ?? null) || str_starts_with(strtoupper($shown[1]), 'CREATE TEMPORARY')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function target(array $excludeTracks = [], array $excludeMappings = [], array $excludeAudits = []): array

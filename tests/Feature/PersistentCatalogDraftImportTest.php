@@ -462,7 +462,7 @@ class PersistentCatalogDraftImportTest extends TestCase
     {
         return array_map(static fn (string $case): array => [$case], ['missing-trigger', 'foreign-trigger', 'missing-unique',
             'foreign-key-cascade', 'nullable-column', 'extra-column', 'foreign-keys-disabled', 'writable-schema', 'ignored-checks',
-            'foreign-referenced-table', 'non-transactional-storage']);
+            'foreign-referenced-table', 'non-transactional-storage', 'temporary-shadow', 'prefix-unique-index']);
     }
 
     public function test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin(): void
@@ -513,7 +513,7 @@ class PersistentCatalogDraftImportTest extends TestCase
         $review = $importer->review($source, $this->release, $actor);
         $this->changeSchema($case);
         $before = $this->evidence();
-        if ($case === 'non-transactional-storage') {
+        if (in_array($case, ['non-transactional-storage', 'temporary-shadow'], true)) {
             // The in-transaction pin refuses the same drift on its own, so a change that lands after admission
             // but before the first write is refused too.
             try {
@@ -532,6 +532,10 @@ class PersistentCatalogDraftImportTest extends TestCase
                 $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
             }
             $this->assertSame($before, $this->evidence());
+        }
+        if ($case === 'temporary-shadow') {
+            DB::connection()->getPdo()->exec($this->mysql() ? 'DROP TEMPORARY TABLE catalog_import_mappings' : 'DROP TABLE temp.catalog_import_mappings');
+            $this->assertSame((new CatalogDatabaseEvidence)->schema(), (new CatalogDatabaseEvidence)->schema());
         }
     }
 
@@ -878,6 +882,15 @@ class PersistentCatalogDraftImportTest extends TestCase
                 break;
             case 'ignored-checks': $pdo->exec('PRAGMA ignore_check_constraints=ON');
                 break;
+            case 'temporary-shadow':
+                // Unqualified statements on this connection would reach the empty temporary copy.
+                $pdo->exec('CREATE TEMP TABLE catalog_import_mappings AS SELECT * FROM main.catalog_import_mappings WHERE 0');
+                break;
+            case 'prefix-unique-index':
+                // SQLite has no prefix index; the counterpart keys uniqueness on the first character only.
+                $pdo->exec('DROP INDEX catalog_import_mappings_record_key_unique');
+                $pdo->exec('CREATE UNIQUE INDEX catalog_import_mappings_record_key_unique ON catalog_import_mappings (substr(record_key, 1, 1))');
+                break;
             case 'non-transactional-storage':
                 // SQLite has one storage engine; its counterpart of a non-rollback table is a connection
                 // whose rollback journal is off.
@@ -924,12 +937,26 @@ class PersistentCatalogDraftImportTest extends TestCase
 
             return;
         }
+        if ($case === 'temporary-shadow') {
+            // CREATE TEMPORARY TABLE t LIKE t is refused (1066), so the shadow copies the durable definition;
+            // temporary tables cannot hold foreign keys, so those clauses are dropped.
+            $definition = (string) $pdo->query('SHOW CREATE TABLE catalog_import_mappings')->fetch(PDO::FETCH_NUM)[1];
+            $lines = array_filter(explode("\n", $definition), static fn (string $line): bool => ! str_contains($line, ' FOREIGN KEY '));
+            $definition = (string) preg_replace('/,(\n\))/', '$1', implode("\n", $lines));
+            $pdo->exec((string) preg_replace('/^CREATE TABLE/', 'CREATE TEMPORARY TABLE', $definition));
+            $this->assertStringStartsWith('CREATE TEMPORARY TABLE', (string) $pdo->query('SHOW CREATE TABLE catalog_import_mappings')->fetch(PDO::FETCH_NUM)[1]);
+
+            return;
+        }
         $peer = $case === 'foreign-referenced-table' ? $this->peerSchemaWithUsers($pdo) : null;
         $statements = match ($case) {
             'missing-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete'],
             'foreign-trigger' => ['DROP TRIGGER catalog_import_mappings_immutable_delete',
                 'CREATE TRIGGER catalog_import_mappings_immutable_delete BEFORE DELETE ON catalog_import_mappings FOR EACH ROW SET @catalog_import_noop = 1'],
             'missing-unique' => ['ALTER TABLE catalog_import_mappings DROP INDEX catalog_import_mappings_record_key_unique'],
+            // Same name, uniqueness, column and position: only the one-character prefix differs.
+            'prefix-unique-index' => ['ALTER TABLE catalog_import_mappings DROP INDEX catalog_import_mappings_record_key_unique,'
+                .' ADD UNIQUE catalog_import_mappings_record_key_unique (record_key(1))'],
             'extra-column' => ['ALTER TABLE catalog_import_mappings ADD COLUMN unreviewed TEXT'],
             'foreign-keys-disabled' => ['SET SESSION foreign_key_checks = 0'],
             'writable-schema' => ['SET SESSION unique_checks = 0'],

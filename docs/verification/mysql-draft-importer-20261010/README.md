@@ -321,6 +321,33 @@ Results: `local-evidence/codex-p3/red-green.txt`.
 The rest of the file was not re-run on MySQL after this change. The schema digest is unchanged, because the
 engine check is separate from the compared owned objects.
 
+## Codex round on `abcc85a`
+
+Two findings, both fixed:
+
+1. **Temporary shadows (P1).** A temporary table named like a participating table shadows it on the
+   importer's connection: `information_schema` describes the durable table, while unqualified reads and
+   writes reach the temporary one and vanish with the connection. Admission (`schema()`) and the
+   in-transaction pin (`lockedStorage()`) now refuse a shadow of any participating table or the discovery
+   epoch. MySQL uses `SHOW CREATE TABLE`, which resolves the temporary table first, as `MembershipSchema`
+   and `SitemapSchema` already do. SQLite checks `sqlite_temp_master`, which also catches temporary triggers
+   on durable tables. New schema-drift data set `temporary-shadow` (#11) on both engines; it also asserts
+   that the pin refuses.
+2. **Prefix unique index (P2).** `UNIQUE (record_key(1))` matched every compared index field, so the drift
+   kept the admitted digest. The owned-index proof now includes `SUB_PART` and expects `null` (full column).
+   This changes the MySQL schema digest. New data set `prefix-unique-index` (#12). On MySQL it is a one-character
+   prefix. SQLite has no prefix index, so its counterpart is an expression index on the first character, which
+   the `sqlite_master` comparison already refused.
+
+Results: `local-evidence/codex-p4/red-green.txt`. On MySQL, `CREATE TEMPORARY TABLE t LIKE t` is refused with 1066,
+so the shadow copies the durable definition from `SHOW CREATE TABLE` without its foreign keys (temporary tables
+cannot hold them). The first MySQL attempt used `LIKE`, errored during setup on both sources and is recorded as a
+setup defect, not as evidence. With the corrected setup, #11 fails on `abcc85a` (the old pin admits the shadow)
+and passes after the fix; #12 fails on `abcc85a` (`prefix-unique-index` admitted at review) and passes after the
+fix. The happy path and the transaction-pin test pass on MySQL. The MySQL-native selection is now 1,820 cases in
+164 files (of 7,650), and the counts in `final-verification.yml` and `.gitlab-ci.yml` are updated. The rest of the
+file was not re-run on MySQL.
+
 ## Policy self-tests (second session; third-session re-runs marked)
 
 | Command | Result |

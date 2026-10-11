@@ -1,0 +1,59 @@
+# Codex round on abcc85a (PR #90): temporary shadows and the prefix unique index
+# MySQL 8.0.46 on a private disposable server (CI uses 8.4.11); SQLite in memory. Direct PHPUnit with this
+# worktree's Composer autoload. Data sets: #11 temporary-shadow, #12 prefix-unique-index.
+## Red, SQLite, source abcc85a: #11 fails (shadow admitted); #12 passes, because sqlite_master already refused the
+## expression-index counterpart
+## First MySQL attempt (setup defect, not evidence for either side). The shadow was created with
+## `CREATE TEMPORARY TABLE t LIKE t`, which MySQL refuses with 1066 'Not unique table/alias', so #11 errored
+## before reaching the importer on both sources. The test now copies the durable definition from
+## SHOW CREATE TABLE without its foreign keys.
+mysqld is alive
+## Red, MySQL 8.0.46, source abcc85a, data set #11
+Time: 02:40.304, Memory: 81.00 MB
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#11 with data ('temporary-shadow')
+Tests: 1, Assertions: 2, Errors: 1.
+## Red, MySQL 8.0.46, source abcc85a, data set #12
+Time: 02:31.397, Memory: 81.00 MB
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#12 with data ('prefix-unique-index')
+Failed asserting that two strings are identical.
+-'catalog_target_schema_invalid'
++'Foreign installed schema admitted: prefix-unique-index review'
+Tests: 1, Assertions: 4, Failures: 1.
+ .../CatalogOnboarding/CatalogDatabaseEvidence.php  | 39 +++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+## Green, MySQL 8.0.46, data set #10
+Time: 02:10.116, Memory: 81.00 MB
+OK (1 test, 8 assertions)
+## Green, MySQL 8.0.46, data set #11
+Time: 02:05.716, Memory: 81.00 MB
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#11 with data ('temporary-shadow')
+Tests: 1, Assertions: 2, Errors: 1.
+## Green, MySQL 8.0.46, data set #12
+Time: 00:53.102, Memory: 81.00 MB
+OK (1 test, 6 assertions)
+## Green, MySQL 8.0.46, transaction pin and happy path
+Time: 03:46.166, Memory: 89.00 MB
+OK (2 tests, 41 assertions)
+
+## MySQL #11 with the corrected shadow setup (red on abcc85a, then green)
+## Red, MySQL 8.0.46, source abcc85a, data set #11 (shadow built from SHOW CREATE TABLE)
+Time: 01:56.532, Memory: 81.00 MB
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#11 with data ('temporary-shadow')
+Failed asserting that two strings are identical.
+-'catalog_target_invalid'
++'Non-transactional storage pinned'
+Tests: 1, Assertions: 5, Failures: 1.
+ .../CatalogOnboarding/CatalogDatabaseEvidence.php  | 39 +++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+## Green, MySQL 8.0.46, data set #11
+Time: 01:09.584, Memory: 81.00 MB
+OK (1 test, 9 assertions)
+
+## Green, SQLite in memory, whole file
+OK (55 tests, 317 assertions)
+## MySQL-native selection after the two new data sets
+warning: 1 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php
+Proved 1820 selected MySQL-native tests in 164 files (of 7650 discovered tests in 557 files) across 8 nonempty shards.
+(generated phpunit-ci-mysql-* files deleted)
+## Not run
+The rest of the file was not re-run on MySQL after this change.
