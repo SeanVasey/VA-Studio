@@ -1,0 +1,174 @@
+# MySQL 8.0.46 green run (second session): the final suite as 19 detached PHPUnit invocations (one per test method, all data sets) in four queues.
+# Queue 1: dedicated schema vaseyaudio_catalog_import, no CI markers. Queues 2-4: importer_ci_queue_{2,3,4} with CI=true VA_CI_DISPOSABLE_MYSQL=1.
+# Each block is one invocation's PHPUnit output (--colors=never) followed by its rc/elapsed line; absolute paths stripped.
+
+=== test_audit_failure_after ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 02:35.960, Memory: 91.00 MB
+OK (1 test, 4 assertions)
+rc=0 elapsed=156s db=vaseyaudio_catalog_import markers='' queue=1
+
+=== test_batch_evidence_is ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 03:33.892, Memory: 87.00 MB
+OK (1 test, 4 assertions)
+rc=0 elapsed=215s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_conflicts_have_explicit ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+......                                                              6 / 6 (100%)
+Time: 38:42.342, Memory: 95.00 MB
+OK (6 tests, 24 assertions)
+rc=0 elapsed=2322s db=importer_ci_queue_3 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=3
+
+=== test_current_revoked_authority ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:55.493, Memory: 87.00 MB
+OK (1 test, 5 assertions)
+rc=0 elapsed=296s db=importer_ci_queue_3 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=3
+
+=== test_declared_media ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 03:24.076, Memory: 89.00 MB
+OK (1 test, 15 assertions)
+rc=0 elapsed=204s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_dry_run_is_read_only ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:53.868, Memory: 89.00 MB
+OK (1 test, 36 assertions)
+rc=0 elapsed=295s db=vaseyaudio_catalog_import markers='' queue=1
+
+=== test_exact_review_source_and_current_target_binding ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+...........                                                       11 / 11 (100%)
+Time: 58:43.621, Memory: 93.00 MB
+OK (11 tests, 55 assertions)
+rc=0 elapsed=3523s db=vaseyaudio_catalog_import markers='' queue=1
+
+=== test_final_direct_current_proof ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.....                                                               5 / 5 (100%)
+Time: 20:30.886, Memory: 93.00 MB
+OK (5 tests, 20 assertions)
+rc=0 elapsed=1231s db=importer_ci_queue_3 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=3
+
+=== test_final_direct_schema_proof ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 03:25.394, Memory: 89.00 MB
+OK (1 test, 17 assertions)
+rc=0 elapsed=206s db=importer_ci_queue_2 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=2
+
+=== test_foreign_or_incomplete_live_owned_schema ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.........                                                           9 / 9 (100%)
+Time: 52:00.910, Memory: 93.00 MB
+OK (9 tests, 54 assertions)
+rc=0 elapsed=3121s db=importer_ci_queue_2 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=2
+
+=== test_fresh_review_of ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 06:06.663, Memory: 89.00 MB
+OK (1 test, 9 assertions)
+rc=0 elapsed=367s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_mappings_are_immutable ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:38.536, Memory: 89.00 MB
+OK (1 test, 4 assertions)
+rc=0 elapsed=278s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_nested_importers_and ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:56.353, Memory: 89.00 MB
+OK (1 test, 14 assertions)
+rc=0 elapsed=296s db=importer_ci_queue_2 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=2
+
+=== test_nested_transaction ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 03:42.569, Memory: 89.00 MB
+OK (1 test, 4 assertions)
+rc=0 elapsed=223s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_overlapping_duplicate ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 02:05.767, Memory: 91.00 MB
+OK (1 test, 25 assertions)
+rc=0 elapsed=126s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_partial_failure_while ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:49.640, Memory: 89.00 MB
+OK (1 test, 20 assertions)
+rc=0 elapsed=290s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_raw_replace_cannot ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.....                                                               5 / 5 (100%)
+Time: 34:04.558, Memory: 95.00 MB
+OK (5 tests, 20 assertions)
+rc=0 elapsed=2045s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4
+
+=== test_schema_changes_after_review ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:03.541, Memory: 89.00 MB
+OK (1 test, 20 assertions)
+rc=0 elapsed=244s db=importer_ci_queue_2 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=2
+
+=== test_source_os_lease ===
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+.                                                                   1 / 1 (100%)
+Time: 04:04.443, Memory: 89.00 MB
+OK (1 test, 6 assertions)
+rc=0 elapsed=245s db=importer_ci_queue_4 markers='CI=true VA_CI_DISPOSABLE_MYSQL=1' queue=4

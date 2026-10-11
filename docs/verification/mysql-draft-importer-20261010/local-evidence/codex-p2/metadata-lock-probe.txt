@@ -1,0 +1,7 @@
+# Does a LIMIT 0 read inside a transaction pin a table's storage engine? (MySQL 8.0.46, private disposable server; CI uses 8.4.11)
+# Table probe.t (InnoDB). Session A: START TRANSACTION; SELECT 1 FROM probe.t LIMIT 0; DO SLEEP(6); COMMIT;
+# Session B, one second later: SET SESSION lock_wait_timeout=3; ALTER TABLE probe.t ENGINE=MyISAM;
+Session B: ERROR 1205 (HY000) at line 1: Lock wait timeout exceeded; try restarting transaction (waited 3 s)
+Engine after A committed: InnoDB
+# Control, no open transaction in another session: the same ALTER succeeds
+Engine after the control ALTER: MyISAM

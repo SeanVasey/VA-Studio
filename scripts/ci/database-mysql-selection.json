@@ -61,6 +61,7 @@
     "tests/Feature/CustomerListeningFreshnessTest.php",
     "tests/Feature/FreeGrantSchemaRecoveryTest.php",
     "tests/Feature/LicenseTemplateAuthoringTest.php",
+    "tests/Feature/PersistentCatalogDraftImportTest.php",
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",

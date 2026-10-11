@@ -1,0 +1,26 @@
+=== red-fk-schema db=imp_fix_c override=<scratch>/mut/fc67774-evidence.php filter=test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#9
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+Time: 01:56.589, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#9 with data ('foreign-referenced-table')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'catalog_target_schema_invalid'
++'Foreign installed schema admitted: foreign-referenced-table review'
+
+tests/Feature/PersistentCatalogDraftImportTest.php:481
+vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 7, Failures: 1.
+rc=1 elapsed=117s
+SCHEMA_NAME
+imp_fix_c

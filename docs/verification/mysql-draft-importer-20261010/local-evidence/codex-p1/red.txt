@@ -1,0 +1,22 @@
+# Codex P1 on PR #90: non-transactional storage in the import target
+# Red: fix stashed, new data set #10 (non-transactional-storage) only
+## SQLite in memory
+--- Expected
++++ Actual
+@@ @@
+-'catalog_target_schema_invalid'
++'Foreign installed schema admitted: non-transactional-storage review'
+tests/Feature/PersistentCatalogDraftImportTest.php:481
+vendor/phpunit/phpunit/phpunit:104
+FAILURES!
+Tests: 1, Assertions: 4, Failures: 1.
+## MySQL 8.0.46 (private disposable server; CI uses 8.4.11)
+--- Expected
++++ Actual
+@@ @@
+-'catalog_target_schema_invalid'
++'Foreign installed schema admitted: non-transactional-storage review'
+tests/Feature/PersistentCatalogDraftImportTest.php:481
+vendor/phpunit/phpunit/phpunit:104
+FAILURES!
+Tests: 1, Assertions: 5, Failures: 1.

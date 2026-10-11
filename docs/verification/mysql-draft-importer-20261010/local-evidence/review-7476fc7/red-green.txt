@@ -1,0 +1,17 @@
+# Conditions of the independent review of 27453f0..7476fc7 (APPROVE WITH CONDITIONS)
+## Red, SQLite, source 7476fc7: data set #11 with a mixed-case shadow (CREATE TEMP TABLE Catalog_Import_Mappings)
+Failed asserting that two strings are identical.
+-'catalog_target_invalid'
++'Drifted storage pinned: temporary-shadow'
+Tests: 1, Assertions: 3, Failures: 1.
+## Green, SQLite in memory, whole file (case-insensitive sqlite_temp_master check)
+OK (55 tests, 317 assertions)
+## Green, MySQL 8.0.46 (CI uses 8.4.11), after the test restructure (cleanup in finally, digest restored)
+## Green, MySQL 8.0.46, data set #11
+Time: 01:42.048, Memory: 81.00 MB
+OK (1 test, 9 assertions)
+## Green, MySQL 8.0.46, data set #12
+Time: 02:26.558, Memory: 81.00 MB
+OK (1 test, 6 assertions)
+## Not run
+lower_case_table_names=1; MySQL 8.4; the rest of the file on MySQL.
