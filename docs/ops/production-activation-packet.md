@@ -330,9 +330,11 @@ no runtime code:
 
 - **S2a: isolated local rehearsal.** A dedicated machine with `APP_ENV=local`, no customer
   data and a test key. This runs today's test pipeline against Stripe test mode.
-- **S2b: hosted test mode**, in two parts with different dependencies. The test checkout chain
-  (`docs/ops/staging-test-purchase.md`) needs only the hosted host and Stripe test inputs: the
-  staging admission is merged (PR #68 at `d8aba146`), and none of the §1 gates blocks it.
+- **S2b: hosted test mode**, in two parts with different dependencies. No §1 code gate blocks the test
+  checkout chain: the staging admission is merged (PR #68 at `d8aba146`). It still needs the
+  host, the Stripe test inputs and the operator setup that `docs/ops/staging-test-purchase.md`
+  and the staging runbook list (staff MFA, seller tag, Sean's seller name and assent text, and a
+  published offer linked to a rights scope).
   Production-checkout test funds on the same host still need the gates in §1 (A1b, provider/route registration, an operator reconciliation
   command) and an `ExecutionContextV1` admission that does not exist yet.
 

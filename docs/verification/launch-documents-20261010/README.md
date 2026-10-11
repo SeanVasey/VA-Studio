@@ -30,7 +30,8 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass12.txt` | Run after the eighth Codex review: checked 251 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass13.txt` | Run after the ninth Codex review: 255 citations across 3 documents (README 98, PRIVACY 98, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass14.txt` | Run after the tenth Codex review: checked 260 citations across 3 documents (PRIVACY.md: 103 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass15.txt` | Final run, after the eleventh Codex review: checked 261 citations across 3 documents (PRIVACY.md: 104 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass15.txt` | Run after the eleventh Codex review: checked 261 citations across 3 documents (PRIVACY.md: 104 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass16.txt` | Final run, after the twelfth Codex review: checked 261 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -145,6 +146,11 @@ Citation check after this pass: `green-check-citations-pass14.txt`.
 | `docs/ops/production-activation-packet.md` listed the production-checkout gates as blocking all of S2b | They block only production-checkout test funds; the S2b test checkout chain (`docs/ops/staging-test-purchase.md`) needs the host and Stripe test inputs alone |
 
 Citation check after this pass: `green-check-citations-pass15.txt`.
+
+| `CLAUDE.md` Project Notes said production customer accounts don't exist, and that staff MFA is required in production only | The production account path is implemented but default-off and unconfigured (policy U-07); staff MFA is required in staging and production |
+| The activation packet said the S2b test checkout chain needs only the host and Stripe test inputs | No §1 code gate blocks it, but it also needs the operator setup the purchase guide and runbook list (staff MFA, seller tag, seller name and assent text, a published offer linked to a rights scope) |
+
+Citation check after this pass: `green-check-citations-pass16.txt`.
 
 ## Contradictions resolved at integration
 
