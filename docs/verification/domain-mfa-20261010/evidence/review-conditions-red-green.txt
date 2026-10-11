@@ -1,0 +1,213 @@
+# Review conditions from the independent review of d806d88 (independent-review-d806d88-DECISION.md)
+# source: fb4dce8ea01e66deda9667d6080ceac66ec68059 (52d0392 integrator patch + runbook, bdd7920 tests, fb4dce8 hardening)
+# environment: PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory, public/build absent. No MySQL server was started:
+#   the two MySQL-only suites below skip on SQLite; native MySQL evidence for this source does not exist.
+# runner (from the worktree root; every run adds --colors=never --do-not-cache-result before the files):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array \
+#     SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- <files>
+# mutants were applied in place to one tracked file at a time, run, then restored with `git checkout HEAD -- <file>`;
+#   each restore is checked by sha256 against the pre-mutation file and by `git diff --quiet HEAD -- <file>` (0 = clean).
+# The RED run puts bdd7920's StaffWriteAuthority.php under fb4dce8's tests (the hardening tests before the hardening).
+# The CONTROL runs put the d806d88 test file back with the reviewer's mutant to show it survived the old tests.
+
+HEAD=fb4dce8ea01e66deda9667d6080ceac66ec68059 public/build=absent php=8.4.26
+
+### RED: fb4dce8 tests with StaffWriteAuthority.php from bdd7920 (before the hardening)
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 107, Failures: 2.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_is_recorded_only_from_the_console
+An attestation was recorded outside the console (local).
+2) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+The rights-scope write was admitted (scope).
+Time: 00:10.171, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 MATCH git-diff-quiet=0
+
+### GREEN: the three lane suites at HEAD
+files: tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+OK (22 tests, 344 assertions)
+Time: 00:15.771, Memory: 96.00 MB
+rc=0
+
+### EXISTING: reviewer-listed suites (plus SharedInventoryTest from the lane baseline) at HEAD, integrator patch applied
+files: tests/Feature/RightsScopeCommandTest.php tests/Feature/RightsScopeCommandUnknownOutcomeTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/SharedInventoryTest.php tests/Feature/PromotionAdministrationTest.php tests/Feature/PromotionAdminHttpTest.php tests/Feature/PromotionAdministrationSettlementTest.php tests/Feature/StagingEnvironmentAdmissionTest.php tests/Feature/StagingOperatorMfaTest.php tests/Feature/OperatorMfaTest.php tests/Feature/PromotionPricingTest.php tests/Feature/PromotionPricingHttpTest.php tests/Feature/ExclusiveWriterAuthorityTest.php
+OK (158 tests, 1327 assertions)
+Time: 03:04.028, Memory: 124.00 MB
+rc=0
+
+### MYSQL-ONLY suites on SQLite (expected to skip)
+files: tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php tests/Feature/RightsScopeWriterConcurrencyTest.php
+OK, but some tests were skipped!
+Tests: 17, Assertions: 0, Skipped: 17.
+Time: 00:00.465, Memory: 63.00 MB
+rc=0
+
+### MUTANT M9-action-binding-removed
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -138 +137,0 @@ final class StaffWriteAuthority
+-            && $this->action === $action
+### M9-action-binding-removed -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 107, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_bound_elsewhere_or_without_its_record_is_refused_without_effect
+The rights-scope write was admitted (another action).
+Time: 00:09.842, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 -> 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 MATCH; git-diff-quiet=0
+
+### MUTANT M14-promotion-require-passed-object
+--- a/app/Domain/Commerce/PromotionAdministration.php
++++ b/app/Domain/Commerce/PromotionAdministration.php
+@@ -187 +187 @@ final class PromotionAdministration
+-        StaffWriteAuthority::require($current);
++        StaffWriteAuthority::require($actor);
+### M14-promotion-require-passed-object -> PromotionAdministrationStaffMfaTest.php
+files: tests/Feature/PromotionAdministrationStaffMfaTest.php
+FAILURES!
+Tests: 6, Assertions: 41, Failures: 1.
+1) Tests\Feature\PromotionAdministrationStaffMfaTest::test_staging_refuses_a_stale_enrolled_actor_object_after_enrollment_was_withdrawn
+The promotion operation was admitted.
+Time: 00:01.625, Memory: 81.00 MB
+rc=1
+
+restored app/Domain/Commerce/PromotionAdministration.php: sha256 477694a992de591563e09bb6fbc60cf67c6c7e4b62d4cc15c0dcbad2ebbebd9a -> 477694a992de591563e09bb6fbc60cf67c6c7e4b62d4cc15c0dcbad2ebbebd9a MATCH; git-diff-quiet=0
+
+### MUTANT M14b-rights-scope-requireFor-passed-object
+--- a/app/Domain/Commerce/Inventory/ManageRightsScope.php
++++ b/app/Domain/Commerce/Inventory/ManageRightsScope.php
+@@ -123,0 +124 @@ final class ManageRightsScope
++        $passed = $actor;
+@@ -135 +136 @@ final class ManageRightsScope
+-        StaffWriteAuthority::requireFor($actor, $attestation, $action, $scopeKey, $revisionId);
++        StaffWriteAuthority::requireFor($passed, $attestation, $action, $scopeKey, $revisionId);
+### M14b-rights-scope-requireFor-passed-object -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 114, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_staging_refuses_a_stale_enrolled_actor_object_after_enrollment_was_withdrawn
+The rights-scope write was admitted (register).
+Time: 00:10.442, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Commerce/Inventory/ManageRightsScope.php: sha256 13b8fd5a5310971c7fa6554fc77c61759aa476e5a3256df2030c2d6469f96df7 -> 13b8fd5a5310971c7fa6554fc77c61759aa476e5a3256df2030c2d6469f96df7 MATCH; git-diff-quiet=0
+
+### MUTANT M15-console-guard-removed
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -71,3 +70,0 @@ final class StaffWriteAuthority
+-        if (! app()->runningInConsole()) {
+-            throw new AuthorizationException(self::CONSOLE_ONLY);
+-        }
+### M15-console-guard-removed -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 115, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_is_recorded_only_from_the_console
+An attestation was recorded outside the console (local).
+Time: 00:09.811, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 -> 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 MATCH; git-diff-quiet=0
+
+### MUTANT M16-recorded-context-unchecked
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -173,3 +173 @@ final class StaffWriteAuthority
+-        return $context['action'] === $this->action
+-            && hash_equals($this->scopeKey, $context['scope_key'])
+-            && ($context['offer_revision_id'] ?? null) === $this->revisionId;
++        return true;
+### M16-recorded-context-unchecked -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 112, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+The rights-scope write was admitted (scope).
+Time: 00:09.793, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 -> 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 MATCH; git-diff-quiet=0
+
+### MUTANT M17-recorded-action-unchecked
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -173,2 +173 @@ final class StaffWriteAuthority
+-        return $context['action'] === $this->action
+-            && hash_equals($this->scopeKey, $context['scope_key'])
++        return hash_equals($this->scopeKey, $context['scope_key'])
+### M17-recorded-action-unchecked -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 114, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+The rights-scope write was admitted (action).
+Time: 00:09.917, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 -> 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 MATCH; git-diff-quiet=0
+
+### MUTANT M18-recorded-revision-unchecked
+--- a/app/Domain/Staff/StaffWriteAuthority.php
++++ b/app/Domain/Staff/StaffWriteAuthority.php
+@@ -174,2 +174 @@ final class StaffWriteAuthority
+-            && hash_equals($this->scopeKey, $context['scope_key'])
+-            && ($context['offer_revision_id'] ?? null) === $this->revisionId;
++            && hash_equals($this->scopeKey, $context['scope_key']);
+### M18-recorded-revision-unchecked -> RightsScopeStaffMfaTest.php
+files: tests/Feature/RightsScopeStaffMfaTest.php
+FAILURES!
+Tests: 10, Assertions: 116, Failures: 1.
+1) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_whose_audit_record_names_another_scope_action_or_revision_is_refused
+The rights-scope write was admitted (revision).
+Time: 00:10.065, Memory: 94.00 MB
+rc=1
+
+restored app/Domain/Staff/StaffWriteAuthority.php: sha256 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 -> 62777cf2619348f85f7954177ef187fd37af1b611fb82a4082bf491404f4e143 MATCH; git-diff-quiet=0
+
+### CONTROL: M9 applied with the d806d88 version of RightsScopeStaffMfaTest.php (the reviewer's surviving mutant)
+files: tests/Feature/RightsScopeStaffMfaTest.php
+OK (7 tests, 95 assertions)
+Time: 00:07.968, Memory: 94.00 MB
+rc=0
+
+restored app/Domain/Staff/StaffWriteAuthority.php tests/Feature/RightsScopeStaffMfaTest.php git-diff-quiet=0
+
+### CONTROL: M14 applied with the d806d88 version of PromotionAdministrationStaffMfaTest.php (the reviewer's surviving mutant)
+files: tests/Feature/PromotionAdministrationStaffMfaTest.php
+OK (5 tests, 38 assertions)
+Time: 00:01.596, Memory: 81.00 MB
+rc=0
+
+restored app/Domain/Commerce/PromotionAdministration.php tests/Feature/PromotionAdministrationStaffMfaTest.php git-diff-quiet=0
+
+### Pint (vendor/bin/pint --test on the PHP files changed by 52d0392, bdd7920, fb4dce8)
+files: app/Domain/Staff/StaffWriteAuthority.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeCommandTest.php tests/Feature/StagingEnvironmentAdmissionTest.php
+{"tool":"pint","result":"passed"}rc=0
+
+### git diff --check d806d88 (working tree incl. the docs commit): rc=0, no output
+
+### MySQL-native selection and CI counts
+command: python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+rc=0: "Proved 1765 selected MySQL-native tests in 163 files (of 7664 discovered tests in 560 files) across 8 nonempty shards."
+  (also printed: 78 test files without a MySQL timing entry use the fallback weight; pre-existing warning.)
+The selection (1765 cases, 163 files) is unchanged: none of the lane's files is selected, and no new method skips on
+either driver (no markTestSkipped/driver check in the three lane suites), so neither scripts/ci/database-sqlite-skips.json
+nor scripts/ci/database-mysql-skips.json changes. The discovered total moved from the comment's 7642/557 to 7664/560,
+which equals the lane's 3 new files and 22 new cases (6 + 10 + 6) if the comment matched base f57e725 (inferred, the
+base inventory was not regenerated here). Updated: the 7642 in .github/workflows/final-verification.yml's backend-mysql
+comment. .gitlab-ci.yml mentions only the 1765 selection, unchanged. Generated phpunit-ci-mysql-* files were deleted.
+python3 scripts/ci/test-phpunit-shards.py: Ran 52 tests, OK. python3 scripts/ci/test-workflow-cadence.py: Ran 14 tests, OK.
+
+### Not tested, not claimed
+- Native MySQL (8.0.46 or CI's 8.4) for fb4dce8: not run (no MySQL server started by instruction). recorded() now reads
+  the JSON context; offer_revision_id compares strictly as int|null, which the earlier MySQL 8.0.46 run showed
+  round-trips as an int (mysql8046-attestation-context-after-test-fix.txt, at f589a2f), but that is not a run of this code.
+- The console guard is tested by flipping the application's protected isRunningInConsole flag; no real HTTP request
+  (FPM) was made. Queue workers and the scheduler also count as console; no test covers a job recording an attestation.
+- Focused checks only; no full suite, Foundation CI, browser specs or release acceptance.

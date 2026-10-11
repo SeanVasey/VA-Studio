@@ -1,0 +1,19 @@
+# source: f0cf472 (HEAD of this branch when run, fourth session)
+# note: Suites that reach ManageRightsScope or PromotionAdministration indirectly through shared fixtures (InventoryFixtures and friends) or the staging profile journey, which keeps PHPUnit's "testing" environment. They must be unaffected because local and testing keep the panel's optional rule. Complete output.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/StagingTestCommerceProfileJourneyTest.php tests/Feature/TestOrderFinalizationTest.php tests/Feature/OrderPreparationTest.php tests/Feature/ExclusiveSelectionTest.php tests/Feature/ReservePricedQuoteTest.php tests/Feature/CustomerOrderItemsTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+...............................................................  63 / 160 ( 39%)
+............................................................... 126 / 160 ( 78%)
+..................................                              160 / 160 (100%)
+
+Time: 05:55.757, Memory: 110.00 MB
+
+OK (160 tests, 2432 assertions)
+rc=0

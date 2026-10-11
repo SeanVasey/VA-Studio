@@ -1,0 +1,18 @@
+# source: f589a2f (f0cf472 + the test-only fix in tests/Feature/RightsScopeStaffMfaTest.php: key-sorted strict comparison of the attestation context; product files unchanged). Run on the working tree immediately before that commit.
+# note: Native MySQL re-run of the suite that failed only on MySQL in mysql8046-authority-command-and-new-suites.txt, after the test fix.
+# native MySQL server facts: private disposable server 8.0.46-0ubuntu0.24.04.4 on 127.0.0.1:33113, own datadir, removed afterwards. CI runs MySQL 8.4.11; this run is NOT 8.4 evidence.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33113 DB_USERNAME=root DB_PASSWORD= DB_DATABASE=vasey_mfa_m4 DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeStaffMfaTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 02:26.107, Memory: 94.00 MB
+
+OK (7 tests, 95 assertions)
+rc=0

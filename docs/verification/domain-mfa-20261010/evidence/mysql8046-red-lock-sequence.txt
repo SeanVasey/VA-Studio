@@ -1,0 +1,96 @@
+# source: de7202a (before the lock-sequence fix)
+# note: Red: the four lock-sequence cases of RightsScopeWriterConcurrencyTest on native MySQL 8.0.46. StaffWriteAuthority::require() at de7202a re-reads the actor FOR UPDATE through AdminMultiFactor::satisfiedBy, a third users lock that the test's asserted writer lock sequence (users, users, tracks, offers, rights_scopes) does not allow.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33113 DB_USERNAME=root DB_PASSWORD= DB_DATABASE=vasey_mfa_red DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeWriterConcurrencyTest.php --filter test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 14:09.657, Memory: 96.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row@link first with data ('link', 0)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'users',
+     1 => 'users',
+-    2 => 'tracks',
+-    3 => 'offers',
+-    4 => 'rights_scopes',
++    2 => 'users',
++    3 => 'tracks',
++    4 => 'offers',
+ ]
+
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:97
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:205
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:77
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row@rights before link with data ('link', 1)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'users',
+     1 => 'users',
+-    2 => 'tracks',
+-    3 => 'offers',
+-    4 => 'rights_scopes',
++    2 => 'users',
++    3 => 'tracks',
++    4 => 'offers',
+ ]
+
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:97
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:205
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:77
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row@block first with data ('block', 0)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'users',
+     1 => 'users',
+-    2 => 'rights_scopes',
++    2 => 'users',
+ ]
+
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:97
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:205
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:77
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row@rights before block with data ('block', 1)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'users',
+     1 => 'users',
+-    2 => 'rights_scopes',
++    2 => 'users',
+ ]
+
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:97
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:205
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:77
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 710, Failures: 4.
+rc=1

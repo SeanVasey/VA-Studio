@@ -1,0 +1,57 @@
+# source: f0cf472 (HEAD of this branch when run, fourth session)
+# note: Native MySQL selection that the third session started and lost to a usage limit, re-run from a fresh database: the promotion-administration MySQL concurrency suite (actor() now applies the panel rule on its shared-locked row), the rights-scope writer-authority suite, the existing command suite and the three new suites. Two failures: (1) RightsScopeCommandTest staging variant without --attest, the expected C2-encoding failure (integrator-existing-tests.patch); (2) a MySQL-only defect in the new RightsScopeStaffMfaTest: it compared the attestation's JSON context with key order significant, and MySQL's JSON type normalizes key order. Every value matched. Fixed in the test (key-sorted strict comparison, the pattern CustomerInquiryConcurrencyTest already uses); see mysql8046-attestation-context-after-test-fix.txt. Stack frames into vendor/ trimmed.
+# native MySQL server facts (private disposable server on 127.0.0.1:33113, own datadir, removed afterwards):
+#   version=8.0.46-0ubuntu0.24.04.4 transaction_isolation=REPEATABLE-READ
+#   CI runs MySQL 8.4.11; this run is NOT 8.4 evidence.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=33113 DB_USERNAME=root DB_PASSWORD= DB_DATABASE=vasey_mfa_m3 DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/RightsScopeCommandTest.php tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+.............................F.................F........          56 / 56 (100%)
+
+Time: 57:12.652, Memory: 100.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\RightsScopeCommandTest::test_staging_admits_the_same_link_and_order_preparation
+Expected status code 0 but received 1.
+Failed asserting that 1 matches expected 0.
+
+<worktree>/tests/Feature/RightsScopeCommandTest.php:131
+<worktree>/tests/Feature/RightsScopeCommandTest.php:102
+
+2) Tests\Feature\RightsScopeStaffMfaTest::test_a_recorded_console_attestation_admits_the_bound_write_in_staging_and_is_linked_from_its_audit
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'schema_version' => 1,
++    'action' => 'register',
++    'command' => 'vasey:rights-scope',
+     'authority' => 'trusted_interactive_console',
+-    'command' => 'vasey:rights-scope',
+-    'action' => 'register',
+     'scope_key' => 'synthetic-attested',
+-    'offer_revision_id' => null,
+     'attested_at' => '2026-10-10T20:18:27+00:00',
+     'environment' => 'staging',
++    'mfa_enrolled' => false,
+     'mfa_required' => true,
+-    'mfa_enrolled' => false,
++    'schema_version' => 1,
++    'offer_revision_id' => null,
+ ]
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:190
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:46
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:182
+
+FAILURES!
+Tests: 56, Assertions: 1327, Failures: 2.
+rc=1

@@ -1,0 +1,45 @@
+# source: f0cf472 (product: db5add2 + de7202a + f0cf472)
+# note: The ten existing promotion, rights-scope, command, staging-admission and operator-MFA suites after the change. Expected: exactly the two tests that encode the C2 behaviour fail; see integrator-existing-tests.patch and integrator-scratch-copies.txt.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeCommandTest.php tests/Feature/RightsScopeCommandUnknownOutcomeTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/SharedInventoryTest.php tests/Feature/PromotionAdministrationTest.php tests/Feature/PromotionAdminHttpTest.php tests/Feature/PromotionAdministrationSettlementTest.php tests/Feature/StagingEnvironmentAdmissionTest.php tests/Feature/StagingOperatorMfaTest.php tests/Feature/OperatorMfaTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+.F.............................................................  63 / 124 ( 50%)
+........................................F....................   124 / 124 (100%)
+
+Time: 03:16.171, Memory: 113.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\RightsScopeCommandTest::test_staging_admits_the_same_link_and_order_preparation
+Expected status code 0 but received 1.
+Failed asserting that 1 matches expected 0.
+
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:464
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandTest.php:131
+<worktree>/tests/Feature/RightsScopeCommandTest.php:102
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging@staging with data ('staging')
+Gates refusing staging
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => 'test promotion administration',
++]
+
+<worktree>/tests/Feature/StagingEnvironmentAdmissionTest.php:336
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 124, Assertions: 1014, Failures: 2.
+rc=1

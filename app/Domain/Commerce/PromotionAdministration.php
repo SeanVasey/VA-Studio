@@ -6,6 +6,7 @@ use App\Domain\Commerce\Models\PromotionAvailability;
 use App\Domain\Commerce\Models\PromotionAvailabilityRevision;
 use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\Models\PromotionUse;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -19,7 +20,10 @@ use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use LogicException;
 
-/** Test-only authoring. Commercial terms and lifetime identities never change. */
+/**
+ * Test-only authoring. Commercial terms and lifetime identities never change. Every operation applies the admin
+ * panel's staff multi-factor rule itself, not only through the panel's routes (#68 review condition C2).
+ */
 final class PromotionAdministration
 {
     public function create(array $policy, User $actor): PromotionCampaign
@@ -178,6 +182,9 @@ final class PromotionAdministration
         $current = $actor->exists ? $query->find($actor->getKey()) : null;
         if ($current === null) { throw new AuthorizationException; }
         Gate::forUser($current)->authorize('administer-catalog');
+        // The panel rule is evaluated on the row read under the shared lock above, with no further read; an
+        // exclusive lock would let two panel requests of the same operator deadlock on their shared locks.
+        StaffWriteAuthority::require($current);
 
         return $current;
     }

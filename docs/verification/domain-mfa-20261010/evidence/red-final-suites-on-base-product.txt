@@ -1,0 +1,167 @@
+# source: de7202a with PromotionAdministration.php, ManageRightsScope.php and ManageRightsScopes.php restored from f57e725 (StaffWriteAuthority.php present but unwired)
+# note: Final red run: the committed suites against the base product files. Every MFA, attestation and console case must fail; only the local/testing-unchanged and list-action cases may pass.
+# command (from the worktree root, public/build absent):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/PromotionAdministrationStaffMfaTest.php tests/Feature/RightsScopeStaffMfaTest.php tests/Feature/RightsScopeCommandAttestationTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+F....F...EF.FEEEEE                                                18 / 18 (100%)
+
+Time: 00:16.317, Memory: 96.00 MB
+
+There were 6 errors:
+
+1) Tests\Feature\RightsScopeStaffMfaTest::test_a_recorded_console_attestation_admits_the_bound_write_in_staging_and_is_linked_from_its_audit
+ErrorException: Undefined array key "attestation_audit_id"
+
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:199
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:46
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:182
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeCommandAttestationTest::test_staging_admits_attested_writes_and_records_who_when_and_which_scope
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:130
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:49
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:126
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeCommandAttestationTest::test_an_attestation_is_recorded_only_after_identity_and_environment_are_confirmed
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:179
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:49
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:177
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:205
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:49
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:203
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\RightsScopeCommandAttestationTest::test_attest_does_not_apply_to_the_read_only_list_action
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:221
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\RightsScopeCommandAttestationTest::test_testing_keeps_writes_optional_and_records_an_explicit_attestation
+Symfony\Component\Console\Exception\InvalidOptionException: The "--attest" option does not exist.
+
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:154
+<worktree>/vendor/symfony/console/Input/ArrayInput.php:121
+<worktree>/vendor/symfony/console/Input/Input.php:53
+<worktree>/vendor/symfony/console/Command/Command.php:295
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+<worktree>/vendor/symfony/console/Application.php:1094
+<worktree>/vendor/symfony/console/Application.php:356
+<worktree>/vendor/symfony/console/Application.php:195
+<worktree>/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+<worktree>/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:237
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 4 failures:
+
+1) Tests\Feature\PromotionAdministrationStaffMfaTest::test_staging_refuses_writes_and_reads_for_an_admin_without_the_panel_factor
+The promotion operation was admitted.
+
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:73
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:90
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:43
+<worktree>/tests/Feature/PromotionAdministrationStaffMfaTest.php:89
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsScopeStaffMfaTest::test_staging_refuses_register_link_and_block_for_an_admin_without_the_panel_factor
+The rights-scope write was admitted.
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:80
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:108
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:46
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:107
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\RightsScopeStaffMfaTest::test_an_attestation_bound_elsewhere_or_without_its_record_is_refused_without_effect
+The rights-scope write was admitted (another scope key).
+
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:80
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:231
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:46
+<worktree>/tests/Feature/RightsScopeStaffMfaTest.php:229
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\RightsScopeCommandAttestationTest::test_staging_refuses_writes_without_an_attestation_and_records_nothing
+Expected status code 1 but received 0.
+Failed asserting that 0 matches expected 1.
+
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:464
+<worktree>/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:110
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:49
+<worktree>/tests/Feature/RightsScopeCommandAttestationTest.php:105
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 18, Assertions: 130, Errors: 6, Failures: 4.
+rc=2

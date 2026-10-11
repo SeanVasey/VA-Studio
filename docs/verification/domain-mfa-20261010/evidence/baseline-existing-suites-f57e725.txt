@@ -1,0 +1,18 @@
+# source: f57e7256891d0d3c117e151a36f7fb967c724ab7 (untouched)
+# note: Baseline of the ten existing suites before any edit.
+# command (from the worktree root, public/build absent, SQLite in memory):
+#   env APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php -d memory_limit=512M \
+#     php -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --do-not-cache-result \
+#     tests/Feature/RightsScopeCommandTest.php tests/Feature/RightsScopeCommandUnknownOutcomeTest.php tests/Feature/RightsScopeWriterAuthorityTest.php tests/Feature/SharedInventoryTest.php tests/Feature/PromotionAdministrationTest.php tests/Feature/PromotionAdminHttpTest.php tests/Feature/PromotionAdministrationSettlementTest.php tests/Feature/StagingEnvironmentAdmissionTest.php tests/Feature/StagingOperatorMfaTest.php tests/Feature/OperatorMfaTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+...............................................................  63 / 124 ( 50%)
+.............................................................   124 / 124 (100%)
+
+Time: 03:08.204, Memory: 127.00 MB
+
+OK (124 tests, 1028 assertions)
+rc=0

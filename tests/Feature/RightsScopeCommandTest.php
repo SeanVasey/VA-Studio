@@ -128,9 +128,13 @@ class RightsScopeCommandTest extends TestCase
             ->expectsOutputToContain('unlinked revision='.$f['revision']->id.' offer='.$f['offer']->id.' track='.$f['track']->slug)
             ->assertExitCode(0);
 
-        $this->register($f['actor'])->expectsOutputToContain('scope=synthetic-track-scope id=')->assertExitCode(0);
+        // C2 (#68): a console write where the panel requires the staff factor carries an explicit, recorded attestation.
+        $attest = $environment === 'staging' ? ['--attest' => true] : [];
+        $this->write(['action' => 'register', '--scope' => 'synthetic-track-scope', '--reference' => self::SCOPE_REFERENCE] + $attest, $f['actor'])
+            ->expectsOutputToContain('scope=synthetic-track-scope id=')->assertExitCode(0);
         $this->assertSame('synthetic-track-scope', DB::table('rights_scopes')->value('scope_key'));
-        $this->link($f['actor'], $f['revision']->id)
+        $this->write(['action' => 'link', '--scope' => 'synthetic-track-scope', '--revision' => (string) $f['revision']->id,
+            '--reference' => self::LINK_REFERENCE] + $attest, $f['actor'])
             ->expectsOutputToContain('revision='.$f['revision']->id.' scope=synthetic-track-scope status=linked')->assertExitCode(0);
 
         $order = $this->prepare($f['quote']);

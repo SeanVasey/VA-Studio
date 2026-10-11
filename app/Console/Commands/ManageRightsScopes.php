@@ -9,17 +9,20 @@ use App\Domain\Commerce\Inventory\ManageRightsScope;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Throwable;
 
 /**
  * Operator entry point for the test-only shared rights inventory. Every rule (staff authority,
  * environment, key/reference format, readiness, immutable linkage and audit) stays in
- * ManageRightsScope; this command only authenticates the named staff account and maps outcomes.
+ * ManageRightsScope; this command only authenticates the named staff account, records the
+ * operator's explicit attestation where the panel would require the staff factor, and maps outcomes.
  */
 final class ManageRightsScopes extends Command
 {
@@ -28,7 +31,8 @@ final class ManageRightsScopes extends Command
         {--actor-id= : Staff user ID performing a write; the password is confirmed at a hidden prompt}
         {--scope= : Rights scope key (lowercase letters, digits and . _ : -)}
         {--revision= : Offer revision ID to link, as printed by the list action}
-        {--reference= : Private evidence reference retained with the scope or link (never printed)}';
+        {--reference= : Private evidence reference retained with the scope or link (never printed)}
+        {--attest : Attest in person, at a trusted console, to this write under your staff identity where the panel would require multi-factor authentication; recorded in the audit log (who, when, which scope)}';
 
     protected $description = 'Register test rights scopes and link current offer revisions to them through the audited domain service.';
 
@@ -56,10 +60,19 @@ final class ManageRightsScopes extends Command
             if ($actor === null) {
                 return $this->refuse('Operator authority was refused.');
             }
+            // The environment answer precedes any attestation, so production never records one.
+            InventoryPolicy::requireTestEnvironment();
+            if (! $this->option('attest') && StaffWriteAuthority::attestationRequired()) {
+                return $this->refuse('This environment requires staff multi-factor authentication and a console has no factor challenge. '
+                    .'Re-run with --attest to record your attestation (who, when, which scope) in the audit log before the write.');
+            }
+            $attestation = $this->attest($actor, $action);
 
-            return $action === 'register' ? $this->register($actor) : $this->link($actor);
-        } catch (AuthorizationException) {
-            return $this->refuse('Operator authority was refused.');
+            return $action === 'register' ? $this->register($actor, $attestation) : $this->link($actor, $attestation);
+        } catch (AuthorizationException $error) {
+            return $this->refuse($error->getMessage() === StaffWriteAuthority::REFUSAL
+                ? 'Operator authority was refused: staff multi-factor authentication is required and no recorded attestation covered this write.'
+                : 'Operator authority was refused.');
         } catch (QuoteException $error) {
             return $this->domainRefusal($error);
         } catch (Throwable) {
@@ -78,6 +91,9 @@ final class ManageRightsScopes extends Command
     {
         if (! is_string($action) || ! array_key_exists($action, self::ALLOWED)) {
             return 'the action must be register, link or list.';
+        }
+        if ($action === 'list' && $this->option('attest')) {
+            return '--attest does not apply to list.';
         }
         foreach (['actor-id', 'scope', 'revision', 'reference'] as $name) {
             $value = $this->option($name);
@@ -99,7 +115,10 @@ final class ManageRightsScopes extends Command
         return null;
     }
 
-    /** Current persisted credentials; authority itself is re-read by the domain inside its transaction. */
+    /**
+     * Current persisted credentials and staff authority; the domain re-reads authority inside its transaction.
+     * The staff check here keeps a non-staff password holder from leaving an attestation on record.
+     */
     private function authenticate(): ?User
     {
         $password = $this->secret('Staff password (hidden)', false);
@@ -107,20 +126,38 @@ final class ManageRightsScopes extends Command
         $valid = $actor !== null && is_string($password) && $password !== '' && Hash::check($password, $actor->getAuthPassword());
         unset($password);
 
-        return $valid ? $actor : null;
+        return $valid && Gate::forUser($actor)->allows('administer-catalog') ? $actor : null;
     }
 
-    private function register(User $actor): int
+    /**
+     * A console has no multi-factor challenge, so an attestation is never implied: only an explicit `--attest`
+     * records one (who, when, which scope), after the password is confirmed and before the domain write, and the
+     * domain service verifies it against that exact write. Without the flag, local and testing keep the panel's
+     * optional rule and nothing is recorded.
+     */
+    private function attest(User $actor, string $action): ?StaffWriteAuthority
+    {
+        if (! $this->option('attest')) {
+            return null;
+        }
+        $attestation = StaffWriteAuthority::attest($actor, 'vasey:rights-scope', $action, (string) $this->option('scope'),
+            $action === 'link' ? (int) $this->option('revision') : null);
+        $this->line('attestation=recorded audit_event='.$attestation->auditEventId);
+
+        return $attestation;
+    }
+
+    private function register(User $actor, ?StaffWriteAuthority $attestation): int
     {
         $key = (string) $this->option('scope');
         $existed = RightsScope::where('scope_key', $key)->exists();
-        $scope = app(ManageRightsScope::class)->register($key, (string) $this->option('reference'), $actor);
+        $scope = app(ManageRightsScope::class)->register($key, (string) $this->option('reference'), $actor, $attestation);
         $this->line('scope='.$scope->scope_key.' id='.$scope->public_id.' status='.($existed ? 'unchanged' : 'registered'));
 
         return self::SUCCESS;
     }
 
-    private function link(User $actor): int
+    private function link(User $actor, ?StaffWriteAuthority $attestation): int
     {
         $key = (string) $this->option('scope');
         $revisionId = (int) $this->option('revision');
@@ -130,7 +167,7 @@ final class ManageRightsScopes extends Command
             return $this->refuse('Rights scope '.$this->safeKey($key).' is not registered. Register it first.');
         }
         try {
-            $link = app(ManageRightsScope::class)->link($scope->id, $revisionId, (string) $this->option('reference'), $actor);
+            $link = app(ManageRightsScope::class)->link($scope->id, $revisionId, (string) $this->option('reference'), $actor, $attestation);
         } catch (ModelNotFoundException) {
             return $this->refuse('Offer revision '.$revisionId.' was not found.');
         } catch (QuoteException $error) {
