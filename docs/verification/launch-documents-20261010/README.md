@@ -15,24 +15,28 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `independent-review-58cc803-DECISION.md` | The independent review of `58cc803`: REQUEST CHANGES, with four conditions (copied verbatim). |
 | `pass3-source-checks.txt` | Third pass, for the review conditions: the false IP claim and missing sections at `58cc803` (red), the session, attachment, service-project and free-grant sources, and the corrected headings and retention rows (green). |
 | `green-check-citations-pass3.txt` | Run after the third pass: 236 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
-| `green-check-citations-pass4.txt` | Final run, after the delta review's conditions: 239 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass4.txt` | Run after the delta review's conditions: 239 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `independent-review-8838dd7-DECISION.md` | The delta review of the third pass. |
+| `green-check-citations-pass5.txt` | Run after the Codex review on PR #91: 243 citations across 3 documents, `RESULT PASS`, exit 0. |
+| `independent-review-58cc803-second-DECISION.md` | A second independent review of `58cc803`: REQUEST CHANGES, five conditions (copied verbatim). Its conditions on session and IP handling, the missing sections and the scanning order had already been met by `8838dd7` and `96db5ff`; pass 6 adds the quarantine wording to the scanning row and applies the rest. |
+| `pass6-source-checks.txt` | Pass 6, for the second review: the remaining statements at `7468661` (red), the sources the corrections cite (the unthrottled Stripe webhook route, the test-account gate, the quarantined media source record), and the corrected lines (green). |
+| `green-check-citations-pass6.txt` | Final run, after pass 6: 244 citations across 3 documents, `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
 ```
 $ python3 -I docs/verification/launch-documents-20261010/check-citations.py
 docs/legal/README.md: 95 distinct cited paths
-docs/legal/PRIVACY.md: 89 distinct cited paths
-docs/legal/TERMS.md: 55 distinct cited paths
-checked 239 citations across 3 documents
+docs/legal/PRIVACY.md: 90 distinct cited paths
+docs/legal/TERMS.md: 59 distinct cited paths
+checked 244 citations across 3 documents
 RESULT PASS
 exit 0
 $ git diff --check
 (exit 0)
 ```
 
-The final run is `green-check-citations-pass5.txt`, after the Codex review; the run below (`green-check-citations-pass4.txt`) followed the delta review's conditions. The earlier 209-, 214- and 236-citation runs are kept in `green-check-citations.txt`, `green-check-citations-pass2.txt` and `green-check-citations-pass3.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+The block above is the final run, `green-check-citations-pass6.txt`, after the second review of `58cc803`. The earlier 209-, 214-, 236-, 239- and 243-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass5.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 

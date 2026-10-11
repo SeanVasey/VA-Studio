@@ -102,7 +102,7 @@ Staff sign in to the administration panel with TOTP multi-factor authentication 
 | Email provider | None configured | `config/mail.php`; `config/production-customer-identity.php` |
 | Marketing / suppression provider | None configured; adapter unbound | `config/customer-suppression.php`; `config/production-suppression.php` |
 | Analytics provider | None in the source | search of `resources/js`, `app`, `config` (see section 2.1) |
-| Malware scanning | ClamAV on the host scans uploads before they are promoted, served or downloaded. Staff media uploads stay private until a clean scan, and only scanned results are promoted; support-attachment originals are stored as immutable private files first and scanned before any download | `ops/staging/README.md`, "Packages and versions"; `docs/media-processing.md`; `docs/verification/support-attachments-20261007.md`, "Effects, retry and retention" |
+| Malware scanning | ClamAV on the host scans uploads after they are stored and before they are promoted, served or downloaded; nothing is scanned before it is stored. Staff media uploads are first stored privately as a quarantined source record and only clean, processed results are promoted; support-attachment originals are stored as immutable private files first and scanned before any download | `ops/staging/README.md`, "Packages and versions"; `docs/media-processing.md`, the paragraph beginning "Every upload is private" and "Publish a track through the admin", step 2 ("a quarantined source record"); `docs/verification/support-attachments-20261007.md`, "Effects, retry and retention" |
 
 The processor list for production (analytics, email, support tooling) is U-13 and belongs to [Sean to decide](#sean-to-decide).
 
@@ -135,17 +135,19 @@ A retention schedule, a deletion procedure that respects the immutable commercia
 - Private payloads (orders, receipts, consent recipients, inquiries, attachment manifests, service-project briefs, free-license origins, listening library, delivery evidence) are encrypted at rest with Laravel's authenticated encryption under the application key; the key must be backed up with the database (`docs/order-preparation.md`, "Immutable private records"; `docs/stripe-webhook-inbox.md`, "Configure a development receiver").
 - Masters, stems, contracts and purchased files live in private, unserved storage and are streamed only after a fresh entitlement and authorization check (`docs/test-contract-issuance.md`, "Isolation and private storage boundaries"; `docs/test-owner-delivery.md`; `AGENTS.md`, Invariants).
 - Private pages and responses carry `private, no-store`, `noindex` and no-referrer headers (`docs/hosted-test-checkout.md`, "Owner API and recovery"; `docs/contact-inquiries.md`).
-- Public endpoints are rate limited and bodies are bounded (`app/Providers/AppServiceProvider.php`; `docs/contact-inquiries.md`).
+- Public browser and embed endpoints are rate limited and bodies are bounded (`app/Providers/AppServiceProvider.php`; `docs/contact-inquiries.md`; the route files named in section 2.1). The one exception is the Stripe webhook, `POST /webhooks/stripe`: it has no rate limit (`routes/webhooks.php`, mounted without middleware in `bootstrap/app.php`). It accepts at most 1 MiB of JSON, and only an event whose `Stripe-Signature` verifies against the configured endpoint secret is stored (`docs/stripe-webhook-inbox.md`).
 - Staff access requires MFA and is audited; the operating contract is in `docs/architecture/security-operations.md`.
 
 ## 6. Your choices today
 
+Only the first and last rows are available to the public today. The account-area rows exist only where customer accounts are admitted: synthetic test accounts in `local`, `testing` or the hosted `staging` rehearsal, with `VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED=true` (section 2.3; `app/Domain/Customers/CustomerAccessPolicy.php`). No member of the public has an account.
+
 | Choice | How | Evidence |
 | --- | --- | --- |
 | Not load third-party video | Do not press **Load … video**; use the external watch link instead | `resources/js/components/EditorialVideo.tsx` |
-| Withdraw marketing consent | **Communication preferences** in the account area; withdrawal works even when no current notice exists | `docs/verification/customer-consent-preferences-20261007/README.md`; `routes/customer.php` |
-| Export or clear the listening library | **Listening library** export and versioned clear | `routes/customer.php`; `docs/verification/customer-listening-notes-export-20261007/README.md` |
-| Sign out | `/account/sign-out`, available even after access withdrawal | `docs/verification/customer-account-test-journey.md` |
+| Withdraw marketing consent (**test-only**) | **Communication preferences** in the account area; withdrawal works even when no current notice exists | `docs/verification/customer-consent-preferences-20261007/README.md`; `routes/customer.php` |
+| Export or clear the listening library (**test-only**) | **Listening library** export and versioned clear | `routes/customer.php`; `docs/verification/customer-listening-notes-export-20261007/README.md` |
+| Sign out of a customer account (**test-only**) | `/account/sign-out`, available even after access withdrawal | `docs/verification/customer-account-test-journey.md`; `routes/customer.php` |
 | Ask about your data | `support@vasey.audio` (the handling procedure is not defined in code) | `CLAUDE.md`, Project Notes |
 
 There is no self-service deletion of an account, an order, a contract or an inquiry; the records are immutable by design (section 4). Any deletion or access-request procedure is a decision for Sean and a reviewer.
@@ -171,3 +173,4 @@ Nothing in this section is decided by the code. Each item names the register key
 - 2026-10-10: after independent review, section 2.1 states that every session is stored server-side with its IP address, user agent and payload; added sections 2.6 to 2.8 (support attachments, service-project briefs, free-license name and assent) and their retention rows; stated that Stripe's page collects the buyer's email address.
 - 2026-10-10: after the delta review of `8838dd7`, section 2.1 names the other per-IP and per-user rate limits and their hashed cache keys, section 3 says uploads are scanned before they are promoted, served or downloaded (support-attachment originals are stored first), and section 4 adds a row for rate-limit counters, which have no scheduled purge.
 - 2026-10-11: after Codex review on PR #91, section 3 separates what this application sends Stripe from what Stripe's hosted page collects directly, and section 4 says browser locators stay for the tab session (the order locator deliberately) instead of clearing on success.
+- 2026-10-11: after a second independent review of `58cc803`, section 3 says uploads are stored privately (quarantined) before they are scanned, section 5 excludes the signature-checked Stripe webhook from the rate-limit statement, and section 6 marks the account-area choices as test-only.
