@@ -271,6 +271,13 @@ rollback's inode match could hit a reused inode only if the caller or root delet
 I1 (the inode-checked rollback, the retained-output uid check and exact `0600` versus `0400` have no killing
 test; the rollback is shown by the probe in `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt`).
 
+The delta review of `3d6b755..20f5dc9` returned APPROVE (`independent-review-20f5dc9-DECISION.md`). Its
+1.6M-input fuzz found the admitted set equal to strict RFC 4180 with LF or CRLF endings. Its two Low docs items
+are met in the next commit: `export_unreadable` is in the guide's reason codes, and the class docblock states
+that the mapping is private too. Informational, unchanged: a fixture-path mapping that does not declare
+`synthetic_fixture` and the `input_changed` byte comparison have no killing test (the code is correct by
+probe); bare CRs, including old Mac line endings, report as `export_csv_quotes`.
+
 ## Codex round on `20f5dc9`
 
 - **Backslash before a pipe in a Markdown cell (P2).** The Markdown report escaped `|` but not `\`. A GFM

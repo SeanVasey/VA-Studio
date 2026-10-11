@@ -11,11 +11,13 @@ use Throwable;
 /**
  * Private file boundary for the dry run: read two inputs, write at most three outputs, nothing else.
  *
- * The export must be a caller-owned, owner-only, single-link file outside this checkout; only a
- * mapping declaring a synthetic fixture may read one from inside it.
+ * The export and the mapping must each be a caller-owned, owner-only, single-link file in private
+ * storage outside this checkout; only a mapping declaring a synthetic fixture may be read, with its
+ * export, from tests/Fixtures/.
  *
  * The output directory must be absolute, symlink-free, owned by the caller, mode 0700, outside
- * this checkout, and hold nothing but earlier outputs of this tool. Existing identical outputs are
+ * every Git working tree, under ancestors no other user can rename, and hold nothing but earlier
+ * caller-owned 0600 outputs of this tool. Existing identical outputs are
  * left in place; different ones are refused, so a report is never silently replaced.
  */
 final class BeatStarsDryRunFiles
