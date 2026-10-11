@@ -33,7 +33,7 @@ VASEY.AUDIO is a first-party store: Sean Vasey publishes, shares, licenses and s
 5. **Finalization.** After verified payment the server consumes the reserved inventory and promotion capacity, records any exclusive sale and creates one grant per line with the frozen buyer, seller, assent and license input; a confirmation observed after the attempt's expiry becomes a reviewed `paid_exception` instead of an automatic sale (`docs/test-payment-finalization.md`; `docs/architecture/decision-register.md`, D-16).
 6. **Unpaid orders.** Reserved inventory and promotion capacity stay pending until verified finalization or an explicit verified unpaid release (`docs/hosted-test-checkout.md`, "Explicit test boundary"; `docs/test-unpaid-release.md`).
 
-Every response in this chain is labelled `testOnly: true` and `payable: false` until live policies exist (`docs/order-preparation.md`; `docs/hosted-test-checkout.md`). The legacy `/checkout` endpoint answers 503 "Checkout is being prepared. No payment has been taken." (`routes/web.php`).
+The successful responses in this chain say they are not live: the quote response carries `payable: false` (`app/Http/Controllers/QuoteController.php`), the order review carries `testOnly: true` and `payable: false` (`app/Domain/Commerce/Orders/ReviewOrder.php`), and the hosted checkout projection carries `testOnly: true` (`app/Domain/Commerce/Checkout/HostedCheckout.php`). Error responses carry only a code (`app/Http/Controllers/TestCheckoutController.php`). See `docs/order-preparation.md` and `docs/hosted-test-checkout.md`. The legacy `/checkout` endpoint answers 503 "Checkout is being prepared. No payment has been taken." (`routes/web.php`).
 
 ## 5. What a buyer receives
 
@@ -83,3 +83,4 @@ Nothing in this section is decided by the code. Each item names the register key
 ## Change log
 
 - 2026-10-10: first draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`).
+- 2026-10-11: after Codex review on PR #91, the test-only paragraph names which responses carry `testOnly` and `payable` instead of claiming every response carries both.

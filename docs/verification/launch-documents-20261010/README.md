@@ -32,7 +32,7 @@ $ git diff --check
 (exit 0)
 ```
 
-This is the final run (`green-check-citations-pass4.txt`), after the delta review's conditions. The earlier 209-, 214- and 236-citation runs are kept in `green-check-citations.txt`, `green-check-citations-pass2.txt` and `green-check-citations-pass3.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+The final run is `green-check-citations-pass5.txt`, after the Codex review; the run below (`green-check-citations-pass4.txt`) followed the delta review's conditions. The earlier 209-, 214- and 236-citation runs are kept in `green-check-citations.txt`, `green-check-citations-pass2.txt` and `green-check-citations-pass3.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -83,6 +83,16 @@ Condition 4, re-review of the changed `PRIVACY.md` text, was met by an independe
 The review's INFO items are not conditions and stay open for the owner's privacy review: no trusted proxies are configured, so a CDN or proxy in front would make the stored session IP the proxy's; Stripe's email collection is inferred from the absent `customer_email`; the free-grant `payload_hash` is a hash of the plaintext. The contradiction it found in `docs/service-projects.md` and `config/services-projects.php` (no attachment authority, against the registered `test_service_project_v1` attachment family) is added below.
 
 The `check-citations.py` script is unchanged. The review's LOW finding on its scope (it checks paths and headers, not facts) is recorded above under "Commands and results", not fixed.
+
+## Fifth pass (Codex review on PR #91)
+
+| Finding | Change |
+| --- | --- |
+| PRIVACY section 3 said Stripe receives no buyer identity | The row separates what this application sends (amounts, generic names, opaque IDs) from what Stripe's hosted page collects directly (email and payment details), as section 2.2 step 3 already says |
+| PRIVACY section 4 said browser locators clear on success | They stay for the tab session unless replaced or removed; the order locator deliberately keeps up to ten IDs after success (`useCart.ts`, `QuoteReview.tsx`, `OrderPreparation.tsx`) |
+| TERMS said every response carries `testOnly: true` and `payable: false` | It names the fields each response actually returns: quote `payable: false`, order review both, hosted checkout projection `testOnly: true`, errors a code only |
+
+Citation check after this pass: `green-check-citations-pass5.txt`.
 
 ## Contradictions reported, not edited
 
