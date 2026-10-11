@@ -5,8 +5,8 @@ Tested commits: `3519dc09ff318c4c6f7ab2a9c3f776d72ddffdd8` (feature) and
 `8ceb96b8b01721a868a04f2629c7b151d6837767` (documentation, no code change).
 Development lane under Sean's 2026-10-06 CI cost policy: these are focused local checks on
 SQLite in the Claude Code container (PHP 8.4.26, PHPUnit 12.5.34), not Foundation CI and not
-final acceptance. No PR was opened and nothing was pushed from this lane. `PLAN.md` was
-committed before implementation.
+final acceptance. The lane itself pushed nothing; the integrator pushed it as PR #89 and applied the
+review and Codex fixes recorded below. `PLAN.md` was committed before implementation.
 
 ## What was built
 
@@ -182,7 +182,17 @@ Its conditions are met as follows:
 - Applying the snapshot through `CatalogDraftImporter` (separately authorized; not run).
 - `composer audit` / `npm audit`: no dependency was added or changed.
 
+## Integration scope and accepted gaps
+
+- `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the
+  lane's owned list. They are the integrator's edits, made deliberately at integration.
+- The snapshot cap has no test at exactly 1,048,576 and 1,048,577 bytes, so the boundary mutants (`>` to
+  `>=`, the newline counted or not) survive. Both directions fail closed: an over-cap snapshot is never
+  written. This boundary is deliberately left untested.
+
 ## Lane hygiene
 
-Worktree left clean on `harness/beatstars-normalizer`; no `phpunit-ci-*` files were generated;
+The implementer left the worktree clean on `harness/beatstars-normalizer`. During integration the
+worktree also carried the integrator's uncommitted edits between commits, which one workflow re-review
+observed; the merged SHA is the one recorded in the handoff ledger. No `phpunit-ci-*` files were generated;
 no server was started; `vendor/` is a hard-link mirror of a sibling worktree and was not written.
