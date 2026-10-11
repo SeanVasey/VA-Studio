@@ -67,8 +67,9 @@ final class BeatStarsExportSheet
     /**
      * fgetcsv accepts a quoted field that never closes (a truncated export), text after a closing quote, and a
      * quote inside an unquoted field, and returns cells or records that another reader could split differently.
-     * Refuse all three before parsing (RFC 4180): a quote may only open a field, a quoted field must close, and
-     * only a delimiter, a line ending or the end of the file may follow its closing quote.
+     * Refuse all three before parsing (RFC 4180): a quote may only open a field, a quoted field must close, only
+     * a delimiter, a line ending or the end of the file may follow its closing quote, and outside quotes a CR
+     * may only begin a CRLF line ending.
      */
     private function quotes(string $bytes): void
     {
@@ -76,11 +77,13 @@ final class BeatStarsExportSheet
         $offset = 0;
         while ($offset < $length) {
             if ($bytes[$offset] !== '"') {
-                // An unquoted field runs to the next delimiter or line feed and holds no quote. This also covers
-                // whitespace before a quote, which fgetcsv skips and then parses as an enclosure.
-                $span = strcspn($bytes, "\",\n", $offset);
-                $this->require(($bytes[$offset + $span] ?? '') !== '"', 'export_csv_quotes');
-                $offset += $span + 1;
+                // An unquoted field runs to the next delimiter or line ending and holds no quote and no bare CR.
+                // This also covers whitespace before a quote, which fgetcsv skips and then parses as an
+                // enclosure, and a CR that fgetcsv strips from a cell while another reader ends a record there.
+                $span = strcspn($bytes, "\",\n\r", $offset);
+                $stop = $bytes[$offset + $span] ?? '';
+                $this->require($stop !== '"' && ($stop !== "\r" || ($bytes[$offset + $span + 1] ?? '') === "\n"), 'export_csv_quotes');
+                $offset += $span + ($stop === "\r" ? 2 : 1);
 
                 continue;
             }

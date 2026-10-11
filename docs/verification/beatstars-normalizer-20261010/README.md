@@ -261,6 +261,16 @@ and 26 feature tests green; the L1 swap probe).
 Evidence: `evidence/codex-sheet-write-and-private-mapping-red-green.txt` (red on the old source; 88 unit and 28
 feature tests green).
 
+The delta review of `65f6107..3d6b755` returned APPROVE WITH CONDITIONS (`independent-review-3d6b755-DECISION.md`).
+Its 900k-input fuzz found no admitted quote in an unquoted cell and no refused RFC-valid input; L1 and L2 are met.
+Condition N1 (Low, older than that delta): a bare CR outside quotes was admitted, and `fgetcsv` strips it from
+the cell while another reader ends a record there. Outside quotes a CR must now begin a CRLF line ending
+(`export_csv_quotes`); evidence `evidence/review-3d6b755-bare-cr-red-green.txt` (red on `37b80be`; 89 unit and 28
+feature tests green). N3 is met by qualifying the guide's rollback sentence. Accepted, not changed: N2 (the
+rollback's inode match could hit a reused inode only if the caller or root deleted this run's file mid-run) and
+I1 (the inode-checked rollback, the retained-output uid check and exact `0600` versus `0400` have no killing
+test; the rollback is shown by the probe in `evidence/codex-strict-quotes-retained-mode-and-rollback-red-green.txt`).
+
 ## Integration scope and accepted gaps
 
 - `CHANGELOG.md`, `docs/migration/README.md` and the Monday plan's M-09, M-10 and S-9 rows are outside the

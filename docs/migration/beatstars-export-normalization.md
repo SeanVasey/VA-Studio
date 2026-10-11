@@ -37,7 +37,8 @@ read through one descriptor whose identity must not change during the read (`inp
 or `input_changed` otherwise). An export or mapping inside this checkout is read only from `tests/Fixtures/`
 with a mapping whose `acquisition_method` is `synthetic_fixture` (`input_inside_repository`
 otherwise). If writing any output fails, every file the run created is removed before it reports
-`output_write`.
+`output_write`, as long as its path still names the file this run wrote; if the output directory was moved
+away during the run, the files stay in the moved directory and nothing in its replacement is touched.
 
 ```json
 {
@@ -145,7 +146,7 @@ A **refusal** (exit `1`) means the inputs cannot be interpreted at all; nothing 
 Reason codes: `usage`, `path`, `input_file`, `input_changed` (the file's identity, size or times changed while it was read), `input_not_private`, `input_inside_repository`,
 `output_directory`, `output_inside_repository`,
 `output_directory_not_empty`, `output_differs`, `output_pending_exists`, `output_write`,
-`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (strict RFC 4180 quoting: a quoted field that never closes, as in a truncated file, text after a closing quote, or any quote inside an unquoted field, including whitespace before an opening quote; a cell such as `12" vinyl` must be exported quoted, as `"12"" vinyl"`), `export_header` (also a header with leading or trailing whitespace, which is refused rather than trimmed), `export_too_many_rows`,
+`export_name`, `export_too_large`, `export_encoding`, `export_csv_quotes` (strict RFC 4180 quoting: a quoted field that never closes, as in a truncated file, text after a closing quote, any quote inside an unquoted field, including whitespace before an opening quote, or a carriage return outside quotes that does not begin a CRLF line ending; a cell such as `12" vinyl` must be exported quoted, as `"12"" vinyl"`), `export_header` (also a header with leading or trailing whitespace, which is refused rather than trimmed), `export_too_many_rows`,
 `export_empty`, and `mapping_*` (`json`, `keys`, `purpose`, `identity`, `acquisition_method`,
 `timestamp`, `currency`, `slug_policy`, `columns`, `constants`, `required_field`,
 `visibility_values`, `tag_separator`, `licenses`, `offers`, `ignored_columns`,

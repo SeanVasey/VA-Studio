@@ -418,6 +418,7 @@ class BeatStarsExportNormalizerTest extends TestCase
             'tab then a quote with text after its close' => ["Track ID,Title\n\t\"x\"-1,SYNTHETIC\n", 'export.csv', 'export_csv_quotes'],
             'bare carriage return after a closing quote' => ["Track ID,Title\n\"x\"\ry,SYNTHETIC\n", 'export.csv', 'export_csv_quotes'],
             'quote after text in an unquoted field' => ["Track ID,Title\nlegacy-1,12\" vinyl\n", 'export.csv', 'export_csv_quotes'],
+            'bare carriage return in an unquoted field' => ["Track ID,Title,Notes\nR1,a\r,\"b\nc\"\n", 'export.csv', 'export_csv_quotes'],
             'quote opening mid-field across a line' => ["Track ID,Title,Rights\nid,x\"foo,R1\nbar\",z,R2\n", 'export.csv', 'export_csv_quotes'],
             'too many rows' => ["Track ID\n".str_repeat("1\n", 1001), 'export.csv', 'export_too_many_rows'],
             'bad name' => ["Track ID\n1\n", 'export file.csv', 'export_name'],
