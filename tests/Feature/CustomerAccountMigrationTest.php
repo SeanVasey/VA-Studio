@@ -7,6 +7,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Tests\Support\CapabilityRollbackFixture;
 use Tests\Support\CustomerFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
@@ -34,6 +35,17 @@ class CustomerAccountMigrationTest extends TestCase
         }
         (require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php'))->down();
         (require database_path('migrations/2026_10_06_000045_customer_identity_challenges.php'))->down();
+        // Newer families hold RESTRICT foreign keys to customer_accounts and refuse operational rollback:
+        // customer_saved_tracks (242000), service projects (244000), free and paid grant origins (245000,
+        // 252000), consent (250000), suppression (251000) and the production identity, feature,
+        // suppression, free-grant and membership families (247000, 253000 to 259000). Native MySQL refuses
+        // to drop a referenced parent (SQLSTATE 3730) and names only the first blocking constraint, so
+        // dispose of every verified-empty dependent from the live catalog, leaves first, with foreign keys
+        // still enforced. Dropping a table also drops its own triggers.
+        $dependents = CapabilityRollbackFixture::dependents(['customer_accounts']);
+        $this->assertContains('customer_saved_tracks', $dependents);
+        CapabilityRollbackFixture::dropEmptyLeavesFirst($dependents);
+        $this->assertSame([], CapabilityRollbackFixture::dependents(['customer_accounts']));
     }
 
     public function test_every_unique_identity_collision_refuses_replace_even_without_recursive_delete_triggers(): void

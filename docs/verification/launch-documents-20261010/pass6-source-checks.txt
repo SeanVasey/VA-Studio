@@ -1,0 +1,90 @@
+# Pass 6: second independent review of 58cc803 (REQUEST CHANGES), applied at 7468661
+# RED: the statements the review's conditions 3-6 name, as they stand at 746866180ae46c0ab6795815f67ccc721b73a16d
+$ grep -n "Public endpoints are rate limited" docs/legal/PRIVACY.md
+138:- Public endpoints are rate limited and bodies are bounded (`app/Providers/AppServiceProvider.php`; `docs/contact-inquiries.md`).
+$ sed -n "141,149p" docs/legal/PRIVACY.md   # section 6 rows carry no test-only marker
+## 6. Your choices today
+
+| Choice | How | Evidence |
+| --- | --- | --- |
+| Not load third-party video | Do not press **Load … video**; use the external watch link instead | `resources/js/components/EditorialVideo.tsx` |
+| Withdraw marketing consent | **Communication preferences** in the account area; withdrawal works even when no current notice exists | `docs/verification/customer-consent-preferences-20261007/README.md`; `routes/customer.php` |
+| Export or clear the listening library | **Listening library** export and versioned clear | `routes/customer.php`; `docs/verification/customer-listening-notes-export-20261007/README.md` |
+| Sign out | `/account/sign-out`, available even after access withdrawal | `docs/verification/customer-account-test-journey.md` |
+| Ask about your data | `support@vasey.audio` (the handling procedure is not defined in code) | `CLAUDE.md`, Project Notes |
+$ grep -n "Malware scanning" docs/legal/PRIVACY.md   # no word on private quarantine storage before the scan
+105:| Malware scanning | ClamAV on the host scans uploads before they are promoted, served or downloaded. Staff media uploads stay private until a clean scan, and only scanned results are promoted; support-attachment originals are stored as immutable private files first and scanned before any download | `ops/staging/README.md`, "Packages and versions"; `docs/media-processing.md`; `docs/verification/support-attachments-20261007.md`, "Effects, retry and retention" |
+$ grep -n "do not add, remove or interpret" docs/legal/TERMS.md   # drafted term, no citation
+22:- **What a license version can say.** The typed model carries usage modes and caps (audio releases, copies/downloads, monetized and non-monetized streams, music videos, live performances, and the rest of the v2 vocabulary), producer credit, deliverables, territory (worldwide or selected countries), duration (perpetual or 1–1,200 months), ownership declarations, a publishing-income entitlement and a recording royalty, each with its complete policy text (`docs/typed-license-terms.md`, "Version 2 vocabulary"; `docs/license-territory-duration.md`; `docs/license-economic-policies.md`, "Exact additive contract"). The license text is the contract term; these terms of service do not add, remove or interpret any license grant. No cap, rate or ownership allocation is preselected and none exists in the repository (`docs/license-economic-policies.md`; `docs/typed-license-terms.md`).
+$ grep -n "checked .* citations" docs/verification/launch-documents-20261010/README.md   # command block shows pass 4, not the final run
+28:checked 239 citations across 3 documents
+
+# SOURCES the corrections cite
+$ cat routes/webhooks.php
+<?php
+
+use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Support\Facades\Route;
+
+// Stateless provider route. Browser routes retain their web/session/CSRF middleware.
+Route::post('/webhooks/stripe', StripeWebhookController::class)->name('webhooks.stripe');
+$ grep -n "webhooks.php" bootstrap/app.php   # mounted with no middleware group
+37:            Route::group([], base_path('routes/webhooks.php'));
+$ grep -c "throttle" routes/webhooks.php
+0
+$ grep -n "admitsTestCommerce" app/Domain/Customers/CustomerAccessPolicy.php
+11:        return TestEnvironment::admitsTestCommerce() && config('customer.test_accounts_enabled') === true;
+$ grep -n "communication-preferences\|listening-library\|sign-out" routes/customer.php
+23:    Route::post('/account/sign-out', [CustomerSessionController::class, 'destroy'])->middleware('throttle:20,1,customer-auth')->block(20, 5)->name('customer.sign-out');
+27:    Route::get('/account/communication-preferences', [CustomerCommunicationPreferencesController::class, 'index'])
+28:        ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.communication-preferences.index');
+29:    Route::post('/account/communication-preferences', [CustomerCommunicationPreferencesController::class, 'store'])
+30:        ->middleware('throttle:30,1,customer-preferences')->block(20, 5)->name('customer.communication-preferences.store');
+31:    Route::get('/account/listening-library', [CustomerListeningLibraryController::class, 'index'])
+32:        ->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.listening-library.index');
+33:    Route::post('/account/listening-library', [CustomerListeningLibraryController::class, 'store'])
+34:        ->middleware('throttle:30,1,customer-listening')->block(20, 5)->name('customer.listening-library.store');
+35:    Route::post('/account/listening-library/export', [CustomerListeningLibraryController::class, 'export'])
+36:        ->middleware('throttle:10,1,customer-listening-export')->block(20, 5)->name('customer.listening-library.export');
+$ grep -n -i "quarantin" docs/media-processing.md | cut -c1-160
+39:A ZIP run produces only `stems_zip`, preserves its quarantined source and records a canonical integer-valued member manifest. It does not change track durati
+89:A site-image commit that reports an error can leave files that no row names, as can a process killed before its cleanup: the prepared files of an image that
+99:Every track-media and site-image processing attempt starts one scoped, monotonic 840-second budget before copying its private snapshot. All `BoundedMediaProc
+191:2. Open **Media Assets**, choose the track and **WAV master**, **Artwork (PNG or JPEG)** or **Stems (WAV-only ZIP)**, then upload the actual file. The serve
+237:An uncertain commit can therefore leave private orphan directories under `media/revisions/<uuid>/`. There is no automatic sweep. Remove an orphan only durin
+
+# Conditions 1 and 2 were already met at this head (commits 8838dd7 and 96db5ff); the sources they rest on:
+$ grep -n "need SESSION_DRIVER" ops/staging/forge-deploy.sh
+113:need SESSION_DRIVER database
+$ grep -n "'driver'\|'lottery'\|'lifetime'" config/session.php
+21:    'driver' => env('SESSION_DRIVER', 'database'),
+35:    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+117:    'lottery' => [2, 100],
+$ grep -n "ip_address\|user_agent" database/migrations/0001_01_01_000000_create_users_table.php
+33:            $table->string('ip_address', 45)->nullable();
+34:            $table->text('user_agent')->nullable();
+$ grep -n "^### 2\.[6-8]\|^| Server-side session rows\|^| Rate-limit counters" docs/legal/PRIVACY.md | cut -c1-120
+68:### 2.6 Support attachments (default-off; local and testing only)
+74:### 2.7 Service-project briefs (default-off; test-only)
+80:### 2.8 Free licenses: declared name and assent (default-off)
+116:| Server-side session rows (`sessions` table: user ID, IP address, user agent, payload) | A row expires after `SESSI
+117:| Rate-limit counters (database cache, hashed keys from the IP address or user ID) | Each counter expires with its w
+$ grep -n "environment(\|admitsTestCommerce" FixtureAttachmentPolicy ServiceProjectPolicy FreeGrantPolicy
+app/Domain/SupportAttachments/FixtureAttachmentPolicy.php:20:        AttachmentException::require(app()->environment(['local', 'testing']) && config('support-attachments.fixture_enabled') === true
+app/Domain/Services/Projects/ServiceProjectPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('services-projects.test_enabled') === true;
+app/Domain/Grants/Free/FreeGrantPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true
+app/Domain/Grants/Free/FreeGrantPolicy.php:32:            FreeGrantException::require(TestEnvironment::admitsTestCommerce() && config('free-grants.test_enabled') === true, 404);
+
+# GREEN: the same statements after the edits (working tree on top of 7468661)
+$ grep -n "rate limited\|POST /webhooks/stripe" docs/legal/PRIVACY.md | cut -c1-260
+138:- Public browser and embed endpoints are rate limited and bodies are bounded (`app/Providers/AppServiceProvider.php`; `docs/contact-inquiries.md`; the route files named in section 2.1). The one exception is the Stripe webhook, `POST /webhooks/stripe`: it h
+$ grep -n "test-only\*\*)\|Only the first and last rows" docs/legal/PRIVACY.md | cut -c1-200
+143:Only the first and last rows are available to the public today. The account-area rows exist only where customer accounts are admitted: synthetic test accounts in `local`, `testing` or the hosted `
+148:| Withdraw marketing consent (**test-only**) | **Communication preferences** in the account area; withdrawal works even when no current notice exists | `docs/verification/customer-consent-preferen
+149:| Export or clear the listening library (**test-only**) | **Listening library** export and versioned clear | `routes/customer.php`; `docs/verification/customer-listening-notes-export-20261007/READ
+150:| Sign out of a customer account (**test-only**) | `/account/sign-out`, available even after access withdrawal | `docs/verification/customer-account-test-journey.md`; `routes/customer.php` |
+$ grep -n "Malware scanning" docs/legal/PRIVACY.md | cut -c1-330
+105:| Malware scanning | ClamAV on the host scans uploads after they are stored and before they are promoted, served or downloaded; nothing is scanned before it is stored. Staff media uploads are first stored privately as a quarantined source record and only clean, processed results are promoted; support-attachment originals are
+$ grep -n "do not add, remove or interpret\|relate to that license text" docs/legal/TERMS.md | cut -c1-260
+22:- **What a license version can say.** The typed model carries usage modes and caps (audio releases, copies/downloads, monetized and non-monetized streams, music videos, live performances, and the rest of the v2 vocabulary), producer credit, deliverables, te
+82:14. **How these terms relate to a license grant.** Proposed wording, not derived from the code: "The license text is the contract term; these terms of service do not add, remove or interpret any license grant." What the code does decide is that the complete

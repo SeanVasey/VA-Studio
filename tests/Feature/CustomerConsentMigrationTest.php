@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\CapabilityRollbackFixture;
 use Tests\Support\ConsentFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MembershipFixtures;
@@ -49,6 +50,12 @@ class CustomerConsentMigrationTest extends TestCase
         $customer = MembershipFixtures::bucket();
         app(ListeningLibrary::class)->change($customer['principal'], $customer['user'], ['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC retained preferences']);
         $before = $this->history();
+        // Later additive migrations reference the owned tables (customer_suppression_intents keys on
+        // customer_consent_events), and MySQL refuses to drop a referenced parent. Dispose those empty
+        // dependents leaves-first, derived from the live catalog, with foreign-key enforcement unchanged.
+        $dependents = CapabilityRollbackFixture::dependents(self::TABLES);
+        $this->assertContains('customer_suppression_intents', $dependents);
+        CapabilityRollbackFixture::dropEmptyLeavesFirst($dependents);
         foreach (array_reverse(self::TABLES) as $table) {
             Schema::drop($table); // These own empty tables are disposable isolated test fixtures.
         }

@@ -67,7 +67,13 @@ final class CapabilityRollbackFixture
         return array_map(fn (array $tables): array => array_values(array_unique($tables)), $children);
     }
 
-    private static function dropEmptyLeavesFirst(array $tables): void
+    /**
+     * Asserts each table empty and drops it once nothing else references it, with foreign-key enforcement
+     * unchanged. Every table that references a listed table must itself be listed, as dependents() returns.
+     *
+     * @param  list<string>  $tables
+     */
+    public static function dropEmptyLeavesFirst(array $tables): void
     {
         while ($tables !== []) {
             $children = self::foreignKeyChildren();

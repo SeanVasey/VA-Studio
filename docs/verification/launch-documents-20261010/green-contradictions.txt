@@ -1,0 +1,25 @@
+# Same greps after the edits (worktree harness/launch-documents)
+
+$ grep -n "hosted staging test mode\|refuses S2\|superseded\|S2b: hosted" docs/ops/production-activation-packet.md docs/live-payment-and-production-preparation-queue.md
+docs/ops/production-activation-packet.md:213:# Leave maintenance last, in this release only; the superseded release stays down. A service
+docs/ops/production-activation-packet.md:310:   and require exactly 200; the superseded release stays down.
+docs/ops/production-activation-packet.md:321:**Finding at base `3716324a`, superseded.** At that base, test checkout (`CheckoutPolicy`),
+docs/ops/production-activation-packet.md:333:- **S2b: hosted test mode.** The staging admission is merged (PR #68 at `d8aba146`), so the
+docs/live-payment-and-production-preparation-queue.md:20:| `harness/production-preparation-1` (Claude Code lane, PR #46) | None. Synthetic, read-only preparation from `main` `3716324a` | Delivered: `vasey:stripe-preflight` (configuration shape, `funds_mode_environment`, SDK 21.3.2 / API `2026-08-26.dahlia` pins, and a confirmed read-only account/capability probe tested only against synthetic fixtures); webhook signature, replay, ordering and unknown-outcome checks; synthetic backup/restore proof, with the MySQL procedure documented and not run; `ops/production/env.production.example`, with a coverage test; `docs/ops/production-activation-packet.md`, prepared and not executed. Architecture findings: (1) there is no live webhook receiver; (2) at base `3716324a`, test-mode payments required `APP_ENV` local or testing, so hosted staging test mode was refused (superseded by PR #68 at `d8aba146`, which admits `APP_ENV=staging` with staff MFA and live mode refused: `docs/private-server-readiness.md`, "First sale and cutover remain separate gates"; `ExecutionContextV1` test funds still require local/testing); (3) the production checkout provider and routes are unregistered; (4) there is no operator command for production reconciliation | Independent review: APPROVE WITH CONDITIONS for `01a2590d`. The R-1/R-2 fixes are in `3d615162` and need re-review. Evidence: `docs/verification/production-preparation-1-20261007/`. Nothing was activated |
+
+$ grep -n "admits only .local./.testing. today\|admitted only" docs/handoff/2026-10-08/MONDAY-PLAN.md
+57:| 2026-10-08 | Environment, interim: staging runs `APP_ENV=local`, `APP_DEBUG=false`, private access only (basic auth or allowlist; the Stripe webhook stays signature-checked). Every test-commerce policy admitted only `local`/`testing` when this was decided; M-06 (PR #68 at `d8aba146`) has since admitted `staging` (`docs/private-server-readiness.md`, "First sale and cutover remain separate gates"). | Claude; **confirmed by Sean** (S-1) |
+
+$ grep -n "^| U-01\|^## Register updates\|SeanVasey/VA-Studio" docs/architecture/decision-register.md
+73:| U-01 | **Resolved 2026-10-10.** The repository is `SeanVasey/VA-Studio` (`ops/staging/README.md`, provisioning step 4; PR links in `docs/handoff/2026-10-08/MONDAY-PLAN.md`, status log). Earlier records link `VASEYDEV/VASEYAUDIO`, the repository D-02 named. | Sean | Nothing | Keep both names readable in historical records; do not rewrite old PR links. |
+226:## Register updates — 2026-10-10
+230:- **U-01 resolved.** The GitHub repository is `SeanVasey/VA-Studio` (`ops/staging/README.md`, provisioning step 4 names it as the repository Forge installs; the status log in `docs/handoff/2026-10-08/MONDAY-PLAN.md` links its PRs). Older entries in this register and in `docs/` link `VASEYDEV/VASEYAUDIO`, the name D-02 recorded; those links are history and are not rewritten.
+
+$ grep -n "sizing specification" ops/staging/README.md docs/architecture/decision-register.md
+ops/staging/README.md:129:| 1 | **Sean, Forge** | **Create the server.** Provider Hetzner or DigitalOcean; type *App server*; **Ubuntu 24.04 LTS**; **PHP 8.4**; database **MySQL 8.4**. Size it at **4 vCPU / 8 GB RAM** (absolute minimum 4 GB: one `clamscan` may use 3 GiB of address space, and MySQL, PHP-FPM and ffmpeg run alongside it). Use at least 160 GB of disk: each master is stored with its derivatives, and stems ZIPs run up to 200 MiB. This step is the sizing specification; the "at least 4 GB RAM" in `docs/handoff/2026-10-08/MONDAY-PLAN.md` (S-2) is this absolute minimum, not the target. Save the sudo and database passwords Forge shows once. Leave the Forge firewall at 22/80/443. |
+docs/architecture/decision-register.md:232:- **Staging server sizing.** Two figures exist: `docs/handoff/2026-10-08/MONDAY-PLAN.md` S-2 asks for a VPS with "at least 4 GB RAM", and `ops/staging/README.md` provisioning step 1 specifies **4 vCPU / 8 GB RAM / at least 160 GB disk**, naming 4 GB as the absolute minimum because one `clamscan` can use 3 GiB alongside MySQL, PHP-FPM and ffmpeg. The ops README is the sizing specification; the plan's figure is its floor.
+
+$ ls docs/legal
+PRIVACY.md
+README.md
+TERMS.md

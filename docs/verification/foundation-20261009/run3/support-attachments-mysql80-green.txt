@@ -1,0 +1,18 @@
+SupportAttachmentNativeConcurrencyTest on the fixed test (this branch), private disposable MySQL 8.0.46 (port 33094, database fnd3_green4), ATTACHMENT_NATIVE_ISOLATED=1, direct PHPUnit; then git status limited to the tracked attachment evidence directory and the receipt's new location:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+.                                                                   1 / 1 (100%)
+
+Time: 04:48.932, Memory: 87.00 MB
+
+OK (1 test, 19 assertions)
+exit 0
+=== git status --porcelain -- docs/verification/support-attachments-20261007 (after the run)
+(empty: the tracked receipt is unchanged)
+=== the receipt now lands under the ignored testing tree
+storage/framework/testing/support-attachments-native-reservation-receipt.json
+storage/framework/testing/.gitignore:1:*	storage/framework/testing/support-attachments-native-reservation-receipt.json

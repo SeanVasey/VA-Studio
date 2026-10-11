@@ -1,0 +1,3 @@
+# CustomerAccountMigrationTest on SQLite (phpunit.xml defaults: in-memory database), direct PHPUnit, whole file.
+# Before (test file at bed64ee): Time: 00:13.968, Memory: 85.00 MB OK (7 tests, 106 assertions) 
+# After (with the fix): Time: 00:14.852, Memory: 85.00 MB OK (7 tests, 484 assertions) 

@@ -1,0 +1,14 @@
+Foundation CI run 38077166247, job 114313535379 (backend, the aggregate gate), log excerpt with timestamps dropped:
+
+All runtime, database, frontend, browser and quality gates passed.
+Run python3 scripts/ci/database-receipts.py collect
+26 current-run database receipts verified. Shadow decision: full; reuse disabled; outer acceptance pending.
+
+"outer acceptance pending" is the verifier's fixed wording: its shadow artifact is uploaded before its own job and the
+run finish, so it cannot certify them (scripts/ci/database-receipts.py:6). The aggregate job then completed with
+conclusion success at 21:06:56 UTC and the run with conclusion success (GitHub API, workflow run 38077166247).
+
+Shadow artifact database-shadow-38077166247-1 (id 11682277905): ZIP SHA-256
+6b97fae2495bf1701fb296533529b1e993c8d2b008191642cca6d7f16908c3e2, one member phpunit-ci-shadow-receipt.json,
+source.checkout_commit 0f23e63f62da9c4ea5b1a8651094c88cafe849bf, tree f0d52332a6c133f0dc64155f626f5da406c68fdb,
+tracked_worktree_clean true, nonignored_untracked_absent true, execution_mode full, reuse_enabled false.

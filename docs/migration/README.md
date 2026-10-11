@@ -12,6 +12,7 @@ Baseline prepared 2026-09-04 from all three owner-provided attachments, public V
 | `authenticated_studio_audit_checklist.csv` | 14 read-only audit areas; all remain unperformed |
 | `legacy_route_inventory.csv` | 20 proposed legacy route mappings requiring actual browser/catalog verification |
 | `cutover_runbook.md` | Acquisition, dry-run, reconciliation, launch gates and rollback procedure |
+| `beatstars-export-normalization.md` | Operator guide for the BeatStars CSV normalizer and read-only dry run (M-09/M-10): mapping file, findings, exit codes and the 1 MiB snapshot limit |
 
 ## Reading the records
 

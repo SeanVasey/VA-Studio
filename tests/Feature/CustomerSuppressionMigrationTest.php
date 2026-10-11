@@ -125,7 +125,11 @@ class CustomerSuppressionMigrationTest extends TestCase
     {
         $this->resetSuppression();
         $steps = $this->steps();
-        DB::unprepared($steps[1][2]);
+        // A non-prefix installation: the first and third tables without the second. Every created table's
+        // foreign-key parent exists, so native MySQL can hold this state as well as SQLite; the second table
+        // alone cannot be created on MySQL before its parents (SQLSTATE 1824).
+        DB::unprepared($steps[0][2]);
+        DB::unprepared($steps[2][2]);
         $before = $this->objects();
         $this->refusesBeforeDDL(fn () => (new SuppressionSchema)->up());
         $this->assertSame($before, $this->objects());

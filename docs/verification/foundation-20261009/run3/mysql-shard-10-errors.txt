@@ -1,0 +1,9 @@
+Foundation CI run 38037183233, backend-mysql (10/24), phpunit-ci-mysql-10-results.xml: error texts (trimmed, runner paths shortened)
+
+Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows (error, 133.8 s)
+  Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows
+  PDOException: There is no active transaction
+  vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:54
+  vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+  vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+  tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php:186

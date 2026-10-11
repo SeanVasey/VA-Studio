@@ -1,0 +1,9 @@
+# Run-level rollback (delta review of 7acdd5d, condition 1)
+## Mutant: the rollback loop in run() deleted
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_a_later_output_failure_removes_every_file_the_run_staged_and_keeps_earlier_outputs
++    3 => 'beatstars-dry-run.md.pending',
+FAILURES!
+Tests: 1, Assertions: 7, Failures: 1.
+## Code as committed
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (22 tests, 171 assertions)

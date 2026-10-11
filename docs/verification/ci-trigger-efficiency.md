@@ -20,7 +20,7 @@ branches from resurrecting their automatic triggers. Do not re-enable them. New
 PR preflight lives in `.github/workflows/preflight.yml` and has a distinct result
 name. It never publishes a successful `backend` full-acceptance result.
 
-The complete eight MySQL shards, two SQLite shards, both operator browsers,
+The complete twenty-four MySQL shards, two SQLite shards, both operator browsers,
 related browser, audits, receipt validation and acceptance rules remain intact.
 Expensive final jobs wait for frontend and backend-quality success. A formatting,
 build or audit failure therefore stops the matrix before runner allocation. This

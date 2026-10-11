@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Commerce\Inventory\ReserveQuoteInventory;
 use App\Domain\Commerce\CreateQuote;
 use Illuminate\Support\Str;
+use Tests\Support\CapabilityRollbackFixture;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures as F;
 use Tests\Support\QuoteFixtures;
@@ -53,6 +54,12 @@ class SharedInventoryMigrationTest extends TestCase
         foreach (['orders', 'order_lines', 'order_attempts'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
+        // free_definitions (245000) holds a RESTRICT foreign key to rights_scopes, and 245000 refuses
+        // operational rollback, so native MySQL refuses the 000015 rollback below (SQLSTATE 3730). Dispose
+        // of the verified-empty free-grant tables from the live catalog, leaves first, with foreign keys
+        // still enforced.
+        $freeGrants = ['free_definitions', ...CapabilityRollbackFixture::dependents(['free_definitions'])];
+        CapabilityRollbackFixture::dropEmptyLeavesFirst($freeGrants);
         $exceptionOperations->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $payments->down(); $checkout->down(); $orders->down(); $activations->down(); $migration->down(); $migration->up(); $activations->up(); $orders->up(); $checkout->up(); $payments->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
         $financialObservations->up();
         $unpaidRelease->up();

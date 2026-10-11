@@ -16,7 +16,8 @@ all WP-08, T18, T23, T24, or T25 requirements.
 
 Both `VASEY_TEST_FREE_GRANTS_ENABLED` and
 `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` default to false. The current author and
-review commands mint only `test_only: true` definitions in `local` or `testing`.
+review commands mint only `test_only: true` definitions in `local`, `testing` or `staging`
+(`TestEnvironment::admitsTestCommerce()`; staging was admitted by PR #68).
 Their buyer binding explicitly says `synthetic-local-account` and
 `legal_identity_verified: false`. Enabling the test flag in production cannot
 admit this provenance.

@@ -1,0 +1,70 @@
+CustomerConsentMigrationTest, two of the twelve interruption cases (after DDL step 1 and 12) on the unfixed test (wt-b2 at dd29a39, same file as main 590ed36), private disposable MySQL 8.0.46 (port 33094, database fnd3_red3), direct PHPUnit:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+EE                                                                  2 / 2 (100%)
+
+Time: 05:27.911, Memory: 87.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history@after DDL step 1 with data (1)
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33094, Database: fnd3_red3, SQL: drop table `customer_consent_events`)
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerConsentMigrationTest.php:53
+vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'.
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerConsentMigrationTest.php:53
+vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history@after DDL step 12 with data (12)
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'. (Connection: mysql, Host: 127.0.0.1, Port: 33094, Database: fnd3_red3, SQL: drop table `customer_consent_events`)
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerConsentMigrationTest.php:53
+vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3730 Cannot drop table 'customer_consent_events' referenced by a foreign key constraint 'customer_suppression_intents_consent_event_id_fk' on table 'customer_suppression_intents'.
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+vendor/laravel/framework/src/Illuminate/Database/Schema/Blueprint.php:122
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:718
+vendor/laravel/framework/src/Illuminate/Database/Schema/Builder.php:551
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerConsentMigrationTest.php:53
+vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 2, Assertions: 0, Errors: 2.
+exit 2

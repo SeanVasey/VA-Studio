@@ -1,0 +1,17 @@
+# ProductionFeatureMigrationTest on a fresh private MySQL 8.0.46 server and database (CI uses 8.4), direct PHPUnit with CI env (APP_ENV=testing, CI=true, root, array cache/session, sync queue).
+# Test file at bed64ee (before the fix); --filter test_recorded_gap_and_non_prefix_installation_refuse_without_repair.
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+E                                                                   1 / 1 (100%)
+Time: 03:05.657, Memory: 81.00 MB
+There was 1 error:
+1) Tests\Feature\ProductionFeatures\ProductionFeatureMigrationTest::test_recorded_gap_and_non_prefix_installation_refuse_without_repair
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'production_account_feature_bindings' (Connection: mysql, Host: 127.0.0.1, Port: 33963, Database: c1_red_pf, SQL: CREATE TABLE `production_listening_libraries` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `binding_id` bigint unsigned NOT NULL, `version` int unsigned NOT NULL, `payload` text CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `created_at` timestamp NOT NULL, `updated_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `production_listening_libraries_binding_unique` (`binding_id`), CONSTRAINT `production_listening_libraries_binding_id_fk` FOREIGN KEY (`binding_id`) REFERENCES `production_account_feature_bindings` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained production account feature v1')
+tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php:160
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'production_account_feature_bindings'
+tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php:160
+ERRORS!
+Tests: 1, Assertions: 12, Errors: 1.
+# exit code 2; wall time 186 s

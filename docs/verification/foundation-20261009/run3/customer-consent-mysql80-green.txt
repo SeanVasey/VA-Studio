@@ -1,0 +1,13 @@
+CustomerConsentMigrationTest::test_actual_migrator_restarts_every_owned_table_trigger_prefix_and_preserves_history, all twelve cases, on the fixed test (this branch), private disposable MySQL 8.0.46 (port 33094, database fnd3_green3), direct PHPUnit:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+............                                                      12 / 12 (100%)
+
+Time: 40:29.202, Memory: 89.00 MB
+
+OK (12 tests, 168 assertions)
+exit 0

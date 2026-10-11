@@ -12,10 +12,10 @@ The stable `backend` aggregate always runs. It accepts exactly one complete mode
 
 | Mode | Required successful jobs | Expected nonexecuted jobs |
 | --- | --- | --- |
-| `full` | scope, backend quality, all eight MySQL shards, both SQLite shards, frontend/build/audits, both operator-browser projects and related-browser | documentation |
+| `full` | scope, backend quality, all twenty-four MySQL shards, both SQLite shards, frontend/build/audits, both operator-browser projects and related-browser | documentation |
 | `docs` | scope and documentation | runtime quality, databases, frontend and browser |
 
-Missing, failed, cancelled, unknown or inconsistent results fail the aggregate. Runtime mode now includes frontend/browser success in the aggregate rather than relying solely on unknown repository protection settings. The stable aggregate job name is retained. MySQL has eight whole-file shards; SQLite still has two. Existing test commands, timeouts, audit settings and exact partition proof are retained. Matrix success remains GitHub's aggregate result of all its shards; a cancelled/failed/skipped matrix cannot satisfy full mode.
+Missing, failed, cancelled, unknown or inconsistent results fail the aggregate. Runtime mode now includes frontend/browser success in the aggregate rather than relying solely on unknown repository protection settings. The stable aggregate job name is retained. MySQL has twenty-four whole-file shards of the reviewed native selection; SQLite still has two. Existing test commands, timeouts, audit settings and exact partition proof are retained. Matrix success remains GitHub's aggregate result of all its shards; a cancelled/failed/skipped matrix cannot satisfy full mode.
 
 Full CI still runs for ready or draft runtime PRs, main runtime pushes and manual dispatch. This first efficiency increment does not introduce draft suppression or post-merge runtime proof reuse. Feature branches can use the separate [focused workflow](focused-ci.md) for informative feedback before a ready PR. Do not describe a focused pass as full acceptance.
 

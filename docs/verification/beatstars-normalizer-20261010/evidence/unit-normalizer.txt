@@ -1,0 +1,8 @@
+# tests/Unit/Migration/BeatStarsExportNormalizerTest.php (no database)
+$ <phpunit direct, SQLite env> -- tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+................................................................. 65 / 71 ( 91%)
+......                                                            71 / 71 (100%)
+Time: 00:00.189, Memory: 24.50 MB
+OK (71 tests, 403 assertions)

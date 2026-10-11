@@ -1,0 +1,39 @@
+CustomerSuppressionMigrationTest::test_non_prefix_or_recorded_missing_guard_is_refused_without_repair on the unfixed test (main 590ed36), private disposable MySQL 8.0.46 (port 33094, database fnd3_red2), direct PHPUnit:
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 04:31.973, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\CustomerSuppressionMigrationTest::test_non_prefix_or_recorded_missing_guard_is_refused_without_repair
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'customer_suppression_targets' (Connection: mysql, Host: 127.0.0.1, Port: 33094, Database: fnd3_red2, SQL: CREATE TABLE `customer_suppression_intents` (`id` bigint unsigned NOT NULL AUTO_INCREMENT, `public_id` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, `consent_event_id` bigint unsigned NOT NULL, `target_id` bigint unsigned NOT NULL, `created_at` timestamp NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `customer_suppression_intents_public_unique` (`public_id`), UNIQUE KEY `customer_suppression_intents_event_unique` (`consent_event_id`), KEY `customer_suppression_intents_target_index` (`target_id`), CONSTRAINT `customer_suppression_intents_consent_event_id_fk` FOREIGN KEY (`consent_event_id`) REFERENCES `customer_consent_events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT, CONSTRAINT `customer_suppression_intents_target_id_fk` FOREIGN KEY (`target_id`) REFERENCES `customer_suppression_targets` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VA retained customer suppression v1')
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:644
+vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerSuppressionMigrationTest.php:128
+vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 1824 Failed to open the referenced table 'customer_suppression_targets'
+
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:650
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:846
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:644
+vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+tests/Feature/CustomerSuppressionMigrationTest.php:128
+vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 1, Errors: 1.
+exit 2

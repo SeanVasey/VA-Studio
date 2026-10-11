@@ -1,0 +1,7 @@
+$ python3 -I docs/verification/launch-documents-20261010/check-citations.py
+docs/legal/README.md: 95 distinct cited paths
+docs/legal/PRIVACY.md: 64 distinct cited paths
+docs/legal/TERMS.md: 55 distinct cited paths
+checked 214 citations across 3 documents
+RESULT PASS
+exit=0

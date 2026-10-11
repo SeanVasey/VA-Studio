@@ -1,0 +1,33 @@
+Foundation CI run 38077166247 on 0f23e63f62da9c4ea5b1a8651094c88cafe849bf: per-shard results from the 26 verified database receipts in database-shadow-38077166247-1 (phpunit-ci-shadow-receipt.json)
+
+engine shard | executed | skipped | errors | failures | assertions | shard files | db version | clean tracked tree
+mysql   1 |    85 |    0 | 0 | 0 |    436 |   1 | 8.4.11 | True
+mysql   2 |    74 |    0 | 0 | 0 |    444 |   4 | 8.4.11 | True
+mysql   3 |    96 |    0 | 0 | 0 |   1370 |   7 | 8.4.11 | True
+mysql   4 |    63 |    0 | 0 | 0 |   3261 |   5 | 8.4.11 | True
+mysql   5 |    64 |    0 | 0 | 0 |   1954 |   6 | 8.4.11 | True
+mysql   6 |    63 |    0 | 0 | 0 |   1188 |   6 | 8.4.11 | True
+mysql   7 |    59 |    0 | 0 | 0 |   1363 |   6 | 8.4.11 | True
+mysql   8 |    45 |   40 | 0 | 0 |   1846 |   7 | 8.4.11 | True
+mysql   9 |    66 |    0 | 0 | 0 |    914 |   6 | 8.4.11 | True
+mysql  10 |    83 |    2 | 0 | 0 |    833 |  11 | 8.4.11 | True
+mysql  11 |    54 |    0 | 0 | 0 |   1325 |   6 | 8.4.11 | True
+mysql  12 |    66 |    0 | 0 | 0 |   1415 |   6 | 8.4.11 | True
+mysql  13 |    77 |    1 | 0 | 0 |   8923 |   7 | 8.4.11 | True
+mysql  14 |    78 |    0 | 0 | 0 |   1989 |   7 | 8.4.11 | True
+mysql  15 |    76 |    0 | 0 | 0 |   1608 |   8 | 8.4.11 | True
+mysql  16 |    91 |    0 | 0 | 0 |   3277 |   8 | 8.4.11 | True
+mysql  17 |    62 |    0 | 0 | 0 |    721 |   7 | 8.4.11 | True
+mysql  18 |    51 |    8 | 0 | 0 |    716 |   7 | 8.4.11 | True
+mysql  19 |    75 |    1 | 0 | 0 |   2881 |   7 | 8.4.11 | True
+mysql  20 |    66 |    0 | 0 | 0 |   2345 |   7 | 8.4.11 | True
+mysql  21 |    82 |    0 | 0 | 0 |   3368 |   8 | 8.4.11 | True
+mysql  22 |    62 |    1 | 0 | 0 |   1458 |   8 | 8.4.11 | True
+mysql  23 |   101 |    1 | 0 | 0 |   4664 |  10 | 8.4.11 | True
+mysql  24 |    68 |    4 | 0 | 0 |   1468 |   8 | 8.4.11 | True
+sqlite  1 |  3717 |  268 | 0 | 0 |  37819 | 279 | 3.45.1 | True
+sqlite  2 |  3302 |  355 | 0 | 0 |  38968 | 278 | 3.45.1 | True
+
+mysql: 1707 executed, 58 skipped, 0 errors, 0 failures, 49767 assertions
+sqlite: 7019 executed, 623 skipped, 0 errors, 0 failures, 76787 assertions
+source census (all discovered): 7642 cases in 557 files

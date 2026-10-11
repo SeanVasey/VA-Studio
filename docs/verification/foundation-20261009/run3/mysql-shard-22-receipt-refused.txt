@@ -1,0 +1,22 @@
+Foundation CI run 38037183233, backend-mysql (22/24), job 114171278011 (log excerpt, timestamps dropped)
+
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: phpunit-ci-mysql-22.xml
+... 73 / 73 (100%)
+Time: 01:46:40.668, Memory: 99.00 MB
+OK (73 tests, 4679 assertions)
+
+Run python3 scripts/ci/database-receipts.py finish --engine=mysql --shard=22
+  DATABASE_TEST_OUTCOME: success
+Database receipt evidence rejected: Probe failed: clean tracked checkout
+##[error]Process completed with exit code 1.
+
+The probe is `git diff --quiet HEAD --` at the checkout root (scripts/ci/database-receipts.py). Of the shard's eight
+files (BulkReplaceLicenseDraftSourceConcurrencyTest, CustomerAccountConcurrencyTest, CustomerInquiryConcurrencyTest,
+InquiryNotificationConcurrencyTest, PromotionAdministrationMySqlConcurrencyTest, SupportAttachmentNativeConcurrencyTest,
+TestOrderFinalizationConcurrencyTest, TransactionalNotificationMigrationTest) only
+SupportAttachmentNativeConcurrencyTest writes a tracked path: it rewrote
+docs/verification/support-attachments-20261007/native-reservation-receipt.json with the hosted server's version and
+results, so the checkout was dirty when the receipt was finalised. The test is MySQL-only (skipped on SQLite), which is
+why both SQLite receipts were accepted.

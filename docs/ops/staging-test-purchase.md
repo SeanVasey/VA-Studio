@@ -193,7 +193,7 @@ php artisan tinker --execute='echo App\Domain\Media\Models\MediaAsset::where("tr
 
 ### Keeping access after the session
 
-The profile enables test customer accounts. The buyer can create a test account and claim the guest order into it, so downloads survive a new browser session. No email is sent: the one-time link is written to `storage/app/private/customer-identity-capture/<uuid>.json` on the host, and the operator reads it from a shell. See [Local test customer enrollment and recovery](../customer-test-self-service.md).
+The profile enables test customer accounts. The buyer can create a test account and claim the guest order into it, so downloads survive a new browser session. No email is sent: the one-time link is written to `storage/app/private/customer-identity-capture/<uuid>.json` on the host, and the operator reads it from a shell. See [Test customer enrollment and recovery](../customer-test-self-service.md).
 
 ## Test cards
 

@@ -1,0 +1,15 @@
+$ grep -rniE "google-analytics|gtag|googletagmanager|plausible|fathom|segment\.com|mixpanel|hotjar|posthog|umami|matomo|facebook\.net|clarity\.ms" resources/js resources/views app config
+matches=0
+
+$ grep -n "admitsTestCommerce" (customer, identity, services gates)
+app/Domain/Customers/CustomerAccessPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('customer.test_accounts_enabled') === true;
+app/Domain/Customers/CustomerIdentityPolicy.php:13:        return app(CustomerAccessPolicy::class)->enabled() && config('customer.test_identity_enabled') === true
+app/Domain/Services/Projects/ServiceProjectPolicy.php:11:        return TestEnvironment::admitsTestCommerce() && config('services-projects.test_enabled') === true;
+20:    public const TEST_COMMERCE = ['local', 'testing', self::STAGING];
+21-
+22-    public const STAFF_MFA = ['production', self::STAGING];
+--
+25:    public static function admitsTestCommerce(): bool
+26-    {
+27:        return in_array(app()->environment(), self::TEST_COMMERCE, true);
+28-    }
