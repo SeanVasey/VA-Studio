@@ -1,0 +1,9 @@
+# Codex round on 20f5dc9 (PR #89): Markdown table cells and backslashes
+## Red: the new unit case against the 20f5dc9 source
+--filter 'test_markdown_table_cells_keep_backslashes' tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+Failed asserting that '| 1 | bs-synthetic-0001 | normalized | — | SYNTHETIC a\\|b \\\|c | synthetic-a-b-c | public | synthetic-basic 100 USD; synthetic-exclusive 1000 USD | SYNTHETIC-RIGHTS-0001 |' [UTF-8](length: 175) contains "SYNTHETIC a\\\|b \\\\\|c" [ASCII](length: 24).
+Tests: 1, Assertions: 2, Failures: 1.
+## Green: whole files with the fix
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php   OK (90 tests, 727 assertions)
+tests/Feature/Migration/BeatStarsDryRunCommandTest.php   OK (28 tests, 208 assertions)
+vendor/bin/pint --test (changed source and tests)        passed

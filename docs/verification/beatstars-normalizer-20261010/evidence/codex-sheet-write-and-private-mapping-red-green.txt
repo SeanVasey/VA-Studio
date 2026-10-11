@@ -1,0 +1,17 @@
+# Codex round on 3d6b755 (PR #89): checked sheet-stream write, private-boundary mapping
+# Direct PHPUnit, SQLite in memory, this worktree's Composer autoload. Run as root in the container.
+## Red: the new feature cases against the 3d6b755 source
+--filter 'group-readable real mapping|repository file as the mapping' tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@group-readable real mapping with data ('input_not_private')
+Failed asserting that two arrays are identical.
+2) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@repository file as the mapping with data ('input_inside_repository')
+Failed asserting that two arrays are identical.
+Tests: 2, Assertions: 4, Failures: 2.
+## Green: whole files with the fixes
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php   OK (88 tests, 722 assertions)
+tests/Feature/Migration/BeatStarsDryRunCommandTest.php   OK (28 tests, 208 assertions)
+vendor/bin/pint --test (changed source and tests)        passed
+## Not tested
+The checked write into php://memory has no failure-injection test: an in-memory stream fails only when PHP's
+memory limit is exhausted, which is fatal rather than a short write. The loop and the size check
+(fstat size equals the input length) fail closed with export_unreadable.

@@ -1,0 +1,39 @@
+# Real CLI on the synthetic fixture (paths redacted)
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export.csv --mapping <fixtures>/mapping.json --output <private>/clean-a
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"unchanged":[],"database_writes":0}
+exit=0
+$ ... --output <private>/clean-b (second directory)
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"unchanged":[],"database_writes":0}
+exit=0
+$ sha256sum of both directories' outputs
+8f5965e3001f961edb72bc54fe4036b6128ef8fba82dbbd6ddaefa7eefa655d5  beatstars-dry-run.json
+6d760eea8ec66eb33889fccc120ac8a39da911bb6c35dcd75294062412b80672  beatstars-dry-run.md
+bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968  catalog.json
+8f5965e3001f961edb72bc54fe4036b6128ef8fba82dbbd6ddaefa7eefa655d5  beatstars-dry-run.json
+6d760eea8ec66eb33889fccc120ac8a39da911bb6c35dcd75294062412b80672  beatstars-dry-run.md
+bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968  catalog.json
+$ ... --output <private>/clean-a (rerun into the first directory)
+{"code":"dry_run_clean","rows":4,"normalized":4,"withheld":0,"findings":0,"snapshot":"catalog.json","written":[],"unchanged":["beatstars-dry-run.json","beatstars-dry-run.md","catalog.json"],"database_writes":0}
+exit=0
+$ ls -l <private>/clean-a (modes)
+600 11309 beatstars-dry-run.json
+600 3940 beatstars-dry-run.md
+600 3101 catalog.json
+
+$ php scripts/migration/beatstars-dry-run.php --export <fixtures>/export-findings.csv ... --output <private>/findings
+{"code":"dry_run_findings","rows":4,"normalized":0,"withheld":4,"findings":2,"snapshot":"none","written":["beatstars-dry-run.json","beatstars-dry-run.md"],"unchanged":[],"database_writes":0}
+exit=3
+$ ls <private>/findings
+beatstars-dry-run.json
+beatstars-dry-run.md
+$ findings section of the Markdown report
+## Findings
+| Scope | Row | Source id | Code | Column | Detail |
+| --- | --- | --- | --- | --- | --- |
+| sheet | — | — | `unmapped_column` | Likes | — |
+| row | 3 | bs-synthetic-0003 | `missing_rights_reference` | Rights Reference | — |
+Sheet findings withhold every row: the sheet cannot be interpreted until each column is mapped or explicitly ignored.
+
+$ stage catalog.json + raw/export.csv in a private 0700 directory and admit it with PrivateSourceFiles::snapshot
+admitted source_sha256=bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968 records=4 artifacts=1
+report snapshot_sha256=bd893c4063ff987fea7c7f5f3921f56f81a5a68853734c9b172908fdeed83968

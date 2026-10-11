@@ -1,0 +1,19 @@
+# Codex review of 7acdd5d on PR #89: CSV quote grammar (P1) and output under another Git checkout (P2)
+
+## Red (fix stashed; new tests only)
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_an_uninterpretable_export_is_refused_with_a_reason_code@unterminated quoted field with data ('Track ID,Title\n"legacy-123', 'export.csv', 'export_csv_quotes')
+2) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_an_uninterpretable_export_is_refused_with_a_reason_code@text after a closing quote with data ('Track ID,Title\n"legacy"-123,...ETIC\n', 'export.csv', 'export_csv_quotes')
+FAILURES!
+Tests: 81, Assertions: 706, Failures: 2.
+1) Tests\Feature\Migration\BeatStarsDryRunCommandTest::test_refusals_leave_the_output_directory_untouched@output under another git checkout with data ('output_inside_repository')
+FAILURES!
+Tests: 21, Assertions: 158, Failures: 1.
+
+## Green
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (81 tests, 708 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (21 tests, 163 assertions)
+$ vendor/bin/pint --test (changed files)
+{"tool":"pint","result":"passed"}
+$ CLI on the clean synthetic fixture: dry_run_clean, catalog.json sha256 bd893c4063ff987f... (unchanged)

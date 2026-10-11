@@ -1,0 +1,13 @@
+# Delta review of 7acdd5d..82993ff (REQUEST CHANGES): whitespace before an opening quote
+## Red (fix stashed; new unit cases)
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_an_uninterpretable_export_is_refused_with_a_reason_code@space then an unterminated quote with data ('Track ID,Title\n "legacy-123', 'export.csv', 'export_csv_quotes')
+2) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_an_uninterpretable_export_is_refused_with_a_reason_code@tab then a quote with text after its close with data ('Track ID,Title\n	"x"-1,SYNTHETIC\n', 'export.csv', 'export_csv_quotes')
+FAILURES!
+Tests: 84, Assertions: 712, Failures: 2.
+(The bare carriage-return case already passed: it pins existing behaviour that a surviving mutant could break.)
+## Green
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (84 tests, 714 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (23 tests, 177 assertions)
+$ CLI on the clean synthetic fixture: dry_run_clean, catalog.json sha256 bd893c4063ff987f... (unchanged)

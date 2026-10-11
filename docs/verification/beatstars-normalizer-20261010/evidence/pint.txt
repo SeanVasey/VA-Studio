@@ -1,0 +1,3 @@
+# Pint, test mode, changed PHP files only
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars scripts/migration/beatstars-dry-run.php tests/Unit/Migration/BeatStarsExportNormalizerTest.php tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+{"tool":"pint","result":"passed"}

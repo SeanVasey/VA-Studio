@@ -72,8 +72,8 @@ The lanes are separate worktrees with no overlapping files. "Review" means an in
 | M-06 | `staging` environment admission plus MFA, live mode refused | B2 `VA-Studio-stagingenv` / `harness/staging-env-admission` | L | — | **auth/payment** | **Merged** #68 at `d8aba146`: `APP_ENV=staging` admits test commerce, requires staff TOTP, refuses live mode and the Paid252 operative lane; independent auth/payment review and delta approved; C2 domain MFA follow-up; host switch via activation or `ctl refresh` then `route:list` check |
 | M-07 | Synthetic end-to-end run on staging, plus drills (declined card, expired session, duplicate webhook, reconcile without webhook) | integrator | L | M-02–M-05, host up | payment evidence | waiting |
 | M-08 | Fix buffer for first-real-interop defects (Stripe test, media, renderer), each fix with a regression test | integrator + reviewer | L | M-07 | **payment/licensing** | waiting |
-| M-09 | BeatStars export normalizer to `vasey-private-catalog-drafts-v1` | C | M | S-9 (export) | **migration** | waiting on export |
-| M-10 | BeatStars dry-run report (no apply) | C | S | M-09 | migration (read-only) | waiting |
+| M-09 | BeatStars export normalizer to `vasey-private-catalog-drafts-v1` | C | M | S-9 (export) | **migration** | normalizer built and reviewed on the synthetic fixture (`docs/verification/beatstars-normalizer-20261010/`); real run waits on S-9 and its mapping |
+| M-10 | BeatStars dry-run report (no apply) | C | S | M-09 | migration (read-only) | dry run built and reviewed on the synthetic fixture; real run waits on S-9 |
 | M-11 | Operator onboarding: two staff accounts, MFA, seller tag WAV and its hash, first-pack checklist, upload session support | integrator + Sean | S + Sean | M-02, S-5–S-8 | auth | waiting |
 | M-12 | Storefront and player check with real content (keyboard, desktop, mobile) | D | M | M-11 | — | waiting |
 | M-13 | Nightly backup plus one restore proof | A | S–M | M-01, S-10 | — | preparation merged #63; credential authentication proved on disposable MySQL, real backup/restore/shipping blocked on S-2/S-10 |
@@ -109,7 +109,7 @@ The best case, with no interop defects, is about 19 hours. If H0 is Friday 12:00
 | S-6 | Seller preview tag WAV; nothing can publish without it | M-11 | required for publication; not supplied at checkpoint |
 | S-7 | 3–10 tracks: WAV masters (up to 200 MiB each), artwork (up to **20 MiB** each), optional stems as one ZIP per track (up to 200 MiB), plus metadata and rights references. Limits from `app/Application/Media/IngestMediaUpload.php:63`. | M-11 | required real content/rights; not supplied at checkpoint |
 | S-8 | License tiers, terms text and USD prices, plus the seller legal name and buyer assent text for the test order policy | M-03, M-11 | required authored terms/prices/seller/assent; templates do not establish approval |
-| S-9 | BeatStars catalog export (whatever BeatStars provides), placed in private storage, never in the repo | M-09, M-10 | required private export; not supplied, normalizer/dry run not done in this checkpoint |
+| S-9 | BeatStars catalog export (whatever BeatStars provides), placed in private storage, never in the repo | M-09, M-10 | required private export plus its column, status, license and price mapping; not supplied. The normalizer and dry run exist and are tested only on a synthetic fixture |
 | S-10 | Encrypted off-host backup destination (bucket or another server) | M-13 | blocking: encrypted off-host destination not supplied; host backup contains environment/key |
 | S-11 | Optional: site copy and the official logo SVG (the logo is not recreated) | M-12 | optional |
 

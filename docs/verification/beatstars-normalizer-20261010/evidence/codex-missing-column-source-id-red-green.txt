@@ -1,0 +1,40 @@
+# Codex P2 on PR #89 (review of 1d744db): source id trimmed when a mapped column is missing
+
+## Red (normalizer fix stashed; new unit case only)
+F                                                                   1 / 1 (100%)
+There was 1 failure:
+1) Tests\Unit\Migration\BeatStarsExportNormalizerTest::test_source_ids_are_checked_as_exported_even_when_a_mapped_column_is_missing
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+     1 => Array &2 [
+         0 => 'row',
+         1 => 1,
+-        2 => 'invalid_source_id',
+-        3 => 'Track ID',
++        2 => 'duplicate_source_id',
++        3 => null,
+     ],
+     2 => Array &3 [
+         0 => 'row',
+-        1 => 3,
+-        2 => 'missing_source_id',
+-        3 => 'Track ID',
++        1 => 2,
++        2 => 'duplicate_source_id',
++        3 => null,
+     ],
+ ]
+tests/Unit/Migration/BeatStarsExportNormalizerTest.php:254
+vendor/phpunit/phpunit/phpunit:104
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.
+
+## Green
+$ phpunit tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+OK (78 tests, 695 assertions)
+$ phpunit tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in memory)
+OK (17 tests, 139 assertions)
+$ vendor/bin/pint --test app/Domain/Migration/BeatStars tests/Unit/Migration/BeatStarsExportNormalizerTest.php
+{"tool":"pint","result":"passed"}

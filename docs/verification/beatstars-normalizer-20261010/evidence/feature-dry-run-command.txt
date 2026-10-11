@@ -1,0 +1,8 @@
+# tests/Feature/Migration/BeatStarsDryRunCommandTest.php (SQLite in-memory, real CLI subprocess)
+$ <phpunit direct, SQLite env> -- tests/Feature/Migration/BeatStarsDryRunCommandTest.php
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+.............                                                     13 / 13 (100%)
+Time: 00:04.077, Memory: 81.00 MB
+OK (13 tests, 110 assertions)

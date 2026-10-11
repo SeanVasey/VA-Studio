@@ -1,0 +1,17 @@
+# Regression after the review fixes. Tested source: fa34fd5bc6689d174815955b97c5f1b6a1170ae8 (SQLite env, direct PHPUnit, PAO_DISABLE=1)
+
+## Adjacent catalog-onboarding tests (unchanged files)
+$ <phpunit direct, SQLite env> --colors=never -- tests/Feature/PersistentCatalogDraftImportTest.php tests/Unit/NormalizedCatalogSourceTest.php tests/Unit/CatalogDryRunTest.php tests/Unit/CatalogDryRunCommandTest.php
+Runtime:       PHP 8.4.26
+Time: 01:04.361, Memory: 89.00 MB
+OK (132 tests, 836 assertions)
+exit=0
+
+## Whole Unit suite
+$ <phpunit direct, SQLite env> --colors=never --testsuite Unit
+Runtime:       PHP 8.4.26
+Time: 01:34.684, Memory: 127.00 MB
+OK, but some tests were skipped!
+Tests: 1072, Assertions: 6866, Skipped: 1.
+exit=0
+(1072 = the earlier 1070 plus the two new normalizer tests; 1 skip, the same count as the earlier run, which recorded it as the native-MySQL-only skip; this run did not list it)
