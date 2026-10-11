@@ -1,0 +1,15 @@
+listed: ["t1","we`ird ta-ble"]
+MDL held by A: [["t1","SHARED_READ","TRANSACTION"],["we`ird ta-ble","SHARED_READ","TRANSACTION"],[null,"INTENTION_EXCLUSIVE","TRANSACTION"]]
+B blocked: ALTER TABLE t1 ENGINE=MyISAM -> 1205
+B blocked: ALTER TABLE `we``ird ta-ble` ENGINE=MyISAM -> 1205
+B blocked: CREATE TRIGGER tr AFTER INSERT ON t1 FOR EACH ROW SET @x=1 -> 1205
+B blocked: RENAME TABLE t1 TO t1x -> 1205
+B blocked: DROP TABLE t1 -> 1205
+B created MyISAM table after pin
+A second listing sees: {"t1":"InnoDB","we`ird ta-ble":"InnoDB"}
+D plain read blocked behind pending ALTER: 1205 after 1.0s
+PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away in $SCRATCH/review-fu-importer/probe.php:30
+Stack trace:
+#0 $SCRATCH/review-fu-importer/probe.php(30): PDO->exec()
+#1 {main}
+  thrown in $SCRATCH/review-fu-importer/probe.php on line 30

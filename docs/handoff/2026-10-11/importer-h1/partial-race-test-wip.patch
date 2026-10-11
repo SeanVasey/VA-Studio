@@ -1,0 +1,142 @@
+diff --git a/tests/Feature/PersistentCatalogDraftImportTest.php b/tests/Feature/PersistentCatalogDraftImportTest.php
+index ef7d554..14321c2 100644
+--- a/tests/Feature/PersistentCatalogDraftImportTest.php
++++ b/tests/Feature/PersistentCatalogDraftImportTest.php
+@@ -548,6 +548,137 @@ class PersistentCatalogDraftImportTest extends TestCase
+         $this->assertSame('catalog_target_invalid', $refusal, 'Storage of an unlisted table changed after admission was admitted.');
+     }
+ 
++    public static function pinRaceTargets(): array
++    {
++        return ['unlisted table' => ['migrations'], 'discovery epoch' => ['catalog_discovery_epoch']];
++    }
++
++    #[DataProvider('pinRaceTargets')]
++    public function test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused(string $target): void
++    {
++        if (! $this->mysql()) {
++            // SQLite has no engines or table locks; the pin's only storage condition is the connection's journal.
++            DB::beginTransaction();
++            try {
++                (new CatalogDatabaseEvidence)->lockedStorage();
++            } finally {
++                DB::rollBack();
++            }
++            $this->assertNotSame('off', strtolower((string) DB::connection()->getPdo()->query('PRAGMA journal_mode')->fetchColumn()));
++
++            return;
++        }
++        $pdo = DB::connection()->getPdo();
++        $tables = $pdo->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'")->fetchAll(PDO::FETCH_COLUMN);
++        sort($tables, SORT_STRING);
++        $first = $tables[0];
++        $this->assertLessThan(0, strcmp($first, $target));
++        // A peer process holds the first pinned table with LOCK TABLES WRITE, so the pin's open of it waits after
++        // the pin has listed the tables. While it waits, a second peer session moves a later table to MyISAM, then
++        // the lock is released and the pin continues.
++        $peer = <<<'PHP'
++            [$self, $config, $first, $target, $importer] = $argv;
++            $config = json_decode($config, true);
++            $dsn = 'mysql:'.(($config['unix_socket'] ?? '') !== '' ? 'unix_socket='.$config['unix_socket'] : 'host='.$config['host'].';port='.$config['port']).';dbname='.$config['database'];
++            $open = static fn (): PDO => new PDO($dsn, $config['username'], $config['password'] ?? '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
++            $lock = $open();
++            $alter = $open();
++            $alter->exec('SET SESSION lock_wait_timeout = 5');
++            $lock->exec('LOCK TABLES `'.$first.'` WRITE');
++            fwrite(STDOUT, "locked\n");
++            $blockedOn = null;
++            $row = null;
++            for ($deadline = microtime(true) + 30; microtime(true) < $deadline; usleep(20000)) {
++                $row = $alter->query('SELECT STATE, INFO FROM information_schema.PROCESSLIST WHERE ID = '.(int) $importer)->fetch(PDO::FETCH_NUM);
++                if (is_array($row) && $row[0] === 'Waiting for table metadata lock') {
++                    $blockedOn = $row[1];
++                    $alter->exec('ALTER TABLE `'.$target.'` ENGINE=MyISAM');
++                    break;
++                }
++            }
++            $lock->exec('UNLOCK TABLES');
++            fwrite(STDOUT, json_encode(['blocked_on' => $blockedOn, 'last_seen' => $row])."\n");
++            PHP;
++        $config = DB::connection()->getConfig();
++        $process = proc_open([PHP_BINARY, '-r', $peer, json_encode(['unix_socket' => $config['unix_socket'] ?? '', 'host' => $config['host'] ?? '',
++            'port' => $config['port'] ?? '', 'database' => $config['database'], 'username' => $config['username'], 'password' => $config['password'] ?? '']),
++            $first, $target, (string) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn()], [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
++        $this->assertIsResource($process);
++        // Only stdout is read before the pin: reading stderr would wait for the peer to exit.
++        $this->assertSame("locked\n", fgets($pipes[1]));
++        $refusal = null;
++        DB::beginTransaction();
++        try {
++            (new CatalogDatabaseEvidence)->lockedStorage();
++        } catch (RuntimeException $error) {
++            $refusal = $error->getMessage();
++        } finally {
++            DB::rollBack();
++        }
++        $report = json_decode((string) stream_get_contents($pipes[1]), true);
++        $errors = (string) stream_get_contents($pipes[2]);
++        proc_close($process);
++        $this->assertSame('SELECT 1 FROM `'.$first.'` LIMIT 0', $report['blocked_on'] ?? null, 'The race window was not reached: '.json_encode($report).' '.$errors);
++        $this->assertSame('MyISAM', $pdo->query("SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '$target'")->fetchColumn());
++        $this->assertSame('catalog_target_invalid', $refusal, 'An engine change racing the pin was admitted.');
++    }
++
++    public function test_a_pin_that_cannot_open_a_table_in_time_is_refused_as_contention_and_restores_the_lock_wait(): void
++    {
++        if (! $this->mysql()) {
++            // SQLite has no metadata locks; its counterpart is that the pin admits the intact connection.
++            DB::beginTransaction();
++            try {
++                (new CatalogDatabaseEvidence)->lockedStorage();
++            } finally {
++                DB::rollBack();
++            }
++            $this->assertSame(0, DB::transactionLevel());
++
++            return;
++        }
++        $pdo = DB::connection()->getPdo();
++        // A caller-chosen wait, longer than the pin's own bound, which the pin must restore afterwards.
++        $pdo->exec('SET SESSION lock_wait_timeout = 30');
++        $foreign = $this->foreignSession();
++        $foreign->exec('LOCK TABLES audit_events WRITE');
++        $refusal = null;
++        $started = microtime(true);
++        DB::beginTransaction();
++        try {
++            (new CatalogDatabaseEvidence)->lockedStorage();
++        } catch (RuntimeException $error) {
++            $refusal = $error->getMessage();
++        } finally {
++            DB::rollBack();
++            $foreign->exec('UNLOCK TABLES');
++        }
++        $this->assertSame('catalog_target_busy', $refusal);
++        $this->assertLessThan(25, microtime(true) - $started);
++        $this->assertSame(30, (int) $pdo->query('SELECT @@session.lock_wait_timeout')->fetchColumn());
++    }
++
++    public function test_a_temporary_shadow_of_a_table_outside_the_evidence_set_is_refused_by_the_pin(): void
++    {
++        $pdo = DB::connection()->getPdo();
++        DB::beginTransaction();
++        $refusal = null;
++        try {
++            // A temporary table named like a durable table outside the evidence set: the pin's open would lock the
++            // temporary table instead of the durable one. SQLite's counterpart is a temporary shadow of an evidence table.
++            $pdo->exec($this->mysql() ? 'CREATE TEMPORARY TABLE migrations (id INT)' : 'CREATE TEMP TABLE Tracks (id INTEGER)');
++            try {
++                (new CatalogDatabaseEvidence)->lockedStorage();
++            } catch (RuntimeException $error) {
++                $refusal = $error->getMessage();
++            }
++        } finally {
++            $pdo->exec($this->mysql() ? 'DROP TEMPORARY TABLE IF EXISTS migrations' : 'DROP TABLE IF EXISTS temp.Tracks');
++            DB::rollBack();
++        }
++        $this->assertSame('catalog_target_invalid', $refusal, 'A temporary shadow outside the evidence set was admitted.');
++    }
++
+     #[DataProvider('schemaDrift')]
+     public function test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs(string $case): void
+     {

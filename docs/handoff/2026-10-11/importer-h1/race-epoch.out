@@ -1,0 +1,8 @@
+== head
+tables=191 first=audit_events migrations_index=61
+PARENT: catalog_discovery_epoch moved to MyISAM while the child waits on `audit_events`
+CHILD: lockedStorage ADMITTED; catalog_discovery_epoch is actually MyISAM
+== old
+tables=191 first=audit_events migrations_index=61
+PARENT: catalog_discovery_epoch moved to MyISAM while the child waits on `audit_events`
+CHILD: refused: RuntimeException catalog_target_invalid
