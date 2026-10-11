@@ -5,6 +5,14 @@ Commits: `3399657` (plan, first), `db5add2` (product and tests), `de7202a` (PHPD
 writes; comments only), `f0cf472` (fix: the rule is evaluated on the locked actor row, no re-read; found by the
 native MySQL run, see below), `f589a2f` (test only: the attestation-context assertion no longer depends on JSON key
 order, found by the second native MySQL run). Read `PLAN.md` and `THREAT-NOTE.md` with this record.
+Review conditions (see the last section): `52d0392`, `bdd7920`, `fb4dce8` and the docs commit that adds this text.
+
+**Scope of the result.** #68 C2 is closed for the two services named here, `PromotionAdministration` and
+`ManageRightsScope`: in staging an unenrolled administrator is refused on every path (panel, any route, a direct
+service call), except through an explicit console attestation that is written to the audit log. The wider class of
+problem is only narrowed. `app/Domain/Catalog/PrepareExclusiveOffer.php` still links a rights scope with only the
+gate and environment checks (no caller in `app/` or `routes/` today), and the panel-only catalog writers still rely on
+the panel's page middleware. Both remain open.
 
 Environment: PHP 8.4.26, PHPUnit 12.5.34, Pint 1.32.1, SQLite in memory, `public/build` absent, PHPUnit run directly
 through the `_composer_autoload_path` invocation printed at the top of every evidence file (never `php artisan test`).
@@ -103,7 +111,7 @@ calls in `PromotionAdministrationStaffMfaTest` and `RightsScopeStaffMfaTest`, no
 On native MySQL the existing `RightsScopeWriterConcurrencyTest` additionally proves that the rights-scope writer's
 lock sequence and the old-snapshot authority denials are unchanged by the check.
 
-## Existing tests and documents that must change (not owned by this lane)
+## Existing tests and documents that must change (applied in `52d0392` at the review's request)
 
 `evidence/integrator-existing-tests.patch` holds the two one-line test changes, verified above:
 
@@ -112,11 +120,11 @@ lock sequence and the old-snapshot authority denials are unchanged by the check.
 - `tests/Feature/StagingEnvironmentAdmissionTest.php`: the `test promotion administration` gate enrolls its admin
   with the same synthetic secret `QuoteFixtures::selection()` uses, so the gate proves only the environment dimension.
 
-Neither file is edited on this branch (the brief's owned list excludes existing tests). Until the patch is applied,
-the affected selection carries these two failures. `docs/ops/staging-test-purchase.md` (step 5) shows the register
+The brief's owned list excluded existing tests, so the lane first left both files untouched; the independent review
+made applying the patch condition 1, and `52d0392` applies it unchanged (`git apply`). `docs/ops/staging-test-purchase.md` (step 5) shows the register
 and link commands for a staging host without `--attest`; after this change those two lines need the flag, and the
-runbook should say that the attestation is recorded in the audit log. `CHANGELOG.md` receives the entry returned to
-the integrator.
+runbook should say that the attestation is recorded in the audit log; `52d0392` does both. `CHANGELOG.md` has its
+Unreleased Security entry since the docs commit.
 
 ## Not tested, not claimed
 
@@ -124,3 +132,29 @@ the integrator.
 - A real staging host, a real operator console session, browser specs, Stripe.
 - Focused checks only; no full-suite, Foundation or release acceptance is claimed. Nothing here authorizes production
   deployment, live payments or any release-boundary change.
+
+## Independent review of `d806d88` and its conditions
+
+The review (`independent-review-d806d88-DECISION.md`, copied verbatim) returned **APPROVE WITH CONDITIONS
+(development merge only)**. Evidence for every condition: `evidence/review-conditions-red-green.txt`, all at
+`fb4dce8` on SQLite (PHP 8.4.26, PHPUnit 12.5.34, `public/build` absent, direct runner with the worktree autoload).
+
+| Condition | Change | Evidence |
+| --- | --- | --- |
+| 1. Integrator patch, runbook `--attest`, CHANGELOG | `52d0392` applies `evidence/integrator-existing-tests.patch` and adds `--attest` with a note on the `staff.console_attestation` record to step 5 of `docs/ops/staging-test-purchase.md`; the docs commit adds the Unreleased Security entry | `RightsScopeCommandTest` and `StagingEnvironmentAdmissionTest` pass inside the existing-suites run below |
+| 2. Action binding isolated; stale enrolled `User` objects | `bdd7920`: the "another action" case attests `register` on `synthetic-existing` and then blocks that same scope, so only the action binding can refuse it. New cases in both services hold the enrolled object after `saveAppAuthenticationSecret(null)` on the persisted row | M9 (action binding removed) and M14 (`require($actor)` in `PromotionAdministration`) are **killed**; the analogous M14b in `ManageRightsScope::authorize()` is killed too. Controls: M9 and M14 still **survive** against the `d806d88` test files, as the reviewer found |
+| 3. THREAT-NOTE tinker row; C2 scope in this README | Tinker now has its own row: not refused, because anyone with tinker can call `attest()` or set an MFA secret, so shell access is the real control. The scope paragraph above states that C2 is closed for the two services, with `PrepareExclusiveOffer` and the panel-only writers open | Documentation only |
+| 4. Recommended hardening | `fb4dce8`: `attest()` throws `StaffWriteAuthority::CONSOLE_ONLY` unless `app()->runningInConsole()`; `recorded()` requires the audit row's `action`, `scope_key` and `offer_revision_id` to match the value being admitted | **Red** before (fb4dce8 tests, bdd7920 class): 10 tests, 2 failures, rc 1, both new cases. **Green** after. Mutants M15 (guard removed), M16 (context unchecked), M17 (action unchecked) and M18 (revision unchecked) are killed |
+
+| Run at `fb4dce8` | Result |
+| --- | --- |
+| The three lane suites | OK, **22 tests, 344 assertions**, rc 0 |
+| Reviewer-listed existing suites: `RightsScopeCommandTest`, `RightsScopeCommandUnknownOutcomeTest`, `RightsScopeWriterAuthorityTest`, `SharedInventoryTest`, `PromotionAdministrationTest`, `PromotionAdminHttpTest`, `PromotionAdministrationSettlementTest`, `StagingEnvironmentAdmissionTest`, `StagingOperatorMfaTest`, `OperatorMfaTest`, `PromotionPricingTest`, `PromotionPricingHttpTest`, `ExclusiveWriterAuthorityTest` | OK, **158 tests, 1,327 assertions**, rc 0. The two C2-encoding failures are gone |
+| MySQL-only `PromotionAdministrationMySqlConcurrencyTest`, `RightsScopeWriterConcurrencyTest` on SQLite | 17 tests, **17 skipped** (MySQL only; no MySQL server was started for this round) |
+| Mutants M9, M14, M14b, M15, M16, M17, M18 | All **killed**; each file restored, sha256 match and clean `git diff` |
+| Pint `--test` on the five changed PHP files; `git diff --check d806d88` | passed; clean |
+| `phpunit-shards.py --shards=8 ... --mysql-native-selection` | rc 0: selection unchanged at 1,765 cases in 163 files; discovered total now 7,664 in 560 files, so the comment in `.github/workflows/final-verification.yml` moves from 7642 to 7664. `.gitlab-ci.yml` cites only the selection. Census files are unchanged because no new method skips on either driver |
+
+Not claimed for this round: native MySQL of `fb4dce8` (the `recorded()` JSON comparison has not run on MySQL), a real
+HTTP request against the console guard (the test flips the application's console flag), a job that records an
+attestation (queue workers count as console), and anything beyond focused checks.
