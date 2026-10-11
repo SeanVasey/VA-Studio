@@ -235,7 +235,9 @@ class RightsScopeStaffMfaTest extends TestCase
             $register = StaffWriteAuthority::attest($operator, 'vasey:rights-scope', 'register', 'synthetic-a');
             $this->refused(fn () => $manage->register('synthetic-b', 'SYNTHETIC-SCOPE', $operator, $register), case: 'another scope key');
             $this->refused(fn () => $manage->register('synthetic-a', 'SYNTHETIC-SCOPE', $stranger, $register), case: 'another operator');
-            $this->refused(fn () => $manage->block($scope->id, true, 0, 'SYNTHETIC-BLOCK', $operator, $register), case: 'another action');
+            // Same operator, scope key and (null) revision as the block below, so only the action binding can refuse it.
+            $existing = StaffWriteAuthority::attest($operator, 'vasey:rights-scope', 'register', 'synthetic-existing');
+            $this->refused(fn () => $manage->block($scope->id, true, 0, 'SYNTHETIC-BLOCK', $operator, $existing), case: 'another action');
 
             $link = StaffWriteAuthority::attest($operator, 'vasey:rights-scope', 'link', 'synthetic-existing', $f['revision']->id);
             $this->refused(fn () => $manage->link($other->id, $f['revision']->id, 'SYNTHETIC-LINK', $operator, $link), case: 'another scope');
@@ -252,9 +254,29 @@ class RightsScopeStaffMfaTest extends TestCase
             $this->refused(fn () => $manage->register('synthetic-stale', 'SYNTHETIC-SCOPE', $operator, $stale), case: 'expired');
         });
 
-        $this->assertSame(3, AuditEvent::where('action', StaffWriteAuthority::ATTESTATION_ACTION)->count(), 'Only the committed attestations remain.');
+        $this->assertSame(4, AuditEvent::where('action', StaffWriteAuthority::ATTESTATION_ACTION)->count(), 'Only the committed attestations remain.');
         $this->assertSame([$before[0], $before[1]], array_slice($this->evidence(), 0, 2), 'rights_scopes and rights_scope_offers unchanged');
         $this->assertSame(['synthetic-existing', 'synthetic-other'], RightsScope::orderBy('id')->pluck('scope_key')->all());
+    }
+
+    public function test_staging_refuses_a_stale_enrolled_actor_object_after_enrollment_was_withdrawn(): void
+    {
+        $f = $this->selection();
+        $manage = app(ManageRightsScope::class);
+        $scope = $manage->register('synthetic-existing', 'SYNTHETIC-SCOPE', $f['actor']);
+        $stale = $f['actor'];
+        User::findOrFail($stale->id)->saveAppAuthenticationSecret(null);
+        $this->assertNotNull($stale->getAppAuthenticationSecret(), 'The caller still holds the enrolled object.');
+        $this->assertNull(User::findOrFail($stale->id)->getAppAuthenticationSecret(), 'The persisted row is withdrawn.');
+        $before = $this->evidence();
+
+        $this->in('staging', function () use ($manage, $scope, $f, $stale): void {
+            $this->refused(fn () => $manage->register('synthetic-stale', 'SYNTHETIC-SCOPE', $stale), case: 'register');
+            $this->refused(fn () => $manage->link($scope->id, $f['revision']->id, 'SYNTHETIC-LINK', $stale), case: 'link');
+            $this->refused(fn () => $manage->block($scope->id, true, 0, 'SYNTHETIC-BLOCK', $stale), case: 'block');
+        });
+
+        $this->assertSame($before, $this->evidence());
     }
 
     public function test_local_and_testing_keep_enrollment_optional_without_an_attestation(): void

@@ -116,6 +116,27 @@ class PromotionAdministrationStaffMfaTest extends TestCase
             ->orderBy('id')->pluck('actor_id')->map(fn ($id) => (int) $id)->all());
     }
 
+    public function test_staging_refuses_a_stale_enrolled_actor_object_after_enrollment_was_withdrawn(): void
+    {
+        $service = app(PromotionAdministration::class);
+        $stale = $this->enrolled();
+        $campaign = $service->create($this->policy('seed'), $stale);
+        User::findOrFail($stale->id)->saveAppAuthenticationSecret(null);
+        $this->assertNotNull($stale->getAppAuthenticationSecret(), 'The caller still holds the enrolled object.');
+        $this->assertNull(User::findOrFail($stale->id)->getAppAuthenticationSecret(), 'The persisted row is withdrawn.');
+        $before = $this->evidence();
+
+        $this->in('staging', function () use ($service, $campaign, $stale): void {
+            $this->refused(fn () => $service->create($this->policy('stale'), $stale), StaffWriteAuthority::REFUSAL);
+            $this->refused(fn () => $service->setAvailability($campaign->id, 1, true, $stale), StaffWriteAuthority::REFUSAL);
+            $this->refused(fn () => $service->campaigns($stale), StaffWriteAuthority::REFUSAL);
+            $this->refused(fn () => $service->detail($campaign->id, $stale), StaffWriteAuthority::REFUSAL);
+        });
+
+        $this->assertSame($before, $this->evidence());
+        $this->assertFalse(PromotionCampaign::where('policy_key', 'synthetic-stale')->exists());
+    }
+
     public function test_production_still_refuses_every_admin_before_the_factor_check(): void
     {
         $service = app(PromotionAdministration::class);
