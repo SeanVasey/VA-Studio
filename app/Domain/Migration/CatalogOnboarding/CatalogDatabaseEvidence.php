@@ -7,6 +7,7 @@ namespace App\Domain\Migration\CatalogOnboarding;
 use App\Domain\Catalog\Discovery\DiscoveryEpoch;
 use Illuminate\Support\Facades\DB;
 use PDO;
+use PDOException;
 use RuntimeException;
 
 /**
@@ -361,7 +362,8 @@ final class CatalogDatabaseEvidence
     /**
      * A temporary table with a participating table's name shadows it on this connection: information_schema
      * describes the durable table while unqualified reads and writes reach the temporary one, which vanishes
-     * with the connection. SQLite also has temporary triggers on durable tables. Either is refused.
+     * with the connection. SQLite also has temporary triggers and views, and resolves names in any letter case,
+     * so its catalog is compared case-insensitively. Any of these is refused, as is a missing table.
      */
     private function shadowed(PDO $pdo): bool
     {
@@ -369,11 +371,15 @@ final class CatalogDatabaseEvidence
         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             $names = "('".implode("', '", $tables)."')";
 
-            return (int) $pdo->query("SELECT COUNT(*) FROM sqlite_temp_master WHERE name IN $names OR tbl_name IN $names")->fetchColumn() !== 0;
+            return (int) $pdo->query("SELECT COUNT(*) FROM sqlite_temp_master WHERE lower(name) IN $names OR lower(tbl_name) IN $names")->fetchColumn() !== 0;
         }
         foreach ($tables as $table) {
             // SHOW CREATE TABLE resolves the temporary table first, as every unqualified statement does.
-            $shown = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM);
+            try {
+                $shown = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM);
+            } catch (PDOException) {
+                return true;
+            }
             if (! is_array($shown) || ! is_string($shown[1] ?? null) || str_starts_with(strtoupper($shown[1]), 'CREATE TEMPORARY')) {
                 return true;
             }

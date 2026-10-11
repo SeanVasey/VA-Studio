@@ -511,14 +511,30 @@ class PersistentCatalogDraftImportTest extends TestCase
         $source = $this->source(NormalizedCatalogFixtures::snapshot(1));
         $importer = new CatalogDraftImporter;
         $review = $importer->review($source, $this->release, $actor);
+        $schema = (new CatalogDatabaseEvidence)->schema();
         $this->changeSchema($case);
+        try {
+            $this->assertDriftRefused($case, $importer, $source, $review, $actor);
+        } finally {
+            if ($case === 'temporary-shadow') {
+                DB::connection()->getPdo()->exec($this->mysql() ? 'DROP TEMPORARY TABLE catalog_import_mappings' : 'DROP TABLE temp.Catalog_Import_Mappings');
+            }
+        }
+        if ($case === 'temporary-shadow') {
+            // Without the shadow the durable schema is admitted again with its original digest.
+            $this->assertSame($schema, (new CatalogDatabaseEvidence)->schema());
+        }
+    }
+
+    private function assertDriftRefused(string $case, CatalogDraftImporter $importer, array $source, array $review, $actor): void
+    {
         $before = $this->evidence();
         if (in_array($case, ['non-transactional-storage', 'temporary-shadow'], true)) {
             // The in-transaction pin refuses the same drift on its own, so a change that lands after admission
             // but before the first write is refused too.
             try {
                 DB::transaction(static fn () => (new CatalogDatabaseEvidence)->lockedStorage());
-                $this->fail('Non-transactional storage pinned');
+                $this->fail('Drifted storage pinned: '.$case);
             } catch (RuntimeException $error) {
                 $this->assertSame('catalog_target_invalid', $error->getMessage());
             }
@@ -532,10 +548,6 @@ class PersistentCatalogDraftImportTest extends TestCase
                 $this->assertSame('catalog_target_schema_invalid', $error->getMessage());
             }
             $this->assertSame($before, $this->evidence());
-        }
-        if ($case === 'temporary-shadow') {
-            DB::connection()->getPdo()->exec($this->mysql() ? 'DROP TEMPORARY TABLE catalog_import_mappings' : 'DROP TABLE temp.catalog_import_mappings');
-            $this->assertSame((new CatalogDatabaseEvidence)->schema(), (new CatalogDatabaseEvidence)->schema());
         }
     }
 
@@ -883,8 +895,9 @@ class PersistentCatalogDraftImportTest extends TestCase
             case 'ignored-checks': $pdo->exec('PRAGMA ignore_check_constraints=ON');
                 break;
             case 'temporary-shadow':
-                // Unqualified statements on this connection would reach the empty temporary copy.
-                $pdo->exec('CREATE TEMP TABLE catalog_import_mappings AS SELECT * FROM main.catalog_import_mappings WHERE 0');
+                // Unqualified statements on this connection would reach the empty temporary copy. SQLite resolves
+                // names in any letter case, so a differently cased temporary table shadows the durable one too.
+                $pdo->exec('CREATE TEMP TABLE Catalog_Import_Mappings AS SELECT * FROM main.catalog_import_mappings WHERE 0');
                 break;
             case 'prefix-unique-index':
                 // SQLite has no prefix index; the counterpart keys uniqueness on the first character only.

@@ -45,8 +45,9 @@ strings (three `True` results, second session).
   `catalog_import_mappings` refuses it on `catalog_import_batches`. A least-privilege application user
   must not hold DROP on the owned tables.
 - **Temporary shadows are invisible to `information_schema` on MySQL**, and `INNODB_TEMP_TABLE_INFO`
-  needs the PROCESS privilege, so a same-session `CREATE TEMPORARY TABLE` over an owned table is not
-  detected. SQLite's `sqlite_temp_master` was not checked before this change either.
+  needs the PROCESS privilege. This was a gap until the Codex round on `abcc85a`: admission and the
+  in-transaction pin now refuse a shadow through `SHOW CREATE TABLE` on MySQL and a case-insensitive
+  `sqlite_temp_master` check on SQLite (see that section).
 - **Storage class.** SQLite records the stored value's class per row (`typeof`). MySQL strict mode fixes
   the stored type to the column's declared type, so the class is `DATA_TYPE` or `null`.
 - **Rolled-back auto-increment values are not reused on InnoDB.** After a refused segment the next
@@ -330,8 +331,8 @@ Two findings, both fixed:
    writes reach the temporary one and vanish with the connection. Admission (`schema()`) and the
    in-transaction pin (`lockedStorage()`) now refuse a shadow of any participating table or the discovery
    epoch. MySQL uses `SHOW CREATE TABLE`, which resolves the temporary table first, as `MembershipSchema`
-   and `SitemapSchema` already do. SQLite checks `sqlite_temp_master`, which also catches temporary triggers
-   on durable tables. New schema-drift data set `temporary-shadow` (#11) on both engines; it also asserts
+   and `SitemapSchema` already do. SQLite checks `sqlite_temp_master` case-insensitively (SQLite resolves table
+   names in any letter case), which also catches temporary views and temporary triggers on durable tables. New schema-drift data set `temporary-shadow` (#11) on both engines; it also asserts
    that the pin refuses.
 2. **Prefix unique index (P2).** `UNIQUE (record_key(1))` matched every compared index field, so the drift
    kept the admitted digest. The owned-index proof now includes `SUB_PART` and expects `null` (full column).
@@ -347,6 +348,25 @@ and passes after the fix; #12 fails on `abcc85a` (`prefix-unique-index` admitted
 fix. The happy path and the transaction-pin test pass on MySQL. The MySQL-native selection is now 1,820 cases in
 164 files (of 7,650), and the counts in `final-verification.yml` and `.gitlab-ci.yml` are updated. The rest of the
 file was not re-run on MySQL.
+
+## Independent review of `27453f0..7476fc7`
+
+APPROVE WITH CONDITIONS (`independent-review-7476fc7-DECISION.md`). Both Codex findings were confirmed fixed on MySQL,
+red to green, and the previous review's conditions are met. Its conditions are met in the next commit:
+
+1. The SQLite shadow check compared names case-sensitively, but SQLite resolves table names in any letter case,
+   so `Catalog_Import_Mappings`, a `TRACKS` view or a trigger on `main.TRACKS` still shadowed. The check now
+   compares `lower(name)` and `lower(tbl_name)`, and the SQLite `temporary-shadow` setup uses a mixed-case name
+   (red on `7476fc7`).
+2. The docs are corrected: the "not detected" bullet, the temporary-trigger claim, and two headings in
+   `local-evidence/codex-p4/red-green.txt`.
+3. Recommended items, also done: a missing participating table on MySQL is refused as
+   `catalog_target_schema_invalid` instead of a raw PDO 1146 error. The `temporary-shadow` cleanup now runs in
+   `finally`, and the test then asserts the original schema digest instead of `schema() === schema()`.
+
+Results: `local-evidence/review-7476fc7/red-green.txt`. The Codex P2 on whole-schema pinning (every base table
+covered by the engine admission) is deferred to the lane's follow-up batch under the owner's freeze-and-batch
+rule; the PR thread records it.
 
 ## Policy self-tests (second session; third-session re-runs marked)
 
