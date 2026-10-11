@@ -162,6 +162,39 @@ class BeatStarsDryRunCommandTest extends TestCase
         $this->assertSame('snapshot_too_large', json_decode($bytes['beatstars-dry-run.json'], true, 64)['findings'][0]['code']);
     }
 
+    public function test_a_later_output_failure_removes_every_file_the_run_staged_and_keeps_earlier_outputs(): void
+    {
+        // Two rows with long descriptions: the JSON report and catalog.json exceed 6 KiB, the Markdown report does not.
+        $export = $this->privateDirectory().'/long.csv';
+        $handle = fopen($export, 'xb');
+        fputcsv($handle, ['Track ID', 'Title', 'BPM', 'Key', 'Genre', 'Mood', 'Tags', 'Description', 'Status', 'Lease Name',
+            'Lease Price', 'Exclusive Price', 'Rights Reference', 'Plays'], ',', '"', '');
+        foreach ([1, 2] as $index) {
+            fputcsv($handle, [sprintf('bs-synthetic-long-%04d', $index), sprintf('SYNTHETIC Long %04d', $index), '95', 'C minor',
+                'Synthetic', '', 'synthetic', 'SYNTHETIC '.str_repeat('d', 3990), 'Public', 'SYNTHETIC Basic', '1.00', '10.00',
+                sprintf('SYNTHETIC-RIGHTS-LONG-%04d', $index), '0'], ',', '"', '');
+        }
+        fclose($handle);
+        chmod($export, 0600);
+        $arguments = ['--export', $export, '--mapping', $this->fixtures.'/mapping.json', '--output', $output = $this->outputDirectory('rollback')];
+        $first = $this->invoke($arguments);
+        $this->assertSame(0, $first['exit'], $first['stdout'].$first['stderr']);
+        $sizes = array_map(static fn (string $name): int => filesize($output.'/'.$name), self::OUTPUTS);
+        $this->assertGreaterThan(6144, $sizes[0]);
+        $this->assertLessThan(6144, $sizes[1]);
+        $this->assertGreaterThan(6144, $sizes[2]);
+        $json = file_get_contents($output.'/beatstars-dry-run.json');
+        unlink($output.'/beatstars-dry-run.md');
+        unlink($output.'/catalog.json');
+
+        // The JSON report is unchanged, the Markdown report stages, catalog.json fails mid-write under a 6 KiB limit.
+        $result = $this->invoke($arguments, ['bash', '-c', 'trap "" XFSZ; ulimit -f 6; exec "$0" "$@"']);
+        $this->assertSame(1, $result['exit'], $result['stdout']);
+        $this->assertSame(['code' => 'dry_run_refused', 'reason' => 'output_write', 'database_writes' => 0], $result['summary']);
+        $this->assertSame(['.', '..', 'beatstars-dry-run.json'], scandir($output));
+        $this->assertSame($json, file_get_contents($output.'/beatstars-dry-run.json'));
+    }
+
     public static function refusals(): array
     {
         return ['missing option' => ['usage'], 'repeated option' => ['usage'], 'missing export' => ['path'], 'empty export' => ['input_file'],

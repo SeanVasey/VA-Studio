@@ -100,8 +100,9 @@ final class BeatStarsDryRunFiles
             return $bytes;
         }
         // The shared private-source boundary: a caller-owned 0600 single-link file in a caller-owned 0700
-        // directory whose parent is not group- or world-writable, with no .git in any ancestor, read through
-        // one descriptor whose uid, mode, link count and identity are checked on the same stat it reads.
+        // directory whose parent is caller-owned and not group- or world-writable; every ancestor must be
+        // non-group/world-writable unless root-owned and sticky, and none may contain .git. The file is read
+        // through one descriptor whose uid, mode, link count and identity are checked on the same stat it reads.
         try {
             $proof = (new PrivateSourceFiles)->protectedFile($path, BeatStarsExportNormalizer::MAX_EXPORT_BYTES);
         } catch (InvalidArgumentException) {

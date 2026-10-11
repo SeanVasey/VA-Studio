@@ -130,7 +130,7 @@ Both are fixed in the next commit with the review's conditions:
 
 | Item | Change |
 | --- | --- |
-| Codex: reuse the full private-source boundary; review L1, L4, I2 | An export outside the checkout now goes through `PrivateSourceFiles::protectedFile`: privacy (uid, `0600`, one link) is checked on the same stat it reads, the parent must be a caller-owned `0700` directory whose parent is not group- or world-writable, and no ancestor may contain `.git`. New refusal case: a `0600` export under another checkout's `.git` (`input_not_private`). |
+| Codex: reuse the full private-source boundary; review L1, L4, I2 | An export outside the checkout now goes through `PrivateSourceFiles::protectedFile`: privacy (uid, `0600`, one link) is checked on the same stat it reads, the parent must be a caller-owned `0700` directory whose own parent is caller-owned and not group- or world-writable, every ancestor must be non-group/world-writable unless root-owned and sticky, and no ancestor may contain `.git`. New refusal case: a `0600` export under another checkout's `.git` (`input_not_private`). |
 | Codex: roll back partial outputs | All outputs are staged as synced `.pending` files, then renamed; any failure removes every file this run created. New refusal case runs the CLI under a 4 KiB file-size limit: before the fix it left `beatstars-dry-run.json.pending`; after it the directory is empty. |
 | Review optional | An export inside this checkout is admitted only under `tests/Fixtures/` with a `synthetic_fixture` mapping. New refusal case: `composer.json` with the fixture mapping. |
 | Review condition 3 | Rights references and slugs are now exact as well; padding is `invalid_rights_reference` / `invalid_slug`. Descriptive text stays trimmed, with the raw cells in `raw_metadata`. |
@@ -152,6 +152,23 @@ Codex's fifth review (of `7acdd5d`) raised a P1 and two P2s:
 
 Red/green: `evidence/codex-quotes-and-output-git-red-green.txt` (81 unit tests, 21 feature tests); the
 clean fixture's `catalog.json` hash is unchanged (`bd893c40…`).
+
+The delta review of `7acdd5d` returned APPROVE WITH CONDITIONS (`independent-review-7acdd5d-DECISION.md`).
+Its conditions are met as follows:
+
+1. Run-level rollback test: the 4 KiB case fails inside the first staged file, so it only proves that
+   `stage()` removes its own `.pending`. A second feature case keeps an identical JSON report from an earlier
+   run, then runs a two-row sheet with long descriptions under a 6 KiB limit: the Markdown report stages and
+   `catalog.json` fails. With the run-level rollback loop deleted the case fails (it leaves
+   `beatstars-dry-run.md.pending`); with the code as committed only the earlier JSON report remains
+   (`evidence/rollback-run-level-red-green.txt`, 22 feature tests).
+2. Boundary wording: the guide, this README and the code comment now state the full rule (caller-owned parent,
+   the ancestor rule, root-owned sticky directories excepted) and tell operators to keep the export under their
+   home, not directly under `/tmp`.
+3. Surviving mutants, recorded as accepted gaps: in `run()`, recording a published path in `$created` and the
+   `! exists()` check before `rename` (the check is check-then-act; it matters only if the same user writes into
+   the `0700` output directory at the same moment); in `export()`, the comparison of the two reads' bytes. Also
+   still untested: the three identity comparisons in `input()` and a concurrent rewrite within one second.
 
 ## Not verified here
 
