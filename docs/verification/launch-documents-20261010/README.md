@@ -23,7 +23,10 @@ Branch `harness/launch-documents` from `f57e7256891d0d3c117e151a36f7fb967c724ab7
 | `green-check-citations-pass6.txt` | Run after pass 6 and the guest-download correction. Pass 6 first recorded 244 citations here; the guest-download commit re-ran the check and overwrote the file with its 245-citation result (README 96 paths), which is what it now holds. `RESULT PASS`, exit 0. |
 | `green-check-citations-pass7.txt` | Run after the third Codex review: 245 citations across 3 documents (README 96, PRIVACY 90, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 | `green-check-citations-pass8.txt` | Run after the fourth Codex review (stale pre-#68 notes removed): the same 245 citations and path counts, `RESULT PASS`, exit 0. |
-| `green-check-citations-pass9.txt` | Final run, after the fifth Codex review: 246 citations across 3 documents (README 96, PRIVACY 91, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `green-check-citations-pass9.txt` | Run after the fifth Codex review: 246 citations across 3 documents (README 96, PRIVACY 91, TERMS 59 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
+| `route-table-unthrottled-production.txt` | The production route table filtered to routes without a throttle (sixth Codex review). |
+| `green-check-citations-pass10.txt` | Run after the sixth Codex review: 246 citations, `RESULT PASS`, exit 0. |
+| `green-check-citations-pass11.txt` | Final run, after the seventh Codex review: 251 citations across 3 documents (PRIVACY 96 paths), `RESULT PASS`, exit 0; `git diff --check` clean. |
 
 ## Commands and results
 
@@ -39,7 +42,7 @@ $ git diff --check
 (exit 0)
 ```
 
-The block above is the final run, `green-check-citations-pass9.txt`, after the fifth Codex review. The earlier 245-citation runs are `green-check-citations-pass6.txt` to `green-check-citations-pass8.txt`. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
+The block above is `green-check-citations-pass9.txt`, after the fifth Codex review; later passes are listed at the end of the Codex review sections, and the last one is the final run. The earlier 245-citation runs are `green-check-citations-pass6.txt` to `green-check-citations-pass8.txt`. The earlier 209-, 214-, 236-, 239-, 243- and 245-citation runs are kept in `green-check-citations.txt` and `green-check-citations-pass2.txt` to `green-check-citations-pass6.txt`. The check proves only that each cited path exists and that each draft carries the header; it does not check what a sentence says about the cited file. The independent review showed that a hand spot-check missed a false claim, so every prose claim still needs a reviewer to read it against its source.
 
 No PHP or TypeScript file changed, so Pint, PHPUnit, the frontend tests and the build were not run; running them would not exercise this change.
 
@@ -113,6 +116,12 @@ Citation check after this pass: `green-check-citations-pass9.txt`.
 | PRIVACY section 5 listed two unthrottled public routes from a scan of the route files | The list now comes from the effective route table with `APP_ENV=production` (`route-table-unthrottled-production.txt`), which adds Laravel's `GET /up` health check (registered in `bootstrap/app.php`, not a route file) and the staff panel and framework routes; the claim of rate limiting is narrowed to the storefront's public browser and embed routes. The cited `vendor/filament/filament/src/Auth/Pages/Login.php` (`rateLimit(5)`, 60-second default window) is outside the checker's prefixes and was checked by hand |
 
 Citation check after this pass: `green-check-citations-pass10.txt`.
+
+| PRIVACY section 5 said private pages and responses carry `private, no-store`, `noindex` and no-referrer headers | Qualified to the boundaries that set them: the customer, service-project, grant, track-review and identity middleware, and the checkout, inquiry, attachment, delivery and exception responses. The staff panel adds none beyond its upload and preview endpoints (`app/Providers/Filament/AdminPanelProvider.php`), so whether staff pages should is now Sean to decide, item 11 |
+| `CLAUDE.md` Working facts said every commerce, contract, delivery and promotion test policy admits `staging` | Narrowed to the policies gated by `TestEnvironment::admitsTestCommerce()`; `ProductionFreeGrantPolicy` and `PaidGrantPolicy` rehearsals stay `local`/`testing` only |
+| This record named pass 9 as the final citation run | Pass 11 is the final run (table above) |
+
+Citation check after this pass: `green-check-citations-pass11.txt`.
 
 ## Contradictions resolved at integration
 
