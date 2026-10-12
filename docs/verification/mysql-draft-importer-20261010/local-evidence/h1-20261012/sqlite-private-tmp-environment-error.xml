@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" tests="60" assertions="68" errors="56" failures="0" skipped="0" time="79.082622">
+    <testcase name="test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="61" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.553950">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:64
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes" tests="11" assertions="11" errors="11" failures="0" skipped="0" time="15.346237">
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #0" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.364508">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #0
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #1" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.471061">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #1
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #2" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.435333">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #2
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #3" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.436761">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #3
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.395162">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #4
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #5" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.435729">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #5
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #6" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.433891">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #6
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #7" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.376586">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #7
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #8" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.369182">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #8
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #9" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.335113">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #9
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #10" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="110" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.292910">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes with data set #10
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish" tests="6" assertions="6" errors="6" failures="0" skipped="0" time="7.900409">
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #0" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.303589">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #0
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #1" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.329262">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #1
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #2" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.314717">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #2
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #3" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.337444">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #3
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.294347">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #4
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #5" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="164" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.321050">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish with data set #5
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_audit_failure_after_the_second_track_rolls_back_the_whole_segment" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="197" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.315334">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_audit_failure_after_the_second_track_rolls_back_the_whole_segment
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:200
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks" tests="5" assertions="5" errors="5" failures="0" skipped="0" time="6.489564">
+      <testcase name="test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #0" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="225" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.299415">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #0
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #1" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="225" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.297145">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #1
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #2" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="225" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.291480">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #2
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #3" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="225" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.298877">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #3
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="225" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.302647">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks with data set #4
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_current_revoked_authority_and_required_mfa_refuse_stale_actor_objects" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="272" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.305175">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_current_revoked_authority_and_required_mfa_refuse_stale_actor_objects
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:275
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_mappings_are_immutable_and_changed_authored_or_public_tracks_require_a_new_disposition" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="296" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.342656">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_mappings_are_immutable_and_changed_authored_or_public_tracks_require_a_new_disposition
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:299
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_nested_transaction_is_refused_and_no_query_callbacks_follow_the_final_mapping_audit" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="328" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.299138">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_nested_transaction_is_refused_and_no_query_callbacks_follow_the_final_mapping_audit
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:331
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_fresh_review_of_exact_existing_mappings_skips_without_duplicate_drafts_or_mappings" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="359" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.307764">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_fresh_review_of_exact_existing_mappings_skips_without_duplicate_drafts_or_mappings
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:362
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_declared_media_and_source_visibility_remain_evidence_without_any_commercial_effect" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="381" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.243731">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_declared_media_and_source_visibility_remain_evidence_without_any_commercial_effect
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:390
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_source_os_lease_refuses_simultaneous_apply_and_is_released_after_failed_operation" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="406" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.297783">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_source_os_lease_refuses_simultaneous_apply_and_is_released_after_failed_operation
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:409
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_batch_evidence_is_immutable_and_its_referenced_actor_and_track_are_retained" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="433" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.271406">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_batch_evidence_is_immutable_and_its_referenced_actor_and_track_are_retained
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:436
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="470" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.325086">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:473
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="509" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.261765">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:512
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused" tests="2" assertions="6" errors="0" failures="0" skipped="0" time="2.512933">
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;unlisted table&quot;" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="3" time="1.261886"/>
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;discovery epoch&quot;" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="3" time="1.251048"/>
+    </testsuite>
+    <testcase name="test_a_pin_that_cannot_open_a_table_in_time_is_refused_as_contention_and_restores_the_lock_wait" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="651" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="3" time="1.291710"/>
+    <testcase name="test_a_temporary_shadow_of_a_table_outside_the_evidence_set_is_refused_by_the_pin" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="697" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="3" time="1.280437"/>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs" tests="13" assertions="13" errors="13" failures="0" skipped="0" time="16.835583">
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #0" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.285220">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #0
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #1" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.380069">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #1
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #2" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.286032">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #2
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #3" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.290769">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #3
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.260722">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #4
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #5" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.325974">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #5
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #6" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.275366">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #6
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #7" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.300147">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #7
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #8" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.292389">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #8
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #9" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.272835">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #9
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #10" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.303967">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #10
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #11" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.274642">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #11
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #12" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.287452">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #12
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_schema_changes_after_review_or_final_mapping_callbacks_roll_back_without_any_missing_constraint" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="767" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.296155">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_schema_changes_after_review_or_final_mapping_callbacks_roll_back_without_any_missing_constraint
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:770
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_final_direct_schema_proof_rejects_late_query_observer_and_target_mutations" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="809" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.263367">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_schema_proof_rejects_late_query_observer_and_target_mutations
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:812
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled" tests="5" assertions="5" errors="5" failures="0" skipped="0" time="6.488260">
+      <testcase name="test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #0" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="851" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.252215">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #0
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #1" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="851" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.256225">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #1
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #2" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="851" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.291796">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #2
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #3" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="851" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.340888">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #3
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="851" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.347137">
+        <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled with data set #4
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testcase name="test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="897" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.313766">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:900
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_overlapping_duplicate_applies_create_exactly_one_draft_mapping_and_audit_set_per_record" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="933" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.278224">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_overlapping_duplicate_applies_create_exactly_one_draft_mapping_and_audit_set_per_record
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:936
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="965" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="1" time="1.262188">
+      <error type="InvalidArgumentException">Tests\Feature\PersistentCatalogDraftImportTest::test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:968
+$BASE/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

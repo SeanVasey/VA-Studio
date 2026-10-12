@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" tests="4" assertions="32" errors="0" failures="0" skipped="0" time="439.615729">
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="216.859386">
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;unlisted table&quot;" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="9" time="129.364536"/>
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;discovery epoch&quot;" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="9" time="87.494850"/>
+    </testsuite>
+    <testcase name="test_a_pin_that_cannot_open_a_table_in_time_is_refused_as_contention_and_restores_the_lock_wait" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="651" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="10" time="93.683016"/>
+    <testcase name="test_a_temporary_shadow_of_a_table_outside_the_evidence_set_is_refused_by_the_pin" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="697" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="4" time="129.073327"/>
+  </testsuite>
+</testsuites>

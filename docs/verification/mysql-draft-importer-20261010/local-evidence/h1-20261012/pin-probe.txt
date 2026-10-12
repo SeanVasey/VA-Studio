@@ -1,0 +1,14 @@
+PASS success restores shorter writer wait
+PASS observer is nonpersistent despite persistent writer config
+PASS configured PDO init option and Unix socket preserved
+PASS observer and writer are distinct sessions
+PASS observer remains autocommit outside a transaction
+PASS pin leaves first writer snapshot until after all metadata locks
+PASS escaped non-evidence table holds metadata lock until transaction end
+PASS rollback releases pin metadata lock
+PASS non-InnoDB engine is refused
+PASS engine refusal restores writer wait
+PASS escaped non-evidence temporary shadow is refused
+PASS shadow refusal restores writer wait
+RESULT 12/12 checks passed
+MYSQL 8.4.11

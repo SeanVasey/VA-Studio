@@ -420,7 +420,17 @@ segment duration. MySQL errors 1205 and 1213 during the pin become `catalog_targ
 work to finish before retrying the unchanged reviewed segment. Missing/renamed objects and engine/set/shadow
 failures remain `catalog_target_invalid`.
 
-Source-bound test results and the fresh independent decision are recorded with this correction before merge.
+Source-bound results: [H1 evidence](local-evidence/h1-20261012/README.md). On private MySQL **8.4.11**, both
+required races fail on `2aba5be`'s unchanged application source (2 tests, 18 assertions, 2 intended failures)
+and pass on corrected source `a4bc2bbc`; the new and previously green selections total **11 distinct tests,
+118 assertions, no failures/errors/skips**. Whole-file SQLite: **60 tests, 336 assertions, no failures/errors/skips**.
+The independent reviewer separately passed a 12-check connection/metadata-lock probe and the three schema-drift
+datasets. Earlier environment and fixture-admission errors are retained. Native discovery is 1,825 cases in
+164 files of 7,800 in 562 files; the CI comments were updated without changing workflow behavior.
+
+The fresh [independent decision](independent-review-a4bc2bbc-DECISION.md) approves the product source with the
+final evidence/count-head assessment still required before merge. No complete Foundation or host acceptance
+is claimed.
 
 ## Policy self-tests (second session; third-session re-runs marked)
 

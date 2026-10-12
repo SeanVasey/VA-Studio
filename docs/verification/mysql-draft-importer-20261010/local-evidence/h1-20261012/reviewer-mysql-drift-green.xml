@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest" file="$REVIEW/tests/Feature/PersistentCatalogDraftImportTest.php" tests="3" assertions="23" errors="0" failures="0" skipped="0" time="259.609366">
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs" tests="3" assertions="23" errors="0" failures="0" skipped="0" time="259.609366">
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #10" file="$REVIEW/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="8" time="93.059087"/>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #11" file="$REVIEW/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="9" time="110.059312"/>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #12" file="$REVIEW/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="6" time="56.490966"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,459 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: $CANDIDATE/phpunit.xml
+
+Time: 01:17.249, Memory: 85.00 MB
+
+There were 56 errors:
+
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_dry_run_is_read_only_and_atomic_segments_resume_without_duplicate_rows_or_audits
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:64
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#0 with data ('review-digest')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#1 with data ('review-field')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#2 with data ('target-commit')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#3 with data ('target-tree')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#4 with data ('target-schema')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+7) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#5 with data ('target-row')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+8) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#6 with data ('target-audit')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+9) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#7 with data ('source-bytes')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+10) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#8 with data ('source-replaced')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+11) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#9 with data ('zero-limit')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+12) Tests\Feature\PersistentCatalogDraftImportTest::test_exact_review_source_and_current_target_binding_is_required_before_writes#10 with data ('over-limit')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:113
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+13) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#0 with data ('duplicate-source')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+14) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#1 with data ('source-slug-collision')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+15) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#2 with data ('target-slug')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+16) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#3 with data ('retained-url')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+17) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#4 with data ('sold')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+18) Tests\Feature\PersistentCatalogDraftImportTest::test_conflicts_have_explicit_disposition_and_never_overwrite_or_publish#5 with data ('unknown')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:185
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+19) Tests\Feature\PersistentCatalogDraftImportTest::test_audit_failure_after_the_second_track_rolls_back_the_whole_segment
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:200
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+20) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks#0 with data ('prior-track')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+21) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks#1 with data ('actor')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+22) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks#2 with data ('source')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+23) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks#3 with data ('audit')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+24) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_current_proof_rejects_late_application_and_query_callbacks#4 with data ('query-observer')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:228
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+25) Tests\Feature\PersistentCatalogDraftImportTest::test_current_revoked_authority_and_required_mfa_refuse_stale_actor_objects
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:275
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+26) Tests\Feature\PersistentCatalogDraftImportTest::test_mappings_are_immutable_and_changed_authored_or_public_tracks_require_a_new_disposition
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:299
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+27) Tests\Feature\PersistentCatalogDraftImportTest::test_nested_transaction_is_refused_and_no_query_callbacks_follow_the_final_mapping_audit
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:331
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+28) Tests\Feature\PersistentCatalogDraftImportTest::test_fresh_review_of_exact_existing_mappings_skips_without_duplicate_drafts_or_mappings
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:362
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+29) Tests\Feature\PersistentCatalogDraftImportTest::test_declared_media_and_source_visibility_remain_evidence_without_any_commercial_effect
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:390
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+30) Tests\Feature\PersistentCatalogDraftImportTest::test_source_os_lease_refuses_simultaneous_apply_and_is_released_after_failed_operation
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:409
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+31) Tests\Feature\PersistentCatalogDraftImportTest::test_batch_evidence_is_immutable_and_its_referenced_actor_and_track_are_retained
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:436
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+32) Tests\Feature\PersistentCatalogDraftImportTest::test_storage_changed_after_admission_but_before_the_first_write_is_refused_by_the_transaction_pin
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:473
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+33) Tests\Feature\PersistentCatalogDraftImportTest::test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:512
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+34) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#0 with data ('missing-trigger')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+35) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#1 with data ('foreign-trigger')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+36) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#2 with data ('missing-unique')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+37) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#3 with data ('foreign-key-cascade')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+38) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#4 with data ('nullable-column')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+39) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#5 with data ('extra-column')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+40) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#6 with data ('foreign-keys-disabled')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+41) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#7 with data ('writable-schema')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+42) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#8 with data ('ignored-checks')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+43) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#9 with data ('foreign-referenced-table')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+44) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#10 with data ('non-transactional-storage')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+45) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#11 with data ('temporary-shadow')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+46) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#12 with data ('prefix-unique-index')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+47) Tests\Feature\PersistentCatalogDraftImportTest::test_schema_changes_after_review_or_final_mapping_callbacks_roll_back_without_any_missing_constraint
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:770
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+48) Tests\Feature\PersistentCatalogDraftImportTest::test_final_direct_schema_proof_rejects_late_query_observer_and_target_mutations
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:812
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+49) Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled#0 with data ('batch-id')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+50) Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled#1 with data ('batch-digest')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+51) Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled#2 with data ('mapping-id')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+52) Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled#3 with data ('mapping-key')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+53) Tests\Feature\PersistentCatalogDraftImportTest::test_raw_replace_cannot_rewrite_retained_evidence_when_recursive_delete_triggers_are_disabled#4 with data ('mapping-track')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:854
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+54) Tests\Feature\PersistentCatalogDraftImportTest::test_partial_failure_while_the_second_mapping_is_created_leaves_no_rows_and_the_next_apply_resumes_exactly
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:900
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+55) Tests\Feature\PersistentCatalogDraftImportTest::test_overlapping_duplicate_applies_create_exactly_one_draft_mapping_and_audit_set_per_record
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:936
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+56) Tests\Feature\PersistentCatalogDraftImportTest::test_nested_importers_and_foreign_sessions_cannot_interleave_while_a_segment_is_open
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:968
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 60, Assertions: 68, Errors: 56.

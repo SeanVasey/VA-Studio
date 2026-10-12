@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: $RED/phpunit.xml
+
+Time: 02:33.335, Memory: 83.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused@unlisted table with data ('migrations')
+An engine change racing the pin was admitted.
+Failed asserting that null is identical to 'catalog_target_invalid'.
+
+$RED/tests/Feature/PersistentCatalogDraftImportTest.php:645
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused@discovery epoch with data ('catalog_discovery_epoch')
+An engine change racing the pin was admitted.
+Failed asserting that null is identical to 'catalog_target_invalid'.
+
+$RED/tests/Feature/PersistentCatalogDraftImportTest.php:645
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 18, Failures: 2.

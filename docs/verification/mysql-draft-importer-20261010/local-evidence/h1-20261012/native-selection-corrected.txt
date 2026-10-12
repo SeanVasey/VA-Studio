@@ -1,0 +1,10 @@
+warning: 1 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php
+Proved 1825 selected MySQL-native tests in 164 files (of 7800 discovered tests in 562 files) across 8 nonempty shards.
+Shard 1: 210 tests; 17 complete files; estimated 274m 44s.
+Shard 2: 282 tests; 20 complete files; estimated 274m 34s.
+Shard 3: 208 tests; 20 complete files; estimated 274m 39s.
+Shard 4: 194 tests; 19 complete files; estimated 274m 29s.
+Shard 5: 209 tests; 19 complete files; estimated 274m 44s.
+Shard 6: 269 tests; 31 complete files; estimated 274m 26s.
+Shard 7: 220 tests; 19 complete files; estimated 274m 33s.
+Shard 8: 233 tests; 19 complete files; estimated 274m 26s.
