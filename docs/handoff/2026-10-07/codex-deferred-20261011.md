@@ -35,3 +35,7 @@ owner's Codex settings, not in this repository.
 - **Fixed in PR #96, merged at `92f940cc` from reviewed head `cb69203e`; application/test source `a4bc2bbc`.** Every pinned name is checked, including escaped identifiers; the native temporary-shadow case passes. See `docs/verification/mysql-draft-importer-20261010/local-evidence/h1-20261012/README.md` and the fresh independent decision. The separate trigger/routine targets outside the pinned set remain an owner-decision residual.
 
 Each item has a thread reply on its PR naming this batch. None is P0/P1.
+
+## #99 dependency tooling, October 12
+- Merged at `0b4a2e76fd2ffc414863a1ba97b9354c9ec4cde8` from exact reviewed head `027c674194c1b8b5c5a20231a6d805523413f855`; preflight `38319085298` passed. No review threads or open P0/P1 at merge.
+- #73/#78/#79 closed as superseded; #76 closed for the Node runtime mismatch. #71/#72/#77 remain deferred/unmerged; #74/#75/#80 are the next paired Laravel/Inertia batch. Newer available dependency versions remain a later coherent batch; do not chase them in this frozen graph.
