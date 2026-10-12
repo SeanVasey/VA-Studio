@@ -28,7 +28,7 @@ attestation immediately, even within its 900-second lifetime.
 ## Evidence
 
 The exact commands and unsuccessful attempts are recorded in `commands.md`. Logs/JUnit are retained beside it;
-paths and ANSI colour may be normalized when archived, with no test results removed. Application/test source
+paths, ANSI colour and trailing whitespace are normalized when archived, with no test results removed. Application/test source
 remains identical across subsequent merge-ledger, evidence and review-receipt commits.
 
 The red run is **1 test / 8 assertions / 1 intended failure / zero errors or skips**, exit 1. It proves distinct
