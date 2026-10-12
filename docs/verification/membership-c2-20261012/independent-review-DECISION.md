@@ -18,3 +18,17 @@ The reviewer independently inspected the source, subsequent changes and retained
 Original failures and the interrupted run are accurately retained, with their corrections demonstrated.
 
 This approval covers the prerequisite batch only. Billing remains default-off and unregistered. Existing activation conditions remain open; no operative award/reserve/consume/activation writer, full Foundation acceptance, real queue/provider interoperability or deployment approval is established. Exact-head green preflight remains required before merge.
+
+## Final-head carry and later P2 addendum
+
+The same separate reviewer explicitly carried development APPROVE to `f7da37369e821c23650505bedb1a07028142f9c8` after inspecting its four-file receipt/status-only delta from `f1b3c71b`. No application, test, workflow or recorded evidence changed in that delta.
+
+After automated review raised P2 r4253341984, the reviewer reassessed the frozen head and returned:
+
+> Development APPROVE remains for `f7da37369e821c23650505bedb1a07028142f9c8`, with this P2 explicitly deferred. No P0/P1 identified.
+
+The finding is valid and distinct from CP-2: endpoint reuse is checked within each table, so low-level insertion can associate one interval with both an attempt and an observation. Current reconciliation allocates fresh positions and uses mutually exclusive write paths; queue retries allocate new intervals and serialized jobs carry none. Attempts supply no paid authority, and no operative credit writer exists.
+
+This addendum supersedes the earlier no-actionable-findings statement for this new P2. Sean’s freeze-and-batch rule supports one deferral reply and next-batch ledger entry. That batch should cover reuse in both directions, endpoint combinations and native concurrent insertion. Prior scope limits remain.
+
+Exact-head preflight `38323937687` subsequently passed. PR #109 merged at `06684deb1465f0747d67a2e1751e11e9b7317c06`.

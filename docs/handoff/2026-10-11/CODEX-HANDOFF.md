@@ -1,5 +1,7 @@
 # Handoff to Codex — 2026-10-11
 
+> Current continuation: [October 12 checkpoint](../2026-10-12/CODEX-CHECKPOINT.md). PRs #96, #98, #99, #108 and #109 have merged. The original state below is preserved as history; C2’s operative writer remains next.
+
 Sean asked Claude to reach a stopping point and hand the development lead to Codex. This file is the entry point.
 Read it first, then root `AGENTS.md` (which governs), `docs/handoff/2026-10-07/CLAUDE-PLAN.md` (§3 phased plan
 and §5 state ledger) and `docs/handoff/2026-10-07/codex-deferred-20261011.md`. The prompt Sean uses to start the
