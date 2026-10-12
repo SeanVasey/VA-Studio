@@ -1,0 +1,63 @@
+{
+  "application_commit": "dfbd0ba0bb331d565d6d69021e955950653a5d11",
+  "test_commit": "1a14437ecdbded5646e1234a7138d056d036f81c",
+  "files": {
+    "app/Domain/Memberships/Billing/BillingHintSweep.php": {
+      "sha256": "af33e40feb33e1bd1778be3a06dc5ac96c314138086a96dd9f5ae454ef07b292",
+      "blob": "87b0d5d1a17779027eba5f801045595ac9c878bb"
+    },
+    "app/Domain/Memberships/Billing/BillingReconciliation.php": {
+      "sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+      "blob": "b5fa0f5073377096042adbd5e7491354cc146f8b"
+    },
+    "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php": {
+      "sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+      "blob": "7a5b55de926110b0919622e2a51c0dbb6e89277c"
+    },
+    "app/Domain/Memberships/Billing/BillingSchema.php": {
+      "sha256": "963dcb8e8afe2b2a28d949e40fedbf99ef38cd78d9993cd9cc50a7d90e83d3ae",
+      "blob": "b7a1c9f383df76db1e5d75f46cbaf3b98bedfb0a"
+    },
+    "app/Domain/Memberships/Billing/BillingWebhookIntake.php": {
+      "sha256": "7c4ac641150b3dc71fc57c0f924ec85a8fadccc710241ab95593eb5245b849bd",
+      "blob": "8d771555b38422abb3488396136b2a35c5bee128"
+    },
+    "app/Jobs/RetrieveMembershipInvoice.php": {
+      "sha256": "ed16cf9fd92c47c647da73b18b29987685c121fea55e3f3ca6c1a425834efab2",
+      "blob": "fd76709aa69feae572c7e05ff1f7f5527d65a516"
+    },
+    "database/migrations/2026_10_12_260000_membership_billing_retrieval_attempts.php": {
+      "sha256": "689d3b37549258ddcc51cac38d68ec87134b6bc8ae954690160de559e0e6e4a6",
+      "blob": "47462a9e0f2bb9ba31279d864392267df78f075d"
+    },
+    "scripts/ci/database-mysql-selection.json": {
+      "sha256": "324516b984a3a7280a017ec2a6c10096b7843cf6f027958c06ccd8bb4d79bd9b",
+      "blob": "09ab944e7679a97a6b57f7faf48a609ab3e2dc85"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php": {
+      "sha256": "77aec214b03230904ef29af224e4b8843dd96a7d0c2be4e0728275db959c62a2",
+      "blob": "95244e65df321d7f033ec5e984a0cf7ebe2816c1"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php": {
+      "sha256": "dc6b63f69806825935dde538435b241c969f796481e3ece3c2f45cbcb41b5ebb",
+      "blob": "4ba64e78479eb995ed875651399785c0aaf14edc"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php": {
+      "sha256": "4ed11b58d593b469c36f012b2ce04e85e00ca9f6e9c36aae2909382f0f118765",
+      "blob": "a1a5ee768478b9940c62dbd1d74e8d1b1c7cf453"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php": {
+      "sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+      "blob": "7e9fbed0ce85d4c998ec3b59415089259c649fd7"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php": {
+      "sha256": "aff2532b5385ff195820b2ec0ef86e55391407fb635c4829fbb35792afe2c922",
+      "blob": "dd1fa22338d57e520ecb4a4785a2111d837ade04"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php": {
+      "sha256": "9ad3b0fdf91bd0e442e36e3e83901f6dd4f13cf1b283821006b0f1928292f2e5",
+      "blob": "03471f17693c53ab65dd1bf644c1b2e005dc229d"
+    }
+  },
+  "initial_application_commit": "46e91e50b02caaa7ce88c3e3e3f521dfa9eccc5b"
+}

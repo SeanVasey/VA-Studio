@@ -1,0 +1,1 @@
+PHPUnit partition rejected: --mysql-native-selection is only valid with --prefix=phpunit-ci-mysql
