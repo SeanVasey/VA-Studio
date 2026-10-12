@@ -3,14 +3,18 @@
 namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingReconciliation;
+use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Billing\BillingValues;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\InterleavingBillingGateway;
 use Tests\Support\RehearsalBillingGateway;
 use Tests\TestCase;
 
@@ -67,5 +71,112 @@ class BillingRetrievalAttemptsTest extends TestCase
         $this->assertSame($attempt, BillingValues::integers((array) DB::table(self::TABLE)->sole(), ['retrieval_position', 'retrieval_end_position']));
         $this->assertSame(0, DB::table('production_membership_paid_periods')->count());
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
+    }
+
+    public function test_repeated_wrong_binding_attempts_do_not_pin_the_invoice_or_disappear_when_the_correct_binding_succeeds(): void
+    {
+        $wrong = F::binding(['subscription_ref' => 'sub_WRONGSYNTHETIC']);
+        $right = F::binding();
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $this->refusal(fn () => (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($wrong['id'], F::INVOICE),
+                'binding_refused_subscription');
+        }
+        $before = DB::table(self::TABLE)->orderBy('retrieval_position')->get()->map(fn ($row) => (array) $row)->all();
+        $this->assertCount(3, $before);
+        $this->assertCount(3, array_unique(array_column($before, 'id')));
+        $this->assertSame([$wrong['id']], array_values(array_unique(array_column($before, 'subscription_binding_id'))));
+        $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($right['id'], F::INVOICE);
+        $this->assertSame(['settled', 1], [$settled['outcome'], $settled['sequence']]);
+        $this->assertSame($right['id'], DB::table('production_membership_billing_invoices')->value('subscription_binding_id'));
+        $this->assertSame($before, DB::table(self::TABLE)->orderBy('retrieval_position')->get()->map(fn ($row) => (array) $row)->all());
+        $this->assertSame(0, DB::table('production_membership_credit_events')->count());
+    }
+
+    public function test_attempt_rows_are_immutable_and_invalid_outcomes_scopes_and_reused_intervals_are_refused(): void
+    {
+        $binding = F::binding();
+        $this->refusal(fn () => (new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')))->retrieve($binding['id'], F::INVOICE), 'provider_unavailable');
+        $row = (array) DB::table(self::TABLE)->sole();
+        $pdo = DB::connection()->getPdo();
+        foreach (['UPDATE '.self::TABLE.' SET reason = reason', 'DELETE FROM '.self::TABLE] as $sql) {
+            $this->pdoRefuses(fn () => $pdo->exec($sql));
+        }
+        $ledger = new BillingLedger;
+        $start = $ledger->startRetrieval();
+        $end = $ledger->endRetrieval($start);
+        $candidate = [...$row, 'id' => BillingValues::id(), 'retrieval_position' => $start, 'retrieval_end_position' => $end];
+        foreach ([['outcome' => 'settled'], ['reason' => 'unbounded_provider_body'], ['provider_account_hash' => str_repeat('f', 64)],
+            ['mode' => 'live'], ['hint_event_id' => BillingValues::id()], ['retrieval_end_position' => $start],
+            ['retrieval_position' => $row['retrieval_position']], ['retrieval_position' => $row['retrieval_end_position']],
+            ['retrieval_end_position' => $row['retrieval_position']], ['retrieval_end_position' => $row['retrieval_end_position']]] as $change) {
+            $this->pdoRefuses(fn () => $this->insert([...$candidate, ...$change]));
+        }
+        $this->assertSame([$row], DB::table(self::TABLE)->get()->map(fn ($value) => (array) $value)->all());
+        $this->assertSame(0, DB::table('production_membership_billing_invoices')->count());
+    }
+
+    public function test_configuration_withdrawn_during_provider_io_or_disabled_before_it_records_no_attempt(): void
+    {
+        $binding = F::binding();
+        $gateway = new InterleavingBillingGateway(new RehearsalBillingGateway(F::graph()), function (): never {
+            config(['production-membership-billing.enabled' => false]);
+            throw new BillingException('provider_unavailable');
+        });
+        $this->refusal(fn () => (new BillingReconciliation($gateway))->retrieve($binding['id'], F::INVOICE), 'changed_policy');
+        $off = new RehearsalBillingGateway(F::graph(), 'invoice');
+        $this->refusal(fn () => (new BillingReconciliation($off))->retrieve($binding['id'], F::INVOICE), 'disabled');
+        $this->assertSame([], $off->calls);
+        $this->assertSame(0, DB::table(self::TABLE)->count());
+        $this->assertSame(0, DB::table('production_membership_billing_invoices')->count());
+        $this->assertSame(0, DB::table('production_membership_billing_observations')->count());
+    }
+
+    public function test_forward_migration_preserves_the_existing_five_tables_and_rows_and_is_idempotent(): void
+    {
+        $binding = F::binding();
+        (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
+        DB::connection()->getPdo()->exec('DROP TABLE '.self::TABLE);
+        $oldTables = array_slice(BillingSchema::TABLES, 0, 5);
+        $snapshot = fn () => array_map(fn ($table) => DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(), $oldTables);
+        $before = $snapshot();
+        $migration = require base_path('database/migrations/2026_10_12_260000_membership_billing_retrieval_attempts.php');
+        $migration->up();
+        $migration->up();
+        $this->assertSame($before, $snapshot());
+        $this->assertSame(0, DB::table(self::TABLE)->count());
+        (new BillingSchema)->assertOwned(DB::connection()->getPdo());
+        try {
+            $migration->down();
+            $this->fail('Attempt evidence needs explicit retention handling, never a destructive down migration.');
+        } catch (\LogicException) {
+            $this->assertSame($before, $snapshot());
+        }
+    }
+
+    private function refusal(callable $operation, string $reason): void
+    {
+        try {
+            $operation();
+            $this->fail('The retrieval must retain its original refusal.');
+        } catch (BillingException $error) {
+            $this->assertSame($reason, $error->reason);
+        }
+    }
+
+    private function pdoRefuses(callable $operation): void
+    {
+        try {
+            $operation();
+            $this->fail('The database must refuse invalid or mutable attempt evidence.');
+        } catch (PDOException) {
+            $this->assertTrue(true);
+        }
+    }
+
+    private function insert(array $row): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $pdo->prepare('INSERT INTO '.self::TABLE.' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')')->execute(array_values($row));
     }
 }

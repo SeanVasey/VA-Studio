@@ -3,7 +3,10 @@
 namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingHintSweep;
 use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Domain\Memberships\Billing\BillingProviderPin;
 use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingVerdict;
@@ -60,6 +63,42 @@ class BillingWebhookRedeliveryTest extends TestCase
         $this->assertNull($duplicate['scheduled']);
         Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
         $this->assertSame(1, DB::table('production_membership_billing_observations')->count());
+    }
+
+    public function test_first_failed_job_retains_its_hint_link_and_redelivery_and_sweep_still_dispatch_until_success(): void
+    {
+        F::binding();
+        Queue::fake();
+        $payload = $this->event('evt_ATTEMPTSYNTHETIC');
+        $received = $this->receive($payload);
+        $eventId = $received['event']['id'];
+        $job = Queue::pushed(RetrieveMembershipInvoice::class)->sole();
+        $this->assertSame($eventId, $job->hintEventId);
+        try {
+            $job->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')));
+            $this->fail('The job keeps the original provider failure.');
+        } catch (BillingException $error) {
+            $this->assertSame('provider_unavailable', $error->reason);
+        }
+        $this->assertSame($eventId, DB::table('production_membership_billing_attempts')->sole()->hint_event_id);
+        $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $duplicate = $this->receive($payload);
+        $this->assertNotNull($duplicate['scheduled']);
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 2);
+        $policy = new BillingPolicy;
+        $configuration = $policy->current();
+        $sweep = new BillingHintSweep;
+        $pending = $sweep->scanAll(100, $configuration)['pending'];
+        $this->assertCount(1, $pending);
+        $this->assertSame($eventId, $pending[0]['hint_event_id']);
+        $this->assertSame(1, $sweep->dispatch($pending, $configuration, $policy));
+        Queue::assertPushed(RetrieveMembershipInvoice::class, 3);
+        $this->assertTrue(Queue::pushed(RetrieveMembershipInvoice::class)->every(fn ($queued) => $queued->hintEventId === $eventId));
+        Queue::pushed(RetrieveMembershipInvoice::class)->last()->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph())));
+        $this->assertSame([], $sweep->scanAll(100, $configuration)['pending']);
+        $this->assertSame(1, DB::table('production_membership_billing_attempts')->count());
+        $this->assertSame(1, DB::table('production_membership_billing_observations')->count());
+        $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
     public function test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged(): void

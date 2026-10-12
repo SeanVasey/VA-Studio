@@ -222,6 +222,25 @@ class BillingObservationLedgerTest extends TestCase
         }
     }
 
+    /** L2-4: account, customer and subscription match; only the returned invoice identity differs. */
+    public function test_another_invoice_returned_for_a_matching_binding_records_a_refusal_without_claiming_the_requested_invoice(): void
+    {
+        $binding = F::binding();
+        try {
+            (new BillingReconciliation($this->refusingBeforeValidation('invoice_identity')))->retrieve($binding['id'], F::INVOICE);
+            $this->fail('An otherwise matching graph cannot establish another invoice identity.');
+        } catch (BillingException $error) {
+            $this->assertSame('binding_refused_invoice_identity', $error->reason);
+        }
+        $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $attempt = DB::table('production_membership_billing_attempts')->sole();
+        $this->assertSame([$binding['id'], 'refused', 'binding_refused_invoice_identity'], [$attempt->subscription_binding_id, $attempt->outcome, $attempt->reason]);
+        $this->assertSame(BillingValues::hash('invoice', F::ACCOUNT, 'test', F::INVOICE), $attempt->invoice_ref_hash);
+        $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
+        $this->assertSame(['settled', 1], [$settled['outcome'], $settled['sequence']]);
+        $this->assertSame(1, DB::table('production_membership_billing_attempts')->count());
+    }
+
     public function test_verdict_values_cannot_claim_settlement_without_facts(): void
     {
         $this->expectException(BillingException::class);

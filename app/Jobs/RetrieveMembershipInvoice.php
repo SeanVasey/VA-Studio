@@ -15,7 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
  * registered by this lane, so the job fails closed until root binds a reviewed gateway. It never
  * awards: it appends one observation (settled, not_settled, unknown, refused or reversed).
  *
- * Up to three attempts. A first retrieval that ends unknown throws (it writes nothing), so the queue retries it with the backoff.
+ * Up to three attempts. A first retrieval that ends unknown retains a non-identity attempt then throws, so the queue retries it.
  * Under an identity the binding already owns, an unknown or incomplete outcome is appended first, so every attempt is visible in
  * the ledger, and the job is then released for another attempt while attempts remain. A retrieval whose provider reads wholly
  * preceded those of the retrieval that produced the tail (`superseded_retrieval`) is a normal end: the newer retrieval recorded the
@@ -34,7 +34,7 @@ final class RetrieveMembershipInvoice implements ShouldQueue
 
     private readonly string $sealedInvoiceRef;
 
-    public function __construct(public readonly string $bindingId, string $invoiceRef)
+    public function __construct(public readonly string $bindingId, string $invoiceRef, public readonly ?string $hintEventId = null)
     {
         BillingException::require(BillingValues::is('invoice', $invoiceRef), 'invalid_value');
         $this->sealedInvoiceRef = BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_retrieval_job', 'invoice_ref' => $invoiceRef]);
@@ -58,7 +58,8 @@ final class RetrieveMembershipInvoice implements ShouldQueue
     public function handle(BillingReconciliation $reconciliation): void
     {
         try {
-            $observation = $reconciliation->retrieve($this->bindingId, $this->invoiceRef());
+            // Previously queued jobs have no hint property; they remain valid direct retrievals.
+            $observation = $reconciliation->retrieve($this->bindingId, $this->invoiceRef(), $this->hintEventId ?? null);
         } catch (BillingException $error) {
             if ($error->reason === 'superseded_retrieval') {
                 return;

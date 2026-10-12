@@ -26,7 +26,7 @@ use PDO;
 final class BillingSchema
 {
     public const TABLES = ['production_membership_billing_subscriptions', 'production_membership_billing_invoices', 'production_membership_billing_observations', 'production_membership_billing_events',
-        'production_membership_billing_positions'];
+        'production_membership_billing_positions', 'production_membership_billing_attempts'];
 
     public const POSITION_KINDS = ['retrieval', 'hint'];
 
@@ -227,6 +227,20 @@ final class BillingSchema
             $unique = [['invoice_id', 'sequence'], ['retrieval_position'], ['retrieval_end_position']];
             $foreign = ['invoice_id' => self::TABLES[1]];
             $check .= " AND sequence BETWEEN 1 AND 10000 AND outcome IN ('settled','not_settled','unknown','refused','reversed') AND length(facts_hash) = 64 AND length(prior_seal) = 64 AND retrieved_at < freshness_deadline AND length(retrieval_started_at) = 26 AND retrieval_position > 0 AND retrieval_end_position > 0 AND retrieval_end_position > retrieval_position AND length(api_version) BETWEEN 1 AND 32 AND length(sdk_reference) = 40 AND (outcome <> 'settled' OR (line_period_start IS NOT NULL AND line_period_end IS NOT NULL AND line_period_start < line_period_end AND amount_minor IS NOT NULL AND amount_minor > 0 AND currency IS NOT NULL AND length(currency) = 3))";
+        } elseif ($logical === self::TABLES[5]) {
+            // Diagnostic attempts are deliberately not invoice identities or settlement observations.
+            // Repeated attempts and different bindings may name the same invoice hash.
+            $columns += ['subscription_binding_id' => $id, 'invoice_ref_hash' => $hash,
+                'provider_account_hash' => $hash, 'mode' => $mode, 'provenance' => 'VARCHAR(32)'.$ascii.' NOT NULL',
+                'hint_event_id' => 'VARCHAR(36)'.$ascii.' NULL', 'retrieval_position' => $position, 'retrieval_end_position' => $position,
+                'outcome' => 'VARCHAR(16)'.$ascii.' NOT NULL', 'reason' => 'VARCHAR(64)'.$ascii.' NOT NULL'];
+            $unique = [['retrieval_position'], ['retrieval_end_position']];
+            $foreign = ['subscription_binding_id' => self::TABLES[0], 'hint_event_id' => self::TABLES[3]];
+            $check .= ' AND length(invoice_ref_hash) = 64 AND length(provider_account_hash) = 64 AND (hint_event_id IS NULL OR length(hint_event_id) = 36)'
+                .' AND retrieval_position > 0 AND retrieval_end_position > retrieval_position'
+                ." AND ((mode = 'test' AND provenance = 'synthetic_rehearsal') OR (mode = 'live' AND provenance = 'verified_production'))"
+                ." AND ((outcome = 'unknown' AND reason IN ('provider_unavailable','provider_inconsistent'))"
+                ." OR (outcome = 'refused' AND reason IN ('provider_incomplete','binding_refused_account','binding_refused_invoice_identity','binding_refused_mode','binding_refused_customer','binding_refused_subscription')))";
         } else {
             $columns += ['provider_event_ref_hash' => $hash, 'type' => 'VARCHAR(64)'.$ascii.' NOT NULL', 'mode' => $mode,
                 'provider_account_hash' => $hash, 'invoice_ref_hash' => 'VARCHAR(64)'.$ascii.' NULL', 'received_at' => $utc, 'hint_position' => $position,
@@ -295,6 +309,17 @@ final class BillingSchema
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE provider_event_ref_hash = NEW.provider_event_ref_hash)'
                 .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.hint_position AND kind = 'hint')"
                 .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE hint_position = NEW.hint_position)';
+        } elseif ($logical === self::TABLES[5]) {
+            $events = $this->table(self::TABLES[3]);
+            $insert .= ' AND EXISTS (SELECT 1 FROM '.$subscriptions.' WHERE id = NEW.subscription_binding_id AND provider_account_hash = NEW.provider_account_hash AND mode = NEW.mode AND provenance = NEW.provenance)'
+                .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.retrieval_position AND kind = 'retrieval')"
+                .' AND EXISTS (SELECT 1 FROM '.$positions." WHERE id = NEW.retrieval_end_position AND kind = 'retrieval')"
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE retrieval_position = NEW.retrieval_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE retrieval_position = NEW.retrieval_end_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE retrieval_end_position = NEW.retrieval_position)'
+                .' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE retrieval_end_position = NEW.retrieval_end_position)'
+                .' AND (NEW.hint_event_id IS NULL OR EXISTS (SELECT 1 FROM '.$events." WHERE id = NEW.hint_event_id AND disposition = 'retrieval_hint'"
+                .' AND provider_account_hash = NEW.provider_account_hash AND mode = NEW.mode AND invoice_ref_hash = NEW.invoice_ref_hash AND hint_position < NEW.retrieval_position))';
         } else {
             // Only the database allocates a position: before the insert an unassigned AUTO_INCREMENT id reads 0 on MySQL and -1 on
             // SQLite, while an explicit id (which could back-date a position into a gap) reads as itself and is refused.
