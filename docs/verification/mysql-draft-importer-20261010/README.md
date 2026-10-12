@@ -377,12 +377,11 @@ before the pin, another privileged session could move an unlisted table such as 
 refused, but the MyISAM row survived the rollback. (A fresh batch was already safe, because `binding()` re-runs
 `schema()` inside the transaction before the first write.)
 
-The fix: on MySQL, the pin now lists every base table in `DATABASE()`, opens each one with
-`SELECT 1 FROM ... LIMIT 0` (backticks escaped), and lists them again. It refuses with `catalog_target_invalid`
-unless the set is unchanged, includes every evidence table and the epoch, and is all InnoDB. A table dropped
-between the listing and its open is mapped to the same refusal. The shadow check still runs first. SQLite is
-unchanged. The cost is one `LIMIT 0` open per table per segment. The trade-off is that DDL on any table in the
-schema now waits until the segment commits, not only DDL on the evidence tables.
+The initial implementation at `2aba5be` listed every base table in `DATABASE()`, opened each one with
+`SELECT 1 FROM ... LIMIT 0` (backticks escaped), and listed them again on the importer connection. Independent
+review rejected it: both listings read the same REPEATABLE READ snapshot, so an engine change while an earlier
+open waited was admitted. The claimed current set/engine comparison was not established. See
+`docs/handoff/2026-10-11/importer-h1/independent-review-2aba5be-DECISION.md` and the correction below.
 
 New test: `test_storage_of_a_table_outside_the_evidence_set_changed_before_the_first_write_is_refused_by_the_transaction_pin`.
 It applies segment 1. In the `TransactionBeginning` window of segment 2, a foreign session moves `migrations` to
@@ -393,11 +392,35 @@ and passes on both sources. On MySQL, data sets #10 to #12, the earlier pin test
 foreign-session interleave case pass. The SQLite file passes with 56 tests. The MySQL-native selection is 1,821
 cases, and both CI comments are updated. Results: `local-evidence/followup-20261011/red-green.txt`.
 
-Residual, not closed and not tested: a trigger on a pinned table that names a table which does not exist at pin
-time. A foreign session could create that table as MyISAM after the pin, since creating a new table takes no lock
-the importer holds. The end-of-segment proof still refuses, but that write would survive. Closing it would need
-the triggers on the pinned tables compared inside the pin (triggers on `tracks` are not in the owned-object
-comparison today). This is an owner decision for a later batch.
+Residual, not closed and not tested: triggers on pinned tables outside the owned-object comparison (`tracks`,
+`users`, `audit_events` and others), or routines they call, can write a table that is not pinned. This includes
+a table created after the final listing and a non-transactional table in another schema. A later refusal cannot
+undo such a write; the final proof does not guarantee detection of a cross-schema side effect. Closing this
+requires reviewed trigger/routine dependency enforcement, not just more engine listings. This remains Sean's
+owner decision for a later batch.
+
+## H1 correction (2026-10-12)
+
+Both table listings now use a separate nonpersistent autocommit PDO built by Laravel's connection factory from
+the importer's resolved writer configuration. The factory preserves Unix sockets, TLS and PDO options; the pin
+requires a different connection ID, the same server UUID/database, autocommit enabled and no open observer
+transaction. A connection routed to a different server is refused. No metadata listing establishes an early
+snapshot on the importer connection.
+
+The importer opens every listed base table, then checks every pinned name for temporary shadowing. While its
+shared metadata locks remain held, the observer reads the current committed set and engines. A changed set or
+non-InnoDB engine is refused at this final listing. This is not a schema-wide lock against future CREATE TABLE.
+SQLite's journal and participating-name shadow checks are unchanged.
+
+Do not run catalog imports during migrations, deploys or other DDL. Every base table holds a shared metadata
+lock until the segment commits or rolls back. Pending DDL can queue ordinary web/worker queries behind it.
+The pin sets session `lock_wait_timeout` to the lesser of its existing value and five seconds, including its
+shadow checks, and restores the original value on exit. This bounds each metadata-lock wait, not the total
+segment duration. MySQL errors 1205 and 1213 during the pin become `catalog_target_busy`; wait for competing
+work to finish before retrying the unchanged reviewed segment. Missing/renamed objects and engine/set/shadow
+failures remain `catalog_target_invalid`.
+
+Source-bound test results and the fresh independent decision are recorded with this correction before merge.
 
 ## Policy self-tests (second session; third-session re-runs marked)
 

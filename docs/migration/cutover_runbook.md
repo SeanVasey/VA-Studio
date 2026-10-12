@@ -42,6 +42,14 @@ Missing original contracts are exceptions, not a prompt to regenerate history. U
 
 ## 4. Produce the concrete dry run
 
+For the MySQL catalog draft importer, schedule each run outside migrations, deploys and other DDL. An apply
+segment retains shared metadata locks on every base table until commit or rollback; queued DDL can also stall
+ordinary queries from web requests and workers. The pin limits each metadata-lock wait to at most five seconds
+(preserving a shorter configured limit) and restores the session setting afterwards. `catalog_target_busy`
+means lock contention: let the competing work finish, then retry the same reviewed segment. This limit is not
+a total segment deadline. The [importer evidence](../verification/mysql-draft-importer-20261010/README.md)
+records the unresolved trigger/routine targets outside the pinned set.
+
 A batch manifest records batch ID, input manifest hash, transform version, target environment, `dry-run`/`commit` mode, approval reference, expected writes, checkpoint and rollback method. A dry run makes no production mutations.
 
 Report per-class creates, updates, skips, conflicts and errors; per-field differences and lossy transforms; visibility, price, currency, rights, license, grant, consent and identity conflicts; unresolved references; destructive effects; estimated storage/job cost; and each exception's owner and proposed disposition.
