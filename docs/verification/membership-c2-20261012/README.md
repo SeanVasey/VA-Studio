@@ -48,7 +48,7 @@ Pint passed on all 13 changed PHP files at `1a14437e`; the single later schema-c
 
 ## Review and limits
 
-A separate reviewer session, `/root/membership_attempt_review`, is assessing the source and final evidence. Its final DECISION and exact reviewed commit will be recorded before merge. No self-review substitutes for that decision.
+A separate reviewer session, `/root/membership_attempt_review`, returned **APPROVE** for development merge at `f1b3c71bea8aff822958d6bf403868a491f5b6f3`, with no actionable findings. The [decision receipt](independent-review-DECISION.md) records the independently checked source, evidence and limits. A later receipt/status-only commit still needs the reviewer's explicit carry and exact-head green preflight before merge.
 
 No full Foundation or GitLab run, real queue worker, real Stripe account, provider I/O, browser, host deployment or customer import was exercised. The whole billing directory was not run on native MySQL. Existing CP-2/CP-3/P1B-1, R-4/R-5/A1-5, L2-1 and other activation conditions are not closed by this batch. A database failure, unrecognized provider exception, or failure before the bounded retrieval outcome does not gain a guaranteed attempt record.
 
