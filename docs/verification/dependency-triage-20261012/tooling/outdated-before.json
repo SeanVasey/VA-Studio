@@ -1,0 +1,37 @@
+{
+  "@fontsource-variable/jetbrains-mono": {
+    "wanted": "5.3.0",
+    "latest": "5.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "@fontsource-variable/noto-sans-display": {
+    "wanted": "5.3.0",
+    "latest": "5.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "@fontsource-variable/reddit-sans": {
+    "wanted": "5.3.0",
+    "latest": "5.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "@fontsource/bebas-neue": {
+    "wanted": "5.3.0",
+    "latest": "5.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "@inertiajs/react": {
+    "wanted": "3.9.1",
+    "latest": "3.9.1",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "react": {
+    "wanted": "19.3.0",
+    "latest": "19.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  },
+  "react-dom": {
+    "wanted": "19.3.0",
+    "latest": "19.3.0",
+    "dependent": "VA-Studio-dependency-tooling"
+  }
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "number": 71,
+    "title": "build(deps): bump stripe/stripe-php from 21.3.2 to 22.0.0",
+    "head_sha": "93d6f1a3a08ab4aa0c6cc985365e85fb2fa1e794",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/71"
+  },
+  {
+    "number": 72,
+    "title": "build(deps): bump tecnickcom/tc-lib-pdf from 8.76.3 to 8.78.2",
+    "head_sha": "d71bbab16a36e028b7888f128bb3c57a683a980b",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/72"
+  },
+  {
+    "number": 73,
+    "title": "build(deps-dev): bump vite from 8.3.0 to 8.3.3",
+    "head_sha": "43513fd4ea2135952b699d076cc644c03193243c",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/73"
+  },
+  {
+    "number": 74,
+    "title": "build(deps): bump laravel/framework from 13.34.0 to 13.35.0",
+    "head_sha": "1d19d126812d1978cc293d60eaee0dcdb04c2c4c",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/74"
+  },
+  {
+    "number": 75,
+    "title": "build(deps): bump inertiajs/inertia-laravel from 3.3.4 to 3.5.1",
+    "head_sha": "31d351e985adf3763ec67d6b8af3503946a2a564",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/75"
+  },
+  {
+    "number": 76,
+    "title": "build(deps-dev): bump @types/node from 24.13.3 to 26.6.4",
+    "head_sha": "92bc22857d2f27cc12dcff8ff4ad6844e0cc1db1",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/76"
+  },
+  {
+    "number": 77,
+    "title": "build(deps): bump tecnickcom/tc-lib-pdf-font from 4.4.1 to 4.5.1",
+    "head_sha": "59a583d9e788d05bb93d97feea0f8d0bb0d0cfaf",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/77"
+  },
+  {
+    "number": 78,
+    "title": "build(deps-dev): bump vitest from 5.0.1 to 5.0.3",
+    "head_sha": "d69f625fe7aab2056eecd26ff6468b1d207d9f05",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/78"
+  },
+  {
+    "number": 79,
+    "title": "build(deps-dev): bump @vitejs/plugin-react from 6.1.1 to 6.1.2",
+    "head_sha": "892ec50d045334f0b550081f4a5c91d347c19b47",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/79"
+  },
+  {
+    "number": 80,
+    "title": "build(deps): bump @inertiajs/react from 3.7.1 to 3.8.0",
+    "head_sha": "c5825983eb4908268d603aa1429143fda2fd4f02",
+    "state": "open",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/80"
+  }
+]
