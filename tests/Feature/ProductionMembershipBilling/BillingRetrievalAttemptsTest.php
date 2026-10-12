@@ -4,7 +4,9 @@ namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Domain\Memberships\Billing\BillingReconciliation;
+use App\Domain\Memberships\Billing\BillingRetrievalAttempts;
 use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Billing\BillingValues;
 use Carbon\CarbonImmutable;
@@ -152,6 +154,47 @@ class BillingRetrievalAttemptsTest extends TestCase
         } catch (\LogicException) {
             $this->assertSame($before, $snapshot());
         }
+    }
+
+    public static function wrongHints(): array
+    {
+        return [['invoice'], ['account'], ['late']];
+    }
+
+    #[DataProvider('wrongHints')]
+    public function test_existing_wrong_scope_or_late_hint_is_refused_by_writer_and_database(string $kind): void
+    {
+        $binding = F::binding();
+        $ledger = new BillingLedger;
+        $configuration = (new BillingPolicy)->current();
+        $verified = $ledger->binding($binding['id'], $configuration);
+        $start = $kind === 'late' ? $ledger->startRetrieval() : null;
+        $hintPosition = DB::transaction(fn () => $ledger->position('hint'));
+        $start ??= $ledger->startRetrieval();
+        $end = $ledger->endRetrieval($start);
+        $invoiceHash = BillingValues::hash('invoice', F::ACCOUNT, 'test', F::INVOICE);
+        $hint = ['id' => BillingValues::id(), 'provider_event_ref_hash' => hash('sha256', 'synthetic attempt hint '.$kind),
+            'type' => 'invoice.paid', 'mode' => 'test',
+            'provider_account_hash' => $kind === 'account' ? BillingValues::hash('provider-account', 'acct_OTHERSYNTHETIC', 'test', 'acct_OTHERSYNTHETIC') : $binding['provider_account_hash'],
+            'invoice_ref_hash' => $kind === 'invoice' ? BillingValues::hash('invoice', F::ACCOUNT, 'test', 'in_OTHERSYNTHETIC') : $invoiceHash,
+            'received_at' => '2026-10-07 00:00:00', 'hint_position' => $hintPosition,
+            'payload_hash' => hash('sha256', 'synthetic attempt hint body'), 'disposition' => 'retrieval_hint',
+            'payload_ciphertext' => BillingValues::encrypt(['purpose' => 'synthetic_attempt_hint_fixture']), 'created_at' => '2026-10-07 00:00:00'];
+        $hint['seal'] = BillingValues::seal($hint);
+        $pdo = DB::connection()->getPdo();
+        $pdo->prepare('INSERT INTO production_membership_billing_events ('.implode(', ', array_keys($hint)).') VALUES ('.implode(', ', array_fill(0, count($hint), '?')).')')->execute(array_values($hint));
+        $this->refusal(fn () => (new BillingRetrievalAttempts)->record($verified, F::INVOICE, 'provider_unavailable', $start, $end, $hint['id'], $configuration), 'attempt_hint');
+
+        $row = ['id' => BillingValues::id(), 'subscription_binding_id' => $binding['id'], 'invoice_ref_hash' => $invoiceHash,
+            'provider_account_hash' => $binding['provider_account_hash'], 'mode' => 'test', 'provenance' => $binding['provenance'],
+            'hint_event_id' => $hint['id'], 'retrieval_position' => $start, 'retrieval_end_position' => $end,
+            'outcome' => 'unknown', 'reason' => 'provider_unavailable',
+            'payload_ciphertext' => BillingValues::encrypt(['purpose' => 'synthetic_attempt_fixture']), 'created_at' => '2026-10-07 00:00:00'];
+        $row['seal'] = BillingValues::seal($row);
+        $this->pdoRefuses(fn () => $this->insert($row));
+        $this->assertSame(0, DB::table(self::TABLE)->count());
+        $this->assertSame(1, DB::table('production_membership_billing_events')->count());
+        $this->assertSame(0, DB::table('production_membership_billing_invoices')->count());
     }
 
     private function refusal(callable $operation, string $reason): void
