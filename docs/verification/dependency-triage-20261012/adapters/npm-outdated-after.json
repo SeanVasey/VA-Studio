@@ -1,0 +1,51 @@
+{
+  "@inertiajs/react": {
+    "current": "3.8.0",
+    "wanted": "3.9.1",
+    "latest": "3.9.1",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/@inertiajs/react"
+  },
+  "@playwright/test": {
+    "current": "1.63.0",
+    "wanted": "1.63.0",
+    "latest": "1.64.0",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/@playwright/test"
+  },
+  "@types/node": {
+    "current": "24.13.3",
+    "wanted": "24.19.2",
+    "latest": "26.6.5",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/@types/node"
+  },
+  "@types/react-dom": {
+    "current": "19.2.7",
+    "wanted": "19.3.0",
+    "latest": "19.3.0",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/@types/react-dom"
+  },
+  "jsdom": {
+    "current": "30.0.1",
+    "wanted": "30.0.1",
+    "latest": "30.1.2",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/jsdom"
+  },
+  "vite": {
+    "current": "8.3.3",
+    "wanted": "8.3.4",
+    "latest": "8.3.4",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/vite"
+  },
+  "vitest": {
+    "current": "5.0.3",
+    "wanted": "5.0.3",
+    "latest": "5.0.4",
+    "dependent": "VA-Studio-dependency-adapters",
+    "location": "WORKTREE/node_modules/vitest"
+  }
+}

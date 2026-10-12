@@ -1,0 +1,1 @@
+PASS: all 14 test-v2 package version/reference identities match the installed candidate lock. Stripe full Composer package record is unchanged. No composer.json, resources/contracts, app or tests diff against merged main 0b4a2e76fd2ffc414863a1ba97b9354c9ec4cde8.

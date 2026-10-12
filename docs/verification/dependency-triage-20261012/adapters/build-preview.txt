@@ -1,0 +1,20 @@
+
+> build:preview
+> tsc --noEmit && vite build --config vite.preview.config.ts
+
+vite v8.3.3 building client environment for production...
+transforming...
+✓ 608 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/design-preview/index.html                                                       0.43 kB │ gzip:   0.30 kB
+dist/design-preview/manifest.json                                                    2.28 kB │ gzip:   0.42 kB
+dist/design-preview/assets/bebas-neue-latin-400-normal-Bi-ndsyu.woff                11.18 kB
+dist/design-preview/assets/bebas-neue-latin-400-normal-9mHNbWWO.woff2               13.76 kB
+dist/design-preview/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2          40.40 kB
+dist/design-preview/assets/reddit-sans-latin-wght-normal-BY_1BeEl.woff2             41.84 kB
+dist/design-preview/assets/noto-sans-display-latin-standard-normal-BzqLAgZu.woff2   69.91 kB
+dist/design-preview/assets/index-CRbBVXsm.css                                       41.99 kB │ gzip:   8.74 kB
+dist/design-preview/assets/index-D2iO3GuN.js                                       498.08 kB │ gzip: 146.09 kB
+
+✓ built in 242ms
