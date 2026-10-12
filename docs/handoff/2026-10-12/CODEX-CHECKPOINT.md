@@ -24,7 +24,7 @@ The integrated T23 committed APIs exist. C2 still needs transaction-bound paid-i
 
 PR #109 P2 [r4253341984](https://github.com/SeanVasey/VA-Studio/pull/109#discussion_r4253341984) remains open for the next membership batch: reserve retrieval endpoints across attempts and observations, in both insertion directions, with endpoint-combination and native concurrency coverage. One deferral reply was posted. The independent reviewer explicitly retained development APPROVE at the final head, with no P0/P1; current reconciliation allocates fresh intervals through mutually exclusive write paths, and attempts supply no paid authority. This addendum supersedes the earlier no-actionable-findings statement for this P2.
 
-Carried CP-2/CP-3/P1B-1, R-4/R-5/A1-5, L2-1 and other membership activation conditions remain open. Follow the original handoff order after C2: A2, B4/B5, D1 conditions, remaining domain MFA writers, then fixture normalization. Foundation stays manual exact-SHA final verification, only when Sean requests a candidate. No GitLab dispatch was made.
+Carried CP-2/CP-3/P1B-1, R-4/R-5/A1-5, L2-1 and other membership activation conditions remain open. Follow the original handoff order after C2: A2, B4/B5, D1 conditions, remaining domain MFA writers, then fixture normalization. The final integrated candidate requires one complete manual Foundation CI run at its exact reviewed 40-character SHA (or additional runs only as actual failures or new source require). Development merges continue with focused local checks and cheap preflight; they do not establish final acceptance. No GitLab dispatch was made.
 
 ## Environment and boundaries
 
