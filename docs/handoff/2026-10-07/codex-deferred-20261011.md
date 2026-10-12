@@ -39,3 +39,12 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 ## #99 dependency tooling, October 12
 - Merged at `0b4a2e76fd2ffc414863a1ba97b9354c9ec4cde8` from exact reviewed head `027c674194c1b8b5c5a20231a6d805523413f855`; preflight `38319085298` passed. No review threads or open P0/P1 at merge.
 - #73/#78/#79 closed as superseded; #76 closed for the Node runtime mismatch. #71/#72/#77 remain deferred/unmerged; #74/#75/#80 are the next paired Laravel/Inertia batch. Newer available dependency versions remain a later coherent batch; do not chase them in this frozen graph.
+
+## #108 Laravel/Inertia batch, October 12
+- Merged at `3ab71dd354199e86625ac6878564b9c7334fba43` from exact head `c28fb81b0c5fcf6fb0823c51f220ea1e3fac78f6`; independent APPROVE carried to the receipt-only head, preflight `38320089400` passed, no review threads or open P0/P1 at merge.
+- #74/#75/#80 closed as superseded. Stripe #71 and frozen renderer #72/#77 remain unmerged. Browser history restoration and completed prior-runtime upgrade remain coverage limits; no demonstrated regression was found.
+- C2 begins with its carried A1-4 durable first-attempt record condition and the matching-binding invoice-id regression; current direct predicate coverage already exists. These are development prerequisites, not a claim that an award/reservation writer exists.
+
+## C2 prerequisite batch, October 12
+- A1-4 durable first-attempt record and L2-4 matching-binding invoice-ID coverage are implemented at application source `46e91e50`; test-only follow-ups `4b0dd809` and `1a14437e` strengthen hint validation and repair two test fixtures. Native CHECK dictionary normalization is corrected at `dfbd0ba0` after the initial setup failure; no table definition or guard changed in that correction. Final native20/217 and combined SQLite198distinct/1070 with5declared skips are recorded in `docs/verification/membership-c2-20261012/`; separate independent APPROVE at `f1b3c71b`. Receipt/status carry and exact-head preflight remain before merge.
+- CP-2/CP-3/P1B-1, R-4/R-5/A1-5, L2-1 and other carried membership activation conditions remain open. New attempts do not supply paid-invoice authority, cover webhook hints, or implement C2 credit writers.

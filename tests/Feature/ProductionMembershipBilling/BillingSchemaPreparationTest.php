@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Production\MembershipSchema;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,7 @@ use LogicException;
 use PDOException;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\RehearsalBillingGateway;
 use Tests\TestCase;
 
 /** Structural synthetic rows only; no row here is a subscription approval, a paid invoice or an award. */
@@ -36,16 +38,22 @@ class BillingSchemaPreparationTest extends TestCase
         $this->assertStringNotContainsString('production_identity_', (string) $sql);
     }
 
-    public function test_bindings_invoices_observations_events_and_positions_are_immutable(): void
+    public function test_bindings_invoices_observations_events_positions_and_attempts_are_immutable(): void
     {
         F::configure();
         $binding = F::binding();
         $invoice = $this->invoice($binding);
         $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown'));
         $this->insert(BillingSchema::TABLES[3], $this->event());
+        try {
+            (new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')))->retrieve($binding['id'], F::INVOICE);
+            $this->fail('The first failure retains an attempt, not an invoice.');
+        } catch (BillingException $error) {
+            $this->assertSame('provider_unavailable', $error->reason);
+        }
         $pdo = DB::connection()->getPdo();
-        // One row each, and three positions: the observation's retrieval start and end and the event's hint.
-        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 3]) as $table => $count) {
+        // One row each, and five positions: two per observation/attempt plus the event's hint.
+        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 5, 1]) as $table => $count) {
             $this->assertSame($count, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
             $this->pdoRefuses(fn () => $pdo->exec('UPDATE '.$table.' SET created_at = created_at'));
             $this->pdoRefuses(fn () => $pdo->exec('DELETE FROM '.$table));
@@ -208,6 +216,8 @@ class BillingSchemaPreparationTest extends TestCase
     public function test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted(): void
     {
         $pdo = DB::connection()->getPdo();
+        // The new attempts table follows positions: remove that empty tail before its guard.
+        $pdo->exec('DROP TABLE production_membership_billing_attempts');
         $pdo->exec('DROP TRIGGER production_membership_billing_positions_delete');
         (new BillingSchema)->up();
         $this->assertTrue($this->guardExists('production_membership_billing_positions_delete'));

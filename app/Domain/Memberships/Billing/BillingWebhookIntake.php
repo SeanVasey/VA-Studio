@@ -103,7 +103,7 @@ final class BillingWebhookIntake
             $binding = (new BillingHintRecovery)->bindingForHint($type, $invoiceRef, $subscriptionRef, $account, $mode);
             if ($binding !== null) {
                 $scheduled = ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
-                RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
+                RetrieveMembershipInvoice::dispatch($binding, $invoiceRef, $row['id']);
             }
         }
 
@@ -126,7 +126,7 @@ final class BillingWebhookIntake
             return null;
         }
         $policy->proveConfiguration($configuration);
-        RetrieveMembershipInvoice::dispatch($pending['binding_id'], $pending['invoice_ref']);
+        RetrieveMembershipInvoice::dispatch($pending['binding_id'], $pending['invoice_ref'], $event['id']);
 
         return $pending;
     }

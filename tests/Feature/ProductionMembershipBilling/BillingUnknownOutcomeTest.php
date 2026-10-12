@@ -14,7 +14,7 @@ use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\RehearsalBillingGateway;
 use Tests\TestCase;
 
-/** A timeout is retained as `unknown` under an invoice identity the binding already owns; a first one leaves no row. Nothing settles, awards or reverses. */
+/** A timeout is retained under an owned identity, or as a non-identity first attempt. Nothing settles, awards or reverses. */
 class BillingUnknownOutcomeTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
@@ -38,7 +38,7 @@ class BillingUnknownOutcomeTest extends TestCase
     }
 
     #[DataProvider('stages')]
-    public function test_first_timeout_leaves_no_ledger_row_and_a_later_one_is_appended_under_the_owned_identity(string $stage): void
+    public function test_first_timeout_leaves_no_invoice_row_and_a_later_one_is_appended_under_the_owned_identity(string $stage): void
     {
         $binding = F::binding();
         $ledger = new BillingLedger;
@@ -73,7 +73,7 @@ class BillingUnknownOutcomeTest extends TestCase
         $right = F::binding();
         try {
             (new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')))->retrieve($wrong['id'], F::INVOICE);
-            $this->fail('An unvalidated first retrieval records nothing.');
+            $this->fail('An unvalidated first retrieval must still refuse invoice ownership.');
         } catch (BillingException $error) {
             $this->assertSame('provider_unavailable', $error->reason);
         }
@@ -90,7 +90,7 @@ class BillingUnknownOutcomeTest extends TestCase
         unset($ambiguous['charges'][F::CHARGE]);
         try {
             (new BillingReconciliation(new RehearsalBillingGateway($ambiguous)))->retrieve($binding['id'], F::INVOICE);
-            $this->fail('A first ambiguous retrieval records nothing.');
+            $this->fail('A first ambiguous retrieval cannot claim invoice ownership.');
         } catch (BillingException $error) {
             $this->assertSame('provider_inconsistent', $error->reason);
         }

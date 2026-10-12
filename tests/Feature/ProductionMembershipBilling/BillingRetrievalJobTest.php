@@ -109,18 +109,57 @@ class BillingRetrievalJobTest extends TestCase
         $job->assertNotFailed();
     }
 
-    public function test_a_first_retrieval_that_ends_unknown_throws_so_the_queue_retries_and_writes_nothing(): void
+    public function test_a_first_retrieval_that_ends_unknown_retains_an_attempt_and_throws_so_the_queue_retries(): void
     {
         $binding = F::binding();
         $job = (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->withFakeQueueInteractions();
         try {
             $job->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')));
-            $this->fail('A first unknown retrieval is retried by the queue, not recorded.');
+            $this->fail('A first unknown retrieval retains diagnostic evidence and is retried by the queue.');
         } catch (BillingException $error) {
             $this->assertSame('provider_unavailable', $error->reason);
         }
         $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $this->assertSame(1, DB::table('production_membership_billing_attempts')->count());
         $job->assertNotReleased();
+    }
+
+    public function test_first_incomplete_retrieval_keeps_a_refused_attempt_and_still_throws_for_retry(): void
+    {
+        $binding = F::binding();
+        $job = (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->withFakeQueueInteractions();
+        try {
+            $job->handle(new BillingReconciliation($this->incompleteGateway()));
+            $this->fail('First incomplete retrievals retain evidence but remain retryable failures.');
+        } catch (BillingException $error) {
+            $this->assertSame('provider_incomplete', $error->reason);
+        }
+        $attempt = DB::table('production_membership_billing_attempts')->sole();
+        $this->assertSame(['refused', 'provider_incomplete', null], [$attempt->outcome, $attempt->reason, $attempt->hint_event_id]);
+        $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
+        $job->assertNotReleased();
+    }
+
+    public function test_older_serialized_job_without_the_new_hint_property_remains_a_direct_retrieval(): void
+    {
+        $binding = F::binding();
+        $current = new RetrieveMembershipInvoice($binding['id'], F::INVOICE);
+        $legacy = (new \ReflectionClass(RetrieveMembershipInvoice::class))->newInstanceWithoutConstructor();
+        (new \ReflectionProperty(RetrieveMembershipInvoice::class, 'bindingId'))->setValue($legacy, $binding['id']);
+        $sealed = new \ReflectionProperty(RetrieveMembershipInvoice::class, 'sealedInvoiceRef');
+        $sealed->setValue($legacy, $sealed->getValue($current));
+        $this->assertFalse((new \ReflectionProperty(RetrieveMembershipInvoice::class, 'hintEventId'))->isInitialized($legacy));
+        $payload = serialize($legacy);
+        $this->assertStringNotContainsString('hintEventId', $payload);
+        $this->assertStringNotContainsString(F::INVOICE, $payload);
+        $job = unserialize($payload, ['allowed_classes' => [RetrieveMembershipInvoice::class]]);
+        try {
+            $job->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')));
+            $this->fail('The old job shape must reach the same retryable provider failure.');
+        } catch (BillingException $error) {
+            $this->assertSame('provider_unavailable', $error->reason);
+        }
+        $this->assertNull(DB::table('production_membership_billing_attempts')->sole()->hint_event_id);
     }
 
     /**

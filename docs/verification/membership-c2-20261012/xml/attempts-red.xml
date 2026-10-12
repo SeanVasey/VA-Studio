@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" tests="7" assertions="14" errors="0" failures="7" skipped="0" time="10.411649">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed" tests="7" assertions="14" errors="0" failures="7" skipped="0" time="10.411649">
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #0" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.752778">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #0
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #1" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.372907">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #1
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #2" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.439177">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #2
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #3" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.434548">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #3
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #4" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.449508">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #4
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #5" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.499491">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #5
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #6" file="/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php" line="43" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalAttemptsTest" assertions="2" time="1.463239">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalAttemptsTest::test_first_timeout_is_retained_without_claiming_an_invoice_and_retry_can_succeed with data set #6
+First unsuccessful retrievals need durable, non-identity attempt records.
+Failed asserting that false is true.
+
+/workspace/VA-Studio-membership-c2/tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -38,7 +38,7 @@ final class BillingHintSweep
      * counts the examined hints that need no retrieval (covered, unbound or not routable). `next` is the cursor that continues after
      * the last examined hint, or null when no hint follows it.
      *
-     * @return array{examined: int, truncated: bool, next: ?string, pending: list<array{event_hash: string, type: string, received_at: string, invoice_hash: string, binding_id: string, invoice_ref: string}>, settled: int}
+     * @return array{examined: int, truncated: bool, next: ?string, pending: list<array{hint_event_id: string, event_hash: string, type: string, received_at: string, invoice_hash: string, binding_id: string, invoice_ref: string}>, settled: int}
      */
     public function scan(int $limit, array $configuration, ?string $after = null): array
     {
@@ -68,7 +68,7 @@ final class BillingHintSweep
             $last = $row;
             $need = $recovery->pending($row, $configuration);
             if ($need !== null) {
-                $pending[] = ['event_hash' => $row['provider_event_ref_hash'], 'type' => $row['type'], 'received_at' => $row['received_at'],
+                $pending[] = ['hint_event_id' => $row['id'], 'event_hash' => $row['provider_event_ref_hash'], 'type' => $row['type'], 'received_at' => $row['received_at'],
                     'invoice_hash' => $row['invoice_ref_hash'], 'binding_id' => $need['binding_id'], 'invoice_ref' => $need['invoice_ref']];
             }
         }
@@ -81,7 +81,7 @@ final class BillingHintSweep
      * Pages of `$limit` hints from `$after` until no hint follows or `sweepBound` hints were examined. `truncated` then means the
      * bound stopped the scan and `next` continues it. Every page re-checks seals and coverage exactly as scan() does.
      *
-     * @return array{examined: int, pages: int, truncated: bool, next: ?string, pending: list<array{event_hash: string, type: string, received_at: string, invoice_hash: string, binding_id: string, invoice_ref: string}>, settled: int}
+     * @return array{examined: int, pages: int, truncated: bool, next: ?string, pending: list<array{hint_event_id: string, event_hash: string, type: string, received_at: string, invoice_hash: string, binding_id: string, invoice_ref: string}>, settled: int}
      */
     public function scanAll(int $limit, array $configuration, ?string $after = null): array
     {
@@ -105,7 +105,7 @@ final class BillingHintSweep
      * Queues one retrieval per distinct uncovered invoice (several uncovered hints of one invoice need one retrieval that begins
      * after all of them). Returns how many were queued.
      *
-     * @param  list<array{binding_id: string, invoice_hash: string, invoice_ref: string}>  $pending
+     * @param  list<array{hint_event_id: string, binding_id: string, invoice_hash: string, invoice_ref: string}>  $pending
      */
     public function dispatch(array $pending, array $configuration, BillingPolicy $policy): int
     {
@@ -116,7 +116,7 @@ final class BillingHintSweep
             }
             $seen[$hint['invoice_hash']] = true;
             $policy->proveConfiguration($configuration);
-            RetrieveMembershipInvoice::dispatch($hint['binding_id'], $hint['invoice_ref']);
+            RetrieveMembershipInvoice::dispatch($hint['binding_id'], $hint['invoice_ref'], $hint['hint_event_id']);
         }
 
         return count($seen);

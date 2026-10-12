@@ -1,5 +1,7 @@
 # Membership operative lane 2 (R-1, R-6, A1-1 to A1-4)
 
+October 12 follow-up: the historical first-retrieval "writes nothing" behavior and durable-record A1-4 condition below are superseded by the [C2 prerequisite batch](../membership-c2-20261012/README.md). That packet records the current immutable attempt behavior, exact verification results and remaining boundaries. This document preserves the October 8 evidence.
+
 - Branch `harness/membership-operative-2`, worktree `/home/user/VA-Studio-member-ops2`, created at `2bd78cce` (head of PR #51).
 - Nothing is committed or pushed by this lane; the integration owner commits the working tree.
 - Date: 2026-10-08 (UTC). PHP 8.4.26, PHPUnit 12.5.34, SQLite `:memory:`, MySQL 8.4.11 (private instance, port 3741).
