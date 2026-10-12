@@ -180,7 +180,8 @@ class RightsScopeWriterConcurrencyTest extends TestCase
         $primary = DB::connection();
         $this->assertSame(0, $primary->transactionLevel());
         $this->assertSame('REPEATABLE-READ', $primary->selectOne('SELECT @@transaction_isolation AS isolation_level')->isolation_level);
-        config(['database.connections.attestation_consumer' => $primary->getConfig()]);
+        // Eloquent writes use the connection's configured name, so do not retain the primary's name.
+        config(['database.connections.attestation_consumer' => array_replace($primary->getConfig(), ['name' => 'attestation_consumer'])]);
         $consumer = DB::connection('attestation_consumer');
         $this->assertNotSame((int) $primary->selectOne('SELECT CONNECTION_ID() AS id')->id,
             (int) $consumer->selectOne('SELECT CONNECTION_ID() AS id')->id);
