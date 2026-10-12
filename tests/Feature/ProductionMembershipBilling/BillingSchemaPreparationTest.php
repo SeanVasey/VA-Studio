@@ -216,6 +216,8 @@ class BillingSchemaPreparationTest extends TestCase
     public function test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted(): void
     {
         $pdo = DB::connection()->getPdo();
+        // The new attempts table follows positions: remove that empty tail before its guard.
+        $pdo->exec('DROP TABLE production_membership_billing_attempts');
         $pdo->exec('DROP TRIGGER production_membership_billing_positions_delete');
         (new BillingSchema)->up();
         $this->assertTrue($this->guardExists('production_membership_billing_positions_delete'));
