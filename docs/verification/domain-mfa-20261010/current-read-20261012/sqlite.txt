@@ -1,7 +1,7 @@
 PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
 
 Runtime:       PHP 8.4.26
-Configuration: <sqlite-worktree>/phpunit.xml
+Configuration: SQLITE_WORKTREE/phpunit.xml
 
 Time: 01:43.164, Memory: 99.00 MB
 

@@ -53,7 +53,7 @@ test_xmlwriter_is_allowed_but_write_and_write_all_permissions_are_rejected (__ma
 FAIL: test_track_discovery_has_exact_bounded_files_and_only_new_native_scenarios (__main__.SelectionTests.test_track_discovery_has_exact_bounded_files_and_only_new_native_scenarios)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "<worktree>/scripts/ci/test-focused-tests.py", line 140, in test_track_discovery_has_exact_bounded_files_and_only_new_native_scenarios
+  File "WORKTREE/scripts/ci/test-focused-tests.py", line 140, in test_track_discovery_has_exact_bounded_files_and_only_new_native_scenarios
     self.assertEqual(__import__("hashlib").sha256(original).hexdigest(), "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c")
 AssertionError: '00429acabf13528030752ffdc3e24aa34f561511ca9460544e70bb6561442358' != 'd93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c'
 - 00429acabf13528030752ffdc3e24aa34f561511ca9460544e70bb6561442358

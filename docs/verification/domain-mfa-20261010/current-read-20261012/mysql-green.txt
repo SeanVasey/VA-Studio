@@ -1,7 +1,7 @@
 PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
 
 Runtime:       PHP 8.4.26
-Configuration: <worktree>/phpunit.xml
+Configuration: WORKTREE/phpunit.xml
 
 Time: 03:25.599, Memory: 100.00 MB
 
