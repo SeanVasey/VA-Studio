@@ -8,6 +8,7 @@ use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Rights\SaveRightsDeclaration;
 use App\Domain\Rights\VerifyRightsDeclaration;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
@@ -166,6 +168,55 @@ class RightsScopeWriterConcurrencyTest extends TestCase
         } else {
             $this->assertNull($current->email_verified_at);
         }
+    }
+
+    public function test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $key = 'synthetic-attestation-snapshot';
+        $reference = 'SYNTHETIC-ATTESTATION-SNAPSHOT';
+        $attestation = StaffWriteAuthority::attest($actor, 'vasey:rights-scope', 'register', $key, null, $reference);
+        $primaryName = DB::getDefaultConnection();
+        $primary = DB::connection();
+        $this->assertSame(0, $primary->transactionLevel());
+        $this->assertSame('REPEATABLE-READ', $primary->selectOne('SELECT @@transaction_isolation AS isolation_level')->isolation_level);
+        // Eloquent writes use the connection's configured name, so do not retain the primary's name.
+        config(['database.connections.attestation_consumer' => array_replace($primary->getConfig(), ['name' => 'attestation_consumer'])]);
+        $consumer = DB::connection('attestation_consumer');
+        $this->assertNotSame((int) $primary->selectOne('SELECT CONNECTION_ID() AS id')->id,
+            (int) $consumer->selectOne('SELECT CONNECTION_ID() AS id')->id);
+        $consumptions = fn () => AuditEvent::where('action', StaffWriteAuthority::CONSUMPTION_ACTION)
+            ->where('subject_type', AuditEvent::class)->where('subject_id', $attestation->auditEventId)->count();
+        $evidence = fn () => [
+            DB::table('rights_scopes')->orderBy('id')->get()->toJson(),
+            DB::table('audit_events')->orderBy('id')->get()->toJson(),
+        ];
+        $primary->beginTransaction();
+        try {
+            $this->assertSame(0, $consumptions()); // Establish a consistent snapshot before the other commit.
+            DB::setDefaultConnection('attestation_consumer');
+            app(ManageRightsScope::class)->register($key, $reference, $actor, $attestation);
+            $this->assertSame(0, $consumer->transactionLevel());
+            $this->assertSame(1, $consumptions());
+            $winnerEvidence = $evidence();
+            DB::setDefaultConnection($primaryName);
+            $this->assertSame(0, $consumptions(), 'The original consistent read must still hide the committed marker.');
+            $refusal = null;
+            try {
+                app(ManageRightsScope::class)->register($key, $reference, $actor, $attestation);
+            } catch (AuthorizationException $exception) {
+                $refusal = $exception->getMessage();
+            }
+            $this->assertSame(StaffWriteAuthority::REFUSAL, $refusal);
+            $this->assertSame(1, $primary->transactionLevel());
+        } finally {
+            DB::setDefaultConnection($primaryName);
+            $primary->rollBack();
+            DB::purge('attestation_consumer');
+        }
+        $this->assertSame(0, $primary->transactionLevel());
+        $this->assertSame(1, $consumptions());
+        $this->assertSame($winnerEvidence, $evidence());
     }
 
     private function race(array $inputs, callable $coordinate): void

@@ -30,7 +30,7 @@ production outright; this note is about staging, the hosted rehearsal that staff
 | Attacker with host shell and a staff password runs `vasey:rights-scope` in staging | Write completed with the password alone | Refused without `--attest`; with it, an append-only audit row names the operator, time, action, scope, revision, environment and enrollment state before the write, and the write's own audit event links to it. The flag is deterrence and attribution, not a cryptographic factor: shell access to the host remains the controlling credential |
 | Attestation reused for another scope, revision, action or operator | n/a | Refused: the domain binds the attestation to the exact write inside its transaction |
 | One attestation reused for a second write: block then unblock, a further versioned change, or a replay of the same write (Codex P2 r4240117094) | Admitted for 900 s: the value bound only operator, action, scope key and (null) revision | Refused since the 2026-10-11 follow-up. The attestation also binds the requested blocked state, expected control version and a keyed hash (HMAC-SHA256 under the application key) of the evidence reference, in the value and in its audit row; and the first admitted write appends a `staff.console_attestation_consumed` audit row (subject: the attestation's row) in its own transaction, after which every use is refused with `REFUSAL`. Audit rows stay append-only; the marker is a new row. A write refused after admission rolls the marker back with it, so the same attestation can then retry only the identical operation it binds |
-| Two concurrent uses of one attestation | n/a | Every use first locks the same operator row FOR UPDATE (the binding requires that operator), so the second waits for the first transaction and then sees its consumption row. **Residual:** the already-used check is a plain read; on MySQL a caller that opened an outer transaction with an older REPEATABLE READ snapshot, and obtained the same in-memory value in a second connection, could miss a concurrent consumption. The value cannot be built outside `attest()` (private constructor), and the full-operation binding limits any such reuse to the identical operation, which the domain treats idempotently (register and link return the existing row; block fails `INVENTORY_CONTROL_CONFLICT` once the version moved). Not exercised on MySQL |
+| Two concurrent uses of one attestation | n/a | Every use first locks the same operator row FOR UPDATE (the binding requires that operator). The 2026-10-12 batch also reads the consumption marker FOR UPDATE, so it sees a committed use even when the caller already holds an older REPEATABLE READ snapshot. The operator lock remains necessary to serialize the absent-marker check and insertion; the audit table has no unique consumption key. See the dated batch evidence for the native regression and its limits |
 | Attestation object kept alive and reused later | n/a | Refused once spent (above) and in any case after 900 seconds (`ATTESTATION_LIFETIME_SECONDS`) |
 | Attestation recorded inside a transaction that rolled back | n/a | Refused: the domain re-reads the audit row before admitting |
 | Attestation whose audit row was changed underneath (the model is append-only, the table is not) to name another scope, action or revision | n/a | Refused since `fb4dce8`: `recorded()` requires the row's `action`, `scope_key` and `offer_revision_id` to match the value being admitted, not only the row's existence and actor; since the 2026-10-11 follow-up also `reference_hmac`, `blocked` and `expected_version` |
@@ -43,13 +43,15 @@ production outright; this note is about staging, the hosted rehearsal that staff
 - Neither service verifies a TOTP code at call time; no domain service in this repository does. A fresh per-request
   step-up would be a separate design (and a new session artefact) that this change deliberately does not introduce.
 - `local` and `testing` keep enrollment optional by the existing policy; a developer host is not a networked panel.
-- The reference hash is keyed by the application key, so the audit row does not expose a guessable reference to
-  someone who can read audit history but not the key. An attestation recorded before a key rotation and used after it
-  is refused (fail closed); it lives 900 seconds.
+- The attestation uses HMAC-SHA256 under the application key to bind the evidence reference without copying it
+  into that attestation row. This is not a confidentiality guarantee for the whole audit history: existing
+  `commerce.inventory.control_changed` events retain an unkeyed SHA-256 reference hash, and rights tables retain
+  the reference in plain text. A key rotation invalidates an existing attestation immediately, including within
+  its 900-second lifetime.
 - The console attestation is explicit and audited, not strong authentication. The staging runbook's host access
   controls remain the control for the console path, for `artisan tinker` and for any other code run on the host.
 - C2 is closed for `PromotionAdministration` and `ManageRightsScope` only. `app/Domain/Catalog/PrepareExclusiveOffer.php`
   still links a rights scope with only the gate and environment checks (no app or route caller today), and the
   panel-only catalog writers still rely on the panel's page middleware.
-- Not exercised here: a real staging host, a real console session, browser flows, Stripe, MySQL 8.4 (this container has
-  8.0.46 only).
+- The original October 10 evidence used MySQL 8.0.46. Later native evidence is recorded separately in the dated
+  batch README; it does not establish real staging-host, interactive-console, browser or Stripe behavior.

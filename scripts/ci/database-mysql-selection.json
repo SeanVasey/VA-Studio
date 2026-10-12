@@ -69,6 +69,8 @@
     "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
     "tests/Feature/ReviewedLicenseDraftTest.php",
     "tests/Feature/ReviewedOfferDraftTest.php",
+    "tests/Feature/RightsScopeCommandAttestationTest.php",
+    "tests/Feature/RightsScopeStaffMfaTest.php",
     "tests/Feature/ServiceProjectSchemaTest.php",
     "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",

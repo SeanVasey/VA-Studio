@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\RightsScopeWriterConcurrencyTest" file="WORKTREE/tests/Feature/RightsScopeWriterConcurrencyTest.php" tests="1" assertions="8" errors="0" failures="1" skipped="0" time="58.929453">
+    <testcase name="test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot" file="WORKTREE/tests/Feature/RightsScopeWriterConcurrencyTest.php" line="173" class="Tests\Feature\RightsScopeWriterConcurrencyTest" classname="Tests.Feature.RightsScopeWriterConcurrencyTest" assertions="8" time="58.929453">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot
+Failed asserting that null is identical to 'Staff multi-factor authentication is required for this write.'.
+
+WORKTREE/tests/Feature/RightsScopeWriterConcurrencyTest.php:210
+SHARED_VENDOR/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

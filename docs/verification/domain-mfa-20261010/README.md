@@ -176,8 +176,7 @@ deferred above (`docs/handoff/2026-10-07/codex-deferred-20261011.md`, #92). Evid
 `evidence/followup-20261011-red-green.txt` (SQLite only; no MySQL server was started).
 
 - **r4240117094, bind and spend the attestation.** Both remedies, because neither alone is complete without a schema
-  change. `attest()` now records a keyed hash (HMAC-SHA256 under the application key; the reference itself never
-  appears) of the evidence reference and, for `block`, the requested blocked state and expected control version
+  change. `attest()` now records a keyed hash (HMAC-SHA256 under the application key; this attestation row does not contain the reference itself) of the evidence reference and, for `block`, the requested blocked state and expected control version
   (context `schema_version` 2). `binds()` checks them against the write and `recorded()` checks them against the
   audit row. `requireFor()` then spends the attestation: inside the write's transaction it refuses with `REFUSAL`
   when a `staff.console_attestation_consumed` audit row already names it (subject: the attestation's own row) and
@@ -203,6 +202,18 @@ deferred above (`docs/handoff/2026-10-07/codex-deferred-20261011.md`, #92). Evid
 | Pint `--test` on the five changed PHP files; `git diff --check` | `772fff1` | passed; clean |
 | `phpunit-shards.py --shards=8 ... --mysql-native-selection` | `772fff1` | rc 0: selection unchanged at 1,820 cases in 164 files; discovered total 7,791 to 7,795, so the comment in `.github/workflows/final-verification.yml` moves to 7795 |
 
-Not tested, not claimed: native MySQL of the new path (the already-used check is a plain read under the operator's
-row lock; see the THREAT-NOTE residual on an older REPEATABLE READ snapshot), MySQL's JSON round trip of the new
+Not tested in the October 11 round: native MySQL of that path (then a plain consumption read under the operator's
+row lock; the October 12 batch addresses older REPEATABLE READ snapshots), MySQL's JSON round trip of the new
 `blocked` and `expected_version` fields in `recorded()`, a real staging console, and anything beyond focused checks.
+
+
+## Current consumption read and native attestation coverage (2026-10-12)
+
+The [dated batch packet](current-read-20261012/README.md) supersedes the October 11 current-read residual and
+MySQL-not-tested limitation for its recorded focused source. The real register caller can already be nested in an
+older snapshot. Its consumption check now uses a current locking read while retaining the operator lock and atomic
+rollback. On private MySQL 8.4.11 the regression fails on old application source (1/8, one intended failure) and the
+fixed selection passes (21/381, no skips), including both complete attestation files. Focused SQLite passes 72 of
+83 cases with 918 assertions and 11 declared native-only skips. Both attestation files are also in the native
+selection. See the packet for exact commands, source hashes, unsuccessful attempts and review conditions. No host
+or full Foundation acceptance is claimed.

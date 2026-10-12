@@ -1,0 +1,9 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: SQLITE_WORKTREE/phpunit.xml
+
+Time: 01:43.164, Memory: 99.00 MB
+
+OK, but some tests were skipped!
+Tests: 83, Assertions: 918, Skipped: 11.

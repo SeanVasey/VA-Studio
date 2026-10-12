@@ -14,7 +14,7 @@ Codex reviews every new commit (its summary shows the "New commits" trigger), wh
 owner's Codex settings, not in this repository.
 
 ## #90 importer
-- **Batch: PR #96.** The historical `2aba5be` rejection is preserved in `docs/handoff/2026-10-11/importer-h1/README.md`. H1 correction and the related findings are verified at application/test source `a4bc2bbc` on private MySQL 8.4.11 and SQLite; fresh review approves the source with final evidence/head assessment and preflight pending. Merge is not yet claimed.
+- **Batch: PR #96.** The historical `2aba5be` rejection is preserved in `docs/handoff/2026-10-11/importer-h1/README.md`. H1 correction and the related findings are verified at application/test source `a4bc2bbc` on private MySQL 8.4.11 and SQLite; fresh independent source and final-delta reviews approved. Merged at `92f940cc48d2ea2e02dd66503dcc99f20da51747`, exact head `cb69203e3c7947366ee8a75758cd2f0f927bcfed`, after preflight `38316912323` passed.
 - discussion_r4240075127: pin every base table covered by engine admission (not only evidence tables + epoch) in lockedStorage(); test: foreign session converts `migrations` to MyISAM + tracks trigger in TransactionBeginning window.
 ## #91 launch documents (reviewed head dc86ba4)
 - **Batch: fixed in PR #94, merged at `6954ffd`.**
@@ -27,10 +27,11 @@ owner's Codex settings, not in this repository.
 - r4240117094 StaffWriteAuthority.php:141 — bind the full operation (blocked state, expected version, reference) or consume the attestation atomically on first write.
 - r4240117095 ManageRightsScopes.php:71 — after a recorded attestation, refusal output must not say "No changes were made"; say no rights-scope write occurred and the attestation row remains.
 
-## #95 MFA follow-up (head ef59507), next MFA batch
-- r4242632400 StaffWriteAuthority.php:230: `consume()` uses a plain `exists()`. A caller already holding an older REPEATABLE READ snapshot could miss a committed consumption marker. Unreachable today: the only caller locks the operator row before any consistent read. Fix: locking read or unique marker key, plus a native MySQL outer-snapshot test. Same as independent review L1 (`docs/verification/domain-mfa-20261010/independent-review-ef59507-DECISION.md`).
+## #95 MFA follow-up (head ef59507), October 12 batch
+- r4242632400 StaffWriteAuthority.php:230: `consume()` uses a plain `exists()`. A caller already holding an older REPEATABLE READ snapshot could miss a committed consumption marker. The caller locks the operator row, but an outer transaction can already hold an older snapshot; the October 12 native regression reproduces this with the existing register caller. Fix: locking read or unique marker key, plus a native MySQL outer-snapshot test. Same as independent review L1 (`docs/verification/domain-mfa-20261010/independent-review-ef59507-DECISION.md`).
+- **Implemented and verified at `abe2956b`; merge pending.** Native old-source failure 1/8; fixed private MySQL 8.4.11 selection 21/381, zero skips; focused SQLite 83/918 with 11 declared native-only skips. Both full attestation suites are now in native selection; HMAC wording corrected. Independent source review approves with final evidence/head and preflight pending. Evidence: `docs/verification/domain-mfa-20261010/current-read-20261012/README.md`.
 ## #96 importer pin (head 2aba5be), in #96's own fix
 - r4242704519 CatalogDatabaseEvidence.php:361: run `shadowed()` over every name in `$pinned`, not only `TABLES` plus the epoch. It needs a same-session temporary table shadowing a non-evidence table.
-- **Implemented and tested in the H1 batch at `a4bc2bbc`; merge pending.** Every pinned name is checked, including escaped identifiers; the native temporary-shadow case passes. See `docs/verification/mysql-draft-importer-20261010/local-evidence/h1-20261012/README.md` and the fresh independent decision. The separate trigger/routine targets outside the pinned set remain an owner-decision residual.
+- **Fixed in PR #96, merged at `92f940cc` from reviewed head `cb69203e`; application/test source `a4bc2bbc`.** Every pinned name is checked, including escaped identifiers; the native temporary-shadow case passes. See `docs/verification/mysql-draft-importer-20261010/local-evidence/h1-20261012/README.md` and the fresh independent decision. The separate trigger/routine targets outside the pinned set remain an owner-decision residual.
 
 Each item has a thread reply on its PR naming this batch. None is P0/P1.
