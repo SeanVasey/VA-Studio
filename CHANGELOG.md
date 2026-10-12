@@ -46,6 +46,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
+- Development tooling: Vite 8.3.3, React plugin 6.1.2 and Vitest 5.0.3, with focused build/test/audit evidence. Automated Node types-major updates wait for a reviewed runtime-major upgrade; the runtime remains Node 24.
+
 - The production activation packet, the preparation queue and the Monday plan's interim-environment row now reflect that PR #68 admits Stripe-test commerce on `APP_ENV=staging` (staff MFA required, live mode refused); production-checkout test funds still require `local`/`testing`. The customer-account, self-service identity, service-project and free-grant guides no longer say those test features run only in `local`/`testing`.
 - Decision register: U-01 resolved as `SeanVasey/VA-Studio`. Forge plus a DigitalOcean VPS is recorded as the staging-host decision, not U-02, and the staging sizing specification is `ops/staging/README.md` step 1.
 
