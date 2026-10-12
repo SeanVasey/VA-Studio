@@ -61,7 +61,8 @@ strings (three `True` results, second session).
 - SQLite: `DB_CONNECTION=sqlite DB_DATABASE=:memory:` (the suite's own named in-memory connection).
 - MySQL: Oracle MySQL `8.0.46-0ubuntu0.24.04.4`, a private disposable `mysqld` initialised and started for
   this lane on `127.0.0.1:33112` with its own socket, data directory and pid file, shut down afterwards.
-  CI uses MySQL 8.4.11, which this container does not have. The server reported
+  CI uses MySQL 8.4.11, which that original container did not have. The October 12 H1 correction below has
+  separate focused evidence on a private MySQL 8.4.11 instance. The original server reported
   `sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION`,
   `transaction_isolation=REPEATABLE-READ`, `foreign_key_checks=1`, `unique_checks=1`, `autocommit=1`.
 - A full `migrate:fresh` on this MySQL takes 75–180 s because the repository's migrations issue about
@@ -449,8 +450,8 @@ the weight.
 
 ## Not verified
 
-- MySQL 8.4 (CI's version); only 8.0.46 exists here. The `information_schema` columns used are present
-  in both, and `EXTRA = DEFAULT_GENERATED` has been reported since 8.0.13, but the 8.4 run is CI's.
+- The complete MySQL 8.4 file and hosted matrix. The original importer runs above used 8.0.46;
+  the October 12 H1 correction adds the explicitly listed focused private MySQL 8.4.11 results only.
 - No hosted Foundation CI dispatch; the policy self-tests and the sharder dry run are the CI evidence.
 - `scripts/migration/persistent-catalog.test.mjs` (needs `public/build`) and the browser specs were not
   run; the `.mjs` files are unchanged.
