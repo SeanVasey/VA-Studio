@@ -1,0 +1,3 @@
+tables=191 first=audit_events migrations_index=61
+PARENT: migrations moved to MyISAM while the child waits on `audit_events`
+CHILD: lockedStorage ADMITTED; migrations is actually MyISAM

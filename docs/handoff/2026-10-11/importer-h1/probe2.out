@@ -1,0 +1,8 @@
+list1 {"a_t":"InnoDB","b_t":"InnoDB","m_t":"InnoDB"}
+B now sees: {"a_t":"InnoDB","b_t":"InnoDB","m_t":"MyISAM","new_t":"MyISAM"}
+A list2 {"a_t":"InnoDB","b_t":"InnoDB","m_t":"InnoDB"}
+A engine m_t via I_S: InnoDB
+A SHOW CREATE m_t: MyISAM
+A SHOW TABLE STATUS m_t: InnoDB
+fresh txn list {"a_t":"InnoDB","b_t":"InnoDB","m_t":"MyISAM","new_t":"MyISAM"}
+after LIMIT0 open then B alter, A list: {"a_t":"InnoDB","b_t":"InnoDB","m_t":"MyISAM"}

@@ -1,6 +1,8 @@
 # Finish-out plan and session protocol — Claude Code, from 2026-10-07
 
-> **Current priority (2026-10-09):** the Monday staging target. Start with
+> **Handoff (2026-10-11):** the development lead passes to Codex. Start with `docs/handoff/2026-10-11/CODEX-HANDOFF.md` (state, open PR #96, conditions, order of work) and use `docs/handoff/2026-10-11/CODEX-PROMPT.md` to start the session. The notes below are kept for history.
+>
+> **Earlier priority (2026-10-09):** the Monday staging target. Start with
 > `docs/handoff/2026-10-09/CLAUDE-HANDOFF.md`, then `docs/handoff/2026-10-08/MONDAY-PLAN.md`, root `AGENTS.md`, and this ledger. Sean chose to finish #63 and hand the remaining queue to Claude. The older CODEX-HANDOFF is historical.
 
 Use the current dated handoff above as the session entry point. This file remains the long plan and merge ledger; the six
@@ -161,3 +163,7 @@ geometry (not to be recreated). Each is listed again in the activation packets
 | 2026-10-11 | MySQL draft importer merged | PR #90 merged at `60aee090` (head `c9706f73`) | preflight green; SQLite 55 tests OK; MySQL 8.0.46 green for schema-drift #10–#12, transaction pin and happy path (not the whole file; CI uses 8.4.11); native selection 1,820 cases in 164 files | delta review of `27453f0..7476fc7` APPROVE WITH CONDITIONS, conditions met in `c9706f7`; one Codex P2 deferred (pin every admitted base table) |
 | 2026-10-11 | Domain staff MFA merged (#68 C2) | PR #92 merged at `4434407d` (head `70c98278`; lane head `57a214db`) | preflight green; SQLite lane suites 22 + affected suites 158 + command/admission 25 tests OK; mutants M9, M14–M19 killed; MySQL 8.0.46 green at `d806d88` only | review of `d806d88` APPROVE WITH CONDITIONS; delta review of the conditions APPROVE; two Codex P2s deferred; still open: `PrepareExclusiveOffer` and panel-only writers |
 | 2026-10-11 | Codex freeze-and-batch rule adopted (Sean) | — | `docs/handoff/2026-10-07/codex-deferred-20261011.md` lists the rule and every deferred P2 by PR | Follow-up batches per lane: importer (1), documents (4), MFA (2) |
+| 2026-10-11 | Launch-documents follow-up merged | PR #94 merged at `6954ffd` | the four #91 Codex P2s fixed; citation pass 17: 272 citations, RESULT PASS | docs only |
+| 2026-10-11 | MFA follow-up merged | PR #95 merged at `592241a` (head `ef59507`; code `772fff1`, docs `6adaf7c`) | preflight green; SQLite lane suites 26 and affected suites 46 + 158 OK; old source fails 6 cases; mutants M20–M30 killed (M31 survives); not run on MySQL | independent review APPROVE WITH CONDITIONS (`docs/verification/domain-mfa-20261010/independent-review-ef59507-DECISION.md`): run the two attestation suites on native MySQL or add them to the selection before staging relies on them; new attestation callers must lock the operator first; one Codex P2 deferred |
+| 2026-10-11 | Importer follow-up (whole-schema pin) | PR #96 draft, head `2aba5be` (code `06c5b3e`) | preflight green; SQLite 56 OK; MySQL 8.0.46 red/green for a storage change before the first listing | **independent review REJECT** (H1 High: the post-open listing reads the snapshot; regression for the epoch table). Packet in `docs/handoff/2026-10-11/importer-h1/` |
+| 2026-10-11 | Development lead handed to Codex | handoff PR (this row) | `docs/handoff/2026-10-11/CODEX-HANDOFF.md`, `CODEX-PROMPT.md` | Claude stopped at a clean point: no product change in flight outside #96, no private MySQL left running |
