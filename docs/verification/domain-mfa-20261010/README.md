@@ -205,3 +205,15 @@ deferred above (`docs/handoff/2026-10-07/codex-deferred-20261011.md`, #92). Evid
 Not tested in the October 11 round: native MySQL of that path (then a plain consumption read under the operator's
 row lock; the October 12 batch addresses older REPEATABLE READ snapshots), MySQL's JSON round trip of the new
 `blocked` and `expected_version` fields in `recorded()`, a real staging console, and anything beyond focused checks.
+
+
+## Current consumption read and native attestation coverage (2026-10-12)
+
+The [dated batch packet](current-read-20261012/README.md) supersedes the October 11 current-read residual and
+MySQL-not-tested limitation for its recorded focused source. The real register caller can already be nested in an
+older snapshot. Its consumption check now uses a current locking read while retaining the operator lock and atomic
+rollback. On private MySQL 8.4.11 the regression fails on old application source (1/8, one intended failure) and the
+fixed selection passes (21/381, no skips), including both complete attestation files. Focused SQLite passes 72 of
+83 cases with 918 assertions and 11 declared native-only skips. Both attestation files are also in the native
+selection. See the packet for exact commands, source hashes, unsuccessful attempts and review conditions. No host
+or full Foundation acceptance is claimed.

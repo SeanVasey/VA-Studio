@@ -1,0 +1,17 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+Time: 00:58.930, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot
+Failed asserting that null is identical to 'Staff multi-factor authentication is required for this write.'.
+
+<worktree>/tests/Feature/RightsScopeWriterConcurrencyTest.php:210
+<shared-vendor>/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 8, Failures: 1.
