@@ -486,10 +486,12 @@ final class BillingSchema
 
     private function check(string $sql): string
     {
-        // Native8.0 dictionaries introduce/escape these exact ASCII enum literals.
+        // Native MySQL dictionaries introduce/escape these exact ASCII enum literals.
         // Admit only the owned literal spellings, never arbitrary charset or SQL rewriting.
         foreach (['synthetic_rehearsal', 'verified_production', 'test', 'live', 'settled', 'not_settled', 'unknown', 'refused', 'reversed',
-            'retrieval_hint', 'no_invoice_hint', 'ignored_type', 'retrieval', 'hint'] as $literal) {
+            'retrieval_hint', 'no_invoice_hint', 'ignored_type', 'retrieval', 'hint',
+            'provider_unavailable', 'provider_inconsistent', 'provider_incomplete', 'binding_refused_account',
+            'binding_refused_invoice_identity', 'binding_refused_mode', 'binding_refused_customer', 'binding_refused_subscription'] as $literal) {
             $sql = str_replace("_utf8mb4\\'".$literal."\\'", "'".$literal."'", $sql);
         }
 
