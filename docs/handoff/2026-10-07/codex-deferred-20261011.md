@@ -14,7 +14,7 @@ Codex reviews every new commit (its summary shows the "New commits" trigger), wh
 owner's Codex settings, not in this repository.
 
 ## #90 importer
-- **Batch: PR #96, draft, independent review REJECT at `2aba5be`.** Handed to Codex: `docs/handoff/2026-10-11/importer-h1/README.md`.
+- **Batch: PR #96.** The historical `2aba5be` rejection is preserved in `docs/handoff/2026-10-11/importer-h1/README.md`. H1 correction and the related findings are verified at application/test source `a4bc2bbc` on private MySQL 8.4.11 and SQLite; fresh review approves the source with final evidence/head assessment and preflight pending. Merge is not yet claimed.
 - discussion_r4240075127: pin every base table covered by engine admission (not only evidence tables + epoch) in lockedStorage(); test: foreign session converts `migrations` to MyISAM + tracks trigger in TransactionBeginning window.
 ## #91 launch documents (reviewed head dc86ba4)
 - **Batch: fixed in PR #94, merged at `6954ffd`.**
@@ -31,5 +31,6 @@ owner's Codex settings, not in this repository.
 - r4242632400 StaffWriteAuthority.php:230: `consume()` uses a plain `exists()`. A caller already holding an older REPEATABLE READ snapshot could miss a committed consumption marker. Unreachable today: the only caller locks the operator row before any consistent read. Fix: locking read or unique marker key, plus a native MySQL outer-snapshot test. Same as independent review L1 (`docs/verification/domain-mfa-20261010/independent-review-ef59507-DECISION.md`).
 ## #96 importer pin (head 2aba5be), in #96's own fix
 - r4242704519 CatalogDatabaseEvidence.php:361: run `shadowed()` over every name in `$pinned`, not only `TABLES` plus the epoch. It needs a same-session temporary table shadowing a non-evidence table.
+- **Implemented and tested in the H1 batch at `a4bc2bbc`; merge pending.** Every pinned name is checked, including escaped identifiers; the native temporary-shadow case passes. See `docs/verification/mysql-draft-importer-20261010/local-evidence/h1-20261012/README.md` and the fresh independent decision. The separate trigger/routine targets outside the pinned set remain an owner-decision residual.
 
 Each item has a thread reply on its PR naming this batch. None is P0/P1.
