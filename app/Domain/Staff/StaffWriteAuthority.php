@@ -131,7 +131,8 @@ final class StaffWriteAuthority
      * Call it inside the write's transaction after locking `$current` FOR UPDATE: admission appends the
      * consumption record in that transaction, so it commits or rolls back with the write. Every use of one
      * attestation locks the same operator row first (the binding requires it), which serializes the
-     * already-used check against a concurrent use. A write refused after admission rolls the record back, so the
+     * already-used check against a concurrent use. The check itself reads current committed state even when the
+     * caller already holds an older consistent snapshot. A write refused after admission rolls the record back, so the
      * attestation may then retry only the identical operation it binds.
      */
     public static function requireFor(User $current, ?self $attestation, string $action, ?string $scopeKey, ?int $revisionId,
@@ -168,8 +169,9 @@ final class StaffWriteAuthority
     }
 
     /**
-     * Keyed, so the audit row does not expose a guessable evidence reference to anyone who can read audit
-     * history; the attestation lives 900 seconds, well inside any application key rotation.
+     * Binds the reference without copying it into this attestation row. Other audit events retain unkeyed
+     * reference hashes and rights tables retain plain references; this is not whole-history confidentiality.
+     * Application key rotation invalidates the attestation even within its 900-second lifetime.
      */
     private static function referenceHmac(string $reference): string
     {
@@ -219,7 +221,8 @@ final class StaffWriteAuthority
      * Spends the attestation on the write that is being admitted: refused when a consumption record already
      * exists, otherwise appends one in the caller's transaction. Audit rows are append-only, so the marker is a
      * new row (subject: the attestation's own row) rather than a change to the attestation. The query is narrowed
-     * by the operator, whose row the caller holds FOR UPDATE.
+     * by the operator, whose row the caller holds FOR UPDATE to serialize admission. This locking read must see
+     * committed consumption even if an outer REPEATABLE READ transaction established an older snapshot.
      */
     private function consume(): bool
     {
@@ -227,8 +230,8 @@ final class StaffWriteAuthority
             ->where('action', self::CONSUMPTION_ACTION)
             ->where('subject_type', AuditEvent::class)
             ->where('subject_id', $this->auditEventId)
-            ->exists();
-        if ($used) {
+            ->lockForUpdate()->first(['id']);
+        if ($used !== null) {
             return false;
         }
         AuditEvent::create([

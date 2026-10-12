@@ -869,6 +869,10 @@
     [
       "Tests\\Feature\\SupportAttachmentSchemaClosureTest",
       "test_native_case_variant_reserved_name_is_not_exact_owned_namespace"
+    ],
+    [
+      "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
+      "test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"
     ]
   ]
 }
