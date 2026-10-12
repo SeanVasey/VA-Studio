@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: $CANDIDATE/phpunit.xml
+
+Time: 01:18.899, Memory: 89.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#4 with data ('nullable-column')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs#5 with data ('extra-column')
+InvalidArgumentException: catalog_source_files_invalid
+
+$CANDIDATE/app/Domain/Migration/CatalogOnboarding/PrivateSourceFiles.php:56
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:1237
+$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php:724
+$BASE/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 60, Assertions: 328, Errors: 2.

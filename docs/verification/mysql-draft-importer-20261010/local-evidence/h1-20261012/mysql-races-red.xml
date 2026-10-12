@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest" file="$RED/tests/Feature/PersistentCatalogDraftImportTest.php" tests="2" assertions="18" errors="0" failures="2" skipped="0" time="153.333105">
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused" tests="2" assertions="18" errors="0" failures="2" skipped="0" time="153.333105">
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;unlisted table&quot;" file="$RED/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="9" time="67.159492">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set "unlisted table"
+An engine change racing the pin was admitted.
+Failed asserting that null is identical to 'catalog_target_invalid'.
+
+$RED/tests/Feature/PersistentCatalogDraftImportTest.php:645
+$BASE/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set &quot;discovery epoch&quot;" file="$RED/tests/Feature/PersistentCatalogDraftImportTest.php" line="559" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="9" time="86.173613">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\PersistentCatalogDraftImportTest::test_engine_change_racing_the_pin_while_an_earlier_open_waits_is_refused with data set "discovery epoch"
+An engine change racing the pin was admitted.
+Failed asserting that null is identical to 'catalog_target_invalid'.
+
+$RED/tests/Feature/PersistentCatalogDraftImportTest.php:645
+$BASE/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

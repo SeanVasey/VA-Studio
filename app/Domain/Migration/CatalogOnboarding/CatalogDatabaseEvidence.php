@@ -319,14 +319,20 @@ final class CatalogDatabaseEvidence
     }
 
     /**
-     * Pin the storage of every evidence table for the caller's open transaction, before its first write.
+     * Pin the storage of every base table for the caller's open transaction, before its first write.
      *
      * schema() runs before the transaction, so another session could change a table's engine in between.
      * On MySQL, opening each table inside the transaction takes a shared metadata lock that an engine change
-     * must wait for until commit; the engines are then required to be InnoDB. The pinned set is every
-     * evidence table plus the discovery epoch, which the tracks insert trigger updates. On SQLite the journal
-     * mode belongs to this connection and can still change until the transaction's first write, so it is
-     * checked here, before that write; nothing in the importer sets a PRAGMA in between.
+     * must wait for until commit; the engines are then required to be InnoDB. The pinned set is every base
+     * table in the schema, the same set the engine admission covers: a trigger can make a segment write any
+     * of them (the tracks insert trigger updates the discovery epoch, and a foreign trigger could write any
+     * other table), so pinning only the evidence tables would let an unlisted table become non-transactional
+     * and keep a write after rollback. A separate autocommit connection lists the set before and after the
+     * opens: the importer's REPEATABLE READ snapshot cannot prove current engines. This also leaves its first
+     * consistent read until after the locks. The final listing proves the set only at that instant; a later
+     * new table or a table in another schema is not pinned. Do not overlap imports with migrations or deploys.
+     * On SQLite the journal mode belongs to this connection and can still change until the transaction's
+     * first write, so it is checked here, before that write; nothing in the importer sets a PRAGMA in between.
      */
     public function lockedStorage(): void
     {
@@ -344,18 +350,47 @@ final class CatalogDatabaseEvidence
         if (DB::getDriverName() !== 'mysql') {
             throw new RuntimeException('catalog_target_invalid');
         }
-        $pinned = [...self::TABLES, DiscoveryEpoch::TABLE];
-        if ($this->shadowed($pdo)) {
-            throw new RuntimeException('catalog_target_invalid');
-        }
-        foreach ($pinned as $table) {
-            $pdo->query('SELECT 1 FROM `'.$table.'` LIMIT 0')->fetchAll();
-        }
-        $statement = $pdo->query("SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'"
-            ." AND TABLE_NAME IN ('".implode("', '", $pinned)."')");
-        $engines = $statement->fetchAll(PDO::FETCH_KEY_PAIR);
-        if (count($engines) !== count($pinned) || array_unique(array_values($engines)) !== ['InnoDB']) {
-            throw new RuntimeException('catalog_target_invalid');
+        $lockWait = (int) $pdo->query('SELECT @@session.lock_wait_timeout')->fetchColumn();
+        try {
+            // SHOW CREATE also acquires metadata locks. Bound all pin statements, including shadow checks,
+            // without increasing an operator's already shorter wait limit. Restore the caller's setting.
+            $pdo->exec('SET SESSION lock_wait_timeout = '.min($lockWait, 5));
+            $config = DB::connection()->getConfig();
+            $config['options'][PDO::ATTR_PERSISTENT] = false;
+            $observer = app('db.factory')->make($config)->getPdo();
+            $identity = 'SELECT DATABASE(), @@server_uuid';
+            if ($observer->inTransaction()
+                || (int) $observer->query('SELECT @@session.autocommit')->fetchColumn() !== 1
+                || $observer->query($identity)->fetch(PDO::FETCH_NUM) !== $pdo->query($identity)->fetch(PDO::FETCH_NUM)
+                || $observer->query('SELECT CONNECTION_ID()')->fetchColumn() === $pdo->query('SELECT CONNECTION_ID()')->fetchColumn()) {
+                throw new RuntimeException('catalog_target_invalid');
+            }
+            $observer->exec('SET SESSION lock_wait_timeout = 5');
+            $baseTables = "SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'";
+            $pinned = array_map('strval', $observer->query($baseTables)->fetchAll(PDO::FETCH_COLUMN));
+            sort($pinned, SORT_STRING);
+            if (array_diff([...self::TABLES, DiscoveryEpoch::TABLE], $pinned) !== []) {
+                throw new RuntimeException('catalog_target_invalid');
+            }
+            foreach ($pinned as $table) {
+                $pdo->query('SELECT 1 FROM `'.str_replace('`', '``', $table).'` LIMIT 0')->fetchAll();
+            }
+            if ($this->shadowed($pdo, $pinned)) {
+                throw new RuntimeException('catalog_target_invalid');
+            }
+            // Fresh committed metadata, while every listed durable table's shared metadata lock is held.
+            $engines = $observer->query($baseTables)->fetchAll(PDO::FETCH_KEY_PAIR);
+            $locked = array_map('strval', array_keys($engines));
+            sort($locked, SORT_STRING);
+            if ($locked !== $pinned || array_unique(array_values($engines)) !== ['InnoDB']) {
+                throw new RuntimeException('catalog_target_invalid');
+            }
+        } catch (PDOException $error) {
+            // Missing/renamed objects are invalid; a lock timeout or deadlock is retryable contention.
+            throw new RuntimeException(in_array((int) ($error->errorInfo[1] ?? 0), [1205, 1213], true)
+                ? 'catalog_target_busy' : 'catalog_target_invalid', 0, $error);
+        } finally {
+            $pdo->exec('SET SESSION lock_wait_timeout = '.$lockWait);
         }
     }
 
@@ -365,9 +400,9 @@ final class CatalogDatabaseEvidence
      * with the connection. SQLite also has temporary triggers and views, and resolves names in any letter case,
      * so its catalog is compared case-insensitively. Any of these is refused, as is a missing table.
      */
-    private function shadowed(PDO $pdo): bool
+    private function shadowed(PDO $pdo, ?array $tables = null): bool
     {
-        $tables = [...self::TABLES, DiscoveryEpoch::TABLE];
+        $tables ??= [...self::TABLES, DiscoveryEpoch::TABLE];
         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             $names = "('".implode("', '", $tables)."')";
 
@@ -376,8 +411,12 @@ final class CatalogDatabaseEvidence
         foreach ($tables as $table) {
             // SHOW CREATE TABLE resolves the temporary table first, as every unqualified statement does.
             try {
-                $shown = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM);
-            } catch (PDOException) {
+                $shown = $pdo->query('SHOW CREATE TABLE `'.str_replace('`', '``', $table).'`')->fetch(PDO::FETCH_NUM);
+            } catch (PDOException $error) {
+                if (in_array((int) ($error->errorInfo[1] ?? 0), [1205, 1213], true)) {
+                    throw $error;
+                }
+
                 return true;
             }
             if (! is_array($shown) || ! is_string($shown[1] ?? null) || str_starts_with(strtoupper($shown[1]), 'CREATE TEMPORARY')) {

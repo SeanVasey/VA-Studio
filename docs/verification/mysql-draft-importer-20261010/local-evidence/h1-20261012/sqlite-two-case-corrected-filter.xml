@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="2.848730">
+    <testsuite name="Tests\Feature\PersistentCatalogDraftImportTest::test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs" tests="2" assertions="10" errors="0" failures="0" skipped="0" time="2.848730">
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #4" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="5" time="1.551361"/>
+      <testcase name="test_foreign_or_incomplete_live_owned_schema_refuses_review_and_apply_without_repairs with data set #5" file="$CANDIDATE/tests/Feature/PersistentCatalogDraftImportTest.php" line="721" class="Tests\Feature\PersistentCatalogDraftImportTest" classname="Tests.Feature.PersistentCatalogDraftImportTest" assertions="5" time="1.297369"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
