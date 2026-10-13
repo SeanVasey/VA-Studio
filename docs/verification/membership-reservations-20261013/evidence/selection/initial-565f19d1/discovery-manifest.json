@@ -1,0 +1,432 @@
+{
+  "schema_version": 1,
+  "source_configuration_sha256": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+  "source_files": 587,
+  "source_test_cases": 8045,
+  "source_case_identity_sha256": "c869ac3f5c7d41594f6ea56058a5fd5c5e32fcf21749636aab0c605e7e6cf3bf",
+  "source_group_identity_sha256": "a2fdbd08c3429e8cee3c1d822ff2ba06475236d7a6de1729e903fff9fe6d9e8b",
+  "proof": "every selected case, file and group appears exactly once",
+  "weighting": {
+    "basis": "measured-milliseconds",
+    "timings_file": "scripts/ci/phpunit-timings-mysql.json",
+    "timings_sha256": "f078ee8b7cbdef272310d9f5647cbf929312badcf6116d41d8c898a22cce2446",
+    "timings_driver": "mysql",
+    "timings_source": "Foundation CI run 38037183233 on bd84978e294ec31ff0b78285deb786d443a5e283, all 24 native-selection shards (MySQL 8.4.11)",
+    "untimed_files": [
+      "tests/Feature/PersistentCatalogDraftImportTest.php",
+      "tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
+      "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+      "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+      "tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php",
+      "tests/Feature/RightsScopeCommandAttestationTest.php",
+      "tests/Feature/RightsScopeStaffMfaTest.php"
+    ]
+  },
+  "shards": [
+    {
+      "index": 1,
+      "configuration": "phpunit-ci-mysql-1.xml",
+      "files": [
+        "tests/Feature/BulkReplaceLicenseDraftSourceTest.php"
+      ],
+      "test_cases": 85,
+      "weight": 7377297
+    },
+    {
+      "index": 2,
+      "configuration": "phpunit-ci-mysql-2.xml",
+      "files": [
+        "tests/Feature/CustomerAccountMigrationTest.php",
+        "tests/Feature/OrderInquiryConcurrencyTest.php",
+        "tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php",
+        "tests/Feature/ReviewedOfferDraftTest.php",
+        "tests/Feature/ServiceProjectCommittedSchemaIndependentTest.php",
+        "tests/Feature/SoundKitUploadMigrationTest.php"
+      ],
+      "test_cases": 88,
+      "weight": 5888035
+    },
+    {
+      "index": 3,
+      "configuration": "phpunit-ci-mysql-3.xml",
+      "files": [
+        "tests/Feature/InquiryNotificationConcurrencyTest.php",
+        "tests/Feature/OrderPreparationConcurrencyTest.php",
+        "tests/Feature/PersistentCatalogDraftImportTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+        "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+        "tests/Feature/TransactionalNotificationConcurrencyTest.php"
+      ],
+      "test_cases": 83,
+      "weight": 5880568
+    },
+    {
+      "index": 4,
+      "configuration": "phpunit-ci-mysql-4.xml",
+      "files": [
+        "tests/Feature/DiscoverySitemapNamespaceAdmissionTest.php",
+        "tests/Feature/DiscoverySitemapSchemaTest.php",
+        "tests/Feature/HostedCheckoutTest.php",
+        "tests/Feature/InquiryConversationConcurrencyTest.php",
+        "tests/Feature/ProductionIdentity/ProductionIdentityMigrationTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php",
+        "tests/Feature/ScopedLicenseMigrationTest.php",
+        "tests/Feature/ServiceProjectConcurrencyTest.php",
+        "tests/Feature/ServiceProjectCurrentAuthorityTest.php",
+        "tests/Feature/SupportAttachmentSchemaClosureTest.php",
+        "tests/Feature/SupportAttachmentSchemaTest.php",
+        "tests/Feature/TypedLicenseMigrationTest.php"
+      ],
+      "test_cases": 93,
+      "weight": 5857961
+    },
+    {
+      "index": 5,
+      "configuration": "phpunit-ci-mysql-5.xml",
+      "files": [
+        "tests/Feature/CustomerInquiryAdministrationConcurrencyTest.php",
+        "tests/Feature/DiscoverySitemapConcurrencyTest.php",
+        "tests/Feature/LicenseWriterConcurrencyTest.php",
+        "tests/Feature/MigrationRecompilationTest.php",
+        "tests/Feature/QuoteConcurrencyTest.php",
+        "tests/Feature/TestOwnerDeliveryMigrationTest.php"
+      ],
+      "test_cases": 69,
+      "weight": 5867362
+    },
+    {
+      "index": 6,
+      "configuration": "phpunit-ci-mysql-6.xml",
+      "files": [
+        "tests/Feature/HashByteGuardMigrationTest.php",
+        "tests/Feature/InquiryNotificationMigrationTest.php",
+        "tests/Feature/MediaWriterConcurrencyTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+        "tests/Feature/ServiceSupportAttachmentsTest.php",
+        "tests/Feature/SiteImageMigrationTest.php"
+      ],
+      "test_cases": 76,
+      "weight": 5859502
+    },
+    {
+      "index": 7,
+      "configuration": "phpunit-ci-mysql-7.xml",
+      "files": [
+        "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeCrossInvoiceClaimTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php",
+        "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php",
+        "tests/Feature/TrackPublicationGuardConcurrencyTest.php",
+        "tests/Feature/TrackPublicationManifestConcurrencyTest.php"
+      ],
+      "test_cases": 80,
+      "weight": 5864549
+    },
+    {
+      "index": 8,
+      "configuration": "phpunit-ci-mysql-8.xml",
+      "files": [
+        "tests/Feature/CustomerSuppressionNativeAdmissionTest.php",
+        "tests/Feature/MembershipCreditConcurrencyTest.php",
+        "tests/Feature/NativeSchemaIsolationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php",
+        "tests/Feature/RightsEvidenceGuardMigrationTest.php",
+        "tests/Feature/StemsRecordingPreviewConcurrencyTest.php"
+      ],
+      "test_cases": 97,
+      "weight": 5864761
+    },
+    {
+      "index": 9,
+      "configuration": "phpunit-ci-mysql-9.xml",
+      "files": [
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSchemaTest.php",
+        "tests/Feature/ProductionIdentityAdapters/IdentityHistoricalCommittedReceiptTest.php",
+        "tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php",
+        "tests/Feature/ProductionTrackPolicyEngineTest.php",
+        "tests/Feature/PromotionConcurrencyTest.php",
+        "tests/Feature/SoundKitConcurrencyTest.php",
+        "tests/Feature/StemsRecordingConcurrencyTest.php"
+      ],
+      "test_cases": 96,
+      "weight": 5879514
+    },
+    {
+      "index": 10,
+      "configuration": "phpunit-ci-mysql-10.xml",
+      "files": [
+        "tests/Feature/CustomerAccountConcurrencyTest.php",
+        "tests/Feature/FreeGrantSchemaRecoveryTest.php",
+        "tests/Feature/MembershipCreditMigrationTest.php",
+        "tests/Feature/ProductionIdentity/ProductionIdentityNativeRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+        "tests/Feature/PromotionMigrationTest.php",
+        "tests/Feature/ServiceProjectSchemaTest.php"
+      ],
+      "test_cases": 82,
+      "weight": 5873674
+    },
+    {
+      "index": 11,
+      "configuration": "phpunit-ci-mysql-11.xml",
+      "files": [
+        "tests/Feature/CustomerIdentityConcurrencyTest.php",
+        "tests/Feature/CustomerSuppressionMigrationTest.php",
+        "tests/Feature/EconomicLicenseMigrationTest.php",
+        "tests/Feature/LicenseEvidenceMigrationTest.php",
+        "tests/Feature/ProductDraftMigrationTest.php",
+        "tests/Feature/ProductionCheckoutCommittedRowsTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/TrackMetadataMigrationTest.php",
+        "tests/Feature/UuidByteGuardMigrationTest.php",
+        "tests/Unit/MysqlConnectionTimezoneTest.php",
+        "tests/Unit/SchemaQualifierDelimiterTest.php"
+      ],
+      "test_cases": 89,
+      "weight": 5857964
+    },
+    {
+      "index": 12,
+      "configuration": "phpunit-ci-mysql-12.xml",
+      "files": [
+        "tests/Feature/BulkUpdateTrackMetadataConcurrencyTest.php",
+        "tests/Feature/CustomerInquiryMigrationTest.php",
+        "tests/Feature/MediaWorkerIdentityTest.php",
+        "tests/Feature/PrivateProductDraftConcurrencyTest.php",
+        "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/ResumableMediaUploadsConcurrencyTest.php"
+      ],
+      "test_cases": 93,
+      "weight": 5880067
+    },
+    {
+      "index": 13,
+      "configuration": "phpunit-ci-mysql-13.xml",
+      "files": [
+        "tests/Feature/ProductionCheckoutNativeRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+        "tests/Feature/ProductionSuppression/ProductionSuppressionMigrationTest.php",
+        "tests/Feature/ProductionTrackPolicyConcurrencyTest.php",
+        "tests/Feature/ReservePricedQuoteConcurrencyTest.php",
+        "tests/Feature/RightsScopeWriterConcurrencyTest.php",
+        "tests/Feature/SupportAttachmentNativeConcurrencyTest.php"
+      ],
+      "test_cases": 68,
+      "weight": 5888130
+    },
+    {
+      "index": 14,
+      "configuration": "phpunit-ci-mysql-14.xml",
+      "files": [
+        "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Feature/ExclusiveSelectionConcurrencyTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php",
+        "tests/Feature/RightsDeclarationWriterConcurrencyTest.php",
+        "tests/Feature/TestFulfillmentActivationConcurrencyTest.php",
+        "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
+        "tests/Feature/TestRefundResolutionMigrationTest.php",
+        "tests/Feature/TrackMetadataPresetsMigrationTest.php"
+      ],
+      "test_cases": 67,
+      "weight": 5870190
+    },
+    {
+      "index": 15,
+      "configuration": "phpunit-ci-mysql-15.xml",
+      "files": [
+        "tests/Feature/LicenseTemplateAuthoringTest.php",
+        "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+        "tests/Feature/SiteContentConcurrencyTest.php",
+        "tests/Feature/SoundKitMigrationTest.php",
+        "tests/Feature/StripeWebhookConcurrencyTest.php",
+        "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+        "tests/Feature/TrackMetadataConcurrencyTest.php",
+        "tests/Feature/TrackPublicationApplyConcurrencyTest.php"
+      ],
+      "test_cases": 83,
+      "weight": 5877560
+    },
+    {
+      "index": 16,
+      "configuration": "phpunit-ci-mysql-16.xml",
+      "files": [
+        "tests/Feature/DiscoverySnapshotConcurrencyTest.php",
+        "tests/Feature/FreeGrantConcurrencyTest.php",
+        "tests/Feature/PaidGrantSchemaRecoveryTest.php",
+        "tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationNativeRaceTest.php",
+        "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutMigrationTest.php",
+        "tests/Feature/SupportAttachmentsTest.php",
+        "tests/Feature/TestContractIssuanceConcurrencyTest.php"
+      ],
+      "test_cases": 82,
+      "weight": 5867778
+    },
+    {
+      "index": 17,
+      "configuration": "phpunit-ci-mysql-17.xml",
+      "files": [
+        "tests/Feature/BulkTrackTagsConcurrencyTest.php",
+        "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/ProductMemberRefreshConcurrencyTest.php",
+        "tests/Feature/ProductionBuyerAssentObservationMigrationTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureMigrationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+        "tests/Feature/TrackMetadataPresetsConcurrencyTest.php"
+      ],
+      "test_cases": 76,
+      "weight": 5864425
+    },
+    {
+      "index": 18,
+      "configuration": "phpunit-ci-mysql-18.xml",
+      "files": [
+        "tests/Feature/CommerceAuditActorConcurrencyTest.php",
+        "tests/Feature/ExclusiveActivationMigrationTest.php",
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalSchemaPreparationTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeInstallerTest.php",
+        "tests/Feature/ProductionTrackPreparationReplayConcurrencyTest.php",
+        "tests/Feature/RightsScopeCommandAttestationTest.php",
+        "tests/Feature/TestPaymentConcurrencyTest.php",
+        "tests/Feature/TransactionalNotificationMigrationTest.php"
+      ],
+      "test_cases": 84,
+      "weight": 5863534
+    },
+    {
+      "index": 19,
+      "configuration": "phpunit-ci-mysql-19.xml",
+      "files": [
+        "tests/Feature/CustomerConsentMigrationTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php",
+        "tests/Feature/MembershipCreditEngineTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php",
+        "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
+        "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestRefundResolutionConcurrencyTest.php",
+        "tests/Feature/TrackPublicationGuardMigrationTest.php"
+      ],
+      "test_cases": 68,
+      "weight": 5862061
+    },
+    {
+      "index": 20,
+      "configuration": "phpunit-ci-mysql-20.xml",
+      "files": [
+        "tests/Feature/CustomerIdentityMigrationTest.php",
+        "tests/Feature/CustomerListeningFreshnessTest.php",
+        "tests/Feature/CustomerPurchaseClaimConcurrencyTest.php",
+        "tests/Feature/ProductDraftConcurrencyTest.php",
+        "tests/Feature/ProductionSuppression/ProductionSuppressionNativeAdmissionTest.php",
+        "tests/Feature/RightsEvidenceGuardConcurrencyTest.php",
+        "tests/Feature/RightsScopeStaffMfaTest.php",
+        "tests/Feature/TestOrderFinalizationConcurrencyTest.php"
+      ],
+      "test_cases": 68,
+      "weight": 5858195
+    },
+    {
+      "index": 21,
+      "configuration": "phpunit-ci-mysql-21.xml",
+      "files": [
+        "tests/Feature/CustomerSuppressionKeyAdmissionTest.php",
+        "tests/Feature/HostedCheckoutMigrationTest.php",
+        "tests/Feature/ProductionCheckoutMigrationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+        "tests/Feature/ReviewedLicenseDraftConcurrencyTest.php",
+        "tests/Feature/SharedInventoryConcurrencyTest.php",
+        "tests/Feature/SiteScheduleConcurrencyTest.php",
+        "tests/Feature/TestUnpaidReleaseConcurrencyTest.php"
+      ],
+      "test_cases": 76,
+      "weight": 5859511
+    },
+    {
+      "index": 22,
+      "configuration": "phpunit-ci-mysql-22.xml",
+      "files": [
+        "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php",
+        "tests/Feature/HostedCheckoutConcurrencyTest.php",
+        "tests/Feature/MediaWriterAuthorityTest.php",
+        "tests/Feature/OrderInquiryMigrationTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php",
+        "tests/Feature/QuotePricingConcurrencyTest.php",
+        "tests/Feature/ReviewedOfferDraftConcurrencyTest.php"
+      ],
+      "test_cases": 86,
+      "weight": 5862895
+    },
+    {
+      "index": 23,
+      "configuration": "phpunit-ci-mysql-23.xml",
+      "files": [
+        "tests/Feature/DiscoveryEpochMigrationTest.php",
+        "tests/Feature/ExclusiveOfferConcurrencyTest.php",
+        "tests/Feature/PrivateProductDraftSchemaTest.php",
+        "tests/Feature/ProductionIdentityAdapters/ProductionIdentityCommittedFrameTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+        "tests/Feature/PromotionAdministrationMySqlConcurrencyTest.php",
+        "tests/Feature/SoundKitUploadsConcurrencyTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php"
+      ],
+      "test_cases": 72,
+      "weight": 5859851
+    },
+    {
+      "index": 24,
+      "configuration": "phpunit-ci-mysql-24.xml",
+      "files": [
+        "tests/Feature/CustomerInquiryConcurrencyTest.php",
+        "tests/Feature/CustomerListeningMigrationTest.php",
+        "tests/Feature/LicenseTemplateAuthoringConcurrencyTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/ReviewedLicenseDraftTest.php",
+        "tests/Feature/ServiceProjectCommittedReadTest.php",
+        "tests/Feature/SiteImageConcurrencyTest.php",
+        "tests/Feature/TestOwnerDeliveryConcurrencyTest.php"
+      ],
+      "test_cases": 110,
+      "weight": 5880057
+    }
+  ],
+  "selection": {
+    "policy": "scripts/ci/database-mysql-selection.json",
+    "policy_sha256": "7e658e505f9f66705ef121935030ed3393b2e1a2f76d3d03583f4f37d1c4a6e0",
+    "sqlite_skip_policy_sha256": "6f9049e4f43f49eb6135e74ee972d51ed8b82cf1dc5cf69069697894bace3930",
+    "mysql_skip_policy_sha256": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+    "files": 187,
+    "test_cases": 1971,
+    "case_identity_sha256": "55410b4dadc0e845eda79804abcd091ff7c82b772b461bfbf14960667d5e88ac"
+  }
+}

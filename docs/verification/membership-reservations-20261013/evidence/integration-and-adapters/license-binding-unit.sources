@@ -1,0 +1,2 @@
+c94600ad842654a3025bed18ac87a6cb1c8e3d7045a6cb0c23ae0e7af41888b4  app/Domain/Memberships/Production/MembershipLicenseBinding.php
+50d4a196f2fdb80f41a13aa9d24ee4a0acae58e4c939fdc20815ad4512c44ee0  tests/Unit/MembershipLicenseBindingTest.php

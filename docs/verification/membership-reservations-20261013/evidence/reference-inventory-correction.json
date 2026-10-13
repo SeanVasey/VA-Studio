@@ -1,0 +1,33 @@
+{
+  "kind": "Archive metadata verification correction; no application or test execution",
+  "initial_comparison": "Failed assertion: 25 source receipt members were absent from the narrower 2112-file reference inventory, not hash mismatches.",
+  "missing_reference_members": [
+    "resources/contracts/free-v1/profile-assets.json",
+    "resources/contracts/paid-v1/profile-assets.json",
+    "resources/contracts/production-free-v1/profile-assets.json",
+    "resources/contracts/test-v1/PROVENANCE.md",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.ctg.z",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.json",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.z",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.ctg.z",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.json",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.z",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans-Bold.ttf",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans.ttf",
+    "resources/contracts/test-v1/fonts/source/LICENSE",
+    "resources/contracts/test-v1/profile-assets.json",
+    "resources/contracts/test-v2/PROVENANCE.md",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf",
+    "resources/contracts/test-v2/fonts/source/LICENSE",
+    "resources/contracts/test-v2/profile-assets.json"
+  ],
+  "resolution": "Read-only comparison against committed defe9580 and archival worktree bytes matched all 25; expanded reference inventory to 2137 files. Frozen resources were never edited or copied into a mutable source capsule.",
+  "original_standalone_log": false
+}

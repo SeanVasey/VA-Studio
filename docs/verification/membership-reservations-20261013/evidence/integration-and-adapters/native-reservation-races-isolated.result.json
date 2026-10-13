@@ -1,0 +1,15 @@
+{
+  "exit": 1,
+  "duration_seconds": 170.809,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+    "file": "/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php",
+    "tests": "1",
+    "assertions": "33",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "time": "170.532946"
+  }
+}

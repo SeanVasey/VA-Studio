@@ -1,0 +1,181 @@
+{
+    "case": "test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it",
+    "parent_pid": 155362,
+    "parent_connection_id": 104,
+    "database": "vaseyaudio_membership_reservation_races",
+    "mysql_version": "8.4.11",
+    "timing_scope": "Explicit synthetic Carbon wall time; real hrtime, process scheduling, native row waits and admission bounds.",
+    "authority_scope": "Real retained invoice, policy and eligible-license producers; unused fixture-only C4 grant gate; no provider\/host claim.",
+    "barriers": [
+        {
+            "requester": 105,
+            "blocker": 104,
+            "table": "production_membership_billing_award_fence",
+            "primary_key": 1,
+            "observed_ns": 49398671414941
+        },
+        {
+            "requester": 106,
+            "blocker": 105,
+            "table": "users",
+            "primary_key": 4,
+            "observed_ns": 49400028469467
+        }
+    ],
+    "workers": [
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 158691,
+            "operation": "release",
+            "request_key": null,
+            "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+            "at": "2026-11-07 00:01:00.000000",
+            "ready": {
+                "connection_id": 105,
+                "pid": 158691,
+                "ready_ns": 49394531994402,
+                "at": "2026-11-07 00:01:00.000000"
+            },
+            "released_ns": 49395922856273,
+            "exit": 0,
+            "stdout": "{\"value\":{\"period_id\":\"2503922f-8a73-47a0-b0a1-084b0c774b44\",\"redemption_id\":\"bda6ef2f-e32c-43f3-8d64-1aad22428747\",\"reservation_event_id\":\"4e2fff92-5928-4d40-91f5-aacc00305a38\",\"release_event_id\":\"fbf560de-e109-4554-9d45-1bdabacacf5e\",\"status\":\"released\",\"balances\":{\"available\":0,\"reserved\":0,\"consumed\":0,\"expired\":1}},\"error_class\":null,\"reason\":null,\"operation\":\"release\",\"at\":\"2026-11-07 00:01:00.000000\",\"entered_ns\":49395927692246,\"finished_ns\":49429430345827,\"connection_id\":105,\"pid\":158691,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": {
+                    "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+                    "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+                    "reservation_event_id": "4e2fff92-5928-4d40-91f5-aacc00305a38",
+                    "release_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+                    "status": "released",
+                    "balances": {
+                        "available": 0,
+                        "reserved": 0,
+                        "consumed": 0,
+                        "expired": 1
+                    }
+                },
+                "error_class": null,
+                "reason": null,
+                "operation": "release",
+                "at": "2026-11-07 00:01:00.000000",
+                "entered_ns": 49395927692246,
+                "finished_ns": 49429430345827,
+                "connection_id": 105,
+                "pid": 158691,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        },
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 158692,
+            "operation": "release",
+            "request_key": null,
+            "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+            "at": "2026-11-07 00:01:00.000000",
+            "ready": {
+                "connection_id": 106,
+                "pid": 158692,
+                "ready_ns": 49395902779727,
+                "at": "2026-11-07 00:01:00.000000"
+            },
+            "released_ns": 49398671417556,
+            "exit": 0,
+            "stdout": "{\"value\":{\"period_id\":\"2503922f-8a73-47a0-b0a1-084b0c774b44\",\"redemption_id\":\"bda6ef2f-e32c-43f3-8d64-1aad22428747\",\"reservation_event_id\":\"4e2fff92-5928-4d40-91f5-aacc00305a38\",\"release_event_id\":\"fbf560de-e109-4554-9d45-1bdabacacf5e\",\"status\":\"released\",\"balances\":{\"available\":0,\"reserved\":0,\"consumed\":0,\"expired\":1}},\"error_class\":null,\"reason\":null,\"operation\":\"release\",\"at\":\"2026-11-07 00:01:00.000000\",\"entered_ns\":49398675595270,\"finished_ns\":49452903368081,\"connection_id\":106,\"pid\":158692,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": {
+                    "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+                    "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+                    "reservation_event_id": "4e2fff92-5928-4d40-91f5-aacc00305a38",
+                    "release_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+                    "status": "released",
+                    "balances": {
+                        "available": 0,
+                        "reserved": 0,
+                        "consumed": 0,
+                        "expired": 1
+                    }
+                },
+                "error_class": null,
+                "reason": null,
+                "operation": "release",
+                "at": "2026-11-07 00:01:00.000000",
+                "entered_ns": 49398675595270,
+                "finished_ns": 49452903368081,
+                "connection_id": 106,
+                "pid": 158692,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        }
+    ],
+    "concurrent_retry": {
+        "outcome": "same_receipt",
+        "elapsed_ns": 54227772811,
+        "original_admission_budget_ns": 60000000000
+    },
+    "before_fresh_retry": {
+        "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+        "tail_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+        "balances": {
+            "available": 0,
+            "reserved": 0,
+            "consumed": 0,
+            "expired": 1
+        },
+        "redemption_ids": [
+            "bda6ef2f-e32c-43f3-8d64-1aad22428747"
+        ],
+        "row_counts": {
+            "production_membership_paid_periods": 1,
+            "production_membership_credit_events": 3,
+            "production_membership_redemptions": 1
+        },
+        "audit_sha256": "caca18f8562c4fef0f7b7550629fffdbee59ca4cdd781d9cf48b3bd0295686ad",
+        "retained_rows_sha256": "41a29177ad1979560a03a3c4e15de6e078856dedfb8aed4fe180eaa3cf2b1330"
+    },
+    "fresh_retry": {
+        "scope": "Separate explicitly invoked parent operation after workers and full audit; no automatic operation retry.",
+        "operation": "release",
+        "entered_ns": 49461783818215,
+        "receipt": {
+            "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+            "redemption_id": "bda6ef2f-e32c-43f3-8d64-1aad22428747",
+            "reservation_event_id": "4e2fff92-5928-4d40-91f5-aacc00305a38",
+            "release_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+            "status": "released",
+            "balances": {
+                "available": 0,
+                "reserved": 0,
+                "consumed": 0,
+                "expired": 1
+            }
+        },
+        "finished_ns": 49488249698029,
+        "transaction_level": 0,
+        "pdo_transaction": false
+    },
+    "after_fresh_retry": {
+        "period_id": "2503922f-8a73-47a0-b0a1-084b0c774b44",
+        "tail_event_id": "fbf560de-e109-4554-9d45-1bdabacacf5e",
+        "balances": {
+            "available": 0,
+            "reserved": 0,
+            "consumed": 0,
+            "expired": 1
+        },
+        "redemption_ids": [
+            "bda6ef2f-e32c-43f3-8d64-1aad22428747"
+        ],
+        "row_counts": {
+            "production_membership_paid_periods": 1,
+            "production_membership_credit_events": 3,
+            "production_membership_redemptions": 1
+        },
+        "audit_sha256": "caca18f8562c4fef0f7b7550629fffdbee59ca4cdd781d9cf48b3bd0295686ad",
+        "retained_rows_sha256": "41a29177ad1979560a03a3c4e15de6e078856dedfb8aed4fe180eaa3cf2b1330"
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "commit": "9c38a4cb932307de27b795d802e08ce0dac6896d",
+  "owned_files": [
+    "app/Domain/Memberships/Production/MembershipPeriodRecords.php",
+    "app/Domain/Memberships/Production/MembershipLedgerAudit.php",
+    "app/Domain/Memberships/Production/MembershipReservationRecords.php",
+    "tests/Unit/MembershipLedgerAuditTest.php"
+  ],
+  "all_match_tested_sha256": true
+}
