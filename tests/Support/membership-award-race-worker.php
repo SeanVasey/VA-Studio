@@ -45,7 +45,8 @@ $grant->shouldNotReceive('proveReadyCurrent');
 $app->instance(MembershipEligibleLicenseAuthority::class, $license);
 $app->instance(MemberGrantAuthority::class, $grant);
 $pdo = DB::connection()->getPdo();
-$pdo->exec('SET SESSION innodb_lock_wait_timeout = 8');
+// Allow the competing owned operation its original 60-second admission budget.
+$pdo->exec('SET SESSION innodb_lock_wait_timeout = 60');
 $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 $connectionId = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
 $directory = getenv('VA_MEMBERSHIP_AWARD_RACE_DIRECTORY');
@@ -55,7 +56,7 @@ if ($input['operation'] === 'award') {
     $principal = ProductionCustomerPrincipal::forUser($actor);
 }
 file_put_contents($directory.'/ready-'.$worker, json_encode(['connection_id' => $connectionId, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
-$deadline = hrtime(true) + 20_000_000_000;
+$deadline = hrtime(true) + 90_000_000_000;
 while (! is_file($directory.'/start-'.$worker)) {
     if (hrtime(true) >= $deadline) {
         throw new RuntimeException('Synthetic award worker barrier timed out.');

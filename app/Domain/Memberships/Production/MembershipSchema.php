@@ -34,7 +34,19 @@ final class MembershipSchema
         MembershipException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
         [$parents] = (new IdentityMigrationOwnership)->inspect($pdo, $driver);
         MembershipException::require(! in_array(false, $parents, true), 'parent_floor');
-        $this->assertNamespace($pdo, $driver);
+        if ($driver === 'mysql' && ! $ddl) {
+            // Existing runtime graphs are opened before any batched metadata read. The caller's
+            // transaction retains these metadata locks; an autocommit inspection makes no atomicity claim.
+            foreach (self::TABLES as $logical) {
+                try {
+                    $pdo->query('SELECT * FROM '.$this->table($logical).' LIMIT 0')->fetchAll(PDO::FETCH_ASSOC);
+                } catch (\PDOException) {
+                    throw new MembershipException('schema');
+                }
+            }
+        }
+        $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
+        $this->assertNamespace($pdo, $driver, $catalog);
         $plans = [];
         $absent = false;
         $prefixEnded = false;
@@ -64,9 +76,7 @@ final class MembershipSchema
                 $statement->execute([$name]);
                 MembershipException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), array_keys($guards)) === [], 'schema');
             } else {
-                $statement = $pdo->prepare('SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)');
-                $statement->execute([$name]);
-                $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $objects = $catalog->named('SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)', $this->mysqlNames(), $name);
                 MembershipException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TABLE_NAME'] === $name), 'schema_namespace');
                 $actual = $objects[0] ?? false;
                 if ($actual !== false) {
@@ -83,11 +93,10 @@ final class MembershipSchema
                 }
                 if ($actual !== false) {
                     MembershipException::require($actual === ['TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin'], 'schema');
-                    $this->mysqlDefinition($pdo, $name, $definition);
+                    $this->mysqlDefinition($pdo, $name, $definition, $catalog);
                 }
-                $statement = $pdo->prepare('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?');
-                $statement->execute([$name]);
-                MembershipException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), array_keys($guards)) === [], 'schema');
+                $actualGuards = $catalog->named('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?', $this->mysqlNames(), $name);
+                MembershipException::require(array_diff(array_column($actualGuards, 'TRIGGER_NAME'), array_keys($guards)) === [], 'schema');
             }
             MembershipException::require(! (($absent || $prefixEnded) && $actual !== false), 'schema_prefix');
             $absent = $absent || $actual === false;
@@ -104,9 +113,7 @@ final class MembershipSchema
                         MembershipException::require($row['type'] === 'trigger' && $row['tbl_name'] === $name && $this->sql($row['sql']) === $this->sql($expected['sql']), 'schema');
                     }
                 } else {
-                    $statement = $pdo->prepare('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND lower(TRIGGER_NAME) = lower(?)');
-                    $statement->execute([$guard]);
-                    $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                    $objects = $catalog->named('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND lower(TRIGGER_NAME) = lower(?)', $this->mysqlGuardNames(), $guard);
                     MembershipException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TRIGGER_NAME'] === $guard), 'schema_namespace');
                     $row = $objects[0] ?? false;
                     if ($row !== false) {
@@ -275,7 +282,7 @@ final class MembershipSchema
         return $result;
     }
 
-    private function assertNamespace(PDO $pdo, string $driver): void
+    private function assertNamespace(PDO $pdo, string $driver, ?MembershipSchemaCatalog $catalog): void
     {
         $reserved = [];
         foreach (self::TABLES as $logical) {
@@ -313,7 +320,7 @@ final class MembershipSchema
             // CHECK and FK symbols are schema-global in distinct native namespaces.
             // Query with the dictionary's name collation, then require exact bytes and
             // ownership. A foreign table-local index/unique name is allowed to coexist.
-            $statement = $pdo->prepare('SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_TYPE = ? AND CONSTRAINT_NAME = ?');
+            $namespaceParameters = $this->mysqlNamespaceParameters();
             foreach (self::TABLES as $logical) {
                 $name = DB::connection()->getTablePrefix().$logical;
                 $definition = $this->definition($logical, $driver);
@@ -322,12 +329,11 @@ final class MembershipSchema
                     $constraints[$name.'_f'.$index] = 'FOREIGN KEY';
                 }
                 foreach ($constraints as $symbol => $type) {
-                    $statement->execute([$type, $symbol]);
-                    $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                    $objects = $catalog->rows('SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_TYPE = ? AND CONSTRAINT_NAME = ?', $namespaceParameters, $symbol);
                     MembershipException::require($objects === [] || $objects === [['CONSTRAINT_NAME' => $symbol, 'TABLE_NAME' => $name, 'CONSTRAINT_TYPE' => $type]], 'schema_namespace');
                 }
             }
-            $rows = $pdo->query("SELECT TABLE_NAME AS name, 'table' AS type FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() UNION ALL SELECT TRIGGER_NAME AS name, 'trigger' AS type FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE()")->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $pdo->query("SELECT TABLE_NAME AS name, 'table' AS type FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() UNION ALL SELECT TRIGGER_NAME AS name, 'trigger' AS type FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE()")->fetchAll(PDO::FETCH_ASSOC);
             foreach ($reserved as $expected) {
                 if ($expected['type'] === 'trigger') {
                     try {
@@ -351,11 +357,53 @@ final class MembershipSchema
         }
     }
 
-    private function mysqlDefinition(PDO $pdo, string $name, array $definition): void
+    private function mysqlNames(): array
     {
-        $s = $pdo->prepare('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION');
-        $s->execute([$name]);
-        $columns = $s->fetchAll(PDO::FETCH_ASSOC);
+        return array_map($this->physical(...), self::TABLES);
+    }
+
+    private function mysqlGuardNames(): array
+    {
+        $names = [];
+        foreach (self::TABLES as $logical) {
+            $events = ['insert', 'update', 'delete'];
+            foreach ($events as $event) {
+                $names[] = $this->physical($logical).'_'.$event;
+            }
+        }
+
+        return $names;
+    }
+
+    private function mysqlForeignParameters(): array
+    {
+        $parameters = [];
+        foreach (self::TABLES as $logical) {
+            $name = $this->physical($logical);
+            foreach (array_keys($this->definition($logical, 'mysql')['foreign']) as $index => $column) {
+                $parameters[$name.'_f'.$index] = [$name, $name.'_f'.$index];
+            }
+        }
+
+        return $parameters;
+    }
+
+    private function mysqlNamespaceParameters(): array
+    {
+        $parameters = [];
+        foreach ($this->mysqlNames() as $name) {
+            $parameters[$name.'_bounds'] = ['CHECK', $name.'_bounds'];
+        }
+        foreach (array_keys($this->mysqlForeignParameters()) as $name) {
+            $parameters[$name] = ['FOREIGN KEY', $name];
+        }
+
+        return $parameters;
+    }
+
+    private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): void
+    {
+        $columns = $catalog->named('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION', $this->mysqlNames(), $name);
         MembershipException::require(array_column($columns, 'COLUMN_NAME') === array_keys($definition['columns']), 'schema');
         foreach ($columns as $column) {
             $expected = $definition['columns'][$column['COLUMN_NAME']];
@@ -381,30 +429,27 @@ final class MembershipSchema
         ksort($actual);
         ksort($wanted);
         MembershipException::require($actual === $wanted, 'schema');
-        $s = $pdo->prepare('SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ?');
-        $s->execute([$name]);
-        $actual = array_column($s->fetchAll(PDO::FETCH_ASSOC), 'CONSTRAINT_TYPE', 'CONSTRAINT_NAME');
+        $constraints = $catalog->named('SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ?', $this->mysqlNames(), $name);
+        $actual = array_column($constraints, 'CONSTRAINT_TYPE', 'CONSTRAINT_NAME');
         $wanted = ['PRIMARY' => 'PRIMARY KEY', $name.'_bounds' => 'CHECK'];
         foreach ($definition['unique'] as $index => $parts) {
             $wanted[$name.'_u'.$index] = 'UNIQUE';
         }
+        $schema = $pdo->query('SELECT DATABASE()')->fetchColumn();
+        $foreignParameters = $this->mysqlForeignParameters();
         foreach (array_keys($definition['foreign']) as $index => $column) {
             $target = $definition['foreign'][$column];
-            $schema = $pdo->query('SELECT DATABASE()')->fetchColumn();
             $wanted[$name.'_f'.$index] = 'FOREIGN KEY';
-            $s = $pdo->prepare('SELECT COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
-            $s->execute([$name, $name.'_f'.$index]);
-            MembershipException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $schema, 'REFERENCED_TABLE_NAME' => $this->physical($target), 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
-            $s = $pdo->prepare('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?');
-            $s->execute([$name, $name.'_f'.$index]);
-            MembershipException::require($s->fetchAll(PDO::FETCH_ASSOC) === [['UNIQUE_CONSTRAINT_SCHEMA' => $schema, 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
+            $foreign = $catalog->rows('SELECT COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            MembershipException::require($foreign === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $schema, 'REFERENCED_TABLE_NAME' => $this->physical($target), 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
+            $foreign = $catalog->rows('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            MembershipException::require($foreign === [['UNIQUE_CONSTRAINT_SCHEMA' => $schema, 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
         }
         ksort($actual);
         ksort($wanted);
         MembershipException::require($actual === $wanted, 'schema');
-        $s = $pdo->prepare("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?");
-        $s->execute([$name, $name.'_bounds']);
-        $rows = $s->fetchAll(PDO::FETCH_ASSOC);
+        $checks = array_combine($this->mysqlNames(), array_map(fn (string $table): array => [$table, $table.'_bounds'], $this->mysqlNames()));
+        $rows = $catalog->rows("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA = DATABASE() AND BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?", $checks, $name);
         MembershipException::require(count($rows) === 1 && $rows[0]['ENFORCED'] === 'YES' && $this->check($rows[0]['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
     }
 

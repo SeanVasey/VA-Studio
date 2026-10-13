@@ -34,8 +34,9 @@ final class MembershipAwards
 
     public function award(string $locator, ProductionCustomerPrincipal $principal, User $actor): array
     {
-        // The one original budget includes source callbacks, lock waits, commit events and receipt.
-        $deadline = hrtime(true) + 10_000_000_000;
+        // One original 60-second admission deadline includes callbacks, waits, commit and receipt.
+        // Checks refuse elapsed authority; this does not guarantee interruption of a blocking wait.
+        $deadline = hrtime(true) + 60_000_000_000;
         $connection = DB::connection();
         $primary = $connection->getPdo();
         foreach (DB::getConnections() as $source) {

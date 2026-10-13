@@ -158,11 +158,12 @@ class MembershipNativeAwardRaceTest extends TestCase
             'configuration' => ['production-customer-identity' => config('production-customer-identity'),
                 'production-memberships' => config('production-memberships'), 'production-membership-billing' => config('production-membership-billing')]];
         $process = new Process([PHP_BINARY, base_path('tests/Support/membership-award-race-worker.php')], base_path(), $environment,
-            json_encode($input, JSON_THROW_ON_ERROR), 30);
+            // Includes worker startup, the explicit barrier and the owned 60-second admission budget.
+            json_encode($input, JSON_THROW_ON_ERROR), 150);
         $process->start();
         $worker = ['process' => $process, 'index' => $index];
         $this->workers[] = $worker;
-        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$index), [$worker], 15);
+        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$index), [$worker], 20);
         $ready = json_decode(file_get_contents($this->directory.'/ready-'.$index), true, 8, JSON_THROW_ON_ERROR);
         $worker += $ready;
         $this->workers[$index] = $worker;
@@ -207,7 +208,7 @@ SQL);
         return $row !== false && trim($row['row_key'], "'\"") === (string) $id;
     }
 
-    private function await(callable $condition, array $workers, int $seconds = 5): void
+    private function await(callable $condition, array $workers, int $seconds = 20): void
     {
         $deadline = hrtime(true) + $seconds * 1_000_000_000;
         do {
