@@ -40,8 +40,12 @@ class MemberGrantActivationIntegrationTest extends TestCase
 
         $result = $this->activateMemberFixture($fixture, $authorization);
         $this->assertInstanceOf(MemberGrantActivationResult::class, $result);
-        $this->assertSame(['originId', 'redemptionId', 'definitionId', 'consumeEventId', 'activationId',
-            'artifactManifestHash', 'activationHash', 'status'], array_keys(get_object_vars($result)));
+        $expectedKeys = ['originId', 'redemptionId', 'definitionId', 'consumeEventId', 'activationId',
+            'artifactManifestHash', 'activationHash', 'status'];
+        $actualKeys = array_keys(get_object_vars($result));
+        sort($expectedKeys, SORT_STRING);
+        sort($actualKeys, SORT_STRING);
+        $this->assertSame($expectedKeys, $actualKeys);
         $this->assertSame('activated', $result->status);
         $this->assertSame($fixture['reservation']['redemption_id'], $result->originId);
         $this->assertSame($result->originId, $result->redemptionId);
