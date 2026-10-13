@@ -51,6 +51,30 @@
       "test_parent_floor_drift_is_refused_before_the_first_owned_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_complete_current_plan_and_committed_frame_preserve_all_installed_definitions"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_current_snapshot_refuses_replaced_native_transaction_without_rolling_it_back"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_key_configuration_drift_is_not_adopted_by_current_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_missing_required_guard_is_not_repaired"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_same_named_guard_with_changed_literal_bytes_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "test_temp_reserved_guard_name_and_extra_owned_index_are_refused"
+    ],
+    [
       "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
       "test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories"
     ],

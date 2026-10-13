@@ -969,6 +969,26 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
       "test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest",
+      "test_actual_show_definitions_and_read_only_frame_are_accepted"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest",
+      "test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest",
+      "test_native_write_read_and_direct_transactions_are_refused_without_cleanup"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest",
+      "test_native_direct_replacement_and_lazy_resolution_refuse_before_callbacks"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest",
+      "test_native_foreign_facade_manager_transaction_is_never_admitted_or_rolled_back"
     ]
   ]
 }
