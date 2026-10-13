@@ -93,6 +93,7 @@ class MembershipNativeCatalogCurrentnessTest extends TestCase
                 'primary_connection_id' => (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn(),
                 'other_connection_id' => (int) $other->query('SELECT CONNECTION_ID()')->fetchColumn(),
                 'inserted_id' => $insertedId, 'counter_before' => $counterBefore, 'counter_after' => $counterAfter,
+                'raw_before' => $before, 'raw_after' => $after,
                 'raw_before_sha256' => hash('sha256', $before), 'raw_after_sha256' => hash('sha256', $after),
                 'selected_plans_unchanged' => true]);
 
@@ -108,7 +109,7 @@ class MembershipNativeCatalogCurrentnessTest extends TestCase
                 ->execute(['SYNTHETIC selected row changed', $fixture['track']->id]);
             $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql'), 'changed_catalog');
             $this->receipt(['case' => __FUNCTION__, 'stage' => 'original_proof_retained_selected_change_refused',
-                'original_deadline_ns' => $snapshot->deadlineNs]);
+                'original_deadline_ns' => $snapshot->deadlineNs, 'refusal' => 'changed_catalog']);
         });
         $this->noMembershipEffects();
     }
@@ -135,6 +136,9 @@ class MembershipNativeCatalogCurrentnessTest extends TestCase
             try {
                 MembershipCatalogEvidence::proveBytes($snapshot);
                 $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql', false), 'changed_catalog_source');
+                $this->receipt(['case' => __FUNCTION__, 'stage' => 'real_comment_change_refused',
+                    'raw_before' => $before, 'raw_after' => $after, 'selected_plans_unchanged' => true,
+                    'refusal' => 'changed_catalog_source']);
                 $frame->finish();
             } finally {
                 $frame->close();
@@ -172,6 +176,9 @@ class MembershipNativeCatalogCurrentnessTest extends TestCase
                 $this->assertSame($durableRows, $pdo->query('SELECT * FROM tracks ORDER BY id')->fetchAll(PDO::FETCH_ASSOC));
                 $this->assertStringStartsWith('CREATE TEMPORARY TABLE', $this->shown($pdo));
                 $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql'), 'catalog_shadow_or_engine');
+                $this->receipt(['case' => __FUNCTION__, 'stage' => 'identical_row_temporary_shadow_refused',
+                    'shadow_definition' => $this->shown($pdo), 'identical_row_count' => count($durableRows),
+                    'identical_rows_sha256' => hash('sha256', serialize($durableRows)), 'refusal' => 'catalog_shadow_or_engine']);
             } finally {
                 $pdo->exec('DROP TEMPORARY TABLE tracks');
             }
