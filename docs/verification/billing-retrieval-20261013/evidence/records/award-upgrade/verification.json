@@ -1,0 +1,80 @@
+{
+  "runtime": {
+    "php": "8.4.26",
+    "sqlite": "3.46.1"
+  },
+  "phases": {
+    "old": {
+      "source": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "tracked_file_count": 10288,
+      "tests": 1,
+      "assertions": 25,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit": 0,
+      "xml_duration_seconds": "8.578075",
+      "source_unchanged": true
+    },
+    "new": {
+      "source": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "tracked_file_count": 10631,
+      "tests": 1,
+      "assertions": 103,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit": 0,
+      "xml_duration_seconds": "4.768387",
+      "source_unchanged": true
+    }
+  },
+  "total_tests": 2,
+  "total_assertions": 128,
+  "first_execution_each_phase_passed": true,
+  "database_continuity_sha256": "7665950b60d2faf010f2e2fd11d5c6a761395ccf7517ec9a175b96d13e1a7d42",
+  "identical": {
+    "receipt": {
+      "bytes": 272,
+      "sha256": "041333699c841125696be159acab5c6ca4f6f2dd45d5e68d5bfb4972cd68d075",
+      "identical": true
+    },
+    "periods": {
+      "bytes": 3325,
+      "sha256": "ce0f9ac00275bf479ebaf0b82f316fd41b2c3cf9b2b95c948f248e9c99b14ab4",
+      "identical": true
+    },
+    "events": {
+      "bytes": 850,
+      "sha256": "390e621df3f46de73017211a2fcc8d6661300b0af97e3133e3702b0be94ec8fc",
+      "identical": true
+    },
+    "identity": {
+      "bytes": 5826,
+      "sha256": "1e9a2ebf67d703f133caa6ed6e467d28811e290daf1ccc567e557aa0b8271fdc",
+      "identical": true
+    }
+  },
+  "result": {
+    "configuration_hashes": {
+      "app_key_sha256": "02bb66bc8040d2a11f3bd36a1284eaee97eccd4de7ede868834f2a252df37c14",
+      "billing_configuration_sha256": "7410e67b1a8f2a3f5c4e21607f271c2ffab24435649c389981d8b646e5ec4365",
+      "encrypter_key_sha256": "b37361a0be8af8905de1f4384e701365ece4313dd5e064d375eb2851c043ba68",
+      "identity_configuration_sha256": "8d3bc985dfdbfac5292dc4a5b4631f721e0de09eddb182af42019baf5269eb55",
+      "membership_configuration_sha256": "961c0a6d429ea02ae52cddb63a143ddf0a2a5b9ffd6ac97e8306e81dc36806d4"
+    },
+    "database_after": "2026-10-13 06:01:36",
+    "database_before": "2026-10-13 06:01:35",
+    "fresh_retrieved_at": "2026-10-13 06:01:36",
+    "legacy_producer_refusal": "legacy_or_changed_evidence",
+    "observation_schema_version": 3,
+    "observation_sequence": 2,
+    "original_billing_columns_identical": true,
+    "original_identity_bytes_identical": true,
+    "original_period_and_event_bytes_identical": true,
+    "original_public_receipt_identical": true,
+    "provider_paid_at": "2026-10-07 00:00:00",
+    "reconciliation_outcome": "settled",
+    "source": "5dc1169156287bfa22ae91339aaeccbfe13674f7"
+  }
+}

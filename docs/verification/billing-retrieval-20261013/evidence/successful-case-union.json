@@ -1,0 +1,2781 @@
+{
+  "scope": "Explicit successful-invocation precedence, deduplicated by driver and full testcase identity. Mixed source/component evidence, not one integrated or final-source suite. Historical schema, synthetic timing and current263 runtime cases remain separate categories.",
+  "behavior_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "final_source_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "precedence": [
+    "records/helpers-final",
+    "records/issuer-final",
+    "records/legacy-transition",
+    "records/award-upgrade-new",
+    "fixture/sqlite-fixtures-initial",
+    "fixture/sqlite-schema-preparation",
+    "fixture/sqlite-cursor",
+    "root/sqlite-historical-migrations",
+    "root/sqlite-award-proof-integration",
+    "root/sqlite-membership-admission-integration",
+    "consumer/unit",
+    "consumer/terminal-restored-green",
+    "schema/sqlite-currentness-final",
+    "schema/mysql-identity-final",
+    "records/native-producer-canary",
+    "records/native-producer-remainder",
+    "schema/mysql-currentness-fixed",
+    "schema/mysql-upgrade-final",
+    "root/native-canaries-final",
+    "root/native-races-final"
+  ],
+  "groups": [
+    {
+      "driver": "mysql",
+      "coverage_scope": "current263_runtime",
+      "tests": 23,
+      "assertions": 379
+    },
+    {
+      "driver": "mysql",
+      "coverage_scope": "current263_schema_and_upgrade",
+      "tests": 22,
+      "assertions": 390
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "adjacent_membership_preparation",
+      "tests": 8,
+      "assertions": 16
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "current263_genuine_old_writer_replay",
+      "tests": 1,
+      "assertions": 103
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "current263_runtime",
+      "tests": 99,
+      "assertions": 1089
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "current263_schema_and_upgrade",
+      "tests": 30,
+      "assertions": 758
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "historical_through260_schema",
+      "tests": 1,
+      "assertions": 8
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "historical_through262_schema",
+      "tests": 24,
+      "assertions": 153
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "synthetic_admission_clock",
+      "tests": 3,
+      "assertions": 38
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "synthetic_cap_context_propagation",
+      "tests": 4,
+      "assertions": 80
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "synthetic_clock_arithmetic",
+      "tests": 9,
+      "assertions": 17
+    },
+    {
+      "driver": "sqlite",
+      "coverage_scope": "technical_clock_and_record_checks",
+      "tests": 34,
+      "assertions": 57
+    }
+  ],
+  "cases": [
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness",
+      "assertions": 14,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-canary",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before append\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before attempt\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before append\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before end\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v1 envelope\"",
+      "assertions": 44,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v2 row binding\"",
+      "assertions": 44,
+      "status": "passed",
+      "detail": null,
+      "run": "records/native-producer-remainder",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeDatabaseIntervalOwnershipRaceTest::test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers",
+      "assertions": 34,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest::test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest::test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest::test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-currentness-fixed",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-currentness-fixed",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_allocated_identity_fields_remain_immutable",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_both_cross_ledger_directions_refuse_reusing_an_exact_valid_interval",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_endpoints_from_two_reads_cannot_be_spliced_even_with_both_actual_tokens",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_exact_endpoint_identity_and_database_time_are_required_on_both_ledgers",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_positions_require_database_time_and_unique_allocation_and_read_phase",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_same_integer_after_disposable_allocation_replacement_does_not_retain_identity",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_database_timed_observation_can_follow_a_retained_future_worker_timestamp",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_10\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_12\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_13\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_15\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_17\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_19\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_foreign_extension_prefix_and_outer_transaction_are_refused",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_late_table_drift_is_refused_before_any_extension_ddl",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_old_interval_migration_cannot_recreate_a_missing_new_guard",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_populated_upgrade_preserves_old_columns_and_only_adds_null_evidence",
+      "assertions": 63,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table",
+      "assertions": 27,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-canaries-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-canaries-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads",
+      "assertions": 23,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation",
+      "assertions": 19,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-races-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-canaries-final",
+      "driver": "mysql",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Runtime\\AwardUpgrade\\NewWriterAwardReplayTest::test_forward_upgrade_reconciles_fresh_authority_and_replays_original_award_bytes",
+      "assertions": 103,
+      "status": "passed",
+      "detail": null,
+      "run": "records/award-upgrade-new",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_genuine_old_writer_replay"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_drifted_event_guard_refuses_before_repairing_a_missing_owned_guard",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_exact_retained_six_table_upgrade_is_idempotent_and_keeps_every_row",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_foreign_successor_shape_refuses_before_creating_any_guard_or_rewriting_rows",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_lock_requires_owned_outer_transaction_and_upgrade_requires_no_transaction",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_singleton_is_immutable_and_missing_seed_prevents_raw_hint_insertion",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_sqlite_replay_lock_holds_writer_intent_even_without_a_period_insert",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest::test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination",
+      "assertions": 27,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest::test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest::test_legacy_cross_ledger_duplicates_are_refused_without_rewriting_or_resealing_them",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest::test_upgrade_refuses_foreign_guard_drift_and_an_outer_transaction",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness",
+      "assertions": 14,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before append\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before attempt\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before append\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before end\"",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v1 envelope\"",
+      "assertions": 44,
+      "status": "passed",
+      "detail": null,
+      "run": "records/legacy-transition",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v2 row binding\"",
+      "assertions": 44,
+      "status": "passed",
+      "detail": null,
+      "run": "records/legacy-transition",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalAttemptsLegacyUpgradeTest::test_forward_migration_preserves_the_existing_five_tables_and_rows_and_is_idempotent",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through260_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_allocated_identity_fields_remain_immutable",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_both_cross_ledger_directions_refuse_reusing_an_exact_valid_interval",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_endpoints_from_two_reads_cannot_be_spliced_even_with_both_actual_tokens",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_exact_endpoint_identity_and_database_time_are_required_on_both_ledgers",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_positions_require_database_time_and_unique_allocation_and_read_phase",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_same_integer_after_disposable_allocation_replacement_does_not_retain_identity",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_database_timed_observation_can_follow_a_retained_future_worker_timestamp",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_1\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_10\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_11\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_12\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_13\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_14\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_15\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_16\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_17\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_18\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_19\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_2\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_3\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_4\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_5\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_6\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_7\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_8\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_each_exact_interrupted_prefix_resumes_without_rewriting_rows with data set \"prefix_9\"",
+      "assertions": 33,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_foreign_extension_prefix_and_outer_transaction_are_refused",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_late_table_drift_is_refused_before_any_extension_ddl",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_old_interval_migration_cannot_recreate_a_missing_new_guard",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalSchemaUpgradeTest::test_populated_upgrade_preserves_old_columns_and_only_adds_null_evidence",
+      "assertions": 63,
+      "status": "passed",
+      "detail": null,
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_positions_and_attempts_are_immutable",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table",
+      "assertions": 27,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_down_refuses_without_mutation",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_events_deduplicate_by_provider_event_identity",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended",
+      "assertions": 14,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "historical_through262_schema"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_a_forged_hint_beyond_the_first_page_still_fails_the_sweep_closed",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_all_pages_until_exhausted_and_reaches_an_uncovered_hint_beyond_the_first_window",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_all_stops_at_the_overall_bound_and_reports_the_cursor_that_continues_it",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_all_with_dispatch_queues_one_retrieval_per_uncovered_invoice_across_pages",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_an_invalid_tampered_or_foreign_cursor_is_refused_before_anything_is_listed_or_dispatched",
+      "assertions": 57,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_an_uncovered_hint_beyond_the_first_window_is_reached_by_following_the_cursor",
+      "assertions": 14,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_hints_sharing_one_received_at_second_are_each_examined_exactly_once_across_page_boundaries",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest::test_the_policy_is_checked_before_the_cursor_or_any_ledger_read",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_a_definitive_observation_after_an_unknown_one_covers_the_hint",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_a_lost_invoice_payment_dispatch_is_recovered_by_redelivery_through_the_same_identity",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_an_observation_older_than_the_hint_does_not_cover_it",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_concurrent_loser_dispatches_nothing_when_the_winner_was_already_observed",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_concurrent_loser_recovers_a_winner_whose_dispatch_was_lost",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_duplicate_after_a_lost_dispatch_dispatches_once_and_leaves_the_event_row_unchanged",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_duplicate_after_a_successful_observation_dispatches_nothing",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_duplicates_before_the_retrieval_runs_each_schedule_and_only_append_valid_chained_observations",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_duplicates_of_events_that_name_no_retrievable_invoice_dispatch_nothing",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_first_failed_job_retains_its_hint_link_and_redelivery_and_sweep_still_dispatch_until_success",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_invoice_payment_paid_dispatches_for_the_binding_that_owns_the_invoice_identity",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_invoice_payment_paid_for_an_unknown_invoice_keeps_the_hint_and_dispatches_nothing",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"not_settled_invoice_open\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"refused_currency\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"refused_provider_incomplete\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"reversed_refunded\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"settled\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"unknown_inconsistent\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_only_a_definitive_observation_after_the_hint_covers_it with data set \"unknown_unavailable\"",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest::test_two_duplicates_after_a_lost_dispatch_still_result_in_one_observation",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+      "assertions": 14,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_admission_clock"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_admission_clock"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_admission_clock"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_capability_resolution_cannot_remove_a_remaining_capability_before_capture",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_complete_direct_nonshared_factories_support_one_owned_award",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_direct_context_cannot_write_using_policy_facts_and_only_two_real_capabilities",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_invoice_callback_cannot_construct_a_second_context_on_the_owned_rows",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_owned_award_refuses_untracked_capability_aliases_before_writing",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardOwnershipTest::test_transient_capability_rebinding_cannot_make_a_missing_capture_baseline_authoritative",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_original_native_window_is_only_returned_for_the_same_issued_customer_frame",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"award after commit\"",
+      "assertions": 16,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/terminal-restored-green",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_cap_context_propagation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"award before commit\"",
+      "assertions": 16,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/terminal-restored-green",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_cap_context_propagation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"reserve after commit\"",
+      "assertions": 24,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/terminal-restored-green",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_cap_context_propagation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"reserve before commit\"",
+      "assertions": 24,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/terminal-restored-green",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_cap_context_propagation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_retained_billing_freshness_uses_native_time_independently_of_the_worker_carbon_clock",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_a_new_published_revision_does_not_admit_an_old_selection_locator",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_locator_and_expected_revision_have_one_unambiguous_bounded_encoding",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_license_effective_until_caps_wall_and_monotonic_readiness",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_readiness_boundary_and_configuration_change_refuse_existing_proof",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_storage_callback_cannot_authenticate_a_later_graph_instead_of_the_selected_graph",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_raw_evidence_uses_no_file_callback_and_refuses_changed_complete_footprint",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_tokens_require_original_issuer_owner_rows_and_frame_and_cannot_be_copied",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_unpublished_track_and_new_unverified_rights_refuse_catalog_authority",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_after_commit_owner_change_refuses_success_but_does_not_claim_rollback",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committed_callback_uncovered_hint_refuses_success_with_durable_award",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_committing_callback_policy_withdrawal_rolls_back_both_effects",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_direct_pdo_replacement_in_beginning_does_not_adopt_or_rollback_foreign_transaction",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_fresh_identical_retrieval_replays_original_award_but_changed_paid_facts_refuse",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_missing_complete_runtime_capabilities_and_nested_transactions_cannot_award",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "assertions": 15,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_payment_at_exclusive_late_boundary_records_no_award",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_provider_paid_time_controls_late_payment_even_when_retrieval_is_after_period_end",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_a_hint_after_retrieval_requires_a_new_retrieval_before_authority",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_another_current_customer_cannot_use_the_approved_buyers_invoice",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_existing_proof_refuses_a_new_observation_even_with_identical_payment_facts",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_identical_retrieval_changes_evidence_but_preserves_semantic_invoice_graph",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_newer_nonsettled_observation_and_original_freshness_deadline_refuse_authority",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_observation_envelope_binds_deadline_sequence_and_positions_beyond_the_outer_checksum",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_real_retained_billing_proves_original_buyer_and_provider_paid_time",
+      "assertions": 9,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipPaidInvoiceProofTest::test_tokens_cannot_be_forged_copied_serialized_or_reused_on_another_frame",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check",
+      "assertions": 18,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission",
+      "assertions": 31,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture",
+      "assertions": 22,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back",
+      "assertions": 17,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative",
+      "assertions": 25,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_available_expiry_preserves_reserved_credit_and_a_later_release_never_restores_it",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_last_credit_refusal_keeps_exactly_the_first_redemption_and_reserve_event",
+      "assertions": 18,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_release_requires_honor_expiry_then_is_idempotent_and_preserves_award_replay",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_actually_awarded_paid_period",
+      "assertions": 18,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_eligible_selection",
+      "assertions": 24,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects",
+      "assertions": 18,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation",
+      "assertions": 16,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event",
+      "assertions": 17,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities",
+      "assertions": 17,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+      "assertions": 20,
+      "status": "passed",
+      "detail": null,
+      "run": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_default_off_and_missing_approved_facts_refuse_even_with_claimed_enablement",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_flag_and_policy_hash_cannot_replace_actual_typed_invoice_capability",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_nullable_cached_environment_is_an_ordinary_baseline_without_award_authority",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_object_policy_leaves_cannot_become_a_held_configuration_baseline",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_original_dates_are_exact_utc_and_do_not_silently_normalize",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_policy_value_requires_actual_bounded_allowance_and_explicit_billing_currency",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_provider_callback_cannot_withdraw_policy_then_return_a_configuration_baseline",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPreparationTest::test_value_bindings_refuse_secret_fields_and_test_owner_keys",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "adjacent_membership_preparation"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_application_defined_sqlite_clock_function_is_refused_before_invocation with data set #0",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_application_defined_sqlite_clock_function_is_refused_before_invocation with data set #1",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_custom_statement_class_cannot_interpose_a_clock_read",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_declared_driver_must_match_the_actual_native_connection",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_explicit_utc_parsing_preserves_microseconds_under_another_php_timezone",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_native_sqlite_clock_is_bracketed_and_its_anchor_precedes_query_completion",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"epoch\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"invalid day\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"milliseconds only\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"negative anchor\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"no micros\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"out of range\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingDatabaseClockTest::test_noncanonical_or_unbounded_native_values_refuse with data set \"timezone suffix\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_an_expired_database_sample_permanently_retires_the_original_window",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_database_time_cannot_regress_after_any_successful_sample",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_exact_deadline_and_later_database_time_are_expired",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_original_operation_or_producer_cap_remains_an_independent_upper_bound",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_read_end_is_a_lower_bound_and_arithmetic_overflow_refuses",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_rechecking_with_a_later_anchor_cannot_renew_the_first_cap",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_remaining_microseconds_are_anchored_before_the_query_and_never_rounded_up",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_technical_window_cannot_be_copied_serialized_or_rebound_to_another_handle",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingFreshnessWindowTest::test_time_spent_waiting_for_the_initial_clock_query_consumes_its_remaining_lifetime",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "consumer/unit",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "synthetic_clock_arithmetic"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_attempt_v2_binds_reason_clock_and_interval_without_relabelling_legacy_diagnostics",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_authenticated_payload_still_requires_matching_facts_hash",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_current_observation_envelope_authenticates_full_row_and_exact_interval",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_current_version_requires_its_explicit_database_clock_basis",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_legacy_observation_bytes_remain_auditable_after_exact_null_extension_but_not_current with data set #0",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_legacy_observation_bytes_remain_auditable_after_exact_null_extension_but_not_current with data set #1",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_legacy_projection_does_not_drop_partial_nonnull_or_unrelated_columns",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"clock regression\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"different retrieval\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"reused end id\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"reused start id\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"unknown physical column\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"wrong phase\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_numeric_position_alone_cannot_adopt_reallocated_or_mismatched_endpoint with data set \"wrong retained endpoint timestamp\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"created time\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"deadline\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"end allocation\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"position\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"retrieval token\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_recomputing_outer_checksum_cannot_change_authenticated_clock_or_allocation with data set \"start allocation\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    },
+    {
+      "identity": "Tests\\Unit\\BillingRetrievalRecordsTest::test_unknown_physical_columns_are_not_admitted_even_with_a_matching_envelope",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "records/helpers-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "technical_clock_and_record_checks"
+    }
+  ],
+  "overridden_cases": [
+    {
+      "driver": "sqlite",
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"award before commit\"",
+      "earlier_run": "root/sqlite-award-proof-integration",
+      "selected_run": "consumer/terminal-restored-green"
+    },
+    {
+      "driver": "sqlite",
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"award after commit\"",
+      "earlier_run": "root/sqlite-award-proof-integration",
+      "selected_run": "consumer/terminal-restored-green"
+    },
+    {
+      "driver": "sqlite",
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"reserve before commit\"",
+      "earlier_run": "root/sqlite-award-proof-integration",
+      "selected_run": "consumer/terminal-restored-green"
+    },
+    {
+      "driver": "sqlite",
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set \"reserve after commit\"",
+      "earlier_run": "root/sqlite-award-proof-integration",
+      "selected_run": "consumer/terminal-restored-green"
+    }
+  ],
+  "skipped_leaves_excluded_from_pass_union": [
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest::test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "records/issuer-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_runtime"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_database_utc_is_independent_of_session_timezone",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest::test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest::test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape",
+      "assertions": 0,
+      "status": "skipped",
+      "detail": "",
+      "run": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "invocation_exit": 0,
+      "coverage_scope": "current263_schema_and_upgrade"
+    }
+  ]
+}

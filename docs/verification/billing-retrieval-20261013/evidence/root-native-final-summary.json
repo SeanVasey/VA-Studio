@@ -1,0 +1,24 @@
+{
+  "id": "root-native-final",
+  "output": "root-native-final-summary.json",
+  "scope": "Two disjoint native root invocations at exact0d2f06c7; not a whole application suite or hosted CI run.",
+  "runs": [
+    "root/native-canaries-final",
+    "root/native-races-final"
+  ],
+  "expected_counts": {
+    "tests": 11,
+    "assertions": 215,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "database_version": "MySQL 8.4.11",
+  "final_schema_correction_exercised": true,
+  "tests": 11,
+  "assertions": 215,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "disjoint_case_identities": true
+}

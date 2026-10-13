@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php">
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#bulk / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#bulk / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#single / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#single / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#legacy / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#legacy / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#submit / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#submit / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#template / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#template / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#role / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#role / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#email / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#email / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#mfa / worker 0 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#mfa / worker 1 first" name="test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#legacy / capture first" name="test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#legacy / writer first" name="test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#submit / capture first" name="test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"/>
+   <testMethod id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#submit / writer first" name="test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"/>
+  </testClass>
+  <testClass name="Tests\Feature\CustomerSuppressionNativeAdmissionTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerSuppressionNativeAdmissionTest.php">
+   <testMethod id="Tests\Feature\CustomerSuppressionNativeAdmissionTest::test_foreign_reserved_constraint_is_refused_before_any_owned_ddl" name="test_foreign_reserved_constraint_is_refused_before_any_owned_ddl"/>
+  </testClass>
+  <testClass name="Tests\Feature\ExclusiveActivationMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ExclusiveActivationMigrationTest.php">
+   <testMethod id="Tests\Feature\ExclusiveActivationMigrationTest::test_disposable_empty_activation_migration_retains_prior_quotes_and_links" name="test_disposable_empty_activation_migration_retains_prior_quotes_and_links"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductDraftConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductDraftConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs edit" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs history" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#history vs edit" name="test_native_product_wait_serializes_competing_draft_changes"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#create" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#edit" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#history selection" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#inspect" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#choices" name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation"/>
+   <testMethod id="Tests\Feature\ProductDraftConcurrencyTest::test_source_lock_captures_metadata_committed_while_creator_waits" name="test_source_lock_captures_metadata_committed_while_creator_waits"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal" name="test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal" name="test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReviewedOfferDraftConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ReviewedOfferDraftConcurrencyTest.php">
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 0 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 1 first" name="test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders"/>
+  </testClass>
+  <testClass name="Tests\Feature\RightsScopeCommandAttestationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/RightsScopeCommandAttestationTest.php">
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_staging_refuses_writes_without_an_attestation_and_records_nothing" name="test_staging_refuses_writes_without_an_attestation_and_records_nothing"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_staging_admits_attested_writes_and_records_who_when_and_which_scope" name="test_staging_admits_attested_writes_and_records_who_when_and_which_scope"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_an_attestation_is_recorded_only_after_identity_and_environment_are_confirmed" name="test_an_attestation_is_recorded_only_after_identity_and_environment_are_confirmed"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write" name="test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_a_refusal_without_an_attestation_keeps_the_original_wording" name="test_a_refusal_without_an_attestation_keeps_the_original_wording"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_attest_does_not_apply_to_the_read_only_list_action" name="test_attest_does_not_apply_to_the_read_only_list_action"/>
+   <testMethod id="Tests\Feature\RightsScopeCommandAttestationTest::test_testing_keeps_writes_optional_and_records_an_explicit_attestation" name="test_testing_keeps_writes_optional_and_records_an_explicit_attestation"/>
+  </testClass>
+  <testClass name="Tests\Feature\ServiceProjectCommittedReadTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ServiceProjectCommittedReadTest.php">
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_receipt_closes_original_read_after_commit_without_resolving_customer_services_or_renewing_expired_token" name="test_receipt_closes_original_read_after_commit_without_resolving_customer_services_or_renewing_expired_token"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#0" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#1" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#2" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#3" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#4" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#5" name="test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_rollback_and_live_transaction_cannot_be_used_as_committed_read_receipts" name="test_rollback_and_live_transaction_cannot_be_used_as_committed_read_receipts"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_current_operator_read_closes_after_commit_without_a_new_locked_graph_or_transaction" name="test_current_operator_read_closes_after_commit_without_a_new_locked_graph_or_transaction"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_mutation_purpose_cannot_mint_a_post_commit_read_receipt" name="test_mutation_purpose_cannot_mint_a_post_commit_read_receipt"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_temporary_copy_cannot_mask_permanent_post_commit_credential_withdrawal" name="test_temporary_copy_cannot_mask_permanent_post_commit_credential_withdrawal"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#0" name="test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#1" name="test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#2" name="test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#3" name="test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#0" name="test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#1" name="test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#2" name="test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence"/>
+   <testMethod id="Tests\Feature\ServiceProjectCommittedReadTest::test_same_framework_connection_cannot_replace_the_captured_primary_or_prefix_after_commit" name="test_same_framework_connection_cannot_replace_the_captured_primary_or_prefix_after_commit"/>
+  </testClass>
+  <testClass name="Tests\Feature\TestRefundResolutionConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TestRefundResolutionConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands#same request" name="test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands"/>
+   <testMethod id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands#competing request" name="test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands"/>
+   <testMethod id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io" name="test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io"/>
+   <testMethod id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_new_scope_capacity_waits_for_the_refund_release_commit" name="test_new_scope_capacity_waits_for_the_refund_release_commit"/>
+   <testMethod id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_last_promotion_capacity_waits_for_the_same_atomic_refund_release" name="test_last_promotion_capacity_waits_for_the_same_atomic_refund_release"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#bulk / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#bulk / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#single / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#single / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#legacy / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#legacy / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#submit / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#submit / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#template / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#template / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#role / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#role / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#email / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#email / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#mfa / worker 0 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders#mfa / worker 1 first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#legacy / capture first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#legacy / writer first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#submit / capture first"/>
+   <test id="Tests\Feature\BulkReplaceLicenseDraftSourceConcurrencyTest::test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review#submit / writer first"/>
+   <test id="Tests\Feature\CustomerSuppressionNativeAdmissionTest::test_foreign_reserved_constraint_is_refused_before_any_owned_ddl"/>
+   <test id="Tests\Feature\ExclusiveActivationMigrationTest::test_disposable_empty_activation_migration_retains_prior_quotes_and_links"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#edit vs history"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes#history vs edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#create"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#edit"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#history selection"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#inspect"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation#choices"/>
+   <test id="Tests\Feature\ProductDraftConcurrencyTest::test_source_lock_captures_metadata_committed_while_creator_waits"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingNativeStaleRetrievalRaceTest::test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#edit / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#legacy / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#publish / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#deactivate / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#role / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#email / worker 1 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 0 first"/>
+   <test id="Tests\Feature\ReviewedOfferDraftConcurrencyTest::test_reviewed_edits_legacy_publication_deactivation_and_authority_serialize_both_commit_orders#mfa / worker 1 first"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_staging_refuses_writes_without_an_attestation_and_records_nothing"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_staging_admits_attested_writes_and_records_who_when_and_which_scope"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_an_attestation_is_recorded_only_after_identity_and_environment_are_confirmed"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_a_domain_refusal_after_the_attestation_keeps_the_attempt_on_record_without_a_write"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_a_refusal_without_an_attestation_keeps_the_original_wording"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_attest_does_not_apply_to_the_read_only_list_action"/>
+   <test id="Tests\Feature\RightsScopeCommandAttestationTest::test_testing_keeps_writes_optional_and_records_an_explicit_attestation"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_receipt_closes_original_read_after_commit_without_resolving_customer_services_or_renewing_expired_token"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#0"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#1"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#2"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#3"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#4"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_actual_transaction_committed_callback_withdrawal_refuses_private_read_after_earlier_current_proof#5"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_rollback_and_live_transaction_cannot_be_used_as_committed_read_receipts"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_current_operator_read_closes_after_commit_without_a_new_locked_graph_or_transaction"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_mutation_purpose_cannot_mint_a_post_commit_read_receipt"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_temporary_copy_cannot_mask_permanent_post_commit_credential_withdrawal"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#0"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#1"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#2"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows#3"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#0"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#1"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_post_commit_actual_mfa_provider_is_checked_before_final_raw_staff_and_source_fence#2"/>
+   <test id="Tests\Feature\ServiceProjectCommittedReadTest::test_same_framework_connection_cannot_replace_the_captured_primary_or_prefix_after_commit"/>
+   <test id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands#same request"/>
+   <test id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_exact_authority_and_order_fences_keep_one_resolution_for_identical_or_competing_commands#competing request"/>
+   <test id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_committed_actor_withdrawal_fences_the_resolution_request_before_provider_io"/>
+   <test id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_new_scope_capacity_waits_for_the_refund_release_commit"/>
+   <test id="Tests\Feature\TestRefundResolutionConcurrencyTest::test_last_promotion_capacity_waits_for_the_same_atomic_refund_release"/>
+  </group>
+ </groups>
+</testSuite>

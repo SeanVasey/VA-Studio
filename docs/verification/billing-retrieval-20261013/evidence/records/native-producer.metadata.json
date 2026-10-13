@@ -1,0 +1,12 @@
+{
+    "mysql_version": "8.4.11",
+    "port": 3306,
+    "socket": "\/run\/mysql-policy\/mysql.sock",
+    "datadir": "\/var\/lib\/mysql\/",
+    "client_socket": "\/workspace\/runtime\/mysql-policy-run\/mysql.sock",
+    "published_port": 33413,
+    "private_datadir_mount": "\/workspace\/runtime\/mysql-policy-data",
+    "owned_schema": "vaseyaudio_billing_retrieval_producer",
+    "php_version": "8.4.26",
+    "ledger_path": "\/workspace\/VA-Studio-membership-ledger\/app\/Domain\/Memberships\/Billing\/BillingLedger.php"
+}

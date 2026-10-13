@@ -1,0 +1,32 @@
+{
+  "scope": "Archived public runner/setup script bytes compared with their captured receipt hashes; no script is executed by this check.",
+  "bindings": [
+    {
+      "receipt": "root/native-canaries-final.source.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/run-native-focused.py",
+      "sha256": "008e4870ed7bac728d802da880a9d8f3486922e507505abe9ed366a093122e53",
+      "matches_captured_runner_hash": true
+    },
+    {
+      "receipt": "root/native-setup.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/setup-private-native.py",
+      "sha256": "6bc18a825e6eef5af3ecf1f35f7086da5b2f2788743f02dc9d6161c6ca841339",
+      "matches_captured_runner_hash": true
+    },
+    {
+      "receipt": "root/native-races-final.source.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/run-native-focused.py",
+      "sha256": "008e4870ed7bac728d802da880a9d8f3486922e507505abe9ed366a093122e53",
+      "matches_captured_runner_hash": true
+    }
+  ]
+}

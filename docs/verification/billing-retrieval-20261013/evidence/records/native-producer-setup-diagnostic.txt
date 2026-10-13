@@ -1,0 +1,5 @@
+
+Fatal error: Uncaught RuntimeException: Unexpected private instance in /workspace/runtime/billing-retrieval-records-evidence/native-producer-setup.php:7
+Stack trace:
+#0 {main}
+  thrown in /workspace/runtime/billing-retrieval-records-evidence/native-producer-setup.php on line 7

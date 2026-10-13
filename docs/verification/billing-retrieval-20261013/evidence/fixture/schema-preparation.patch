@@ -1,0 +1,136 @@
+diff --git a/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php b/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php
+index 98dccae5..463212bb 100644
+--- a/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php
++++ b/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php
+@@ -14,11 +14,18 @@ use Tests\Support\BillingStripeFixtures as F;
+ use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\TestCase;
+ 
+-/** Synthetic structural evidence only; no retained fixture is an approval or a paid-invoice proof. */
++/** Historical through-262 structural evidence; no retained fixture is an approval or a paid-invoice proof. */
+ class BillingAwardFenceTest extends TestCase
+ {
+     use BillingIntervalFixtures;
+-    use FinalizationDatabaseMigrations;
++    use FinalizationDatabaseMigrations {
++        migrateFreshUsing as private baselineMigrateFreshUsing;
++    }
++
++    protected function migrateFreshUsing(): array
++    {
++        return $this->legacyBillingMigrationOptions($this->baselineMigrateFreshUsing());
++    }
+ 
+     public function test_exact_retained_six_table_upgrade_is_idempotent_and_keeps_every_row(): void
+     {
+diff --git a/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php b/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php
+index 7e9fbed0..41d1f617 100644
+--- a/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php
++++ b/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php
+@@ -3,23 +3,41 @@
+ namespace Tests\Feature\ProductionMembershipBilling;
+ 
+ use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
++use App\Domain\Memberships\Billing\BillingAttemptRecord;
++use App\Domain\Memberships\Billing\BillingEvidenceRecord;
+ use App\Domain\Memberships\Billing\BillingException;
++use App\Domain\Memberships\Billing\BillingLedger;
++use App\Domain\Memberships\Billing\BillingProviderPin;
+ use App\Domain\Memberships\Billing\BillingReconciliation;
++use App\Domain\Memberships\Billing\BillingRetrievalSchema;
+ use App\Domain\Memberships\Billing\BillingSchema;
++use App\Domain\Memberships\Billing\BillingValues;
++use App\Domain\Memberships\Billing\BillingWebhookIntake;
+ use App\Domain\Memberships\Production\MembershipSchema;
+ use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Queue;
+ use Illuminate\Support\Str;
+ use LogicException;
+ use PDOException;
++use Stripe\WebhookSignature;
++use Tests\Support\BillingIntervalFixtures;
+ use Tests\Support\BillingStripeFixtures as F;
+ use Tests\Support\FinalizationDatabaseMigrations;
+ use Tests\Support\RehearsalBillingGateway;
+ use Tests\TestCase;
+ 
+-/** Structural synthetic rows only; no row here is a subscription approval, a paid invoice or an award. */
++/** Historical through-262 structural guards, plus an explicit current-263 producer/immutability case. Synthetic facts only. */
+ class BillingSchemaPreparationTest extends TestCase
+ {
+-    use FinalizationDatabaseMigrations;
++    use BillingIntervalFixtures;
++    use FinalizationDatabaseMigrations {
++        migrateFreshUsing as private baselineMigrateFreshUsing;
++    }
++
++    protected function migrateFreshUsing(): array
++    {
++        return $this->legacyBillingMigrationOptions($this->baselineMigrateFreshUsing());
++    }
+ 
+     public function test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent(): void
+     {
+@@ -45,21 +63,58 @@ class BillingSchemaPreparationTest extends TestCase
+         $invoice = $this->invoice($binding);
+         $this->insert(BillingSchema::TABLES[2], $this->observation($invoice, 1, str_repeat('0', 64), 'unknown'));
+         $this->insert(BillingSchema::TABLES[3], $this->event());
++        // Historical structural attempt, deliberately not emitted by the current database-clock producer.
++        $this->insert(BillingSchema::TABLES[5], ['id' => (string) Str::uuid(), 'subscription_binding_id' => $binding['id'],
++            'invoice_ref_hash' => hash('sha256', 'synthetic legacy attempt'), 'provider_account_hash' => $binding['provider_account_hash'],
++            'mode' => $binding['mode'], 'provenance' => $binding['provenance'], 'hint_event_id' => null,
++            'retrieval_position' => $this->position('retrieval'), 'retrieval_end_position' => $this->position('retrieval'),
++            'outcome' => 'unknown', 'reason' => 'provider_unavailable', 'payload_ciphertext' => 'synthetic placeholder',
++            'seal' => hash('sha256', 'synthetic legacy attempt seal'), 'created_at' => '2026-10-07 00:00:00']);
++        $pdo = DB::connection()->getPdo();
++        // One row each, and five positions: two per observation/attempt plus the event's hint.
++        foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 5, 1]) as $table => $count) {
++            $this->assertSame($count, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
++            $this->pdoRefuses(fn () => $pdo->exec('UPDATE '.$table.' SET created_at = created_at'));
++            $this->pdoRefuses(fn () => $pdo->exec('DELETE FROM '.$table));
++        }
++        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[0], [...$binding, 'id' => (string) Str::uuid()]));
++        $this->assertSame(1, (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_subscriptions')->fetchColumn());
++    }
++
++    public function test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table(): void
++    {
++        (require database_path('migrations/2026_10_13_263000_membership_billing_retrieval_identity.php'))->up();
++        $pdo = DB::connection()->getPdo();
++        (new BillingRetrievalSchema)->assertOwned($pdo);
++        F::configure();
++        $binding = F::binding();
+         try {
+             (new BillingReconciliation(new RehearsalBillingGateway(F::graph(), 'invoice')))->retrieve($binding['id'], F::INVOICE);
+             $this->fail('The first failure retains an attempt, not an invoice.');
+         } catch (BillingException $error) {
+             $this->assertSame('provider_unavailable', $error->reason);
+         }
+-        $pdo = DB::connection()->getPdo();
+-        // One row each, and five positions: two per observation/attempt plus the event's hint.
++        $this->assertSame(0, DB::table(BillingSchema::TABLES[1])->count());
++        $attempt = BillingValues::integers((array) DB::table(BillingSchema::TABLES[5])->sole(), ['retrieval_position', 'retrieval_end_position']);
++        $this->assertSame(2, BillingAttemptRecord::verify($attempt)['schema_version']);
++        $observation = (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
++        $this->assertSame('settled', $observation['outcome']);
++        $this->assertSame(3, BillingEvidenceRecord::verify($observation, BillingEvidenceRecord::OBSERVATION)['schema_version']);
++        $this->assertSame($observation['id'], (new BillingLedger)->currentSettled($observation['invoice_id'])['id']);
++        Queue::fake();
++        $payload = json_encode(['id' => 'evt_SYNTHETICIMMUTABLE263', 'object' => 'event', 'type' => 'invoice.updated', 'livemode' => false,
++            'account' => null, 'api_version' => BillingProviderPin::API_VERSION, 'created' => F::PERIOD_START,
++            'data' => ['object' => F::graph()['invoice']]], JSON_THROW_ON_ERROR);
++        $hint = (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, 'whsec_SYNTHETICREHEARSAL'));
++        $this->assertSame(2, BillingEvidenceRecord::verify($hint['event'], BillingEvidenceRecord::HINT)['schema_version']);
++        $this->assertSame(['end', 'end', 'hint', 'start', 'start'], DB::table(BillingSchema::TABLES[4])->orderBy('phase')->pluck('phase')->all());
++        $before = $this->billingSnapshot();
+         foreach (array_combine(BillingSchema::TABLES, [1, 1, 1, 1, 5, 1]) as $table => $count) {
+             $this->assertSame($count, (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn());
+             $this->pdoRefuses(fn () => $pdo->exec('UPDATE '.$table.' SET created_at = created_at'));
+             $this->pdoRefuses(fn () => $pdo->exec('DELETE FROM '.$table));
+         }
+-        $this->pdoRefuses(fn () => $this->insert(BillingSchema::TABLES[0], [...$binding, 'id' => (string) Str::uuid()]));
+-        $this->assertSame(1, (int) $pdo->query('SELECT COUNT(*) FROM production_membership_billing_subscriptions')->fetchColumn());
++        $this->assertSame($before, $this->billingSnapshot());
+     }
+ 
+     /**

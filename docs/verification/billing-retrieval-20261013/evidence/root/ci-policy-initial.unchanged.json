@@ -1,0 +1,10 @@
+{
+  "files": 1043,
+  "changed": [],
+  "all_three_processes_completed": true,
+  "exit_codes": {
+    "test-phpunit-shards": 0,
+    "test-database-receipts": 0,
+    "test-ci-scope": 0
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "head": "1fb14b45ae94c6c99102f148e06f556af460cfa3",
+  "cwd": "/workspace/VA-Studio-billing-retrieval-hints",
+  "file": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php",
+  "source_before": "c87f0c4fb30a64ee08c8689db176ad0a90fcf7d8d05f4ee32f7575657256c309",
+  "checks": [
+    {
+      "argv": [
+        "php",
+        "-l",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php"
+      ],
+      "exit": 0,
+      "log": "legacy260-static-0.log"
+    },
+    {
+      "argv": [
+        "php",
+        "/workspace/VA-Studio-membership-reservations/vendor/bin/pint",
+        "--test",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php"
+      ],
+      "exit": 0,
+      "log": "legacy260-static-1.log"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "log": "legacy260-static-2.log"
+    }
+  ],
+  "test_bodies": "Not run: coordinated schema dependencies still pending.",
+  "source_after": "c87f0c4fb30a64ee08c8689db176ad0a90fcf7d8d05f4ee32f7575657256c309",
+  "unchanged": true
+}

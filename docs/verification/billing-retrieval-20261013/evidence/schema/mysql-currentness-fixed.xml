@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" tests="2" assertions="34" errors="0" failures="0" skipped="0" time="133.311834">
+    <testcase name="test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" line="18" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalGuardDefinitionTest" assertions="13" time="59.989225"/>
+    <testcase name="test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php" line="72" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalGuardDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalGuardDefinitionTest" assertions="21" time="73.322609"/>
+  </testsuite>
+</testsuites>

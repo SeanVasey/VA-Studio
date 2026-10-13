@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerListeningMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerListeningMigrationTest.php">
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history" name="test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#empty" name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#populated" name="test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#index" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#column" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#trigger" name="test_foreign_or_drifted_objects_are_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_temporary_shadow_is_never_adopted_or_dropped" name="test_temporary_shadow_is_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after complete up" name="test_real_migrator_restarts_an_exact_complete_unrecorded_install"/>
+   <testMethod id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after atomic CREATE event" name="test_real_migrator_restarts_an_exact_complete_unrecorded_install"/>
+  </testClass>
+  <testClass name="Tests\Feature\MediaWriterConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/MediaWriterConcurrencyTest.php">
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+  </testClass>
+  <testClass name="Tests\Feature\NativeSchemaIsolationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/NativeSchemaIsolationTest.php">
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration" name="test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#hyphen" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#dollar" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#non-ASCII" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+  </testClass>
+  <testClass name="Tests\Feature\PaidGrantSchemaRecoveryTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/PaidGrantSchemaRecoveryTest.php">
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly" name="test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down" name="test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#0" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#1" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#2" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#3" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#4" name="test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target" name="test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl" name="test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"/>
+   <testMethod id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_no_line_can_activate_until_all_first_originals_are_complete_and_immutable" name="test_no_line_can_activate_until_all_first_originals_are_complete_and_immutable"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingLegacyObservationTransitionTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingLegacyObservationTransitionTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current#original v1 envelope" name="test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current#original v2 row binding" name="test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent" name="test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_positions_and_attempts_are_immutable" name="test_bindings_invoices_observations_events_positions_and_attempts_are_immutable"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table" name="test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing" name="test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind" name="test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended" name="test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp" name="test_the_retrieval_start_must_be_a_microsecond_timestamp"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner" name="test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode" name="test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount" name="test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_events_deduplicate_by_provider_event_identity" name="test_events_deduplicate_by_provider_event_identity"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted" name="test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker" name="test_reserved_guard_name_collision_refuses_and_retains_foreign_marker"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_down_refuses_without_mutation" name="test_down_refuses_without_mutation"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding" name="test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_identical_retry_keeps_original_author_row_and_creation_time" name="test_identical_retry_keeps_original_author_row_and_creation_time"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_changed_customer_price_buyer_or_policy_cannot_reassign_a_subscription" name="test_changed_customer_price_buyer_or_policy_cannot_reassign_a_subscription"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_legacy_binding_remains_readable_but_cannot_be_adopted_as_approved_authority" name="test_legacy_binding_remains_readable_but_cannot_be_adopted_as_approved_authority"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_approval_requires_enabled_authoring_and_exact_approved_policy" name="test_approval_requires_enabled_authoring_and_exact_approved_policy"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_nonstaff_unenrolled_stale_and_revoked_staff_are_refused_even_on_retry" name="test_nonstaff_unenrolled_stale_and_revoked_staff_are_refused_even_on_retry"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_authenticated_record_binds_all_columns_even_when_outer_checksum_is_recomputed" name="test_authenticated_record_binds_all_columns_even_when_outer_checksum_is_recomputed"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_staff_revocation_rolls_back_without_an_approval" name="test_encryption_callback_staff_revocation_rolls_back_without_an_approval"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_policy_withdrawal_refuses_before_write" name="test_encryption_callback_policy_withdrawal_refuses_before_write"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_cannot_remove_a_billing_guard_before_the_write" name="test_encryption_callback_cannot_remove_a_billing_guard_before_the_write"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_result_is_provisional_and_caller_rollback_retains_no_approval" name="test_result_is_provisional_and_caller_rollback_retains_no_approval"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline" name="test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline" name="test_later_producer_lease_cannot_renew_the_original_operation_deadline"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back" name="test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back"/>
+  </testClass>
+  <testClass name="Tests\Feature\TransactionalNotificationMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TransactionalNotificationMigrationTest.php">
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_empty_owned_rollback_reinstall_and_absent_rollback_preserve_the_complete_guard_set" name="test_empty_owned_rollback_reinstall_and_absent_rollback_preserve_the_complete_guard_set"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_existing_owned_and_populated_schema_is_not_adopted_or_erased" name="test_existing_owned_and_populated_schema_is_not_adopted_or_erased"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_owned_tables_keep_restrictive_foreign_keys_with_a_different_mysql_default_engine" name="test_owned_tables_keep_restrictive_foreign_keys_with_a_different_mysql_default_engine"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_every_notice_field_and_deletion_is_immutable_even_for_a_noop_raw_update" name="test_every_notice_field_and_deletion_is_immutable_even_for_a_noop_raw_update"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_unique_notice_collisions_never_replace_original_rows_without_recursive_delete_triggers" name="test_unique_notice_collisions_never_replace_original_rows_without_recursive_delete_triggers"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_raw_insert_requires_exact_notice_identity_policy_hashes_authority_and_activation" name="test_raw_insert_requires_exact_notice_identity_policy_hashes_authority_and_activation"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_raw_attempt_insertion_enforces_exact_lease_shape_ttl_sequence_and_creation_floor" name="test_raw_attempt_insertion_enforces_exact_lease_shape_ttl_sequence_and_creation_floor"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_attempt_claim_identity_and_illegal_states_or_padding_cannot_change_a_lease" name="test_attempt_claim_identity_and_illegal_states_or_padding_cannot_change_a_lease"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_known_failure_requires_a_new_bounded_claim_and_uncertainty_never_authorizes_another_attempt" name="test_known_failure_requires_a_new_bounded_claim_and_uncertainty_never_authorizes_another_attempt"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_unique_attempt_collisions_cannot_retire_or_replace_claim_evidence" name="test_unique_attempt_collisions_cannot_retire_or_replace_claim_evidence"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_temporary_table_and_guard_shadows_are_rejected_before_any_permanent_ddl" name="test_temporary_table_and_guard_shadows_are_rejected_before_any_permanent_ddl"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_partial_unknown_or_case_aliased_schema_is_never_adopted_or_dropped" name="test_partial_unknown_or_case_aliased_schema_is_never_adopted_or_dropped"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_foreign_guard_or_index_name_collision_is_preserved_before_creation" name="test_foreign_guard_or_index_name_collision_is_preserved_before_creation"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra column" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra index" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#missing index" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#missing guard" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#changed guard" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra guard" name="test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationMigrationTest::test_external_empty_child_foreign_key_prevents_all_rollback_ddl" name="test_external_empty_child_foreign_key_prevents_all_rollback_ddl"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_repeated_complete_owned_install_preserves_customer_preferences_and_real_credit_history"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#empty"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_rollback_always_refuses_before_query_and_retains_schema_history_and_repository_record#populated"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#index"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#column"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_foreign_or_drifted_objects_are_never_adopted_or_dropped#trigger"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_temporary_shadow_is_never_adopted_or_dropped"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after complete up"/>
+   <test id="Tests\Feature\CustomerListeningMigrationTest::test_real_migrator_restarts_an_exact_complete_unrecorded_install#after atomic CREATE event"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / publication first"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#hyphen"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#dollar"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#non-ASCII"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#0"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#1"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#2"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#3"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write#4"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"/>
+   <test id="Tests\Feature\PaidGrantSchemaRecoveryTest::test_no_line_can_activate_until_all_first_originals_are_complete_and_immutable"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current#original v1 envelope"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingLegacyObservationTransitionTest::test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current#original v2 row binding"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_bindings_invoices_observations_events_positions_and_attempts_are_immutable"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_an_observation_from_an_earlier_or_reused_position_is_refused_by_the_guard_and_the_worker_clock_orders_nothing"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_positions_are_issued_only_by_the_database_and_each_backs_one_row_of_its_own_kind"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_end_position_must_be_an_unused_later_retrieval_position_and_a_read_must_begin_after_the_tails_read_ended"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_the_retrieval_start_must_be_a_microsecond_timestamp"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_binding_requires_existing_plan_version_of_same_provenance_and_active_verified_owner"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_invoice_identity_is_unique_and_scoped_to_its_binding_account_and_mode"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_observations_are_contiguous_hash_linked_and_settled_requires_period_and_amount"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_events_deduplicate_by_provider_event_identity"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_down_refuses_without_mutation"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_identical_retry_keeps_original_author_row_and_creation_time"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_changed_customer_price_buyer_or_policy_cannot_reassign_a_subscription"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_legacy_binding_remains_readable_but_cannot_be_adopted_as_approved_authority"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_approval_requires_enabled_authoring_and_exact_approved_policy"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_nonstaff_unenrolled_stale_and_revoked_staff_are_refused_even_on_retry"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_authenticated_record_binds_all_columns_even_when_outer_checksum_is_recomputed"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_staff_revocation_rolls_back_without_an_approval"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_policy_withdrawal_refuses_before_write"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_cannot_remove_a_billing_guard_before_the_write"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_result_is_provisional_and_caller_rollback_retains_no_approval"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_empty_owned_rollback_reinstall_and_absent_rollback_preserve_the_complete_guard_set"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_existing_owned_and_populated_schema_is_not_adopted_or_erased"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_owned_tables_keep_restrictive_foreign_keys_with_a_different_mysql_default_engine"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_every_notice_field_and_deletion_is_immutable_even_for_a_noop_raw_update"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_unique_notice_collisions_never_replace_original_rows_without_recursive_delete_triggers"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_raw_insert_requires_exact_notice_identity_policy_hashes_authority_and_activation"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_raw_attempt_insertion_enforces_exact_lease_shape_ttl_sequence_and_creation_floor"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_attempt_claim_identity_and_illegal_states_or_padding_cannot_change_a_lease"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_known_failure_requires_a_new_bounded_claim_and_uncertainty_never_authorizes_another_attempt"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_unique_attempt_collisions_cannot_retire_or_replace_claim_evidence"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_temporary_table_and_guard_shadows_are_rejected_before_any_permanent_ddl"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_partial_unknown_or_case_aliased_schema_is_never_adopted_or_dropped"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_foreign_guard_or_index_name_collision_is_preserved_before_creation"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra column"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra index"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#missing index"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#missing guard"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#changed guard"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_modified_empty_schema_refuses_before_dropping_either_table_or_any_remaining_guard#extra guard"/>
+   <test id="Tests\Feature\TransactionalNotificationMigrationTest::test_external_empty_child_foreign_key_prevents_all_rollback_ddl"/>
+  </group>
+ </groups>
+</testSuite>

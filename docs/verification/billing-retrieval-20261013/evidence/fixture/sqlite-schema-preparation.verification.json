@@ -1,0 +1,19 @@
+{
+  "tested_head": "a063e38067193562593a6e560db01c9daf4cf8c6",
+  "tested_two_file_overlay_committed_as": "822408d2a840a1de2154f5adcd63671f2b839e34",
+  "all_source_hashes_equal_final_commit": true,
+  "source_count": 1956,
+  "mismatches": [],
+  "distinct_cases": 21,
+  "assertions": 142,
+  "classes": {
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest": {
+      "tests": 14,
+      "assertions": 108
+    },
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest": {
+      "tests": 7,
+      "assertions": 34
+    }
+  }
+}

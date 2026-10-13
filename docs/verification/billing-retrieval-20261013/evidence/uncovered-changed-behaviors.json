@@ -1,0 +1,13 @@
+{
+  "scope": "Required native identity reconciliation plus explicit untested conditions; no acceptance decision or whole-suite claim.",
+  "behavior_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "pending_root_native_cases": [],
+  "pending_schema_native_selection": null,
+  "out_of_scope_conditions": [
+    "No real provider credentials, network payment processing, or customer entitlements.",
+    "No production binding/activation, deploy, host verification, backup/restore/failover claim, or C4 grant consume.",
+    "No Foundation CI or GitLab dispatch; local discovery and policy tooling do not establish hosted CI.",
+    "SQLite interrupted prefixes 1\u201319 are distinct from the selected native prefix subset; no all-prefix native claim.",
+    "Synthetic cap arithmetic/offsets and Context narrowing are not physical elapsed-time or wall-clock interruption guarantees."
+  ]
+}

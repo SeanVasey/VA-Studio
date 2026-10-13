@@ -1,0 +1,10 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-billing-retrieval-fixtures/phpunit.xml
+
+...............................................                   47 / 47 (100%)
+
+Time: 05:45.771, Memory: 104.00 MB
+
+[30;42mOK (47 tests, 429 assertions)[0m

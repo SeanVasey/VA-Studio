@@ -1,0 +1,1957 @@
+{
+  "scope": "Completed focused evidence with actual component source bindings and frozen root native reference; overlapping invocations are not one suite or a unique passing total.",
+  "final_source_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "pending": [
+    "independent final review and exact-head preflight (root-owned)"
+  ],
+  "runs": [
+    {
+      "id": "records/helpers-initial",
+      "driver": "sqlite",
+      "source_description": "Clock and versioned record helper component; synthetic arithmetic and native SQLite clock checks.",
+      "xml": "records/helpers-initial.xml",
+      "exit": "records/helpers-initial.exit",
+      "source_receipts": [
+        "records/helpers-initial.sources.json"
+      ],
+      "command_receipts": [
+        "records/helpers-initial.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 32,
+        "assertions": 54,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/helpers-final",
+      "driver": "sqlite",
+      "source_description": "Clock and versioned record helper component; synthetic arithmetic and native SQLite clock checks.",
+      "xml": "records/helpers-final.xml",
+      "exit": "records/helpers-final.exit",
+      "source_receipts": [
+        "records/helpers-final.sources.json"
+      ],
+      "command_receipts": [
+        "records/helpers-final.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 34,
+        "assertions": 57,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/issuer-canary",
+      "driver": "sqlite",
+      "source_description": "Component writer source; initial canary/full precede current-read fallback; final source 7ed9ef47.",
+      "xml": "records/issuer-canary.xml",
+      "exit": "records/issuer-canary.exit",
+      "source_receipts": [
+        "records/issuer-canary.sources.json"
+      ],
+      "command_receipts": [
+        "records/issuer-canary.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 14,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/issuer-full",
+      "driver": "sqlite",
+      "source_description": "Component writer source; initial canary/full precede current-read fallback; final source 7ed9ef47.",
+      "xml": "records/issuer-full.xml",
+      "exit": "records/issuer-full.exit",
+      "source_receipts": [
+        "records/issuer-full.sources.json"
+      ],
+      "command_receipts": [
+        "records/issuer-full.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 43,
+        "assertions": 124,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/issuer-final",
+      "driver": "sqlite",
+      "source_description": "Component writer source; initial canary/full precede current-read fallback; final source 7ed9ef47.",
+      "xml": "records/issuer-final.xml",
+      "exit": "records/issuer-final.exit",
+      "source_receipts": [
+        "records/issuer-final.sources.json"
+      ],
+      "command_receipts": [
+        "records/issuer-final.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 10,
+        "assertions": 67,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "id": "records/legacy-transition",
+      "driver": "sqlite",
+      "source_description": "5dc11691; authentic legacy-format synthetic rows, not genuine old writer.",
+      "xml": "records/legacy-transition.xml",
+      "exit": "records/legacy-transition.exit",
+      "source_receipts": [
+        "records/legacy-transition.sources.json"
+      ],
+      "command_receipts": [
+        "records/legacy-transition.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 2,
+        "assertions": 88,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/native-producer-canary",
+      "driver": "mysql",
+      "source_description": "5dc11691; private MySQL 8.4.11, one actual producer case.",
+      "xml": "records/native-producer-canary.xml",
+      "exit": "records/native-producer-canary.exit",
+      "source_receipts": [
+        "records/native-producer-canary.source.json"
+      ],
+      "command_receipts": [
+        "records/run-native.py",
+        "records/native-producer.metadata.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 14,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/baseline",
+      "driver": "sqlite",
+      "source_description": "45d12994 original APIs; four intended baseline assertion failures.",
+      "xml": "records/baseline/phpunit.xml",
+      "exit": "records/baseline/phpunit.exit",
+      "source_receipts": [
+        "records/baseline/source-before.json",
+        "records/baseline/source-after.json"
+      ],
+      "command_receipts": [
+        "records/baseline/run.sh"
+      ],
+      "expected_exit": 1,
+      "expected_counts": {
+        "tests": 4,
+        "assertions": 53,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/award-upgrade-old",
+      "driver": "sqlite",
+      "source_description": "Genuine public old writer / same persisted SQLite / 263 / new real reconciliation; runtime test source retained separately.",
+      "xml": "records/award-upgrade/old-phpunit.xml",
+      "exit": "records/award-upgrade/old-phpunit.exit",
+      "source_receipts": [
+        "records/award-upgrade/old-source-before.json",
+        "records/award-upgrade/old-source-after.json"
+      ],
+      "command_receipts": [
+        "records/award-upgrade/run-phase.sh",
+        "records/award-upgrade/README.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 25,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/award-upgrade-new",
+      "driver": "sqlite",
+      "source_description": "Genuine public old writer / same persisted SQLite / 263 / new real reconciliation; runtime test source retained separately.",
+      "xml": "records/award-upgrade/new-phpunit.xml",
+      "exit": "records/award-upgrade/new-phpunit.exit",
+      "source_receipts": [
+        "records/award-upgrade/new-source-before.json",
+        "records/award-upgrade/new-source-after.json"
+      ],
+      "command_receipts": [
+        "records/award-upgrade/run-phase.sh",
+        "records/award-upgrade/README.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 103,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/sqlite-upgrade-initial",
+      "driver": "sqlite",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/sqlite-upgrade-initial.xml",
+      "exit": "schema/sqlite-upgrade-initial.exit",
+      "source_receipts": [
+        "schema/sqlite-upgrade-initial.source.json",
+        "schema/sqlite-upgrade-initial.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/sqlite-upgrade-initial.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 23,
+        "assertions": 698,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/sqlite-identity-initial",
+      "driver": "sqlite",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/sqlite-identity-initial.xml",
+      "exit": "schema/sqlite-identity-initial.exit",
+      "source_receipts": [
+        "schema/sqlite-identity-initial.source.json",
+        "schema/sqlite-identity-initial.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/sqlite-identity-initial.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 7,
+        "assertions": 54,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "id": "schema/mysql-canary",
+      "driver": "mysql",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/mysql-canary.xml",
+      "exit": "schema/mysql-canary.exit",
+      "source_receipts": [
+        "schema/mysql-canary.source.json",
+        "schema/mysql-canary.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/mysql-canary.source.json"
+      ],
+      "expected_exit": 2,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/mysql-canary-diagnostic",
+      "driver": "mysql",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/mysql-canary-diagnostic.xml",
+      "exit": "schema/mysql-canary-diagnostic.exit",
+      "source_receipts": [
+        "schema/mysql-canary-diagnostic.source.json",
+        "schema/mysql-canary-diagnostic.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/mysql-canary-diagnostic.source.json"
+      ],
+      "expected_exit": 2,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/mysql-canary-fixed",
+      "driver": "mysql",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/mysql-canary-fixed.xml",
+      "exit": "schema/mysql-canary-fixed.exit",
+      "source_receipts": [
+        "schema/mysql-canary-fixed.source.json",
+        "schema/mysql-canary-fixed.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/mysql-canary-fixed.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 1,
+        "assertions": 63,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/sqlite-final",
+      "driver": "sqlite",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/sqlite-final.xml",
+      "exit": "schema/sqlite-final.exit",
+      "source_receipts": [
+        "schema/sqlite-final.source.json",
+        "schema/sqlite-final.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/sqlite-final.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 33,
+        "assertions": 758,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 3
+      }
+    },
+    {
+      "id": "schema/mysql-identity-final",
+      "driver": "mysql",
+      "source_description": "Schema component at documented overlays; final component reference 57c9bf9f, preceding pending P1 correction.",
+      "xml": "schema/mysql-identity-final.xml",
+      "exit": "schema/mysql-identity-final.exit",
+      "source_receipts": [
+        "schema/mysql-identity-final.source.json",
+        "schema/mysql-identity-final.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands.md",
+        "schema/mysql-identity-final.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 9,
+        "assertions": 81,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "fixture/sqlite-fixtures-initial",
+      "driver": "sqlite",
+      "source_description": "Exact full captured source bound to a063e38067193562593a6e560db01c9daf4cf8c6; overlays committed after run as documented.",
+      "xml": "fixture/sqlite-fixtures-initial.xml",
+      "exit": "fixture/sqlite-fixtures-initial.exit",
+      "source_receipts": [
+        "fixture/sqlite-fixtures-initial.source.json",
+        "fixture/sqlite-fixtures-initial.verification.json"
+      ],
+      "command_receipts": [
+        "fixture/run-fixture-sqlite.py",
+        "fixture/commands.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 47,
+        "assertions": 429,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "fixture/sqlite-schema-preparation",
+      "driver": "sqlite",
+      "source_description": "Exact full captured source bound to 822408d2a840a1de2154f5adcd63671f2b839e34; overlays committed after run as documented.",
+      "xml": "fixture/sqlite-schema-preparation.xml",
+      "exit": "fixture/sqlite-schema-preparation.exit",
+      "source_receipts": [
+        "fixture/sqlite-schema-preparation.source.json",
+        "fixture/sqlite-schema-preparation.verification.json"
+      ],
+      "command_receipts": [
+        "fixture/run-fixture-sqlite.py",
+        "fixture/commands.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 21,
+        "assertions": 142,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "fixture/sqlite-cursor",
+      "driver": "sqlite",
+      "source_description": "Exact full captured source bound to a4c68a506ef6ef8a73533d342ca9d8c8c15a064a; overlays committed after run as documented.",
+      "xml": "fixture/sqlite-cursor.xml",
+      "exit": "fixture/sqlite-cursor.exit",
+      "source_receipts": [
+        "fixture/sqlite-cursor.source.json",
+        "fixture/sqlite-cursor.verification.json"
+      ],
+      "command_receipts": [
+        "fixture/run-fixture-sqlite.py",
+        "fixture/commands.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 8,
+        "assertions": 123,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/sqlite-historical-migrations",
+      "driver": "sqlite",
+      "source_description": "Exact root source 67fa03a72798997f95ffd1f0358707ca051b3dc9; full invocation status preserved, including timestamp/order assertion failures.",
+      "xml": "root/sqlite-historical-migrations.xml",
+      "exit": "root/sqlite-historical-migrations.exit",
+      "source_receipts": [
+        "root/sqlite-historical-migrations.source.json",
+        "root/sqlite-historical-migrations.result.json"
+      ],
+      "command_receipts": [
+        "root/run-focused.py"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 5,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/sqlite-award-proof-integration",
+      "driver": "sqlite",
+      "source_description": "Exact root source bea13e9cf4f6d50fe4c51023186afd6e846ccefc; full invocation status preserved, including timestamp/order assertion failures.",
+      "xml": "root/sqlite-award-proof-integration.xml",
+      "exit": "root/sqlite-award-proof-integration.exit",
+      "source_receipts": [
+        "root/sqlite-award-proof-integration.source.json",
+        "root/sqlite-award-proof-integration.result.json"
+      ],
+      "command_receipts": [
+        "root/run-focused.py"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 32,
+        "assertions": 320,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/sqlite-billing-api-integration",
+      "driver": "sqlite",
+      "source_description": "Exact root source 3bcf22ca18b084683a101b322dc81809fc583c93; full invocation status preserved, including timestamp/order assertion failures.",
+      "xml": "root/sqlite-billing-api-integration.xml",
+      "exit": "root/sqlite-billing-api-integration.exit",
+      "source_receipts": [
+        "root/sqlite-billing-api-integration.source.json",
+        "root/sqlite-billing-api-integration.result.json"
+      ],
+      "command_receipts": [
+        "root/run-focused.py"
+      ],
+      "expected_exit": 1,
+      "expected_counts": {
+        "tests": 51,
+        "assertions": 316,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/sqlite-hint-job-integration",
+      "driver": "sqlite",
+      "source_description": "Exact root source 8631279671e65396255b5876036daa9abbb2e130; full invocation status preserved, including timestamp/order assertion failures.",
+      "xml": "root/sqlite-hint-job-integration.xml",
+      "exit": "root/sqlite-hint-job-integration.exit",
+      "source_receipts": [
+        "root/sqlite-hint-job-integration.source.json",
+        "root/sqlite-hint-job-integration.result.json"
+      ],
+      "command_receipts": [
+        "root/run-focused.py"
+      ],
+      "expected_exit": 1,
+      "expected_counts": {
+        "tests": 54,
+        "assertions": 353,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/sqlite-membership-admission-integration",
+      "driver": "sqlite",
+      "source_description": "Exact root source e050e7200e1ffe76b66b486e74383261fed1229d; full invocation status preserved, including timestamp/order assertion failures.",
+      "xml": "root/sqlite-membership-admission-integration.xml",
+      "exit": "root/sqlite-membership-admission-integration.exit",
+      "source_receipts": [
+        "root/sqlite-membership-admission-integration.source.json",
+        "root/sqlite-membership-admission-integration.result.json"
+      ],
+      "command_receipts": [
+        "root/run-focused.py"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 16,
+        "assertions": 169,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1
+      }
+    },
+    {
+      "id": "consumer/unit",
+      "driver": "sqlite",
+      "source_description": "Synthetic technical math.",
+      "xml": "consumer/unit.xml",
+      "exit": "consumer/unit.exit",
+      "source_receipts": [
+        "consumer/unit.before.sha256",
+        "consumer/unit.after.sha256",
+        "consumer/unit.base"
+      ],
+      "command_receipts": [
+        "consumer/unit.sh",
+        "consumer/commands.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 9,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "consumer/terminal-omission-red",
+      "driver": "sqlite",
+      "source_description": "bea13e9c Context propagation comparison; omission still refused publicly by complementary checks, direct Context terminal reason is the tested distinction.",
+      "xml": "consumer/terminal-omission-red.xml",
+      "exit": "consumer/terminal-omission-red.exit",
+      "source_receipts": [
+        "consumer/terminal-omission-red.before.sha256",
+        "consumer/terminal-omission-red.after.sha256",
+        "consumer/terminal-omission-red.base"
+      ],
+      "command_receipts": [
+        "consumer/terminal-check.sh",
+        "consumer/commands.md"
+      ],
+      "expected_exit": 1,
+      "expected_counts": {
+        "tests": 4,
+        "assertions": 56,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "consumer/terminal-restored-green",
+      "driver": "sqlite",
+      "source_description": "bea13e9c Context propagation comparison; omission still refused publicly by complementary checks, direct Context terminal reason is the tested distinction.",
+      "xml": "consumer/terminal-restored-green.xml",
+      "exit": "consumer/terminal-restored-green.exit",
+      "source_receipts": [
+        "consumer/terminal-restored-green.before.sha256",
+        "consumer/terminal-restored-green.after.sha256",
+        "consumer/terminal-restored-green.base"
+      ],
+      "command_receipts": [
+        "consumer/terminal-check.sh",
+        "consumer/commands.md"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 4,
+        "assertions": 80,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "records/native-producer-remainder",
+      "driver": "mysql",
+      "source_description": "5dc11691 on private MySQL 8.4.11; remaining eleven actual producer cases, separate from the one-case canary and preceding schema P1 correction.",
+      "xml": "records/native-producer-remainder.xml",
+      "exit": "records/native-producer-remainder.exit",
+      "source_receipts": [
+        "records/native-producer-remainder.source.json",
+        "records/native-producer-remainder.source-check.json"
+      ],
+      "command_receipts": [
+        "records/run-native.py",
+        "records/native-producer.metadata.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 11,
+        "assertions": 150,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/mysql-currentness-red",
+      "driver": "mysql",
+      "source_description": "Original application 57c9bf9f plus retained new two-method test capsule; two expected assertion failures for stale guard/table dictionary acceptance.",
+      "xml": "schema/mysql-currentness-red.xml",
+      "exit": "schema/mysql-currentness-red.exit",
+      "source_receipts": [
+        "schema/mysql-currentness-red.source.json",
+        "schema/mysql-currentness-red.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands-currentness.md",
+        "schema/mysql-currentness-red.source.json"
+      ],
+      "expected_exit": 1,
+      "expected_counts": {
+        "tests": 2,
+        "assertions": 28,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/mysql-currentness-fixed",
+      "driver": "mysql",
+      "source_description": "Fixed component 71f545bd; exact captured application/test source, preceding final root native integration.",
+      "xml": "schema/mysql-currentness-fixed.xml",
+      "exit": "schema/mysql-currentness-fixed.exit",
+      "source_receipts": [
+        "schema/mysql-currentness-fixed.source.json",
+        "schema/mysql-currentness-fixed.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands-currentness.md",
+        "schema/mysql-currentness-fixed.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 2,
+        "assertions": 34,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "schema/sqlite-currentness-final",
+      "driver": "sqlite",
+      "source_description": "Fixed component 71f545bd; exact captured application/test source, preceding final root native integration.",
+      "xml": "schema/sqlite-currentness-final.xml",
+      "exit": "schema/sqlite-currentness-final.exit",
+      "source_receipts": [
+        "schema/sqlite-currentness-final.source.json",
+        "schema/sqlite-currentness-final.unchanged.json"
+      ],
+      "command_receipts": [
+        "schema/commands-currentness.md",
+        "schema/sqlite-currentness-final.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 35,
+        "assertions": 758,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 5
+      }
+    },
+    {
+      "id": "schema/mysql-upgrade-final",
+      "driver": "mysql",
+      "source_description": "Final component 71f545bd: populated upgrade, six exact interrupted prefixes, drift/refusal and legacy-clock transition; no skips. Separate from root integration.",
+      "xml": "schema/mysql-upgrade-final.xml",
+      "exit": "schema/mysql-upgrade-final.exit",
+      "source_receipts": [
+        "schema/mysql-upgrade-final.source.json",
+        "schema/mysql-upgrade-final.unchanged.json",
+        "schema/mysql-upgrade-final.commit-map.json"
+      ],
+      "command_receipts": [
+        "schema/commands-final.md",
+        "schema/mysql-upgrade-final.source.json"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 11,
+        "assertions": 275,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/native-canaries-final",
+      "driver": "mysql",
+      "source_description": "Root integration at 0d2f06c7 on private MySQL8.4.11: actual award replay, reservation replay, and current263 producer/immutability canaries. Separate from the still-running eight race/postcommit cases.",
+      "xml": "root/native-canaries-final.xml",
+      "exit": "root/native-canaries-final.exit",
+      "source_receipts": [
+        "root/native-canaries-final.source.json",
+        "root/native-canaries-final.result.json"
+      ],
+      "command_receipts": [
+        "root/run-native-focused.py",
+        "root/run-native-integration.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 3,
+        "assertions": 63,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "root/native-races-final",
+      "driver": "mysql",
+      "source_description": "Final root 0d2f06c7 on private MySQL8.4.11: eight independent-process interval/stale/hint and committed-owner cases. Small separate in-memory C4 workload briefly overlapped timing; no database state overlap or exclusive CPU claim.",
+      "xml": "root/native-races-final.xml",
+      "exit": "root/native-races-final.exit",
+      "source_receipts": [
+        "root/native-races-final.source.json",
+        "root/native-races-final.result.json"
+      ],
+      "command_receipts": [
+        "root/run-native-focused.py",
+        "root/run-native-integration.sh"
+      ],
+      "expected_exit": 0,
+      "expected_counts": {
+        "tests": 8,
+        "assertions": 152,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "source_bindings": [
+    {
+      "id": "helpers-initial",
+      "receipt": "records/helpers-initial.sources.json",
+      "reference": "a8facf90b1360f5c9b593b4bad40a5962be423b6",
+      "keys": [],
+      "require_exact": false,
+      "limitation": "Initial helper version differs from final helper source."
+    },
+    {
+      "id": "helpers-final",
+      "receipt": "records/helpers-final.sources.json",
+      "reference": "a8facf90b1360f5c9b593b4bad40a5962be423b6",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "issuer-canary",
+      "receipt": "records/issuer-canary.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical source is compared with the later committed writer; any mismatches remain explicit, not final evidence."
+    },
+    {
+      "id": "issuer-full",
+      "receipt": "records/issuer-full.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical source is compared with the later committed writer; any mismatches remain explicit, not final evidence."
+    },
+    {
+      "id": "issuer-final",
+      "receipt": "records/issuer-final.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "legacy-transition",
+      "receipt": "records/legacy-transition.sources.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "native-producer-canary",
+      "receipt": "records/native-producer-canary.source.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "baseline",
+      "receipt": "records/baseline/source-before.json",
+      "reference": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "award-upgrade-old",
+      "receipt": "records/award-upgrade/old-source-before.json",
+      "reference": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "award-upgrade-new",
+      "receipt": "records/award-upgrade/new-source-before.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-upgrade-initial",
+      "receipt": "schema/sqlite-upgrade-initial.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit."
+    },
+    {
+      "id": "sqlite-identity-initial",
+      "receipt": "schema/sqlite-identity-initial.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit."
+    },
+    {
+      "id": "mysql-canary",
+      "receipt": "schema/mysql-canary.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit."
+    },
+    {
+      "id": "mysql-canary-diagnostic",
+      "receipt": "schema/mysql-canary-diagnostic.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit."
+    },
+    {
+      "id": "mysql-canary-fixed",
+      "receipt": "schema/mysql-canary-fixed.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit."
+    },
+    {
+      "id": "sqlite-final",
+      "receipt": "schema/sqlite-final.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "mysql-identity-final",
+      "receipt": "schema/mysql-identity-final.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-fixtures-initial",
+      "receipt": "fixture/sqlite-fixtures-initial.source.json",
+      "reference": "a063e38067193562593a6e560db01c9daf4cf8c6",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-schema-preparation",
+      "receipt": "fixture/sqlite-schema-preparation.source.json",
+      "reference": "822408d2a840a1de2154f5adcd63671f2b839e34",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-cursor",
+      "receipt": "fixture/sqlite-cursor.source.json",
+      "reference": "a4c68a506ef6ef8a73533d342ca9d8c8c15a064a",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-historical-migrations",
+      "receipt": "root/sqlite-historical-migrations.source.json",
+      "reference": "67fa03a72798997f95ffd1f0358707ca051b3dc9",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-award-proof-integration",
+      "receipt": "root/sqlite-award-proof-integration.source.json",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-billing-api-integration",
+      "receipt": "root/sqlite-billing-api-integration.source.json",
+      "reference": "3bcf22ca18b084683a101b322dc81809fc583c93",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-hint-job-integration",
+      "receipt": "root/sqlite-hint-job-integration.source.json",
+      "reference": "8631279671e65396255b5876036daa9abbb2e130",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-membership-admission-integration",
+      "receipt": "root/sqlite-membership-admission-integration.source.json",
+      "reference": "e050e7200e1ffe76b66b486e74383261fed1229d",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "unit",
+      "receipt": "consumer/unit.before.sha256",
+      "reference": "cd58ada94e4e88c82d1d565dabc92cbaa01e112d",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "terminal-omission-red",
+      "receipt": "consumer/terminal-omission-red.before.sha256",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [],
+      "require_exact": true,
+      "overlay": "consumer/terminal-omission.overlay.patch"
+    },
+    {
+      "id": "terminal-restored-green",
+      "receipt": "consumer/terminal-restored-green.before.sha256",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "consumer-static",
+      "receipt": "consumer/static.before.sha256",
+      "reference": "cd58ada94e4e88c82d1d565dabc92cbaa01e112d",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "native-arbitration-static",
+      "receipt": "consumer/native-arbitration-static.before.sha256",
+      "reference": "b229f5bfa4ea0bedfd15dd687908bc9d92259d62",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "ci-policy-initial",
+      "receipt": "root/ci-policy-initial.source.json",
+      "reference": "e050e7200e1ffe76b66b486e74383261fed1229d",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "native-producer-remainder",
+      "receipt": "records/native-producer-remainder.source.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "mysql-currentness-red",
+      "receipt": "schema/mysql-currentness-red.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "retained_overrides": {
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php": "schema/currentness-red-test-source.php.txt"
+      }
+    },
+    {
+      "id": "mysql-currentness-fixed",
+      "receipt": "schema/mysql-currentness-fixed.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "sqlite-currentness-final",
+      "receipt": "schema/sqlite-currentness-final.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "discovery-initial",
+      "receipt": "selection/discovery.sources.json",
+      "reference": "67d85d6e07953a272118ec3d339ec2bb8b7ecaec",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "discovery-final",
+      "receipt": "selection/final-67d85d6e/discovery.sources.json",
+      "reference": "67d85d6e07953a272118ec3d339ec2bb8b7ecaec",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "quality-initial",
+      "receipt": "quality/sources-before.json",
+      "reference": "874d57fe1897569a520b4627acd4f34d5c3e6d80",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "quality-pint-v2",
+      "receipt": "quality/pint-v2/sources-before.json",
+      "reference": "51b6d59f3cc21a218a00b2480fc97c7bd076ffae",
+      "keys": [],
+      "require_exact": true
+    },
+    {
+      "id": "mysql-upgrade-final",
+      "receipt": "schema/mysql-upgrade-final.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "native-canaries-final",
+      "receipt": "root/native-canaries-final.source.json",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    },
+    {
+      "id": "native-races-final",
+      "receipt": "root/native-races-final.source.json",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true
+    }
+  ],
+  "source_stability": [
+    {
+      "id": "records/helpers-final",
+      "receipt": "records/helpers-final-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "records/issuer-canary",
+      "receipt": "records/issuer-canary-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true
+    },
+    {
+      "id": "records/issuer-full",
+      "receipt": "records/issuer-full-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true
+    },
+    {
+      "id": "records/issuer-final",
+      "receipt": "records/issuer-final-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true
+    },
+    {
+      "id": "records/legacy-transition",
+      "receipt": "records/legacy-transition-source-check.json",
+      "keys": [
+        "unchanged"
+      ],
+      "expected": true
+    },
+    {
+      "id": "records/native-producer-canary",
+      "receipt": "records/native-producer-canary.source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "records/baseline",
+      "before": {
+        "receipt": "records/baseline/source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/baseline/source-after.json",
+        "keys": [
+          "files"
+        ]
+      }
+    },
+    {
+      "id": "records/award-upgrade-old",
+      "before": {
+        "receipt": "records/award-upgrade/old-source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/award-upgrade/old-source-after.json",
+        "keys": [
+          "files"
+        ]
+      }
+    },
+    {
+      "id": "records/award-upgrade-new",
+      "before": {
+        "receipt": "records/award-upgrade/new-source-before.json",
+        "keys": [
+          "files"
+        ]
+      },
+      "after": {
+        "receipt": "records/award-upgrade/new-source-after.json",
+        "keys": [
+          "files"
+        ]
+      }
+    },
+    {
+      "id": "schema/sqlite-upgrade-initial",
+      "receipt": "schema/sqlite-upgrade-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/sqlite-identity-initial",
+      "receipt": "schema/sqlite-identity-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-canary",
+      "receipt": "schema/mysql-canary.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-canary-diagnostic",
+      "receipt": "schema/mysql-canary-diagnostic.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-canary-fixed",
+      "receipt": "schema/mysql-canary-fixed.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/sqlite-final",
+      "receipt": "schema/sqlite-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-identity-final",
+      "receipt": "schema/mysql-identity-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "fixture/sqlite-fixtures-initial",
+      "receipt": "fixture/sqlite-fixtures-initial.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "fixture/sqlite-schema-preparation",
+      "receipt": "fixture/sqlite-schema-preparation.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "fixture/sqlite-cursor",
+      "receipt": "fixture/sqlite-cursor.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/sqlite-historical-migrations",
+      "receipt": "root/sqlite-historical-migrations.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/sqlite-award-proof-integration",
+      "receipt": "root/sqlite-award-proof-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/sqlite-billing-api-integration",
+      "receipt": "root/sqlite-billing-api-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/sqlite-hint-job-integration",
+      "receipt": "root/sqlite-hint-job-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/sqlite-membership-admission-integration",
+      "receipt": "root/sqlite-membership-admission-integration.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "consumer/unit",
+      "before": {
+        "receipt": "consumer/unit.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/unit.after.sha256"
+      }
+    },
+    {
+      "id": "consumer/terminal-omission-red",
+      "before": {
+        "receipt": "consumer/terminal-omission-red.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/terminal-omission-red.after.sha256"
+      }
+    },
+    {
+      "id": "consumer/terminal-restored-green",
+      "before": {
+        "receipt": "consumer/terminal-restored-green.before.sha256"
+      },
+      "after": {
+        "receipt": "consumer/terminal-restored-green.after.sha256"
+      }
+    },
+    {
+      "id": "root/ci-policy-initial",
+      "receipt": "root/ci-policy-initial.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "records/native-producer-remainder",
+      "receipt": "records/native-producer-remainder.source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-currentness-red",
+      "receipt": "schema/mysql-currentness-red.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/mysql-currentness-fixed",
+      "receipt": "schema/mysql-currentness-fixed.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "schema/sqlite-currentness-final",
+      "receipt": "schema/sqlite-currentness-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "selection/discovery-initial",
+      "receipt": "selection/discovery-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "selection/discovery-final",
+      "receipt": "selection/final-67d85d6e/discovery-source-check.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "quality/initial",
+      "before": {
+        "receipt": "quality/sources-before.json"
+      },
+      "after": {
+        "receipt": "quality/sources-after.json"
+      }
+    },
+    {
+      "id": "quality/pint-v2",
+      "before": {
+        "receipt": "quality/pint-v2/sources-before.json"
+      },
+      "after": {
+        "receipt": "quality/pint-v2/sources-after.json"
+      }
+    },
+    {
+      "id": "schema/mysql-upgrade-final",
+      "receipt": "schema/mysql-upgrade-final.unchanged.json",
+      "keys": [
+        "changed"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/native-canaries-final",
+      "receipt": "root/native-canaries-final.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    },
+    {
+      "id": "root/native-races-final",
+      "receipt": "root/native-races-final.result.json",
+      "keys": [
+        "changed_sources"
+      ],
+      "expected": []
+    }
+  ],
+  "source_stability_unavailable": [
+    "records/helpers-initial: single source map and passing receipt retained; no separately retained after-map or stability sidecar."
+  ],
+  "command_runs": [
+    {
+      "id": "root/ci-initial-test-phpunit-shards",
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "log": "root/ci-initial-test-phpunit-shards.log",
+      "exit": "root/ci-initial-test-phpunit-shards.exit",
+      "expected_exit": 0,
+      "unittest_count": 52,
+      "source_receipt": "root/ci-policy-initial.source.json",
+      "source_description": "Preliminary e050e720; final schema selection/census not integrated, not hosted CI or application checks."
+    },
+    {
+      "id": "root/ci-initial-test-database-receipts",
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "log": "root/ci-initial-test-database-receipts.log",
+      "exit": "root/ci-initial-test-database-receipts.exit",
+      "expected_exit": 0,
+      "unittest_count": 61,
+      "source_receipt": "root/ci-policy-initial.source.json",
+      "source_description": "Preliminary e050e720; final schema selection/census not integrated, not hosted CI or application checks."
+    },
+    {
+      "id": "root/ci-initial-test-ci-scope",
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "log": "root/ci-initial-test-ci-scope.log",
+      "exit": "root/ci-initial-test-ci-scope.exit",
+      "expected_exit": 0,
+      "unittest_count": 27,
+      "source_receipt": "root/ci-policy-initial.source.json",
+      "source_description": "Preliminary e050e720; final schema selection/census not integrated, not hosted CI or application checks."
+    },
+    {
+      "id": "selection/discovery-initial",
+      "argv": [
+        "bash",
+        "/workspace/runtime/billing-retrieval-selection-evidence/discovery.sh"
+      ],
+      "log": "selection/discovery.txt",
+      "exit": "selection/discovery.exit",
+      "expected_exit": 1,
+      "log_contains": [
+        "Cannot redeclare class",
+        "PHPUnit test discovery failed"
+      ],
+      "source_receipt": "selection/discovery.sources.json",
+      "source_description": "Enumeration only at 67d85d6e07953a272118ec3d339ec2bb8b7ecaec; MySQL endpoint 127.0.0.1:1 is unreachable; no test bodies ran."
+    },
+    {
+      "id": "selection/discovery-final",
+      "argv": [
+        "bash",
+        "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.sh"
+      ],
+      "log": "selection/final-67d85d6e/discovery.txt",
+      "exit": "selection/final-67d85d6e/discovery.exit",
+      "expected_exit": 0,
+      "log_contains": [
+        "Proved 2068 selected MySQL-native tests in 199 files (of 8151 discovered tests in 599 files) across 24 nonempty shards."
+      ],
+      "source_receipt": "selection/final-67d85d6e/discovery.sources.json",
+      "source_description": "Enumeration only at 67d85d6e07953a272118ec3d339ec2bb8b7ecaec; MySQL endpoint 127.0.0.1:1 is unreachable; no test bodies ran."
+    },
+    {
+      "id": "quality/pint",
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Memberships/Billing/BillingAttemptRecord.php",
+        "app/Domain/Memberships/Billing/BillingDatabaseClock.php",
+        "app/Domain/Memberships/Billing/BillingDatabaseInstant.php",
+        "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+        "app/Domain/Memberships/Billing/BillingFreshnessWindow.php",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+        "app/Domain/Memberships/Billing/BillingLedger.php",
+        "app/Domain/Memberships/Billing/BillingReconciliation.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalInterval.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalSchema.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalStart.php",
+        "app/Domain/Memberships/Billing/BillingSchema.php",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php",
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+        "app/Domain/Memberships/Production/MembershipReservationContext.php",
+        "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+        "database/migrations/2026_10_13_263000_membership_billing_retrieval_identity.php",
+        "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingLegacyObservationTransitionTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeDatabaseIntervalOwnershipRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+        "tests/Support/BillingIntervalFixtures.php",
+        "tests/Support/MembershipAwardFixtures.php",
+        "tests/Support/MembershipReservationFixtures.php",
+        "tests/Support/membership-interval-race-worker.php",
+        "tests/Unit/BillingDatabaseClockTest.php",
+        "tests/Unit/BillingFreshnessWindowTest.php",
+        "tests/Unit/BillingRetrievalRecordsTest.php"
+      ],
+      "log": "quality/pint.log",
+      "exit": "quality/pint.exit",
+      "expected_exit": 1,
+      "source_receipt": "quality/sources-before.json",
+      "source_description": "Exact local command at 874d57fe1897569a520b4627acd4f34d5c3e6d80; source inventories unchanged, no hosted CI dispatch.",
+      "pint_result": "fail",
+      "selected_php_files": 56
+    },
+    {
+      "id": "quality/test-phpunit-shards",
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "log": "quality/test-phpunit-shards.log",
+      "exit": "quality/test-phpunit-shards.exit",
+      "expected_exit": 0,
+      "source_receipt": "quality/sources-before.json",
+      "source_description": "Exact local command at 874d57fe1897569a520b4627acd4f34d5c3e6d80; source inventories unchanged, no hosted CI dispatch.",
+      "unittest_count": 52
+    },
+    {
+      "id": "quality/test-database-receipts",
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "log": "quality/test-database-receipts.log",
+      "exit": "quality/test-database-receipts.exit",
+      "expected_exit": 0,
+      "source_receipt": "quality/sources-before.json",
+      "source_description": "Exact local command at 874d57fe1897569a520b4627acd4f34d5c3e6d80; source inventories unchanged, no hosted CI dispatch.",
+      "unittest_count": 61
+    },
+    {
+      "id": "quality/test-ci-scope",
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "log": "quality/test-ci-scope.log",
+      "exit": "quality/test-ci-scope.exit",
+      "expected_exit": 0,
+      "source_receipt": "quality/sources-before.json",
+      "source_description": "Exact local command at 874d57fe1897569a520b4627acd4f34d5c3e6d80; source inventories unchanged, no hosted CI dispatch.",
+      "unittest_count": 27
+    },
+    {
+      "id": "quality/test-workflow-cadence",
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "log": "quality/test-workflow-cadence.log",
+      "exit": "quality/test-workflow-cadence.exit",
+      "expected_exit": 0,
+      "source_receipt": "quality/sources-before.json",
+      "source_description": "Exact local command at 874d57fe1897569a520b4627acd4f34d5c3e6d80; source inventories unchanged, no hosted CI dispatch.",
+      "unittest_count": 14
+    },
+    {
+      "id": "quality/pint-v2/pint",
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Memberships/Billing/BillingAttemptRecord.php",
+        "app/Domain/Memberships/Billing/BillingDatabaseClock.php",
+        "app/Domain/Memberships/Billing/BillingDatabaseInstant.php",
+        "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+        "app/Domain/Memberships/Billing/BillingFreshnessWindow.php",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+        "app/Domain/Memberships/Billing/BillingLedger.php",
+        "app/Domain/Memberships/Billing/BillingReconciliation.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalInterval.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalSchema.php",
+        "app/Domain/Memberships/Billing/BillingRetrievalStart.php",
+        "app/Domain/Memberships/Billing/BillingSchema.php",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php",
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+        "app/Domain/Memberships/Production/MembershipReservationContext.php",
+        "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+        "database/migrations/2026_10_13_263000_membership_billing_retrieval_identity.php",
+        "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingLegacyObservationTransitionTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeDatabaseIntervalOwnershipRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+        "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+        "tests/Support/BillingIntervalFixtures.php",
+        "tests/Support/MembershipAwardFixtures.php",
+        "tests/Support/MembershipReservationFixtures.php",
+        "tests/Support/membership-interval-race-worker.php",
+        "tests/Unit/BillingDatabaseClockTest.php",
+        "tests/Unit/BillingFreshnessWindowTest.php",
+        "tests/Unit/BillingRetrievalRecordsTest.php"
+      ],
+      "log": "quality/pint-v2/pint.log",
+      "exit": "quality/pint-v2/pint.exit",
+      "expected_exit": 0,
+      "source_receipt": "quality/pint-v2/sources-before.json",
+      "source_description": "Exact local command at 51b6d59f3cc21a218a00b2480fc97c7bd076ffae; source inventories unchanged, no hosted CI dispatch.",
+      "pint_result": "passed",
+      "selected_php_files": 56
+    }
+  ],
+  "disjoint_component_groups": [
+    {
+      "id": "native-producer",
+      "output": "native-producer-component-summary.json",
+      "scope": "Two disjoint producer invocations at component source 5dc11691, not one suite invocation or final-schema integration result.",
+      "runs": [
+        "records/native-producer-canary",
+        "records/native-producer-remainder"
+      ],
+      "expected_counts": {
+        "tests": 12,
+        "assertions": 164,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "database_version": "MySQL 8.4.11",
+      "final_schema_correction_exercised": false
+    },
+    {
+      "id": "root-native-final",
+      "output": "root-native-final-summary.json",
+      "scope": "Two disjoint native root invocations at exact0d2f06c7; not a whole application suite or hosted CI run.",
+      "runs": [
+        "root/native-canaries-final",
+        "root/native-races-final"
+      ],
+      "expected_counts": {
+        "tests": 11,
+        "assertions": 215,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "database_version": "MySQL 8.4.11",
+      "final_schema_correction_exercised": true
+    }
+  ],
+  "discovery_receipts": [
+    {
+      "id": "selection/final-67d85d6e",
+      "directory": "selection/final-67d85d6e/listings",
+      "source_root": "/workspace/VA-Studio-billing-retrieval",
+      "output": "discovery-summary.json",
+      "source": "67d85d6e"
+    }
+  ],
+  "external_program_bindings": [
+    {
+      "id": "records/baseline",
+      "before": "records/baseline/source-before.json",
+      "after": "records/baseline/source-after.json",
+      "programs": {
+        "records/baseline/BillingPreC3RegressionTest.php": [
+          "probe_sha256"
+        ],
+        "records/baseline/run.sh": [
+          "command_sha256"
+        ]
+      }
+    },
+    {
+      "id": "records/award-upgrade-old",
+      "before": "records/award-upgrade/old-source-before.json",
+      "after": "records/award-upgrade/old-source-after.json",
+      "programs": {
+        "records/award-upgrade/OldWriterAwardTest.php": [
+          "programs",
+          "OldWriterAwardTest.php"
+        ],
+        "records/award-upgrade/NewWriterAwardReplayTest.php": [
+          "programs",
+          "NewWriterAwardReplayTest.php"
+        ],
+        "records/award-upgrade/AwardUpgradeRuntime.php": [
+          "programs",
+          "AwardUpgradeRuntime.php"
+        ],
+        "records/award-upgrade/run-phase.sh": [
+          "programs",
+          "run-phase.sh"
+        ],
+        "records/award-upgrade/source_receipt.py": [
+          "programs",
+          "source_receipt.py"
+        ]
+      }
+    },
+    {
+      "id": "records/award-upgrade-new",
+      "before": "records/award-upgrade/new-source-before.json",
+      "after": "records/award-upgrade/new-source-after.json",
+      "programs": {
+        "records/award-upgrade/OldWriterAwardTest.php": [
+          "programs",
+          "OldWriterAwardTest.php"
+        ],
+        "records/award-upgrade/NewWriterAwardReplayTest.php": [
+          "programs",
+          "NewWriterAwardReplayTest.php"
+        ],
+        "records/award-upgrade/AwardUpgradeRuntime.php": [
+          "programs",
+          "AwardUpgradeRuntime.php"
+        ],
+        "records/award-upgrade/run-phase.sh": [
+          "programs",
+          "run-phase.sh"
+        ],
+        "records/award-upgrade/source_receipt.py": [
+          "programs",
+          "source_receipt.py"
+        ]
+      }
+    }
+  ],
+  "policy_carry_receipts": [
+    {
+      "receipt": "quality/pint-v2/policy-carry.json",
+      "before": "quality/sources-before.json",
+      "after": "quality/pint-v2/sources-before.json",
+      "original_results": "quality/results.json"
+    }
+  ],
+  "imported_digest_manifests": [
+    {
+      "receipt": "quality/artifact-digests.json",
+      "directory": "quality"
+    },
+    {
+      "receipt": "quality/pint-v2/artifact-digests.json",
+      "directory": "quality/pint-v2"
+    },
+    {
+      "receipt": "schema/component-release-digests.json",
+      "directory": "schema",
+      "keys": [
+        "sha256"
+      ],
+      "path_overrides": {
+        "commands.md": "commands-final.md",
+        "runbook-facts.md": "runbook-facts-final.md"
+      },
+      "original_archive_hashes": true
+    }
+  ],
+  "discovery_cleanup_receipts": [
+    {
+      "receipt": "selection/generated-file-cleanup.json",
+      "archived_directory": "selection/final-67d85d6e/listings"
+    }
+  ],
+  "runner_hash_bindings": [
+    {
+      "receipt": "root/native-canaries-final.source.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/run-native-focused.py"
+    },
+    {
+      "receipt": "root/native-setup.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/setup-private-native.py"
+    },
+    {
+      "receipt": "root/native-races-final.source.json",
+      "keys": [
+        "runner_sha256"
+      ],
+      "program": "root/run-native-focused.py"
+    }
+  ],
+  "native_worker_receipts": [
+    {
+      "run": "root/native-races-final",
+      "receipt": "root/native-races-final-interval-workers/test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers-01fe8f8c-7dcc-40da-985e-1d222a2ec8e8.json"
+    }
+  ]
+}

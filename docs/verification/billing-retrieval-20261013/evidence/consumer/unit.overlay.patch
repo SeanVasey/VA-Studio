@@ -1,0 +1,404 @@
+diff --git a/app/Domain/Memberships/Production/MembershipAwardContext.php b/app/Domain/Memberships/Production/MembershipAwardContext.php
+index e8ea5e9d..e32c4679 100644
+--- a/app/Domain/Memberships/Production/MembershipAwardContext.php
++++ b/app/Domain/Memberships/Production/MembershipAwardContext.php
+@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+ use App\Domain\Customers\ProductionCustomerAccess;
+ use App\Domain\Customers\ProductionCustomerPrincipal;
+ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
++use App\Domain\Memberships\Billing\BillingFreshnessWindow;
+ use App\Domain\Memberships\Billing\BillingPolicy;
+ use App\Models\User;
+ use App\Support\CanonicalJson;
+@@ -22,6 +23,8 @@ final class MembershipAwardContext
+ 
+     private MembershipPaidInvoiceProof $invoiceProof;
+ 
++    private ?BillingFreshnessWindow $invoiceFreshness = null;
++
+     private MembershipPolicyFactsProof $policyProof;
+ 
+     private MembershipInvoiceBinding $invoice;
+@@ -60,6 +63,7 @@ final class MembershipAwardContext
+         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
+         $this->invoiceProof = $configuration->invoices->lock($locator, $principal, $actor, $rows);
+         $this->invoice = $this->invoiceProof->binding();
++        $this->invoiceFreshness = $configuration->invoices->freshnessWindow($this->invoiceProof, $principal, $actor, $rows);
+         MembershipException::require($this->invoice->planVersionId !== null && $this->invoice->paidAt !== null
+             && $this->invoice->invoiceId !== null && $this->invoice->evidenceDeadline !== null, 'source_facts_absent');
+         $this->policyProof = $configuration->policies->lock($this->invoice->planVersionId, $rows);
+@@ -104,7 +108,7 @@ final class MembershipAwardContext
+     public function proveCurrent(): void
+     {
+         $this->proveSources();
+-        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration);
++        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration, $this->invoiceFreshness);
+         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
+         MembershipPolicyVersions::document($plan);
+         MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
+@@ -124,7 +128,7 @@ final class MembershipAwardContext
+         MembershipException::require($frame->reader()->identityPrimary() === $this->rows->identity(), 'changed_primary');
+         $this->admit();
+         (new MembershipSchema)->assertOwned($this->rows->identity());
+-        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline);
++        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline, $this->invoiceFreshness);
+         $plan = $this->read(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, false);
+         MembershipException::require(count($plan) === 1, 'changed_policy_facts');
+         MembershipPolicyVersions::document($plan[0]);
+@@ -140,6 +144,7 @@ final class MembershipAwardContext
+         MembershipBillingEvidence::assertCommittedSnapshot($frame, $billing);
+         $this->admit();
+         $frame->finish();
++        $this->admit();
+     }
+ 
+     private function proveSources(): void
+@@ -176,6 +181,7 @@ final class MembershipAwardContext
+         $this->billingPolicy->proveConfiguration($this->billingConfiguration);
+         MembershipAwardConfiguration::plainPrimary($this->rows->identity());
+         MembershipException::require(hrtime(true) < $this->deadline, 'operation_deadline');
++        $this->invoiceFreshness?->assertDeadline();
+     }
+ 
+     private function insert(string $table, array $row): void
+diff --git a/app/Domain/Memberships/Production/MembershipBillingEvidence.php b/app/Domain/Memberships/Production/MembershipBillingEvidence.php
+index b255a001..cb5bb38c 100644
+--- a/app/Domain/Memberships/Production/MembershipBillingEvidence.php
++++ b/app/Domain/Memberships/Production/MembershipBillingEvidence.php
+@@ -5,13 +5,15 @@ namespace App\Domain\Memberships\Production;
+ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+ use App\Domain\Memberships\Billing\BillingAwardFence;
+ use App\Domain\Memberships\Billing\BillingEvidenceRecord;
++use App\Domain\Memberships\Billing\BillingFreshnessWindow;
+ use App\Domain\Memberships\Billing\BillingLedger;
+ use App\Domain\Memberships\Billing\BillingProviderPin;
++use App\Domain\Memberships\Billing\BillingRetrievalInterval;
++use App\Domain\Memberships\Billing\BillingRetrievalSchema;
+ use App\Domain\Memberships\Billing\BillingSchema;
+ use App\Domain\Memberships\Billing\BillingSubscriptionRecord;
+ use App\Domain\Memberships\Billing\BillingValues;
+ use App\Support\CanonicalJson;
+-use Carbon\CarbonImmutable;
+ use PDO;
+ 
+ /** Bounded retained billing audit on one captured primary. No provider I/O and no authority mint. */
+@@ -23,39 +25,41 @@ final class MembershipBillingEvidence
+         'retrieval_position', 'retrieval_end_position', 'hint_position'];
+ 
+     /** Caller takes T23 identity locks first. The fixed fence precedes every membership/billing lock. */
+-    public static function lock(MembershipRows $rows, string $locator, array $configuration): array
++    public static function lock(MembershipRows $rows, string $locator, array $configuration, int $originalDeadlineNs, ?BillingFreshnessWindow $window = null): array
+     {
+         $rows->assertCurrent();
+         (new BillingAwardFence)->lock($rows->identity());
+-        $evidence = self::read($rows->identity(), $rows->driver(), $locator, $configuration, true);
++        $evidence = self::read($rows->identity(), $rows->driver(), $locator, $configuration, true, $originalDeadlineNs, $window);
+         $rows->assertCurrent();
++        $evidence['freshness']->assertDeadline();
+ 
+         return $evidence;
+     }
+ 
+-    public static function currentSnapshot(MembershipRows $rows, MembershipInvoiceBinding $expected, array $configuration): array
++    public static function currentSnapshot(MembershipRows $rows, MembershipInvoiceBinding $expected, array $configuration, BillingFreshnessWindow $window): array
+     {
+         MembershipException::require($expected->invoiceId !== null, 'invoice_facts_absent');
+-        $evidence = self::lock($rows, $expected->invoiceId, $configuration);
++        $evidence = self::lock($rows, $expected->invoiceId, $configuration, $window->originalDeadlineNs, $window);
+         self::same($expected, $evidence['binding']);
+ 
+         return $evidence['snapshot'];
+     }
+ 
+-    public static function committed(IdentityCommittedFrame $frame, MembershipInvoiceBinding $expected, array $configuration, int $originalDeadlineNs): array
++    public static function committed(IdentityCommittedFrame $frame, MembershipInvoiceBinding $expected, array $configuration, int $originalDeadlineNs, BillingFreshnessWindow $window): array
+     {
+         $frame->assertActive();
+         MembershipException::require($expected->invoiceId !== null && hrtime(true) < $originalDeadlineNs, 'expired_invoice_proof');
+         $reader = $frame->reader();
+-        $evidence = self::read($reader->identityPrimary(), $reader->identityDriver(), $expected->invoiceId, $configuration, false);
++        $evidence = self::read($reader->identityPrimary(), $reader->identityDriver(), $expected->invoiceId, $configuration, false, $originalDeadlineNs, $window);
+         self::same($expected, $evidence['binding']);
+         $frame->assertActive();
+         MembershipException::require(hrtime(true) < $originalDeadlineNs, 'expired_invoice_proof');
++        $window->assertDeadline();
+ 
+         return $evidence['snapshot'];
+     }
+ 
+-    /** Only native PDO and already-built SQL; no clocks, decryptors or container resolution. */
++    /** Native PDO, captured SQL and native UTC only; no application clocks or callbacks. */
+     public static function assertCurrentSnapshot(MembershipRows $rows, array $snapshot): void
+     {
+         self::assertSnapshot($rows->identity(), $snapshot);
+@@ -72,24 +76,27 @@ final class MembershipBillingEvidence
+         MembershipException::require(CanonicalJson::encode(get_object_vars($expected)) === CanonicalJson::encode(get_object_vars($actual)), 'changed_invoice_facts');
+     }
+ 
+-    private static function read(PDO $pdo, string $driver, string $locator, array $configuration, bool $locking): array
++    private static function read(PDO $pdo, string $driver, string $locator, array $configuration, bool $locking, int $originalDeadlineNs, ?BillingFreshnessWindow $window): array
+     {
+         MembershipValues::id($locator);
+         BillingProviderPin::assertInstalled();
+         $schema = new BillingSchema;
+-        $schema->assertOwned($pdo);
+-        $snapshot = ['pdo' => $pdo, 'queries' => []];
+-        $invoiceTable = $schema->table(BillingSchema::TABLES[1]);
+-        $subscriptionTable = $schema->table(BillingSchema::TABLES[0]);
++        (new BillingRetrievalSchema)->assertOwned($pdo);
++        $database = $driver === 'mysql' ? $pdo->query('SELECT DATABASE()')->fetchColumn() : 'main';
++        MembershipException::require(is_string($database) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $database) === 1, 'changed_schema');
++        $qualify = static fn (string $table): string => $driver === 'mysql' ? '`'.$database.'`.'.$table : $table;
++        $snapshot = ['pdo' => $pdo, 'driver' => $driver, 'queries' => []];
++        $invoiceTable = $qualify($schema->table(BillingSchema::TABLES[1]));
++        $subscriptionTable = $qualify($schema->table(BillingSchema::TABLES[0]));
+         // Immutable routing only. All authority rows are subsequently read in the fixed lock order.
+         $route = self::query($pdo, 'SELECT * FROM '.$invoiceTable.' WHERE id = ? LIMIT 2', [$locator]);
+         MembershipException::require(count($route) === 1, 'invoice_facts_absent');
+         $subscriptionRoute = self::query($pdo, 'SELECT * FROM '.$subscriptionTable.' WHERE id = ? LIMIT 2', [$route[0]['subscription_binding_id']]);
+         MembershipException::require(count($subscriptionRoute) === 1, 'invoice_facts_absent');
+         $suffix = $locking && $driver === 'mysql' ? ' FOR UPDATE' : '';
+-        $fence = self::capture($pdo, $snapshot, 'SELECT * FROM '.(new BillingAwardFence)->table().' WHERE id = 1'.$suffix, []);
++        $fence = self::capture($pdo, $snapshot, 'SELECT * FROM '.$qualify((new BillingAwardFence)->table()).' WHERE id = 1'.$suffix, []);
+         MembershipException::require(count($fence) === 1, 'invoice_facts_absent');
+-        $plans = self::capture($pdo, $snapshot, 'SELECT * FROM '.(new MembershipSchema)->table(MembershipRecords::TABLE).' WHERE id = ? LIMIT 2'.$suffix, [$subscriptionRoute[0]['plan_version_id']]);
++        $plans = self::capture($pdo, $snapshot, 'SELECT * FROM '.$qualify((new MembershipSchema)->table(MembershipRecords::TABLE)).' WHERE id = ? LIMIT 2'.$suffix, [$subscriptionRoute[0]['plan_version_id']]);
+         MembershipException::require(count($plans) === 1, 'policy_facts_absent');
+         $document = MembershipPolicyVersions::document($plans[0]);
+         $subscriptions = self::capture($pdo, $snapshot, 'SELECT * FROM '.$subscriptionTable.' WHERE id = ? LIMIT 2'.$suffix, [$subscriptionRoute[0]['id']]);
+@@ -106,30 +113,48 @@ final class MembershipBillingEvidence
+         MembershipException::require(count($invoices) === 1, 'invoice_facts_absent');
+         $invoice = $invoices[0];
+         $invoicePayload = self::invoice($invoice, $approval);
+-        $chain = self::capture($pdo, $snapshot, 'SELECT * FROM '.$schema->table(BillingSchema::TABLES[2]).' WHERE invoice_id = ? ORDER BY sequence LIMIT '.(BillingLedger::MAX_OBSERVATIONS + 1).$suffix, [$locator]);
++        $chain = self::capture($pdo, $snapshot, 'SELECT * FROM '.$qualify($schema->table(BillingSchema::TABLES[2])).' WHERE invoice_id = ? ORDER BY sequence LIMIT '.(BillingLedger::MAX_OBSERVATIONS + 1).$suffix, [$locator]);
+         MembershipException::require($chain !== [] && count($chain) <= BillingLedger::MAX_OBSERVATIONS, 'technical_bound');
+         $prior = self::ZERO;
+         $priorEnd = 0;
++        $priorVersion = null;
++        $priorCreated = null;
+         foreach ($chain as $index => $observation) {
+             MembershipException::require($observation['invoice_id'] === $locator && $observation['sequence'] === $index + 1
+-                && $observation['prior_seal'] === $prior && hash_equals(BillingValues::seal($observation), $observation['seal'])
++                && $observation['prior_seal'] === $prior
+                 && $observation['retrieval_position'] > $priorEnd && $observation['retrieval_end_position'] > $observation['retrieval_position'], 'tampered_ledger');
+-            $payload = BillingValues::decrypt($observation['payload_ciphertext']);
+-            MembershipException::require(in_array($payload['schema_version'] ?? null, [1, 2], true)
++            $payload = BillingEvidenceRecord::read($observation, 'production_membership_billing_observation');
++            MembershipException::require(in_array($payload['schema_version'] ?? null, [1, 2, 3], true)
+                 && ($payload['purpose'] ?? null) === 'production_membership_billing_observation'
+                 && ($payload['provenance'] ?? null) === $configuration['provenance']
+                 && ($payload['outcome'] ?? null) === $observation['outcome']
+                 && CanonicalJson::hash(['outcome' => $payload['outcome'], 'reason' => $payload['reason'] ?? null, 'facts' => $payload['facts'] ?? null]) === $observation['facts_hash'], 'tampered_ledger');
+-            if ($payload['schema_version'] === 2) {
+-                BillingEvidenceRecord::verify($observation, 'production_membership_billing_observation');
+-            }
++            MembershipValues::utc($observation['created_at']);
++            MembershipException::require($priorVersion !== 3 || $payload['schema_version'] === 3, 'tampered_ledger');
++            // Only the explicit legacy-to-database-time transition may follow a clock-ahead old row.
++            MembershipException::require($priorCreated === null
++                || ($priorVersion !== 3 && $payload['schema_version'] === 3)
++                || $observation['created_at'] >= $priorCreated, 'tampered_ledger');
+             $prior = $observation['seal'];
+             $priorEnd = $observation['retrieval_end_position'];
++            $priorVersion = $payload['schema_version'];
++            $priorCreated = $observation['created_at'];
+         }
+         $tail = $chain[array_key_last($chain)];
+         $payload = BillingEvidenceRecord::verify($tail, 'production_membership_billing_observation');
+         MembershipException::require($tail['outcome'] === 'settled' && $payload['reason'] === null
+             && $tail['api_version'] === BillingProviderPin::API_VERSION && $tail['sdk_reference'] === BillingProviderPin::SDK_REFERENCE, 'invoice_not_settled');
++        $positionTable = $qualify($schema->table(BillingSchema::TABLES[4]));
++        $starts = self::capture($pdo, $snapshot, 'SELECT * FROM '.$positionTable.' WHERE id = ? LIMIT 2'.$suffix, [$tail['retrieval_position']]);
++        $ends = self::capture($pdo, $snapshot, 'SELECT * FROM '.$positionTable.' WHERE id = ? LIMIT 2'.$suffix, [$tail['retrieval_end_position']]);
++        MembershipException::require(count($starts) === 1 && count($ends) === 1, 'retrieval_identity_changed');
++        BillingRetrievalInterval::verifyRows($tail, $starts[0], $ends[0]);
++        if ($window === null) {
++            $window = BillingFreshnessWindow::capture($pdo, $driver, $tail, $starts[0], $ends[0], $originalDeadlineNs);
++        } else {
++            $window->assertCurrent($pdo, $driver, $tail, $starts[0], $ends[0]);
++        }
++        $snapshot['freshness'] = $window;
+         $facts = $payload['facts'];
+         MembershipException::require(is_array($facts), 'invoice_facts_absent');
+         MembershipPolicyDocument::keys($facts, ['invoice_ref', 'subscription_ref', 'customer_ref', 'price_ref', 'provenance',
+@@ -152,7 +177,7 @@ final class MembershipBillingEvidence
+         $retrieved = new \DateTimeImmutable($tail['retrieved_at'], new \DateTimeZone('UTC'));
+         MembershipException::require($facts['paid_at'] <= $tail['retrieved_at']
+             && $retrieved->modify('+'.BillingLedger::FRESHNESS_SECONDS.' seconds')->format('Y-m-d H:i:s') === $tail['freshness_deadline'], 'invalid_freshness');
+-        $hints = self::capture($pdo, $snapshot, 'SELECT * FROM '.$schema->table(BillingSchema::TABLES[3]).' WHERE invoice_ref_hash = ? ORDER BY id LIMIT '.(MembershipPolicy::MAX_EVENTS + 1).$suffix, [$invoice['invoice_ref_hash']]);
++        $hints = self::capture($pdo, $snapshot, 'SELECT * FROM '.$qualify($schema->table(BillingSchema::TABLES[3])).' WHERE invoice_ref_hash = ? ORDER BY id LIMIT '.(MembershipPolicy::MAX_EVENTS + 1).$suffix, [$invoice['invoice_ref_hash']]);
+         MembershipException::require(count($hints) <= MembershipPolicy::MAX_EVENTS, 'technical_bound');
+         foreach ($hints as $hint) {
+             $hintPayload = BillingEvidenceRecord::verify($hint, 'production_membership_billing_event_hint');
+@@ -169,12 +194,9 @@ final class MembershipBillingEvidence
+         $binding = new MembershipInvoiceBinding($invoice['source_invoice_hash'], $graph, $invoice['provider_account_hash'], $facts['amount_minor'],
+             $facts['currency'], $facts['line_period_start'], $facts['line_period_end'], $document->hash(), $document->termsHash(),
+             $approved['original_buyer_binding'], $facts['provenance'], $facts['paid_at'], $approved['plan_version_id'], $locator, $tail['freshness_deadline'], $tail['id'], $tail['seal']);
+-        // Clock hooks precede the caller's terminal raw snapshot/configuration/frame comparisons.
+-        $now = CarbonImmutable::now('UTC')->format('Y-m-d H:i:s');
+-        MembershipException::require($tail['retrieved_at'] <= $now && $now < $tail['freshness_deadline'], 'expired_invoice_proof');
+         self::assertSnapshot($pdo, $snapshot);
+ 
+-        return ['binding' => $binding, 'snapshot' => $snapshot];
++        return ['binding' => $binding, 'snapshot' => $snapshot, 'freshness' => $window];
+     }
+ 
+     private static function invoice(array $row, array $approval): array
+@@ -212,8 +234,10 @@ final class MembershipBillingEvidence
+     private static function assertSnapshot(PDO $pdo, array $snapshot): void
+     {
+         MembershipException::require($snapshot['pdo'] === $pdo, 'changed_primary');
++        MembershipAwardConfiguration::plainPrimary($pdo);
+         foreach ($snapshot['queries'] as $query) {
+             MembershipException::require(self::query($pdo, $query['sql'], $query['parameters']) === $query['rows'], 'changed_invoice_facts');
+         }
++        $snapshot['freshness']->assertLive($pdo, $snapshot['driver']);
+     }
+ }
+diff --git a/app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php b/app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php
+index f0b867ec..416aa8d2 100644
+--- a/app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php
++++ b/app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php
+@@ -3,6 +3,7 @@
+ namespace App\Domain\Memberships\Production;
+ 
+ use App\Domain\Customers\ProductionCustomerPrincipal;
++use App\Domain\Memberships\Billing\BillingFreshnessWindow;
+ use App\Models\User;
+ 
+ /** Registered provider capability; a locator or browser invoice is never proof of paid ownership. */
+@@ -11,4 +12,7 @@ interface MembershipPaidInvoiceAuthority
+     public function lock(string $locator, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): MembershipPaidInvoiceProof;
+ 
+     public function proveCurrent(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): void;
++
++    /** Returns the exact original technical window only after issuer/frame/customer validation. */
++    public function freshnessWindow(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): BillingFreshnessWindow;
+ }
+diff --git a/app/Domain/Memberships/Production/MembershipReservationContext.php b/app/Domain/Memberships/Production/MembershipReservationContext.php
+index 452748ff..976107d0 100644
+--- a/app/Domain/Memberships/Production/MembershipReservationContext.php
++++ b/app/Domain/Memberships/Production/MembershipReservationContext.php
+@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+ use App\Domain\Customers\ProductionCustomerAccess;
+ use App\Domain\Customers\ProductionCustomerPrincipal;
+ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
++use App\Domain\Memberships\Billing\BillingFreshnessWindow;
+ use App\Domain\Memberships\Billing\BillingPolicy;
+ use App\Domain\Memberships\Billing\BillingSchema;
+ use App\Models\User;
+@@ -26,6 +27,8 @@ final class MembershipReservationContext
+ 
+     private MembershipPaidInvoiceProof $invoiceProof;
+ 
++    private ?BillingFreshnessWindow $invoiceFreshness = null;
++
+     private MembershipPolicyFactsProof $policyProof;
+ 
+     private MembershipInvoiceBinding $invoice;
+@@ -98,6 +101,7 @@ final class MembershipReservationContext
+         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
+         $this->invoiceProof = $configuration->invoices->lock($locator, $principal, $actor, $rows);
+         $this->invoice = $this->invoiceProof->binding();
++        $this->invoiceFreshness = $configuration->invoices->freshnessWindow($this->invoiceProof, $principal, $actor, $rows);
+         MembershipException::require($this->invoice->planVersionId !== null && $this->invoice->paidAt !== null
+             && $this->invoice->invoiceId !== null && $this->invoice->evidenceDeadline !== null, 'source_facts_absent');
+         $this->policyProof = $configuration->policies->lock($this->invoice->planVersionId, $rows);
+@@ -157,7 +161,7 @@ final class MembershipReservationContext
+     public function proveCurrent(): void
+     {
+         $this->proveSources();
+-        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration);
++        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration, $this->invoiceFreshness);
+         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
+         MembershipPolicyVersions::document($plan);
+         MembershipLedgerAudit::verify($this->period, $this->events, $this->redemptions, $this->invoice, $this->facts,
+@@ -179,7 +183,7 @@ final class MembershipReservationContext
+         MembershipException::require($frame->reader()->identityPrimary() === $this->rows->identity(), 'changed_primary');
+         $this->admit();
+         (new MembershipSchema)->assertOwned($this->rows->identity());
+-        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline);
++        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline, $this->invoiceFreshness);
+         $plan = $this->read(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, false);
+         MembershipException::require(count($plan) === 1, 'changed_policy_facts');
+         MembershipPolicyVersions::document($plan[0]);
+@@ -200,6 +204,7 @@ final class MembershipReservationContext
+         $this->assertCatalog(false);
+         $this->admit();
+         $frame->finish();
++        $this->admit();
+     }
+ 
+     /** Value only: the issuing registry and original frame separately establish authority. */
+@@ -456,6 +461,7 @@ final class MembershipReservationContext
+         $this->billingPolicy->proveConfiguration($this->billingConfiguration);
+         MembershipAwardConfiguration::plainPrimary($this->rows->identity());
+         MembershipException::require(hrtime(true) < min($this->deadline, $this->authorityDeadline), 'operation_deadline');
++        $this->invoiceFreshness?->assertDeadline();
+     }
+ 
+     private function insert(string $table, array $row): void
+diff --git a/app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php b/app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php
+index 6b8736bb..d31cb5d5 100644
+--- a/app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php
++++ b/app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php
+@@ -4,11 +4,11 @@ namespace App\Domain\Memberships\Production;
+ 
+ use App\Domain\Customers\ProductionCustomerAccess;
+ use App\Domain\Customers\ProductionCustomerPrincipal;
++use App\Domain\Memberships\Billing\BillingFreshnessWindow;
+ use App\Domain\Memberships\Billing\BillingPolicy;
+-use App\Domain\Memberships\Billing\BillingSchema;
++use App\Domain\Memberships\Billing\BillingRetrievalSchema;
+ use App\Models\User;
+ use App\Support\CanonicalJson;
+-use Carbon\CarbonImmutable;
+ use WeakMap;
+ 
+ /** Retained, approved billing evidence only. Construction does not register a runtime capability. */
+@@ -37,14 +37,14 @@ final class SealedMembershipPaidInvoice implements MembershipPaidInvoiceAuthorit
+             && $configuration['provenance'] === $billing['provenance'], 'policy_not_approved');
+         $access = new ProductionCustomerAccess;
+         $current = $access->lock($principal, $actor, $rows->current());
+-        $evidence = MembershipBillingEvidence::lock($rows, $locator, $billing);
++        $evidence = MembershipBillingEvidence::lock($rows, $locator, $billing, $deadlineNs);
+         $binding = $evidence['binding'];
+         $this->sameOwner($binding->originalBuyerBinding, $access->durableBinding($principal));
+         $historical = $access->verifyHistoricalBinding($binding->originalBuyerBinding, $rows->current());
+         $proof = MembershipPaidInvoiceToken::value($binding);
+         $this->issued[$proof] = ['rows' => $rows, 'pdo' => $rows->identity(), 'principal' => $principal, 'actor' => $actor,
+             'access' => $access, 'current' => $current, 'historical' => $historical, 'policy' => $policy,
+-            'configuration' => $configuration, 'billing_policy' => $billingPolicy, 'billing' => $billing, 'deadline_ns' => $deadlineNs];
++            'configuration' => $configuration, 'billing_policy' => $billingPolicy, 'billing' => $billing, 'deadline_ns' => $deadlineNs, 'freshness' => $evidence['freshness']];
+         $this->proveCurrent($proof, $principal, $actor, $rows);
+ 
+         return $proof;
+@@ -60,17 +60,23 @@ final class SealedMembershipPaidInvoice implements MembershipPaidInvoiceAuthorit
+         $issued['billing_policy']->proveConfiguration($issued['billing']);
+         $access = $issued['access'];
+         $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
+-        $snapshot = MembershipBillingEvidence::currentSnapshot($rows, $proof->binding(), $issued['billing']);
++        $snapshot = MembershipBillingEvidence::currentSnapshot($rows, $proof->binding(), $issued['billing'], $issued['freshness']);
+         $access->proveHistoricalBindingCurrent($proof->binding()->originalBuyerBinding, $rows->current(), $issued['historical']);
+-        $now = CarbonImmutable::now('UTC')->format('Y-m-d H:i:s');
+-        MembershipException::require($proof->binding()->evidenceDeadline !== null && $now < $proof->binding()->evidenceDeadline, 'expired_invoice_proof');
+         $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
+-        (new BillingSchema)->assertOwned($rows->identity());
++        (new BillingRetrievalSchema)->assertOwned($rows->identity());
+         MembershipBillingEvidence::assertCurrentSnapshot($rows, $snapshot);
+         $issued['policy']->proveConfiguration($issued['configuration']);
+         $issued['billing_policy']->proveConfiguration($issued['billing']);
+         $rows->assertCurrent();
+         MembershipException::require(hrtime(true) < $issued['deadline_ns'], 'expired_invoice_proof');
++        $issued['freshness']->assertDeadline();
++    }
++
++    public function freshnessWindow(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): BillingFreshnessWindow
++    {
++        $this->proveCurrent($proof, $principal, $actor, $rows);
++
++        return $this->issued[$proof]['freshness'];
+     }
+ 
+     private function sameOwner(array $original, array $current): void

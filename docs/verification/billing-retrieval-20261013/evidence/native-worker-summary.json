@@ -1,0 +1,57 @@
+{
+  "scope": "Actual completed upgraded263 interval-worker outcomes, not every permitted branch of the test.",
+  "receipts": [
+    {
+      "run": "root/native-races-final",
+      "receipt": "root/native-races-final-interval-workers/test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers-01fe8f8c-7dcc-40da-985e-1d222a2ec8e8.json",
+      "case": "test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers",
+      "mysql_version": "8.4.11",
+      "positive_controls": "Both exact candidate inserts passed independently and were rolled back before workers started.",
+      "observed_waits": [
+        {
+          "requester": 193,
+          "blocker": 191,
+          "start_id": 1
+        },
+        {
+          "requester": 192,
+          "blocker": 191,
+          "start_id": 1
+        }
+      ],
+      "workers": [
+        {
+          "result": "saved",
+          "sqlstate": null,
+          "driver_code": null,
+          "connection_id": 193,
+          "pid": 221136,
+          "transaction_level": 0,
+          "snapshot_before": {
+            "production_membership_billing_observations": 0,
+            "production_membership_billing_attempts": 0
+          },
+          "snapshot_after": null,
+          "in_transaction": false
+        },
+        {
+          "result": "denied",
+          "sqlstate": "40001",
+          "driver_code": 1213,
+          "connection_id": 192,
+          "pid": 221137,
+          "transaction_level": 0,
+          "snapshot_before": {
+            "production_membership_billing_observations": 0,
+            "production_membership_billing_attempts": 0
+          },
+          "snapshot_after": null,
+          "in_transaction": false
+        }
+      ],
+      "observed_loser_branch": "40001 / 1213 deadlock refusal",
+      "alternative_45000_branch_observed": false,
+      "limit": "The losing transaction has no retained snapshot_after. The alternative 45000 post-refusal snapshot branch was not observed; separate schema old-snapshot tests retain their own coverage."
+    }
+  ]
+}
