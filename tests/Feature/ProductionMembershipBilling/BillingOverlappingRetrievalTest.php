@@ -126,7 +126,9 @@ class BillingOverlappingRetrievalTest extends TestCase
         });
         $straddling = (new BillingReconciliation($open))->retrieve($binding['id'], F::INVOICE);
         $this->assertSame(['not_settled', 2], [$straddling['outcome'], $straddling['sequence']]);
-        $this->assertGreaterThan(DB::table('production_membership_billing_events')->value('received_at'), $straddling['created_at']);
+        $hintPosition = (int) DB::table('production_membership_billing_events')->value('hint_position');
+        $this->assertLessThan($hintPosition, $straddling['retrieval_position']);
+        $this->assertGreaterThan($hintPosition, $straddling['retrieval_end_position']);
 
         $this->at(40);
         Queue::fake();
@@ -135,7 +137,8 @@ class BillingOverlappingRetrievalTest extends TestCase
             'A retrieval that began before the hint must not cover it.');
         Queue::assertPushed(RetrieveMembershipInvoice::class, 1);
 
-        $this->retrieve($binding['id'], 50);
+        $covering = $this->retrieve($binding['id'], 50);
+        $this->assertGreaterThan($hintPosition, $covering['retrieval_position']);
         $this->at(60);
         Queue::fake();
         $this->assertNull($this->receive($payload)['scheduled'], 'A retrieval that began after the hint covers it.');
