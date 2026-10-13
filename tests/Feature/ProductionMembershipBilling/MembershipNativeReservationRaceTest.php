@@ -5,7 +5,9 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Memberships\Billing\BillingAwardFence;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
+use App\Domain\Memberships\Production\MembershipReservationOperations;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
+use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
@@ -98,12 +100,14 @@ class MembershipNativeReservationRaceTest extends TestCase
         [$first, $second] = $this->race($fixture, ['operation' => 'reserve', 'request_key' => 'native-same-key'],
             ['operation' => 'reserve', 'request_key' => 'native-same-key']);
         $this->success($first, 'reserved');
-        $this->success($second, 'reserved');
-        $this->assertSame($first['value'], $second['value']);
+        $this->sameReceiptOrElapsedAdmission($first, $second, 'reserved');
         $audit = $this->ledgerSnapshot($fixture);
         $this->assertSame(['available' => 0, 'reserved' => 1, 'consumed' => 0, 'expired' => 0], $audit['balances']);
         $this->assertSame([$first['value']['redemption_id']], array_keys($audit['reservations']));
+        $this->assertSame($first['value']['reservation_event_id'], $audit['reservations'][$first['value']['redemption_id']]['reserve']['id']);
+        $this->assertSame($first['value']['honor_deadline'], $audit['reservations'][$first['value']['redemption_id']]['record']['honor_deadline']);
         $this->assertLedgerShape(['award', 'reserve'], 1);
+        $this->freshRetryPreservesLedger($fixture, ['operation' => 'reserve', 'request_key' => 'native-same-key'], $first['value'], $audit);
     }
 
     public function test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation(): void
@@ -115,12 +119,16 @@ class MembershipNativeReservationRaceTest extends TestCase
         $arguments = ['operation' => 'release', 'redemption_id' => $saved['redemption_id']];
         [$first, $second] = $this->race($fixture, $arguments, $arguments);
         $this->success($first, 'released');
-        $this->success($second, 'released');
-        $this->assertSame($first['value'], $second['value']);
+        $this->assertSame($saved['period_id'], $first['value']['period_id']);
+        $this->assertSame($saved['redemption_id'], $first['value']['redemption_id']);
+        $this->assertSame($saved['reservation_event_id'], $first['value']['reservation_event_id']);
+        $this->sameReceiptOrElapsedAdmission($first, $second, 'released');
         $audit = $this->ledgerSnapshot($fixture);
         $this->assertSame(['available' => 1, 'reserved' => 0, 'consumed' => 0, 'expired' => 0], $audit['balances']);
         $this->assertSame($first['value']['release_event_id'], $audit['reservations'][$saved['redemption_id']]['terminal']['id']);
+        $this->assertSame($saved['honor_deadline'], $audit['reservations'][$saved['redemption_id']]['record']['honor_deadline']);
         $this->assertLedgerShape(['award', 'reserve', 'release'], 1);
+        $this->freshRetryPreservesLedger($fixture, $arguments, $first['value'], $audit);
         $this->refused(fn () => $this->reserveFixture($fixture), 'reservation_terminal');
     }
 
@@ -138,12 +146,16 @@ class MembershipNativeReservationRaceTest extends TestCase
         $arguments = ['operation' => 'release', 'redemption_id' => $saved['redemption_id']];
         [$first, $second] = $this->race($fixture, $arguments, $arguments);
         $this->success($first, 'released');
-        $this->success($second, 'released');
-        $this->assertSame($first['value'], $second['value']);
+        $this->assertSame($saved['period_id'], $first['value']['period_id']);
+        $this->assertSame($saved['redemption_id'], $first['value']['redemption_id']);
+        $this->assertSame($saved['reservation_event_id'], $first['value']['reservation_event_id']);
+        $this->sameReceiptOrElapsedAdmission($first, $second, 'released');
         $audit = $this->ledgerSnapshot($fixture);
         $this->assertSame(['available' => 0, 'reserved' => 0, 'consumed' => 0, 'expired' => 1], $audit['balances']);
         $this->assertSame($first['value']['release_event_id'], $audit['reservations'][$saved['redemption_id']]['terminal']['id']);
+        $this->assertSame($saved['honor_deadline'], $audit['reservations'][$saved['redemption_id']]['record']['honor_deadline']);
         $this->assertLedgerShape(['award', 'reserve', 'release'], 1);
+        $this->freshRetryPreservesLedger($fixture, $arguments, $first['value'], $audit);
         $this->refused(fn () => $this->reserveFixture($fixture, 'new-after-expiry'), 'credit_expired');
         $this->assertSame($audit['balances'], $this->ledgerSnapshot($fixture)['balances']);
     }
@@ -301,6 +313,82 @@ SQL);
         $this->assertSame(1, DB::table(MembershipPeriodRecords::PERIODS)->count());
         $this->assertSame(0, DB::transactionLevel());
         $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+    }
+
+    private function sameReceiptOrElapsedAdmission(array $first, array $second, string $status): void
+    {
+        $elapsed = $second['finished_ns'] - $second['entered_ns'];
+        $this->transcript['concurrent_retry'] = ['outcome' => $second['error_class'] === null ? 'same_receipt' : $second['reason'],
+            'elapsed_ns' => $elapsed, 'original_admission_budget_ns' => 60_000_000_000];
+        $this->writeReceipt();
+        if ($second['error_class'] === null) {
+            $this->success($second, $status);
+            $this->assertSame($first['value'], $second['value']);
+        } else {
+            // The original budget includes real lock waits. Only elapsed precommit admission may refuse.
+            $this->domainRefusal($second, 'operation_deadline');
+            $this->assertNull($second['value']);
+            $this->assertGreaterThanOrEqual(60_000_000_000, $elapsed);
+            $this->assertSame(0, $second['transaction_level']);
+            $this->assertFalse($second['pdo_transaction']);
+        }
+    }
+
+    private function freshRetryPreservesLedger(array $fixture, array $arguments, array $expected, array $beforeAudit): void
+    {
+        // All workers have ended and the real full-chain audit/cardinality checks ran before this separate invocation.
+        $before = $this->retainedLedgerRows();
+        $this->transcript['before_fresh_retry'] = $this->auditedSummary($beforeAudit, $before);
+        $this->writeReceipt();
+        $entered = hrtime(true);
+        $operations = new MembershipReservationOperations;
+        $this->transcript['fresh_retry'] = ['scope' => 'Separate explicitly invoked parent operation after workers and full audit; no automatic operation retry.',
+            'operation' => $arguments['operation'], 'entered_ns' => $entered];
+        try {
+            $value = match ($arguments['operation']) {
+                'reserve' => $operations->reserve($fixture['invoice']['id'], $fixture['selection'], $fixture['expected_revision'],
+                    $arguments['request_key'], $fixture['buyer']['principal'], $fixture['buyer']['user']),
+                'release' => $operations->release($fixture['invoice']['id'], $arguments['redemption_id'],
+                    $fixture['buyer']['principal'], $fixture['buyer']['user']),
+            };
+            $this->transcript['fresh_retry']['receipt'] = $value;
+        } catch (\Throwable $error) {
+            $this->transcript['fresh_retry']['error_class'] = get_class($error);
+            $this->transcript['fresh_retry']['reason'] = property_exists($error, 'reason') ? $error->reason : null;
+            throw $error;
+        } finally {
+            $this->transcript['fresh_retry']['finished_ns'] = hrtime(true);
+            $this->transcript['fresh_retry']['transaction_level'] = DB::transactionLevel();
+            $this->transcript['fresh_retry']['pdo_transaction'] = DB::connection()->getPdo()->inTransaction();
+            $this->writeReceipt();
+        }
+        $this->assertSame($expected, $value);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        $afterAudit = $this->ledgerSnapshot($fixture);
+        $after = $this->retainedLedgerRows();
+        $this->transcript['after_fresh_retry'] = $this->auditedSummary($afterAudit, $after);
+        $this->writeReceipt();
+        $this->assertSame($beforeAudit, $afterAudit);
+        $this->assertSame($before, $after);
+    }
+
+    private function retainedLedgerRows(): array
+    {
+        $rows = [];
+        foreach ([MembershipPeriodRecords::PERIODS, MembershipPeriodRecords::EVENTS, MembershipReservationRecords::TABLE] as $table) {
+            $rows[$table] = DB::table($table)->orderBy('id')->get()->map(fn (object $row): array => (array) $row)->all();
+        }
+
+        return $rows;
+    }
+
+    private function auditedSummary(array $audit, array $rows): array
+    {
+        return ['period_id' => $audit['period']['id'], 'tail_event_id' => $audit['tail']['id'],
+            'balances' => $audit['balances'], 'redemption_ids' => array_keys($audit['reservations']),
+            'row_counts' => array_map(count(...), $rows), 'audit_sha256' => CanonicalJson::hash($audit),
+            'retained_rows_sha256' => CanonicalJson::hash($rows)];
     }
 
     private function success(array $result, string $status): void
