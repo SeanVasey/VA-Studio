@@ -139,3 +139,10 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 - The preceding native blocker is corrected in unpublished `9399dd99` / integrated `32f083d2`. Two private initialization proofs are deferred to the existing complete readiness/committing closure; public inspection/writers, original honor/frame/workflow/physical caps and the separate committed proof remain intact. Separate source review found no new P0/P1.
 - Corrected SQLite22/509 and public reservation proof1/20 pass. Actual private MySQL8.4.11 preparation/exact retry1/48 and root source-withdrawal1/30 pass with no errors/failures/skips and no diagnostic overlay. All original errors remain source-bound in the packet. Final evidence DECISION, exact-head preflight and merge still remain; no frozen-head follow-up push occurred.
 - The two native cases are focused development evidence, not a representative latency/throughput, physical honor-window, host or provider claim. All previously listed activation conditions and unanswered inputs remain open. C4c still owns real consumption/activation and native origin/redemption insertion/join.
+
+
+### C4b independent development approval
+
+- Separate non-author DECISION APPROVE at exact `453c1af816592fffb856b7cb47b2c891a14c58c1`, no known open P0/P1. All E1–E11 corrections and the exact private-initialization correction are closed within their recorded source/evidence scopes; no new P2 was reported by this review.
+- Corrected SQLite 22/509 plus public proof 1/20 and two separate private MySQL 8.4.11 cases totaling 2/78 pass with zero errors/failures/skips. The broader 239/1530 catalog remains mixed-source. Original errors, partial historical captures and untested conditions are retained in the packet.
+- Receipt-only final-head carry and cheap exact-head preflight remain before merge. Prior activation conditions, current unexpected-trigger inventory, representative latency, physical storage/timing and outstanding commercial/legal/account/host inputs remain open. No Foundation/GitLab dispatch or activation claim.
