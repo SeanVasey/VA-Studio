@@ -1,0 +1,19 @@
+{
+  "expected": "fail",
+  "expected_behavior_observed": true,
+  "tests": 1,
+  "assertions": 10,
+  "failures": 1,
+  "errors": 0,
+  "skips": 0,
+  "exit": 1,
+  "xml_duration_seconds": "0.006061",
+  "observed": {
+    "decision": "admitted",
+    "factory_calls": [
+      "App\\Domain\\Grants\\Member\\MemberGrantFactsAuthority",
+      "App\\Domain\\Grants\\Member\\MemberOriginalArtifactAuthority",
+      "App\\Domain\\Memberships\\Production\\MembershipReservationAuthority"
+    ]
+  }
+}

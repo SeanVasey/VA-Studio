@@ -1,0 +1,160 @@
+{
+  "scope": "Every selected input in successful-coverage precedence compared with actual frozen root Git blobs. Differences remain visible and do not become reruns; unlisted inputs are not attested. Full original public inventories remain archived separately.",
+  "final_source": "0095e46aefa85463268027d89c829a4886537ad6",
+  "comparisons": [
+    {
+      "run": "r4/sqlite-final",
+      "component_reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "selected_captured_inputs": 2328,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "tooling/config/resource",
+          "captured_sha256": "b02fb0db41b7585122cdbfcc3eecbee5b9975710dbf00aa5f98d45fa60d44d4a",
+          "final_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "tooling/config/resource",
+          "captured_sha256": "5f30b7369a1072e78ecc1061a5f5a5d0a2946c84cf701bcd7074d5bbb97d5629",
+          "final_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+          "category": "application",
+          "captured_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+          "final_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "1d8e2a324a51897b6db7f54b3fe27f94c36a3e8717fcfa152da862d714a32888",
+          "final_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571"
+        },
+        {
+          "path": "scripts/ci/database-mysql-skips.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+          "final_sha256": "e69a1971831a49f5dc3db31af96e82963a66bedb958837672e0a357c6684d7f0"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "1e726b57cd614631cd53dea27fe48cc548e4c178d9a63a9c7387f65d8f0e4a50",
+          "final_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95"
+        }
+      ]
+    },
+    {
+      "run": "catalog/pure-final",
+      "component_reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+      "selected_captured_inputs": 5,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "r4/native-four",
+      "component_reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "selected_captured_inputs": 2328,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "tooling/config/resource",
+          "captured_sha256": "b02fb0db41b7585122cdbfcc3eecbee5b9975710dbf00aa5f98d45fa60d44d4a",
+          "final_sha256": "1ffbddb38f50997ae6bc990b178d71df76e5308cd51f3e50683826128423f47b"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "tooling/config/resource",
+          "captured_sha256": "5f30b7369a1072e78ecc1061a5f5a5d0a2946c84cf701bcd7074d5bbb97d5629",
+          "final_sha256": "49b06da921c0d503ed55da17ad73571ab93d9bd2e6b4665ad346b6fa5e171ffd"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+          "category": "application",
+          "captured_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+          "final_sha256": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "1d8e2a324a51897b6db7f54b3fe27f94c36a3e8717fcfa152da862d714a32888",
+          "final_sha256": "a6e943d29564e5ac9c3444c8b43c1e02e5e8682477be22633de42f342740c571"
+        },
+        {
+          "path": "scripts/ci/database-mysql-skips.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+          "final_sha256": "e69a1971831a49f5dc3db31af96e82963a66bedb958837672e0a357c6684d7f0"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "tooling/config/resource",
+          "captured_sha256": "1e726b57cd614631cd53dea27fe48cc548e4c178d9a63a9c7387f65d8f0e4a50",
+          "final_sha256": "d94f9ecb010fc2e0102b9cc564fe3e54e3c59b77915a0a5f902e33ecaf896a95"
+        }
+      ]
+    },
+    {
+      "run": "catalog/native-fixed-five",
+      "component_reference": "982f4ea69ed8d2191345cd8c752377da19780a89",
+      "selected_captured_inputs": 1961,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantPolicy.php",
+          "category": "application",
+          "captured_sha256": "4977404fa5b6c0fe303db535a2662bc0c1aa7aff7295c50d8ab2f17ec9b662c3",
+          "final_sha256": "3bea0da5495aa6a45ced33527399701325a353ddec2a1b7c092917efa42d88b6"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+          "category": "test or fixture",
+          "captured_sha256": "397f26f54104e00fcd90d67985e10d998478645d2dd26e95e9f4f15915444932",
+          "final_sha256": "4c33c52da247fbf346525cf15aa882d2d4e085ea79b8bbf9459b32a12e4f1e65"
+        },
+        {
+          "path": "tests/Feature/StagingEnvironmentAdmissionTest.php",
+          "category": "test or fixture",
+          "captured_sha256": "3fd5c1a06a38635abd3529bd321c4d4e0c45c86c9aa7f9b3070a352c3eb16711",
+          "final_sha256": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a"
+        }
+      ]
+    },
+    {
+      "run": "catalog/sqlite-eligibility-whole",
+      "component_reference": "982f4ea69ed8d2191345cd8c752377da19780a89",
+      "selected_captured_inputs": 1961,
+      "all_selected_inputs_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Grants/Member/MemberGrantPolicy.php",
+          "category": "application",
+          "captured_sha256": "4977404fa5b6c0fe303db535a2662bc0c1aa7aff7295c50d8ab2f17ec9b662c3",
+          "final_sha256": "3bea0da5495aa6a45ced33527399701325a353ddec2a1b7c092917efa42d88b6"
+        },
+        {
+          "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+          "category": "test or fixture",
+          "captured_sha256": "397f26f54104e00fcd90d67985e10d998478645d2dd26e95e9f4f15915444932",
+          "final_sha256": "4c33c52da247fbf346525cf15aa882d2d4e085ea79b8bbf9459b32a12e4f1e65"
+        },
+        {
+          "path": "tests/Feature/StagingEnvironmentAdmissionTest.php",
+          "category": "test or fixture",
+          "captured_sha256": "3fd5c1a06a38635abd3529bd321c4d4e0c45c86c9aa7f9b3070a352c3eb16711",
+          "final_sha256": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a"
+        }
+      ]
+    },
+    {
+      "run": "root/native-reservation-integration",
+      "component_reference": "0095e46aefa85463268027d89c829a4886537ad6",
+      "selected_captured_inputs": 1275,
+      "all_selected_inputs_match_final": true,
+      "differences": []
+    }
+  ]
+}

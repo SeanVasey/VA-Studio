@@ -1,0 +1,15 @@
+{
+  "base": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "final": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+  "commits": [
+    "a4e37cdc222ccea13ae65fb983c6d5fd89a25e29",
+    "3424190f7974b38048d65128c359570c2df45cf2",
+    "15a65e0761382a9ad50c4b279605a644a4eeb285"
+  ],
+  "files": {
+    "app/Domain/Grants/Member/MemberGrantPolicy.php": "3bea0da5495aa6a45ced33527399701325a353ddec2a1b7c092917efa42d88b6",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php": "4c33c52da247fbf346525cf15aa882d2d4e085ea79b8bbf9459b32a12e4f1e65",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php": "e7314f8b2ceccab1a0d4737a9c2c2d99fcebe337f413c5bd92f2a846228d4a7f",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a"
+  }
+}

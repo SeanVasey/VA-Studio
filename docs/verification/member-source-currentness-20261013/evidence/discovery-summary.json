@@ -1,0 +1,14 @@
+{
+  "scope": "Offline reconstruction of released --list-tests-xml artifacts; no test bodies or hosted CI.",
+  "source": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+  "discovered_tests": 8245,
+  "discovered_files": 602,
+  "selected_tests": 2103,
+  "selected_files": 202,
+  "nonempty_shards": 24,
+  "disjoint_complete_files": true,
+  "case_and_group_hashes_match": true,
+  "fallback_weight_files": 39,
+  "test_bodies_executed": false,
+  "database_endpoint": "127.0.0.1:1 (unreachable for bodies)"
+}

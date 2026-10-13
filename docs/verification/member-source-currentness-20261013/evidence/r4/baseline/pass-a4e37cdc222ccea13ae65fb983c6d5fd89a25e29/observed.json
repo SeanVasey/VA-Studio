@@ -1,0 +1,12 @@
+{
+    "scope": "synthetic configuration-only proof",
+    "observed": {
+        "decision": "provenance_driver",
+        "factory_calls": []
+    },
+    "configured_258_provenance": "verified_production",
+    "configured_257_provenance": "synthetic_rehearsal",
+    "configured_driver": "sqlite",
+    "database_manager_bound": false,
+    "policy_source": "\/workspace\/VA-Studio-member-policy-admission\/app\/Domain\/Grants\/Member\/MemberGrantPolicy.php"
+}

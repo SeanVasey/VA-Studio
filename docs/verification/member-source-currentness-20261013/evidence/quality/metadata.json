@@ -1,0 +1,39 @@
+{
+  "autoload_realpath": "/workspace/VA-Studio-member-source-currentness/vendor/autoload.php",
+  "autoload_sha256": "4f88d20ebf0e8a55b8b362e50fc16fa49d1f4eb767ab5a893f09c636f19c4f73",
+  "base": "7b467c3824e2da81174a5445b6ee639cf0a59d93",
+  "changed_php_count": 8,
+  "changed_php_discovery_argv": [
+    "git",
+    "diff",
+    "--name-only",
+    "--diff-filter=ACM",
+    "-z",
+    "7b467c3824e2da81174a5445b6ee639cf0a59d93",
+    "--",
+    "*.php"
+  ],
+  "changed_php_files": [
+    "app/Domain/Grants/Member/MemberGrantPolicy.php",
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php",
+    "tests/Unit/MembershipCatalogDefinitionTest.php"
+  ],
+  "environment_setup": "source /workspace/.va-studio-toolchain/activate.sh; PYTHONDONTWRITEBYTECODE=1",
+  "head": "cc612650217830d2972efeafa12d4d9652c48524",
+  "php_version": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+  "pint_proxy_realpath": "/workspace/VA-Studio-member-source-currentness/vendor/bin/pint",
+  "pint_proxy_sha256": "6550374367378e01df46d1a6bf0bf994a27c1b28b4e61aab518ca2da52c470fb",
+  "python_version": "Python 3.12.14",
+  "requested_head": "cc612650217830d2972efeafa12d4d9652c48524",
+  "requested_to_actual_diff": "",
+  "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+  "source_count": 2287,
+  "started_at_utc": "2026-10-13T07:28:25.048548+00:00",
+  "status_before": "",
+  "working_directory": "/workspace/VA-Studio-member-source-currentness"
+}

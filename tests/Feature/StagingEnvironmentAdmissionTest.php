@@ -472,9 +472,6 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 return $error->reason;
             }
         };
-        $this->assertSame('admitted', $this->in('production', $memberGrant));
-        $this->assertSame('provenance', $this->in('staging', $memberGrant));
-
         config(['production-memberships.enabled' => true, 'production-memberships.version' => ProductionMembershipPolicy::VERSION,
             'production-memberships.provenance' => IdentityPolicy::PRODUCTION, 'production-memberships.approved_policy_hash' => str_repeat('a', 64)]);
         foreach ([MembershipPaidInvoiceAuthority::class, MembershipPolicyFactsAuthority::class, MembershipEligibleLicenseAuthority::class, MemberGrantAuthority::class] as $capability) {
@@ -489,10 +486,13 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 return $error->reason;
             }
         };
-        // Verified production needs the native driver; only the configured driver name is read, never a connection.
+        // Both configuration-only gates require a MySQL label. No connection is opened here;
+        // actual native frame admission is covered separately by MemberGrantSourceAdmissionTest.
         $default = config('database.default');
         config(['database.connections.staging_probe_native' => ['driver' => 'mysql'], 'database.default' => 'staging_probe_native']);
         try {
+            $this->assertSame('admitted', $this->in('production', $memberGrant));
+            $this->assertSame('provenance', $this->in('staging', $memberGrant));
             $this->assertSame('admitted', $this->in('production', $membership));
             $this->assertSame('provenance', $this->in('staging', $membership));
         } finally {

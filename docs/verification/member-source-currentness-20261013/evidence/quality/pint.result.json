@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "vendor/bin/pint",
+    "--test",
+    "app/Domain/Grants/Member/MemberGrantPolicy.php",
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php",
+    "tests/Unit/MembershipCatalogDefinitionTest.php"
+  ],
+  "completed_at_utc": "2026-10-13T07:29:18.081635+00:00",
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "duration_seconds": 1.199139,
+  "exit": 0,
+  "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+  "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+  "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+  "selected_php_files": 8,
+  "started_at_utc": "2026-10-13T07:29:16.882309+00:00",
+  "unittest_reported_tests": null
+}

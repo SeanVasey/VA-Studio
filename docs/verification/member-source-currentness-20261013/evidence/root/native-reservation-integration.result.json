@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "duration_seconds": 279.991,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest",
+    "file": "/workspace/VA-Studio-member-source-currentness/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php",
+    "tests": "1",
+    "assertions": "21",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "279.744427"
+  }
+}

@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-catalog-currentness/phpunit.xml
+
+........[31;1mE[0m.....................................................    62 / 62 (100%)
+
+Time: 00:00.018, Memory: 24.50 MB
+
+There was 1 error:
+
+1) Tests\Unit\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact@backslash quote with data ('`note` text DEFAULT 'it\'s ) ...NT=12'', ' COMMENT='it\'s AUTO_INCREMENT=77'')
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipCatalogDefinition.php:16
+/workspace/VA-Studio-member-catalog-currentness/tests/Unit/MembershipCatalogDefinitionTest.php:39
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 62[0m[37;41m, Assertions: 71[0m[37;41m, Errors: 1[0m[37;41m.[0m

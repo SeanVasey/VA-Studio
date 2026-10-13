@@ -1,0 +1,19 @@
+{
+  "id": "catalog-pure-quote-boundary",
+  "full_receipt": "catalog/pure-quote-boundary.source.json",
+  "full_receipt_original_sha256": "ab98dd136524dfa5fd5df1e46b88ee08d5a6655c0744b87b64be153f33be947c",
+  "captured_head_label": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "reference": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+  "original_path_count": 5,
+  "selected_path_count": 5,
+  "excluded_path_count": 0,
+  "excluded_top_level_counts": {},
+  "files": {
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "ec0f7e685fe8e0e6a0a8adbf86c480bcd353f2cba27e4b00b97c7c8f65c6f485",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "composer.lock": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "eea841bb56e9bbdc7f4cdd9f0aa8617ee19e3b6825e0c15feb08c2757b9fdc95"
+  },
+  "projection_scope": "All captured application/bootstrap/config/database/public/resources/routes/scripts/tests/workflow inputs and explicitly named root entry/dependency/test configuration files. Excluded unrelated documentation hashes remain available in compressed full receipt; this projection is not an all-tracked-source claim."
+}

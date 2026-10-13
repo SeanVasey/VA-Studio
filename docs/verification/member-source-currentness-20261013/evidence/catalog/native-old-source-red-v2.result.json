@@ -1,0 +1,32 @@
+{
+  "changed_sources": [],
+  "completed_utc": "2026-10-13T07:25:29.409632+00:00",
+  "duration_seconds": 79.314,
+  "exit": 2,
+  "head_after": "982f4ea69ed8d2191345cd8c752377da19780a89",
+  "junit": {
+    "assertions": "12",
+    "errors": "1",
+    "failures": "0",
+    "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+    "skipped": "0",
+    "tests": "1",
+    "time": "78.980270"
+  },
+  "leaves": [
+    {
+      "assertions": "12",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipNativeCatalogCurrentnessTest",
+      "errors": 1,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "line": "52",
+      "name": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+      "skips": 0,
+      "time": "78.980270"
+    }
+  ],
+  "source_count": 1961
+}

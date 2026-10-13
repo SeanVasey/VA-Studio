@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fail","files":[{"path":"tests\/Unit\/MembershipCatalogDefinitionTest.php","fixers":["single_quote"]}]}

@@ -1,0 +1,2 @@
+Working directory: /workspace/VA-Studio-billing-retrieval
+DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_HOST=127.0.0.1 DB_PORT=1 bash /workspace/runtime/member-policy-admission-evidence/baseline/run.sh /workspace/VA-Studio-billing-retrieval 0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371 fail

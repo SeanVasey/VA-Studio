@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\StagingEnvironmentAdmissionTest" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/StagingEnvironmentAdmissionTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="2.929473">
+    <testcase name="test_staging_never_admits_verified_production_membership_or_member_grant_provenance" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/StagingEnvironmentAdmissionTest.php" line="458" class="Tests\Feature\StagingEnvironmentAdmissionTest" classname="Tests.Feature.StagingEnvironmentAdmissionTest" assertions="4" time="2.929473"/>
+  </testsuite>
+</testsuites>

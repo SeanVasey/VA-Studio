@@ -1,0 +1,13 @@
+{
+  "baseline": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "source_overlay": "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+  "old_source_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+  "unchanged_test_body": "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+  "test_sha256": "a2fdba09f61d8019f8f6757d2a03a272e845055bc8e1df101b32262c0d439185",
+  "case": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+  "status": "planned only; no native execution yet",
+  "expected_old_result": "changed_catalog_source after successful independent committed auto-id insert and unchanged selected rows",
+  "candidate_commit": "822a848138d5a209ff293e7fc8886680e361a4c0",
+  "test_capsule": "native-test-822a8481.php",
+  "execution_method": "Preload exact historical Evidence class before native test file; do not edit frozen working-tree source"
+}

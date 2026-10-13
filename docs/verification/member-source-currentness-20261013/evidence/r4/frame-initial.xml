@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" tests="12" assertions="51" errors="1" failures="0" skipped="1" time="32.412781">
+    <testcase name="test_rehearsal_admission_binds_the_real_frame_and_terminal_checks_do_not_resolve_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="42" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="7" time="2.897718"/>
+    <testcase name="test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="61" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="0" time="2.481191">
+      <skipped/>
+    </testcase>
+    <testcase name="test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="78" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="3" time="2.593985"/>
+    <testcase name="test_capability_callback_configuration_drift_refuses_before_the_remaining_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="98" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="12" time="2.706333"/>
+    <testcase name="test_each_callback_boundary_checks_the_frame_before_resolving_later_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="123" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="6" time="2.796108"/>
+    <testcase name="test_replaced_repository_or_container_is_refused_before_other_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="144" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="4" time="2.650283"/>
+    <testcase name="test_callback_cannot_withdraw_a_later_capability_and_run_intervening_factories" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="169" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="2" time="2.655915"/>
+    <testcase name="test_transient_configuration_cannot_admit_a_nested_mismatched_frame" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="179" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="3" time="2.610477">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest::test_transient_configuration_cannot_admit_a_nested_mismatched_frame
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 cannot VACUUM - SQL statements in progress (Connection: sqlite, Database: :memory:, SQL: vacuum "main")
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio-member-policy-admission/tests/Support/FinalizationDatabaseMigrations.php:32
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101</error>
+    </testcase>
+    <testcase name="test_equal_configuration_cannot_transfer_an_issued_frame_to_another_policy_or_rows" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="201" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="5" time="2.700205"/>
+    <testcase name="test_terminal_reproof_rejects_policy_connection_name_and_capability_drift_without_callbacks" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="217" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="4" time="2.858582"/>
+    <testcase name="test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="243" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="2" time="2.806578"/>
+    <testcase name="test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission" file="/workspace/VA-Studio-member-policy-admission/tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php" line="299" class="Tests\Feature\ProductionMemberOriginals\MemberGrantSourceAdmissionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantSourceAdmissionTest" assertions="3" time="2.655405"/>
+  </testsuite>
+</testsuites>

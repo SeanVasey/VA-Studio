@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-phpunit-shards.py"
+  ],
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+  "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+  "started_at_utc": "2026-10-13T07:28:25.129858+00:00"
+}

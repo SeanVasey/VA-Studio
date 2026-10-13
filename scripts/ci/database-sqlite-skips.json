@@ -953,6 +953,22 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest",
       "test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof"
     ]
   ]
 }
