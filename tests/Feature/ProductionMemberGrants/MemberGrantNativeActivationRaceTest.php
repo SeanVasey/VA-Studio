@@ -146,6 +146,7 @@ class MemberGrantNativeActivationRaceTest extends TestCase
         $winningWorkers = array_values(array_filter([$first, $second], static fn (array $worker): bool => $worker['authorization_hash'] === $winnerHash));
         $this->assertCount(1, $winningWorkers);
         $winner = $winningWorkers[0];
+        $this->assertSame([], $results[$winner['index']]['errors'], 'The actual graph writer must return its receipt; a bounded refusal may only describe the other worker.');
         $this->assertSame($winner['authorization_id'], $origin['authorization']['authorization_id']);
         $this->assertSame($winner['confirmed_at'], $origin['authorization']['confirmed_at']);
         $this->assertSame($winnerHash, $activation['authorization_document_hash']);
