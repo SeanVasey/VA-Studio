@@ -5,6 +5,8 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Memberships\Billing\BillingEvidenceRecord;
 use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingSchema;
 use App\Domain\Memberships\Billing\BillingValues;
 use App\Domain\Memberships\Billing\BillingVerdict;
 use App\Domain\Memberships\Production\MembershipException;
@@ -109,6 +111,31 @@ class MembershipPaidInvoiceProofTest extends TestCase
         $this->assertNotSame($fixture['observation']['id'], $secondRow['id']);
         $this->assertNotSame($first->evidenceDeadline, $second->evidenceDeadline);
         $this->assertSame($first->sourceGraphHash, $second->sourceGraphHash);
+    }
+
+    public function test_existing_proof_refuses_a_new_observation_even_with_identical_facts_and_second(): void
+    {
+        $fixture = $this->awardFixture();
+        $ledger = new BillingLedger;
+        $start = $ledger->startRetrieval();
+        $end = $ledger->endRetrieval($start);
+        DB::transaction(function () use ($fixture, $start, $end): void {
+            $rows = new MembershipRows;
+            $authority = new SealedMembershipPaidInvoice;
+            $buyer = $fixture['buyer'];
+            $proof = $authority->lock($fixture['invoice']['id'], $buyer['principal'], $buyer['user'], $rows);
+            $row = [...$fixture['observation'], 'id' => BillingValues::id(), 'sequence' => 2,
+                'retrieval_position' => $start, 'retrieval_end_position' => $end, 'prior_seal' => $fixture['observation']['seal']];
+            $payload = BillingValues::decrypt($row['payload_ciphertext']);
+            unset($payload['schema_version'], $payload['row_binding']);
+            $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, $payload);
+            $row['seal'] = BillingValues::seal($row);
+            $statement = $rows->identity()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2])
+                .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+            $statement->execute(array_values($row));
+            $this->assertSame($fixture['observation']['freshness_deadline'], $row['freshness_deadline']);
+            $this->refused(fn () => $authority->proveCurrent($proof, $buyer['principal'], $buyer['user'], $rows), 'changed_invoice_facts');
+        });
     }
 
     public function test_observation_envelope_binds_deadline_sequence_and_positions_beyond_the_outer_checksum(): void
