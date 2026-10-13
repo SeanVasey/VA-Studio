@@ -1,11 +1,10 @@
 {
   "schema_version": 1,
-  "status": "interim_evidence_packet_not_final_acceptance",
-  "snapshot_utc": "2026-10-13T03:43:52.048564+00:00",
+  "status": "completed_local_evidence_pending_fresh_review_and_exact_head_preflight",
+  "snapshot_utc": "2026-10-13T04:01:15.382990+00:00",
   "integrated_base_commit": "7f0bfe9a531d082f1716358518333bb5ba68ae08",
   "last_recorded_application_correction_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
-  "current_reference_for_file_inventory": "9ec090737e66e7f89075600cca96a6174ef2076d",
-  "file_inventory_note": "Reference inventory only. Native metadata performance changes are ongoing after the ownership correction; no final candidate approval is claimed. Per-run identities below govern each result.",
+  "file_inventory_note": "reference_files remains the historical 9ec09073 inventory. The separate final_frozen_inventory binds all 2062 tracked declared scope files to integrated 3a36ae0a; all still match at packet completion. Application and migrations are unchanged from bf498055. Isolated clock commit 53070a8b has identical bytes in all declared scopes. Native final-application coverage is exactly the four named disjoint selections; historical approvals/upgrades and failed diagnostics remain separate. Per-run identities govern execution evidence.",
   "reference_files": {
     ".github/workflows/final-verification.yml": {
       "blob": "e0546da32700e0ebfe867947642ffaab606f71f5",
@@ -5643,6 +5642,296 @@
       "database": "vaseyaudio_membership_award",
       "mysql_version": "8.4.11",
       "mysql_version_basis": "Previously retained metadata/version probe on the same private server, not remeasured by this canary."
+    },
+    {
+      "name": "native-races-final",
+      "kind": "phpunit",
+      "engine": "mysql",
+      "database": "vaseyaudio_membership_award_profile",
+      "mysql_version": "8.4.11",
+      "mysql_version_basis": "Previously retained version probe for the same private server; not remeasured by this race selection.",
+      "totals": {
+        "tests": 3,
+        "assertions": 69,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "passed_cases": 3,
+      "observed_shell_exit": 0,
+      "artifacts": [
+        "evidence/native-races-final.txt",
+        "evidence/native-races-final.xml",
+        "evidence/native-races-final.exit"
+      ],
+      "selected_cases": [
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+          "name": "test_concurrent_owned_awards_return_identical_ids_and_commit_one_period_and_one_event",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+          "status": "passed",
+          "assertions": 25
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+          "name": "test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+          "status": "passed",
+          "assertions": 21
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+          "name": "test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+          "status": "passed",
+          "assertions": 23
+        }
+      ],
+      "source": {
+        "identity": "committed_PHP_source_with_unchanged_before_after_inventory",
+        "application_test_migration_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "pre_run_head": "evidence/native-races-final.head",
+        "pre_run_inventory": "evidence/native-races-final.sources.json",
+        "post_run_source_check": "evidence/native-races-final.source-check.json",
+        "independent_verification": "evidence/native-races-final-source-verification.json",
+        "verified_files": 1841,
+        "later_docs_only_commit": "2534d99a84c67f33fad841a2a46c25769b434857",
+        "basis": "All 1841 recorded source hashes independently match 904f08d5; retained post-run check has no changed files. 2534d99a changed only docs after the run started."
+      },
+      "command_record": {
+        "kind": "retained_runner",
+        "path": "evidence/native-races-final.sh"
+      },
+      "note": "Three native races pass: concurrent awards commit one period/event and return identical IDs; a hint waits for the award fence and then refuses the committed receipt without rollback; a hint committed after an older repeatable-read snapshot is observed by current reads. The same private MySQL instance concurrently ran a separate ten-case schema workload in another database. Whole-test timing is not isolated performance acceptance; that workload and isolated clock tests remain pending at this append."
+    },
+    {
+      "name": "native-schema-final",
+      "kind": "phpunit",
+      "engine": "mysql",
+      "totals": {
+        "tests": 10,
+        "assertions": 40,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "passed_cases": 10,
+      "observed_shell_exit": 0,
+      "artifacts": [
+        "evidence/native-schema-final.txt",
+        "evidence/native-schema-final.xml",
+        "evidence/native-schema-final.exit"
+      ],
+      "selected_cases": [
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+          "name": "test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+          "status": "passed",
+          "assertions": 5
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+          "name": "test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+          "status": "passed",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+          "name": "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl",
+          "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 3
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+          "name": "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary",
+          "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+          "name": "test_native_changed_enum_check_is_not_normalized_into_owned_provenance",
+          "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+          "name": "test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows",
+          "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest",
+          "name": "test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 4
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest",
+          "name": "test_reserved_guard_name_collision_refuses_and_retains_foreign_marker",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "status": "passed",
+          "assertions": 2
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest",
+          "name": "test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "status": "passed",
+          "assertions": 11
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest",
+          "name": "test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row",
+          "file": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+          "status": "passed",
+          "assertions": 5
+        }
+      ],
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "command_record": {
+        "kind": "retained_runner",
+        "path": "evidence/native-schema-final.sh"
+      },
+      "note": "Ten native schema cases completed with fail-fast flags, no errors/failures/skips. The same instance concurrently ran race verification in the separately owned profile database; 784.443-second whole-file timing is not an unloaded benchmark. This selection does not repeat approval, deadline tests or the full native suite.",
+      "database": "vaseyaudio_membership_award",
+      "mysql_version": "8.4.11",
+      "runtime_metadata": "evidence/native-schema-final.metadata.json"
+    },
+    {
+      "name": "deadline-frozen-clock-sqlite",
+      "kind": "phpunit",
+      "engine": "sqlite",
+      "totals": {
+        "tests": 3,
+        "assertions": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "passed_cases": 3,
+      "observed_shell_exit": 0,
+      "artifacts": [
+        "evidence/deadline-frozen-clock-sqlite.txt",
+        "evidence/deadline-frozen-clock-sqlite.xml",
+        "evidence/deadline-frozen-clock-sqlite.exit"
+      ],
+      "selected_cases": [
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 12
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 14
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 12
+        }
+      ],
+      "source": {
+        "identity": "exact_three_file_capsule_later_committed_unchanged",
+        "recorded_base_head": "evidence/deadline-frozen-clock-sqlite.base",
+        "base_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "isolated_correction_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "source_receipt": "evidence/deadline-frozen-clock-sqlite.sources",
+        "source_capsule": "evidence/deadline-frozen-clock-sqlite-source/",
+        "all_three_hashes_match_isolated_and_integrated_commits": true,
+        "basis": "Executed as uncommitted two-file correction atop 904f08d5; retained three hashes/copies match later isolated 53070a8b and integrated 3a36ae0a commits. All declared 2062-file source scopes match between those commits."
+      },
+      "command_record": {
+        "kind": "retained_command_notes_checkpoint",
+        "path": "evidence/deadline-frozen-clock-sqlite-commands.md",
+        "original_runtime_path": "/workspace/runtime/membership-award-evidence/deadline-frozen-clock-commands.md"
+      },
+      "note": "Three exact synthetic-clock deadline checks pass with 38 assertions. Test-only helper freezes an explicitly active clock one hour ahead and advances it exactly; other namespaces retain real clocks. This avoids real elapsed native setup consuming the intended synthetic interval. Application deadline remains sixty seconds. No physical performance or interrupt guarantee; native clock run pending at this append."
+    },
+    {
+      "name": "deadline-frozen-clock-native",
+      "kind": "phpunit_synthetic_clock_native",
+      "engine": "mysql",
+      "database": "vaseyaudio_membership_award_profile",
+      "mysql_version": "8.4.11",
+      "runtime_metadata": "evidence/deadline-frozen-clock-native.runtime",
+      "totals": {
+        "tests": 3,
+        "assertions": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "passed_cases": 3,
+      "observed_shell_exit": 0,
+      "artifacts": [
+        "evidence/deadline-frozen-clock-native.txt",
+        "evidence/deadline-frozen-clock-native.xml",
+        "evidence/deadline-frozen-clock-native.exit"
+      ],
+      "selected_cases": [
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 12
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 14
+        },
+        {
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+          "name": "test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
+          "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "status": "passed",
+          "assertions": 12
+        }
+      ],
+      "source": {
+        "identity": "clean_isolated_committed_source_equivalent_to_integrated_source",
+        "source_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+        "pre_run_inventory": "evidence/deadline-frozen-clock-native.sources.json",
+        "post_run_source_check": "evidence/deadline-frozen-clock-native.source-check.json",
+        "independent_verification": "evidence/deadline-frozen-clock-native-source-verification.json",
+        "verified_php_files": 1841,
+        "all_declared_integrated_scope_files_equal": 2062
+      },
+      "command_record": {
+        "kind": "retained_runner_and_completed_notes",
+        "path": "evidence/deadline-frozen-clock-native.sh",
+        "notes": "evidence/deadline-frozen-clock-commands.md"
+      },
+      "note": "Three native cases use an explicitly active frozen membership clock and exact synthetic advances. All 1841 PHP hashes unchanged. Setup overlapped a separate schema workload on the same private MySQL instance; whole-file 392.385-second duration is not an unloaded benchmark. Tests establish logical deadline semantics, not physical elapsed-time guarantees or blocking-call interruption."
     }
   ],
   "non_test_evidence": [
@@ -5789,6 +6078,35 @@
         "evidence/final-pint-v2.exit"
       ],
       "note": "All 35 pre-run source hashes independently matched the stated commit. Formatting receipt is not runtime acceptance."
+    },
+    {
+      "name": "deadline-frozen-clock-format-and-syntax",
+      "kind": "completed_checks_recorded_in_command_notes",
+      "command_record": "evidence/deadline-frozen-clock-sqlite-commands.md",
+      "checks": [
+        "Pint --test for the two corrected test/helper files",
+        "php -l for both files",
+        "git diff --check",
+        "sha256sum -c for three-file receipt"
+      ],
+      "reported_result": "All passed in retained operation-agent command notes.",
+      "standalone_logs_or_exit_receipts_retained": false,
+      "note": "Exact commands and successful outputs were seen by the executing agent; packet preserves its completed-pass notes, not invented standalone logs or numeric check exits."
+    },
+    {
+      "name": "final-pint-v3",
+      "kind": "format_check_only",
+      "status": "passed",
+      "observed_shell_exit": 0,
+      "php_file_count": 35,
+      "all_source_hashes_match_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+      "artifacts": [
+        "evidence/final-pint-v3-command.json",
+        "evidence/final-pint-v3.sh",
+        "evidence/final-pint-v3.txt",
+        "evidence/final-pint-v3.exit"
+      ],
+      "note": "Integrated formatting rerun after both clock-test files changed. All 35 source hashes independently match integrated 3a36ae0a. This receipt supersedes v2 for final formatting, not runtime acceptance."
     }
   ],
   "incomplete_outputs_not_archived": [],
@@ -5820,11 +6138,38 @@
     "unique_committed_case_identities": 277,
     "passed": 262,
     "skipped": 15,
-    "assertions_latest_case_results": 1478,
+    "assertions_latest_case_results": 1481,
     "runtime_only_probes_excluded": 2,
     "runtime_only_probe_assertions": 7,
     "single_run": false,
     "single_source_commit": false
   },
-  "latest_recorded_candidate_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314"
+  "latest_recorded_candidate_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+  "historical_reference_for_file_inventory": "9ec090737e66e7f89075600cca96a6174ef2076d",
+  "final_frozen_inventory": {
+    "status": "verified_after_all_completed_native_selections",
+    "path": "evidence/integrated-3a36ae0a-source-inventory.json",
+    "integrated_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+    "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+    "equivalent_isolated_clock_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+    "files": 2062,
+    "not_test_result": true
+  },
+  "final_application_native_census": {
+    "path": "evidence/final-application-native-case-census.json",
+    "run_names": [
+      "native-final-canary",
+      "native-races-final",
+      "native-schema-final",
+      "deadline-frozen-clock-native"
+    ],
+    "tests": 17,
+    "assertions": 162,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "single_run": false,
+    "synthetic_clock_tests": 3,
+    "synthetic_clock_assertions": 38
+  }
 }

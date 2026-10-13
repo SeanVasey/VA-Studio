@@ -7,17 +7,18 @@
     "ownership-entry-green",
     "sqlite-schema-batch",
     "sqlite-billing-parent-floor",
-    "admission-budget-green-v2"
+    "admission-budget-green-v2",
+    "deadline-frozen-clock-sqlite"
   ],
   "counts": {
     "unique_committed_case_identities": 277,
     "passed": 262,
     "skipped": 15,
-    "assertions_latest_case_results": 1478,
+    "assertions_latest_case_results": 1481,
     "runtime_only_probes_excluded": 2,
     "runtime_only_probe_assertions": 7
   },
-  "note": "Source identities vary by selection. This historical unique coverage cannot be presented as one 904f08d5 run or as native acceptance. The final parent-floor existing schema case is assigned to that later source; deadline/ownership/first-award cases use the final 18-case run.",
+  "note": "Source identities vary by selection; this is historical unique coverage, not a single final-head execution. The three deadline case results now use the frozen-clock correction (3/38); the other fifteen cases retain the prior 18/176 selection source. Older results remain in source-map and original receipts.",
   "cases": [
     {
       "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
@@ -3297,16 +3298,19 @@
       "name": "test_later_producer_lease_cannot_renew_the_original_operation_deadline",
       "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
       "status": "passed",
-      "assertions": 13,
+      "assertions": 14,
       "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline",
-      "latest_completed_passing_selection": "admission-budget-green-v2",
+      "latest_completed_passing_selection": "deadline-frozen-clock-sqlite",
       "source": {
-        "identity": "recorded_scoped_source_capsule",
-        "base_head_record": "evidence/admission-budget-green-v2.head",
-        "source_receipt": "evidence/admission-budget-green-v2.sources",
-        "source_capsule": "evidence/admission-budget-green-v2-source/",
-        "whole_tree_commit": null,
-        "all_five_receipt_hashes_match_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314"
+        "identity": "exact_three_file_capsule_later_committed_unchanged",
+        "recorded_base_head": "evidence/deadline-frozen-clock-sqlite.base",
+        "base_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "isolated_correction_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "source_receipt": "evidence/deadline-frozen-clock-sqlite.sources",
+        "source_capsule": "evidence/deadline-frozen-clock-sqlite-source/",
+        "all_three_hashes_match_isolated_and_integrated_commits": true,
+        "basis": "Executed as uncommitted two-file correction atop 904f08d5; retained three hashes/copies match later isolated 53070a8b and integrated 3a36ae0a commits. All declared 2062-file source scopes match between those commits."
       }
     },
     {
@@ -3314,16 +3318,19 @@
       "name": "test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
       "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
       "status": "passed",
-      "assertions": 11,
+      "assertions": 12,
       "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
-      "latest_completed_passing_selection": "admission-budget-green-v2",
+      "latest_completed_passing_selection": "deadline-frozen-clock-sqlite",
       "source": {
-        "identity": "recorded_scoped_source_capsule",
-        "base_head_record": "evidence/admission-budget-green-v2.head",
-        "source_receipt": "evidence/admission-budget-green-v2.sources",
-        "source_capsule": "evidence/admission-budget-green-v2-source/",
-        "whole_tree_commit": null,
-        "all_five_receipt_hashes_match_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314"
+        "identity": "exact_three_file_capsule_later_committed_unchanged",
+        "recorded_base_head": "evidence/deadline-frozen-clock-sqlite.base",
+        "base_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "isolated_correction_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "source_receipt": "evidence/deadline-frozen-clock-sqlite.sources",
+        "source_capsule": "evidence/deadline-frozen-clock-sqlite-source/",
+        "all_three_hashes_match_isolated_and_integrated_commits": true,
+        "basis": "Executed as uncommitted two-file correction atop 904f08d5; retained three hashes/copies match later isolated 53070a8b and integrated 3a36ae0a commits. All declared 2062-file source scopes match between those commits."
       }
     },
     {
@@ -3331,16 +3338,19 @@
       "name": "test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
       "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
       "status": "passed",
-      "assertions": 11,
+      "assertions": 12,
       "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
-      "latest_completed_passing_selection": "admission-budget-green-v2",
+      "latest_completed_passing_selection": "deadline-frozen-clock-sqlite",
       "source": {
-        "identity": "recorded_scoped_source_capsule",
-        "base_head_record": "evidence/admission-budget-green-v2.head",
-        "source_receipt": "evidence/admission-budget-green-v2.sources",
-        "source_capsule": "evidence/admission-budget-green-v2-source/",
-        "whole_tree_commit": null,
-        "all_five_receipt_hashes_match_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314"
+        "identity": "exact_three_file_capsule_later_committed_unchanged",
+        "recorded_base_head": "evidence/deadline-frozen-clock-sqlite.base",
+        "base_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "isolated_correction_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "source_receipt": "evidence/deadline-frozen-clock-sqlite.sources",
+        "source_capsule": "evidence/deadline-frozen-clock-sqlite-source/",
+        "all_three_hashes_match_isolated_and_integrated_commits": true,
+        "basis": "Executed as uncommitted two-file correction atop 904f08d5; retained three hashes/copies match later isolated 53070a8b and integrated 3a36ae0a commits. All declared 2062-file source scopes match between those commits."
       }
     },
     {

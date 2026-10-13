@@ -217,6 +217,106 @@
       "sha256": "2d9dcb5be51e03c44ec278e55c55eca3f87292ee20a3afd282343da3be8132de"
     },
     {
+      "path": "evidence/deadline-frozen-clock-commands.md",
+      "bytes": 5463,
+      "sha256": "8250196aa55750964f3b7712a002a533cf7e971609f91d22950204d60e9c2212"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native-source-verification.json",
+      "bytes": 1046,
+      "sha256": "5112c15d01ad94c8026da395755c73a41a4657c045e6d440ad6c04218f13a23d"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.base",
+      "bytes": 41,
+      "sha256": "5e0ce0620da8b24a9560cd42e77dae06b9ea68c41f037fc6383e32cb43c53bc9"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.runtime",
+      "bytes": 195,
+      "sha256": "6dbe568cde146c3e41e68e4ed63f26e6913f0dcd74342c60662e627fe1b46de4"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.sh",
+      "bytes": 2802,
+      "sha256": "e73be42177e778b465b10d39190a52dd9165fdcbb6139d4731a798e6c334f0e6"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.source-check.json",
+      "bytes": 37,
+      "sha256": "7f9fc745a6aa6e737ee888ec791e1cd2e63b2f845e3cff987c711312161c051d"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.sources.json",
+      "bytes": 236370,
+      "sha256": "3ee8932f0dc58358484aa921c542e3c15760401d62ed7b287e316d49c11a817f"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.status",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.txt",
+      "bytes": 306,
+      "sha256": "2f95ac1f96c5ca82c0625087885815425adc7c209027e0f4147e0b0aa401dc9f"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-native.xml",
+      "bytes": 1657,
+      "sha256": "a8b2393f189fc2f955e8c400432c131e998dce97ef591494162c4f9d34161fc5"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite-commands.md",
+      "bytes": 4632,
+      "sha256": "5cbf072629c2d00eb1f22a8ac20cb559e554a828ebaad42c30526bdf99bb85d2"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite-source/app/Domain/Memberships/Production/MembershipAwards.php",
+      "bytes": 6288,
+      "sha256": "d9889da054ba319cdd15030e3e8005a78a5d205e9757bbab0a97f5d01fdba473"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite-source/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+      "bytes": 7323,
+      "sha256": "8644416563f9bf971c9314d9c37e6719056c5afd3770bdec5eca214c183a2867"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite-source/tests/Support/MembershipAwardMonotonicClock.php",
+      "bytes": 2143,
+      "sha256": "d5fc5099913bc77855525699b0b8284b5d9a04a1602a5f79567ab1e50b4a4ff9"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite.base",
+      "bytes": 41,
+      "sha256": "50b562e1292b24a518b22284a6a99a91c00f0342c00877e07d1d01d9bbd8ba59"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite.sources",
+      "bytes": 375,
+      "sha256": "674f5a2a3fe1330ff9dfe58125aeec6e6751d862ca152f968dd1a29b5c96d2db"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite.txt",
+      "bytes": 306,
+      "sha256": "8bc36c9a0f2c27c6ecbd4f187be5d73d4d2e3f596e0670bc352326eb2de4abc2"
+    },
+    {
+      "path": "evidence/deadline-frozen-clock-sqlite.xml",
+      "bytes": 1650,
+      "sha256": "92e90f8c60d55a3c27b2146931e8ecf6aca72100bf1596a6de55af800ace5e40"
+    },
+    {
       "path": "evidence/fence-source-sha256.txt",
       "bytes": 507,
       "sha256": "55c2cac06d203ca83154432596b5a2d8b4b6264274e59787cbeee02d346a2074"
@@ -235,6 +335,11 @@
       "path": "evidence/fence-sqlite-1.xml",
       "bytes": 3166,
       "sha256": "40e1f546faa0b69643226ab0b97af8990a6d4889683474cce612df7c591caf50"
+    },
+    {
+      "path": "evidence/final-application-native-case-census.json",
+      "bytes": 21624,
+      "sha256": "0bd55b7ce04794f825f3f69bef6a6bc4ef0aeb06a6eb1585e3e0e06e06595547"
     },
     {
       "path": "evidence/final-pint-command.json",
@@ -262,6 +367,26 @@
       "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
     },
     {
+      "path": "evidence/final-pint-v3-command.json",
+      "bytes": 7339,
+      "sha256": "38e852b01f6cb3c328300d76e2d9f8ba091c26f370f838c9b77f1e4c77e1b234"
+    },
+    {
+      "path": "evidence/final-pint-v3.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/final-pint-v3.sh",
+      "bytes": 2488,
+      "sha256": "a54f06daec359ea7c52e6e9e6c29cc8e372d6f8e438743076e588230d8ff47f8"
+    },
+    {
+      "path": "evidence/final-pint-v3.txt",
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
       "path": "evidence/final-pint.exit",
       "bytes": 2,
       "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
@@ -285,6 +410,11 @@
       "path": "evidence/function-profile-original/app/Domain/Memberships/Production/MembershipSchema.php",
       "bytes": 33554,
       "sha256": "cc5d5ed89c11db96a6ab4a90b30871de700c27fb988a4eb59bfa96b1352db8bf"
+    },
+    {
+      "path": "evidence/integrated-3a36ae0a-source-inventory.json",
+      "bytes": 267397,
+      "sha256": "835077d87e0264fc44aee41f4c7fd8f809f5d16631010c2abf5dad23db6b4ceb"
     },
     {
       "path": "evidence/integrated-sqlite-307699b6.exit",
@@ -607,6 +737,46 @@
       "sha256": "65e1b2f3616c0ab45969e696370027af9ab91b7b6cf44edd69547421bdb8892e"
     },
     {
+      "path": "evidence/native-races-final-source-verification.json",
+      "bytes": 1353,
+      "sha256": "d8af5479e996b99c87d546f7d7603cccabd4b83a675aa28edc153521dad7f887"
+    },
+    {
+      "path": "evidence/native-races-final.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/native-races-final.head",
+      "bytes": 41,
+      "sha256": "50b562e1292b24a518b22284a6a99a91c00f0342c00877e07d1d01d9bbd8ba59"
+    },
+    {
+      "path": "evidence/native-races-final.sh",
+      "bytes": 1961,
+      "sha256": "9a46c70b4bf4d5b8bae8e8ac5295126c84d67ff7af3af3c69687958cdd130989"
+    },
+    {
+      "path": "evidence/native-races-final.source-check.json",
+      "bytes": 37,
+      "sha256": "7f9fc745a6aa6e737ee888ec791e1cd2e63b2f845e3cff987c711312161c051d"
+    },
+    {
+      "path": "evidence/native-races-final.sources.json",
+      "bytes": 236370,
+      "sha256": "0998d4d30e5eabe4f11569d34f1e60306d1e3880b671f04a808470f8eda6ab17"
+    },
+    {
+      "path": "evidence/native-races-final.txt",
+      "bytes": 306,
+      "sha256": "9410175dd4bc11fffb52e241264d1dd7a8ee0da8de982787d222073db1758643"
+    },
+    {
+      "path": "evidence/native-races-final.xml",
+      "bytes": 1703,
+      "sha256": "fc837402b13edf91463c9699dc5aa8b246065237fbab8c83605b4bda3e81696c"
+    },
+    {
       "path": "evidence/native-retained-upgrades-approval.exit",
       "bytes": 2,
       "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
@@ -625,6 +795,76 @@
       "path": "evidence/native-retained-upgrades-approval.xml",
       "bytes": 2394,
       "sha256": "a66f3166a1ef0ee300a4a6caa09654ed20b771a89120ff37b9b4fa9ac2422d8f"
+    },
+    {
+      "path": "evidence/native-schema-final-artifacts.json",
+      "bytes": 1225,
+      "sha256": "97acb403a1e4ba4cc0921d69d01b74b459c62fcef62ab6968795a12390097708"
+    },
+    {
+      "path": "evidence/native-schema-final-notes.md",
+      "bytes": 2647,
+      "sha256": "8bbb32e22c77ef2ac6f7c02211e826e13e9b221239913ec58177698c5f7a1fd4"
+    },
+    {
+      "path": "evidence/native-schema-final-source-check.txt",
+      "bytes": 37,
+      "sha256": "86fd804a72ed364ffad849fad506aad2fbbd11443a3ca1e121906a5ffda329d8"
+    },
+    {
+      "path": "evidence/native-schema-final-source-verification.json",
+      "bytes": 843,
+      "sha256": "a020c3100c3aaed551b5d8b020747067b351ecddff638dcd453f2235a50231d8"
+    },
+    {
+      "path": "evidence/native-schema-final-workload.md",
+      "bytes": 953,
+      "sha256": "2ce4b1b13a133875987f4497018521603fd27795b0a666611a2738ce7bbc4669"
+    },
+    {
+      "path": "evidence/native-schema-final.base",
+      "bytes": 41,
+      "sha256": "50b562e1292b24a518b22284a6a99a91c00f0342c00877e07d1d01d9bbd8ba59"
+    },
+    {
+      "path": "evidence/native-schema-final.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "evidence/native-schema-final.metadata.json",
+      "bytes": 110,
+      "sha256": "c1972518dca3f019e83f1732afa47e33355006bdde392b3da4271daec30f52b2"
+    },
+    {
+      "path": "evidence/native-schema-final.patch",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/native-schema-final.selection.txt",
+      "bytes": 1554,
+      "sha256": "5e26f08fc319f7fe9552aa99a11a5d260e2be1d9fe8de5af50800a3e33af9b28"
+    },
+    {
+      "path": "evidence/native-schema-final.sh",
+      "bytes": 4537,
+      "sha256": "fcc4e647f4b41b816ec12996f71757624e2514c25178029a42b97eced9ccb471"
+    },
+    {
+      "path": "evidence/native-schema-final.sources.json",
+      "bytes": 261614,
+      "sha256": "d4305e75733bcada9464184e594885fde2973044687d721607a5372edec861a7"
+    },
+    {
+      "path": "evidence/native-schema-final.txt",
+      "bytes": 307,
+      "sha256": "f4e98fca864a9228a4adb7a96718198b402fd48da0d732ce0026d9633e4261a2"
+    },
+    {
+      "path": "evidence/native-schema-final.xml",
+      "bytes": 5924,
+      "sha256": "33537b95a361f07e9605d0176cb499bd4b68b348316d4613ded0633b6b2728ff"
     },
     {
       "path": "evidence/native-trigger-metadata-probe.php",
@@ -1133,8 +1373,8 @@
     },
     {
       "path": "evidence/sqlite-unique-completed-case-census.json",
-      "bytes": 282175,
-      "sha256": "2b79feda1df79c94a5bb91c82e3e05be4865568727297e2d6e17a7b14110cacf"
+      "bytes": 283590,
+      "sha256": "b62e3d6630adf61c5e1bd78440fbad7a6ff38648bfcd22c53a7fd149748c03fe"
     },
     {
       "path": "evidence/subscription-canary.exit",

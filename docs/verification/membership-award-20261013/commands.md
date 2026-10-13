@@ -1,6 +1,6 @@
 # Commands, source identities and retained outcomes
 
-This is an **interim packet**, not final acceptance. The native first-award commit/replay canary now passes at source matching application `bf498055` and selected test/support bytes in `904f08d5`: **1 test, 15 assertions, zero failures/errors/skips**. Its broad source check separately failed for an unrelated deadline-test cleanup; the exact failure and subsequent relevant-source verification are retained below. Native schema selection and race completion, fresh final-source review and exact-head preflight remain pending at this append. Earlier deadline errors remain visible. The full review of `307699b6` says **REQUEST CHANGES**; the later `9ec09073` review approves only the four-file entry/gate correction.
+The completed local evidence has **17 native tests, 162 assertions, zero failures/errors/skips** across four disjoint final-application selections, including three synthetic-clock cases with 38 assertions. The integrated source inventory is frozen at `3a36ae0a`; application/migration bytes remain `bf498055`. Historical unique SQLite coverage is **277 committed identities, 1,481 assertions, 15 skips** across documented sources. This is focused local evidence; fresh independent review and exact-head preflight remain separate acceptance requirements. Every earlier failed attempt is retained, including the native canary's unrelated broad source-check failure and its subsequent relevant-source verification.
 
 `source-map.json` records completed JUnit selections, every observed case status, shell exit files, source identities and their limits. `evidence/artifact-digests.json` pins the archived bytes. Earlier failures, fixture corrections and incomplete setup attempts remain visible. An output filename alone is not used to establish a tested checkout.
 
@@ -181,7 +181,7 @@ The original broad post-run check **failed**: [its retained result](evidence/nat
 
 [Independent source comparison](evidence/native-final-canary-relevant-source-verification.json) verifies all **1,840 other inventoried files** against `904f08d5`, including **1,177** application, migration, support, base-test and selected-test files. Of that broader relevant set, **1,176** also match application commit `bf498055`; the sole additional clock helper was uncommitted there and matches `904f08d5`. The changed deadline test is outside the explicit PHPUnit file selection and is not loaded by that selected test or its shared fixtures; it alone loads the synthetic clock shim. This conclusion follows from the retained command and static source references, not an invented runtime include trace. No functional rerun or whole-worktree immutability is claimed.
 
-This is positive acceptance of the selected commit/replay path. The two timing profiles remain **erroring diagnostics**, each **1 test / 8 assertions / 1 error / exit 2**, and are not counted as acceptance. Earlier setup errors, native red regressions and the two native metadata passes remain recorded at their own source identities. The still-unfinished final native schema selection and the pending race cases contribute no passing counts here.
+This is positive acceptance of the selected commit/replay path. The two timing profiles remain **erroring diagnostics**, each **1 test / 8 assertions / 1 error / exit 2**, and are not counted as acceptance. Earlier setup errors, native red regressions and the two native metadata passes remain recorded at their own source identities. At the canary checkpoint, the unfinished final native schema selection and race cases contributed no passing counts. The subsequently completed race selection is retained below.
 
 ## Final deadline-case discovery and formatting receipts
 
@@ -193,6 +193,59 @@ The first census also returned exit 0, but its post-listing source check detecte
 
 ## Unique completed SQLite case census
 
-The [case-by-case census](evidence/sqlite-unique-completed-case-census.json) contains **277 unique committed test identities: 262 passes and 15 native-only skips**, with **1,478 assertions** from each identity's latest applicable completed passing selection. It starts with the 255-case whole Billing run at `a1b91e13`, then updates overlapping identities from the ownership green, 49-case schema batch, corrected parent-floor selection and final 18-case admission selection. All earlier completed green SQLite selections are subsets of those identities. The two external runtime probes are excluded; together they contribute seven additional assertions in their own three-case selection.
+The [case-by-case census](evidence/sqlite-unique-completed-case-census.json) contains **277 unique committed test identities: 262 passes and 15 native-only skips**, with **1,481 assertions** from each identity's latest applicable completed passing selection. It starts with the 255-case whole Billing run at `a1b91e13`, then updates overlapping identities from the ownership green, 49-case schema batch, corrected parent-floor selection, 18-case admission selection and the later three-case frozen-clock correction. All earlier completed green SQLite selections are subsets of those identities. The two external runtime probes are excluded; together they contribute seven additional assertions in their own three-case selection.
 
 These totals deduplicate full class and JUnit case names, including dataset suffixes. Each identity retains its originating run and source limit. They are **historical coverage across multiple sources**, not a single 277-case execution or final-head verification. Skips are never counted as passes. Native functional results and failed diagnostics remain separate.
+
+
+## Completed native award races
+
+The [exact race runner](evidence/native-races-final.sh), captured head, full log, XML, exit and before/after source receipts are retained. All three `MembershipNativeAwardRaceTest` cases pass on private MySQL **8.4.11**: **3 tests, 69 assertions, zero failures/errors/skips, exit 0**. The cases independently cover concurrent award/replay serialization (**25 assertions**), a hint blocked behind the award fence followed by a refused committed receipt without undoing the award (**21**), and a hint committed after an older REPEATABLE READ snapshot being seen by current reads (**23**).
+
+Packet assembly independently matched all **1,841 recorded application/test/migration PHP hashes** to `904f08d55fe832aacb37b76cbd04bd0d8a02d314`. The [post-run check](evidence/native-races-final.source-check.json) reports zero changed files. Commit `2534d99a` occurred after the run started and changes only documentation; its 120 changed paths were checked independently. The [source verification record](evidence/native-races-final-source-verification.json) preserves the scope and does not claim a complete vendor/environment inventory.
+
+The development lead records an overlapping **ten-case schema workload on the same MySQL instance**, using separate database `vaseyaudio_membership_award`; the race runner uses `vaseyaudio_membership_award_profile`. Both use the private socket and port 33413. Their database settings were checked against the runners. The **412.833-second** whole race-file duration includes migrations, fixtures and the competing schema workload; it is not an isolated performance measurement. The ten-case schema result and the three isolated clock checks remain pending at this append. No result is inferred for either.
+
+
+## Completed ten-case native schema selection
+
+The [exact runner](evidence/native-schema-final.sh), [selection discovery](evidence/native-schema-final.selection.txt), actual [runtime metadata](evidence/native-schema-final.metadata.json), full logs, XML, exit and released artifact receipt are retained. On private MySQL **8.4.11** / PHP **8.4.26**, all **10 tests and 40 assertions** pass with **zero failures/errors/skips, exit 0**. Cases cover current fence/trigger definition checks after old snapshots, foreign CHECK/UNIQUE namespaces, changed enum checks, temporary-table shadow refusal, reserved guard collisions, retained-prefix refusal, guard recovery and exact legacy interval upgrades.
+
+The run began at `904f08d5`; all **2,061** recorded files match that commit and the retained after-run check reports no changes. The [independent source verification](evidence/native-schema-final-source-verification.json) confirms the later integrated `3a36ae0a` differs within the declared scopes only in the separate deadline test/helper, which this selection does not load. Application/migration source remains `bf498055`. The **784.443-second** whole-file duration includes a concurrently running race selection in another database on the same private instance, as retained in the [workload note](evidence/native-schema-final-workload.md); it is not an unloaded benchmark. This selection makes no full-native-suite claim.
+
+## Deterministic admission-clock correction
+
+The isolated worktree correction `53070a8b8ca8a6b495c4b63296e2e065e553c859` changes only the deadline test and test-only clock helper, integrated unchanged at `3a36ae0a7db5588fc45954a83e4ef024ed29bf07`. The prior real-clock-plus-offset helper let real execution consume part of the intended synthetic interval. Its replacement explicitly activates a frozen membership clock, anchored one hour ahead, and applies exact synthetic advances; other namespaces keep real clocks. Setup/teardown reset it and inactive membership calls use the real clock. Production source and its sixty-second admission bound are unchanged.
+
+The [retained SQLite command checkpoint](evidence/deadline-frozen-clock-sqlite-commands.md), three-file source capsule, receipt, log, XML and exit record **3 tests, 38 assertions, zero failures/errors/skips, exit 0**. Execution occurred with the two-file change uncommitted atop `904f08d5`; all three recorded hashes match the later isolated correction and integrated cherry-pick exactly. The earlier **18/176** pass remains tied to its old test/helper bytes; it is not relabeled as an 18-case rerun of this correction. Updating only the three case identities raises the unique SQLite historical census to **277 identities / 1,481 assertions / 15 skips**, with 262 passes and the two external runtime probes still excluded.
+
+The operation agent retained exact Pint, syntax, source-check and whitespace-check commands plus their completed-pass statement in the command notes. Separate standalone logs/exit receipts were not saved for those auxiliary checks; none are fabricated here. These synthetic tests verify deadline semantics and do not measure physical native performance or guarantee interruption of blocking calls. At this SQLite checkpoint, the three native frozen-clock cases were pending; their completed result is retained below.
+
+## Integrated frozen source inventory
+
+The [integrated source inventory](evidence/integrated-3a36ae0a-source-inventory.json) binds **2,062 tracked files** across app, bootstrap, config, database, tests, retained contract resources, Composer manifests and PHPUnit configuration to `3a36ae0a`. All current bytes matched the commit when prepared. All declared scope bytes also match isolated clock commit `53070a8b`; the commits differ in documentation outside these scopes. Application and migration bytes match `bf498055`. The native schema run's narrower inventory excluded the bootstrap cache placeholder; this final tracked inventory includes it.
+
+The original `9ec09073` reference inventory remains explicitly historical. This new inventory records source identity, not a test run, complete vendor/environment inventory, host verification or final release acceptance. The final native clock result is now retained below. Review and preflight still need their own receipts before merge acceptance.
+
+
+## Completed native frozen-clock selection and final local totals
+
+The [exact native runner](evidence/deadline-frozen-clock-native.sh), [combined completed command notes](evidence/deadline-frozen-clock-commands.md), runtime/version receipt, tracked status, full log, XML, exit and source checks are retained. On private MySQL **8.4.11** / PHP **8.4.26**, the three deterministic admission-clock cases pass **3 tests, 38 assertions, zero failures/errors/skips, exit 0** at isolated commit `53070a8b`.
+
+All **1,841 captured PHP files** remain unchanged and independently match integrated `3a36ae0a`. The complete **2,062-file declared source inventory** also matches both commits and still matches the main working files; [verification](evidence/deadline-frozen-clock-native-source-verification.json) binds those comparisons. Reflection resolved application code into the isolated worktree. The runtime receipt reports container socket `/run/mysql-policy/mysql.sock` and internal port 3306; the runner uses host socket `/workspace/runtime/mysql-policy-run/mysql.sock` and configured host port 33413.
+
+These three cases use a frozen synthetic membership clock and exact advances. They prove admission after twenty synthetic seconds, refusal beyond the original sixty-second bound despite a newer producer lease, and refusal of a post-commit receipt without claiming durable effects rolled back. They do **not** measure physical deadline enforcement or interruption of blocking calls. The **392.385-second** whole-file duration includes setup/teardown and initially overlapped the separate main-schema workload on the same instance; it is not an unloaded benchmark.
+
+The [final native case census](evidence/final-application-native-case-census.json) includes exactly these disjoint selections:
+
+| Completed final-application selection | Tests | Assertions | Failures / errors / skips | Exit |
+| --- | ---: | ---: | --- | ---: |
+| `native-final-canary` | 1 | 15 | 0 / 0 / 0 | 0 |
+| `native-races-final` | 3 | 69 | 0 / 0 / 0 | 0 |
+| `native-schema-final` | 10 | 40 | 0 / 0 / 0 | 0 |
+| `deadline-frozen-clock-native` | 3 | 38 | 0 / 0 / 0 | 0 |
+| **Total across four selections** | **17** | **162** | **0 / 0 / 0** | **all 0** |
+
+All application and migration bytes match the final application correction `bf498055`; recorded test/source differences and the canary's separate broad-check failure remain explicit. The three synthetic-clock cases are **3/38** of this total; the other selected native cases are **14/124**. Earlier native migration **1/4**, approvals/upgrades **3/25**, red regressions and erroring timing profiles remain historical evidence and are excluded from this final-application headline. No whole-native-suite, hosted Foundation, provider or host verification is claimed.
+
+The final integrated [Pint runner](evidence/final-pint-v3.sh) and [command/hash receipt](evidence/final-pint-v3-command.json) bind all **35 PHP files** to `3a36ae0a` and record **exit 0** after the two clock-test files changed. It supersedes the earlier v2 receipt for the final formatting claim. All completed JUnit totals/exits, artifact digests and source inventory mappings were checked again during packet completion. Review and exact-head preflight remain separate from this local evidence.

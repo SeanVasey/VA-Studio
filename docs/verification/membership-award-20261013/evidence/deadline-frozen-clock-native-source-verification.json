@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "isolated_source_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+  "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+  "application_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+  "captured_php_files": 1841,
+  "all_captured_hashes_match_isolated_and_integrated": true,
+  "retained_post_run_changed_files": 0,
+  "isolated_tracked_status_empty": true,
+  "full_declared_integrated_source_scope_files_equal": 2062,
+  "integrated_worktree_all_scope_files_still_match": true,
+  "basis": "Independent Git archive byte comparison of both commits and SHA256 verification of each native pre-run receipt path; retained source-check JSON and clean status inspected.",
+  "runtime_receipt": "evidence/deadline-frozen-clock-native.runtime",
+  "scope_note": "Synthetic frozen membership clock tests verify logical admission expiry, not physical timing or blocking-call interruption. Full scope equality excludes docs/vendor/environment; final inventory defines exact included paths."
+}
