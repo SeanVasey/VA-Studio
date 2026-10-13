@@ -66,6 +66,7 @@
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
     "tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
     "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
     "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
