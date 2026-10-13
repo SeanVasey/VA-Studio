@@ -125,6 +125,47 @@ final class MemberOriginalFiles
         }
     }
 
+    /** Read-only historical adapter entry. It accepts no arbitrary path and has no creation mode. */
+    public function readRetained(MemberActivatedOriginal $original, MemberOriginalIoFrame $idle,
+        MemberOriginalBudget $budget, ?MemberRetainedOriginalObservation $expected = null): MemberRetainedOriginalObservation
+    {
+        $started = $expected?->observationStartedNs ?? \hrtime(true);
+        try {
+            $record = $this->sourceRecord($original->source());
+            $artifact = $original->artifact();
+            $record += ['hash' => $artifact['sha256'], 'size' => $artifact['bytes']];
+            if ($record['path'] !== $artifact['derived_relative_path'] || $record['source'] !== $artifact['render_source_hash']
+                || $record['profile'] !== $artifact['profile_hash'] || $record['storage'] !== $artifact['storage_policy_hash']
+                || ($expected !== null && ($expected->relativePath !== $record['path'] || $expected->renderSourceHash !== $record['source']
+                    || $expected->sha256 !== $record['hash'] || $expected->sizeBytes !== $record['size']
+                    || $expected->profileHash !== $record['profile'] || $expected->storagePolicyHash !== $record['storage']
+                    || $started > $expected->observedAtNs || $expected->observedAtNs > \hrtime(true)))) {
+                throw new UnexpectedValueException;
+            }
+            $root = $this->root(false, $idle, $budget);
+            // A historical read must own the whole private subtree, without correcting permissions or ownership.
+            $owner = function_exists('posix_geteuid') ? \posix_geteuid() : \getmyuid();
+            $directory = $root;
+            foreach (array_merge([''], explode('/', dirname($record['path']))) as $component) {
+                $directory .= $component === '' ? '' : '/'.$component;
+                $stat = $this->io($idle, $budget, fn () => $this->stat($directory));
+                if (! is_array($stat) || $stat['uid'] !== $owner) {
+                    throw new UnexpectedValueException;
+                }
+            }
+            $physical = $this->readExisting($root, $record, null, $expected, $idle, $budget);
+            if ($physical['opened']['uid'] !== $owner || $physical['closed']['uid'] !== $owner) {
+                throw new UnexpectedValueException;
+            }
+
+            return new MemberRetainedOriginalObservation($record['path'], $record['source'], $record['hash'], $record['size'],
+                $record['profile'], $record['storage'], $physical['opened']['dev'], $physical['opened']['ino'],
+                $started, $physical['observed_at']);
+        } catch (Throwable) {
+            throw new MemberGrantException('original_unavailable');
+        }
+    }
+
     private function record(MemberOriginalSourceValues $source, RenderedContract $expected): array
     {
         $record = $this->sourceRecord($source);
@@ -184,6 +225,18 @@ final class MemberOriginalFiles
     private function observe(string $root, array $record, ?string $trustedBytes, ?MemberOriginalFileObservation $expected,
         int $started, MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): MemberOriginalFileObservation
     {
+        $physical = $this->readExisting($root, $record, $trustedBytes, $expected, $idle, $budget);
+
+        return new MemberOriginalFileObservation($record['path'], $record['source'], $record['hash'], $record['size'],
+            $record['pages'], $record['profile'], $record['storage'], $physical['opened']['dev'], $physical['opened']['ino'],
+            $started, $physical['observed_at']);
+    }
+
+    /** Shared native read only. Writer/adoption checks remain in their existing callers. */
+    private function readExisting(string $root, array $record, ?string $trustedBytes,
+        MemberOriginalFileObservation|MemberRetainedOriginalObservation|null $expected,
+        MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): array
+    {
         $input = null;
         try {
             $this->directories($root, dirname($record['path']), false, $idle, $budget);
@@ -206,12 +259,12 @@ final class MemberOriginalFiles
                 throw new UnexpectedValueException;
             }
             $this->validateBytes($bytes, $record);
-            $this->sameFile($path, $this->io($idle, $budget, fn () => fstat($input)), $root, true, 1, $idle, $budget);
+            $closed = $this->io($idle, $budget, fn () => fstat($input));
+            $this->sameFile($path, $closed, $root, true, 1, $idle, $budget);
             $this->root(false, $idle, $budget);
             $this->directories($root, dirname($record['path']), false, $idle, $budget);
 
-            return new MemberOriginalFileObservation($record['path'], $record['source'], $record['hash'], $record['size'],
-                $record['pages'], $record['profile'], $record['storage'], $opened['dev'], $opened['ino'], $started, \hrtime(true));
+            return ['opened' => $opened, 'closed' => $closed, 'observed_at' => \hrtime(true)];
         } finally {
             if (is_resource($input)) {
                 fclose($input);
