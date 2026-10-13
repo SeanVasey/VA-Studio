@@ -183,13 +183,20 @@ class MembershipEligibleLicenseProofTest extends TestCase
         $f = $this->fixture();
         $pdo = DB::connection()->getPdo();
         if (DB::getDriverName() === 'mysql') {
-            $durableRows = $pdo->query('SELECT * FROM tracks')->fetchAll(\PDO::FETCH_ASSOC);
-            $pdo->exec('CREATE TEMPORARY TABLE tracks LIKE tracks');
+            $durableRows = $pdo->query('SELECT * FROM tracks ORDER BY id')->fetchAll(\PDO::FETCH_ASSOC);
+            // MySQL rejects CREATE TEMPORARY TABLE t LIKE t (1066). Reuse the importer
+            // fixture's definition-copy pattern; temporary tables cannot retain foreign keys.
+            $definition = (string) $pdo->query('SHOW CREATE TABLE tracks')->fetch(\PDO::FETCH_NUM)[1];
+            $lines = array_filter(explode("\n", $definition), static fn (string $line): bool => ! str_contains($line, ' FOREIGN KEY '));
+            $definition = (string) preg_replace('/,(\n\))/', '$1', implode("\n", $lines));
+            $pdo->exec((string) preg_replace('/^CREATE TABLE/', 'CREATE TEMPORARY TABLE', $definition));
+            $this->assertStringStartsWith('CREATE TEMPORARY TABLE', (string) $pdo->query('SHOW CREATE TABLE tracks')->fetch(\PDO::FETCH_NUM)[1]);
             foreach ($durableRows as $row) {
                 $statement = $pdo->prepare('INSERT INTO tracks (`'.implode('`, `', array_keys($row)).'`) VALUES ('
                     .implode(', ', array_fill(0, count($row), '?')).')');
                 $statement->execute(array_values($row));
             }
+            $this->assertSame($durableRows, $pdo->query('SELECT * FROM tracks ORDER BY id')->fetchAll(\PDO::FETCH_ASSOC));
         } else {
             $pdo->exec('CREATE TEMP TABLE tracks AS SELECT * FROM main.tracks');
         }
