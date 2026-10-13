@@ -19,12 +19,12 @@ final class MemberGrantRenderProfileRegistry
         'runtime_seconds' => 60, 'memory_bytes' => 134217728];
 
     // Filled from the complete new implementation before its first release. Never replace a released entry.
-    private const MANIFEST_HASH = '107619de4ca044fccbaab32cf310d0f8642bd2d43fe0dfc4cf41b5f09af86ef3';
+    private const MANIFEST_HASH = '10c7cfe4d0ca037f8f5fd1ea83d239361a4f4669e60d5b2e2db8091c9176b20c';
 
     public const RELEASED = [
         'r1' => [
-            'synthetic_rehearsal' => '9eb70c7937bf9a1ac8caf697f4ca7a29bc6cce35a6df79ef0e6d7b93b8a1ed84',
-            'verified_production' => '5b2fcdfba98f71bf4316a8f36ebe13e5b456c582119a500d96b4d5704ce9f6c5',
+            'synthetic_rehearsal' => '3964453761e443baac23a2373c7e946fe3adb095e6008546862fe747c031b88d',
+            'verified_production' => '2dc584d9840b8e11190a3641147e034c1249ec65e37c5fff84051eb0a5b27eda',
         ],
     ];
 
@@ -216,7 +216,7 @@ final class MemberGrantRenderProfileRegistry
                 'app/Domain/Grants/Member/MemberOriginalRenderInput.php' => '6b470c6d2dfadbb74d24bc7263e347985ce92864c29b236aac50d70bd379e3c7',
                 'app/Domain/Grants/Member/MemberOriginalText.php' => '959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da',
                 'app/Domain/Grants/Member/MemberOriginalPdfRenderer.php' => 'c48ad0a3e49eac2adc48f92a6351eec8e7808db94421fe4c361a2a7ac88481c6',
-                'app/Domain/Grants/Member/MemberOriginalRendererProcess.php' => 'a1d5c9461e2617f6ed933e4cc666e77300e07fcb8eaf47f35e0804d225f82190',
+                'app/Domain/Grants/Member/MemberOriginalRendererProcess.php' => '9a4cdf3f2397f5d2fc23bdb0f419b53d0ecc5d3cc41905360276507d589924ae',
                 'scripts/member-original-renderer-autoload.php' => 'adca75e6c55194265c0395df088cf77b8aab37a30923435e3b5e2704ada7193c',
                 'scripts/render-member-original.php' => '31fc3adbc8065cf3718cd6ce31462081fc99c530c3c586f32a53db8e5734b348',
             ],

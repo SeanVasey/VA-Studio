@@ -154,6 +154,20 @@ final class MemberOriginalRendererTest extends TestCase
         }
     }
 
+    public function test_real_child_timeout_is_shortened_to_the_original_workflow_remainder(): void
+    {
+        $budget = MemberOriginalBudget::start();
+        $budget->shortenTo(hrtime(true) + 10_000_000_000);
+        $process = null;
+        $renderer = new MemberOriginalRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use (&$process): Process {
+            return $process = new Process($command, $cwd, $environment, $payload, 60);
+        });
+        $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, $budget);
+        $this->assertGreaterThan(0, $process->getTimeout());
+        $this->assertLessThan(10, $process->getTimeout());
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+    }
+
     public function test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph(): void
     {
         $terms = MemberOriginalRendererFixtures::terms();

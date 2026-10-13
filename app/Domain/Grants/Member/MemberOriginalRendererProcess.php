@@ -98,7 +98,9 @@ final class MemberOriginalRendererProcess
             MemberGrantRenderProfile::verifyRuntime($profile, $idle);
             $budget->assertCurrent();
             $idle->assertStillIdle();
-            $process->setTimeout(min(60.0, ($budget->deadlineNs() - \hrtime(true)) / 1_000_000_000));
+            $remainingSeconds = ($budget->deadlineNs() - \hrtime(true)) / 1_000_000_000;
+            MemberGrantException::require($remainingSeconds > 0, 'workflow_deadline');
+            $process->setTimeout(min(60.0, $remainingSeconds));
             $stdout = '';
             $stderrBytes = 0;
             $process->run(function (string $type, string $chunk) use ($process, $idle, $budget, &$stdout, &$stderrBytes, &$collectOutput): void {
