@@ -69,6 +69,7 @@
     "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
     "tests/Feature/ProductionMembership/MembershipPolicyClockTest.php",
