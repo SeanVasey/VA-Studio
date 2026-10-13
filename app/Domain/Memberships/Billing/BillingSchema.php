@@ -163,7 +163,9 @@ final class BillingSchema
                 }
                 if ($actual !== false) {
                     BillingException::require($actual === ['TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin'], 'schema');
-                    $this->mysqlDefinition($pdo, $name, $definition, $catalog);
+                    $ownedCheck = $this->mysqlDefinition($pdo, $name, $definition, $catalog);
+                    // An earlier dictionary snapshot cannot establish the opened table's current structure.
+                    $this->mysqlShownDefinition($shown[1], $name, $definition, $ownedCheck);
                 }
                 $actualGuards = $catalog->named('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?', $this->mysqlNames(), $name);
                 BillingException::require(array_diff(array_column($actualGuards, 'TRIGGER_NAME'), $allowedGuards) === [], 'schema');
@@ -188,6 +190,20 @@ final class BillingSchema
                     $row = $objects[0] ?? false;
                     if ($row !== false) {
                         BillingException::require($row['EVENT_OBJECT_TABLE'] === $name && $row['EVENT_MANIPULATION'] === $expected['event'] && $row['ACTION_TIMING'] === 'BEFORE' && $this->sql($row['ACTION_STATEMENT']) === $this->sql($expected['body']), 'schema');
+                    }
+                    // The subject is pinned above (or locked by the upgrader). Named SHOW reads
+                    // its current required guard even when information_schema retains an old snapshot.
+                    try {
+                        $current = $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC);
+                        $original = $current['SQL Original Statement'] ?? null;
+                        BillingException::require($row !== false && is_string($original) && ($offset = strpos($original, ' TRIGGER ')) !== false, 'schema');
+                        $wanted = 'TRIGGER `'.$guard.'` BEFORE '.$expected['event'].' ON `'.$name.'` FOR EACH ROW '.$expected['body'];
+                        BillingException::require($this->sql(substr($original, $offset + 1)) === $this->sql($wanted), 'schema');
+                    } catch (\PDOException $error) {
+                        if (($error->errorInfo[1] ?? null) !== 1360) {
+                            throw $error;
+                        }
+                        BillingException::require($row === false, 'schema');
                     }
                 }
                 $legacyInterval = $intervalUpgrade && $actual !== false && $guard === $name.'_interval';
@@ -833,7 +849,7 @@ final class BillingSchema
         return $parameters;
     }
 
-    private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): void
+    private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): string
     {
         $columns = $catalog->named('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION', $this->mysqlNames(), $name);
         BillingException::require(array_column($columns, 'COLUMN_NAME') === array_keys($definition['columns']), 'schema');
@@ -889,6 +905,62 @@ final class BillingSchema
         $checks = array_combine($this->mysqlNames(), array_map(fn (string $table): array => [$table, $table.'_bounds'], $this->mysqlNames()));
         $rows = $catalog->rows("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA = DATABASE() AND BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?", $checks, $name);
         BillingException::require(count($rows) === 1 && $rows[0]['ENFORCED'] === 'YES' && $this->check($rows[0]['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
+
+        return $rows[0]['CHECK_CLAUSE'];
+    }
+
+    /** Current opened-table structure; only the volatile table allocation counter is excluded. */
+    private function mysqlShownDefinition(string $shown, string $name, array $definition, string $ownedNativeCheck): void
+    {
+        $header = 'CREATE TABLE `'.$name.'` (';
+        $suffix = ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin';
+        $shown = preg_replace('/\) ENGINE=InnoDB AUTO_INCREMENT=[0-9]+ DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin\z/D', $suffix, $shown);
+        BillingException::require(str_starts_with($shown, $header) && str_ends_with($shown, $suffix), 'schema');
+        $body = trim(substr($shown, strlen($header), -strlen($suffix)));
+        $lines = array_map(trim(...), explode(",\n", $body));
+        foreach ($definition['columns'] as $column => $type) {
+            $type = preg_replace_callback('/\A(VARCHAR\([0-9]+\)|BIGINT UNSIGNED|INTEGER|LONGTEXT)/', fn (array $match): string => $match[1] === 'INTEGER' ? 'int' : strtolower($match[1]), $type);
+            if (! str_contains($type, 'NOT NULL')) {
+                $type = preg_replace('/ NULL\z/D', ' DEFAULT NULL', $type);
+            }
+            BillingException::require(array_shift($lines) === '`'.$column.'` '.$type, 'schema');
+        }
+        $parts = fn (array $columns): string => '(`'.implode('`,`', $columns).'`)';
+        $expected = ['PRIMARY KEY '.$parts($definition['primary'])];
+        $keys = [$definition['primary']];
+        foreach ($definition['unique'] as $index => $columns) {
+            $expected[] = 'UNIQUE KEY `'.$name.'_u'.$index.'` '.$parts($columns);
+            $keys[] = $columns;
+        }
+        foreach ($definition['extra_unique'] as $suffix => $columns) {
+            $expected[] = 'UNIQUE KEY `'.$name.'_'.$suffix.'` '.$parts($columns);
+            $keys[] = $columns;
+        }
+        foreach (array_keys($definition['foreign']) as $index => $column) {
+            if (! array_any($keys, fn (array $columns): bool => $columns[0] === $column)) {
+                $expected[] = 'KEY `'.$name.'_f'.$index.'` '.$parts([$column]);
+            }
+            $expected[] = 'CONSTRAINT `'.$name.'_f'.$index.'` FOREIGN KEY '.$parts([$column]).' REFERENCES `'.$this->physical($definition['foreign'][$column]).'` (`id`)';
+        }
+        $checkHeader = 'CONSTRAINT `'.$name.'_bounds` CHECK ';
+        $foundCheck = false;
+        $other = [];
+        foreach ($lines as $line) {
+            if (str_starts_with($line, $checkHeader)) {
+                BillingException::require(! $foundCheck, 'schema');
+                $check = substr($line, strlen($checkHeader));
+                // SHOW wraps the native predicate once. Preserve its internal boolean grouping.
+                BillingException::require(str_starts_with($check, '(') && str_ends_with($check, ')'), 'schema');
+                BillingException::require($this->nativeCheck(substr($check, 1, -1)) === $this->nativeCheck($ownedNativeCheck), 'schema');
+                $foundCheck = true;
+            } else {
+                // MySQL may omit these exact default actions; every other FK action stays significant.
+                $other[] = str_replace([' ON DELETE RESTRICT', ' ON UPDATE RESTRICT'], '', $line);
+            }
+        }
+        sort($expected);
+        sort($other);
+        BillingException::require($foundCheck && $expected === $other, 'schema');
     }
 
     private function sql(string $sql): string
@@ -896,7 +968,7 @@ final class BillingSchema
         return trim(preg_replace('/\s+/', ' ', $sql), ' ;');
     }
 
-    private function check(string $sql): string
+    private function nativeCheck(string $sql): string
     {
         // Native MySQL dictionaries introduce/escape these exact ASCII enum literals.
         // Admit only the owned literal spellings, never arbitrary charset or SQL rewriting.
@@ -907,9 +979,16 @@ final class BillingSchema
             // MySQL 8.4 rewrites these same ASCII column literals to _ascii after ADD COLUMN.
             foreach (['_utf8mb4', '_ascii'] as $charset) {
                 $sql = str_replace($charset."\\'".$literal."\\'", "'".$literal."'", $sql);
+                $sql = str_replace($charset."'".$literal."'", "'".$literal."'", $sql);
             }
         }
 
-        return strtolower(preg_replace('/[\s`()]+/', '', $sql));
+        // Whitespace outside quoted tokens is formatting; literal contents and grouping are not.
+        return trim(preg_replace_callback("/'(?:''|\\\\.|[^'\\\\])*'|`(?:``|[^`])*`|\\s+/", fn (array $match): string => ctype_space($match[0]) ? ' ' : $match[0], $sql));
+    }
+
+    private function check(string $sql): string
+    {
+        return strtolower(preg_replace('/[\s`()]+/', '', $this->nativeCheck($sql)));
     }
 }
