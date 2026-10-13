@@ -1,0 +1,4212 @@
+{
+  "scope": "Independent JUnit leaf/suite reconciliation or explicit log totals. Counts overlap; unknown command exits remain null. Component runs are not an integrated suite.",
+  "runs": [
+    {
+      "id": "renderer/input-text-complete",
+      "driver": "none",
+      "xml": "renderer/input-text-complete.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 23,
+        "assertions": 37,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 23,
+      "assertions": 37,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/input-text-initial",
+      "driver": "none",
+      "xml": "renderer/input-text-initial.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 23,
+        "assertions": 37,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 23,
+      "assertions": 37,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/lane-combined-final.xml",
+      "log": null,
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "renderer-final",
+      "expected": {
+        "tests": 76,
+        "assertions": 243,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 76,
+      "assertions": 243,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_opening_a_native_transaction_refuses_without_closing_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_expiring_original_budget_refuses",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_original_budget_includes_time_spent_in_the_prelaunch_observation_hook",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_user_space_file_stream_cannot_substitute_expected_bytes_for_wrong_native_candidate with data set #0",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_user_space_file_stream_cannot_substitute_expected_bytes_for_wrong_native_candidate with data set #1",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_one_shot_wrapper_is_refused_before_a_pre_open_stat_callback_can_restore_native_files",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_candidate_is_private_exact_and_recoverable_only_against_trusted_expected_bytes",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #0",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #1",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #2",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #3",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #4",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #5",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_actual_worker_death_preserves_partial_link_and_recovers_only_completed_publication with data set #0",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_actual_worker_death_preserves_partial_link_and_recovers_only_completed_publication with data set #1",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #0",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #1",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #2",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #3",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #4",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #5",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #6",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #7",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #8",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_read_only_verification_does_not_recreate_missing_root",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_failed_write_cleanup_never_removes_a_replacement_temporary_entry",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_native_transaction_started_after_write_stops_publication_and_preserves_foreign_transaction",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_wrapper_installed_after_physical_write_is_refused_before_path_closure_or_publication",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_removes_only_its_owned_entries_and_never_traverses_links",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_substituted_filesystem_without_touching_owned_or_unrelated_contents with data set #0",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_substituted_filesystem_without_touching_owned_or_unrelated_contents with data set #1",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_a_replaced_directory_or_expired_original_budget",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_expired_original_budget_prevents_candidate_write",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_excess_depth_and_preserves_unrelated_directory",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_native_transaction_at_framework_level_zero_and_configuration_change_prevent_io",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_independent_processes_never_replace_winner_and_retry_adopts_only_equal_bytes",
+          "assertions": 16,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/reference-alias-fixed-source",
+      "driver": "none",
+      "xml": "renderer/reference-alias-fixed-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 1,
+      "assertions": 3,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/reference-alias-old-source",
+      "driver": "none",
+      "xml": "renderer/reference-alias-old-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 1,
+      "assertions": 1,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 1,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "renderer/renderer-corrected-barrier",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-corrected-barrier.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 34,
+        "assertions": 89,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 34,
+      "assertions": 89,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_opening_a_native_transaction_cannot_start_child_or_close_it",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_expiring_original_budget_cannot_start_child",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_timeout_is_shortened_to_the_original_workflow_remainder",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/renderer-corrected",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-corrected.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 9,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 9,
+      "assertions": 43,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_opening_a_native_transaction_cannot_start_child_or_close_it",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_expiring_original_budget_cannot_start_child",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/renderer-e6-e8-complete",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-e6-e8-complete.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 36,
+        "assertions": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 36,
+      "assertions": 86,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_opening_a_native_transaction_refuses_without_closing_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_expiring_original_budget_refuses",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_original_budget_includes_time_spent_in_the_prelaunch_observation_hook",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/renderer-initial",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-initial.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 9,
+        "assertions": 40,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 9,
+      "assertions": 40,
+      "errors": 0,
+      "failures": 3,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 2,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_opening_a_native_transaction_cannot_start_child_or_close_it",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_expiring_original_budget_cannot_start_child",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/renderer-input-interim",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-input-interim.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 33,
+        "assertions": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 33,
+      "assertions": 86,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_opening_a_native_transaction_cannot_start_child_or_close_it",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_factory_expiring_original_budget_cannot_start_child",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/transport-cr-fixed-source",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/transport-cr-fixed-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 12,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 12,
+      "assertions": 46,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_opening_a_native_transaction_refuses_without_closing_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_expiring_original_budget_refuses",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_original_budget_includes_time_spent_in_the_prelaunch_observation_hook",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "renderer/transport-cr-old-source",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/transport-cr-old-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 1,
+        "errors": 1,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 2,
+      "assertions": 1,
+      "errors": 1,
+      "failures": 1,
+      "skipped": 0,
+      "exit": null,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest",
+          "assertions": 0,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "renderer/member-original-files-e7-red-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-e7-red-20261013.log",
+      "reported_exit": 1,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 3,
+        "assertions": 7,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 3,
+      "assertions": 7,
+      "errors": 0,
+      "failures": 3,
+      "skipped": 0,
+      "exit": 1,
+      "cases": []
+    },
+    {
+      "id": "renderer/member-original-files-e7-green-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-e7-green-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 3,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 3,
+      "assertions": 15,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": []
+    },
+    {
+      "id": "renderer/member-original-files-workspace-red-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-workspace-red-20261013.log",
+      "reported_exit": 1,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 2,
+      "assertions": 3,
+      "errors": 0,
+      "failures": 2,
+      "skipped": 0,
+      "exit": 1,
+      "cases": []
+    },
+    {
+      "id": "renderer/member-original-files-workspace-green-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-workspace-green-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 2,
+      "assertions": 10,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": []
+    },
+    {
+      "id": "renderer/member-original-files-full-interim-38-147-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-full-interim-38-147-20261013.log",
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 38,
+        "assertions": 147,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      },
+      "tests": 38,
+      "assertions": 147,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": null,
+      "cases": []
+    },
+    {
+      "id": "renderer/member-original-files-full-final-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-full-final-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 40,
+        "assertions": 157,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 40,
+      "assertions": 157,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": []
+    },
+    {
+      "id": "facts/authoring-canary-fixed",
+      "driver": "sqlite",
+      "xml": "facts/authoring-canary-fixed.xml",
+      "exit_file": "facts/authoring-canary-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 9,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 9,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/authoring-committed-diagnostic",
+      "driver": "sqlite",
+      "xml": "facts/authoring-committed-diagnostic.xml",
+      "exit_file": "facts/authoring-committed-diagnostic.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 0,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 0,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "facts/authoring-diagnostic",
+      "driver": "sqlite",
+      "xml": "facts/authoring-diagnostic.xml",
+      "exit_file": "facts/authoring-diagnostic.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 0,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 0,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "facts/document-cap-old",
+      "driver": "none",
+      "xml": "facts/document-cap-old.xml",
+      "exit_file": "facts/document-cap-old.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 1,
+      "assertions": 1,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source exceeds member renderer capacity\"",
+          "assertions": 1,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "facts/documents-records-cap-final",
+      "driver": "none",
+      "xml": "facts/documents-records-cap-final.xml",
+      "exit_file": "facts/documents-records-cap-final.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 30,
+        "assertions": 66,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 30,
+      "assertions": 66,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_authored_source_at_the_released_renderer_limit_is_retained_exactly",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source exceeds member renderer capacity\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/documents-records-final",
+      "driver": "none",
+      "xml": "facts/documents-records-final.xml",
+      "exit_file": "facts/documents-records-final.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 28,
+      "assertions": 64,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/documents-records-first",
+      "driver": "none",
+      "xml": "facts/documents-records-first.xml",
+      "exit_file": "facts/documents-records-first.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 28,
+      "assertions": 64,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/documents-records-fixed",
+      "driver": "none",
+      "xml": "facts/documents-records-fixed.xml",
+      "exit_file": "facts/documents-records-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 28,
+      "assertions": 64,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/schema/pure-detach",
+      "driver": "none",
+      "xml": "facts/schema/pure-detach.xml",
+      "exit_file": "facts/schema/pure-detach.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 24,
+        "assertions": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 24,
+      "assertions": 49,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #0",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #1",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #2",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #3",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_callers_cannot_adopt_a_snapshot_or_select_arbitrary_tables",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_driver_lookup_also_requires_issuance",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_snapshots_do_not_serialize",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baselines_detach_nested_caller_held_references",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baseline_refuses_recursive_values_with_a_bounded_depth",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baseline_refuses_application_objects",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_native_printing_parentheses_keyword_case_and_exact_enum_introducers_are_allowed",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"engine\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"table collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"column collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal case\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal whitespace\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"boolean grouping\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"check disabled\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"counter\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"extra key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"different unique\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"default\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_trigger_definer_is_the_only_ignored_header_and_literal_bytes_remain_owned",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_sqlite_comparison_preserves_literal_whitespace_and_identifier_case",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/schema/pure-final",
+      "driver": "none",
+      "xml": "facts/schema/pure-final.xml",
+      "exit_file": "facts/schema/pure-final.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 21,
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 21,
+      "assertions": 44,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #0",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #1",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #2",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #3",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_callers_cannot_adopt_a_snapshot_or_select_arbitrary_tables",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_driver_lookup_also_requires_issuance",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_snapshots_do_not_serialize",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_native_printing_parentheses_keyword_case_and_exact_enum_introducers_are_allowed",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"engine\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"table collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"column collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal case\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal whitespace\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"boolean grouping\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"check disabled\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"counter\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"extra key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"different unique\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"default\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_trigger_definer_is_the_only_ignored_header_and_literal_bytes_remain_owned",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_sqlite_comparison_preserves_literal_whitespace_and_identifier_case",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/schema/pure-first",
+      "driver": "none",
+      "xml": "facts/schema/pure-first.xml",
+      "exit_file": "facts/schema/pure-first.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 21,
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 21,
+      "assertions": 44,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #0",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #1",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #2",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #3",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_callers_cannot_adopt_a_snapshot_or_select_arbitrary_tables",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_driver_lookup_also_requires_issuance",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_snapshots_do_not_serialize",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_native_printing_parentheses_keyword_case_and_exact_enum_introducers_are_allowed",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"engine\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"table collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"column collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal case\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal whitespace\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"boolean grouping\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"check disabled\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"counter\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"extra key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"different unique\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"default\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_trigger_definer_is_the_only_ignored_header_and_literal_bytes_remain_owned",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_sqlite_comparison_preserves_literal_whitespace_and_identifier_case",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/sqlite-authoring-facts-first",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-authoring-facts-first.xml",
+      "exit_file": "facts/sqlite-authoring-facts-first.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 9,
+        "assertions": 39,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 9,
+      "assertions": 39,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_missing_real_mfa_refuses_before_member_rows_are_written",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_authoring_flag_is_independent_and_defaults_off",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_exact_authenticated_plan_hash_is_required_before_inserts",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_committing_callback_configuration_change_rolls_back_both_immutable_rows",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_committed_callback_staff_withdrawal_refuses_receipt_while_retaining_durable_rows",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_caller_outer_transaction_cannot_receive_provisional_authoring_identity",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_real_authored_facts_yield_detached_snapshot_and_one_combined_committed_frame",
+          "assertions": 5,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "facts/sqlite-facts-fixed",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-facts-fixed.xml",
+      "exit_file": "facts/sqlite-facts-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 4,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 4,
+      "assertions": 17,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_real_authored_facts_yield_detached_snapshot_and_one_combined_committed_frame",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_raw_closure_detects_owner_change_after_callback_phase",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_public_token_values_foreign_issuers_and_unregistered_closures_have_no_admission",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_required_full_customer_gate_is_not_replaced_by_authoring_flag",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/sqlite-schema-authoring-canary",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-schema-authoring-canary.xml",
+      "exit_file": "facts/sqlite-schema-authoring-canary.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 7,
+        "assertions": 17,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 7,
+      "assertions": 17,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_complete_current_plan_and_committed_frame_preserve_all_installed_definitions",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_missing_required_guard_is_not_repaired",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_same_named_guard_with_changed_literal_bytes_is_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_temp_reserved_guard_name_and_extra_owned_index_are_refused",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_current_snapshot_refuses_replaced_native_transaction_without_rolling_it_back",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_key_configuration_drift_is_not_adopted_by_current_snapshot",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 0,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "facts/schema/native/native-old-01",
+      "driver": "mysql",
+      "xml": "facts/schema/native/native-old-01/phpunit.xml",
+      "exit_file": "facts/schema/native/native-old-01/phpunit.exit",
+      "command_receipt": "facts/schema/native/native-old-01/command.json",
+      "command_status": "Original structured argv and public environment retained; runner success means expected outcome validation, not a green old PHPUnit run.",
+      "source_binding": "facts/schema/native/native-old-01",
+      "expected": {
+        "tests": 2,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 2,
+      "assertions": 10,
+      "errors": 0,
+      "failures": 2,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot with data set #0",
+          "assertions": 5,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot with data set #1",
+          "assertions": 5,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "facts/schema/native/native-fixed-01",
+      "driver": "mysql",
+      "xml": "facts/schema/native/native-fixed-01/phpunit.xml",
+      "exit_file": "facts/schema/native/native-fixed-01/phpunit.exit",
+      "command_receipt": "facts/schema/native/native-fixed-01/command.json",
+      "command_status": "Original structured argv and public environment retained; runner success means expected outcome validation, not a green old PHPUnit run.",
+      "source_binding": "facts/schema/native/native-fixed-01",
+      "expected": {
+        "tests": 4,
+        "assertions": 19,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 4,
+      "assertions": 19,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_actual_show_definitions_and_read_only_frame_are_accepted",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot with data set #0",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot with data set #1",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot with data set #2",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/budget-io-final",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-final.xml",
+      "log": "operation/budget-io-final.log",
+      "exit_file": "operation/budget-io-final.exit",
+      "command_receipt": "operation/budget-io-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-final",
+      "expected": {
+        "tests": 18,
+        "assertions": 65,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 18,
+      "assertions": 65,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_one_native_monotonic_workflow_cap_can_only_shorten",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_copied_or_serialized_into_another_workflow",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_restored_with_a_caller_selected_deadline",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_idle_barrier_rechecks_all_captured_native_handles_without_framework_queries",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_write_transaction_at_framework_zero_is_refused_and_left_untouched",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_transaction_on_a_second_resolved_connection_is_refused",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_separate_read_handle_transaction_is_refused_without_resolving_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_transaction_at_framework_zero_is_refused_and_preserved",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_replacement_and_lazy_slot_are_refused_without_resolution",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_database_facade_cannot_point_to_a_foreign_resolved_manager",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_facade_application_identity_cannot_change_behind_the_captured_container",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_framework_transaction_counter_is_not_replaced_by_an_idle_native_handle",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_lazy_native_slots_are_refused_without_invoking_the_resolver",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_connection_or_handle_created_after_capture_cannot_join_the_barrier",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_configuration_repository_and_manager_identity_cannot_change",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_unexpected_framework_or_native_subclasses_are_not_called",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_container_replacement_and_serialization_are_refused",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_io_frame_object_restoration_is_explicitly_refused",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/budget-io-initial",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-initial.xml",
+      "log": "operation/budget-io-initial.log",
+      "exit_file": "operation/budget-io-initial.exit",
+      "command_receipt": "operation/budget-io-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-initial",
+      "expected": {
+        "tests": 12,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 12,
+      "assertions": 45,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_one_native_monotonic_workflow_cap_can_only_shorten",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_copied_or_serialized_into_another_workflow",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_idle_barrier_rechecks_all_captured_native_handles_without_framework_queries",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_write_transaction_at_framework_zero_is_refused_and_left_untouched",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_transaction_on_a_second_resolved_connection_is_refused",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_separate_read_handle_transaction_is_refused_without_resolving_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_framework_transaction_counter_is_not_replaced_by_an_idle_native_handle",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_lazy_native_slots_are_refused_without_invoking_the_resolver",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_connection_or_handle_created_after_capture_cannot_join_the_barrier",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_configuration_repository_and_manager_identity_cannot_change",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_unexpected_framework_or_native_subclasses_are_not_called",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_container_replacement_and_serialization_are_refused",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/budget-io-reviewed",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-reviewed.xml",
+      "log": "operation/budget-io-reviewed.log",
+      "exit_file": "operation/budget-io-reviewed.exit",
+      "command_receipt": "operation/budget-io-reviewed.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-reviewed",
+      "expected": {
+        "tests": 16,
+        "assertions": 61,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 16,
+      "assertions": 61,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_one_native_monotonic_workflow_cap_can_only_shorten",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_copied_or_serialized_into_another_workflow",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_idle_barrier_rechecks_all_captured_native_handles_without_framework_queries",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_write_transaction_at_framework_zero_is_refused_and_left_untouched",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_transaction_on_a_second_resolved_connection_is_refused",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_separate_read_handle_transaction_is_refused_without_resolving_it",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_transaction_at_framework_zero_is_refused_and_preserved",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_replacement_and_lazy_slot_are_refused_without_resolution",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_database_facade_cannot_point_to_a_foreign_resolved_manager",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_facade_application_identity_cannot_change_behind_the_captured_container",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_framework_transaction_counter_is_not_replaced_by_an_idle_native_handle",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_lazy_native_slots_are_refused_without_invoking_the_resolver",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_connection_or_handle_created_after_capture_cannot_join_the_barrier",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_configuration_repository_and_manager_identity_cannot_change",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_unexpected_framework_or_native_subclasses_are_not_called",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_container_replacement_and_serialization_are_refused",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-frame-issuer-5bbebd77",
+      "driver": "sqlite",
+      "xml": "operation/composition-frame-issuer-5bbebd77.xml",
+      "log": "operation/composition-frame-issuer-5bbebd77.log",
+      "exit_file": "operation/composition-frame-issuer-5bbebd77.exit",
+      "command_receipt": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-frame-issuer-5bbebd77",
+      "expected": {
+        "tests": 10,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 10,
+      "assertions": 45,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_plain_cached_route_finishes_the_real_read_only_frame_once",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_config_and_global_hooks_cannot_execute_between_raw_proof_and_finish",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_earlier_callback_work_can_complete_and_be_removed_before_final_admission",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_contextual_config_resolution_is_refused_before_factory_execution",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_only_the_captured_primary_can_be_active_during_current_and_committed_raw_proofs",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_shaped_source_claim_and_materialization_are_refused_by_the_actual_issuer",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor",
+          "assertions": 5,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-frame-issuer-final",
+      "driver": "sqlite",
+      "xml": "operation/composition-frame-issuer-final.xml",
+      "log": "operation/composition-frame-issuer-final.log",
+      "exit_file": "operation/composition-frame-issuer-final.exit",
+      "command_receipt": "operation/composition-frame-issuer-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-frame-issuer-final",
+      "expected": {
+        "tests": 10,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 10,
+      "assertions": 45,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_plain_cached_route_finishes_the_real_read_only_frame_once",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_config_and_global_hooks_cannot_execute_between_raw_proof_and_finish",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_earlier_callback_work_can_complete_and_be_removed_before_final_admission",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_contextual_config_resolution_is_refused_before_factory_execution",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_only_the_captured_primary_can_be_active_during_current_and_committed_raw_proofs",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_shaped_source_claim_and_materialization_are_refused_by_the_actual_issuer",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor",
+          "assertions": 5,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-issuer-fixed",
+      "driver": "sqlite",
+      "xml": "operation/composition-issuer-fixed.xml",
+      "log": "operation/composition-issuer-fixed.log",
+      "exit_file": "operation/composition-issuer-fixed.exit",
+      "command_receipt": "operation/composition-issuer-fixed.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-issuer-fixed",
+      "expected": {
+        "tests": 4,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 4,
+      "assertions": 15,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_shaped_source_claim_and_materialization_are_refused_by_the_actual_issuer",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor",
+          "assertions": 5,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-issuer-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-issuer-initial.xml",
+      "log": "operation/composition-issuer-initial.log",
+      "exit_file": "operation/composition-issuer-initial.exit",
+      "command_receipt": "operation/composition-issuer-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-issuer-initial",
+      "expected": {
+        "tests": 0,
+        "assertions": 0,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 255
+      },
+      "aborted_before_tests": true,
+      "abort_log_marker": "is not a trait",
+      "tests": 0,
+      "assertions": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 255,
+      "cases": []
+    },
+    {
+      "id": "operation/finish-boundary-final",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-final.xml",
+      "log": "operation/finish-boundary-final.log",
+      "exit_file": "operation/finish-boundary-final.exit",
+      "command_receipt": "operation/finish-boundary-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-final",
+      "expected": {
+        "tests": 5,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 5,
+      "assertions": 21,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_plain_cached_route_finishes_the_real_read_only_frame_once",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_config_and_global_hooks_cannot_execute_between_raw_proof_and_finish",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_earlier_callback_work_can_complete_and_be_removed_before_final_admission",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_contextual_config_resolution_is_refused_before_factory_execution",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/finish-boundary-initial",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-initial.xml",
+      "log": "operation/finish-boundary-initial.log",
+      "exit_file": "operation/finish-boundary-initial.exit",
+      "command_receipt": "operation/finish-boundary-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-initial",
+      "expected": {
+        "tests": 4,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 4,
+      "assertions": 17,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_plain_cached_route_finishes_the_real_read_only_frame_once",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_config_and_global_hooks_cannot_execute_between_raw_proof_and_finish",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_earlier_callback_work_can_complete_and_be_removed_before_final_admission",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_contextual_config_resolution_is_refused_before_factory_execution",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/finish-boundary-native-statements",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-native-statements.xml",
+      "log": "operation/finish-boundary-native-statements.log",
+      "exit_file": "operation/finish-boundary-native-statements.exit",
+      "command_receipt": "operation/finish-boundary-native-statements.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-native-statements",
+      "expected": {
+        "tests": 5,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 5,
+      "assertions": 21,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_plain_cached_route_finishes_the_real_read_only_frame_once",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_config_and_global_hooks_cannot_execute_between_raw_proof_and_finish",
+          "assertions": 8,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_earlier_callback_work_can_complete_and_be_removed_before_final_admission",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFinishBoundaryTest::test_contextual_config_resolution_is_refused_before_factory_execution",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/io-review-red",
+      "driver": "sqlite",
+      "xml": "operation/io-review-red.xml",
+      "log": "operation/io-review-red.log",
+      "exit_file": "operation/io-review-red.exit",
+      "command_receipt": "operation/io-review-red.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/io-review-red",
+      "expected": {
+        "tests": 4,
+        "assertions": 8,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 4,
+      "assertions": 8,
+      "errors": 0,
+      "failures": 4,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_transaction_at_framework_zero_is_refused_and_preserved",
+          "assertions": 2,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_direct_handle_replacement_and_lazy_slot_are_refused_without_resolution",
+          "assertions": 1,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_database_facade_cannot_point_to_a_foreign_resolved_manager",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIoFrameTest::test_facade_application_identity_cannot_change_behind_the_captured_container",
+          "assertions": 2,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "operation/native-io-final",
+      "driver": "mysql",
+      "xml": "operation/native-io-final.xml",
+      "log": "operation/native-io-final.log",
+      "exit_file": "operation/native-io-final.exit",
+      "command_receipt": "operation/native-io-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/native-io-final",
+      "expected": {
+        "tests": 3,
+        "assertions": 24,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 3,
+      "assertions": 24,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest::test_native_write_read_and_direct_transactions_are_refused_without_cleanup",
+          "assertions": 14,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest::test_native_direct_replacement_and_lazy_resolution_refuse_before_callbacks",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest::test_native_foreign_facade_manager_transaction_is_never_admitted_or_rolled_back",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/source-values-final",
+      "driver": "none",
+      "xml": "operation/source-values-final.xml",
+      "log": "operation/source-values-final.log",
+      "exit_file": "operation/source-values-final.exit",
+      "command_receipt": "operation/source-values-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/source-values-final",
+      "expected": {
+        "tests": 5,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 5,
+      "assertions": 20,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_nested_caller_references_and_returned_arrays_cannot_mutate_retained_source",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_historical_identity_observation_remains_in_the_semantic_source_hash",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_fresh_observation_fields_are_not_accepted_as_render_source_members",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_changed_definition_profile_selection_and_owner_relations_refuse",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/source-values-initial",
+      "driver": "none",
+      "xml": "operation/source-values-initial.xml",
+      "log": "operation/source-values-initial.log",
+      "exit_file": "operation/source-values-initial.exit",
+      "command_receipt": "operation/source-values-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/source-values-initial",
+      "expected": {
+        "tests": 5,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 5,
+      "assertions": 15,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority",
+          "assertions": 4,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_nested_caller_references_and_returned_arrays_cannot_mutate_retained_source",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_historical_identity_observation_remains_in_the_semantic_source_hash",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_fresh_observation_fields_are_not_accepted_as_render_source_members",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_changed_definition_profile_selection_and_owner_relations_refuse",
+          "assertions": 6,
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "component_slices": [
+    {
+      "id": "facts/schema-six",
+      "run": "facts/sqlite-schema-authoring-canary",
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "expected": {
+        "tests": 6,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "tests": 6,
+      "assertions": 17,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "invocation_exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_complete_current_plan_and_committed_frame_preserve_all_installed_definitions",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_missing_required_guard_is_not_repaired",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_same_named_guard_with_changed_literal_bytes_is_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_temp_reserved_guard_name_and_extra_owned_index_are_refused",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_current_snapshot_refuses_replaced_native_transaction_without_rolling_it_back",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest::test_key_configuration_drift_is_not_adopted_by_current_snapshot",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/authoring-eight",
+      "run": "facts/sqlite-authoring-facts-first",
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest",
+      "expected": {
+        "tests": 8,
+        "assertions": 34,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "tests": 8,
+      "assertions": 34,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "invocation_exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_missing_real_mfa_refuses_before_member_rows_are_written",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_authoring_flag_is_independent_and_defaults_off",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_exact_authenticated_plan_hash_is_required_before_inserts",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_committing_callback_configuration_change_rolls_back_both_immutable_rows",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_committed_callback_staff_withdrawal_refuses_receipt_while_retaining_durable_rows",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest::test_caller_outer_transaction_cannot_receive_provisional_authoring_identity",
+          "assertions": 4,
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

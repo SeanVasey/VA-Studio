@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" tests="9" assertions="40" errors="0" failures="3" skipped="0" time="1.816017">
+    <testcase name="test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="37" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="10" time="0.674499"/>
+    <testcase name="test_auto_created_pages_are_also_deterministic_across_real_children" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="60" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="3" time="0.588584"/>
+    <testcase name="test_pure_released_profile_remains_available_inside_a_transaction" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="72" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="2" time="0.035711">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+     'schema_version' =&gt; 1,
+     'version' =&gt; 'production-member-original-pdf-v1',
+     'purpose' =&gt; 'production-member-license-grant-v1',
+-    'provenance' =&gt; 'synthetic_rehearsal',
+     'template' =&gt; 'production-member-original-sections-v1',
+     'base' =&gt; Array &amp;1 [
+         'schema_version' =&gt; 1,
+@@ @@
+             'scripts/render-member-original.php' =&gt; '31fc3adbc8065cf3718cd6ce31462081fc99c530c3c586f32a53db8e5734b348',
+         ],
+     ],
++    'provenance' =&gt; 'synthetic_rehearsal',
+ ]
+
+/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php:77</failure>
+    </testcase>
+    <testcase name="test_changed_full_profile_is_refused_without_child_launch" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="87" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="2" time="0.024029"/>
+    <testcase name="test_runtime_verifies_new_manifest_members_without_modifying_frozen_files" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="105" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="14" time="0.021580"/>
+    <testcase name="test_factory_opening_a_native_transaction_cannot_start_child_or_close_it" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="115" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="1" time="0.038503">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest::test_factory_opening_a_native_transaction_cannot_start_child_or_close_it
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'io_frame'
++'storage_failed'
+
+/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php:128</failure>
+    </testcase>
+    <testcase name="test_factory_expiring_original_budget_cannot_start_child" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="139" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="1" time="0.041144">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest::test_factory_expiring_original_budget_cannot_start_child
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'workflow_deadline'
++'storage_failed'
+
+/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php:152</failure>
+    </testcase>
+    <testcase name="test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="157" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="1" time="0.151965"/>
+    <testcase name="test_real_child_has_no_application_environment_and_transport_is_bounded" file="/workspace/VA-Studio-member-original-renderer/tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php" line="170" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRendererTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRendererTest" assertions="6" time="0.240001"/>
+  </testsuite>
+</testsuites>

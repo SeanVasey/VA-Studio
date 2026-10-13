@@ -1,0 +1,548 @@
+{
+  "scope": "Successful driver/case identities in explicit component precedence. Superseded invocations remain history. No summed whole-suite or native-concurrency claim.",
+  "precedence": [
+    "renderer/lane-combined-final"
+  ],
+  "passed_driver_case_identities": 76,
+  "assertions": 243,
+  "cases": [
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+      "assertions": 4,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+      "assertions": 12,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_two_real_children_produce_identical_pdf_bytes_and_exact_source_metadata",
+      "assertions": 10,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_auto_created_pages_are_also_deterministic_across_real_children",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_pure_released_profile_remains_available_inside_a_transaction",
+      "assertions": 4,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_changed_full_profile_is_refused_without_child_launch",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_runtime_verifies_new_manifest_members_without_modifying_frozen_files",
+      "assertions": 14,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_opening_a_native_transaction_refuses_without_closing_it",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_expiring_original_budget_refuses",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_original_budget_includes_time_spent_in_the_prelaunch_observation_hook",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_has_no_application_environment_and_transport_is_bounded",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_observation_hook_cannot_substitute_a_pdf_looking_transport_result",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRendererTest::test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_user_space_file_stream_cannot_substitute_expected_bytes_for_wrong_native_candidate with data set #0",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_user_space_file_stream_cannot_substitute_expected_bytes_for_wrong_native_candidate with data set #1",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_one_shot_wrapper_is_refused_before_a_pre_open_stat_callback_can_restore_native_files",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_candidate_is_private_exact_and_recoverable_only_against_trusted_expected_bytes",
+      "assertions": 16,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #0",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #1",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #2",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #3",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #4",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_invalid_expected_rendered_values_cannot_create_a_candidate with data set #5",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #0",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #1",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #2",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #3",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #4",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #5",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_reobservation_refuses_missing_changed_or_replaced_original with data set #6",
+      "assertions": 1,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_actual_worker_death_preserves_partial_link_and_recovers_only_completed_publication with data set #0",
+      "assertions": 8,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_actual_worker_death_preserves_partial_link_and_recovers_only_completed_publication with data set #1",
+      "assertions": 7,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #0",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #1",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #2",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #3",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #4",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #5",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #6",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #7",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_unsafe_private_configuration_refuses_before_creating_candidates with data set #8",
+      "assertions": 4,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_read_only_verification_does_not_recreate_missing_root",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_failed_write_cleanup_never_removes_a_replacement_temporary_entry",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_native_transaction_started_after_write_stops_publication_and_preserves_foreign_transaction",
+      "assertions": 6,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_wrapper_installed_after_physical_write_is_refused_before_path_closure_or_publication",
+      "assertions": 6,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_removes_only_its_owned_entries_and_never_traverses_links",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_substituted_filesystem_without_touching_owned_or_unrelated_contents with data set #0",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_substituted_filesystem_without_touching_owned_or_unrelated_contents with data set #1",
+      "assertions": 5,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_a_replaced_directory_or_expired_original_budget",
+      "assertions": 4,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_expired_original_budget_prevents_candidate_write",
+      "assertions": 2,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_workspace_cleanup_refuses_excess_depth_and_preserves_unrelated_directory",
+      "assertions": 3,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_native_transaction_at_framework_level_zero_and_configuration_change_prevent_io",
+      "assertions": 7,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalFilesTest::test_independent_processes_never_replace_winner_and_retry_adopts_only_equal_bytes",
+      "assertions": 16,
+      "status": "passed",
+      "run": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite"
+    }
+  ],
+  "pending": [
+    "Facts bd3661ec historical component plus old/fixed native schema archived; E9/E4 facts corrections remain pending.",
+    "Operation and composed integration final source/results pending.",
+    "Root focused quality/discovery and final source comparison pending.",
+    "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
+  ]
+}

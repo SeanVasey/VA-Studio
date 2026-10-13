@@ -1,0 +1,2 @@
+
+Fatal error: Tests\Feature\ProductionMemberOriginals\MemberOriginalIssuerOwnershipTest cannot use Tests\Support\MemberOriginalRendererFixtures - it is not a trait in /workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php on line 29

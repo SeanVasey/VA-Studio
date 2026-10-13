@@ -1,0 +1,80 @@
+{
+    "class": "App\\Domain\\Grants\\Member\\MemberGrantException",
+    "reason": "staff_refused",
+    "file": "\/workspace\/VA-Studio-member-original-facts\/app\/Domain\/Grants\/Member\/MemberGrantException.php",
+    "line": 15,
+    "trace": [
+        {
+            "file": "\/workspace\/VA-Studio-member-original-facts\/app\/Domain\/Grants\/Member\/MemberGrantDefinitions.php",
+            "line": 169,
+            "function": "require",
+            "class": "App\\Domain\\Grants\\Member\\MemberGrantException"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-member-original-facts\/app\/Domain\/Grants\/Member\/MemberGrantDefinitions.php",
+            "line": 131,
+            "function": "committedStaff",
+            "class": "App\\Domain\\Grants\\Member\\MemberGrantDefinitions"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-member-original-facts\/tests\/Feature\/ProductionMemberOriginals\/MemberGrantDefinitionsTest.php",
+            "line": 41,
+            "function": "author",
+            "class": "App\\Domain\\Grants\\Member\\MemberGrantDefinitions"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestCase.php",
+            "line": 1318,
+            "function": "test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes",
+            "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestCase.php",
+            "line": 1355,
+            "function": "invokeTestMethod",
+            "class": "PHPUnit\\Framework\\TestCase"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestCase.php",
+            "line": 521,
+            "function": "runTest",
+            "class": "PHPUnit\\Framework\\TestCase"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestRunner\/TestRunner.php",
+            "line": 99,
+            "function": "runBare",
+            "class": "PHPUnit\\Framework\\TestCase"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestCase.php",
+            "line": 361,
+            "function": "run",
+            "class": "PHPUnit\\Framework\\TestRunner"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/Framework\/TestSuite.php",
+            "line": 374,
+            "function": "run",
+            "class": "PHPUnit\\Framework\\TestCase"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/TextUI\/TestRunner.php",
+            "line": 64,
+            "function": "run",
+            "class": "PHPUnit\\Framework\\TestSuite"
+        },
+        {
+            "file": "\/workspace\/VA-Studio-dependency-adapters\/vendor\/phpunit\/phpunit\/src\/TextUI\/Application.php",
+            "line": 229,
+            "function": "run",
+            "class": "PHPUnit\\TextUI\\TestRunner"
+        },
+        {
+            "file": "Command line code",
+            "line": 1,
+            "function": "run",
+            "class": "PHPUnit\\TextUI\\Application"
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MemberOriginalRenderInputTest" file="/workspace/VA-Studio-member-original-renderer/tests/Unit/MemberOriginalRenderInputTest.php" tests="1" assertions="3" errors="0" failures="0" skipped="0" time="0.000906">
+    <testcase name="test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections" file="/workspace/VA-Studio-member-original-renderer/tests/Unit/MemberOriginalRenderInputTest.php" line="26" class="Tests\Unit\MemberOriginalRenderInputTest" classname="Tests.Unit.MemberOriginalRenderInputTest" assertions="3" time="0.000906"/>
+  </testsuite>
+</testsuites>

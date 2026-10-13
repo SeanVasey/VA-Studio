@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-policy-admission/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 02:01.125, Memory: 72.50 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#0 with data ('table')
+Changed current member definition was admitted from the old RR dictionary snapshot.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/schema/native/MemberGrantNativeCurrentSchemaTest.php:95
+
+2) Tests\Feature\ProductionMemberOriginals\MemberGrantNativeCurrentSchemaTest::test_current_definitions_refuse_changes_hidden_by_an_older_rr_dictionary_snapshot#1 with data ('missing_guard')
+Changed current member definition was admitted from the old RR dictionary snapshot.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/schema/native/MemberGrantNativeCurrentSchemaTest.php:95
+
+FAILURES!
+Tests: 2, Assertions: 10, Failures: 2.

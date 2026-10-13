@@ -1,0 +1,277 @@
+{
+  "scope": "Independent full before/after equality where retained; other unchanged-source claims are identified as owner result sidecars. Runner and exact historical capsule bytes are checked independently.",
+  "observations": [
+    {
+      "run": "operation/budget-io-final",
+      "source": "operation/budget-io-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/budget-io-initial",
+      "source": "operation/budget-io-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/budget-io-reviewed",
+      "source": "operation/budget-io-reviewed.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-reviewed.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-frame-issuer-5bbebd77",
+      "source": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-frame-issuer-5bbebd77.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-frame-issuer-final",
+      "source": "operation/composition-frame-issuer-final.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-frame-issuer-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-issuer-fixed",
+      "source": "operation/composition-issuer-fixed.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-issuer-fixed.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-issuer-initial",
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": null,
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": false,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/finish-boundary-final",
+      "source": "operation/finish-boundary-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/finish-boundary-initial",
+      "source": "operation/finish-boundary-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/finish-boundary-native-statements",
+      "source": "operation/finish-boundary-native-statements.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-native-statements.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/io-review-red",
+      "source": "operation/io-review-red.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/io-review-red.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/native-io-final",
+      "source": "operation/native-io-final.source.json.gz",
+      "runner": "operation/run-native-focused.py",
+      "result": "operation/native-io-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/source-values-final",
+      "source": "operation/source-values-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/source-values-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/source-values-initial",
+      "source": "operation/source-values-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/source-values-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "facts/schema/native/native-old-01",
+      "before": "facts/schema/native/native-old-01/source-before.json.gz",
+      "after": "facts/schema/native/native-old-01/source-after.json.gz",
+      "program_directory": "facts/schema/native",
+      "independent_before_after_maps": true,
+      "captured_files": 10633,
+      "program_bytes_verified": [
+        "run.py",
+        "MemberGrantNativeCurrentSchemaTest.php"
+      ]
+    },
+    {
+      "run": "facts/schema/native/native-fixed-01",
+      "before": "facts/schema/native/native-fixed-01/source-before.json.gz",
+      "after": "facts/schema/native/native-fixed-01/source-after.json.gz",
+      "program_directory": "facts/schema/native",
+      "independent_before_after_maps": true,
+      "captured_files": 11503,
+      "program_bytes_verified": [
+        "run.py",
+        "MemberGrantNativeCurrentSchemaTest.php"
+      ]
+    }
+  ],
+  "capsules": [
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantAuthoringObserver.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantAuthoringObserver.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantDefinitions.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantDefinitions.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsClosure.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantFactsClosure.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsToken.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantFactsToken.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantRows.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantRows.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/SealedMemberGrantFacts.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
+      "capsule": "facts/canary-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+      "capsule": "facts/canary-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantAuthoringObserver.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantAuthoringObserver.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantDefinitions.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantDefinitions.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsClosure.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantFactsClosure.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsToken.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantFactsToken.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantRows.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantRows.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/SealedMemberGrantFacts.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php"
+    },
+    {
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "app/Domain/Grants/Member/MemberOriginalIoFrame.php",
+      "capsule": "operation/io-review-red-IoFrame.php.txt"
+    },
+    {
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php",
+      "capsule": "operation/io-review-red-test.php.txt"
+    },
+    {
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+      "capsule": "operation/composition-issuer-initial-test.php.txt"
+    }
+  ]
+}

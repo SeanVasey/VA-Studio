@@ -1,0 +1,1584 @@
+{
+  "assembly_base": "3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8",
+  "integrated_tested_source": null,
+  "runs": [
+    {
+      "id": "renderer/input-text-complete",
+      "driver": "none",
+      "xml": "renderer/input-text-complete.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 23,
+        "assertions": 37,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/input-text-initial",
+      "driver": "none",
+      "xml": "renderer/input-text-initial.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 23,
+        "assertions": 37,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/lane-combined-final",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/lane-combined-final.xml",
+      "log": null,
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "renderer-final",
+      "expected": {
+        "tests": 76,
+        "assertions": 243,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "renderer/reference-alias-fixed-source",
+      "driver": "none",
+      "xml": "renderer/reference-alias-fixed-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/reference-alias-old-source",
+      "driver": "none",
+      "xml": "renderer/reference-alias-old-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/renderer-corrected-barrier",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-corrected-barrier.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 34,
+        "assertions": 89,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/renderer-corrected",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-corrected.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 9,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/renderer-e6-e8-complete",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-e6-e8-complete.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 36,
+        "assertions": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/renderer-initial",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-initial.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 9,
+        "assertions": 40,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/renderer-input-interim",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/renderer-input-interim.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 33,
+        "assertions": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/transport-cr-fixed-source",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/transport-cr-fixed-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 12,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/transport-cr-old-source",
+      "driver": "none/idle-sqlite",
+      "xml": "renderer/transport-cr-old-source.xml",
+      "log": null,
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 1,
+        "errors": 1,
+        "failures": 1,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/member-original-files-e7-red-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-e7-red-20261013.log",
+      "reported_exit": 1,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 3,
+        "assertions": 7,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "renderer/member-original-files-e7-green-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-e7-green-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 3,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "renderer/member-original-files-workspace-red-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-workspace-red-20261013.log",
+      "reported_exit": 1,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "renderer/member-original-files-workspace-green-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-workspace-green-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 2,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "renderer/member-original-files-full-interim-38-147-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-full-interim-38-147-20261013.log",
+      "reported_exit": null,
+      "exit_provenance": "Original standalone exit receipt unavailable; no code inferred from JUnit or log.",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original full invocation unavailable; selected testcase names retained; E1/E6/E8 reproduction commands in README",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 38,
+        "assertions": 147,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": null
+      }
+    },
+    {
+      "id": "renderer/member-original-files-full-final-20261013",
+      "driver": "none/idle-sqlite",
+      "xml": null,
+      "log": "renderer/member-original-files-full-final-20261013.log",
+      "reported_exit": 0,
+      "exit_provenance": "renderer/README.md: exact final/file-owner observed receipt",
+      "command_receipt": "renderer/README.md",
+      "command_status": "original command retained",
+      "source_binding": "historical owner-attested variant; see retrospective capsules and limits in source-map.md",
+      "expected": {
+        "tests": 40,
+        "assertions": 157,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/authoring-canary-fixed",
+      "driver": "sqlite",
+      "xml": "facts/authoring-canary-fixed.xml",
+      "exit_file": "facts/authoring-canary-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/authoring-committed-diagnostic",
+      "driver": "sqlite",
+      "xml": "facts/authoring-committed-diagnostic.xml",
+      "exit_file": "facts/authoring-committed-diagnostic.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "facts/authoring-diagnostic",
+      "driver": "sqlite",
+      "xml": "facts/authoring-diagnostic.xml",
+      "exit_file": "facts/authoring-diagnostic.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "facts/document-cap-old",
+      "driver": "none",
+      "xml": "facts/document-cap-old.xml",
+      "exit_file": "facts/document-cap-old.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "facts/documents-records-cap-final",
+      "driver": "none",
+      "xml": "facts/documents-records-cap-final.xml",
+      "exit_file": "facts/documents-records-cap-final.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 30,
+        "assertions": 66,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/documents-records-final",
+      "driver": "none",
+      "xml": "facts/documents-records-final.xml",
+      "exit_file": "facts/documents-records-final.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/documents-records-first",
+      "driver": "none",
+      "xml": "facts/documents-records-first.xml",
+      "exit_file": "facts/documents-records-first.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "facts/documents-records-fixed",
+      "driver": "none",
+      "xml": "facts/documents-records-fixed.xml",
+      "exit_file": "facts/documents-records-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 28,
+        "assertions": 64,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/schema/pure-detach",
+      "driver": "none",
+      "xml": "facts/schema/pure-detach.xml",
+      "exit_file": "facts/schema/pure-detach.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 24,
+        "assertions": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/schema/pure-final",
+      "driver": "none",
+      "xml": "facts/schema/pure-final.xml",
+      "exit_file": "facts/schema/pure-final.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 21,
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/schema/pure-first",
+      "driver": "none",
+      "xml": "facts/schema/pure-first.xml",
+      "exit_file": "facts/schema/pure-first.exit",
+      "command_receipt": "facts/schema/README.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 21,
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/sqlite-authoring-facts-first",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-authoring-facts-first.xml",
+      "exit_file": "facts/sqlite-authoring-facts-first.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 9,
+        "assertions": 39,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "facts/sqlite-facts-fixed",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-facts-fixed.xml",
+      "exit_file": "facts/sqlite-facts-fixed.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 4,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/sqlite-schema-authoring-canary",
+      "driver": "sqlite",
+      "xml": "facts/sqlite-schema-authoring-canary.xml",
+      "exit_file": "facts/sqlite-schema-authoring-canary.exit",
+      "command_receipt": "facts/component-commands.md",
+      "command_status": "owner command narrative or named retained shell; diagnostics described separately",
+      "source_binding": "Historical component; final comparison bd3661ec, exact captured overlays where retained; subsequent E9/E4 review unresolved.",
+      "expected": {
+        "tests": 7,
+        "assertions": 17,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "facts/schema/native/native-old-01",
+      "driver": "mysql",
+      "xml": "facts/schema/native/native-old-01/phpunit.xml",
+      "exit_file": "facts/schema/native/native-old-01/phpunit.exit",
+      "command_receipt": "facts/schema/native/native-old-01/command.json",
+      "command_status": "Original structured argv and public environment retained; runner success means expected outcome validation, not a green old PHPUnit run.",
+      "source_binding": "facts/schema/native/native-old-01",
+      "expected": {
+        "tests": 2,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "facts/schema/native/native-fixed-01",
+      "driver": "mysql",
+      "xml": "facts/schema/native/native-fixed-01/phpunit.xml",
+      "exit_file": "facts/schema/native/native-fixed-01/phpunit.exit",
+      "command_receipt": "facts/schema/native/native-fixed-01/command.json",
+      "command_status": "Original structured argv and public environment retained; runner success means expected outcome validation, not a green old PHPUnit run.",
+      "source_binding": "facts/schema/native/native-fixed-01",
+      "expected": {
+        "tests": 4,
+        "assertions": 19,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/budget-io-final",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-final.xml",
+      "log": "operation/budget-io-final.log",
+      "exit_file": "operation/budget-io-final.exit",
+      "command_receipt": "operation/budget-io-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-final",
+      "expected": {
+        "tests": 18,
+        "assertions": 65,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/budget-io-initial",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-initial.xml",
+      "log": "operation/budget-io-initial.log",
+      "exit_file": "operation/budget-io-initial.exit",
+      "command_receipt": "operation/budget-io-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-initial",
+      "expected": {
+        "tests": 12,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/budget-io-reviewed",
+      "driver": "sqlite",
+      "xml": "operation/budget-io-reviewed.xml",
+      "log": "operation/budget-io-reviewed.log",
+      "exit_file": "operation/budget-io-reviewed.exit",
+      "command_receipt": "operation/budget-io-reviewed.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/budget-io-reviewed",
+      "expected": {
+        "tests": 16,
+        "assertions": 61,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-frame-issuer-5bbebd77",
+      "driver": "sqlite",
+      "xml": "operation/composition-frame-issuer-5bbebd77.xml",
+      "log": "operation/composition-frame-issuer-5bbebd77.log",
+      "exit_file": "operation/composition-frame-issuer-5bbebd77.exit",
+      "command_receipt": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-frame-issuer-5bbebd77",
+      "expected": {
+        "tests": 10,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-frame-issuer-final",
+      "driver": "sqlite",
+      "xml": "operation/composition-frame-issuer-final.xml",
+      "log": "operation/composition-frame-issuer-final.log",
+      "exit_file": "operation/composition-frame-issuer-final.exit",
+      "command_receipt": "operation/composition-frame-issuer-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-frame-issuer-final",
+      "expected": {
+        "tests": 10,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-issuer-fixed",
+      "driver": "sqlite",
+      "xml": "operation/composition-issuer-fixed.xml",
+      "log": "operation/composition-issuer-fixed.log",
+      "exit_file": "operation/composition-issuer-fixed.exit",
+      "command_receipt": "operation/composition-issuer-fixed.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-issuer-fixed",
+      "expected": {
+        "tests": 4,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-issuer-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-issuer-initial.xml",
+      "log": "operation/composition-issuer-initial.log",
+      "exit_file": "operation/composition-issuer-initial.exit",
+      "command_receipt": "operation/composition-issuer-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/composition-issuer-initial",
+      "expected": {
+        "tests": 0,
+        "assertions": 0,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 255
+      },
+      "aborted_before_tests": true,
+      "abort_log_marker": "is not a trait"
+    },
+    {
+      "id": "operation/finish-boundary-final",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-final.xml",
+      "log": "operation/finish-boundary-final.log",
+      "exit_file": "operation/finish-boundary-final.exit",
+      "command_receipt": "operation/finish-boundary-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-final",
+      "expected": {
+        "tests": 5,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/finish-boundary-initial",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-initial.xml",
+      "log": "operation/finish-boundary-initial.log",
+      "exit_file": "operation/finish-boundary-initial.exit",
+      "command_receipt": "operation/finish-boundary-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-initial",
+      "expected": {
+        "tests": 4,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/finish-boundary-native-statements",
+      "driver": "sqlite",
+      "xml": "operation/finish-boundary-native-statements.xml",
+      "log": "operation/finish-boundary-native-statements.log",
+      "exit_file": "operation/finish-boundary-native-statements.exit",
+      "command_receipt": "operation/finish-boundary-native-statements.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/finish-boundary-native-statements",
+      "expected": {
+        "tests": 5,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/io-review-red",
+      "driver": "sqlite",
+      "xml": "operation/io-review-red.xml",
+      "log": "operation/io-review-red.log",
+      "exit_file": "operation/io-review-red.exit",
+      "command_receipt": "operation/io-review-red.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/io-review-red",
+      "expected": {
+        "tests": 4,
+        "assertions": 8,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "operation/native-io-final",
+      "driver": "mysql",
+      "xml": "operation/native-io-final.xml",
+      "log": "operation/native-io-final.log",
+      "exit_file": "operation/native-io-final.exit",
+      "command_receipt": "operation/native-io-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/native-io-final",
+      "expected": {
+        "tests": 3,
+        "assertions": 24,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/source-values-final",
+      "driver": "none",
+      "xml": "operation/source-values-final.xml",
+      "log": "operation/source-values-final.log",
+      "exit_file": "operation/source-values-final.exit",
+      "command_receipt": "operation/source-values-final.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/source-values-final",
+      "expected": {
+        "tests": 5,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/source-values-initial",
+      "driver": "none",
+      "xml": "operation/source-values-initial.xml",
+      "log": "operation/source-values-initial.log",
+      "exit_file": "operation/source-values-initial.exit",
+      "command_receipt": "operation/source-values-initial.source.json.gz",
+      "command_status": "Original structured argv retained; public environment projection is explicitly recorded.",
+      "source_binding": "operation/source-values-initial",
+      "expected": {
+        "tests": 5,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      }
+    }
+  ],
+  "source_bindings": [
+    {
+      "id": "renderer-final",
+      "source": "renderer/inventory.json",
+      "key": [
+        "source_inventory"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "32 changed source/dependency entries, complete baseline diff; owner final-head execution statement, not a full before/after runtime inventory."
+    },
+    {
+      "id": "renderer-E1-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "1d88e9f0b7c744af1008c8dc4b656c735d96dd2d",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E1-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E1-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        0,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "2333b9dae2059e2d79c062f8f635332c67a83acf",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E6-E8-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E6-E8-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E6-E8-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        1,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E7-old",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "old"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "cd6aefe91c4272203774448c26f0b753106667fa",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E7-fixed",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "fixed"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "renderer-E7-regression_test",
+      "source": "renderer/inventory.json",
+      "key": [
+        "regression_capsules",
+        2,
+        "regression_test"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "require_exact": true,
+      "scope": "Retrospective author mapping, not contemporaneous historical run-source capture. E6/E8 old-run test bytes are not established by corrective test capsule."
+    },
+    {
+      "id": "facts-schema-source",
+      "source": "facts/schema/source.sha256",
+      "format": "sha256sum",
+      "reference": "6b76eea88c9be83889d0940bd77fa2c6ab70e2b1",
+      "require_exact": true,
+      "scope": "Eight recorded schema-owned implementation/test paths, not full running tree."
+    },
+    {
+      "id": "facts-schema-source-detach",
+      "source": "facts/schema/source-detach.sha256",
+      "format": "sha256sum",
+      "reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
+      "require_exact": true,
+      "scope": "Eight recorded schema-owned implementation/test paths, not full running tree."
+    },
+    {
+      "id": "facts-bd3661ec-final",
+      "source": "facts/final-bd3661ec-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Complete 11,503 tracked-file owner inventory from historical facts final component; not current acceptance."
+    },
+    {
+      "id": "facts-canary-source-versus-bd3661ec",
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": false,
+      "scope": "Historical captured working tree compared to later facts component. Differences include actual precommit implementation overlays and are not silently carried."
+    },
+    {
+      "id": "facts-authoring-facts-first-source-versus-bd3661ec",
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": false,
+      "scope": "Historical captured working tree compared to later facts component. Differences include actual precommit implementation overlays and are not silently carried."
+    },
+    {
+      "id": "facts-lifetime-correction",
+      "source": "facts/facts-lifetime-source/source-sha256.json",
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Two exact changed source/test inputs of the successful corrected SQLite facts run; other source from authoring-facts-first capture."
+    },
+    {
+      "id": "facts-native-old-before",
+      "source": "facts/schema/native/native-old-01/source-before.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs."
+    },
+    {
+      "id": "facts-native-old-after",
+      "source": "facts/schema/native/native-old-01/source-after.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs."
+    },
+    {
+      "id": "facts-native-fixed-before",
+      "source": "facts/schema/native/native-fixed-01/source-before.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs."
+    },
+    {
+      "id": "facts-native-fixed-after",
+      "source": "facts/schema/native/native-fixed-01/source-after.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+      "require_exact": true,
+      "scope": "Full tracked Git inventory; external runner/test hashes are separate program inputs."
+    },
+    {
+      "id": "operation/budget-io-final",
+      "source": "operation/budget-io-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/budget-io-initial",
+      "source": "operation/budget-io-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": true,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/budget-io-reviewed",
+      "source": "operation/budget-io-reviewed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/composition-frame-issuer-5bbebd77",
+      "source": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": true,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/composition-frame-issuer-final",
+      "source": "operation/composition-frame-issuer-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/composition-issuer-fixed",
+      "source": "operation/composition-issuer-fixed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/composition-issuer-initial",
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/finish-boundary-final",
+      "source": "operation/finish-boundary-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/finish-boundary-initial",
+      "source": "operation/finish-boundary-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/finish-boundary-native-statements",
+      "source": "operation/finish-boundary-native-statements.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/io-review-red",
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/native-io-final",
+      "source": "operation/native-io-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/source-values-final",
+      "source": "operation/source-values-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/source-values-initial",
+      "source": "operation/source-values-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": false,
+      "scope": "Full captured executable/dependency input comparison. Uncommitted unrelated composition drafts and intermediate test changes remain differences, not committed component claims."
+    },
+    {
+      "id": "operation/budget-io-commit-binding",
+      "source": "operation/budget-io-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    },
+    {
+      "id": "operation/budget-io-review-binding",
+      "source": "operation/budget-io-review-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    },
+    {
+      "id": "operation/native-io-final.commit-binding",
+      "source": "operation/native-io-final.commit-binding.json",
+      "key": [
+        "selected_executed_inputs"
+      ],
+      "reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    },
+    {
+      "id": "operation/source-values-commit-binding",
+      "source": "operation/source-values-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    },
+    {
+      "id": "operation/finish-boundary-commit-binding",
+      "source": "operation/finish-boundary-commit-binding.json",
+      "key": [
+        "files"
+      ],
+      "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
+      "require_exact": true,
+      "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    }
+  ],
+  "frozen_profiles": [
+    {
+      "receipt": "renderer/frozen-profiles-inventory.json",
+      "reference": "483793065c3f7a66057907a777f938f608bf7036"
+    }
+  ],
+  "coverage_precedence": [
+    "renderer/lane-combined-final"
+  ],
+  "pending": [
+    "Facts bd3661ec historical component plus old/fixed native schema archived; E9/E4 facts corrections remain pending.",
+    "Operation and composed integration final source/results pending.",
+    "Root focused quality/discovery and final source comparison pending.",
+    "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
+  ],
+  "release_manifests": [
+    {
+      "receipt": "renderer/public-release-manifest.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "renderer/"
+    },
+    {
+      "receipt": "facts/completed-component-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/"
+    },
+    {
+      "receipt": "facts/native-schema-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/"
+    },
+    {
+      "receipt": "operation/checkpoint-5bbebd77-artifacts.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "operation/"
+    }
+  ],
+  "component_slices": [
+    {
+      "id": "facts/schema-six",
+      "run": "facts/sqlite-schema-authoring-canary",
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantCurrentSchemaTest",
+      "expected": {
+        "tests": 6,
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "id": "facts/authoring-eight",
+      "run": "facts/sqlite-authoring-facts-first",
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantDefinitionsTest",
+      "expected": {
+        "tests": 8,
+        "assertions": 34,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "execution_receipts": [
+    {
+      "run": "operation/budget-io-final",
+      "source": "operation/budget-io-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-final.result.json"
+    },
+    {
+      "run": "operation/budget-io-initial",
+      "source": "operation/budget-io-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-initial.result.json"
+    },
+    {
+      "run": "operation/budget-io-reviewed",
+      "source": "operation/budget-io-reviewed.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/budget-io-reviewed.result.json"
+    },
+    {
+      "run": "operation/composition-frame-issuer-5bbebd77",
+      "source": "operation/composition-frame-issuer-5bbebd77.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-frame-issuer-5bbebd77.result.json"
+    },
+    {
+      "run": "operation/composition-frame-issuer-final",
+      "source": "operation/composition-frame-issuer-final.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-frame-issuer-final.result.json"
+    },
+    {
+      "run": "operation/composition-issuer-fixed",
+      "source": "operation/composition-issuer-fixed.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-issuer-fixed.result.json"
+    },
+    {
+      "run": "operation/composition-issuer-initial",
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": null
+    },
+    {
+      "run": "operation/finish-boundary-final",
+      "source": "operation/finish-boundary-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-final.result.json"
+    },
+    {
+      "run": "operation/finish-boundary-initial",
+      "source": "operation/finish-boundary-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-initial.result.json"
+    },
+    {
+      "run": "operation/finish-boundary-native-statements",
+      "source": "operation/finish-boundary-native-statements.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/finish-boundary-native-statements.result.json"
+    },
+    {
+      "run": "operation/io-review-red",
+      "source": "operation/io-review-red.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/io-review-red.result.json"
+    },
+    {
+      "run": "operation/native-io-final",
+      "source": "operation/native-io-final.source.json.gz",
+      "runner": "operation/run-native-focused.py",
+      "result": "operation/native-io-final.result.json"
+    },
+    {
+      "run": "operation/source-values-final",
+      "source": "operation/source-values-final.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/source-values-final.result.json"
+    },
+    {
+      "run": "operation/source-values-initial",
+      "source": "operation/source-values-initial.source.json.gz",
+      "runner": "operation/run-focused-before-empty-xml.py.txt",
+      "result": "operation/source-values-initial.result.json"
+    }
+  ],
+  "before_after_receipts": [
+    {
+      "run": "facts/schema/native/native-old-01",
+      "before": "facts/schema/native/native-old-01/source-before.json.gz",
+      "after": "facts/schema/native/native-old-01/source-after.json.gz",
+      "program_directory": "facts/schema/native"
+    },
+    {
+      "run": "facts/schema/native/native-fixed-01",
+      "before": "facts/schema/native/native-fixed-01/source-before.json.gz",
+      "after": "facts/schema/native/native-fixed-01/source-after.json.gz",
+      "program_directory": "facts/schema/native"
+    }
+  ],
+  "capsule_checks": [
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantAuthoringObserver.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantAuthoringObserver.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantDefinitions.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantDefinitions.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsClosure.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantFactsClosure.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsToken.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantFactsToken.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantRows.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/MemberGrantRows.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+      "capsule": "facts/canary-source/untracked/app/Domain/Grants/Member/SealedMemberGrantFacts.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
+      "capsule": "facts/canary-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php"
+    },
+    {
+      "source": "facts/canary-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+      "capsule": "facts/canary-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantAuthoringObserver.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantAuthoringObserver.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantDefinitions.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantDefinitions.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsClosure.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantFactsClosure.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantFactsToken.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantFactsToken.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/MemberGrantRows.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/MemberGrantRows.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/app/Domain/Grants/Member/SealedMemberGrantFacts.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php"
+    },
+    {
+      "source": "facts/authoring-facts-first-source/source-sha256.json.gz",
+      "key": [],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php",
+      "capsule": "facts/authoring-facts-first-source/untracked/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php"
+    },
+    {
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "app/Domain/Grants/Member/MemberOriginalIoFrame.php",
+      "capsule": "operation/io-review-red-IoFrame.php.txt"
+    },
+    {
+      "source": "operation/io-review-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php",
+      "capsule": "operation/io-review-red-test.php.txt"
+    },
+    {
+      "source": "operation/composition-issuer-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
+      "capsule": "operation/composition-issuer-initial-test.php.txt"
+    }
+  ]
+}

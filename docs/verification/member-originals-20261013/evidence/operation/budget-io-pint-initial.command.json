@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "php",
+    "vendor/bin/pint",
+    "--test",
+    "app/Domain/Grants/Member/MemberOriginalBudget.php",
+    "app/Domain/Grants/Member/MemberOriginalIoFrame.php",
+    "tests/Unit/MemberOriginalBudgetTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php"
+  ],
+  "source": {
+    "app/Domain/Grants/Member/MemberOriginalBudget.php": "b783bf32f0a5f755aaa4ab309cf788032d73f9cc51ab0f6f503f40be0c7a5122",
+    "app/Domain/Grants/Member/MemberOriginalIoFrame.php": "8321845574b88ea52f561c19a4d01dfe93005f17f276a088417956a56854d12d",
+    "tests/Unit/MemberOriginalBudgetTest.php": "7733376c30056847ec9782bbfbe9d0e9aba0ea634e31a3ba52b54f4a4acec5af",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php": "4d8f6970ac0d270a4d1fe2823027fdf738153c6d9882ade5e4eb4e411b25bd83"
+  }
+}

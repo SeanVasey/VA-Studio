@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "duration_seconds": 0.481,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest",
+    "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php",
+    "tests": "3",
+    "assertions": "24",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "0.251053"
+  }
+}

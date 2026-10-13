@@ -1,0 +1,4 @@
+{
+  "app/Domain/Grants/Member/SealedMemberGrantFacts.php": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406",
+  "tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php": "5f0338c8315a4958be5ff843f38d196e87c347a2297c2f584e3e764711d0e4b8"
+}

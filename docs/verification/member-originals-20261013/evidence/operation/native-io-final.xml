@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalNativeIoFrameTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php" tests="3" assertions="24" errors="0" failures="0" skipped="0" time="0.251053">
+    <testcase name="test_native_write_read_and_direct_transactions_are_refused_without_cleanup" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php" line="27" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalNativeIoFrameTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalNativeIoFrameTest" assertions="14" time="0.207353"/>
+    <testcase name="test_native_direct_replacement_and_lazy_resolution_refuse_before_callbacks" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php" line="54" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalNativeIoFrameTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalNativeIoFrameTest" assertions="4" time="0.023322"/>
+    <testcase name="test_native_foreign_facade_manager_transaction_is_never_admitted_or_rolled_back" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php" line="73" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalNativeIoFrameTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalNativeIoFrameTest" assertions="6" time="0.020378"/>
+  </testsuite>
+</testsuites>
