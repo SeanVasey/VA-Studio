@@ -23,7 +23,7 @@ final class MemberActivationReadEnvironmentTest extends TestCase
 
     private mixed $priorFacadeApplication;
 
-    private array $priorFacades;
+    private mixed $priorFacades;
 
     private Application $application;
 
