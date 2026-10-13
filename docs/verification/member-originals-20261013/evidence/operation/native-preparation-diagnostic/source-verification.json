@@ -1,0 +1,16 @@
+{
+  "native-one": {
+    "head": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "git_matched_inputs": 1324,
+    "diagnostic_php_files": 4,
+    "unchanged_during_run": true,
+    "exit": 2
+  },
+  "native-one-v2": {
+    "head": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+    "git_matched_inputs": 1324,
+    "diagnostic_php_files": 4,
+    "unchanged_during_run": true,
+    "exit": 2
+  }
+}

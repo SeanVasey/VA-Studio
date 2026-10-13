@@ -1,6 +1,6 @@
 {
   "assembly_base": "3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8",
-  "integrated_tested_source": null,
+  "integrated_tested_source": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
   "runs": [
     {
       "id": "renderer/input-text-complete",
@@ -1116,6 +1116,110 @@
         "skipped": 0,
         "exit": 2
       }
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-diagnostic/native-one.xml",
+      "exit_file": "operation/native-preparation-diagnostic/native-one.exit",
+      "command_receipt": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "command_status": "Exact diagnostic invocation with four timing-only preloaded PHP files; no acceptance claim.",
+      "source_binding": "operation/native-preparation-diagnostic/native-one",
+      "scope": "Initial missing-TMPDIR fixture error.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one-v2",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-diagnostic/native-one-v2.xml",
+      "exit_file": "operation/native-preparation-diagnostic/native-one-v2.exit",
+      "command_receipt": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "command_status": "Exact diagnostic invocation with four timing-only preloaded PHP files; no acceptance claim.",
+      "source_binding": "operation/native-preparation-diagnostic/native-one-v2",
+      "scope": "Diagnostic source overlay preserves original cap; real original60-second frame expires during committed proof.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition",
+      "driver": "sqlite",
+      "xml": "operation/native-preparation-correction/sqlite-owned-composition.xml",
+      "exit_file": "operation/native-preparation-correction/sqlite-owned-composition.exit",
+      "command_receipt": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/sqlite-owned-composition",
+      "expected": {
+        "tests": 22,
+        "assertions": 509,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "driver": "sqlite",
+      "xml": "operation/native-preparation-correction/sqlite-public-reservation-proof.xml",
+      "exit_file": "operation/native-preparation-correction/sqlite-public-reservation-proof.exit",
+      "command_receipt": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "expected": {
+        "tests": 1,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-correction/native-positive-final.xml",
+      "exit_file": "operation/native-preparation-correction/native-positive-final.exit",
+      "command_receipt": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/native-positive-final",
+      "expected": {
+        "tests": 1,
+        "assertions": 48,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "root/native-source-withdrawal-ec90cc1a",
+      "driver": "mysql",
+      "xml": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.xml",
+      "exit_file": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.exit",
+      "command_receipt": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "command_status": "Exact original selected-case argv and public environment retained.",
+      "source_binding": "root/native-source-withdrawal-ec90cc1a",
+      "expected": {
+        "tests": 1,
+        "assertions": 30,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
     }
   ],
   "source_bindings": [
@@ -1688,6 +1792,116 @@
       "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
       "require_exact": true,
       "scope": "All 1,388 captured application/config/resource/dependency and selected test inputs match exact root f4732dbe; initial failed run, no final acceptance."
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one",
+      "source": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked."
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one-v2",
+      "source": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked."
+    },
+    {
+      "id": "operation/native-diagnostic-root-equivalence",
+      "source": "operation/native-preparation-diagnostic/root-source-equivalence.json.gz",
+      "key": [
+        "matching_application_and_selected_inputs"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "985 original application/selected test/fixture/child paths compare to actual failed root source; four timing-only overlays remain separate."
+    },
+    {
+      "id": "quality/native-budget-followup",
+      "source": "quality/native-budget-followup/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact source inventory for 4-file Pint and list-only discovery after private initialization correction. No behavior execution."
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload."
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution."
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload."
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution."
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload."
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final-root-equivalence",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution."
+    },
+    {
+      "id": "root/native-source-withdrawal-ec90cc1a",
+      "source": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "require_exact": true,
+      "scope": "All1,388 captured inputs at exact frozen root source; actual native withdrawal during real materialization."
     }
   ],
   "frozen_profiles": [
@@ -1697,11 +1911,22 @@
     }
   ],
   "coverage_precedence": [
-    "renderer/lane-combined-final"
+    "renderer/lane-combined-final",
+    "facts/facts-review/fixed",
+    "facts/schema/native/native-fixed-01",
+    "operation/budget-io-final",
+    "operation/native-io-final",
+    "operation/composition-frame-issuer-5bbebd77",
+    "operation/reservation-wrappers-initial",
+    "operation/reservation-clock-wrapper-final",
+    "root/integrated-pure-4962943d",
+    "operation/native-preparation-correction/sqlite-owned-composition",
+    "operation/native-preparation-correction/sqlite-public-reservation-proof",
+    "operation/native-preparation-correction/native-positive-final",
+    "root/native-source-withdrawal-ec90cc1a"
   ],
   "pending": [
-    "Root native first integration at f4732dbe failed1/16 with one error; second selected case unrun. Bounded diagnosis/correction and final source comparison pending.",
-    "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
+    "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities. Full Foundation, production host/provider acceptance and unselected native cases remain outside this focused packet."
   ],
   "release_manifests": [
     {
@@ -1775,6 +2000,36 @@
         "artifacts"
       ],
       "prefix": "root/native-initial-f4732dbe/",
+      "absolute_paths": true
+    },
+    {
+      "receipt": "operation/native-preparation-diagnostic/release-manifest.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "operation/native-preparation-diagnostic/"
+    },
+    {
+      "receipt": "quality/native-budget-followup/artifact-digests.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "quality/native-budget-followup/",
+      "hash_values": true
+    },
+    {
+      "receipt": "operation/native-preparation-correction/release-manifest.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "operation/native-preparation-correction/"
+    },
+    {
+      "receipt": "root/native-withdrawal-ec90cc1a/public-release-native-withdrawal.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "root/native-withdrawal-ec90cc1a/",
       "absolute_paths": true
     }
   ],
@@ -1948,6 +2203,44 @@
       "source": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
       "runner": "root/native-initial-f4732dbe/run-native-focused.py",
       "result": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.result.json"
+    },
+    {
+      "run": "operation/native-preparation-diagnostic/native-one",
+      "source": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "runner": "operation/native-preparation-diagnostic/run-native-diagnostic.py",
+      "result": "operation/native-preparation-diagnostic/native-one.result.json",
+      "diagnostic_directory": "operation/native-preparation-diagnostic/"
+    },
+    {
+      "run": "operation/native-preparation-diagnostic/native-one-v2",
+      "source": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "runner": "operation/native-preparation-diagnostic/run-native-diagnostic.py",
+      "result": "operation/native-preparation-diagnostic/native-one-v2.result.json",
+      "diagnostic_directory": "operation/native-preparation-diagnostic/"
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-owned-composition",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-composed.py",
+      "result": "operation/native-preparation-correction/sqlite-owned-composition.result.json"
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-composed.py",
+      "result": "operation/native-preparation-correction/sqlite-public-reservation-proof.result.json"
+    },
+    {
+      "run": "operation/native-preparation-correction/native-positive-final",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-native-fixed.py",
+      "result": "operation/native-preparation-correction/native-positive-final.result.json"
+    },
+    {
+      "run": "root/native-source-withdrawal-ec90cc1a",
+      "source": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "runner": "root/native-withdrawal-ec90cc1a/run-native-focused.py",
+      "result": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.result.json"
     }
   ],
   "before_after_receipts": [
@@ -2166,7 +2459,18 @@
         "files"
       ],
       "prefix": "quality/",
-      "expected_members": 88
+      "expected_members": 88,
+      "excluded_prefixes": [
+        "quality/native-budget-followup/"
+      ]
+    },
+    {
+      "receipt": "quality/native-budget-followup/public-artifacts.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "quality/native-budget-followup/",
+      "expected_members": 77
     }
   ],
   "quality_receipt": {
@@ -2183,5 +2487,109 @@
     "discovery_cases": 2143,
     "discovery_files": 210,
     "discovery_shards": 24
-  }
+  },
+  "coverage_driver_overrides": {
+    "renderer/lane-combined-final": "sqlite"
+  },
+  "final_comparisons": [
+    {
+      "run": "renderer/lane-combined-final",
+      "binding": "renderer-final"
+    },
+    {
+      "run": "facts/facts-review/fixed",
+      "binding": "facts-5d6c58da-final"
+    },
+    {
+      "run": "facts/timestamp-compatibility/fixed",
+      "binding": "facts-a7265e8c-final"
+    },
+    {
+      "run": "facts/schema/native/native-fixed-01",
+      "binding": "facts-native-fixed-before"
+    },
+    {
+      "run": "facts/schema component slice",
+      "binding": "facts-schema-source-detach"
+    },
+    {
+      "run": "facts/authoring component slice",
+      "binding": "facts-authoring-facts-first-source-versus-bd3661ec"
+    },
+    {
+      "run": "operation/budget-io-final",
+      "binding": "operation/budget-io-review-binding"
+    },
+    {
+      "run": "operation/native-io-final",
+      "binding": "operation/native-io-final.commit-binding"
+    },
+    {
+      "run": "operation/composition-frame-issuer-5bbebd77",
+      "binding": "operation/composition-frame-issuer-5bbebd77"
+    },
+    {
+      "run": "operation/reservation-wrappers-initial",
+      "binding": "operation/reservation-wrappers-initial"
+    },
+    {
+      "run": "operation/reservation-clock-wrapper-final",
+      "binding": "operation/reservation-clock-wrapper-final"
+    },
+    {
+      "run": "root/integrated-pure-4962943d",
+      "binding": "root/integrated-pure-4962943d"
+    },
+    {
+      "run": "quality initial159policy78Pintdiscovery",
+      "binding": "quality/source-before"
+    },
+    {
+      "run": "quality followup4Pintdiscovery",
+      "binding": "quality/native-budget-followup"
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-owned-composition",
+      "binding": "operation/native-preparation-correction/sqlite-owned-composition"
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "binding": "operation/native-preparation-correction/sqlite-public-reservation-proof"
+    },
+    {
+      "run": "operation/native-preparation-correction/native-positive-final",
+      "binding": "operation/native-preparation-correction/native-positive-final"
+    },
+    {
+      "run": "root/native-source-withdrawal-ec90cc1a",
+      "binding": "root/native-source-withdrawal-ec90cc1a"
+    }
+  ],
+  "runtime_tree_equivalence": [
+    {
+      "source": "32f083d28db0609a52cade793849a8767a855ae3",
+      "target": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "paths": [
+        "app",
+        "bootstrap",
+        "config",
+        "database",
+        "public",
+        "resources",
+        "routes",
+        "scripts",
+        "tests",
+        "artisan",
+        "composer.json",
+        "composer.lock",
+        "phpunit.xml",
+        "phpunit.xml.dist",
+        "package.json",
+        "package-lock.json",
+        "vite.config.ts",
+        "tsconfig.json"
+      ],
+      "scope": "Complete named runtime/test/dependency path trees between reachable integrated correction and final native target; excludes documentation and workflow census comments. Not an additional test execution."
+    }
+  ]
 }

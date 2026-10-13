@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 import xml.etree.ElementTree as ET
 
 HERE = Path(__file__).resolve().parent
@@ -82,7 +83,8 @@ for spec in registry.get('release_manifests', []):
 for spec in registry.get('allowlist_receipts', []):
     members = field(load(spec['receipt']), spec['key'])
     assert len(members) == len(set(members)) == spec['expected_members'], spec['receipt']
-    paths = {x['path'].removesuffix('.gz') for x in index['files'] if x['path'].startswith(spec['prefix'])}
+    paths = {x['path'].removesuffix('.gz') for x in index['files'] if x['path'].startswith(spec['prefix'])
+             and not any(x['path'].startswith(prefix) for prefix in spec.get('excluded_prefixes', []))}
     assert paths == {spec['prefix'] + name for name in members}, spec['receipt']
     releases.append(spec | {'verified_members': len(paths), 'verification': 'Exact explicit allowlist equality; individual original hashes are in archive-index.'})
 save('release-verification.json', {'scope': 'Every explicitly released manifest member reconciled with the archived original bytes, including lossless compressed maps.', 'releases': releases})
@@ -158,6 +160,11 @@ for spec in registry.get('execution_receipts', []):
     if spec.get('result'):
         result = load(spec['result'])
         assert result['changed_sources'] == [], spec['run']
+        if spec.get('diagnostic_directory'):
+            assert result['changed_diagnostic_files'] == [], spec['run']
+            assert sha(raw(spec['diagnostic_directory'] + Path(source['overlay']['path']).name)) == source['overlay']['sha256']
+            for path, digest in source['diagnostic_files'].items():
+                assert sha(raw(spec['diagnostic_directory'] + Path(path).name)) == digest, path
         run = next(x for x in runs if x['id'] == spec['run'])
         assert result['exit'] == run['exit'], spec['run']
         for key in ('tests', 'assertions', 'errors', 'failures', 'skipped'):
@@ -267,6 +274,29 @@ if (HERE / 'operation/reservation-wrapper-carry.json').exists():
         'wrapper_original_inputs': len(old), 'wrapper_changed_inputs': delta,
         'wrapper_selected_unchanged_files': carry['selected_tests_and_phase_split_files_unchanged'],
         'retained_deadline_same_test_inputs': comparison['identical_test_inputs'], 'retained_deadline_cases': comparison['cases'],
+    })
+
+if (HERE / 'operation/native-preparation-correction/source-verification.json').exists():
+    prefix = 'operation/native-preparation-correction/'
+    old_native = load('operation/native-preparation-diagnostic/native-one-v2.source.json.gz')
+    fixed_native = load(prefix + 'native-positive-final.source.json.gz')
+    reported = load(prefix + 'source-verification.json')['native_comparison']
+    old_files, fixed_files = old_native['files'], fixed_native['files']
+    assert set(old_files) == set(fixed_files)
+    delta = {path: {'old': digest, 'fixed': fixed_files[path]} for path, digest in old_files.items() if digest != fixed_files[path]}
+    assert delta == reported['changed_captured_inputs'] and len(delta) == 2
+    test_path = 'tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php'
+    fixture_path = 'tests/Support/MemberOriginalFixtures.php'
+    assert old_files[test_path] == fixed_files[test_path] == reported['same_selected_test_sha256']
+    assert old_files[fixture_path] == fixed_files[fixture_path] == reported['same_fixture_sha256']
+    assert 'overlay' not in fixed_native and 'diagnostic_files' not in fixed_native
+    assert not any('preload.php' in argument for argument in fixed_native['argv'])
+    save('native-correction-relations.json', {
+        'scope': 'Exact captured-input comparison: diagnostic supporting source versus corrected uninstrumented positive. The original diagnostic overlays remain separately archived; this comparison is not a performance guarantee or a rerun of the old root source.',
+        'old_supporting_commit': old_native['head'], 'fixed_commit': fixed_native['head'],
+        'captured_paths': len(fixed_files), 'changed_inputs': delta,
+        'identical_selected_test_sha256': fixed_files[test_path], 'identical_fixture_sha256': fixed_files[fixture_path],
+        'fixed_receipt_has_no_overlay_or_preload': True,
     })
 
 trees = {}
@@ -404,7 +434,12 @@ save('source-verification.json', {
 save('final-source-verification.json', {
     'scope': 'Each named captured executable/resource-input selection compared with the explicit integrated target. Differences remain visible; a byte comparison is not a rerun. External probes remain separately identified. Documentation-only inventory entries are excluded from this final carry comparison.',
     'integrated_tested_source': registry.get('integrated_tested_source'), 'comparisons': final_comparisons,
+    'runtime_tree_equivalence': [{
+        **spec,
+        'changed_paths': subprocess.check_output(['git', '-C', args.git_repo, 'diff', '--name-only', spec['source'], spec['target'], '--', *spec['paths']], text=True).splitlines(),
+    } for spec in registry.get('runtime_tree_equivalence', [])],
 })
+assert all(not item['changed_paths'] for item in load('final-source-verification.json')['runtime_tree_equivalence'])
 
 coverage = {}
 for identity in registry['coverage_precedence']:
@@ -412,13 +447,25 @@ for identity in registry['coverage_precedence']:
     assert run['exit'] == 0, identity
     for case in run['cases']:
         if case['status'] == 'passed':
-            coverage[(run['driver'], case['identity'])] = case | {'run': identity, 'driver': run['driver']}
+            driver = 'none' if case['identity'].startswith('Tests\\Unit\\') else registry.get('coverage_driver_overrides', {}).get(identity, run['driver'])
+            coverage[(driver, case['identity'])] = case | {'run': identity, 'driver': driver}
+driver_counts = {}
+for case in coverage.values():
+    counts = driver_counts.setdefault(case['driver'], {'cases': 0, 'assertions': 0})
+    counts['cases'] += 1
+    counts['assertions'] += case['assertions']
 save('coverage-summary.json', {
     'scope': 'Successful driver/case identities in explicit component precedence. Superseded invocations remain history. No summed whole-suite or native-concurrency claim.',
     'precedence': registry['coverage_precedence'], 'passed_driver_case_identities': len(coverage),
     'assertions': sum(x['assertions'] for x in coverage.values()), 'cases': list(coverage.values()),
+    'by_driver': driver_counts,
+    'component_slices_outside_successful_invocations': [{'id': x['id'], 'run': x['run'], 'tests': x['tests'], 'assertions': x['assertions'], 'invocation_exit': x['invocation_exit']} for x in components],
     'pending': registry['pending'],
 })
+
+followup_verifier = HERE / 'verify-quality-followup.py'
+if followup_verifier.exists():
+    subprocess.run([sys.executable, str(followup_verifier), '--git-repo', args.git_repo], check=True, stdout=subprocess.PIPE)
 
 owned = [HERE.parent / name for name in ('commands.md', 'source-map.md', 'coverage-map.md', 'coverage-review.md')]
 files = {}

@@ -1,0 +1,21 @@
+{
+  "head": "32f083d28db0609a52cade793849a8767a855ae3",
+  "pint_exit": 0,
+  "pint_php_files": 4,
+  "discovery_exit": 0,
+  "generated_archived_and_deleted": 50,
+  "source_count": 2360,
+  "sources_and_metadata_unchanged": true,
+  "old88_release_unchanged": true,
+  "policy_selftests_rerun": false,
+  "application_test_bodies_executed": false,
+  "census": {
+    "source_cases": 8478,
+    "source_files": 625,
+    "selected_cases": 2145,
+    "selected_files": 210,
+    "shards": 24,
+    "nonempty_shards": 24,
+    "untimed_files": 47
+  }
+}

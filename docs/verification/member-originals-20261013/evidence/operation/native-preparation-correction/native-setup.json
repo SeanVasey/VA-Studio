@@ -1,0 +1,16 @@
+{
+  "captured_utc": "2026-10-13T09:37:21.858144+00:00",
+  "version": "8.4.11",
+  "container": "va-studio-private-mysql-policy-20261013",
+  "host_port": 33413,
+  "host_socket": "/workspace/runtime/mysql-policy-run/mysql.sock",
+  "host_datadir": "/workspace/runtime/mysql-policy-data",
+  "server_port": 3306,
+  "server_socket": "/run/mysql-policy/mysql.sock",
+  "server_datadir": "/var/lib/mysql/",
+  "database": "vaseyaudio_member_original_operation",
+  "database_created": false,
+  "existing_owned_table_count": 0,
+  "scope": "Private synthetic local MySQL only; no host/provider acceptance.",
+  "runner_sha256": "79a9a1b1af0a4d43e640d13998c3b9eb15f555031c28430bfa444b23f3c4354a"
+}

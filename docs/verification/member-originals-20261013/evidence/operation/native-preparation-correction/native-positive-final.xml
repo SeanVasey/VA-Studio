@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" tests="1" assertions="48" errors="0" failures="0" skipped="0" time="421.042574">
+    <testcase name="test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest" assertions="48" time="421.042574"/>
+  </testsuite>
+</testsuites>

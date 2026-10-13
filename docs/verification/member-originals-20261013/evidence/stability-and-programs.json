@@ -218,6 +218,62 @@
       "independent_before_after_maps": false
     },
     {
+      "run": "operation/native-preparation-diagnostic/native-one",
+      "source": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "runner": "operation/native-preparation-diagnostic/run-native-diagnostic.py",
+      "result": "operation/native-preparation-diagnostic/native-one.result.json",
+      "diagnostic_directory": "operation/native-preparation-diagnostic/",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/native-preparation-diagnostic/native-one-v2",
+      "source": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "runner": "operation/native-preparation-diagnostic/run-native-diagnostic.py",
+      "result": "operation/native-preparation-diagnostic/native-one-v2.result.json",
+      "diagnostic_directory": "operation/native-preparation-diagnostic/",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-owned-composition",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-composed.py",
+      "result": "operation/native-preparation-correction/sqlite-owned-composition.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-composed.py",
+      "result": "operation/native-preparation-correction/sqlite-public-reservation-proof.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/native-preparation-correction/native-positive-final",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "runner": "operation/native-preparation-correction/run-native-fixed.py",
+      "result": "operation/native-preparation-correction/native-positive-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "root/native-source-withdrawal-ec90cc1a",
+      "source": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "runner": "root/native-withdrawal-ec90cc1a/run-native-focused.py",
+      "result": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
       "run": "facts/schema/native/native-old-01",
       "before": "facts/schema/native/native-old-01/source-before.json.gz",
       "after": "facts/schema/native/native-old-01/source-after.json.gz",

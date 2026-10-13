@@ -1,0 +1,13 @@
+{
+  "captured_utc": "2026-10-13T09:21:02.309263+00:00",
+  "command": [
+    "mkdir",
+    "-m",
+    "700",
+    "-p",
+    "/tmp/va-studio-member-original-operation-20261013"
+  ],
+  "verified_directory": "/tmp/va-studio-member-original-operation-20261013",
+  "mode": "0o700",
+  "scope": "Creates only the owned synthetic fixture directory missing in the first diagnostic attempt. No product/overlay/deadline changes."
+}

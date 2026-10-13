@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "duration_seconds": 286.271,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest",
+    "file": "/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php",
+    "tests": "1",
+    "assertions": "30",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "285.984868"
+  }
+}

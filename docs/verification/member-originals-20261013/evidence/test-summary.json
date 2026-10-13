@@ -5569,6 +5569,293 @@
           "status": "error"
         }
       ]
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-diagnostic/native-one.xml",
+      "exit_file": "operation/native-preparation-diagnostic/native-one.exit",
+      "command_receipt": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "command_status": "Exact diagnostic invocation with four timing-only preloaded PHP files; no acceptance claim.",
+      "source_binding": "operation/native-preparation-diagnostic/native-one",
+      "scope": "Initial missing-TMPDIR fixture error.",
+      "expected": {
+        "tests": 1,
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 0,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 0,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one-v2",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-diagnostic/native-one-v2.xml",
+      "exit_file": "operation/native-preparation-diagnostic/native-one-v2.exit",
+      "command_receipt": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "command_status": "Exact diagnostic invocation with four timing-only preloaded PHP files; no acceptance claim.",
+      "source_binding": "operation/native-preparation-diagnostic/native-one-v2",
+      "scope": "Diagnostic source overlay preserves original cap; real original60-second frame expires during committed proof.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 16,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 16,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition",
+      "driver": "sqlite",
+      "xml": "operation/native-preparation-correction/sqlite-owned-composition.xml",
+      "exit_file": "operation/native-preparation-correction/sqlite-owned-composition.exit",
+      "command_receipt": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/sqlite-owned-composition",
+      "expected": {
+        "tests": 22,
+        "assertions": 509,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 22,
+      "assertions": 509,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_shaped_source_claim_and_materialization_are_refused_by_the_actual_issuer",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_a_caller_cannot_select_pending_member_initialization_for_any_context_operation",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalIssuerOwnershipTest::test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 48,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_after_commit_owner_withdrawal_returns_no_candidate_and_never_starts_the_renderer",
+          "assertions": 27,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_returned_candidate_values_cannot_be_reused_as_authority_after_source_withdrawal",
+          "assertions": 43,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary",
+          "assertions": 26,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog",
+          "assertions": 28,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog",
+          "assertions": 28,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work",
+          "assertions": 29,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket",
+          "assertions": 27,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "driver": "sqlite",
+      "xml": "operation/native-preparation-correction/sqlite-public-reservation-proof.xml",
+      "exit_file": "operation/native-preparation-correction/sqlite-public-reservation-proof.exit",
+      "command_receipt": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "expected": {
+        "tests": 1,
+        "assertions": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 20,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+          "assertions": 20,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final",
+      "driver": "mysql",
+      "xml": "operation/native-preparation-correction/native-positive-final.xml",
+      "exit_file": "operation/native-preparation-correction/native-positive-final.exit",
+      "command_receipt": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "command_status": "Original exact argv/public environment retained; uninstrumented native positive retains original caps.",
+      "source_binding": "operation/native-preparation-correction/native-positive-final",
+      "expected": {
+        "tests": 1,
+        "assertions": 48,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 48,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 48,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "root/native-source-withdrawal-ec90cc1a",
+      "driver": "mysql",
+      "xml": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.xml",
+      "exit_file": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.exit",
+      "command_receipt": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "command_status": "Exact original selected-case argv and public environment retained.",
+      "source_binding": "root/native-source-withdrawal-ec90cc1a",
+      "expected": {
+        "tests": 1,
+        "assertions": 30,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 30,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate",
+          "assertions": 30,
+          "status": "passed"
+        }
+      ]
     }
   ],
   "component_slices": [

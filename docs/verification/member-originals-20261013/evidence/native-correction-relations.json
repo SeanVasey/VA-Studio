@@ -1,0 +1,19 @@
+{
+  "scope": "Exact captured-input comparison: diagnostic supporting source versus corrected uninstrumented positive. The original diagnostic overlays remain separately archived; this comparison is not a performance guarantee or a rerun of the old root source.",
+  "old_supporting_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+  "fixed_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+  "captured_paths": 1324,
+  "changed_inputs": {
+    "app/Domain/Grants/Member/MemberOriginalInspection.php": {
+      "old": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+      "fixed": "fe6ffc866a9f257b7bd98e4cece6e472af3c61c97aeaaf57d4acae27a04eb295"
+    },
+    "app/Domain/Memberships/Production/MembershipReservationContext.php": {
+      "old": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+      "fixed": "a02b8246e8e9247c3095a8f90b38a13a45ddd0569441278702277bf398e37624"
+    }
+  },
+  "identical_selected_test_sha256": "9192bfd6d23f052e5fe0a0423220a05abb8d5d83e7b5b8e97a88bbae185b6304",
+  "identical_fixture_sha256": "162496d0060c7e3297b0bef2f7ab820121031478e334202b19c1b7488c2dea2a",
+  "fixed_receipt_has_no_overlay_or_preload": true
+}

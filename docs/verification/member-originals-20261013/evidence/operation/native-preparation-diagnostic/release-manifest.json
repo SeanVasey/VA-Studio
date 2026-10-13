@@ -1,0 +1,105 @@
+{
+  "scope": "Completed diagnostic failures only. Synthetic credential fields in source environment require the established public projection; no env/key/database/row artifacts. Prior164-member release remains untouched.",
+  "artifacts": {
+    "Diagnostic.php": {
+      "sha256": "517181ff173b9d2d3eeea176da1c337349572e7790ee46d3d9c7a20390fe8691",
+      "bytes": 1028
+    },
+    "MemberOriginalInspection.diff": {
+      "sha256": "f17bc29ac6b5ce7467f713958e81452935db39ec840a10515ca3bfc751bb5bdd",
+      "bytes": 5773
+    },
+    "MemberOriginalInspection.php": {
+      "sha256": "67ef957f0024bc0b8dfeb0197fddb4a05bef64988d18a4920733d9438025bcba",
+      "bytes": 10402
+    },
+    "MemberOriginalSourceCapture.diff": {
+      "sha256": "35a70f05026900bc57262eec2f7af2e77007096cbc6a1a78fffb6a60428e3ae6",
+      "bytes": 3361
+    },
+    "MemberOriginalSourceCapture.php": {
+      "sha256": "12c8850483e16aab8d1a415dbc24bd631429d3568576fa456763f4a55cac8f90",
+      "bytes": 15415
+    },
+    "build-overlay.py": {
+      "sha256": "cb815ac8ee583080d5e4be5d6c8cb73fcd4cee3c2c20ea63bc1c63494a9d894a",
+      "bytes": 5418
+    },
+    "commands.md": {
+      "sha256": "26380b92c7c4459235bb1a56d3c255c7c5e343834562d651970a4b37b8982342",
+      "bytes": 3648
+    },
+    "native-one-v2.exit": {
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    "native-one-v2.log": {
+      "sha256": "f8666879781d466fe36c134a6c114e5d22df949d1543a767f664ea0665697858",
+      "bytes": 5547
+    },
+    "native-one-v2.result.json": {
+      "sha256": "f13427f84d7e6a00144b78d26b0be144e87a465af040f66669a0d08bf2fc6fcc",
+      "bytes": 497
+    },
+    "native-one-v2.source.json": {
+      "sha256": "f5286600f0f72fc468981e04770d849596b53278268d108d7f1b12d6b532855c",
+      "bytes": 171831
+    },
+    "native-one-v2.xml": {
+      "sha256": "7dd5326fbd9c09c07a0a4a04a65e0dec74678dbdc14db49488066b03f8fc5f6d",
+      "bytes": 1847
+    },
+    "native-one.exit": {
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "bytes": 2
+    },
+    "native-one.log": {
+      "sha256": "f926525e6a4a9e5a4b9aa833737d91963087cc7613a4688ec0311c21be366bc1",
+      "bytes": 2276
+    },
+    "native-one.result.json": {
+      "sha256": "7ba46067e7b36c70d28f7c42dce0b98f977e77ab3f4c5c557603147ddedb43c6",
+      "bytes": 496
+    },
+    "native-one.source.json": {
+      "sha256": "24793397d504e1f84550d3a1d00da25de795704261eba5d3c41056db03c41fbb",
+      "bytes": 171825
+    },
+    "native-one.xml": {
+      "sha256": "5b6ab070bbbf3e329c0b3723ce9560fc53a9fcb5043f36e13396431c253645e2",
+      "bytes": 2838
+    },
+    "native-setup.json": {
+      "sha256": "6e61469e0fccfe3a775b8fcfa8ec1c811212aede5a75520ce85ee1fa19c84d67",
+      "bytes": 686
+    },
+    "overlay-manifest.json": {
+      "sha256": "6e7f5cd823fad7bfb16ff4409d6fccf3beacfc491d61b46b8eb8782e2240b70b",
+      "bytes": 1250
+    },
+    "preload.php": {
+      "sha256": "576a4eb51c2a936d9508662718d5a41da39811bdcbb42d80f2525ba053e2169e",
+      "bytes": 142
+    },
+    "root-source-equivalence.json": {
+      "sha256": "5075d3d13a29689b4dd2a607023367fa156750ff254be495feecf89a557c901c",
+      "bytes": 127947
+    },
+    "run-native-diagnostic.py": {
+      "sha256": "8c5226517fafc7980462086bcfb7021934a6e28e069e7102eea083aab306c0a5",
+      "bytes": 3965
+    },
+    "setup-private-native.py": {
+      "sha256": "b9c0a3097adcd936b6947b6a417876017667ee86312d524602c2291170358a5c",
+      "bytes": 2558
+    },
+    "source-verification.json": {
+      "sha256": "12f3f7b900f41e6c4eaf072d9cb659591ed7b473fb8e313dfb4b5e305816b2f3",
+      "bytes": 386
+    },
+    "tmpdir-correction.json": {
+      "sha256": "65046ec6c4335f980bb21115252fecb5db966f2f58b902cebd443eec06264ea1",
+      "bytes": 416
+    }
+  }
+}

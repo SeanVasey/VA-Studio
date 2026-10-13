@@ -1559,6 +1559,171 @@
       "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
       "require_exact": true,
       "scope": "All 1,388 captured application/config/resource/dependency and selected test inputs match exact root f4732dbe; initial failed run, no final acceptance.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1388,
+      "matched_paths": 1388,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one",
+      "source": "operation/native-preparation-diagnostic/native-one.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-diagnostic/native-one-v2",
+      "source": "operation/native-preparation-diagnostic/native-one-v2.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Supporting original application/selected input tree only; exact timing-only overlays are separately retained and checked.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-diagnostic-root-equivalence",
+      "source": "operation/native-preparation-diagnostic/root-source-equivalence.json.gz",
+      "key": [
+        "matching_application_and_selected_inputs"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "985 original application/selected test/fixture/child paths compare to actual failed root source; four timing-only overlays remain separate.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 985,
+      "matched_paths": 985,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "quality/native-budget-followup",
+      "source": "quality/native-budget-followup/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact source inventory for 4-file Pint and list-only discovery after private initialization correction. No behavior execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2360,
+      "matched_paths": 2360,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-owned-composition-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-owned-composition.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/sqlite-public-reservation-proof-root-equivalence",
+      "source": "operation/native-preparation-correction/sqlite-public-reservation-proof.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "require_exact": true,
+      "scope": "Complete captured inputs at exact correction author commit; original source identity retained, no diagnostic preload.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/native-preparation-correction/native-positive-final-root-equivalence",
+      "source": "operation/native-preparation-correction/native-positive-final.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "require_exact": true,
+      "scope": "Exact captured-path equivalence to integrated root source, not a new root execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1324,
+      "matched_paths": 1324,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "root/native-source-withdrawal-ec90cc1a",
+      "source": "root/native-withdrawal-ec90cc1a/native-source-withdrawal-ec90cc1a.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "require_exact": true,
+      "scope": "All1,388 captured inputs at exact frozen root source; actual native withdrawal during real materialization.",
       "reference_resolution": "direct Git reference",
       "captured_paths": 1388,
       "matched_paths": 1388,
@@ -1627,10 +1792,18 @@
     {
       "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
       "reachable_default": "78ef16be7626c81de49d103d581551b707201eda",
-      "verified_path_pairs": 2034,
+      "verified_path_pairs": 2037,
       "overrides": 0,
       "preserved_absences": 0,
-      "original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9"
+      "original_path_blob_pairs_sha256": "b1edbea156dee4a878fb97af2c2662c03b9027c8751b0128dbe839734214b0cf"
+    },
+    {
+      "original_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "reachable_default": "32f083d28db0609a52cade793849a8767a855ae3",
+      "verified_path_pairs": 2360,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "1898a42dab5c516bc46967cd346f58f4b58968855d94d75f3ca572d4d8aa96a8"
     },
     {
       "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
@@ -1713,6 +1886,14 @@
       "original_path_blob_pairs_sha256": "443d988d0ff1ef0e2ecd00240bb2863d440b2677754b4c5d87572380594eaacd"
     },
     {
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "reachable_default": "32f083d28db0609a52cade793849a8767a855ae3",
+      "verified_path_pairs": 2037,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "3718d8560ab30706faf50dc93e94b701fd2739034c7cc09e518bf9f329d5e5f6"
+    },
+    {
       "original_reference": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
       "reachable_default": "bc58f4fdc5da4792e02b35221bc08b9733719827",
       "verified_path_pairs": 1297,
@@ -1783,6 +1964,14 @@
       "overrides": 2,
       "preserved_absences": 9,
       "original_path_blob_pairs_sha256": "2c90b70b694f131540ece466a01a142c47c30eb3a28f667357a1df4ab4d45b89"
+    },
+    {
+      "original_reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "reachable_default": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "verified_path_pairs": 1388,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "0fd6eee011222404dcfe6078afa40cdc6ed5430acf917585b18334def2f31e2c"
     }
   ]
 }

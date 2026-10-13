@@ -1,0 +1,26 @@
+warning: 47 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantNativeCurrentSchemaTest.php, ...
+Proved 2145 selected MySQL-native tests in 210 files (of 8478 discovered tests in 625 files) across 24 nonempty shards.
+Shard 1: 85 tests; 1 complete files; estimated 122m 57s.
+Shard 2: 90 tests; 7 complete files; estimated 106m 58s.
+Shard 3: 88 tests; 7 complete files; estimated 106m 55s.
+Shard 4: 78 tests; 7 complete files; estimated 106m 57s.
+Shard 5: 77 tests; 8 complete files; estimated 107m 10s.
+Shard 6: 85 tests; 9 complete files; estimated 107m 03s.
+Shard 7: 102 tests; 11 complete files; estimated 106m 47s.
+Shard 8: 90 tests; 11 complete files; estimated 106m 47s.
+Shard 9: 91 tests; 8 complete files; estimated 106m 50s.
+Shard 10: 95 tests; 11 complete files; estimated 106m 47s.
+Shard 11: 99 tests; 9 complete files; estimated 107m 10s.
+Shard 12: 75 tests; 9 complete files; estimated 106m 52s.
+Shard 13: 104 tests; 10 complete files; estimated 106m 57s.
+Shard 14: 81 tests; 9 complete files; estimated 106m 47s.
+Shard 15: 106 tests; 9 complete files; estimated 106m 58s.
+Shard 16: 95 tests; 9 complete files; estimated 107m 00s.
+Shard 17: 88 tests; 9 complete files; estimated 107m 04s.
+Shard 18: 75 tests; 9 complete files; estimated 106m 59s.
+Shard 19: 83 tests; 9 complete files; estimated 106m 52s.
+Shard 20: 95 tests; 12 complete files; estimated 106m 47s.
+Shard 21: 81 tests; 9 complete files; estimated 106m 51s.
+Shard 22: 107 tests; 9 complete files; estimated 106m 59s.
+Shard 23: 79 tests; 9 complete files; estimated 106m 55s.
+Shard 24: 96 tests; 9 complete files; estimated 106m 58s.

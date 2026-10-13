@@ -11,18 +11,20 @@
     "Rebuild sorted path/blob-or-null pairs and require SHA256 equals original_path_blob_pairs_sha256; when original author objects exist, optionally verify the same digest directly against them.",
     "Compare captured source hashes with resolved actual bytes exactly as before; historical differences and partial comparisons must remain unchanged."
   ],
-  "revision": 2,
-  "supersedes": {
-    "path": "/workspace/runtime/member-original-evidence-portable-git.json",
-    "sha256": "761e8986a600e4d1abb9b990cb514f27107db5788ec44d96efee2bc9e1f06116",
-    "bytes": 40646,
-    "existing_reference_records_preserved": 18
-  },
-  "derived_from_root_head": "f4732dbe21b9e40eb386b6115be1283ff563f511",
-  "root_history_commits": 1777,
-  "registry_sha256_at_derivation": "8447c4f847e764fdda326f0ac1d8a91b17bb21a5de618ffd0b050c7da60ba3d0",
-  "registry_source_bindings_at_derivation": 53,
   "path_alias_handling": "Apply each source binding path_aliases after path_key/hash_key selection; requested unions and canonical proofs use the aliased repository paths.",
+  "revision": 3,
+  "supersedes": {
+    "path": "/workspace/runtime/member-original-evidence-portable-git-v2.json",
+    "sha256": "7e207f21b19df98867220ef090cb392426f61419255d8fef78a0052385d79ff3",
+    "bytes": 48091,
+    "existing_reference_records_identical": 23,
+    "existing_reference_path_scopes_extended": 1,
+    "all_existing_reference_resolutions_preserved": true
+  },
+  "derived_from_root_head": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+  "root_history_commits": 1785,
+  "registry_sha256_at_derivation": "6658fe1ee8e687fae8f69f3165ea3a57ae5fe29c64cb4713b0fe26897aa9d47b",
+  "registry_source_bindings_at_derivation": 65,
   "additional_requests_for_preserved_references": {
     "5bbebd776ca6cce2be4fd0d427f3baa926c2676d": [
       {
@@ -31,6 +33,39 @@
       }
     ]
   },
+  "path_scope_extensions": [
+    {
+      "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "prior_requested_paths_count": 2034,
+      "prior_requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+      "prior_original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
+      "added_paths": [
+        {
+          "path": "database/.gitignore",
+          "original_git_blob": "9b19b93c9f13d72749cc3bac760a28325116f3f1",
+          "original_sha256": "e758642d95e83e907e010b6e46b07b3f953c7cef11fe5ebefc2a77b9d7b4d5f7"
+        },
+        {
+          "path": "tests/Support/production_identity_smtp_sink.py",
+          "original_git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+          "original_sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6"
+        },
+        {
+          "path": "tests/Support/production_identity_tls_smtp_sink.py",
+          "original_git_blob": "438c80bc75cb1c1e36334b3315ddf6d8dae33a0a",
+          "original_sha256": "48f953c5df3643bbcbc660f70fd258b7059207304876b04d318b1590409a5c51"
+        }
+      ],
+      "prior_resolution_preserved": true
+    }
+  ],
+  "direct_unbounded_references": [
+    {
+      "reference": "ec90cc1a097db8925d87689d0ac62fdff0165c5a",
+      "registered_source_paths": 1388,
+      "reason": "Explicit final integrated target remains a direct reachable Git reference; final source comparisons intentionally use a broader path union than its one captured execution."
+    }
+  ],
   "references": [
     {
       "original_reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
@@ -160,16 +195,81 @@
         {
           "kind": "source_binding",
           "id": "operation/reservation-clock-wrapper-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-diagnostic/native-one"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-diagnostic/native-one-v2"
         }
       ],
-      "requested_paths_count": 2034,
-      "original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
-      "effective_fallback_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
-      "requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+      "requested_paths_count": 2037,
+      "original_path_blob_pairs_sha256": "b1edbea156dee4a878fb97af2c2662c03b9027c8751b0128dbe839734214b0cf",
+      "effective_fallback_path_blob_pairs_sha256": "b1edbea156dee4a878fb97af2c2662c03b9027c8751b0128dbe839734214b0cf",
+      "requested_sorted_paths_sha256": "96ee354a59a24226410f1ad0311d27aa75f91aaa9070e5a7dcc26c933e0d2360",
       "absent_paths": [],
       "path_overrides": {},
       "unavailable_paths": {},
-      "default_identical_present_paths": 2034,
+      "default_identical_present_paths": 2037,
+      "all_original_reference_bytes_or_absences_preserved": true,
+      "prior_path_scope": {
+        "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+        "prior_requested_paths_count": 2034,
+        "prior_requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+        "prior_original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
+        "added_paths": [
+          {
+            "path": "database/.gitignore",
+            "original_git_blob": "9b19b93c9f13d72749cc3bac760a28325116f3f1",
+            "original_sha256": "e758642d95e83e907e010b6e46b07b3f953c7cef11fe5ebefc2a77b9d7b4d5f7"
+          },
+          {
+            "path": "tests/Support/production_identity_smtp_sink.py",
+            "original_git_blob": "ad852c9ddfc2b039306abf7cd5c9be61a997a647",
+            "original_sha256": "d0291a72f85013c9ae994dd4a391404645c6e6e535961339a539b44ae9fd44c6"
+          },
+          {
+            "path": "tests/Support/production_identity_tls_smtp_sink.py",
+            "original_git_blob": "438c80bc75cb1c1e36334b3315ddf6d8dae33a0a",
+            "original_sha256": "48f953c5df3643bbcbc660f70fd258b7059207304876b04d318b1590409a5c51"
+          }
+        ],
+        "prior_resolution_preserved": true
+      }
+    },
+    {
+      "original_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "original_subject": "fix: avoid duplicate private member source reinspection",
+      "default_reachable_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "default_selection": "original reference reachable from root snapshot",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "quality/native-budget-followup"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/sqlite-owned-composition-root-equivalence"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/sqlite-public-reservation-proof-root-equivalence"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/native-positive-final-root-equivalence"
+        }
+      ],
+      "requested_paths_count": 2360,
+      "original_path_blob_pairs_sha256": "1898a42dab5c516bc46967cd346f58f4b58968855d94d75f3ca572d4d8aa96a8",
+      "effective_fallback_path_blob_pairs_sha256": "1898a42dab5c516bc46967cd346f58f4b58968855d94d75f3ca572d4d8aa96a8",
+      "requested_sorted_paths_sha256": "c613ad5143bd13a82a51506ad88d70976856e4be82a6552dbff02053b913e322",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2360,
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
@@ -506,6 +606,35 @@
       "path_overrides": {},
       "unavailable_paths": {},
       "default_identical_present_paths": 42,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "9399dd998cc3d972b94f6753e576e2c756438657",
+      "original_subject": "fix: avoid duplicate private member source reinspection",
+      "default_reachable_reference": "32f083d28db0609a52cade793849a8767a855ae3",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/sqlite-owned-composition"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/sqlite-public-reservation-proof"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-preparation-correction/native-positive-final"
+        }
+      ],
+      "requested_paths_count": 2037,
+      "original_path_blob_pairs_sha256": "3718d8560ab30706faf50dc93e94b701fd2739034c7cc09e518bf9f329d5e5f6",
+      "effective_fallback_path_blob_pairs_sha256": "3718d8560ab30706faf50dc93e94b701fd2739034c7cc09e518bf9f329d5e5f6",
+      "requested_sorted_paths_sha256": "96ee354a59a24226410f1ad0311d27aa75f91aaa9070e5a7dcc26c933e0d2360",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2037,
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
@@ -928,12 +1057,37 @@
       "unavailable_paths": {},
       "default_identical_present_paths": 1945,
       "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "original_subject": "ci: record member originals native discovery census",
+      "default_reachable_reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "default_selection": "original reference reachable from root snapshot",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "root/native-preparation-integration-f4732dbe"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/native-diagnostic-root-equivalence"
+        }
+      ],
+      "requested_paths_count": 1388,
+      "original_path_blob_pairs_sha256": "0fd6eee011222404dcfe6078afa40cdc6ed5430acf917585b18334def2f31e2c",
+      "effective_fallback_path_blob_pairs_sha256": "0fd6eee011222404dcfe6078afa40cdc6ed5430acf917585b18334def2f31e2c",
+      "requested_sorted_paths_sha256": "0d751842ee64ee9da32884c882ce237f2ed76ffe3a63d7360fe33ba78ff66588",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1388,
+      "all_original_reference_bytes_or_absences_preserved": true
     }
   ],
   "summary": {
-    "original_references": 24,
-    "requested_reference_path_pairs": 68210,
-    "default_identical_present_paths": 68127,
+    "original_references": 27,
+    "requested_reference_path_pairs": 73998,
+    "default_identical_present_paths": 73915,
     "path_overrides": 35,
     "original_absences": 48,
     "unavailable_paths": 0
