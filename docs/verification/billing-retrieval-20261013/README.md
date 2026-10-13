@@ -3,7 +3,9 @@
 This development batch follows PR #113, merged at
 `6c871b9c5b510c1926437bbdf6e96d661e2c2f30`. Its integrated native verification
 source is `0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371`. Focused verification is
-complete; final independent approval and exact-head Development preflight remain
+complete. The [separate independent review](DECISION.md) approves candidate
+`526e6f5b12068ca3d9571dfcb47dc25194e24598` for development merge with no open P0/P1
+in C3. Receipt-only review carry and exact-head Development preflight remain
 merge gates. This is not activation or full Foundation acceptance.
 
 ## Behavior
