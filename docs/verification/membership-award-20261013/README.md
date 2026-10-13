@@ -1,6 +1,6 @@
 # C2 retained invoice and first-period award
 
-Development candidate on `harness/membership-award-20261013`, based on PR #111 merge `7f0bfe9a531d082f1716358518333bb5ba68ae08`. Application and focused checks are complete; final independent packet review, PR preflight and merge remain pending.
+Development candidate on `harness/membership-award-20261013`, based on PR #111 merge `7f0bfe9a531d082f1716358518333bb5ba68ae08`. The separate reviewer [APPROVES the development candidate](independent-review-DECISION.md) at `224f981aa7446f88a0e8d8a821b705f7a095e959`, with no open P0/P1. Exact-head cheap preflight and merge remain pending.
 
 ## Implemented scope
 
@@ -35,7 +35,7 @@ Application `bf498055a5917172f930c877ffcff5f220dc4d4d` changes the unpublished t
 
 Transaction-bound proof tokens are used only before the ordinary commit. The committed read-only frame independently verifies retained policy, current owner/configuration, invoice evidence and the durable period/event under the original operation deadline. It does not reuse the former policy proof or claim to recheck that token's original Carbon wall-clock lease. This follows the separate-frame boundary in the PR #111 next-writer packet.
 
-Before runtime activation, measure sustained award/hint latency and throughput under representative load, and address repeated identity inspection and the shared intake fence as needed without weakening current ownership proofs. This local change makes no production performance claim. No final candidate approval or merge is claimed yet.
+Before runtime activation, measure sustained award/hint latency and throughput under representative load, and address repeated identity inspection and the shared intake fence as needed without weakening current ownership proofs. This local change makes no production performance claim. Final independent development approval is recorded above; no merge is claimed yet.
 
 Initial integrated SQLite evidence at `307699b6`: 16 tests, 120 assertions, one failure, zero errors/skips, exit 1. The failed after-commit fixture omitted the account guard's required access-version increment. Its test-only correction at `04b2699a` passes one test / ten assertions, exit 0; no application behavior was relaxed. The MySQL migration canary at `307699b6` passes one test / four assertions, exit 0. Original logs will be retained alongside final results.
 
