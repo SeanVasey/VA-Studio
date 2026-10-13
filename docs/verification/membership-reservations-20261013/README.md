@@ -1,6 +1,11 @@
-# C2 membership reservation lifecycle — focused verification complete
+# C2 membership reservation lifecycle — merged development batch
 
-This batch follows PR #112, merged at `bd230c52a605e05aa89158ab161309091afd17e2`.
+PR [#113](https://github.com/SeanVasey/VA-Studio/pull/113) merged at
+`6c871b9c5b510c1926437bbdf6e96d661e2c2f30` from exact head
+`1c1a9a950c51837c75c16aa9a8b69ea0f3080fcc`, following PR #112. Independent
+APPROVE was explicitly carried from `d8e7944c` to that receipt/status-only final
+head. Development preflight `38352962553` succeeded; no P0/P1 was open. The final
+Codex P2 r4255153787 duplicates the catalog condition already recorded below.
 It is not an activation, host, provider, commercial-policy or release claim.
 
 The coherent change adds explicit v2 redemption terms, current catalog/license
@@ -45,8 +50,8 @@ native temporary-table fixture and the bounded-admission race assertions. The
 separate non-author reviewer **APPROVED development merge** at
 `d8e7944c5137c6649bdc067f22a251d56cbd09b1`, after verifying the complete packet,
 with no remaining P0/P1. Its [DECISION](independent-review-DECISION.md) retains
-activation conditions. Receipt-only carry and exact-head preflight remain before
-merge; no activation or release approval is claimed.
+activation conditions. Receipt-only carry and exact-head preflight completed as recorded above; no
+activation or release approval is claimed.
 
 The completed integrated SQLite selection passed **13 tests / 228 assertions**,
 with one declared MySQL-only skip and zero failures or errors. The source-bound
@@ -139,8 +144,8 @@ all carried Billing and member-original activation conditions remain open. The
 failed deadline race is evidence relevant to that performance condition, not a
 reason to renew or lengthen an issued proof's budget. No Foundation or GitLab
 workflow was dispatched, and no full matrix, browser, provider or host acceptance
-is claimed. Final independent evidence review is complete; exact-head preflight and
-merge remain.
+is claimed. Independent review and exact-head preflight completed before the
+expected-SHA merge recorded above.
 
 The [next batch](next-batch.md) follows this C2 slice. C3 should reuse the existing
 pinned Stripe 21.3.2 read adapter

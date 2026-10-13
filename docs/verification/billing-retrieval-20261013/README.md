@@ -1,8 +1,8 @@
 # C3 retained retrieval identity and database freshness — development in progress
 
-This isolated batch follows the C2 reservation candidate. It is not published or
-approved for activation. Integrate the reservation batch's actual reviewed merge
-before publishing this branch. The scope is
+This isolated batch follows PR #113, merged at
+`6c871b9c5b510c1926437bbdf6e96d661e2c2f30`; that actual merge is integrated
+as `fb5647b3`. The C3 batch is not published or approved for activation. The scope is
 [the reservation packet's next batch](../membership-reservations-20261013/next-batch.md).
 
 CP-2 concerns a retrieval whose original numeric allocation disappeared and was
@@ -39,7 +39,8 @@ and atomic consumption/activation; C5 owns commercial continuity.
 Source integration and focused verification are underway. Existing receipts are
 component-specific and are not a final integrated acceptance claim. Initial
 native schema verification stopped after the first forward ALTER; that failure
-is retained and under diagnosis. No final native, independent-review or preflight
+is retained. A narrow correction for MySQL's ASCII CHECK-literal rendering passed
+the populated-upgrade native canary (1/63); the broader native selection continues. No final native, independent-review or preflight
 approval is claimed.
 
 Deterministic technical-window tests and synthetic cap-consumption callbacks do
