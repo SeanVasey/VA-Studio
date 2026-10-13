@@ -51,6 +51,12 @@ final class BillingSchema
 
     public function up(bool $ddl = true): void
     {
+        $this->inspect($ddl, false);
+    }
+
+    /** Only the explicit successor may admit the exact old six-table graph without the new interval guards. */
+    private function inspect(bool $ddl, bool $intervalUpgrade): void
+    {
         $pdo = DB::connection()->getPdo();
         $driver = DB::getDriverName();
         BillingException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
@@ -137,16 +143,18 @@ final class BillingSchema
                         BillingException::require($row['EVENT_OBJECT_TABLE'] === $name && $row['EVENT_MANIPULATION'] === $expected['event'] && $row['ACTION_TIMING'] === 'BEFORE' && $this->sql($row['ACTION_STATEMENT']) === $this->sql($expected['body']), 'schema');
                     }
                 }
+                $legacyInterval = $intervalUpgrade && $actual !== false && $guard === $name.'_interval';
                 BillingException::require(! ($prefixEnded && $row !== false), 'schema_prefix');
-                $prefixEnded = $prefixEnded || $row === false;
+                $prefixEnded = $prefixEnded || ($row === false && ! $legacyInterval);
                 if ($row === false) {
                     $missing[] = $expected['sql'];
                 }
             }
-            if ($actual !== false && $missing !== []) {
+            $onlyInterval = $intervalUpgrade && isset($guards[$name.'_interval']) && $missing === [$guards[$name.'_interval']['sql']];
+            if ($actual !== false && $missing !== [] && ! $onlyInterval) {
                 BillingException::require($pdo->query('SELECT 1 FROM '.$table.' LIMIT 1')->fetchColumn() === false, 'retained_unguarded_schema');
             }
-            BillingException::require($ddl || ($actual !== false && $missing === []), 'schema');
+            BillingException::require($ddl || ($actual !== false && ($missing === [] || $onlyInterval)), 'schema');
             BillingException::require($actual !== false || count($missing) === count($guards), 'schema');
             $plans[] = ['create' => $actual === false ? $create : null, 'guards' => $missing];
         }
@@ -335,7 +343,101 @@ final class BillingSchema
             $result[$guard] = ['sql' => $sql, 'event' => strtoupper($event), 'body' => $body];
         }
 
+        if (in_array($logical, [self::TABLES[2], self::TABLES[5]], true)) {
+            $guard = $name.'_interval';
+            $result[$guard] = $this->intervalGuard($driver, $guard, $table);
+        }
+
         return $result;
+    }
+
+    /** Both raw insert paths lock the same position rows, then use current reads across both ledgers. */
+    private function intervalGuard(string $driver, string $guard, string $table): array
+    {
+        $positions = $this->table(self::TABLES[4]);
+        $queries = [];
+        foreach ([self::TABLES[2], self::TABLES[5]] as $logical) {
+            $queries[] = 'SELECT COUNT(*) FROM '.$this->table($logical).' WHERE retrieval_position IN (NEW.retrieval_position, NEW.retrieval_end_position) OR retrieval_end_position IN (NEW.retrieval_position, NEW.retrieval_end_position)';
+        }
+        $valid = 'NEW.retrieval_position > 0 AND NEW.retrieval_end_position > NEW.retrieval_position';
+        if ($driver === 'mysql') {
+            $body = "BEGIN DECLARE found_kind VARCHAR(16) DEFAULT NULL; DECLARE used_positions BIGINT DEFAULT 0; IF NOT COALESCE(({$valid}),0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; "
+                .'SELECT kind INTO found_kind FROM '.$positions.' WHERE id = NEW.retrieval_position FOR UPDATE; '
+                ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; SET found_kind = NULL; "
+                .'SELECT kind INTO found_kind FROM '.$positions.' WHERE id = NEW.retrieval_end_position FOR UPDATE; '
+                ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; ";
+            foreach ($queries as $query) {
+                $body .= str_replace('COUNT(*) FROM', 'COUNT(*) INTO used_positions FROM', $query).' FOR UPDATE; '
+                    ."IF used_positions <> 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; ";
+            }
+            $body .= 'END';
+            $sql = 'CREATE TRIGGER `'.$guard.'` BEFORE INSERT ON '.$table.' FOR EACH ROW '.$body;
+        } else {
+            $condition = $valid.' AND ('.$queries[0].') = 0 AND ('.$queries[1].') = 0';
+            $condition = str_replace('main.', '', $condition);
+            $body = '';
+            $sql = 'CREATE TRIGGER "'.$guard.'" BEFORE INSERT ON '.$table.' WHEN NOT COALESCE(('.$condition."),0) BEGIN SELECT RAISE(ABORT, 'Retain billing retrieval interval'); END";
+        }
+
+        return ['sql' => $sql, 'event' => 'INSERT', 'body' => $body];
+    }
+
+    /** Offline forward upgrade: no row is deleted, adopted or resealed; exact existing guards are required. */
+    public function upgradeIntervals(): void
+    {
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        BillingException::require($connection->transactionLevel() === 0 && ! $pdo->inTransaction(), 'migration_transaction');
+        $this->inspect(false, true);
+        // SQLite DDL is transactional. Native DDL is not: both table write locks stay held
+        // while validating retained intervals and installing the two supplementary guards.
+        if ($driver === 'sqlite') {
+            $pdo->exec('BEGIN IMMEDIATE');
+        } else {
+            $pdo->exec('LOCK TABLES '.implode(', ', array_map(fn ($logical) => $this->table($logical).' WRITE', self::TABLES)));
+        }
+        try {
+            // Reinspect after acquiring locks, closing the pre-lock metadata window.
+            $this->inspect(false, true);
+            $this->assertRetainedIntervals($pdo);
+            foreach ([self::TABLES[2], self::TABLES[5]] as $logical) {
+                $table = $this->table($logical);
+                $name = $connection->getTablePrefix().$logical.'_interval';
+                $statement = $pdo->prepare($driver === 'sqlite'
+                    ? "SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND name = ?"
+                    : 'SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND BINARY TRIGGER_NAME = BINARY ?');
+                $statement->execute([$name]);
+                if ($statement->fetchColumn() === false) {
+                    $pdo->exec($this->intervalGuard($driver, $name, $table)['sql']);
+                }
+            }
+            $this->assertRetainedIntervals($pdo);
+            if ($driver === 'sqlite') {
+                $pdo->exec('COMMIT');
+            }
+        } finally {
+            if ($driver === 'sqlite') {
+                if ($pdo->inTransaction()) {
+                    $pdo->exec('ROLLBACK');
+                }
+            } else {
+                $pdo->exec('UNLOCK TABLES');
+            }
+        }
+        $this->up(false);
+    }
+
+    private function assertRetainedIntervals(PDO $pdo): void
+    {
+        $parts = [];
+        foreach ([self::TABLES[2], self::TABLES[5]] as $logical) {
+            foreach (['retrieval_position', 'retrieval_end_position'] as $column) {
+                $parts[] = 'SELECT '.$column.' AS position_id FROM '.$this->table($logical);
+            }
+        }
+        $query = 'SELECT position_id FROM ('.implode(' UNION ALL ', $parts).') retained_intervals GROUP BY position_id HAVING COUNT(*) > 1 LIMIT 1';
+        BillingException::require($pdo->query($query)->fetchColumn() === false, 'retained_interval_conflict');
     }
 
     private function assertNamespace(PDO $pdo, string $driver): void
@@ -345,7 +447,8 @@ final class BillingSchema
             $name = DB::connection()->getTablePrefix().$logical;
             $this->table($logical);
             $reserved[strtolower($name)] = ['name' => $name, 'type' => 'table'];
-            foreach (['insert', 'update', 'delete'] as $event) {
+            $events = in_array($logical, [self::TABLES[2], self::TABLES[5]], true) ? ['insert', 'update', 'delete', 'interval'] : ['insert', 'update', 'delete'];
+            foreach ($events as $event) {
                 $guard = $name.'_'.$event;
                 $reserved[strtolower($guard)] = ['name' => $guard, 'type' => 'trigger'];
             }
