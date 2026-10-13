@@ -23,11 +23,39 @@ final class MemberGrantSchema
 
     public function table(string $logical): string
     {
+        return self::tableFor($logical, DB::getDriverName(), DB::connection()->getTablePrefix());
+    }
+
+    /** Pure installed DDL plan. Runtime consumers cannot substitute their own expected definitions. */
+    public static function expectedPlan(string $driver, string $schema, string $prefix): array
+    {
+        MemberGrantException::require(in_array($driver, ['sqlite', 'mysql'], true)
+            && preg_match('/\A[a-zA-Z0-9_]{1,64}\z/D', $schema) === 1
+            && ($driver !== 'sqlite' || $schema === 'main')
+            && preg_match('/\A[a-zA-Z0-9_]*\z/D', $prefix) === 1, 'schema');
+        $builder = new self;
+        $tables = [];
+        foreach (self::TABLES as $logical) {
+            $installedTable = self::tableFor($logical, $driver, $prefix);
+            $name = $prefix.$logical;
+            $definition = $builder->definition($logical, $driver, $prefix);
+            $tables[$logical] = ['name' => $name, 'table' => '`'.$schema.'`.`'.$name.'`',
+                'create' => 'CREATE TABLE '.$installedTable.' ('.$definition['sql'].')'
+                    .($driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin' : ''),
+                'definition' => $definition,
+                'guards' => $builder->guards($logical, $driver, $name, $installedTable, $prefix)];
+        }
+
+        return compact('driver', 'schema', 'prefix', 'tables');
+    }
+
+    private static function tableFor(string $logical, string $driver, string $prefix): string
+    {
         MemberGrantException::require(in_array($logical, self::TABLES, true), 'schema');
-        $name = DB::connection()->getTablePrefix().$logical;
+        $name = $prefix.$logical;
         MemberGrantException::require(strlen($name) <= 52 && preg_match('/\A[a-zA-Z0-9_]+\z/D', $name) === 1, 'schema');
 
-        return DB::getDriverName() === 'sqlite' ? 'main."'.$name.'"' : '`'.$name.'`';
+        return $driver === 'sqlite' ? 'main."'.$name.'"' : '`'.$name.'`';
     }
 
     public function assertOwned(PDO $pdo): void
@@ -154,19 +182,19 @@ final class MemberGrantSchema
         throw new LogicException('Production member original evidence requires an explicit retention migration.');
     }
 
-    private function physical(string $logical): string
+    private function physical(string $logical, ?string $prefix = null): string
     {
         if (in_array($logical, [...self::TABLES, 'production_membership_redemptions', 'production_membership_paid_periods', 'production_membership_credit_events'], true)) {
-            return DB::connection()->getTablePrefix().$logical;
+            return ($prefix ?? DB::connection()->getTablePrefix()).$logical;
         }
         MemberGrantException::require(in_array($logical, ['users', 'customer_accounts'], true), 'schema');
 
         return $logical;
     }
 
-    private function definition(string $logical, string $driver): array
+    private function definition(string $logical, string $driver, ?string $prefix = null): array
     {
-        $name = $this->physical($logical);
+        $name = $this->physical($logical, $prefix);
         $ascii = $driver === 'mysql' ? ' CHARACTER SET ascii COLLATE ascii_bin' : ' COLLATE BINARY';
         $text = $driver === 'mysql' ? 'LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : 'TEXT';
         $integer = $driver === 'mysql' ? 'BIGINT UNSIGNED' : 'INTEGER';
@@ -225,18 +253,19 @@ final class MemberGrantSchema
             $sql .= ', CONSTRAINT '.$quote.$name.'_u'.$index.$quote.' UNIQUE ('.implode(', ', $parts).')';
         }
         foreach (array_keys($foreign) as $index => $column) {
-            $sql .= ', CONSTRAINT '.$quote.$name.'_f'.$index.$quote.' FOREIGN KEY ('.$column.') REFERENCES '.$quote.$this->physical($foreign[$column]).$quote.' (id) ON UPDATE RESTRICT ON DELETE RESTRICT';
+            $sql .= ', CONSTRAINT '.$quote.$name.'_f'.$index.$quote.' FOREIGN KEY ('.$column.') REFERENCES '.$quote.$this->physical($foreign[$column], $prefix).$quote.' (id) ON UPDATE RESTRICT ON DELETE RESTRICT';
         }
 
         return compact('sql', 'columns', 'primary', 'unique', 'check', 'foreign');
     }
 
-    private function guards(string $logical, string $driver, string $name, string $table): array
+    private function guards(string $logical, string $driver, string $name, string $table, ?string $prefix = null): array
     {
-        $profiles = $this->table(self::TABLES[0]);
-        $definitions = $this->table(self::TABLES[1]);
-        $origins = $this->table(self::TABLES[2]);
-        $artifacts = $this->table(self::TABLES[3]);
+        $memberTable = fn (string $logical): string => $prefix === null ? $this->table($logical) : self::tableFor($logical, $driver, $prefix);
+        $profiles = $memberTable(self::TABLES[0]);
+        $definitions = $memberTable(self::TABLES[1]);
+        $origins = $memberTable(self::TABLES[2]);
+        $artifacts = $memberTable(self::TABLES[3]);
         $insert = 'NOT EXISTS (SELECT 1 FROM '.$table.' WHERE id = NEW.id)';
         if ($logical === self::TABLES[0]) {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE profile_hash = NEW.profile_hash)';
@@ -246,7 +275,7 @@ final class MemberGrantSchema
         } elseif ($logical === self::TABLES[2]) {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE redemption_id = NEW.redemption_id)'
                 .' AND EXISTS (SELECT 1 FROM '.$definitions.' WHERE id = NEW.definition_id AND profile_id = NEW.profile_id AND original_terms_hash = NEW.original_terms_hash AND license_manifest_hash = NEW.license_manifest_hash AND asset_manifest_hash = NEW.asset_manifest_hash AND provenance = NEW.provenance)'
-                .' AND EXISTS (SELECT 1 FROM '.$this->physical('production_membership_redemptions').' r JOIN '.$this->physical('production_membership_paid_periods').' p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash)'
+                .' AND EXISTS (SELECT 1 FROM '.$this->physical('production_membership_redemptions', $prefix).' r JOIN '.$this->physical('production_membership_paid_periods', $prefix).' p ON p.id = r.period_id WHERE r.id = NEW.redemption_id AND r.owner_binding_hash = NEW.owner_binding_hash AND r.intent_hash = NEW.intent_hash AND r.license_manifest_hash = NEW.license_manifest_hash AND r.asset_manifest_hash = NEW.asset_manifest_hash AND r.original_terms_hash = NEW.original_terms_hash AND r.honor_deadline = NEW.honor_deadline AND p.account_id = NEW.account_id AND p.user_id = NEW.user_id AND p.identity_origin_id = NEW.identity_origin_id AND p.source_invoice_hash = NEW.invoice_identity_hash)'
                 .' AND EXISTS (SELECT 1 FROM customer_accounts a JOIN users u ON u.id = a.user_id WHERE a.id = NEW.account_id AND u.id = NEW.user_id AND a.active = 1 AND u.is_admin = 0 AND u.email_verified_at IS NOT NULL)';
         } elseif ($logical === self::TABLES[3]) {
             $insert .= ' AND NOT EXISTS (SELECT 1 FROM '.$table.' WHERE origin_id = NEW.origin_id AND (ordinal = NEW.ordinal OR role = NEW.role))'
@@ -258,7 +287,7 @@ final class MemberGrantSchema
         }
         $guards = [['insert', 'insert', $insert], ['update', 'update', '0 = 1'], ['delete', 'delete', '0 = 1']];
         if ($logical === self::TABLES[4]) {
-            $events = $this->physical('production_membership_credit_events');
+            $events = $this->physical('production_membership_credit_events', $prefix);
             $guards[] = [self::COUPLING, 'insert', 'EXISTS (SELECT 1 FROM '.$events.' c JOIN '.$events.' r ON r.id = c.reservation_event_id'
                 ." WHERE c.kind = 'consume' AND c.redemption_id = NEW.redemption_id AND c.grant_origin_id = NEW.origin_id"
                 .' AND c.grant_receipt_hash = NEW.readiness_receipt_hash AND c.grant_purpose = NEW.purpose AND c.created_at <= NEW.created_at'
