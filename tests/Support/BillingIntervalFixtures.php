@@ -9,6 +9,15 @@ use Illuminate\Support\Str;
 /** Structural synthetic rows exercise raw SQL invariants; they are never invoice authority. */
 trait BillingIntervalFixtures
 {
+    /** Historical 261/262 arbitration fixture: omit only the separately tested 263 extension. */
+    private function legacyBillingMigrationOptions(array $options): array
+    {
+        $paths = array_values(array_filter(glob(database_path('migrations/*.php')),
+            fn (string $path): bool => basename($path) !== '2026_10_13_263000_membership_billing_retrieval_identity.php'));
+
+        return [...$options, '--path' => $paths, '--realpath' => true];
+    }
+
     private function positions(int $count): array
     {
         $pdo = DB::connection()->getPdo();

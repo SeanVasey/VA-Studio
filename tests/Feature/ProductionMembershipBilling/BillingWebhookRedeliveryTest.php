@@ -380,7 +380,7 @@ class BillingWebhookRedeliveryTest extends TestCase
         $identity = (array) DB::table('production_membership_billing_invoices')->first();
         $ledger = new BillingLedger;
         $start = $ledger->startRetrieval();
-        $ledger->append($identity, $verdict, self::T0 + $offset, IdentityPolicy::REHEARSAL, $start, $ledger->endRetrieval($start), CarbonImmutable::now('UTC'));
+        $ledger->append($identity, $verdict, IdentityPolicy::REHEARSAL, $ledger->endRetrieval($start));
     }
 
     private function at(int $offset): void

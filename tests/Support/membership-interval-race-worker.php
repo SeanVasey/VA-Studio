@@ -22,8 +22,9 @@ $pdo->exec('SET SESSION innodb_lock_wait_timeout=15');
 $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 DB::beginTransaction();
 // Both workers pin an older snapshot before either inserts; the guard must use current evidence.
+$snapshotBefore = [];
 foreach ([BillingSchema::TABLES[2], BillingSchema::TABLES[5]] as $table) {
-    $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn();
+    $snapshotBefore[$table] = (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn();
 }
 file_put_contents($directory.'/ready-'.$worker, (string) $connectionId);
 $deadline = microtime(true) + 30;
@@ -34,18 +35,30 @@ while (! is_file($directory.'/start')) {
     usleep(5000);
     clearstatcache();
 }
+$snapshotAfter = null;
 try {
     $row = $input['row'];
     $pdo->prepare('INSERT INTO '.$input['table'].' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')')->execute(array_values($row));
     DB::commit();
     $result = 'saved';
 } catch (PDOException $error) {
-    if (DB::transactionLevel() > 0) {
-        DB::rollBack();
-    }
     $result = 'denied';
     $state = $error->errorInfo[0] ?? $error->getCode();
     $driverCode = $error->errorInfo[1] ?? null;
+    try {
+        // A deadlock may already have ended the transaction; never manufacture a post-refusal snapshot.
+        if ($state === '45000' && $pdo->inTransaction()) {
+            $snapshotAfter = [];
+            foreach ([BillingSchema::TABLES[2], BillingSchema::TABLES[5]] as $table) {
+                $snapshotAfter[$table] = (int) $pdo->query('SELECT COUNT(*) FROM '.$table)->fetchColumn();
+            }
+        }
+    } finally {
+        if (DB::transactionLevel() > 0) {
+            DB::rollBack();
+        }
+    }
 }
 echo json_encode(['result' => $result, 'sqlstate' => $state ?? null, 'driver_code' => $driverCode ?? null,
-    'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel()], JSON_THROW_ON_ERROR);
+    'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel(),
+    'snapshot_before' => $snapshotBefore, 'snapshot_after' => $snapshotAfter, 'in_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);
