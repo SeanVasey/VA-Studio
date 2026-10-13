@@ -2,6 +2,7 @@
 
 namespace App\Domain\Memberships\Production;
 
+use App\Domain\Grants\Member\MemberActivationHistory;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Crypt;
@@ -53,9 +54,10 @@ final class MembershipPeriodRecords
     }
 
     /** Preserve the original award projection after auditing every retained ledger effect. */
-    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId, array $redemptions = []): array
+    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy,
+        int $originId, array $redemptions, MemberActivationHistory $history): array
     {
-        return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $policy, $originId)['award'];
+        return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $policy, $originId, $history)['award'];
     }
 
     /** The original first-event format. Creation, payload purpose and keyed seal bytes stay unchanged. */
