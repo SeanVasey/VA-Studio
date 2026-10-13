@@ -31,7 +31,13 @@ class BillingAwardFenceDefinitionTest extends TestCase
             $this->assertSame($guard, $pdo->query($catalog)->fetchColumn());
             $other->exec('DROP TRIGGER `'.$guard.'`');
             $this->assertSame($guard, $pdo->query($catalog)->fetchColumn(), 'The ordinary trigger catalog deliberately retains the old snapshot.');
-            $this->assertSame([], $pdo->query("SHOW TRIGGERS WHERE `Trigger` = '".$guard."'")->fetchAll(PDO::FETCH_ASSOC), 'SHOW must see the current trigger inventory.');
+            $this->assertCount(1, $pdo->query("SHOW TRIGGERS WHERE `Trigger` = '".$guard."'")->fetchAll(PDO::FETCH_ASSOC), 'SHOW TRIGGERS also retains the old catalog snapshot.');
+            try {
+                $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`');
+                $this->fail('The named current definition must report the removed trigger.');
+            } catch (\PDOException $error) {
+                $this->assertSame(1360, $error->errorInfo[1]);
+            }
             try {
                 (new BillingAwardFence)->lock($pdo);
                 $this->fail('The current hint guard is absent, so an award fence cannot be admitted.');
