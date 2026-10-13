@@ -72,6 +72,7 @@
     "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingNativeDatabaseIntervalOwnershipRaceTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
