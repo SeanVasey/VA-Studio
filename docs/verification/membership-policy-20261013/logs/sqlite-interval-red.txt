@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-policy-red/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:01.948, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination
+One retrieval endpoint cannot belong to both ledgers: production_membership_billing_observations start_start
+
+/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 1[0m[37;41m, Failures: 1[0m[37;41m.[0m

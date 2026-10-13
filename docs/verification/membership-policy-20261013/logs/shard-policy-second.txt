@@ -1,0 +1,21 @@
+.F..................................................
+======================================================================
+FAIL: test_committed_policy_covers_every_driver_branching_file_under_tests_exactly (__main__.PartitionProofTest.test_committed_policy_covers_every_driver_branching_file_under_tests_exactly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-membership-policy/scripts/ci/test-phpunit-shards.py", line 269, in test_committed_policy_covers_every_driver_branching_file_under_tests_exactly
+    self.assertEqual([], module.branching_coverage_errors(repository, paths, selection))
+AssertionError: Lists differ: [] != ['driver-branching helper not in branching[61 chars]php']
+
+Second list contains 1 additional elements.
+First extra element 0:
+'driver-branching helper not in branching_helper_files: tests/Support/membership-interval-race-worker.php'
+
+- []
++ ['driver-branching helper not in branching_helper_files: '
++  'tests/Support/membership-interval-race-worker.php']
+
+----------------------------------------------------------------------
+Ran 52 tests in 0.254s
+
+FAILED (failures=1)

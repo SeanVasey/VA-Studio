@@ -1,0 +1,130 @@
+{
+  "mysql-canary-second": {
+    "tests": 1,
+    "assertions": 8,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-canary": {
+    "tests": 1,
+    "assertions": 0,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-interval-canary": {
+    "tests": 1,
+    "assertions": 27,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-interval-integration": {
+    "tests": 6,
+    "assertions": 74,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-interval-red": {
+    "tests": 1,
+    "assertions": 5,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-policy-final": {
+    "tests": 2,
+    "assertions": 23,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": 0
+  },
+  "mysql-policy": {
+    "tests": 5,
+    "assertions": 37,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "mysql-snapshot-final": {
+    "tests": 1,
+    "assertions": 51,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": 0
+  },
+  "sqlite-affected": {
+    "tests": 261,
+    "assertions": 1311,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 9,
+    "recorded_exit_code": null
+  },
+  "sqlite-canary": {
+    "tests": 1,
+    "assertions": 8,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "sqlite-clock-red": {
+    "tests": 1,
+    "assertions": 1,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "sqlite-interval-first": {
+    "tests": 4,
+    "assertions": 38,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "sqlite-interval-red": {
+    "tests": 1,
+    "assertions": 1,
+    "errors": 0,
+    "failures": 1,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "sqlite-policy-final": {
+    "tests": 16,
+    "assertions": 78,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 1,
+    "recorded_exit_code": 0
+  },
+  "sqlite-policy-first": {
+    "tests": 3,
+    "assertions": 25,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  },
+  "sqlite-policy-second": {
+    "tests": 14,
+    "assertions": 73,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "recorded_exit_code": null
+  }
+}
