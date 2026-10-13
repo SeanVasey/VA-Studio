@@ -51,6 +51,10 @@
       "test_parent_floor_drift_is_refused_before_the_first_owned_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberActivationHistoryReaderTest",
+      "test_actual_empty_history_keeps_exact_reader_rows_and_committed_frame_until_retirement"
+    ],
+    [
       "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
       "test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories"
     ],
