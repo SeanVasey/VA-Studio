@@ -149,6 +149,8 @@ final readonly class MemberActivationHistory
         $g = $this->graphs[$redemption['id']];
         $s = $g['o']['source'];
         $r = $g['o']['readiness_commitment'];
+        $reservation = MembershipReservationRecords::verify($redemption, $period, $invoice, $policy);
+        self::equal($s['selection'], $reservation['intent']['selection']);
         self::equal($s['invoice'], MembershipPeriodRecords::semantic($invoice));
         self::equal($s['buyer_binding'], $invoice->originalBuyerBinding);
         MemberGrantException::require($s['period']['id'] === $period['id'] && $s['period']['seal'] === $period['seal']
