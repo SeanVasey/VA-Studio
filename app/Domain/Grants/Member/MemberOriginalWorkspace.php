@@ -24,12 +24,14 @@ final class MemberOriginalWorkspace
         if (str_contains($parent, PATH_SEPARATOR) || str_contains($parent, "\0") || ! str_starts_with($parent, '/')) {
             throw new MemberGrantException('storage_failed');
         }
+        self::nativeFilesystem($idle, $budget);
         $path = $parent.'/'.bin2hex(random_bytes(16));
         if (! @mkdir($path, 0700)) {
             throw new MemberGrantException('storage_failed');
         }
         $idle->assertStillIdle();
         $budget->assertCurrent();
+        self::nativeFilesystem($idle, $budget);
         clearstatcache(true, $path);
         $stat = @lstat($path);
         if (! is_array($stat) || ($stat['mode'] & 0177777) !== 0040700 || realpath($path) !== $path) {
@@ -71,6 +73,11 @@ final class MemberOriginalWorkspace
             throw new UnexpectedValueException;
         }
         try {
+            $metadata = $this->io(fn () => stream_get_meta_data($entries));
+            if (($metadata['wrapper_type'] ?? null) !== 'plainfile' || ($metadata['stream_type'] ?? null) !== 'dir') {
+                throw new UnexpectedValueException;
+            }
+            $this->sameDirectory($directory, $identity);
             while (($name = $this->io(fn () => readdir($entries))) !== false) {
                 if ($name === '.' || $name === '..') {
                     continue;
@@ -113,6 +120,7 @@ final class MemberOriginalWorkspace
 
     private function sameDirectory(string $path, array $identity): void
     {
+        self::nativeFilesystem($this->idle, $this->budget);
         $current = $this->io(fn () => $this->stat($path));
         if (! is_array($current) || ($current['mode'] & 0177777) !== 0040700
             || $current['dev'] !== $identity['dev'] || $current['ino'] !== $identity['ino']
@@ -126,6 +134,33 @@ final class MemberOriginalWorkspace
         clearstatcache(true, $path);
 
         return @lstat($path);
+    }
+
+    /** Admit native files before a substituted stat wrapper can restore itself in a callback. */
+    private static function nativeFilesystem(MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): void
+    {
+        $probe = null;
+        try {
+            $idle->assertStillIdle();
+            $budget->assertCurrent();
+            $probe = @fopen(__FILE__, 'rb');
+            $idle->assertStillIdle();
+            $budget->assertCurrent();
+            if (! is_resource($probe) || get_resource_type($probe) !== 'stream') {
+                throw new UnexpectedValueException;
+            }
+            $metadata = stream_get_meta_data($probe);
+            $idle->assertStillIdle();
+            $budget->assertCurrent();
+            if (($metadata['wrapper_type'] ?? null) !== 'plainfile' || ($metadata['stream_type'] ?? null) !== 'STDIO'
+                || ($metadata['uri'] ?? null) !== __FILE__) {
+                throw new UnexpectedValueException;
+            }
+        } finally {
+            if (is_resource($probe)) {
+                fclose($probe);
+            }
+        }
     }
 
     private function io(callable $operation): mixed

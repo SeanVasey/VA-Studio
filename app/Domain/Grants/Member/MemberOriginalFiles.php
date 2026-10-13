@@ -31,7 +31,7 @@ final class MemberOriginalFiles
         $output = null;
         $temporary = null;
         $owned = null;
-        $started = hrtime(true);
+        $started = \hrtime(true);
         try {
             $record = $this->record($source, $expected);
             $this->validateBytes($expected->pdfBytes, $record);
@@ -54,6 +54,7 @@ final class MemberOriginalFiles
             if (! is_resource($output)) {
                 throw new UnexpectedValueException;
             }
+            $this->nativeStream($output, $temporary, $idle, $budget);
             $owned = $this->io($idle, $budget, fn () => fstat($output));
             $this->sameFile($temporary, $owned, $root, false, 1, $idle, $budget);
             for ($offset = 0; $offset < $expected->sizeBytes;) {
@@ -112,7 +113,7 @@ final class MemberOriginalFiles
             $record = $this->sourceRecord($source);
             if ($record['path'] !== $expected->relativePath || $record['source'] !== $expected->renderSourceHash
                 || $record['storage'] !== $expected->storagePolicyHash || $record['profile'] !== $expected->profileHash
-                || $expected->observationStartedNs > $expected->observedAtNs || $expected->observedAtNs > hrtime(true)) {
+                || $expected->observationStartedNs > $expected->observedAtNs || $expected->observedAtNs > \hrtime(true)) {
                 throw new UnexpectedValueException;
             }
             $record += ['hash' => $expected->sha256, 'size' => $expected->sizeBytes, 'pages' => $expected->pageCount];
@@ -193,6 +194,7 @@ final class MemberOriginalFiles
             if (! is_resource($input)) {
                 throw new UnexpectedValueException;
             }
+            $this->nativeStream($input, $path, $idle, $budget);
             $opened = $this->io($idle, $budget, fn () => fstat($input));
             if ($before['ino'] !== $opened['ino'] || $before['dev'] !== $opened['dev'] || $opened['size'] !== $record['size']
                 || ($expected !== null && ($opened['ino'] !== $expected->inode || $opened['dev'] !== $expected->device))) {
@@ -209,7 +211,7 @@ final class MemberOriginalFiles
             $this->directories($root, dirname($record['path']), false, $idle, $budget);
 
             return new MemberOriginalFileObservation($record['path'], $record['source'], $record['hash'], $record['size'],
-                $record['pages'], $record['profile'], $record['storage'], $opened['dev'], $opened['ino'], $started, hrtime(true));
+                $record['pages'], $record['profile'], $record['storage'], $opened['dev'], $opened['ino'], $started, \hrtime(true));
         } finally {
             if (is_resource($input)) {
                 fclose($input);
@@ -221,6 +223,10 @@ final class MemberOriginalFiles
     {
         $idle->assertStillIdle();
         $budget->assertCurrent();
+        // Open a known existing native file before any path/stat work. A one-shot
+        // substituted wrapper must not run a stat callback, restore itself, and
+        // then pass the later candidate-stream check. No probe bytes are trusted.
+        $this->nativeFilesystem($idle, $budget);
         $disk = config('filesystems.disks.local');
         if (! is_array($disk) || ($disk['driver'] ?? null) !== 'local' || ($disk['serve'] ?? false) !== false
             || ($disk['visibility'] ?? 'private') !== 'private' || ($disk['prefix'] ?? '') !== ''
@@ -336,6 +342,7 @@ final class MemberOriginalFiles
     private function sameFile(string $path, array|false $opened, string $root, bool $sealed, int $links,
         MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): void
     {
+        $this->nativeFilesystem($idle, $budget);
         $current = $this->io($idle, $budget, fn () => $this->stat($path));
         if (! is_array($opened) || ! is_array($current) || ($opened['mode'] & 0170000) !== 0100000
             || ($current['mode'] & 0170000) !== 0100000 || $opened['nlink'] !== $links || $current['nlink'] !== $links
@@ -365,6 +372,31 @@ final class MemberOriginalFiles
         clearstatcache(true, $path);
 
         return @lstat($path);
+    }
+
+    private function nativeFilesystem(MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): void
+    {
+        $probe = null;
+        try {
+            $probe = $this->io($idle, $budget, static fn () => @fopen(__FILE__, 'rb'));
+            $this->nativeStream($probe, __FILE__, $idle, $budget);
+        } finally {
+            if (is_resource($probe)) {
+                fclose($probe);
+            }
+        }
+    }
+
+    private function nativeStream(mixed $stream, string $path, MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): void
+    {
+        if (! is_resource($stream) || get_resource_type($stream) !== 'stream') {
+            throw new UnexpectedValueException;
+        }
+        $metadata = $this->io($idle, $budget, static fn () => stream_get_meta_data($stream));
+        if (($metadata['wrapper_type'] ?? null) !== 'plainfile' || ($metadata['stream_type'] ?? null) !== 'STDIO'
+            || ($metadata['uri'] ?? null) !== $path) {
+            throw new UnexpectedValueException;
+        }
     }
 
     private function io(MemberOriginalIoFrame $idle, MemberOriginalBudget $budget, callable $operation): mixed
