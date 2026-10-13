@@ -41,8 +41,8 @@ class MembershipHistoricalInvoiceTest extends TestCase
         // Historical decoding does not consult today's time, commercial approval or provider status.
         CarbonImmutable::setTestNow('2036-10-13 12:00:00 UTC');
         $historical = Period::historicalInvoice($f['period'], $f['award'], $f['policy'], 7);
-        $this->assertSame(Period::semantic($f['invoice']), Period::semantic($historical));
-        $this->assertSame($f['invoice']->originalBuyerBinding, $historical->originalBuyerBinding);
+        $this->assertSame(CanonicalJson::encode(Period::semantic($f['invoice'])), CanonicalJson::encode(Period::semantic($historical)));
+        $this->assertSame(CanonicalJson::encode($f['invoice']->originalBuyerBinding), CanonicalJson::encode($historical->originalBuyerBinding));
         $this->assertNotNull($f['invoice']->invoiceId);
         $this->assertNull($historical->invoiceId);
         $this->assertNull($historical->observationId);
