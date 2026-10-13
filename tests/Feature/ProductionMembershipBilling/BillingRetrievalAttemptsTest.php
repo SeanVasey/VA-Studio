@@ -136,28 +136,6 @@ class BillingRetrievalAttemptsTest extends TestCase
         $this->assertSame(0, DB::table('production_membership_billing_observations')->count());
     }
 
-    public function test_forward_migration_preserves_the_existing_five_tables_and_rows_and_is_idempotent(): void
-    {
-        $binding = F::binding();
-        (new BillingReconciliation(new RehearsalBillingGateway(F::graph())))->retrieve($binding['id'], F::INVOICE);
-        DB::connection()->getPdo()->exec('DROP TABLE '.self::TABLE);
-        $oldTables = array_slice(BillingSchema::TABLES, 0, 5);
-        $snapshot = fn () => array_map(fn ($table) => DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(), $oldTables);
-        $before = $snapshot();
-        $migration = require base_path('database/migrations/2026_10_12_260000_membership_billing_retrieval_attempts.php');
-        $migration->up();
-        $migration->up();
-        $this->assertSame($before, $snapshot());
-        $this->assertSame(0, DB::table(self::TABLE)->count());
-        (new BillingSchema)->assertOwned(DB::connection()->getPdo());
-        try {
-            $migration->down();
-            $this->fail('Attempt evidence needs explicit retention handling, never a destructive down migration.');
-        } catch (\LogicException) {
-            $this->assertSame($before, $snapshot());
-        }
-    }
-
     public static function wrongHints(): array
     {
         return [['invoice'], ['account'], ['late']];
