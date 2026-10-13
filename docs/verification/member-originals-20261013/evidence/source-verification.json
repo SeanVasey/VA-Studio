@@ -1379,6 +1379,176 @@
       "matched_paths": 5,
       "all_captured_paths_match": true,
       "differences": []
+    },
+    {
+      "id": "root/integrated-pure-4962943d",
+      "source": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "require_exact": true,
+      "scope": "Root exact-source changed-unit selection captured inputs; clean Git state and owner unchanged-source sidecar. Unit execution only.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1396,
+      "matched_paths": 1396,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-canary-initial",
+      "source": "operation/composition-canary-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2006,
+      "matched_paths": 2006,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/reservation-wrappers-initial",
+      "source": "operation/reservation-wrappers-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2006,
+      "matched_paths": 2006,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-canary-timestamp-fixed",
+      "source": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/retained-deadline-old-bridge-red",
+      "source": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Supporting tree only; exact executed old class is separately bound and overlaid.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-fifteen-initial",
+      "source": "operation/composition-fifteen-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-facts-callback-corrected",
+      "source": "operation/composition-facts-callback-corrected.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/composition-fifteen-final",
+      "source": "operation/composition-fifteen-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/reservation-clock-wrapper-final",
+      "source": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2034,
+      "matched_paths": 2034,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "operation/retained-deadline-old-inspection",
+      "source": "operation/retained-deadline-red-green-comparison.json",
+      "key": [
+        "red_source"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "path_aliases": {
+        "/workspace/runtime/member-original-operation-evidence/retained-deadline-old-inspection.php.txt": "app/Domain/Grants/Member/MemberOriginalInspection.php"
+      },
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": true,
+      "scope": "Exact single old preloaded class; supporting tree is a082, not an old whole-source run.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 1,
+      "matched_paths": 1,
+      "all_captured_paths_match": true,
+      "differences": []
+    },
+    {
+      "id": "quality/source-before",
+      "source": "quality/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "require_exact": true,
+      "scope": "Exact quality/discovery root inventory; no application body execution.",
+      "reference_resolution": "portable reachable-root path mapping",
+      "captured_paths": 2254,
+      "matched_paths": 2254,
+      "all_captured_paths_match": true,
+      "differences": []
     }
   ],
   "frozen_profiles": [
@@ -1440,6 +1610,14 @@
       "original_path_blob_pairs_sha256": "0eedef1603c7c3b725ebefd65d455f267932b6e5b0f38de4e92c9eaddcde4548"
     },
     {
+      "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "reachable_default": "78ef16be7626c81de49d103d581551b707201eda",
+      "verified_path_pairs": 2034,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9"
+    },
+    {
       "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
       "reachable_default": "910ddf3090a1a9b10eff7861495d37d252ce8e77",
       "verified_path_pairs": 8,
@@ -1456,12 +1634,28 @@
       "original_path_blob_pairs_sha256": "b47b812da9470f1685e4dd302e3e04604493e7e22ac0f2fc44da3ece0e647b5c"
     },
     {
+      "original_reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "reachable_default": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+      "verified_path_pairs": 2034,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "a89a1eead1f94f306106fc265e5618624707c9ff7c75ed9dbfbdff2f9a5ff05d"
+    },
+    {
       "original_reference": "483793065c3f7a66057907a777f938f608bf7036",
       "reachable_default": "0bfacbbc0ad970881a0cd8ddb0044d8a69e0fe90",
       "verified_path_pairs": 74,
       "overrides": 0,
       "preserved_absences": 0,
       "original_path_blob_pairs_sha256": "ef8078cf2191fb2d3db3d0fb1e3c6f38d52c72cb9ee69960025b73a0b66a41f8"
+    },
+    {
+      "original_reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "reachable_default": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "verified_path_pairs": 1396,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "e1921c9e78a4d2f0ad467a5928285d63fd94070df0222c8e6b6ab784446dc296"
     },
     {
       "original_reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
@@ -1488,6 +1682,14 @@
       "original_path_blob_pairs_sha256": "3e37df1dfb07d47f7e09c02688bd76ee081c95edd81599d9f0ee7a45b4d08240"
     },
     {
+      "original_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "reachable_default": "78ef16be7626c81de49d103d581551b707201eda",
+      "verified_path_pairs": 2254,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "938f0a515b47ffa90140e6003da436aac857112c52a3b989b5c85cea9cd51481"
+    },
+    {
       "original_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
       "reachable_default": "7edd614497b930c5bc02141537cc7e24dce6fb27",
       "verified_path_pairs": 42,
@@ -1502,6 +1704,22 @@
       "overrides": 4,
       "preserved_absences": 9,
       "original_path_blob_pairs_sha256": "6df9d61b44b84a8cde9404d30044b2173baeda0dedebac222750c6246508f012"
+    },
+    {
+      "original_reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "reachable_default": "0add9cd20b1e20a51bc2b68cf8cdf405aae73767",
+      "verified_path_pairs": 2006,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "c76da71bf313a20431fe03fed0d38c4c7474313fb59e046cae44d69f9638fd9f"
+    },
+    {
+      "original_reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "reachable_default": "1cee974d42adc2c478f443ca3834fed851c2e69c",
+      "verified_path_pairs": 2034,
+      "overrides": 0,
+      "preserved_absences": 0,
+      "original_path_blob_pairs_sha256": "93e2d41eeb0ca055dcebac3532314c1f838bd65b47d948444256cf77652b2dc5"
     },
     {
       "original_reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",

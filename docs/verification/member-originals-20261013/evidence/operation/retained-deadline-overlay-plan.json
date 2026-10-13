@@ -1,0 +1,7 @@
+{
+  "status": "prepared, not executed",
+  "class": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+  "commit": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+  "sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f",
+  "scope": "Only exact old composed Inspection class preloaded; supporting current corrected facts/schema/interfaces remain current. Not a whole-old-source run."
+}

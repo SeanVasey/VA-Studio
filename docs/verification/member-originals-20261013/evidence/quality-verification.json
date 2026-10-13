@@ -1,0 +1,58 @@
+{
+  "scope": "Offline source, runner, log/exit, exact generated artifact and listing reconciliation. Discovery is selection, not execution of application bodies.",
+  "head": "78ef16be7626c81de49d103d581551b707201eda",
+  "source_paths_unchanged": 2254,
+  "checks": [
+    {
+      "name": "policy-phpunit-shards",
+      "exit": 0,
+      "duration_seconds": 0.52,
+      "policy_test_count": 52,
+      "command_receipt": "quality/policy-phpunit-shards.command.json"
+    },
+    {
+      "name": "policy-database-receipts",
+      "exit": 0,
+      "duration_seconds": 51.198,
+      "policy_test_count": 61,
+      "command_receipt": "quality/policy-database-receipts.command.json"
+    },
+    {
+      "name": "policy-gitlab-database-receipts",
+      "exit": 0,
+      "duration_seconds": 39.441,
+      "policy_test_count": 32,
+      "command_receipt": "quality/policy-gitlab-database-receipts.command.json"
+    },
+    {
+      "name": "policy-workflow-cadence",
+      "exit": 0,
+      "duration_seconds": 0.166,
+      "policy_test_count": 14,
+      "command_receipt": "quality/policy-workflow-cadence.command.json"
+    },
+    {
+      "name": "pint-operative",
+      "exit": 0,
+      "duration_seconds": 4.73,
+      "policy_test_count": null,
+      "command_receipt": "quality/pint-operative.command.json"
+    },
+    {
+      "name": "native-discovery",
+      "exit": 0,
+      "duration_seconds": 6.241,
+      "policy_test_count": null,
+      "command_receipt": "quality/native-discovery.command.json"
+    }
+  ],
+  "policy_tests": 159,
+  "style_files": 78,
+  "source_cases": 8475,
+  "selected_cases": 2143,
+  "selected_files": 210,
+  "nonempty_shards": 24,
+  "untimed_files_warning": 47,
+  "generated_files_verified": 50,
+  "owner_cleanup_sidecar_verified": true
+}

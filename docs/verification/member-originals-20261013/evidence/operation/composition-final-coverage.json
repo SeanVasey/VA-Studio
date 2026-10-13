@@ -1,0 +1,195 @@
+{
+  "scope": "Three focused migration-backed SQLite invocations on their stated source boundaries, not one suite run or native acceptance. Earlier wrapper sources have an explicit carry comparison; current compose15 and portable clock1 match final author source.",
+  "invocations": {
+    "composition-fifteen-final": {
+      "result": {
+        "exit": 0,
+        "seconds": 314.484,
+        "source_count": 2034,
+        "changed_sources": [],
+        "junit": {
+          "name": "CLI Arguments",
+          "tests": "15",
+          "assertions": "432",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "314.186498"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects": {
+          "assertions": 48,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate": {
+          "assertions": 30,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_after_commit_owner_withdrawal_returns_no_candidate_and_never_starts_the_renderer": {
+          "assertions": 27,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest::test_returned_candidate_values_cannot_be_reused_as_authority_after_source_withdrawal": {
+          "assertions": 43,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return": {
+          "assertions": 30,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed": {
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary": {
+          "assertions": 26,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap": {
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission": {
+          "assertions": 25,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure": {
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it": {
+          "assertions": 25,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source": {
+          "assertions": 25,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission": {
+          "assertions": 25,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work": {
+          "assertions": 29,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket": {
+          "assertions": 27,
+          "outcome": "passed"
+        }
+      }
+    },
+    "reservation-wrappers-initial": {
+      "result": {
+        "exit": 0,
+        "seconds": 216.155,
+        "source_count": 2006,
+        "changed_sources": [],
+        "junit": {
+          "name": "CLI Arguments",
+          "tests": "17",
+          "assertions": "345",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "215.895297"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity": {
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_last_credit_refusal_keeps_exactly_the_first_redemption_and_reserve_event": {
+          "assertions": 18,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_eligible_selection": {
+          "assertions": 24,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_actually_awarded_paid_period": {
+          "assertions": 18,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_release_requires_honor_expiry_then_is_idempotent_and_preserves_award_replay": {
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest::test_available_expiry_preserves_reserved_credit_and_a_later_release_never_restores_it": {
+          "assertions": 21,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities": {
+          "assertions": 17,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event": {
+          "assertions": 17,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects": {
+          "assertions": 18,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation": {
+          "assertions": 16,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame": {
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate": {
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back": {
+          "assertions": 17,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection": {
+          "assertions": 20,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission": {
+          "assertions": 31,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture": {
+          "assertions": 22,
+          "outcome": "passed"
+        },
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative": {
+          "assertions": 25,
+          "outcome": "passed"
+        }
+      }
+    },
+    "reservation-clock-wrapper-final": {
+      "result": {
+        "exit": 0,
+        "seconds": 13.044,
+        "source_count": 2034,
+        "changed_sources": [],
+        "junit": {
+          "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest",
+          "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php",
+          "tests": "1",
+          "assertions": "18",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "12.781017"
+        }
+      },
+      "cases": {
+        "Tests.Feature.ProductionMembershipBilling.MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check": {
+          "assertions": 18,
+          "outcome": "passed"
+        }
+      }
+    }
+  }
+}

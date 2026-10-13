@@ -1,0 +1,5 @@
+{
+  "scope": "Each named captured executable/resource-input selection compared with the explicit integrated target. Differences remain visible; a byte comparison is not a rerun. External probes remain separately identified. Documentation-only inventory entries are excluded from this final carry comparison.",
+  "integrated_tested_source": null,
+  "comparisons": []
+}

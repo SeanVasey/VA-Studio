@@ -128,6 +128,87 @@
       "independent_before_after_maps": false
     },
     {
+      "run": "root/integrated-pure-4962943d",
+      "source": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "runner": "root/pure-4962943d/run-native-focused.py",
+      "result": "root/pure-4962943d/integrated-pure-4962943d.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-canary-initial",
+      "source": "operation/composition-canary-initial.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-canary-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/reservation-wrappers-initial",
+      "source": "operation/reservation-wrappers-initial.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/reservation-wrappers-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-canary-timestamp-fixed",
+      "source": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-canary-timestamp-fixed.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/retained-deadline-old-bridge-red",
+      "source": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "runner": "operation/run-retained-deadline-overlay.py",
+      "result": "operation/retained-deadline-old-bridge-red.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-fifteen-initial",
+      "source": "operation/composition-fifteen-initial.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-fifteen-initial.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-facts-callback-corrected",
+      "source": "operation/composition-facts-callback-corrected.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-facts-callback-corrected.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/composition-fifteen-final",
+      "source": "operation/composition-fifteen-final.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-fifteen-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
+      "run": "operation/reservation-clock-wrapper-final",
+      "source": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/reservation-clock-wrapper-final.result.json",
+      "runner_bytes_verified": true,
+      "owner_unchanged_source_sidecar": true,
+      "independent_before_after_maps": false
+    },
+    {
       "run": "facts/schema/native/native-old-01",
       "before": "facts/schema/native/native-old-01/source-before.json.gz",
       "after": "facts/schema/native/native-old-01/source-after.json.gz",
@@ -323,6 +404,14 @@
         "fixed"
       ],
       "artifact": "facts/facts-review/repository-test-source.php"
+    },
+    {
+      "receipt": "operation/retained-deadline-red-green-comparison.json",
+      "key": [
+        "red_source",
+        "sha256"
+      ],
+      "artifact": "operation/retained-deadline-old-inspection.php.txt"
     }
   ]
 }

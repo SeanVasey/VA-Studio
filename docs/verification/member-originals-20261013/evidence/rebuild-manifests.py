@@ -39,6 +39,22 @@ def field(value, key):
     return value
 
 
+def source_map(binding):
+    if binding.get('format') == 'sha256sum':
+        captured = {line.split(None, 1)[1]: line.split(None, 1)[0] for line in raw(binding['source']).decode().splitlines() if line.strip()}
+    else:
+        captured = field(load(binding['source']), binding.get('key'))
+    if binding.get('path_key'):
+        entries = captured if isinstance(captured, list) else [captured]
+        captured = {item[binding['path_key']]: item for item in entries}
+    assert isinstance(captured, dict), binding['id']
+    if binding.get('hash_key'):
+        captured = {path: value[binding['hash_key']] for path, value in captured.items()}
+    if binding.get('path_aliases'):
+        captured = {binding['path_aliases'].get(path, path): value for path, value in captured.items()}
+    return captured
+
+
 index = load('archive-index.json')
 for item in index['files']:
     data = (HERE / item['path']).read_bytes()
@@ -51,16 +67,24 @@ registry = load('runs.json')
 releases = []
 for spec in registry.get('release_manifests', []):
     manifest = field(load(spec['receipt']), spec['key'])
-    members = manifest if isinstance(manifest, list) else [dict(item, path=name) for name, item in manifest.items()]
+    members = manifest if isinstance(manifest, list) else [dict(sha256=item, path=name) if spec.get('hash_values') else dict(item, path=name) for name, item in manifest.items()]
     verified = []
     for member in members:
-        expected_path = spec['prefix'] + member['path']
+        expected_path = spec['prefix'] + (Path(member['path']).name if spec.get('absolute_paths') else member['path'])
         matches = [x for x in index['files'] if x['path'] in (expected_path, expected_path + '.gz')]
         assert len(matches) == 1, expected_path
         archived = matches[0]
-        assert archived['original_sha256'] == member['sha256'] and archived['original_bytes'] == member['bytes'], expected_path
+        assert archived['original_sha256'] == member['sha256'], expected_path
+        if 'bytes' in member:
+            assert archived['original_bytes'] == member['bytes'], expected_path
         verified.append(archived['path'])
     releases.append(spec | {'verified_members': len(verified), 'archived_paths': verified})
+for spec in registry.get('allowlist_receipts', []):
+    members = field(load(spec['receipt']), spec['key'])
+    assert len(members) == len(set(members)) == spec['expected_members'], spec['receipt']
+    paths = {x['path'].removesuffix('.gz') for x in index['files'] if x['path'].startswith(spec['prefix'])}
+    assert paths == {spec['prefix'] + name for name in members}, spec['receipt']
+    releases.append(spec | {'verified_members': len(paths), 'verification': 'Exact explicit allowlist equality; individual original hashes are in archive-index.'})
 save('release-verification.json', {'scope': 'Every explicitly released manifest member reconciled with the archived original bytes, including lossless compressed maps.', 'releases': releases})
 runs = []
 for run in registry['runs']:
@@ -159,6 +183,92 @@ save('stability-and-programs.json', {
     'digest_checks': registry.get('digest_checks', []),
 })
 
+quality = registry.get('quality_receipt')
+if quality:
+    prefix = quality['prefix']
+    before = load(prefix + 'source-before.json.gz')
+    after = load(prefix + 'source-after.json.gz')
+    assert before['sources'] == after['sources'] and before['head'] == after['head'] == quality['head']
+    assert not before['git_status'] and not after['git_status'] and after['unchanged']
+    checks = []
+    for name in list(quality['policy_tests']) + ['pint-operative', 'native-discovery']:
+        command = load(prefix + name + '.command.json')
+        result = load(prefix + name + '.result.json')
+        assert command['head'] == result['head_after'] == quality['head'], name
+        assert result['source_unchanged'] and result['source_count'] == len(before['sources']), name
+        assert command['source_before_sha256'] == sha(raw(prefix + 'source-before.json.gz')), name
+        assert command['runner_sha256'] == sha(raw(prefix + 'run-check.py')), name
+        assert result['exit'] == int(raw(prefix + name + '.exit')) == 0, name
+        if name in quality['policy_tests']:
+            log = raw(prefix + name + '.log').decode()
+            count = int(re.search(r'^Ran (\d+) tests? in ', log, re.M).group(1))
+            assert log.rstrip().endswith('OK') and count == result['selftest_count'] == quality['policy_tests'][name], name
+        checks.append({'name': name, 'exit': result['exit'], 'duration_seconds': result['duration_seconds'],
+                       'policy_test_count': quality['policy_tests'].get(name), 'command_receipt': prefix + name + '.command.json'})
+    selection = load(prefix + 'pint-selection.json')
+    assert len(selection['operative_php']) == quality['style_files']
+    style = load(prefix + 'pint-operative.result.json')
+    assert style['selected_sources_unchanged'] and style['selected_php_files'] == quality['style_files']
+    manifest = load(prefix + 'generated/phpunit-ci-mysql-manifest.json')
+    selected, selected_files = [], set()
+    for shard in manifest['shards']:
+        xml = ET.fromstring(raw(prefix + 'generated/phpunit-ci-mysql-' + str(shard['index']) + '-tests.xml'))
+        cases = [x.get('id') for x in xml.iter() if x.tag.endswith('}testMethod')]
+        assert len(cases) == shard['test_cases'] and cases, shard['index']
+        selected.extend(cases)
+        selected_files.update(shard['files'])
+    assert len(selected) == len(set(selected)) == manifest['selection']['test_cases'] == quality['discovery_cases']
+    assert len(selected_files) == manifest['selection']['files'] == quality['discovery_files']
+    assert len(manifest['shards']) == quality['discovery_shards']
+    source_xml = ET.fromstring(raw(prefix + 'generated/phpunit-ci-mysql-source-tests.xml.gz'))
+    source_cases = {x.get('id') for x in source_xml.iter() if x.tag.endswith('}testMethod')}
+    assert len(source_cases) == manifest['source_test_cases'] and set(selected) <= source_cases
+    assert 'tests/Feature/ProductionMemberOriginals/MemberGrantCurrentSchemaTest.php' not in selected_files
+    assert 'tests/Feature/ProductionMemberOriginals/MemberGrantNativeCurrentSchemaTest.php' in selected_files
+    generated = load(prefix + 'generated-artifacts.json')
+    cleanup = load(prefix + 'generated-cleanup.json')
+    assert generated['expected_count'] == generated['created_count'] == len(generated['files']) == 50
+    for name, expected in generated['files'].items():
+        path = prefix + 'generated/' + name
+        assert sha(raw(path if (HERE / path).exists() else path + '.gz')) == expected, name
+    assert set(generated['files']) == set(cleanup['deleted_exact_names'])
+    assert cleanup['all_deleted_names_absent'] and cleanup['archived_bytes_verified'] and not cleanup['unrelated_files_deleted']
+    save('quality-verification.json', {
+        'scope': 'Offline source, runner, log/exit, exact generated artifact and listing reconciliation. Discovery is selection, not execution of application bodies.',
+        'head': quality['head'], 'source_paths_unchanged': len(before['sources']), 'checks': checks,
+        'policy_tests': sum(quality['policy_tests'].values()), 'style_files': quality['style_files'],
+        'source_cases': len(source_cases), 'selected_cases': len(selected), 'selected_files': len(selected_files),
+        'nonempty_shards': len(manifest['shards']), 'untimed_files_warning': len(manifest['weighting']['untimed_files']),
+        'generated_files_verified': len(generated['files']), 'owner_cleanup_sidecar_verified': True,
+    })
+
+if (HERE / 'operation/reservation-wrapper-carry.json').exists():
+    carry = load('operation/reservation-wrapper-carry.json')
+    old = load('operation/reservation-wrappers-initial.source.json.gz')['source']
+    new = load('operation/composition-fifteen-final.source.json.gz')['source']
+    delta = [{'path': path, 'tested_sha256': digest, 'current_sha256': new.get(path)} for path, digest in old.items() if new.get(path) != digest]
+    assert delta == carry['changed_inputs']
+    for path, digest in carry['selected_tests_and_phase_split_files_unchanged'].items():
+        assert old[path] == new[path] == digest, path
+    comparison = load('operation/retained-deadline-red-green-comparison.json')
+    red = load('operation/retained-deadline-old-bridge-red.source.json.gz')
+    assert sha(raw('operation/retained-deadline-old-inspection.php.txt')) == red['overlay']['sha256'] == comparison['red_source']['sha256']
+    for path, digest in comparison['identical_test_inputs'].items():
+        assert red['source'][path] == new[path] == digest, path
+    assert new['app/Domain/Grants/Member/MemberOriginalInspection.php'] == comparison['fixed_inspection_sha256']
+    for run_id, outcome_key in [('operation/retained-deadline-old-bridge-red', 'old'), ('operation/composition-fifteen-final', 'fixed')]:
+        run = next(x for x in runs if x['id'] == run_id)
+        actual = {x['identity'].replace('\\', '.'): x for x in run['cases']}
+        for case, expected in comparison['cases'].items():
+            assert actual[case]['assertions'] == expected[outcome_key]['assertions']
+            assert actual[case]['status'] == expected[outcome_key]['outcome']
+    save('operation-relations.json', {
+        'scope': 'Independent receipt-to-receipt comparisons. Original wrapper invocation remains at its original source; old Inspection is one class overlay.',
+        'wrapper_original_inputs': len(old), 'wrapper_changed_inputs': delta,
+        'wrapper_selected_unchanged_files': carry['selected_tests_and_phase_split_files_unchanged'],
+        'retained_deadline_same_test_inputs': comparison['identical_test_inputs'], 'retained_deadline_cases': comparison['cases'],
+    })
+
 trees = {}
 blob_hashes = {}
 portable = load('portable-git-map.json') if (HERE / 'portable-git-map.json').exists() else {'references': []}
@@ -219,17 +329,9 @@ def git_hash(ref, path):
 bindings = []
 try:
     for binding in registry['source_bindings']:
-        if binding.get('format') == 'sha256sum':
-            captured = {line.split(None, 1)[1]: line.split(None, 1)[0] for line in raw(binding['source']).decode().splitlines() if line.strip()}
-        else:
-            captured = field(load(binding['source']), binding.get('key'))
-        if binding.get('path_key'):
-            entries = captured if isinstance(captured, list) else [captured]
-            captured = {item[binding['path_key']]: item for item in entries}
-        assert isinstance(captured, dict), binding['id']
+        captured = source_map(binding)
         differences = []
         for path, expected in captured.items():
-            expected = expected[binding['hash_key']] if binding.get('hash_key') else expected
             assert re.fullmatch('[a-f0-9]{64}', expected), (binding['id'], path)
             override = binding.get('overrides', {}).get(path)
             actual = sha(raw(override)) if override else git_hash(binding['reference'], path)
@@ -259,6 +361,24 @@ try:
         for name, expected in manifest['files'].items():
             assert git_hash(spec['reference'], name) == expected, name
         profiles.append(spec | {'members': manifest['files'], 'member_count': len(manifest['files'])})
+    final_comparisons = []
+    final_source = registry.get('integrated_tested_source')
+    prefixes = ('app/', 'bootstrap/', 'config/', 'database/', 'public/', 'resources/', 'routes/', 'scripts/', 'tests/', '.github/workflows/')
+    root_inputs = {'artisan', 'composer.json', 'composer.lock', 'phpunit.xml', 'phpunit.xml.dist', 'package.json', 'package-lock.json', 'vite.config.ts', 'tsconfig.json', '.gitlab-ci.yml'}
+    for spec in registry.get('final_comparisons', []):
+        assert final_source, spec['run']
+        binding = next(x for x in registry['source_bindings'] if x['id'] == spec['binding'])
+        captured = source_map(binding)
+        selected = {path: digest for path, digest in captured.items() if path.startswith(prefixes) or path in root_inputs or path.startswith('phpunit') and path.endswith('.xml')}
+        differences = []
+        for path, expected in selected.items():
+            actual = git_hash(final_source, path)
+            if actual != expected:
+                category = 'application' if path.startswith('app/') else 'test/fixture' if path.startswith('tests/') else 'config/resource/tooling'
+                differences.append({'path': path, 'category': category, 'captured_sha256': expected, 'final_sha256': actual})
+        final_comparisons.append(spec | {'original_reference': binding['reference'], 'captured_paths': len(captured),
+                                         'selected_input_paths': len(selected), 'all_selected_inputs_match_final': not differences,
+                                         'differences': differences})
     portable_checks = []
     for ref, pairs in resolved_pairs.items():
         spec = portable_refs[ref]
@@ -280,6 +400,10 @@ save('source-verification.json', {
     'scope': 'Captured paths compared to actual Git blob bytes or explicitly retained source overrides. A partial comparison remains partial. This does not attest unlisted source or execute a suite.',
     'bindings': bindings, 'frozen_profiles': frozen, 'new_member_profiles': profiles,
     'portable_git_checks': portable_checks,
+})
+save('final-source-verification.json', {
+    'scope': 'Each named captured executable/resource-input selection compared with the explicit integrated target. Differences remain visible; a byte comparison is not a rerun. External probes remain separately identified. Documentation-only inventory entries are excluded from this final carry comparison.',
+    'integrated_tested_source': registry.get('integrated_tested_source'), 'comparisons': final_comparisons,
 })
 
 coverage = {}

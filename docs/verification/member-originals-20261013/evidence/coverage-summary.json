@@ -540,9 +540,7 @@
     }
   ],
   "pending": [
-    "Facts E9 and timestamp corrections archived; operation initial composed canary setup-error receipt and corrected composition release pending.",
-    "Operation and composed integration final source/results pending.",
-    "Root focused quality/discovery and final source comparison pending.",
+    "Root pure107/220, complete SQLite composition15/432 and quality/discovery are archived; root native integration and candidate source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
   ]
 }

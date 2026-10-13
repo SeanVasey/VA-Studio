@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:41.580, Memory: 102.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work
+Original honor must cap detached work.
+Failed asserting that 62042312542569 is equal to 61983827965135 or is less than 61983827965135.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:72
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket
+Expected original retained authority to expire.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:123
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:100
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 43, Failures: 2.

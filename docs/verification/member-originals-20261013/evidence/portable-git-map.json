@@ -1,9 +1,5 @@
 {
   "schema_version": "member-original-evidence-portable-git-v1",
-  "derived_from_root_head": "c2a23b86ab9d6b246387df6338a649061f37adf9",
-  "root_history_commits": 1771,
-  "registry_sha256_at_derivation": "a05589f839d152e2ed33b95422503ef05acd5b4a44e88c8c09d5235f925a1e84",
-  "registry_source_bindings_at_derivation": 42,
   "scope": "Offline equivalence mapping of original Git-reference observations to commits reachable from the recorded root head. Captured historical hashes are not rewritten or promoted; original absent paths remain absent. No application execution or approval claim.",
   "canonical_serialization": "UTF-8 bytes of json.dumps(sorted([path, original_git_blob_sha1_or_null] pairs by path), separators=(',', ':'), ensure_ascii=False); no trailing newline. Path-set digest uses the same JSON options on sorted paths.",
   "resolution_order": [
@@ -15,6 +11,26 @@
     "Rebuild sorted path/blob-or-null pairs and require SHA256 equals original_path_blob_pairs_sha256; when original author objects exist, optionally verify the same digest directly against them.",
     "Compare captured source hashes with resolved actual bytes exactly as before; historical differences and partial comparisons must remain unchanged."
   ],
+  "revision": 2,
+  "supersedes": {
+    "path": "/workspace/runtime/member-original-evidence-portable-git.json",
+    "sha256": "761e8986a600e4d1abb9b990cb514f27107db5788ec44d96efee2bc9e1f06116",
+    "bytes": 40646,
+    "existing_reference_records_preserved": 18
+  },
+  "derived_from_root_head": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+  "root_history_commits": 1777,
+  "registry_sha256_at_derivation": "8447c4f847e764fdda326f0ac1d8a91b17bb21a5de618ffd0b050c7da60ba3d0",
+  "registry_source_bindings_at_derivation": 53,
+  "path_alias_handling": "Apply each source binding path_aliases after path_key/hash_key selection; requested unions and canonical proofs use the aliased repository paths.",
+  "additional_requests_for_preserved_references": {
+    "5bbebd776ca6cce2be4fd0d427f3baa926c2676d": [
+      {
+        "kind": "source_binding",
+        "id": "operation/retained-deadline-old-inspection"
+      }
+    ]
+  },
   "references": [
     {
       "original_reference": "10b8cb250438a4f82b3e5657b2c915c4c13a687b",
@@ -128,6 +144,35 @@
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
+      "original_reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "original_subject": "test: exercise member facts decrypt callback in composition",
+      "default_reachable_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-facts-callback-corrected"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-fifteen-final"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/reservation-clock-wrapper-final"
+        }
+      ],
+      "requested_paths_count": 2034,
+      "original_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
+      "effective_fallback_path_blob_pairs_sha256": "5d76a7e6806159ff36d8485e68e9bec234b9e534c63d03e7c3344d82a1cbd5d9",
+      "requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2034,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
       "original_reference": "3561eee8351d83aec11af996687f4b2d63ea271c",
       "original_subject": "Detach captured member schema configuration values",
       "default_reachable_reference": "910ddf3090a1a9b10eff7861495d37d252ce8e77",
@@ -191,6 +236,27 @@
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
+      "original_reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "original_subject": "Accept exact catalog microsecond timestamps in member facts",
+      "default_reachable_reference": "c2a23b86ab9d6b246387df6338a649061f37adf9",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-canary-timestamp-fixed"
+        }
+      ],
+      "requested_paths_count": 2034,
+      "original_path_blob_pairs_sha256": "a89a1eead1f94f306106fc265e5618624707c9ff7c75ed9dbfbdff2f9a5ff05d",
+      "effective_fallback_path_blob_pairs_sha256": "a89a1eead1f94f306106fc265e5618624707c9ff7c75ed9dbfbdff2f9a5ff05d",
+      "requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2034,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
       "original_reference": "483793065c3f7a66057907a777f938f608bf7036",
       "original_subject": "fix: require native member original filesystem streams",
       "default_reachable_reference": "0bfacbbc0ad970881a0cd8ddb0044d8a69e0fe90",
@@ -225,6 +291,27 @@
       "path_overrides": {},
       "unavailable_paths": {},
       "default_identical_present_paths": 74,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "original_subject": "ci: include facts callback and retained deadline regressions",
+      "default_reachable_reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "default_selection": "original reference reachable from root snapshot",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "root/integrated-pure-4962943d"
+        }
+      ],
+      "requested_paths_count": 1396,
+      "original_path_blob_pairs_sha256": "e1921c9e78a4d2f0ad467a5928285d63fd94070df0222c8e6b6ab784446dc296",
+      "effective_fallback_path_blob_pairs_sha256": "e1921c9e78a4d2f0ad467a5928285d63fd94070df0222c8e6b6ab784446dc296",
+      "requested_sorted_paths_sha256": "beadb72bdcda1ade2ac327ca21e1c9c39c79c732183a837438cb7537be4017ea",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 1396,
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
@@ -380,6 +467,27 @@
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
+      "original_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "original_subject": "test: exercise member facts decrypt callback in composition",
+      "default_reachable_reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "default_selection": "original reference reachable from root snapshot",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "quality/source-before"
+        }
+      ],
+      "requested_paths_count": 2254,
+      "original_path_blob_pairs_sha256": "938f0a515b47ffa90140e6003da436aac857112c52a3b989b5c85cea9cd51481",
+      "effective_fallback_path_blob_pairs_sha256": "938f0a515b47ffa90140e6003da436aac857112c52a3b989b5c85cea9cd51481",
+      "requested_sorted_paths_sha256": "cc91fe4eb4c8e8b6d0d9f99da449fae303975f117818e09190dd244ba7dd26de",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2254,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
       "original_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
       "original_subject": "docs: record C4a merge and member originals implementation contract",
       "default_reachable_reference": "7edd614497b930c5bc02141537cc7e24dce6fb27",
@@ -458,6 +566,56 @@
       },
       "unavailable_paths": {},
       "default_identical_present_paths": 1284,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "original_subject": "fix: carry original member honor and post-finish source deadlines",
+      "default_reachable_reference": "0add9cd20b1e20a51bc2b68cf8cdf405aae73767",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-canary-initial"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/reservation-wrappers-initial"
+        }
+      ],
+      "requested_paths_count": 2006,
+      "original_path_blob_pairs_sha256": "c76da71bf313a20431fe03fed0d38c4c7474313fb59e046cae44d69f9638fd9f",
+      "effective_fallback_path_blob_pairs_sha256": "c76da71bf313a20431fe03fed0d38c4c7474313fb59e046cae44d69f9638fd9f",
+      "requested_sorted_paths_sha256": "de03e1e57d9744360c153d985ac8f62c5e46cdbf151442214ba211604a4c751d",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2006,
+      "all_original_reference_bytes_or_absences_preserved": true
+    },
+    {
+      "original_reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "original_subject": "test: assert retained honor outside renderer error translation",
+      "default_reachable_reference": "1cee974d42adc2c478f443ca3834fed851c2e69c",
+      "default_selection": "nearest root-history commit with exactly matching subject",
+      "requested_by": [
+        {
+          "kind": "source_binding",
+          "id": "operation/retained-deadline-old-bridge-red"
+        },
+        {
+          "kind": "source_binding",
+          "id": "operation/composition-fifteen-initial"
+        }
+      ],
+      "requested_paths_count": 2034,
+      "original_path_blob_pairs_sha256": "93e2d41eeb0ca055dcebac3532314c1f838bd65b47d948444256cf77652b2dc5",
+      "effective_fallback_path_blob_pairs_sha256": "93e2d41eeb0ca055dcebac3532314c1f838bd65b47d948444256cf77652b2dc5",
+      "requested_sorted_paths_sha256": "82fa176859f52284bd8e144c39496fb896eb8197975043d05cf1b802c382f3a8",
+      "absent_paths": [],
+      "path_overrides": {},
+      "unavailable_paths": {},
+      "default_identical_present_paths": 2034,
       "all_original_reference_bytes_or_absences_preserved": true
     },
     {
@@ -773,9 +931,9 @@
     }
   ],
   "summary": {
-    "original_references": 18,
-    "requested_reference_path_pairs": 56452,
-    "default_identical_present_paths": 56369,
+    "original_references": 24,
+    "requested_reference_path_pairs": 68210,
+    "default_identical_present_paths": 68127,
     "path_overrides": 35,
     "original_absences": 48,
     "unavailable_paths": 0

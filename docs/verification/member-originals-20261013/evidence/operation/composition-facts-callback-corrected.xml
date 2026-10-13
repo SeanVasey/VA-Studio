@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php" tests="1" assertions="25" errors="0" failures="0" skipped="0" time="18.482809">
+    <testcase name="test_facts_callback_cannot_withdraw_catalog_after_reservation_admission" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php" line="152" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalCompositionTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalCompositionTest" assertions="25" time="18.482809"/>
+  </testsuite>
+</testsuites>

@@ -1,6 +1,6 @@
 # C4b source and invocation map
 
-Renderer final source is `483793065c3f7a66057907a777f938f608bf7036`. Its final four-file run passes **76 tests / 243 assertions**, with zero errors, failures or skips and exit 0. This is a renderer component execution; an integrated C4b suite is pending. The evidence worktree begins at root `3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8`, not at that component commit.
+Renderer final source is `483793065c3f7a66057907a777f938f608bf7036`. Its final four-file run passes **76 tests / 243 assertions**, with zero errors, failures or skips and exit 0. This is a renderer component execution; later composed operation and integrated unit selections are recorded below as separate invocations. The evidence worktree begins at root `3b23aa3d4edfc2bbbd0891d9272a9fc3c0ae51e8`, not at that component commit.
 
 ## Renderer results
 
@@ -33,7 +33,7 @@ Counts overlap; they must not be summed as one suite. `unknown` means the origin
 
 The renderer owner inventory records all 32 changed implementation, fixture, test and imported dependency entries from baseline `7edd614497b930c5bc02141537cc7e24dce6fb27`. [Source verification](evidence/source-verification.json) compares each hash with actual Git blob bytes at the final renderer commit. It is a complete baseline-diff inventory, not a contemporaneous full-tree before/after capture. The owner's clean final worktree and execution statement remain separately identified in the released README.
 
-Original author commit labels remain unchanged throughout the packet. For public-checkout portability, [the explicit fallback map](evidence/portable-git-map.json) resolves equivalent path bytes from root history reachable at `c2a23b86ab9d6b246387df6338a649061f37adf9`. Canonical fingerprints cover all 56,452 requested path/blob pairs across 18 original refs. Thirty-five per-path overrides and 48 original absences preserve the original comparison results exactly, including the 14 partial historical comparisons. This is selected-path equivalence, not whole-tree equivalence or a reassignment of old runs to root source. The verifier does not require an unpublished author branch.
+Original author commit labels remain unchanged throughout the packet. For public-checkout portability, [the explicit fallback map](evidence/portable-git-map.json) resolves equivalent path bytes from root history reachable at `f4732dbe21b9e40eb386b6115be1283ff563f511`. Canonical fingerprints cover all 68,210 requested path/blob pairs across 24 original refs. Thirty-five per-path overrides and 48 original absences preserve the original comparison results exactly, including the 14 partial historical comparisons. This is selected-path equivalence, not whole-tree equivalence or a reassignment of old runs to root source. The verifier does not require an unpublished author branch.
 
 Nine additional comparisons verify retrospective E1, E6/E8 and E7 old/fixed implementation/test capsule hashes against their declared Git references. They do not reconstruct every historical running tree. E6/E8 red XML identifies test methods at lines 205/223, while the retained corrective test file identifies them at 198/216; therefore that corrective file does not establish the exact red-run test bytes. Original E1/E6/E8 full shell invocations were not retained; the README explicitly supplies reproduction commands instead. E1 and E7 failure locations are consistent with their named source mappings, but that consistency is not an independent historical environment capture.
 
@@ -101,4 +101,37 @@ The initial issuer invocation used a fixture class as a trait and died before te
 
 The first budget/I/O full map matches all 1,942 captured inputs at `c7310cda`. Committed issuer/frame source `5bbebd776ca6cce2be4fd0d427f3baa926c2676d` matches all 2,003 captured inputs. Twelve other full checkpoint comparisons remain partial because of draft composition files or intervening implementation/test changes. The five narrow owner-selected binding receipts match every named file at their exact dependency commits. All retained operation runner bytes independently match captured hashes, and completed invocations retain owner unchanged-source sidecars; those are not described as independent full before/after maps.
 
-Eleven migration-backed composition cases and the final integrated candidate were not executed by this checkpoint release. Later E10/E11/observer review corrections are pending. Root source will advance during integration; component passes will be compared against the final candidate without being relabelled as reruns. CI policy/discovery, integrated native execution, independent review and exact-head preflight remain separate records.
+Eleven migration-backed composition cases were unexecuted at that checkpoint. The later frozen release below supplies actual migration-backed execution after E10/E11 and observer corrections. Checkpoint pending language remains historical; no earlier invocation is relabelled as a later rerun.
+
+## Root exact unit selection
+
+Root source `4962943d366b54c9e3b85e16ef1f747bf6eb09c0` passes nine changed unit files: **107 tests / 220 assertions**, zero errors/failures/skips, exit 0. All 1,396 captured source hashes independently match that reachable root commit. The retained runner hash matches, the source receipt records clean status and an all-true Git comparison, and the result reports no changed sources. This is exact integrated unit execution, not a composed preparation or native result. Later CI selection changes are not reruns of these unit cases. Root native execution and final source carry remain pending. Policy/discovery completion is recorded separately below.
+
+## Complete SQLite composition
+
+The frozen [operation command narrative](evidence/operation/commands.md) and source/result/exit/XML receipts retain all eight later invocations. They use SQLite; the portable clock selection excludes its native-only sibling without counting an unselected case as a skip.
+
+| Invocation | Tests / assertions | Errors | Failures | Skips | Exit | Source boundary |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| composition-canary-initial | 1 / 16 | 1 | 0 | 0 | 2 | Exact `9d8abd45`; timestamp setup error before operation, not expected red |
+| reservation-wrappers-initial | 17 / 345 | 0 | 0 | 0 | 0 | Exact `9d8abd45`; all 2,006 inputs match |
+| composition-canary-timestamp-fixed | 1 / 48 | 0 | 0 | 0 | 0 | Exact `43e58632`; all 2,034 inputs match |
+| retained-deadline-old-bridge-red | 2 / 43 | 0 | 2 | 0 | 1 | Supporting `a082d3b3` plus exact old `5bbebd77` Inspection preload |
+| composition-fifteen-initial | 9 / 269 | 0 | 1 | 0 | 1 | Exact `a082d3b3`; fail-fast, inert Carbon test hook |
+| composition-facts-callback-corrected | 1 / 25 | 0 | 0 | 0 | 0 | One test-file precommit overlay over `a082d3b3`; all bytes match `2cfd9a0d` |
+| composition-fifteen-final | 15 / 432 | 0 | 0 | 0 | 0 | Exact `2cfd9a0d`; all 2,034 inputs match |
+| reservation-clock-wrapper-final | 1 / 18 | 0 | 0 | 0 | 0 | Same exact `2cfd9a0d`; all 2,034 inputs match |
+
+Final author source is `2cfd9a0db46a806c0a0bd0c83839b5b584fc3627`. The complete selection comprises real candidate/retry integration 4 / 148, composed boundaries 9 / 228 and retained deadlines 2 / 56. Recorded wall durations are 314.484 seconds for that selection and 13.044 seconds for the separate clock case. Runner hashes and unchanged-source result sidecars independently reconcile; unlisted runtime dependencies are not supplied by the Git comparison.
+
+[Operation relations](evidence/operation-relations.json) independently compares the earlier 17 wrapper cases with final captured bytes: 2,003 of 2,006 captured inputs remain identical. The timestamp validator and two operation test files differ; every changed path/hash remains visible. All seven named reservation implementation/wrapper/fixture files remain identical. This supports a bounded source carry, not a 17-case rerun on final source or one combined 33-case run.
+
+The retained-deadline red executes only the exact old Inspection class, SHA-256 `9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f`, over the current supporting tree. Its two test inputs are byte-identical to the final fixed tests. The same cases move from 2 / 43 with two failures to 2 / 56 passing within the whole 15-case run. These narrowed private-cap fixtures establish original honor/invoice-window preservation; they do not claim measured physical elapsed time or native MySQL behavior. The archived overlay plan's “prepared, not executed” label is its historical preparation status; actual source/result/exit receipts establish the subsequent execution.
+
+The first 15-case attempt stopped after nine cases because a proposed Carbon callback was never invoked, so its facts mutation never happened. The correction uses the real retained-record decrypt callback, asserts refusal and rollback, and changes only the test. The initial eight passing leaves remain inside the failed invocation rather than becoming a separate green run.
+
+## Root policy, style and discovery
+
+At exact root `78ef16be7626c81de49d103d581551b707201eda`, four policy self-test suites pass 52, 61, 32 and 14 tests respectively, totaling 159. Pint passes all 78 operative changed PHP paths. The 32 historical archived PHP capsules are deliberately excluded from formatting, preserving their original bytes. All six commands exit 0 and all 2,254 captured source hashes match Git and before/after receipts. [Quality verification](evidence/quality-verification.json) independently reconciles those results and retained runner identities.
+
+Native selection discovery lists 2,143 selected cases in 210 files from 8,475 discovered cases in 625 files, across 24 nonempty shards. The 47 untimed-file warning remains visible; fallback weights are not measured durations. Discovery runs no application/database bodies, and selection-policy skips are not runtime skips. Pure SQLite schema cases remain unselected on MySQL while their real native counterparts are selected. The 50 exact generated listings/configurations/manifest are archived and hash-verified; the owner records exact cleanup with no unrelated deletion. [Quality commands](evidence/quality/commands.md) supplies the original full argv and environment context.

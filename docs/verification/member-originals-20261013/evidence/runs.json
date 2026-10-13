@@ -937,6 +937,167 @@
         "skipped": 0,
         "exit": 0
       }
+    },
+    {
+      "id": "root/integrated-pure-4962943d",
+      "driver": "none",
+      "xml": "root/pure-4962943d/integrated-pure-4962943d.xml",
+      "exit_file": "root/pure-4962943d/integrated-pure-4962943d.exit",
+      "command_receipt": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "command_status": "Exact original argv plus public environment; no migration or native test body.",
+      "source_binding": "root/integrated-pure-4962943d",
+      "expected": {
+        "tests": 107,
+        "assertions": 220,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-canary-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-canary-initial.xml",
+      "exit_file": "operation/composition-canary-initial.exit",
+      "command_receipt": "operation/composition-canary-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-canary-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
+    },
+    {
+      "id": "operation/reservation-wrappers-initial",
+      "driver": "sqlite",
+      "xml": "operation/reservation-wrappers-initial.xml",
+      "exit_file": "operation/reservation-wrappers-initial.exit",
+      "command_receipt": "operation/reservation-wrappers-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/reservation-wrappers-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 17,
+        "assertions": 345,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-canary-timestamp-fixed",
+      "driver": "sqlite",
+      "xml": "operation/composition-canary-timestamp-fixed.xml",
+      "exit_file": "operation/composition-canary-timestamp-fixed.exit",
+      "command_receipt": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-canary-timestamp-fixed",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 48,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/retained-deadline-old-bridge-red",
+      "driver": "sqlite",
+      "xml": "operation/retained-deadline-old-bridge-red.xml",
+      "exit_file": "operation/retained-deadline-old-bridge-red.exit",
+      "command_receipt": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/retained-deadline-old-bridge-red",
+      "scope": "Supporting tree plus exact old Inspection preload; not whole old source.",
+      "expected": {
+        "tests": 2,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "operation/composition-fifteen-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-fifteen-initial.xml",
+      "exit_file": "operation/composition-fifteen-initial.exit",
+      "command_receipt": "operation/composition-fifteen-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-fifteen-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 9,
+        "assertions": 269,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "operation/composition-facts-callback-corrected",
+      "driver": "sqlite",
+      "xml": "operation/composition-facts-callback-corrected.xml",
+      "exit_file": "operation/composition-facts-callback-corrected.exit",
+      "command_receipt": "operation/composition-facts-callback-corrected.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-facts-callback-corrected",
+      "scope": "Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 25,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/composition-fifteen-final",
+      "driver": "sqlite",
+      "xml": "operation/composition-fifteen-final.xml",
+      "exit_file": "operation/composition-fifteen-final.exit",
+      "command_receipt": "operation/composition-fifteen-final.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-fifteen-final",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 15,
+        "assertions": 432,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "operation/reservation-clock-wrapper-final",
+      "driver": "sqlite",
+      "xml": "operation/reservation-clock-wrapper-final.xml",
+      "exit_file": "operation/reservation-clock-wrapper-final.exit",
+      "command_receipt": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/reservation-clock-wrapper-final",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
     }
   ],
   "source_bindings": [
@@ -1384,6 +1545,121 @@
       "reference": "5d6c58da50267a636e393ce3754ef473516923aa",
       "require_exact": true,
       "scope": "Five captured old formatter/document dependencies; external regression file is separately retained, not in committed old source."
+    },
+    {
+      "id": "root/integrated-pure-4962943d",
+      "source": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "4962943d366b54c9e3b85e16ef1f747bf6eb09c0",
+      "require_exact": true,
+      "scope": "Root exact-source changed-unit selection captured inputs; clean Git state and owner unchanged-source sidecar. Unit execution only."
+    },
+    {
+      "id": "operation/composition-canary-initial",
+      "source": "operation/composition-canary-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/reservation-wrappers-initial",
+      "source": "operation/reservation-wrappers-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "9d8abd4501b75a2577dc6f72a6a2adb4b6afbf5a",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/composition-canary-timestamp-fixed",
+      "source": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "43e58632d87977b467f58fde0feeef47b6a89dcc",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/retained-deadline-old-bridge-red",
+      "source": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Supporting tree only; exact executed old class is separately bound and overlaid."
+    },
+    {
+      "id": "operation/composition-fifteen-initial",
+      "source": "operation/composition-fifteen-initial.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "a082d3b394d071538cc65057074c1d06a7f6c994",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/composition-facts-callback-corrected",
+      "source": "operation/composition-facts-callback-corrected.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison. Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit."
+    },
+    {
+      "id": "operation/composition-fifteen-final",
+      "source": "operation/composition-fifteen-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/reservation-clock-wrapper-final",
+      "source": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "key": [
+        "source"
+      ],
+      "reference": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+      "require_exact": true,
+      "scope": "Complete captured input inventory. The native/runtime environment and unlisted dependencies are not supplied by this Git comparison."
+    },
+    {
+      "id": "operation/retained-deadline-old-inspection",
+      "source": "operation/retained-deadline-red-green-comparison.json",
+      "key": [
+        "red_source"
+      ],
+      "path_key": "path",
+      "hash_key": "sha256",
+      "path_aliases": {
+        "/workspace/runtime/member-original-operation-evidence/retained-deadline-old-inspection.php.txt": "app/Domain/Grants/Member/MemberOriginalInspection.php"
+      },
+      "reference": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+      "require_exact": true,
+      "scope": "Exact single old preloaded class; supporting tree is a082, not an old whole-source run."
+    },
+    {
+      "id": "quality/source-before",
+      "source": "quality/source-before.json.gz",
+      "key": [
+        "sources"
+      ],
+      "reference": "78ef16be7626c81de49d103d581551b707201eda",
+      "require_exact": true,
+      "scope": "Exact quality/discovery root inventory; no application body execution."
     }
   ],
   "frozen_profiles": [
@@ -1396,9 +1672,7 @@
     "renderer/lane-combined-final"
   ],
   "pending": [
-    "Facts E9 and timestamp corrections archived; operation initial composed canary setup-error receipt and corrected composition release pending.",
-    "Operation and composed integration final source/results pending.",
-    "Root focused quality/discovery and final source comparison pending.",
+    "Root pure107/220, complete SQLite composition15/432 and quality/discovery are archived; root native integration and candidate source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
   ],
   "release_manifests": [
@@ -1443,6 +1717,29 @@
         "files"
       ],
       "prefix": "facts/"
+    },
+    {
+      "receipt": "root/pure-4962943d/public-release-pure.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "root/pure-4962943d/",
+      "absolute_paths": true
+    },
+    {
+      "receipt": "operation/final-artifacts.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "operation/"
+    },
+    {
+      "receipt": "quality/artifact-digests.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "quality/",
+      "hash_values": true
     }
   ],
   "component_slices": [
@@ -1555,6 +1852,60 @@
       "source": "operation/source-values-initial.source.json.gz",
       "runner": "operation/run-focused-before-empty-xml.py.txt",
       "result": "operation/source-values-initial.result.json"
+    },
+    {
+      "run": "root/integrated-pure-4962943d",
+      "source": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "runner": "root/pure-4962943d/run-native-focused.py",
+      "result": "root/pure-4962943d/integrated-pure-4962943d.result.json"
+    },
+    {
+      "run": "operation/composition-canary-initial",
+      "source": "operation/composition-canary-initial.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/composition-canary-initial.result.json"
+    },
+    {
+      "run": "operation/reservation-wrappers-initial",
+      "source": "operation/reservation-wrappers-initial.source.json.gz",
+      "runner": "operation/run-focused.py",
+      "result": "operation/reservation-wrappers-initial.result.json"
+    },
+    {
+      "run": "operation/composition-canary-timestamp-fixed",
+      "source": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-canary-timestamp-fixed.result.json"
+    },
+    {
+      "run": "operation/retained-deadline-old-bridge-red",
+      "source": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "runner": "operation/run-retained-deadline-overlay.py",
+      "result": "operation/retained-deadline-old-bridge-red.result.json"
+    },
+    {
+      "run": "operation/composition-fifteen-initial",
+      "source": "operation/composition-fifteen-initial.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-fifteen-initial.result.json"
+    },
+    {
+      "run": "operation/composition-facts-callback-corrected",
+      "source": "operation/composition-facts-callback-corrected.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-facts-callback-corrected.result.json"
+    },
+    {
+      "run": "operation/composition-fifteen-final",
+      "source": "operation/composition-fifteen-final.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/composition-fifteen-final.result.json"
+    },
+    {
+      "run": "operation/reservation-clock-wrapper-final",
+      "source": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "runner": "operation/run-composed.py",
+      "result": "operation/reservation-clock-wrapper-final.result.json"
     }
   ],
   "before_after_receipts": [
@@ -1749,6 +2100,39 @@
         "fixed"
       ],
       "artifact": "facts/facts-review/repository-test-source.php"
+    },
+    {
+      "receipt": "operation/retained-deadline-red-green-comparison.json",
+      "key": [
+        "red_source",
+        "sha256"
+      ],
+      "artifact": "operation/retained-deadline-old-inspection.php.txt"
     }
-  ]
+  ],
+  "allowlist_receipts": [
+    {
+      "receipt": "quality/public-artifacts.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "quality/",
+      "expected_members": 88
+    }
+  ],
+  "quality_receipt": {
+    "prefix": "quality/",
+    "head": "78ef16be7626c81de49d103d581551b707201eda",
+    "policy_tests": {
+      "policy-phpunit-shards": 52,
+      "policy-database-receipts": 61,
+      "policy-gitlab-database-receipts": 32,
+      "policy-workflow-cadence": 14
+    },
+    "style_files": 78,
+    "historical_capsules_excluded": 32,
+    "discovery_cases": 2143,
+    "discovery_files": 210,
+    "discovery_shards": 24
+  }
 }

@@ -4535,6 +4535,1009 @@
           "status": "passed"
         }
       ]
+    },
+    {
+      "id": "root/integrated-pure-4962943d",
+      "driver": "none",
+      "xml": "root/pure-4962943d/integrated-pure-4962943d.xml",
+      "exit_file": "root/pure-4962943d/integrated-pure-4962943d.exit",
+      "command_receipt": "root/pure-4962943d/integrated-pure-4962943d.source.json.gz",
+      "command_status": "Exact original argv plus public environment; no migration or native test body.",
+      "source_binding": "root/integrated-pure-4962943d",
+      "expected": {
+        "tests": 107,
+        "assertions": 220,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 107,
+      "assertions": 220,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #0",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #1",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #2",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_original_installed_ddl_is_byte_identical_without_a_database_or_application with data set #3",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_callers_cannot_adopt_a_snapshot_or_select_arbitrary_tables",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_driver_lookup_also_requires_issuance",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_snapshots_do_not_serialize",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baselines_detach_nested_caller_held_references",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baseline_refuses_recursive_values_with_a_bounded_depth",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantExpectedPlanTest::test_configuration_baseline_refuses_application_objects",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_native_printing_parentheses_keyword_case_and_exact_enum_introducers_are_allowed",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"engine\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"table collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"column collation\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal case\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"literal whitespace\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"boolean grouping\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"check disabled\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"counter\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"extra key\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"different unique\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_semantic_or_unowned_printer_changes_are_refused with data set \"default\"",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_trigger_definer_is_the_only_ignored_header_and_literal_bytes_remain_owned",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberGrantSqlDefinitionTest::test_sqlite_comparison_preserves_literal_whitespace_and_identifier_case",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_one_native_monotonic_workflow_cap_can_only_shorten",
+          "assertions": 10,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_copied_or_serialized_into_another_workflow",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalBudgetTest::test_budget_cannot_be_restored_with_a_caller_selected_deadline",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_pure_value_preserves_exact_terms_and_canonical_hash_without_authority",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"unknown key\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"purpose\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"uuid v5\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"source hash\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer string\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"buyer negative\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date invalid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"date inferred format\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_wrong_or_extra_input_is_refused with data set \"provenance\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_selection_cannot_substitute_different_original_terms",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_unbounded_depth_is_refused_before_canonical_encoding",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalRenderInputTest::test_oversized_authored_source_is_refused_without_truncation",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority",
+          "assertions": 9,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_nested_caller_references_and_returned_arrays_cannot_mutate_retained_source",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_historical_identity_observation_remains_in_the_semantic_source_hash",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_fresh_observation_fields_are_not_accepted_as_render_source_members",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalSourceValuesTest::test_changed_definition_profile_selection_and_owner_relations_refuse",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_exact_multiline_terms_are_escaped_and_every_source_field_is_present",
+          "assertions": 12,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_unrepresentable_text_fails_without_a_substitute with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\MemberOriginalTextTest::test_supported_greek_cyrillic_and_latin_remain_exact",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #0",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #1",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #2",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #3",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #7",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #8",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #9",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #10",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #11",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_authored_source_at_the_released_renderer_limit_is_retained_exactly",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source exceeds member renderer capacity\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-canary-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-canary-initial.xml",
+      "exit_file": "operation/composition-canary-initial.exit",
+      "command_receipt": "operation/composition-canary-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-canary-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 16,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 16,
+          "status": "error"
+        }
+      ]
+    },
+    {
+      "id": "operation/reservation-wrappers-initial",
+      "driver": "sqlite",
+      "xml": "operation/reservation-wrappers-initial.xml",
+      "exit_file": "operation/reservation-wrappers-initial.exit",
+      "command_receipt": "operation/reservation-wrappers-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/reservation-wrappers-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 17,
+        "assertions": 345,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 17,
+      "assertions": 345,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+          "assertions": 21,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_last_credit_refusal_keeps_exactly_the_first_redemption_and_reserve_event",
+          "assertions": 18,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_eligible_selection",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_reused_key_cannot_adopt_another_actually_awarded_paid_period",
+          "assertions": 18,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_release_requires_honor_expiry_then_is_idempotent_and_preserves_award_replay",
+          "assertions": 20,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_available_expiry_preserves_reserved_credit_and_a_later_release_never_restores_it",
+          "assertions": 21,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities",
+          "assertions": 17,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event",
+          "assertions": 17,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects",
+          "assertions": 18,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation",
+          "assertions": 16,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+          "assertions": 20,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate",
+          "assertions": 20,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back",
+          "assertions": 17,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection",
+          "assertions": 20,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission",
+          "assertions": 31,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture",
+          "assertions": 22,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative",
+          "assertions": 25,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-canary-timestamp-fixed",
+      "driver": "sqlite",
+      "xml": "operation/composition-canary-timestamp-fixed.xml",
+      "exit_file": "operation/composition-canary-timestamp-fixed.exit",
+      "command_receipt": "operation/composition-canary-timestamp-fixed.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-canary-timestamp-fixed",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 48,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 48,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 48,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/retained-deadline-old-bridge-red",
+      "driver": "sqlite",
+      "xml": "operation/retained-deadline-old-bridge-red.xml",
+      "exit_file": "operation/retained-deadline-old-bridge-red.exit",
+      "command_receipt": "operation/retained-deadline-old-bridge-red.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/retained-deadline-old-bridge-red",
+      "scope": "Supporting tree plus exact old Inspection preload; not whole old source.",
+      "expected": {
+        "tests": 2,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 2,
+      "assertions": 43,
+      "errors": 0,
+      "failures": 2,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work",
+          "assertions": 22,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket",
+          "assertions": 21,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-fifteen-initial",
+      "driver": "sqlite",
+      "xml": "operation/composition-fifteen-initial.xml",
+      "exit_file": "operation/composition-fifteen-initial.exit",
+      "command_receipt": "operation/composition-fifteen-initial.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-fifteen-initial",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 9,
+        "assertions": 269,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 9,
+      "assertions": 269,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 48,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_after_commit_owner_withdrawal_returns_no_candidate_and_never_starts_the_renderer",
+          "assertions": 27,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_returned_candidate_values_cannot_be_reused_as_authority_after_source_withdrawal",
+          "assertions": 43,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary",
+          "assertions": 26,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission",
+          "assertions": 17,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-facts-callback-corrected",
+      "driver": "sqlite",
+      "xml": "operation/composition-facts-callback-corrected.xml",
+      "exit_file": "operation/composition-facts-callback-corrected.exit",
+      "command_receipt": "operation/composition-facts-callback-corrected.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-facts-callback-corrected",
+      "scope": "Only MemberOriginalCompositionTest.php differed from captured HEAD; exact tested bytes match this later test-only commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 25,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 25,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission",
+          "assertions": 25,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/composition-fifteen-final",
+      "driver": "sqlite",
+      "xml": "operation/composition-fifteen-final.xml",
+      "exit_file": "operation/composition-fifteen-final.exit",
+      "command_receipt": "operation/composition-fifteen-final.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/composition-fifteen-final",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 15,
+        "assertions": 432,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 15,
+      "assertions": 432,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 48,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_after_commit_owner_withdrawal_returns_no_candidate_and_never_starts_the_renderer",
+          "assertions": 27,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_returned_candidate_values_cannot_be_reused_as_authority_after_source_withdrawal",
+          "assertions": 43,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_actual_final_frame_readiness_is_issuer_bound_and_its_capture_is_retired_before_return",
+          "assertions": 30,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_workflow_budget_can_be_consumed_before_producers_but_never_renewed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_original_physical_cap_is_carried_into_the_fresh_final_commit_boundary",
+          "assertions": 26,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_completed_regular_commit_cannot_renew_the_original_materialization_cap",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_facts_callback_cannot_withdraw_catalog_after_reservation_admission",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_reservation_callback_cannot_withdraw_member_configuration_before_its_raw_closure",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_final_committed_callback_hook_is_refused_before_shared_finish_can_execute_it",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest::test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission",
+          "assertions": 25,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work",
+          "assertions": 29,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket",
+          "assertions": 27,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "operation/reservation-clock-wrapper-final",
+      "driver": "sqlite",
+      "xml": "operation/reservation-clock-wrapper-final.xml",
+      "exit_file": "operation/reservation-clock-wrapper-final.exit",
+      "command_receipt": "operation/reservation-clock-wrapper-final.source.json.gz",
+      "command_status": "Original full argv/public environment retained; operation/commands.md supplies shell context.",
+      "source_binding": "operation/reservation-clock-wrapper-final",
+      "scope": "Exact full captured inventory at stated author commit.",
+      "expected": {
+        "tests": 1,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 1,
+      "assertions": 18,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check",
+          "assertions": 18,
+          "status": "passed"
+        }
+      ]
     }
   ],
   "component_slices": [
