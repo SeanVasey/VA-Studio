@@ -51,6 +51,14 @@ final class BillingSchema
         (new BillingAwardFence)->assertOwned($pdo);
     }
 
+    /** New writers and authority readers never accept baseline or partial263 ownership. */
+    public function assertRetrievalOwned(PDO $pdo): void
+    {
+        BillingException::require(DB::connection()->getPdo() === $pdo, 'changed_connection');
+        $this->inspect(false, false, false, BillingRetrievalSchema::COMPLETE);
+        (new BillingAwardFence)->assertOwned($pdo);
+    }
+
     /** Migration 262 must recheck the historical graph while its native table locks are held. */
     public function assertRetainedGraph(PDO $pdo, bool $tablesLocked = false): void
     {
@@ -64,7 +72,7 @@ final class BillingSchema
     }
 
     /** Only the explicit successor may admit the exact old six-table graph without the new interval guards. */
-    private function inspect(bool $ddl, bool $intervalUpgrade, bool $billingTablesLocked = false): void
+    private function inspect(bool $ddl, bool $intervalUpgrade, bool $billingTablesLocked = false, ?int $retrievalStage = null): void
     {
         $pdo = DB::connection()->getPdo();
         $driver = DB::getDriverName();
@@ -93,8 +101,9 @@ final class BillingSchema
                 }
             }
         }
+        $retrievalStage ??= $this->hasRetrievalColumns($pdo, $driver) ? BillingRetrievalSchema::COMPLETE : 0;
         $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
-        $this->assertNamespace($pdo, $driver, $billingTablesLocked, $catalog);
+        $this->assertNamespace($pdo, $driver, $billingTablesLocked, $catalog, $retrievalStage);
         // The later fence is optional for historical migrations, but never an unowned extra trigger.
         (new BillingAwardFence)->assertEventGuardIfPresent($pdo, $billingTablesLocked);
         $plans = [];
@@ -103,9 +112,9 @@ final class BillingSchema
         foreach (self::TABLES as $logical) {
             $table = $this->table($logical);
             $name = DB::connection()->getTablePrefix().$logical;
-            $definition = $this->definition($logical, $driver);
+            $definition = $this->definition($logical, $driver, $retrievalStage);
             $create = 'CREATE TABLE '.$table.' ('.$definition['sql'].')'.($driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin' : '');
-            $guards = $this->guards($logical, $driver, $name, $table);
+            $guards = $this->guards($logical, $driver, $name, $table, $retrievalStage);
             $allowedGuards = array_keys($guards);
             if ($logical === self::TABLES[3]) {
                 $allowedGuards[] = (new BillingAwardFence)->eventGuardName();
@@ -124,7 +133,14 @@ final class BillingSchema
                 if ($actual !== false) {
                     BillingException::require($actual['type'] === 'table' && $this->sql($actual['sql']) === $this->sql(str_replace('main.', '', $create)), 'schema');
                     $indexes = $pdo->query('PRAGMA main.index_list("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC);
-                    BillingException::require(count($indexes) === $this->autoindexes($logical, $driver), 'schema');
+                    BillingException::require(count($indexes) === $this->autoindexes($logical, $driver) + count($definition['extra_unique']), 'schema');
+                    foreach ($definition['extra_unique'] as $suffix => $parts) {
+                        $index = $name.'_'.$suffix;
+                        $matches = array_values(array_filter($indexes, fn (array $row): bool => $row['name'] === $index));
+                        BillingException::require(count($matches) === 1 && $matches[0]['unique'] === 1 && $matches[0]['origin'] === 'c' && $matches[0]['partial'] === 0, 'schema');
+                        $actualParts = $pdo->query('PRAGMA main.index_info("'.$index.'")')->fetchAll(PDO::FETCH_ASSOC);
+                        BillingException::require(array_column($actualParts, 'name') === $parts, 'schema');
+                    }
                 }
                 $statement = $pdo->prepare("SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND tbl_name = ?");
                 $statement->execute([$name]);
@@ -219,7 +235,7 @@ final class BillingSchema
         return $logical;
     }
 
-    private function definition(string $logical, string $driver): array
+    private function definition(string $logical, string $driver, int $retrievalStage = 0): array
     {
         $name = $this->physical($logical);
         $ascii = $driver === 'mysql' ? ' CHARACTER SET ascii COLLATE ascii_bin' : ' COLLATE BINARY';
@@ -300,11 +316,13 @@ final class BillingSchema
             $sql .= ', CONSTRAINT '.$quote.$name.'_f'.$index.$quote.' FOREIGN KEY ('.$column.') REFERENCES '.$quote.$this->physical($foreign[$column]).$quote.' (id) ON UPDATE RESTRICT ON DELETE RESTRICT';
         }
 
-        return compact('sql', 'columns', 'primary', 'unique', 'check', 'foreign');
+        return (new BillingRetrievalSchema)->definition(compact('sql', 'columns', 'primary', 'unique', 'check', 'foreign'), $logical, $driver, $retrievalStage);
     }
 
-    private function guards(string $logical, string $driver, string $name, string $table): array
+    private function guards(string $logical, string $driver, string $name, string $table, int $retrievalStage = 0): array
     {
+        $retrieval = new BillingRetrievalSchema;
+        $state = $retrieval->state($retrievalStage)['guards'][$logical] ?? [];
         $subscriptions = $this->table(self::TABLES[0]);
         $invoices = $this->table(self::TABLES[1]);
         $observations = $this->table(self::TABLES[2]);
@@ -339,7 +357,8 @@ final class BillingSchema
                 .' AND NOT EXISTS (SELECT 1 FROM '.$observations.' WHERE invoice_id = NEW.invoice_id AND sequence = NEW.sequence)'
                 .' AND NEW.sequence = COALESCE((SELECT MAX(sequence) FROM '.$observations.' WHERE invoice_id = NEW.invoice_id), 0) + 1'
                 ." AND ((NEW.sequence = 1 AND NEW.prior_seal = '".str_repeat('0', 64)."')"
-                .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND o.created_at <= NEW.created_at'
+                .' OR EXISTS (SELECT 1 FROM '.$observations.' o WHERE o.invoice_id = NEW.invoice_id AND o.sequence = NEW.sequence - 1 AND o.seal = NEW.prior_seal AND '
+                .(($state['insert'] ?? null) === 'current' ? '(('.$retrieval->legacyCondition($logical, 'o').') OR o.created_at <= NEW.created_at)' : 'o.created_at <= NEW.created_at')
                 // Only a read that began after the tail's read ended can become the tail (review R-6). A start position allocated before
                 // a read does not order the reads themselves, so the new start is compared with the tail's END: an overlapping read may
                 // have seen older provider state than the tail. Positions, never a worker clock (Codex P1 on PR #54, L2-3 and :42).
@@ -362,7 +381,7 @@ final class BillingSchema
         } else {
             // Only the database allocates a position: before the insert an unassigned AUTO_INCREMENT id reads 0 on MySQL and -1 on
             // SQLite, while an explicit id (which could back-date a position into a gap) reads as itself and is refused.
-            $insert = 'NEW.id < 1';
+            $insert = ($state['insert'] ?? null) === 'current' ? $retrieval->positionCondition($driver) : 'NEW.id < 1';
         }
         $result = [];
         foreach (['insert' => $insert, 'update' => '0 = 1', 'delete' => '0 = 1'] as $event => $condition) {
@@ -376,14 +395,20 @@ final class BillingSchema
 
         if (in_array($logical, [self::TABLES[2], self::TABLES[5]], true)) {
             $guard = $name.'_interval';
-            $result[$guard] = $this->intervalGuard($driver, $guard, $table);
+            $result[$guard] = $this->intervalGuard($driver, $guard, $table, ($state['interval'] ?? null) === 'current');
+        }
+
+        foreach ($state as $event => $version) {
+            if ($version === 'absent') {
+                unset($result[$name.'_'.$event]);
+            }
         }
 
         return $result;
     }
 
     /** Both raw insert paths lock the same positions, then current-read the opposite ledger. */
-    private function intervalGuard(string $driver, string $guard, string $table): array
+    private function intervalGuard(string $driver, string $guard, string $table, bool $retrievalIdentity = false): array
     {
         $positions = $this->table(self::TABLES[4]);
         $queries = [];
@@ -391,12 +416,22 @@ final class BillingSchema
             $queries[] = 'SELECT COUNT(*) FROM '.$this->table($logical).' WHERE retrieval_position IN (NEW.retrieval_position, NEW.retrieval_end_position) OR retrieval_end_position IN (NEW.retrieval_position, NEW.retrieval_end_position)';
         }
         $valid = 'NEW.retrieval_position > 0 AND NEW.retrieval_end_position > NEW.retrieval_position';
+        $retrieval = new BillingRetrievalSchema;
+        $observation = $table === $this->table(self::TABLES[2]);
         if ($driver === 'mysql') {
-            $body = "BEGIN DECLARE found_kind VARCHAR(16) DEFAULT NULL; DECLARE used_positions BIGINT DEFAULT 0; IF NOT COALESCE(({$valid}),0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; "
-                .'SELECT kind INTO found_kind FROM '.$positions.' WHERE id = NEW.retrieval_position FOR UPDATE; '
+            $body = 'BEGIN DECLARE found_kind VARCHAR(16) DEFAULT NULL; DECLARE used_positions BIGINT DEFAULT 0; '
+                .($retrievalIdentity ? 'DECLARE start_at VARCHAR(26) DEFAULT NULL; DECLARE end_at VARCHAR(26) DEFAULT NULL; ' : '')
+                ."IF NOT COALESCE(({$valid}),0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; "
+                .'SELECT kind'.($retrievalIdentity ? ', database_at' : '').' INTO found_kind'.($retrievalIdentity ? ', start_at' : '').' FROM '.$positions.' WHERE id = NEW.retrieval_position'
+                .($retrievalIdentity ? " AND phase = 'start' AND allocation_token = NEW.start_allocation_token AND retrieval_token = NEW.retrieval_token" : '').' FOR UPDATE; '
                 ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; SET found_kind = NULL; "
-                .'SELECT kind INTO found_kind FROM '.$positions.' WHERE id = NEW.retrieval_end_position FOR UPDATE; '
+                .'SELECT kind'.($retrievalIdentity ? ', database_at' : '').' INTO found_kind'.($retrievalIdentity ? ', end_at' : '').' FROM '.$positions.' WHERE id = NEW.retrieval_end_position'
+                .($retrievalIdentity ? " AND phase = 'end' AND allocation_token = NEW.end_allocation_token AND retrieval_token = NEW.retrieval_token" : '').' FOR UPDATE; '
                 ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; ";
+            if ($retrievalIdentity) {
+                $condition = $retrieval->lockedIntervalCondition($driver, $observation);
+                $body .= "IF NOT COALESCE(({$condition}),0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval identity'; END IF; ";
+            }
             $ownIndex = $table === $this->table(self::TABLES[2]) ? 0 : 1;
             foreach ($queries as $index => $query) {
                 // MySQL forbids a trigger's locking read of its own subject table (1442).
@@ -411,7 +446,8 @@ final class BillingSchema
             $body .= 'END';
             $sql = 'CREATE TRIGGER `'.$guard.'` BEFORE INSERT ON '.$table.' FOR EACH ROW '.$body;
         } else {
-            $condition = $valid.' AND ('.$queries[0].') = 0 AND ('.$queries[1].') = 0';
+            $condition = $valid.' AND ('.$queries[0].') = 0 AND ('.$queries[1].') = 0'
+                .($retrievalIdentity ? ' AND '.$retrieval->intervalCondition($driver, $observation) : '');
             $condition = str_replace('main.', '', $condition);
             $body = '';
             $sql = 'CREATE TRIGGER "'.$guard.'" BEFORE INSERT ON '.$table.' WHEN NOT COALESCE(('.$condition."),0) BEGIN SELECT RAISE(ABORT, 'Retain billing retrieval interval'); END";
@@ -427,6 +463,11 @@ final class BillingSchema
         $pdo = $connection->getPdo();
         $driver = $connection->getDriverName();
         BillingException::require($connection->transactionLevel() === 0 && ! $pdo->inTransaction(), 'migration_transaction');
+        if ($this->hasRetrievalColumns($pdo, $driver)) {
+            $this->assertRetrievalOwned($pdo);
+
+            return;
+        }
         $this->inspect(false, true);
         // SQLite DDL is transactional. Native DDL is not: both table write locks stay held
         // while validating retained intervals and installing the two supplementary guards.
@@ -466,6 +507,173 @@ final class BillingSchema
         $this->up(false);
     }
 
+    /** Offline forward263 upgrade; no retained scalar, ciphertext, seal or counter is rewritten. */
+    public function upgradeRetrievalIdentity(): void
+    {
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        BillingException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
+        BillingException::require($connection->transactionLevel() === 0 && ! $pdo->inTransaction(), 'migration_transaction');
+        $retrieval = new BillingRetrievalSchema;
+        $stage = $this->retrievalStage($pdo, $driver);
+        // Inspect all retained tables and every reserved name before the first ALTER/DROP.
+        $this->inspect(false, false, false, $stage);
+        (new BillingAwardFence)->assertOwned($pdo);
+        $this->assertRetainedIntervals($pdo);
+        $this->assertRetrievalRows($pdo, $driver, $stage);
+        if ($stage === BillingRetrievalSchema::COMPLETE) {
+            return;
+        }
+        if ($driver === 'sqlite') {
+            $pdo->exec('BEGIN IMMEDIATE');
+        }
+        try {
+            while ($stage < BillingRetrievalSchema::COMPLETE) {
+                if ($driver === 'mysql') {
+                    // ALTER may end table-lock mode. Reacquire all seven before every next DDL.
+                    $tables = array_map(fn (string $table): string => $this->table($table).' WRITE', self::TABLES);
+                    $tables[] = (new BillingAwardFence)->table().' WRITE';
+                    $pdo->exec('LOCK TABLES '.implode(', ', $tables));
+                }
+                try {
+                    BillingException::require($this->retrievalStage($pdo, $driver) === $stage, 'retrieval_schema_changed');
+                    $this->inspect(false, false, $driver === 'mysql', $stage);
+                    $this->assertRetrievalRows($pdo, $driver, $stage);
+                    $step = $retrieval->steps()[$stage];
+                    $table = $this->table($step['table']);
+                    $name = $connection->getTablePrefix().$step['table'];
+                    $quote = $driver === 'mysql' ? '`' : '"';
+                    if ($step['kind'] === 'column') {
+                        $pdo->exec('ALTER TABLE '.$table.' ADD COLUMN '.$quote.$step['name'].$quote.' '.$retrieval->columnType($step['length'], $driver));
+                    } elseif ($step['kind'] === 'index') {
+                        $pdo->exec($retrieval->indexSql($step['name'], $step['columns'], $driver));
+                    } elseif ($step['kind'] === 'drop') {
+                        $pdo->exec('DROP TRIGGER '.$quote.$name.'_'.$step['name'].$quote);
+                    } else {
+                        $guards = $this->guards($step['table'], $driver, $name, $table, $stage + 1);
+                        $pdo->exec($guards[$name.'_'.$step['name']]['sql']);
+                    }
+                    $stage++;
+                } finally {
+                    if ($driver === 'mysql') {
+                        $pdo->exec('UNLOCK TABLES');
+                    }
+                }
+            }
+            $this->inspect(false, false, false, BillingRetrievalSchema::COMPLETE);
+            $this->assertRetrievalRows($pdo, $driver, BillingRetrievalSchema::COMPLETE);
+            if ($driver === 'sqlite') {
+                $pdo->exec('COMMIT');
+            }
+        } finally {
+            if ($driver === 'sqlite' && $pdo->inTransaction()) {
+                $pdo->exec('ROLLBACK');
+            }
+        }
+        $this->assertRetrievalOwned($pdo);
+    }
+
+    /** A hint of the format only; the caller subsequently verifies every column/index/guard exactly. */
+    private function hasRetrievalColumns(PDO $pdo, string $driver): bool
+    {
+        $columns = $this->retrievalColumns($pdo, $driver, self::TABLES[4]);
+
+        return in_array('allocation_token', $columns, true);
+    }
+
+    private function retrievalColumns(PDO $pdo, string $driver, string $logical): array
+    {
+        $name = DB::connection()->getTablePrefix().$logical;
+        if ($driver === 'sqlite') {
+            return array_column($pdo->query('PRAGMA main.table_info("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC), 'name');
+        }
+        try {
+            return array_column($pdo->query('SHOW COLUMNS FROM '.$this->table($logical))->fetchAll(PDO::FETCH_ASSOC), 'Field');
+        } catch (\PDOException $error) {
+            if ($error->getCode() !== '42S02') {
+                throw $error;
+            }
+
+            return [];
+        }
+    }
+
+    /** Only the migration calls this prefix recognizer; runtime accepts complete263 or exact baseline. */
+    private function retrievalStage(PDO $pdo, string $driver): int
+    {
+        $retrieval = new BillingRetrievalSchema;
+        $actual = ['columns' => [], 'indexes' => [], 'guards' => []];
+        foreach (BillingRetrievalSchema::COLUMNS as $logical => $columns) {
+            $present = $this->retrievalColumns($pdo, $driver, $logical);
+            BillingException::require($present !== [], 'retrieval_schema');
+            $actual['columns'][$logical] = array_intersect_key($columns, array_flip($present));
+        }
+        $name = DB::connection()->getTablePrefix().self::TABLES[4];
+        $indexes = $pdo->query($driver === 'mysql' ? 'SHOW INDEX FROM '.$this->table(self::TABLES[4]) : 'PRAGMA main.index_list("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC);
+        $names = array_column($indexes, $driver === 'mysql' ? 'Key_name' : 'name');
+        foreach (BillingRetrievalSchema::INDEXES as $suffix => $parts) {
+            if (in_array($name.'_'.$suffix, $names, true)) {
+                $actual['indexes'][$suffix] = $parts;
+            }
+        }
+        foreach (BillingRetrievalSchema::GUARDS as [$logical, $event]) {
+            $name = DB::connection()->getTablePrefix().$logical;
+            $guard = $name.'_'.$event;
+            $statement = $pdo->prepare($driver === 'mysql'
+                ? 'SELECT ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND BINARY TRIGGER_NAME = BINARY ?'
+                : "SELECT sql FROM main.sqlite_master WHERE type = 'trigger' AND name = ?");
+            $statement->execute([$guard]);
+            $bodies = $statement->fetchAll(PDO::FETCH_COLUMN);
+            BillingException::require(count($bodies) <= 1, 'retrieval_schema');
+            $version = 'absent';
+            if ($bodies !== []) {
+                $version = null;
+                foreach ([0 => 'legacy', BillingRetrievalSchema::COMPLETE => 'current'] as $stage => $candidate) {
+                    $expected = $this->guards($logical, $driver, $name, $this->table($logical), $stage)[$guard];
+                    if ($this->sql($bodies[0]) === $this->sql($expected[$driver === 'mysql' ? 'body' : 'sql'])) {
+                        $version = $candidate;
+                    }
+                }
+                BillingException::require($version !== null, 'retrieval_schema');
+            }
+            $actual['guards'][$logical][$event] = $version;
+        }
+        for ($stage = 0; $stage <= BillingRetrievalSchema::COMPLETE; $stage++) {
+            if ($actual === $retrieval->state($stage)) {
+                return $stage;
+            }
+        }
+
+        throw new BillingException('retrieval_schema_prefix');
+    }
+
+    /** Migration data preflight only. No existing observation is upgraded to current authority. */
+    private function assertRetrievalRows(PDO $pdo, string $driver, int $stage): void
+    {
+        $retrieval = new BillingRetrievalSchema;
+        $state = $retrieval->state($stage);
+        foreach ($state['columns'] as $logical => $columns) {
+            if ($columns === []) {
+                continue;
+            }
+            $legacy = implode(' AND ', array_map(fn (string $column): string => 'NEW.'.$column.' IS NULL', array_keys($columns)));
+            $condition = $legacy;
+            if ($stage === BillingRetrievalSchema::COMPLETE) {
+                $current = $logical === self::TABLES[4] ? $retrieval->positionCondition($driver, false)
+                    : $retrieval->intervalCondition($driver, $logical === self::TABLES[2], false);
+                $condition .= ' OR ('.$current.')';
+            }
+            // Native table locks admit only the physical table, not an unregistered alias.
+            $alias = $stage === BillingRetrievalSchema::COMPLETE ? ' AS NEW' : '';
+            if ($alias === '') {
+                $condition = str_replace('NEW.', '', $condition);
+            }
+            $query = 'SELECT 1 FROM '.$this->table($logical).$alias.' WHERE NOT COALESCE(('.$condition.'),0) LIMIT 1';
+            BillingException::require($pdo->query($query)->fetchColumn() === false, 'retained_retrieval_identity');
+        }
+    }
+
     private function assertRetainedIntervals(PDO $pdo): void
     {
         $parts = [];
@@ -478,7 +686,7 @@ final class BillingSchema
         BillingException::require($pdo->query($query)->fetchColumn() === false, 'retained_interval_conflict');
     }
 
-    private function assertNamespace(PDO $pdo, string $driver, bool $billingTablesLocked = false, ?MembershipSchemaCatalog $catalog = null): void
+    private function assertNamespace(PDO $pdo, string $driver, bool $billingTablesLocked = false, ?MembershipSchemaCatalog $catalog = null, int $retrievalStage = 0): void
     {
         $reserved = [];
         foreach (self::TABLES as $logical) {
@@ -502,7 +710,23 @@ final class BillingSchema
                     $indexes[strtolower($symbol)] = ['name' => $symbol, 'type' => 'index', 'tbl_name' => $name, 'sql' => null];
                 }
             }
+            $retrieval = new BillingRetrievalSchema;
+            $extra = $retrieval->state($retrievalStage)['indexes'];
+            foreach (BillingRetrievalSchema::INDEXES as $suffix => $parts) {
+                $symbol = DB::connection()->getTablePrefix().self::TABLES[4].'_'.$suffix;
+                $reserved[strtolower($symbol)] = ['name' => $symbol, 'type' => 'index'];
+            }
             $objects = $pdo->query('SELECT name, type, tbl_name, sql FROM main.sqlite_master')->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($objects as $object) {
+                foreach (BillingRetrievalSchema::INDEXES as $suffix => $parts) {
+                    $symbol = DB::connection()->getTablePrefix().self::TABLES[4].'_'.$suffix;
+                    if (strtolower($object['name']) === strtolower($symbol)) {
+                        BillingException::require(isset($extra[$suffix]) && $object['name'] === $symbol && $object['type'] === 'index'
+                            && $object['tbl_name'] === DB::connection()->getTablePrefix().self::TABLES[4]
+                            && $this->sql($object['sql']) === $this->sql(str_replace('main.', '', $retrieval->indexSql($suffix, $parts, $driver))), 'schema_namespace');
+                    }
+                }
+            }
             $rows = [];
             $seen = [];
             foreach ($objects as $object) {
@@ -622,12 +846,15 @@ final class BillingSchema
         $indexes = $pdo->query('SHOW INDEX FROM `'.$name.'`')->fetchAll(PDO::FETCH_ASSOC);
         $actual = [];
         foreach ($indexes as $index) {
-            BillingException::require($index['Index_type'] === 'BTREE' && $index['Sub_part'] === null && $index['Non_unique'] == ($index['Key_name'] === 'PRIMARY' || preg_match('/_u[0-9]+\z/D', $index['Key_name']) === 1 ? 0 : 1), 'schema');
+            BillingException::require($index['Index_type'] === 'BTREE' && $index['Sub_part'] === null && $index['Non_unique'] == ($index['Key_name'] === 'PRIMARY' || preg_match('/_u[0-9]+\z/D', $index['Key_name']) === 1 || in_array($index['Key_name'], array_map(fn (string $suffix): string => $name.'_'.$suffix, array_keys($definition['extra_unique'])), true) ? 0 : 1), 'schema');
             $actual[$index['Key_name']][] = $index['Column_name'];
         }
         $wanted = ['PRIMARY' => $definition['primary']];
         foreach ($definition['unique'] as $index => $parts) {
             $wanted[$name.'_u'.$index] = $parts;
+        }
+        foreach ($definition['extra_unique'] as $suffix => $parts) {
+            $wanted[$name.'_'.$suffix] = $parts;
         }
         foreach (array_keys($definition['foreign']) as $index => $column) {
             if (! array_any($wanted, fn ($parts): bool => $parts[0] === $column)) {
@@ -642,6 +869,9 @@ final class BillingSchema
         $wanted = ['PRIMARY' => 'PRIMARY KEY', $name.'_bounds' => 'CHECK'];
         foreach ($definition['unique'] as $index => $parts) {
             $wanted[$name.'_u'.$index] = 'UNIQUE';
+        }
+        foreach ($definition['extra_unique'] as $suffix => $parts) {
+            $wanted[$name.'_'.$suffix] = 'UNIQUE';
         }
         $schema = $pdo->query('SELECT DATABASE()')->fetchColumn();
         $foreignParameters = $this->mysqlForeignParameters();
@@ -674,7 +904,10 @@ final class BillingSchema
             'retrieval_hint', 'no_invoice_hint', 'ignored_type', 'retrieval', 'hint',
             'provider_unavailable', 'provider_inconsistent', 'provider_incomplete', 'binding_refused_account',
             'binding_refused_invoice_identity', 'binding_refused_mode', 'binding_refused_customer', 'binding_refused_subscription'] as $literal) {
-            $sql = str_replace("_utf8mb4\\'".$literal."\\'", "'".$literal."'", $sql);
+            // MySQL 8.4 rewrites these same ASCII column literals to _ascii after ADD COLUMN.
+            foreach (['_utf8mb4', '_ascii'] as $charset) {
+                $sql = str_replace($charset."\\'".$literal."\\'", "'".$literal."'", $sql);
+            }
         }
 
         return strtolower(preg_replace('/[\s`()]+/', '', $sql));
