@@ -56,9 +56,10 @@ final class CurrentEligibleLicenses implements MembershipEligibleLicenseAuthorit
         $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
         MembershipCatalogEvidence::proveBytes($snapshot);
         CurrentSelection::proveCurrent($rows->current(), $snapshot->selection, CarbonImmutable::now('UTC'));
-        $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
-        // Clock hooks and all callback-capable work finish before the native catalog closure.
+        // Evaluate the last clock before the last identity proof: a clock callback may withdraw
+        // the buyer, and that withdrawal must be observed before any source authority returns.
         $now = CarbonImmutable::now('UTC');
+        $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
         MembershipException::require((int) $now->format('Uu') < $snapshot->binding->validUntilUnixMicros, 'expired_license_proof');
         $issued['policy']->proveConfiguration($issued['configuration']);
         $rows->assertCurrent();

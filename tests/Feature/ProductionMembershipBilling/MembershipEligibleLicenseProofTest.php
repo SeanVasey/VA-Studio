@@ -6,6 +6,7 @@ use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
@@ -182,7 +183,13 @@ class MembershipEligibleLicenseProofTest extends TestCase
         $f = $this->fixture();
         $pdo = DB::connection()->getPdo();
         if (DB::getDriverName() === 'mysql') {
+            $durableRows = $pdo->query('SELECT * FROM tracks')->fetchAll(\PDO::FETCH_ASSOC);
             $pdo->exec('CREATE TEMPORARY TABLE tracks LIKE tracks');
+            foreach ($durableRows as $row) {
+                $statement = $pdo->prepare('INSERT INTO tracks (`'.implode('`, `', array_keys($row)).'`) VALUES ('
+                    .implode(', ', array_fill(0, count($row), '?')).')');
+                $statement->execute(array_values($row));
+            }
         } else {
             $pdo->exec('CREATE TEMP TABLE tracks AS SELECT * FROM main.tracks');
         }
@@ -320,6 +327,66 @@ class MembershipEligibleLicenseProofTest extends TestCase
         $this->noMembershipEffects();
     }
 
+    public function test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof(): void
+    {
+        $f = $this->fixture();
+        DB::transaction(function () use ($f): void {
+            $rows = new MembershipRows;
+            $authority = new CurrentEligibleLicenses;
+            $proof = $this->lock($authority, $rows, $f);
+            $at = CarbonImmutable::now('UTC');
+            $directClocks = 0;
+            CarbonImmutable::setTestNow(function () use ($at, $f, &$directClocks) {
+                $frames = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                $classes = array_column($frames, 'class');
+                if (in_array(CurrentEligibleLicenses::class, $classes, true)
+                    && ! in_array(ProductionCustomerAccess::class, $classes, true) && ++$directClocks === 2) {
+                    DB::table('customer_accounts')->where('id', $f['buyer']['binding']['account_id'])
+                        ->update(['active' => false, 'access_version' => DB::raw('access_version + 1')]);
+                }
+
+                return $at;
+            });
+            try {
+                $this->refused(fn () => $authority->proveCurrent($proof, $f['buyer']['principal'], $f['buyer']['user'], $rows));
+                $this->assertSame(2, $directClocks);
+                $this->assertSame(0, (int) DB::table('customer_accounts')->where('id', $f['buyer']['binding']['account_id'])->value('active'));
+            } finally {
+                CarbonImmutable::setTestNow($at);
+            }
+        });
+        $this->noMembershipEffects();
+    }
+
+    public function test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper(): void
+    {
+        $f = $this->fixture();
+        DB::transaction(function () use ($f): void {
+            $rows = new MembershipRows;
+            $authority = new CurrentEligibleLicenses;
+            $proof = $this->lock($authority, $rows, $f);
+            $snapshot = $authority->snapshot($proof, $f['buyer']['principal'], $f['buyer']['user'], $rows);
+            $pdo = $rows->identity();
+            $statement = $pdo->prepare('UPDATE customer_accounts SET active = 0, access_version = access_version + 1 WHERE id = ?');
+            $accountId = $f['buyer']['binding']['account_id'];
+            EligibilityOneShotFileWrapper::$callback = static fn () => $statement->execute([$accountId]);
+            EligibilityOneShotFileWrapper::$statCalls = EligibilityOneShotFileWrapper::$openCalls = 0;
+            stream_wrapper_unregister('file');
+            stream_wrapper_register('file', EligibilityOneShotFileWrapper::class);
+            EligibilityOneShotFileWrapper::$installed = true;
+            try {
+                $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, $rows->driver()), 'private_bytes');
+                $this->assertSame(0, EligibilityOneShotFileWrapper::$statCalls);
+                $this->assertSame(1, EligibilityOneShotFileWrapper::$openCalls);
+                $this->assertSame(1, (int) DB::table('customer_accounts')->where('id', $accountId)->value('active'));
+            } finally {
+                EligibilityOneShotFileWrapper::restore();
+                EligibilityOneShotFileWrapper::$callback = null;
+            }
+        });
+        $this->noMembershipEffects();
+    }
+
     private function mutateBytesFromClockAfterResolve(array $f): object
     {
         $at = CarbonImmutable::now('UTC');
@@ -376,5 +443,44 @@ class MembershipEligibleLicenseProofTest extends TestCase
         } catch (MembershipException|CheckoutException|IdentityException|ValidationException|MediaFailure $error) {
             $reason === null ? $this->assertNotEmpty($error->getMessage()) : $this->assertSame($reason, $error->reason);
         }
+    }
+}
+
+/** One-shot synthetic wrapper: a pre-open stat would run a callback then restore native files. */
+class EligibilityOneShotFileWrapper
+{
+    public mixed $context;
+
+    public static ?\Closure $callback = null;
+
+    public static int $statCalls = 0;
+
+    public static int $openCalls = 0;
+
+    public static bool $installed = false;
+
+    public static function restore(): void
+    {
+        if (self::$installed) {
+            stream_wrapper_restore('file');
+            self::$installed = false;
+        }
+    }
+
+    public function url_stat(string $path, int $flags): array|false
+    {
+        self::$statCalls++;
+        EligibilityOneShotFileWrapper::restore();
+        (self::$callback)();
+
+        return lstat($path);
+    }
+
+    public function stream_open(string $path, string $mode, int $options, ?string &$openedPath): bool
+    {
+        self::$openCalls++;
+        EligibilityOneShotFileWrapper::restore();
+
+        return false;
     }
 }

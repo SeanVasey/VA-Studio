@@ -121,16 +121,9 @@ final class MembershipCatalogEvidence
     /** Resolved plain local files only; never calls the application storage adapter or resolver. */
     private static function nativeBytes(array $file): void
     {
-        foreach ($file['directories'] as $path => $expected) {
-            clearstatcache(true, $path);
-            $stat = @lstat($path);
-            MembershipException::require(is_array($stat) && array_intersect_key($stat, array_flip(['dev', 'ino', 'mode'])) === $expected, 'private_bytes');
-        }
         $path = $file['path'];
-        clearstatcache(true, $path);
-        $before = @lstat($path);
-        MembershipException::require(is_array($before) && self::fileStat($before) === $file['stat']
-            && ($before['mode'] & 0170000) === 0100000 && $before['size'] === $file['size_bytes'], 'private_bytes');
+        // Open first. A replaced file wrapper must not run a stat callback, restore the native
+        // wrapper, and then pass a later fopen check. A substituted stream never passes this gate.
         $input = @fopen($path, 'rb');
         try {
             MembershipException::require(is_resource($input), 'private_bytes');
@@ -138,6 +131,15 @@ final class MembershipCatalogEvidence
             $opened = fstat($input);
             MembershipException::require($metadata['wrapper_type'] === 'plainfile' && $metadata['stream_type'] === 'STDIO'
                 && is_array($opened) && self::fileStat($opened) === $file['stat'], 'private_bytes');
+            foreach ($file['directories'] as $directory => $expected) {
+                clearstatcache(true, $directory);
+                $stat = @lstat($directory);
+                MembershipException::require(is_array($stat) && array_intersect_key($stat, array_flip(['dev', 'ino', 'mode'])) === $expected, 'private_bytes');
+            }
+            clearstatcache(true, $path);
+            $before = @lstat($path);
+            MembershipException::require(is_array($before) && self::fileStat($before) === $file['stat']
+                && ($before['mode'] & 0170000) === 0100000 && $before['size'] === $file['size_bytes'], 'private_bytes');
             $hash = hash_init('sha256');
             MembershipException::require(hash_update_stream($hash, $input) === $file['size_bytes']
                 && hash_equals($file['sha256'], hash_final($hash)), 'private_bytes');
