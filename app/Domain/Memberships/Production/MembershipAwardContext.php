@@ -50,6 +50,8 @@ final class MembershipAwardContext
         private readonly int $deadline,
         string $locator,
     ) {
+        MembershipAwards::consumeContextPermit($rows, $configuration, $policy, $membershipConfiguration,
+            $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator);
         $this->admit();
         $this->access = new ProductionCustomerAccess;
         $this->identity = $this->access->lock($principal, $actor, $rows->current());

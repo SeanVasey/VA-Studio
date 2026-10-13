@@ -11,10 +11,27 @@ use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\DB;
 use ReflectionProperty;
 use Throwable;
+use WeakMap;
 
 /** Unmounted/default-off owned first-period award with a post-callback durable receipt. */
 final class MembershipAwards
 {
+    /** Only award() can mint an entry, immediately before its one constructor invocation. */
+    private static ?WeakMap $contextPermits = null;
+
+    /** Context construction consumes its exact owned invocation before any source callback or write. */
+    public static function consumeContextPermit(MembershipRows $rows, MembershipAwardConfiguration $configuration,
+        MembershipPolicy $policy, array $membershipConfiguration, BillingPolicy $billingPolicy, array $billingConfiguration,
+        ProductionCustomerPrincipal $principal, User $actor, int $deadline, string $locator): void
+    {
+        $permit = self::$contextPermits[$rows] ?? null;
+        if (self::$contextPermits !== null) {
+            unset(self::$contextPermits[$rows]);
+        }
+        MembershipException::require($permit === [$rows->identity(), $configuration, $policy, $membershipConfiguration,
+            $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator], 'owned_invocation_required');
+    }
+
     public function award(string $locator, ProductionCustomerPrincipal $principal, User $actor): array
     {
         // The one original budget includes source callbacks, lock waits, commit events and receipt.
@@ -30,7 +47,9 @@ final class MembershipAwards
         $membershipConfiguration = $policy->current();
         $billingPolicy = new BillingPolicy;
         $billingConfiguration = $billingPolicy->current();
-        $configuration = new MembershipAwardConfiguration;
+        $configuration = new MembershipAwardConfiguration(requireComplete: true);
+        // Resolve the full gate against the already-captured complete registration baseline.
+        $policy->current();
         foreach (DB::getConnections() as $source) {
             $sourcePrimary = $source->getPdo();
             MembershipAwardConfiguration::plainPrimary($sourcePrimary);
@@ -49,8 +68,17 @@ final class MembershipAwards
         $connection->setEventDispatcher($observer);
         try {
             $connection->beginTransaction();
-            $context = new MembershipAwardContext($observer->rows(), $configuration, $policy, $membershipConfiguration,
-                $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator);
+            $rows = $observer->rows();
+            self::$contextPermits ??= new WeakMap;
+            self::$contextPermits[$rows] = [$rows->identity(), $configuration, $policy, $membershipConfiguration,
+                $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator];
+            try {
+                $context = new MembershipAwardContext($rows, $configuration, $policy, $membershipConfiguration,
+                    $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator);
+            } finally {
+                // A failed construction must never leave authority for another invocation.
+                unset(self::$contextPermits[$rows]);
+            }
             $projection = $context->projection();
             $observer->prepare($context);
             // PDO commit, scoped afterCommit callbacks and ordinary committed delegates all run.
