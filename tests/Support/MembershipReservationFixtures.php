@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingSettlement;
@@ -170,7 +171,16 @@ trait MembershipReservationFixtures
             $events = $rows->rows(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$period['id']], MembershipPolicy::MAX_EVENTS + 1);
             $redemptions = $rows->rows(MembershipReservationRecords::TABLE, 'period_id = ?', [$period['id']], MembershipPolicy::MAX_EVENTS + 1);
 
-            return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $facts, (int) $historical['origin']['id']);
+            $reader = new MemberActivationHistoryReader;
+            $snapshot = $reader->capturePeriod($period['id'], $rows);
+            try {
+                $audit = MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $facts, (int) $historical['origin']['id'], $snapshot->value());
+                $reader->currentRaw($snapshot, $rows);
+
+                return $audit;
+            } finally {
+                $reader->retire($snapshot);
+            }
         });
     }
 }

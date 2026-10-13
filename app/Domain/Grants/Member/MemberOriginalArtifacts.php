@@ -102,7 +102,7 @@ final class MemberOriginalArtifacts implements MemberOriginalArtifactAuthority
 
     /** Terminal registry/value closure only. Never refreshes a producer or reads a file. */
     public function assertInspectionCurrent(MemberOriginalMaterialization $materialized, MemberOriginalSourceCapture $sources,
-        MemberOriginalInspection $inspection, MemberOriginalSourceValues $values, MemberOriginalBudget $budget): void
+        MemberOriginalInspection|MemberActivationInspection $inspection, MemberOriginalSourceValues $values, MemberOriginalBudget $budget): void
     {
         $entry = $this->entry($materialized);
         MemberGrantException::require($sources === $this->sources && $entry['inspection'] === $inspection
@@ -118,7 +118,7 @@ final class MemberOriginalArtifacts implements MemberOriginalArtifactAuthority
     }
 
     /** Retiring a frame can only remove authority; detached values retain no Rows or producers. */
-    public function retireInspection(MemberOriginalInspection $inspection): void
+    public function retireInspection(MemberOriginalInspection|MemberActivationInspection $inspection): void
     {
         foreach ($this->ready as $receipt => $entry) {
             if ($entry[1] === $inspection) {

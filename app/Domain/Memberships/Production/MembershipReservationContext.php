@@ -6,6 +6,9 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Grants\Member\MemberActivationHistory;
+use App\Domain\Grants\Member\MemberActivationHistoryReader;
+use App\Domain\Grants\Member\MemberActivationHistorySnapshot;
 use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Domain\Memberships\Billing\BillingSchema;
@@ -24,6 +27,10 @@ final class MembershipReservationContext
     private array $identity;
 
     private array $historical;
+
+    private MemberActivationHistoryReader $memberHistoryReader;
+
+    private MemberActivationHistorySnapshot $memberHistory;
 
     private MembershipPaidInvoiceProof $invoiceProof;
 
@@ -64,6 +71,14 @@ final class MembershipReservationContext
 
     private ?array $newEvent = null;
 
+    private ?array $newConsume = null;
+
+    private ?MembershipActivationTransition $activationTransition = null;
+
+    private ?array $activationPlan = null;
+
+    private string $activationState = 'live';
+
     private int $createdAtNs;
 
     private int $createdAtMicros;
@@ -73,7 +88,7 @@ final class MembershipReservationContext
     private static ?WeakMap $reservationPermits = null;
 
     /** Exact issuer-owned capture; phase entry never supplies a mutation permit. */
-    private ?MembershipMemberCapture $memberCapture = null;
+    private MembershipMemberCapture|MembershipActivationCapture|null $memberCapture = null;
 
     private ?array $memberPhase = null;
 
@@ -90,7 +105,7 @@ final class MembershipReservationContext
         private readonly string $operation,
         string $locator,
         private readonly array $arguments,
-        ?MembershipMemberCapture $memberInitialization = null,
+        MembershipMemberCapture|MembershipActivationCapture|null $memberInitialization = null,
     ) {
         if ($operation === 'inspect') {
             $permit = self::$inspectionPermits[$rows] ?? null;
@@ -106,6 +121,7 @@ final class MembershipReservationContext
         }
         MembershipException::require(in_array($operation, ['reserve', 'release', 'expire', 'inspect'], true), 'unsupported_operation');
         $this->admit();
+        $this->memberHistoryReader = new MemberActivationHistoryReader;
         $this->access = new ProductionCustomerAccess;
         $this->identity = $this->access->lock($principal, $actor, $rows->current());
         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
@@ -189,14 +205,18 @@ final class MembershipReservationContext
     }
 
     /** Bind exactly once while the concrete issuer still owns this newly created inspection. */
-    public function bindMemberCapture(MembershipMemberCapture $capture): void
+    public function bindMemberCapture(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         MembershipException::require($this->operation === 'inspect' && $this->memberCapture === null, 'foreign_member_capture');
-        MembershipReservations::consumeMemberContextPermit($capture, $this, $this->rows);
+        if ($capture instanceof MembershipActivationCapture) {
+            MembershipReservations::consumeActivationContextPermit($capture, $this, $this->rows);
+        } else {
+            MembershipReservations::consumeMemberContextPermit($capture, $this, $this->rows);
+        }
         $this->memberCapture = $capture;
     }
 
-    public function memberCurrentCallbacks(MembershipMemberCapture $capture): void
+    public function memberCurrentCallbacks(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         $this->member($capture);
         $this->memberPhase = null;
@@ -204,7 +224,7 @@ final class MembershipReservationContext
         $this->memberPhase = ['current', $billing];
     }
 
-    public function memberCurrentRaw(MembershipMemberCapture $capture): void
+    public function memberCurrentRaw(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         $this->member($capture);
         $phase = $this->memberPhase;
@@ -213,7 +233,7 @@ final class MembershipReservationContext
         $this->currentRaw($phase[1]);
     }
 
-    public function memberCommittedCallbacks(MembershipMemberCapture $capture, IdentityCommittedFrame $frame): void
+    public function memberCommittedCallbacks(MembershipMemberCapture|MembershipActivationCapture $capture, IdentityCommittedFrame $frame): void
     {
         $this->member($capture);
         $this->memberPhase = null;
@@ -221,7 +241,7 @@ final class MembershipReservationContext
         $this->memberPhase = ['committed', $frame, $billing];
     }
 
-    public function memberCommittedRaw(MembershipMemberCapture $capture, IdentityCommittedFrame $frame): void
+    public function memberCommittedRaw(MembershipMemberCapture|MembershipActivationCapture $capture, IdentityCommittedFrame $frame): void
     {
         $this->member($capture);
         $phase = $this->memberPhase;
@@ -230,15 +250,16 @@ final class MembershipReservationContext
         $this->committedRaw($frame, $phase[2]);
     }
 
-    public function retireMemberCapture(MembershipMemberCapture $capture): void
+    public function retireMemberCapture(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         $this->member($capture);
         $this->memberCapture = null;
         $this->memberPhase = null;
+        $this->memberHistoryReader->retire($this->memberHistory);
     }
 
     /** Copied values only. Original invoice/eligibility leases stay in this private inspection. */
-    public function memberSourceValues(MembershipMemberCapture $capture): array
+    public function memberSourceValues(MembershipMemberCapture|MembershipActivationCapture $capture): array
     {
         $this->member($capture);
         $reservation = $this->reservation();
@@ -255,7 +276,7 @@ final class MembershipReservationContext
     }
 
     /** Live producer objects are available only to the exact registered issuing capture. */
-    public function memberIntent(MembershipMemberCapture $capture, MembershipReservationProof $reservation): MemberGrantIntent
+    public function memberIntent(MembershipMemberCapture|MembershipActivationCapture $capture, MembershipReservationProof $reservation): MemberGrantIntent
     {
         $this->member($capture);
         MembershipException::require($this->licenseProof !== null && $reservation->binding() == $this->reservationBinding(), 'foreign_member_capture');
@@ -263,7 +284,7 @@ final class MembershipReservationContext
         return new MemberGrantIntent($this->invoiceProof, $this->licenseProof, $reservation);
     }
 
-    public function memberHonorDeadline(MembershipMemberCapture $capture): int
+    public function memberHonorDeadline(MembershipMemberCapture|MembershipActivationCapture $capture): int
     {
         $this->member($capture);
         MembershipException::require($this->honorDeadlineNs !== PHP_INT_MAX, 'foreign_member_capture');
@@ -272,25 +293,26 @@ final class MembershipReservationContext
     }
 
     /** Final elapsed/configuration admission only; never calls a closed Rows proof or renews a producer. */
-    public function memberPostFinish(MembershipMemberCapture $capture): void
+    public function memberPostFinish(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         $this->member($capture);
         $this->admit();
     }
 
-    private function member(MembershipMemberCapture $capture): void
+    private function member(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         MembershipException::require($this->memberCapture === $capture && $this->operation === 'inspect', 'foreign_member_capture');
     }
 
     private function currentCallbacks(): array
     {
+        $this->memberHistoryReader->currentCallbacks($this->memberHistory, $this->rows);
         $this->proveSources();
         $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration, $this->invoiceFreshness);
         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
         MembershipPolicyVersions::document($plan);
         MembershipLedgerAudit::verify($this->period, $this->events, $this->redemptions, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id']);
+            (int) $this->historical['origin']['id'], $this->memberHistory->value());
         $this->checkDeadlines();
         $this->access->proveCurrent($this->principal, $this->actor, $this->rows->current(), $this->identity);
 
@@ -300,6 +322,7 @@ final class MembershipReservationContext
     private function currentRaw(array $billing): void
     {
         // All participating producer callbacks must have completed before entering this phase.
+        $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
         $this->assertEffects(false);
         MembershipBillingEvidence::assertCurrentSnapshot($this->rows, $billing);
         $this->assertCatalog(true);
@@ -314,6 +337,7 @@ final class MembershipReservationContext
         MembershipException::require($frame->reader()->identityPrimary() === $this->rows->identity(), 'changed_primary');
         $this->admit();
         (new MembershipSchema)->assertOwned($this->rows->identity());
+        $this->memberHistoryReader->committedCallbacks($this->memberHistory, $frame);
         $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline, $this->invoiceFreshness);
         $plan = $this->read(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, false);
         MembershipException::require(count($plan) === 1, 'changed_policy_facts');
@@ -322,7 +346,8 @@ final class MembershipReservationContext
         MembershipException::require(count($period) === 1, 'changed_period');
         $events = $this->read(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
         $redemptions = $this->read(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
-        MembershipLedgerAudit::verify($period[0], $events, $redemptions, $this->invoice, $this->facts, (int) $this->historical['origin']['id']);
+        MembershipLedgerAudit::verify($period[0], $events, $redemptions, $this->invoice, $this->facts, (int) $this->historical['origin']['id'], $this->memberHistory->value());
+        $this->assertHistoryScope($period[0], $events, $redemptions);
         if ($this->catalog !== null) {
             MembershipCatalogEvidence::proveBytes($this->catalog);
         }
@@ -335,6 +360,7 @@ final class MembershipReservationContext
 
     private function committedRaw(IdentityCommittedFrame $frame, array $billing): void
     {
+        $this->memberHistoryReader->committedRaw($this->memberHistory, $frame);
         $this->assertEffects(true);
         MembershipBillingEvidence::assertCapturedSnapshot($this->rows->identity(), $billing);
         $this->assertCatalog(false);
@@ -352,22 +378,116 @@ final class MembershipReservationContext
             $record['intent_hash'], (int) $record['credit_amount'], $record['honor_deadline'], $this->invoice->originalBuyerBinding);
     }
 
+    /** Detached inputs from the exact owned activation capture; they are not write authority. */
+    public function activationValues(MembershipActivationCapture $capture): array
+    {
+        $this->member($capture);
+
+        return ['policy' => $this->facts, 'actor' => $this->access->durableBinding($this->principal),
+            'identity_origin_id' => (int) $this->historical['origin']['id'], 'audit' => $this->audit,
+            'history' => $this->memberHistory->value()];
+    }
+
+    /** Exact private owner plan only: old complete scope plus four fixed rows. */
+    public function planActivation(MembershipActivationCapture $capture, MembershipActivationTransition $transition, array $plan): void
+    {
+        MembershipReservations::consumeTransitionPermit($capture, $transition, $this, $this->rows, $plan);
+        $this->member($capture);
+        MembershipException::require($this->activationState === 'live' && $this->activationTransition === null
+            && $this->reservation()['terminal'] === null && $this->facts->supports('consume'), 'foreign_activation_transition');
+        $history = $plan['history'];
+        MembershipException::require($history instanceof MemberActivationHistory, 'foreign_activation_transition');
+        $expected = $this->memberHistory->value()->rows();
+        foreach (['origins' => 'origin', 'artifacts' => 'artifact', 'activations' => 'activation'] as $set => $key) {
+            $expected[$set][] = $plan[$key];
+        }
+        foreach (['profiles', 'definitions', 'plans'] as $set) {
+            foreach ($plan['support'][$set] as $row) {
+                $existing = array_values(array_filter($expected[$set], static fn (array $old): bool => $old['id'] === $row['id']));
+                MembershipException::require($existing === [] || MembershipRecords::strings($existing[0]) === MembershipRecords::strings($row), 'changed_retained_effect');
+                if ($existing === []) {
+                    $expected[$set][] = $row;
+                }
+            }
+        }
+        MembershipException::require(self::normalizedHistory($expected) === self::normalizedHistory($history->rows()), 'changed_retained_effect');
+        MembershipLedgerAudit::verify($this->period, [...$this->events, $plan['consume']], $this->redemptions,
+            $this->invoice, $this->facts, (int) $this->historical['origin']['id'], $history);
+        $this->activationTransition = $transition;
+        $this->activationPlan = $plan;
+        $this->activationState = 'planned';
+        $this->admit();
+    }
+
+    public function beginActivationInsert(MembershipActivationCapture $capture, MembershipActivationTransition $transition): void
+    {
+        $this->member($capture);
+        MembershipException::require($this->activationTransition === $transition && $this->activationState === 'planned', 'foreign_activation_transition');
+        $this->admit();
+        $this->activationState = 'inserting';
+    }
+
+    public function proveInsertedActivation(MembershipActivationCapture $capture, MembershipActivationTransition $transition): void
+    {
+        $this->member($capture);
+        MembershipException::require($this->activationTransition === $transition && $this->activationState === 'inserting'
+            && $this->activationPlan !== null, 'foreign_activation_transition');
+        $new = $this->memberHistoryReader->capturePeriod($this->period['id'], $this->rows);
+        $scope = $new->scope();
+        $events = [...$this->events, $this->activationPlan['consume']];
+        MembershipException::require(MembershipRecords::strings($scope['period']) === MembershipRecords::strings($this->period)
+            && self::normalizedRows($scope['redemptions']) === self::normalizedRows($this->redemptions)
+            && self::normalizedRows($scope['events']) === self::normalizedRows($events)
+            && self::normalizedHistory($new->value()->rows()) === self::normalizedHistory($this->activationPlan['history']->rows()), 'changed_retained_effect');
+        $audit = MembershipLedgerAudit::verify($scope['period'], $scope['events'], $scope['redemptions'], $this->invoice,
+            $this->facts, (int) $this->historical['origin']['id'], $new->value());
+        $this->memberHistoryReader->retire($this->memberHistory);
+        $this->memberHistory = $new;
+        $this->events = $scope['events'];
+        $this->audit = $audit;
+        $this->newConsume = $this->activationPlan['consume'];
+        $this->activationState = 'inserted';
+        $this->checkDeadlines();
+        $this->admit();
+    }
+
+    private static function normalizedRows(array $rows): array
+    {
+        usort($rows, static fn (array $a, array $b): int => strcmp($a['id'], $b['id']));
+
+        return array_map(MembershipRecords::strings(...), $rows);
+    }
+
+    private static function normalizedHistory(array $rows): array
+    {
+        foreach ($rows as $key => $set) {
+            $rows[$key] = self::normalizedRows($set);
+        }
+        ksort($rows, SORT_STRING);
+
+        return $rows;
+    }
+
     /** Read-only load for an authority's lock(); this path can never select a mutation operation. */
     public static function inspect(string $redemptionId, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): self
     {
         return self::inspectAt($redemptionId, $principal, $actor, $rows, hrtime(true) + 60_000_000_000);
     }
 
-    public static function inspectMember(MembershipMemberCapture $capture, string $redemptionId,
+    public static function inspectMember(MembershipMemberCapture|MembershipActivationCapture $capture, string $redemptionId,
         ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows, int $deadline): self
     {
-        MembershipReservations::consumeMemberInspectionPermit($capture, $redemptionId, $principal, $actor, $rows, $deadline);
+        if ($capture instanceof MembershipActivationCapture) {
+            MembershipReservations::consumeActivationInspectionPermit($capture, $redemptionId, $principal, $actor, $rows, $deadline);
+        } else {
+            MembershipReservations::consumeMemberInspectionPermit($capture, $redemptionId, $principal, $actor, $rows, $deadline);
+        }
 
         return self::inspectAt($redemptionId, $principal, $actor, $rows, $deadline, $capture);
     }
 
     private static function inspectAt(string $redemptionId, ProductionCustomerPrincipal $principal, User $actor,
-        MembershipRows $rows, int $deadline, ?MembershipMemberCapture $memberInitialization = null): self
+        MembershipRows $rows, int $deadline, MembershipMemberCapture|MembershipActivationCapture|null $memberInitialization = null): self
     {
         MembershipValues::id($redemptionId);
         MembershipException::require(hrtime(true) < $deadline, 'operation_deadline');
@@ -445,7 +565,9 @@ final class MembershipReservationContext
                 $this->licenseProof->binding(), $key, $at);
             $event = MembershipReservationRecords::reserveEvent($this->audit, $record, $this->access->durableBinding($this->principal), $at);
             $this->newEvent = $event;
+            $this->memberHistoryReader->currentCallbacks($this->memberHistory, $this->rows);
             $this->proveSources();
+            $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
             $this->insert(MembershipReservationRecords::TABLE, $record);
             $this->insert(MembershipPeriodRecords::EVENTS, $event);
             $this->redemptionId = $record['id'];
@@ -475,7 +597,9 @@ final class MembershipReservationContext
             $event = MembershipReservationRecords::releaseEvent($this->audit, $this->redemptionId, $this->facts,
                 $this->access->durableBinding($this->principal), $at);
             $this->newEvent = $event;
+            $this->memberHistoryReader->currentCallbacks($this->memberHistory, $this->rows);
             $this->proveSources();
+            $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
             $this->insert(MembershipPeriodRecords::EVENTS, $event);
             $this->refreshLedger();
             $reservation = $this->reservation();
@@ -494,7 +618,9 @@ final class MembershipReservationContext
             $event = MembershipReservationRecords::expireEvent($this->audit, $this->facts,
                 $this->access->durableBinding($this->principal), $at);
             $this->newEvent = $event;
+            $this->memberHistoryReader->currentCallbacks($this->memberHistory, $this->rows);
             $this->proveSources();
+            $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
             $this->insert(MembershipPeriodRecords::EVENTS, $event);
             $this->refreshLedger();
         }
@@ -507,8 +633,13 @@ final class MembershipReservationContext
     {
         $this->redemptions = $this->rows->rows(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
         $this->events = $this->rows->rows(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
+        if (isset($this->memberHistory)) {
+            $this->memberHistoryReader->retire($this->memberHistory);
+        }
+        $this->memberHistory = $this->memberHistoryReader->capturePeriod($this->period['id'], $this->rows);
+        $this->assertHistoryScope($this->period, $this->events, $this->redemptions);
         $this->audit = MembershipLedgerAudit::verify($this->period, $this->events, $this->redemptions, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id']);
+            (int) $this->historical['origin']['id'], $this->memberHistory->value());
     }
 
     private function reservation(): array
@@ -524,7 +655,9 @@ final class MembershipReservationContext
         $now = CarbonImmutable::now('UTC');
         if (in_array($this->operation, ['reserve', 'inspect'], true)) {
             $reservation = $this->reservation();
-            MembershipException::require($reservation['terminal'] === null
+            MembershipException::require(($reservation['terminal'] === null || ($this->memberCapture instanceof MembershipActivationCapture
+                && $this->activationState === 'inserted' && $this->newConsume !== null
+                && MembershipRecords::strings($reservation['terminal']) === MembershipRecords::strings($this->newConsume)))
                 && $now->format('Y-m-d H:i:s') < $reservation['record']['honor_deadline'], 'reservation_terminal');
             $honorMicros = (int) (new \DateTimeImmutable($reservation['record']['honor_deadline'], new \DateTimeZone('UTC')))->format('Uu');
             $this->honorDeadlineNs = min($this->honorDeadlineNs,
@@ -631,6 +764,19 @@ final class MembershipReservationContext
             MembershipException::require(CanonicalJson::encode(array_map(MembershipRecords::strings(...), $actual))
                 === CanonicalJson::encode(array_map(MembershipRecords::strings(...), $expected)), 'changed_retained_effect');
         }
+    }
+
+    /** The complete member graph and ordinary credit audit must use the exact same 257 scope. */
+    private function assertHistoryScope(array $period, array $events, array $redemptions): void
+    {
+        $sort = static function (array $rows): array {
+            usort($rows, static fn (array $a, array $b): int => strcmp($a['id'], $b['id']));
+
+            return array_map(MembershipRecords::strings(...), $rows);
+        };
+        $scope = $this->memberHistory->scope();
+        MembershipException::require(MembershipRecords::strings($period) === MembershipRecords::strings($scope['period'])
+            && $sort($events) === $sort($scope['events']) && $sort($redemptions) === $sort($scope['redemptions']), 'changed_retained_effect');
     }
 
     private function read(string $table, string $where, array $bindings, int $limit, bool $locking): array
