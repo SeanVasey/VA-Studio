@@ -29,6 +29,14 @@ final class MemberGrantDocumentsTest extends TestCase
         self::assertNotSame($d->hash(), MemberGrantDefinitionDocument::from($definition)->hash());
     }
 
+    public function test_authored_source_at_the_released_renderer_limit_is_retained_exactly(): void
+    {
+        $profile = Fixture::profile();
+        $profile['original_terms']['authored_source'] = str_repeat('x', 65536);
+        $retained = MemberGrantProfileDocument::from($profile);
+        self::assertSame($profile['original_terms']['authored_source'], $retained->value()['original_terms']['authored_source']);
+    }
+
     public function test_nested_input_references_and_getter_results_cannot_change_retained_values(): void
     {
         $profile = Fixture::profile();
@@ -68,6 +76,7 @@ final class MemberGrantDocumentsTest extends TestCase
 
     public static function invalidDocuments(): iterable
     {
+        yield 'source exceeds member renderer capacity' => ['profile', ['original_terms', 'authored_source'], str_repeat('x', 65537)];
         yield 'profile extra' => ['profile', ['unknown'], true];
         yield 'technical descriptor changed' => ['profile', ['render_profile', 'template'], 'another'];
         yield 'terms extra' => ['profile', ['original_terms', 'path'], '/private'];

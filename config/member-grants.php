@@ -2,6 +2,7 @@
 
 return [
     'enabled' => false,
+    'authoring_enabled' => false,
     'version' => 1,
     'family' => 'production-member-origin-v1',
     'purpose' => 'production-member-license-grant-v1',

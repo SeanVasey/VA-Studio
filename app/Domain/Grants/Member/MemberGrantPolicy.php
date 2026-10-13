@@ -28,6 +28,8 @@ final class MemberGrantPolicy
     /** @var WeakMap<MembershipRows, array{pdo: PDO, driver: string, configuration: array}> */
     private WeakMap $frames;
 
+    private WeakMap $authoringFrames;
+
     private Container $container;
 
     private Repository $repository;
@@ -35,6 +37,7 @@ final class MemberGrantPolicy
     public function __construct()
     {
         $this->frames = new WeakMap;
+        $this->authoringFrames = new WeakMap;
         $this->container = Container::getInstance();
         $this->repository = $this->container->make('config');
         MemberGrantException::require(get_class($this->repository) === Repository::class, 'changed_policy');
@@ -76,6 +79,74 @@ final class MemberGrantPolicy
         MemberGrantException::require(is_array($frame) && $frame['configuration'] === $expected, 'foreign_frame');
         $this->proveConfiguration($expected);
         $this->proveFrame($rows, $frame);
+        $this->capabilitiesPresent();
+        $this->proveConfiguration($expected);
+    }
+
+    /** Scalar entry baseline only; the actual native authoring gate remains authoringFor. */
+    public function authoringBaseline(): array
+    {
+        return $this->authoringConfiguration();
+    }
+
+    /** Independent operator gate; it cannot enable customer preparation or fill missing capabilities. */
+    public function authoringFor(MembershipRows $rows): array
+    {
+        if (isset($this->authoringFrames[$rows])) {
+            $configuration = $this->authoringFrames[$rows]['configuration'];
+            $this->proveAuthoringCurrent($configuration, $rows);
+
+            return $configuration;
+        }
+        $configuration = $this->authoringConfiguration();
+        MemberGrantException::require($configuration['authoring_enabled'] === true && $configuration['version'] === 1
+            && $configuration['family'] === MemberGrantIntent::FAMILY && $configuration['purpose'] === MemberGrantIntent::PURPOSE, 'disabled');
+        MemberGrantException::require(in_array($configuration['provenance'], [IdentityPolicy::REHEARSAL, IdentityPolicy::PRODUCTION], true)
+            && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
+            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment'])), 'provenance');
+        MemberGrantException::require(in_array($configuration['driver'], ['sqlite', 'mysql'], true)
+            && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || $configuration['driver'] === 'mysql'), 'provenance_driver');
+        $frame = ['pdo' => $rows->identity(), 'driver' => $rows->driver(), 'configuration' => $configuration];
+        $this->proveFrame($rows, $frame);
+        MemberGrantException::require($this->authoringConfiguration() === $configuration, 'changed_policy');
+        $this->authoringFrames[$rows] = $frame;
+
+        return $configuration;
+    }
+
+    public function proveAuthoringCurrent(array $expected, MembershipRows $rows): void
+    {
+        $frame = $this->authoringFrames[$rows] ?? null;
+        MemberGrantException::require(is_array($frame) && $frame['configuration'] === $expected, 'foreign_frame');
+        $this->proveAuthoringConfiguration($expected);
+        $this->proveFrame($rows, $frame);
+        $this->proveAuthoringConfiguration($expected);
+    }
+
+    /** Raw captured configuration only; the issuer separately proves its issued physical frame. */
+    public function proveAuthoringConfiguration(array $expected): void
+    {
+        MemberGrantException::require($this->authoringConfiguration() === $expected, 'changed_policy');
+    }
+
+    private function authoringConfiguration(): array
+    {
+        $current = $this->configuration();
+        $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->repository);
+        $enabled = $items['member-grants']['authoring_enabled'] ?? null;
+        MemberGrantException::require(is_bool($enabled), 'changed_policy');
+        $result = ['authoring_enabled' => $enabled];
+        foreach (['version', 'family', 'purpose', 'provenance', 'environment', 'connection_name', 'driver'] as $key) {
+            $result[$key] = $current[$key];
+        }
+
+        return $result;
+    }
+
+    /** Callback-free terminal gate, paired with the caller's already-issued native frame proof. */
+    public function proveCapturedConfiguration(array $expected): void
+    {
+        $this->proveConfiguration($expected);
         $this->capabilitiesPresent();
         $this->proveConfiguration($expected);
     }

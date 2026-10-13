@@ -228,7 +228,8 @@ final class MemberGrantDocumentValues
     {
         self::keys($value, ['purpose', 'authored_source', 'structured_terms', 'renderer_version', 'render_fixture_hash']);
         MemberGrantException::require($value['purpose'] === 'membership-license-original-terms-v1', 'invalid_document');
-        self::text($value['authored_source'], 100000, true);
+        // The released member v1 renderer admits at most 65536 bytes, without truncation.
+        self::text($value['authored_source'], 65536, true);
         self::terms($value['structured_terms']);
         self::text($value['renderer_version'], 160);
         self::hash($value['render_fixture_hash']);
