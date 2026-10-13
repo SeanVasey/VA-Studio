@@ -44,12 +44,12 @@ class MemberOriginalRetainedDeadlineTest extends TestCase
         $at = CarbonImmutable::now('UTC');
         CarbonImmutable::setTestNow($at->addMinute());
         $originalHonor = null;
+        $detachedDeadline = null;
         $calls = 0;
         $operation = null;
-        $operation = $this->memberOriginalOperation(function () use (&$operation, $at, &$originalHonor, &$calls): void {
+        $operation = $this->memberOriginalOperation(function () use (&$operation, $at, &$detachedDeadline, &$calls): void {
             $budget = self::budget($operation);
-            $this->assertIsInt($originalHonor);
-            $this->assertLessThanOrEqual($originalHonor, $budget->deadlineNs(), 'Original honor must cap detached work.');
+            $detachedDeadline = $budget->deadlineNs();
             CarbonImmutable::setTestNow($at->subDay());
             // Deliberately consume the real original object after moving wall time backward.
             // No replacement source, budget, invoice window or observation is installed.
@@ -67,6 +67,9 @@ class MemberOriginalRetainedDeadlineTest extends TestCase
         });
         $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'workflow_deadline');
         $this->assertSame(1, $calls);
+        $this->assertIsInt($originalHonor);
+        $this->assertIsInt($detachedDeadline);
+        $this->assertLessThanOrEqual($originalHonor, $detachedDeadline, 'Original honor must cap detached work.');
         $this->assertSame([], glob(config('filesystems.disks.local.root').'/contracts/production-member-v1/synthetic_rehearsal/'
             .$fixture['reservation']['redemption_id'].'/*/original.pdf'));
         $this->assertMemberOriginalEffectsUnchanged($before);
