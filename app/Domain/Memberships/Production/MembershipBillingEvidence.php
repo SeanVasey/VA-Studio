@@ -168,7 +168,7 @@ final class MembershipBillingEvidence
             'original_terms_hash' => $document->termsHash(), 'original_buyer_binding' => $approved['original_buyer_binding']]);
         $binding = new MembershipInvoiceBinding($invoice['source_invoice_hash'], $graph, $invoice['provider_account_hash'], $facts['amount_minor'],
             $facts['currency'], $facts['line_period_start'], $facts['line_period_end'], $document->hash(), $document->termsHash(),
-            $approved['original_buyer_binding'], $facts['provenance'], $facts['paid_at'], $approved['plan_version_id'], $locator, $tail['freshness_deadline']);
+            $approved['original_buyer_binding'], $facts['provenance'], $facts['paid_at'], $approved['plan_version_id'], $locator, $tail['freshness_deadline'], $tail['id'], $tail['seal']);
         // Clock hooks precede the caller's terminal raw snapshot/configuration/frame comparisons.
         $now = CarbonImmutable::now('UTC')->format('Y-m-d H:i:s');
         MembershipException::require($tail['retrieved_at'] <= $now && $now < $tail['freshness_deadline'], 'expired_invoice_proof');

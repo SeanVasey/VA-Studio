@@ -188,8 +188,13 @@ final class BillingAwardFence
             $statement->execute([$name]);
             BillingException::require($statement->fetchAll(PDO::FETCH_COLUMN) === [], 'schema_namespace');
             try {
+                // Retain the actual table's MDL for the caller's transaction before inspecting its current definition.
+                $pdo->query('SELECT id FROM '.$this->table().' LIMIT 0')->closeCursor();
                 $shown = $pdo->query('SHOW CREATE TABLE '.$this->table())->fetch(PDO::FETCH_NUM);
                 BillingException::require(! str_contains(strtoupper($shown[1]), 'TEMPORARY'), 'shadowed_schema');
+                $expected = 'CREATE TABLE `'.$name.'` (`id` int unsigned NOT NULL, PRIMARY KEY (`id`), CONSTRAINT `'.$name.'_bounds` CHECK ((`id` = 1))) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin';
+                // Dictionary listings can retain the outer REPEATABLE READ snapshot. SHOW CREATE uses the opened table.
+                BillingException::require($this->definitionSql($shown[1]) === $this->definitionSql($expected), 'award_fence_schema');
             } catch (PDOException $error) {
                 if ($exists || $error->getCode() !== '42S02') {
                     throw $error;
@@ -232,12 +237,36 @@ final class BillingAwardFence
             $statement->execute([$guard]);
             BillingException::require($statement->fetchAll(PDO::FETCH_COLUMN) === [], 'shadowed_schema');
         } else {
+            // A trigger's subject must remain pinned while its named current definition is verified.
+            try {
+                $pdo->query('SELECT 1 FROM `'.$expected['table'].'` LIMIT 0')->closeCursor();
+            } catch (PDOException $error) {
+                if ($error->getCode() !== '42S02') {
+                    throw $error;
+                }
+            }
             $statement = $pdo->prepare('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT, ACTION_ORDER FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND lower(TRIGGER_NAME) = lower(?)');
             $statement->execute([$guard]);
             $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
             BillingException::require($rows === [] || (count($rows) === 1 && $rows[0]['TRIGGER_NAME'] === $guard && $rows[0]['EVENT_OBJECT_TABLE'] === $expected['table']
                 && $rows[0]['EVENT_MANIPULATION'] === $expected['event'] && $rows[0]['ACTION_TIMING'] === 'BEFORE' && (int) $rows[0]['ACTION_ORDER'] === 1
                 && $this->sql($rows[0]['ACTION_STATEMENT']) === $this->sql($expected['body'])), 'award_fence_schema');
+            // SHOW TRIGGERS is also snapshot-based. Only a named SHOW CREATE closes current required-guard admission.
+            try {
+                $current = $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC);
+                $original = $current['SQL Original Statement'] ?? null;
+                BillingException::require(is_string($original) && ($offset = strpos($original, ' TRIGGER ')) !== false, 'award_fence_schema');
+                $tail = substr($original, $offset + 1);
+                $tail = str_replace(' FOR EACH ROW PRECEDES `'.DB::connection()->getTablePrefix().BillingSchema::TABLES[3].'_insert` ', ' FOR EACH ROW ', $tail);
+                $wanted = 'TRIGGER `'.$guard.'` BEFORE '.$expected['event'].' ON `'.$expected['table'].'` FOR EACH ROW '.$expected['body'];
+                BillingException::require($this->sql($tail) === $this->sql($wanted), 'award_fence_schema');
+                $present = true;
+            } catch (PDOException $error) {
+                if (($error->errorInfo[1] ?? null) !== 1360) {
+                    throw $error;
+                }
+                $present = false;
+            }
             $statement = $pdo->prepare('SELECT TABLE_NAME FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)');
             $statement->execute([$guard]);
             BillingException::require($statement->fetchAll(PDO::FETCH_COLUMN) === [], 'schema_namespace');
@@ -253,7 +282,7 @@ final class BillingAwardFence
             }
         }
 
-        return $rows !== [];
+        return DB::getDriverName() === 'mysql' ? $present : $rows !== [];
     }
 
     private function mysqlDefinition(PDO $pdo): void
@@ -281,5 +310,10 @@ final class BillingAwardFence
     private function sql(string $sql): string
     {
         return trim(preg_replace('/\s+/', ' ', $sql), ' ;');
+    }
+
+    private function definitionSql(string $sql): string
+    {
+        return preg_replace('/\s+/', '', $sql);
     }
 }

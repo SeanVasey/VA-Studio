@@ -21,6 +21,8 @@ final readonly class MembershipInvoiceBinding
         public ?string $planVersionId = null,
         public ?string $invoiceId = null,
         public ?string $evidenceDeadline = null,
+        public ?string $observationId = null,
+        public ?string $observationSeal = null,
     ) {
         foreach ([$sourceInvoiceHash, $sourceGraphHash, $providerScopeHash, $planPolicyHash, $originalTermsHash] as $hash) {
             MembershipValues::hash($hash);
@@ -34,10 +36,13 @@ final readonly class MembershipInvoiceBinding
                 MembershipValues::utc($date);
             }
         }
-        foreach ([$planVersionId, $invoiceId] as $id) {
+        foreach ([$planVersionId, $invoiceId, $observationId] as $id) {
             if ($id !== null) {
                 MembershipValues::id($id);
             }
+        }
+        if ($observationSeal !== null) {
+            MembershipValues::hash($observationSeal);
         }
         MembershipException::require($amountMinor >= 0 && preg_match('/\A[A-Z]{3}\z/D', $currency) === 1
             && $periodStart < $periodEnd && $originalBuyerBinding['provenance'] === $provenance, 'invalid_invoice_value');
