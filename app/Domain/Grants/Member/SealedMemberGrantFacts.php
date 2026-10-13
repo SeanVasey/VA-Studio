@@ -8,6 +8,8 @@ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Models\User;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use ReflectionProperty;
 use WeakMap;
@@ -44,6 +46,7 @@ final class SealedMemberGrantFacts implements MemberGrantFactsAuthority
     {
         $deadline = \hrtime(true) + 60_000_000_000;
         MemberGrantDocumentValues::id($definitionId);
+        $ownerInputs = self::ownerInputs($actor);
         $policy = new MemberGrantPolicy;
         $configuration = $policy->currentFor($rows);
         $schema = MemberGrantCurrentSchema::pin($rows);
@@ -63,7 +66,7 @@ final class SealedMemberGrantFacts implements MemberGrantFactsAuthority
             && $owner['durable_binding']['provenance'] === $configuration['provenance'], 'facts_not_approved');
         $proof = new MemberGrantFactsToken($snapshot->factsBinding);
         $this->issued[$proof] = compact('principal', 'actor', 'rows', 'deadline', 'policy', 'configuration',
-            'schema', 'reader', 'owner', 'definition', 'profile', 'snapshot', 'plan') + ['actor_attributes' => self::actor($actor)];
+            'schema', 'reader', 'owner', 'definition', 'profile', 'snapshot', 'plan') + ['owner_inputs' => $ownerInputs];
         $this->proveCurrent($proof, $principal, $actor, $rows);
 
         return $proof;
@@ -184,7 +187,7 @@ final class SealedMemberGrantFacts implements MemberGrantFactsAuthority
     private function raw(array $issued, bool $committed): void
     {
         $issued['policy']->proveCapturedConfiguration($issued['configuration']);
-        MemberGrantException::require(self::actor($issued['actor']) === $issued['actor_attributes'], 'changed_owner');
+        MemberGrantException::require(self::ownerInputs($issued['actor']) === $issued['owner_inputs'], 'changed_owner');
         $reader = $issued['reader'];
         $reader->owner($issued['owner'], $committed);
         MemberGrantRows::equal($issued['profile'], $reader->profile($issued['profile']['id'], $committed));
@@ -202,10 +205,46 @@ final class SealedMemberGrantFacts implements MemberGrantFactsAuthority
             && $document->facts['provenance'] === $definition['provenance'], 'conflicting_plan');
     }
 
-    private static function actor(User $actor): array
+    /** Detached original policy and owner argument values; no framework resolution in raw closure. */
+    private static function ownerInputs(User $actor): array
     {
-        return [(new ReflectionProperty(Model::class, 'attributes'))->getValue($actor),
-            (new ReflectionProperty(Model::class, 'original'))->getValue($actor)];
+        $container = Container::getInstance();
+        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($container);
+        $repository = is_array($instances) ? ($instances['config'] ?? null) : null;
+        MemberGrantException::require($repository instanceof Repository && get_class($repository) === Repository::class, 'changed_owner');
+        $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($repository);
+        MemberGrantException::require(is_array($items) && is_array($items['production-customer-identity'] ?? null), 'changed_owner');
+        $remaining = 4096;
+        $bytes = 1048576;
+        $values = self::copyOwnerValues([
+            'identity_configuration' => $items['production-customer-identity'],
+            'actor_exists' => (new ReflectionProperty(Model::class, 'exists'))->getValue($actor),
+            'actor_attributes' => (new ReflectionProperty(Model::class, 'attributes'))->getValue($actor),
+            'actor_original' => (new ReflectionProperty(Model::class, 'original'))->getValue($actor),
+        ], $remaining, $bytes);
+
+        return ['container' => $container, 'repository' => $repository, 'values' => $values];
+    }
+
+    private static function copyOwnerValues(mixed $value, int &$remaining, int &$bytes, int $depth = 0): mixed
+    {
+        MemberGrantException::require(--$remaining >= 0 && $depth <= 16, 'changed_owner');
+        if (is_array($value)) {
+            $copy = [];
+            foreach ($value as $key => $child) {
+                $copy[$key] = self::copyOwnerValues($child, $remaining, $bytes, $depth + 1);
+            }
+
+            return $copy;
+        }
+        MemberGrantException::require($value === null || is_string($value) || is_int($value) || is_bool($value)
+            || (is_float($value) && is_finite($value)), 'changed_owner');
+        if (is_string($value)) {
+            $bytes -= strlen($value);
+            MemberGrantException::require($bytes >= 0, 'changed_owner');
+        }
+
+        return $value;
     }
 
     private static function deadline(array $issued): void
