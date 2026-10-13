@@ -42,8 +42,11 @@ Application source is frozen at
 `defe95802e7d09e7df12c61a98c1ebf1caee99c0`; final test source is
 `45d1299406821627f4ba02af186e324a70c6ade0`. The two later commits change only the
 native temporary-table fixture and the bounded-admission race assertions. The
-separate non-author reviewer found no remaining P0/P1 in the application or those
-test corrections; final evidence review and its recorded DECISION remain pending. No merge or release approval is claimed here.
+separate non-author reviewer **APPROVED development merge** at
+`d8e7944c5137c6649bdc067f22a251d56cbd09b1`, after verifying the complete packet,
+with no remaining P0/P1. Its [DECISION](independent-review-DECISION.md) retains
+activation conditions. Receipt-only carry and exact-head preflight remain before
+merge; no activation or release approval is claimed.
 
 The completed integrated SQLite selection passed **13 tests / 228 assertions**,
 with one declared MySQL-only skip and zero failures or errors. The source-bound
@@ -136,7 +139,8 @@ all carried Billing and member-original activation conditions remain open. The
 failed deadline race is evidence relevant to that performance condition, not a
 reason to renew or lengthen an issued proof's budget. No Foundation or GitLab
 workflow was dispatched, and no full matrix, browser, provider or host acceptance
-is claimed. Preflight and exact-head merge remain after final independent review.
+is claimed. Final independent evidence review is complete; exact-head preflight and
+merge remain.
 
 The [next batch](next-batch.md) follows this C2 slice. C3 should reuse the existing
 pinned Stripe 21.3.2 read adapter
