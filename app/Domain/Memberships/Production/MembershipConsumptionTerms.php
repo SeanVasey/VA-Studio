@@ -16,16 +16,13 @@ final readonly class MembershipConsumptionTerms
         MembershipException::require($facts['schema_version'] === 'membership-consumption-terms-v1'
             && $facts['purpose'] === MemberGrantIntent::PURPOSE && $facts['source_rule'] === 'current_selected_catalog', 'unsupported_policy');
         self::text($facts['reference'], 160);
-        self::text($facts['text'], 65536);
+        self::text($facts['text'], 65536, true);
         MembershipException::require(is_array($facts['retention_policy']) && is_array($facts['authorization_policy']), 'invalid_policy_value');
         $retention = $facts['retention_policy'];
         MembershipPolicyDocument::keys($retention, ['schema_version', 'reference', 'text']);
         MembershipException::require($retention['schema_version'] === 'member-original-retention-facts-v1', 'unsupported_policy');
         self::text($retention['reference'], 160);
-        self::text($retention['text'], 65536);
-        // Preserve the exact C4b authored retention vocabulary, including its text control bounds.
-        MembershipException::require(preg_match('/[\x00-\x1F\x7F]/', $retention['reference']) === 0
-            && preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', $retention['text']) === 0, 'invalid_policy_value');
+        self::text($retention['text'], 65536, true);
         $authorization = $facts['authorization_policy'];
         MembershipPolicyDocument::keys($authorization, ['schema_version', 'mode', 'action', 'record_claim', 'display_reference', 'display_text', 'required_sources']);
         MembershipException::require($authorization['schema_version'] === 'member-license-authorization-policy-v1'
@@ -34,7 +31,7 @@ final readonly class MembershipConsumptionTerms
             && $authorization['record_claim'] === 'owner_requested_activation'
             && $authorization['required_sources'] === 'selected_license_and_consumption_terms', 'unsupported_policy');
         self::text($authorization['display_reference'], 160);
-        self::text($authorization['display_text'], 65536);
+        self::text($authorization['display_text'], 65536, true);
 
         return new self(CanonicalJson::encode($facts));
     }
@@ -91,8 +88,10 @@ final readonly class MembershipConsumptionTerms
         return $value;
     }
 
-    private static function text(mixed $value, int $max): void
+    private static function text(mixed $value, int $max, bool $multiline = false): void
     {
-        MembershipException::require(is_string($value) && trim($value) !== '' && strlen($value) <= $max, 'invalid_policy_value');
+        // Match the mandatory confirmation display and C4b retention vocabulary without normalizing bytes.
+        MembershipException::require(is_string($value) && trim($value) !== '' && strlen($value) <= $max
+            && preg_match($multiline ? '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/' : '/[\x00-\x1F\x7F]/', $value) === 0, 'invalid_policy_value');
     }
 }
