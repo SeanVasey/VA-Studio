@@ -41,7 +41,7 @@ final class MemberLicenseAuthorizationRecordsTest extends TestCase
         $actor['verification_observation_hash'] = hash('sha256', 'different synthetic current observation');
         $fresh = MemberLicenseAuthorizationRecords::create($f['source'], $f['policy'], $actor, $f['authorization_id'], $f['confirmed_at']);
         $this->assertSame($a['intent_hash'], $fresh['intent_hash']);
-        $this->assertSame($actor, $fresh['actor_binding']);
+        $this->assertSame(CanonicalJson::encode($actor), CanonicalJson::encode($fresh['actor_binding']));
     }
 
     public function test_nested_references_and_returned_values_cannot_mutate_retained_display(): void
