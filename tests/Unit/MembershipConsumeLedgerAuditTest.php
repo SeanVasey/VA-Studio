@@ -186,7 +186,7 @@ class MembershipConsumeLedgerAuditTest extends TestCase
         $f = $this->fixture();
         $event = $f['consume'];
         $event[$field] = match ($field) {
-            'amount', 'after_consumed', 'after_available', 'before_reserved' => 2,
+            'amount', 'after_consumed', 'after_available', 'before_reserved' => $event[$field] + 1,
             'sequence' => 4,
             'created_at' => $f['redemption']['honor_deadline'],
             'grant_purpose' => 'different-purpose',
