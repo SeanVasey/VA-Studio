@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionMembership;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Production\MemberGrantAuthority;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MemberGrantReceipt;
@@ -61,6 +62,11 @@ class MembershipPreparationTest extends TestCase
                 }
 
                 public function proveCurrent(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): void
+                {
+                    throw new \LogicException('Unbound fixture');
+                }
+
+                public function freshnessWindow(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): BillingFreshnessWindow
                 {
                     throw new \LogicException('Unbound fixture');
                 }
