@@ -11,15 +11,21 @@ final readonly class MembershipPolicyDocument
 
     public const CREDIT_VERSION = 'membership-credit-policy-v2';
 
+    public const CONSUMPTION_VERSION = 'membership-credit-policy-v3';
+
     private function __construct(public array $facts, public MembershipAwardTerms $awardTerms,
-        public ?MembershipRedemptionTerms $redemptionTerms) {}
+        public ?MembershipRedemptionTerms $redemptionTerms, public ?MembershipConsumptionTerms $consumptionTerms = null) {}
 
     public static function from(array $facts): self
     {
-        $credit = ($facts['schema_version'] ?? null) === self::CREDIT_VERSION;
+        $consume = ($facts['schema_version'] ?? null) === self::CONSUMPTION_VERSION;
+        if ($consume) {
+            $facts = MembershipConsumptionTerms::detached($facts);
+        }
+        $credit = $consume || ($facts['schema_version'] ?? null) === self::CREDIT_VERSION;
         self::keys($facts, [...['schema_version', 'scope', 'provenance', 'plan_name', 'terms_reference', 'terms_text',
-            'credit_allowance', 'billing_price_minor', 'billing_currency', 'period_source', 'award_terms'], ...($credit ? ['redemption_terms'] : [])]);
-        MembershipException::require(($credit ? $facts['scope'] === 'paid_period_credit_lifecycle'
+            'credit_allowance', 'billing_price_minor', 'billing_currency', 'period_source', 'award_terms'], ...($credit ? ['redemption_terms'] : []), ...($consume ? ['consumption_terms'] : [])]);
+        MembershipException::require(($credit ? $facts['scope'] === ($consume ? 'paid_period_credit_activation' : 'paid_period_credit_lifecycle')
             : $facts['schema_version'] === self::VERSION && $facts['scope'] === 'paid_period_award')
             && $facts['period_source'] === 'verified_invoice_line_service_period', 'unsupported_policy');
         MembershipException::require(is_string($facts['provenance']), 'invalid_policy_value');
@@ -38,11 +44,15 @@ final readonly class MembershipPolicyDocument
             MembershipException::require(is_array($facts['redemption_terms']), 'invalid_policy_value');
         }
         $redemption = $credit ? MembershipRedemptionTerms::from($facts['redemption_terms']) : null;
+        if ($consume) {
+            MembershipException::require(is_array($facts['consumption_terms']), 'invalid_policy_value');
+        }
+        $consumption = $consume ? MembershipConsumptionTerms::from($facts['consumption_terms']) : null;
         $canonical = CanonicalJson::encode($facts);
         // Leave space for the retained author/record envelope under its existing 131072-byte cap.
         MembershipException::require(! $credit || strlen($canonical) <= 122880, 'invalid_policy_value');
 
-        return new self($facts, $terms, $redemption);
+        return new self($facts, $terms, $redemption, $consumption);
     }
 
     public function hash(): string
@@ -60,13 +70,14 @@ final readonly class MembershipPolicyDocument
         return new MembershipPolicyBinding(
             planVersionId: $id, policyHash: $this->hash(), originalTermsHash: $this->termsHash(),
             rolloverPolicyHash: null, lateInvoicePolicyHash: hash('sha256', CanonicalJson::encode($this->awardTerms->facts['late_payment'])),
-            cancellationPolicyHash: null, reservationHonorPolicyHash: $this->redemptionTerms?->honorHash(), grandfatherPolicyHash: null, retentionPolicyHash: null,
+            cancellationPolicyHash: null, reservationHonorPolicyHash: $this->redemptionTerms?->honorHash(), grandfatherPolicyHash: null, retentionPolicyHash: $this->consumptionTerms?->retentionHash(),
             provenance: $this->facts['provenance'], creditAllowance: $this->facts['credit_allowance'],
             billingPriceMinor: $this->facts['billing_price_minor'], billingCurrency: $this->facts['billing_currency'],
             periodPolicyHash: hash('sha256', CanonicalJson::encode(['source' => $this->facts['period_source'], 'expiry' => $this->awardTerms->facts['expiry']])),
             eligibleLicensePolicyHash: $this->redemptionTerms?->eligibilityHash(), awardTerms: $this->awardTerms,
-            supportedOperations: $this->redemptionTerms === null ? ['paid_period_award'] : ['paid_period_award', 'reserve', 'release', 'expire'],
+            supportedOperations: $this->redemptionTerms === null ? ['paid_period_award'] : ['paid_period_award', 'reserve', 'release', 'expire', ...($this->consumptionTerms === null ? [] : ['consume'])],
             redemptionTerms: $this->redemptionTerms,
+            consumptionTerms: $this->consumptionTerms,
         );
     }
 
