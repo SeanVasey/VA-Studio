@@ -48,4 +48,37 @@ class MemberGrantExpectedPlanTest extends TestCase
         $this->expectException(MemberGrantException::class);
         serialize(new MemberGrantSchemaSnapshot);
     }
+
+    public function test_configuration_baselines_detach_nested_caller_held_references(): void
+    {
+        $host = 'synthetic-original-host';
+        $key = 'synthetic-original-key';
+        $previous = ['synthetic-previous-key'];
+        $source = ['database' => ['connections' => ['mysql' => ['host' => &$host]]],
+            'connection' => ['host' => &$host], 'keys' => [&$key, &$previous]];
+        $method = new \ReflectionMethod(MemberGrantCurrentSchema::class, 'detachedValues');
+        $captured = $method->invoke(null, $source);
+        $expected = ['database' => ['connections' => ['mysql' => ['host' => 'synthetic-original-host']]],
+            'connection' => ['host' => 'synthetic-original-host'], 'keys' => ['synthetic-original-key', ['synthetic-previous-key']]];
+        $this->assertSame($expected, $captured);
+        $host = 'synthetic-replacement-host';
+        $key = 'synthetic-replacement-key';
+        $previous[] = 'synthetic-new-key';
+        $this->assertSame($expected, $captured);
+        $this->assertNotSame($source, $captured);
+    }
+
+    public function test_configuration_baseline_refuses_recursive_values_with_a_bounded_depth(): void
+    {
+        $cycle = [];
+        $cycle['self'] = &$cycle;
+        $this->expectException(MemberGrantException::class);
+        (new \ReflectionMethod(MemberGrantCurrentSchema::class, 'detachedValues'))->invoke(null, $cycle);
+    }
+
+    public function test_configuration_baseline_refuses_application_objects(): void
+    {
+        $this->expectException(MemberGrantException::class);
+        (new \ReflectionMethod(MemberGrantCurrentSchema::class, 'detachedValues'))->invoke(null, ['value' => new \stdClass]);
+    }
 }

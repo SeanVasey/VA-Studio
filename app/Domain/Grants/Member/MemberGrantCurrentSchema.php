@@ -37,9 +37,9 @@ final class MemberGrantCurrentSchema
         }
         $state['plan'] = MemberGrantSchema::expectedPlan($state['driver'], $state['schema'], $state['prefix']);
         $items = self::property($state['configuration'], Repository::class, 'items');
-        $state['configurationItems'] = $items['database'] ?? null;
-        $state['keyConfig'] = [$items['app']['key'] ?? null, $items['app']['previous_keys'] ?? null];
-        $state['connectionConfig'] = self::property($state['connection'], Connection::class, 'config');
+        $state['configurationItems'] = self::detachedValues($items['database'] ?? null);
+        $state['keyConfig'] = self::detachedValues([$items['app']['key'] ?? null, $items['app']['previous_keys'] ?? null]);
+        $state['connectionConfig'] = self::detachedValues(self::property($state['connection'], Connection::class, 'config'));
         $owned = self::property($rows, MembershipRows::class, 'ownedTransaction');
         if ($owned === null) {
             $state['marker'] = self::property($rows, MembershipRows::class, 'marker');
@@ -184,6 +184,36 @@ final class MemberGrantCurrentSchema
         if ($state['driver'] === 'mysql') {
             MemberGrantException::require($pdo->query('SELECT DATABASE()')->fetchColumn() === $state['schema'], 'changed_schema');
         }
+    }
+
+    /** A PHP array copy can retain references. Rebuild every value so callers cannot move an issued baseline. */
+    private static function detachedValues(mixed $value): mixed
+    {
+        $nodes = 10000;
+        $bytes = 1048576;
+
+        return self::detach($value, 0, $nodes, $bytes);
+    }
+
+    private static function detach(mixed $value, int $depth, int &$nodes, int &$bytes): mixed
+    {
+        MemberGrantException::require($depth <= 16 && --$nodes >= 0, 'changed_connection');
+        if (is_array($value)) {
+            $copy = [];
+            foreach ($value as $key => $child) {
+                $bytes -= is_string($key) ? strlen($key) : 0;
+                MemberGrantException::require($bytes >= 0, 'changed_connection');
+                $copy[$key] = self::detach($child, $depth + 1, $nodes, $bytes);
+            }
+
+            return $copy;
+        }
+        MemberGrantException::require($value === null || is_string($value) || is_int($value) || is_bool($value)
+            || (is_float($value) && is_finite($value)), 'changed_connection');
+        $bytes -= is_string($value) ? strlen($value) : 0;
+        MemberGrantException::require($bytes >= 0, 'changed_connection');
+
+        return $value;
     }
 
     private static function property(object $object, string $class, string $name): mixed
