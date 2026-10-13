@@ -1,0 +1,70 @@
+[
+  {
+    "id": "retained",
+    "runtime_root": "/workspace/runtime/member-activation-retained-evidence",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "7f1f830b9374c09d994e169a9971eba2011f21b4b16f3f7a6971d4b836ac209f",
+    "scope": "Synthetic retained values and native files; inert SQLite handles only",
+    "limits": [
+      "Files regression and Pint overlap is corrected by handoff.md; original receipt bytes retained.",
+      "No real renderer, member graph, MySQL or timing acceptance."
+    ]
+  },
+  {
+    "id": "authorization",
+    "runtime_root": "/workspace/runtime/member-activation-operation-evidence",
+    "manifest": "authorization-release.json",
+    "manifest_sha256": "bc1f08faadbb7f56af382bddddc5151d0030cde7a6ca0a0d57f156433bfd1b09",
+    "scope": "Pure authorization records only",
+    "limits": [
+      "Initial assertion failure retained; final test-only correction.",
+      "No actual issuer, confirmation, DB or legal-assent claim."
+    ]
+  },
+  {
+    "id": "integration-preparation",
+    "runtime_root": "/workspace/runtime/member-activation-integration-evidence",
+    "manifest": "release-preparation-manifest.json",
+    "manifest_sha256": "8ef90670fa0ff72b37bdc23a72e01b84d8ca0b86230b0ed90fb7b81d42cd78fd",
+    "scope": "Static fixture and native rollback preparation only",
+    "limits": [
+      "Seven planned cases are not execution counts or skips.",
+      "Working source overlay hashes bind later committed files; observed precommit HEAD is preserved."
+    ]
+  },
+  {
+    "id": "history-core",
+    "runtime_root": "/workspace/runtime/member-activation-history-evidence",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "0b7e924c55bd464836883e848310c943da5c3ad1ac5105efa141a518cd2090cc",
+    "scope": "Pure synthetic record codecs and history graph",
+    "limits": [
+      "Initial helper-name fatal exit 255 and empty JUnit retained.",
+      "Synthetic sealed consume graph is not actual ledger producer or database authority.",
+      "Private accumulator boundary is not a near-cap live graph."
+    ]
+  },
+  {
+    "id": "reader",
+    "runtime_root": "/workspace/runtime/member-activation-reader-evidence",
+    "manifest": "public-release.json",
+    "manifest_sha256": "ae43b227b0c033508f33588371a7595c3ad809ed7a9de433e015c35070671686",
+    "scope": "Pure handles, bounded SQLite queries and installed-schema empty history",
+    "limits": [
+      "Four invocations are a source-mixed catalog, not a final suite.",
+      "No native or nonempty authenticated reader composition."
+    ]
+  },
+  {
+    "id": "policy-consume",
+    "runtime_root": "/workspace/runtime/member-consumption-policy-evidence",
+    "manifest": "public-release-v1.json",
+    "manifest_sha256": "de0d1c54b931e44aed1c1e6e214f48745ae79613be99370a63a1a067fcf47ffe",
+    "scope": "Pure v3 policy, historical invoice and consume ledger values",
+    "limits": [
+      "Historical assertion-order failure, no-op mutation failure and Pint path error retained.",
+      "Cleanup 1/6 selects one added method, not a whole-file rerun.",
+      "Source inventory covers tracked paths; runtime and runner are identified before invocation, without retained after metadata checks."
+    ]
+  }
+]

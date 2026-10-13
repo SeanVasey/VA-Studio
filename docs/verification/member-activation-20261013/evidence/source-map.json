@@ -1,0 +1,149 @@
+{
+  "anchor": "ec151b20a9af83118ab9d85e65eadf9c703c941d",
+  "author_to_integration": {
+    "2468639fc3cf757c63afd6b202a44468abb4d396": "0dd2ea1b5dbd3e04d86552ad7559aaea215cf29b",
+    "3202ad0494e17370b030db76ec5e62a93d6358fe": "77289a7b9ece25095e6d52bc633f5dce4cec39e9",
+    "33beeb02c65f05c6b41680b380f8a74a3afda541": "010826b641a4ae7afa4ab73176e908ba4c300046",
+    "34a4938667fb1f58d5dee09bccd4fe4c34940cd7": "59d73ad9732676348d23daf0ae99a65b48694f84",
+    "3646d50c46a546f72d19173937e75bd4f3d7e37c": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
+    "3af459ff7e7daa83b037b11044ecad3e98aa5a20": "350f35ba60edf96fb6cfdd804316bae03c02cbae",
+    "433b84f3c6a7221c922bb2f36f0f0d87b231e486": "83b0dedaee621341bac7926f073cc10e77c20edf",
+    "4bc0e54c19d76595868411c7df2562d2bfcea87b": "e58d5aa8870829e93bb2a7d480b20b7ed5e1e357",
+    "558e4ec289c9eb66e547471a39c23c1133ad2702": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
+    "8a4741630d4dfadfe45075468c90353118adfdbe": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+    "a2e3b5ad1d22602388e575aa44fa308b715c9629": "665602c1bca79091cffd84bc247b765c72e96359",
+    "c8c76f82965d2a3a116b00b2160d18e6b16958f1": "3a252c02858ae64336469d40600b81467024c77a",
+    "d0e81c46f660776a6f8b5fc171d570acd23f0540": "81f4cd2d5a9aed836fffd498919cc6263b294b4a",
+    "e02fb79a5be74e3ff83cab316995da2d938208f3": "39db5e4a6e343853e5212cca9652660240e72f84",
+    "fad28b10d0b5120931dc8ee40c5c57e770243eb7": "d67637f81019d791bcfc12aa00f49a6c1b64c00f",
+    "feb05d227d42cb8d07415178295306ffd9f69fe2": "1b4328e04735df22a092b3273ec258a3a69f3dea"
+  },
+  "base": "a108aca947ae0d3f661e9feef8a19441d5c3a165",
+  "meaning": "Exact named path-byte equivalence to reachable root versions; not execution of those versions or complete uncaptured harness proof.",
+  "schema": "c4c-portable-source-map-v1",
+  "sources": {
+    "authorization/bundles/3c8bcb5600169f76a1f1cb2176733156534c4dfaf30293885f192457d89f4838.json": {
+      "author_head": "2468639fc3cf757c63afd6b202a44468abb4d396",
+      "default_ref": "0dd2ea1b5dbd3e04d86552ad7559aaea215cf29b",
+      "input_count": 1329,
+      "overrides": {}
+    },
+    "authorization/bundles/89bb46cc6490eef2422ab18b7156f95b7ef09c6b025fa3307dbe95db7a868a5f.json": {
+      "author_head": "3646d50c46a546f72d19173937e75bd4f3d7e37c",
+      "default_ref": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
+      "input_count": 1329,
+      "overrides": {}
+    },
+    "history-core/bundles/4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d.json": {
+      "author_head": "d0e81c46f660776a6f8b5fc171d570acd23f0540",
+      "default_ref": "81f4cd2d5a9aed836fffd498919cc6263b294b4a",
+      "input_count": 1336,
+      "overrides": {}
+    },
+    "history-core/bundles/474262b06838c1b3b4e1030db91e6c10471695206449d5aad616c43560c91931.json": {
+      "author_head": "34a4938667fb1f58d5dee09bccd4fe4c34940cd7",
+      "default_ref": "59d73ad9732676348d23daf0ae99a65b48694f84",
+      "input_count": 1336,
+      "overrides": {}
+    },
+    "history-core/bundles/6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a.json": {
+      "author_head": "433b84f3c6a7221c922bb2f36f0f0d87b231e486",
+      "default_ref": "83b0dedaee621341bac7926f073cc10e77c20edf",
+      "input_count": 1336,
+      "overrides": {}
+    },
+    "integration-preparation/preparation-commit-binding.json": {
+      "author_head": "8a4741630d4dfadfe45075468c90353118adfdbe",
+      "default_ref": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+      "input_count": 3,
+      "overrides": {}
+    },
+    "policy-consume/bundle-3202ad0494e1-32b0aab5a0ae/manifest.json": {
+      "author_head": "3202ad0494e17370b030db76ec5e62a93d6358fe",
+      "default_ref": "77289a7b9ece25095e6d52bc633f5dce4cec39e9",
+      "input_count": 1446,
+      "overrides": {}
+    },
+    "policy-consume/bundle-3af459ff7e7d-9771a9d35394/manifest.json": {
+      "author_head": "3af459ff7e7daa83b037b11044ecad3e98aa5a20",
+      "default_ref": "350f35ba60edf96fb6cfdd804316bae03c02cbae",
+      "input_count": 1435,
+      "overrides": {}
+    },
+    "policy-consume/bundle-558e4ec289c9-f5b920dd9412/manifest.json": {
+      "author_head": "558e4ec289c9eb66e547471a39c23c1133ad2702",
+      "default_ref": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
+      "input_count": 1445,
+      "overrides": {}
+    },
+    "policy-consume/bundle-a2e3b5ad1d22-293f951580b1/manifest.json": {
+      "author_head": "a2e3b5ad1d22602388e575aa44fa308b715c9629",
+      "default_ref": "665602c1bca79091cffd84bc247b765c72e96359",
+      "input_count": 1435,
+      "overrides": {}
+    },
+    "policy-consume/bundle-e02fb79a5be7-c623c2f66a76/manifest.json": {
+      "author_head": "e02fb79a5be74e3ff83cab316995da2d938208f3",
+      "default_ref": "39db5e4a6e343853e5212cca9652660240e72f84",
+      "input_count": 1435,
+      "overrides": {}
+    },
+    "policy-consume/bundle-fad28b10d0b5-bb11c81c5416/manifest.json": {
+      "author_head": "fad28b10d0b5120931dc8ee40c5c57e770243eb7",
+      "default_ref": "d67637f81019d791bcfc12aa00f49a6c1b64c00f",
+      "input_count": 1446,
+      "overrides": {}
+    },
+    "reader/bundles/3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba.json": {
+      "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
+      "input_count": 1338,
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+      }
+    },
+    "reader/bundles/8a7eaf1bfd43b6cb32cae452a01f13ee8f06990c4b45ef07c3286be723434dac.json": {
+      "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
+      "input_count": 1338,
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+      }
+    },
+    "reader/bundles/be6335ac83654561b5ee84f0f15938cf3e3bda4b784ae43a439200971df2f9eb.json": {
+      "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
+      "input_count": 1338,
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+      }
+    },
+    "reader/bundles/d47462d7c200312101615598c52ad580147e70fe6f6eaa8a421962e232e3dc4d.json": {
+      "author_head": "33beeb02c65f05c6b41680b380f8a74a3afda541",
+      "default_ref": "010826b641a4ae7afa4ab73176e908ba4c300046",
+      "input_count": 1338,
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+      }
+    },
+    "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json": {
+      "author_head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
+      "default_ref": "3a252c02858ae64336469d40600b81467024c77a",
+      "input_count": 1394,
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
+        "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "f8f648905eceae0808285d3bbe453328b73b3b05",
+        "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "f8f648905eceae0808285d3bbe453328b73b3b05",
+        "tests/Support/MembershipPolicyFixtures.php": "f8f648905eceae0808285d3bbe453328b73b3b05"
+      }
+    }
+  }
+}

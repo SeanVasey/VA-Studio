@@ -1,0 +1,794 @@
+{
+  "application_tests_executed_by_verifier": false,
+  "exit_markers": {
+    "authorization/pure-authorization-final/exit": 0,
+    "authorization/pure-authorization-initial/exit": 1,
+    "authorization/pure-authorization-pint.exit": 0,
+    "history-core/history-helper-corrected/exit": 0,
+    "history-core/history-initial/exit": 255,
+    "history-core/records-initial/exit": 0,
+    "integration-preparation/autoload-initial.exit": 0,
+    "policy-consume/consume-cleanup-pint.exit": 0,
+    "policy-consume/consume-pint.exit": 0,
+    "policy-consume/historical-pint-corrected.exit": 0,
+    "policy-consume/historical-pint.exit": 255,
+    "policy-consume/policy-pint.exit": 0,
+    "policy-consume/setup-composer.exit": 0,
+    "reader/handles-initial/exit": 0,
+    "reader/queries-closure-followup/exit": 0,
+    "reader/queries-initial/exit": 0,
+    "reader/registered-empty-initial/exit": 0
+  },
+  "git_source_check": true,
+  "releases": {
+    "authorization": {
+      "limits": [
+        "Initial assertion failure retained; final test-only correction.",
+        "No actual issuer, confirmation, DB or legal-assent claim."
+      ],
+      "manifest_sha256": "bc1f08faadbb7f56af382bddddc5151d0030cde7a6ca0a0d57f156433bfd1b09",
+      "members": 16,
+      "scope": "Pure authorization records only"
+    },
+    "history-core": {
+      "limits": [
+        "Initial helper-name fatal exit 255 and empty JUnit retained.",
+        "Synthetic sealed consume graph is not actual ledger producer or database authority.",
+        "Private accumulator boundary is not a near-cap live graph."
+      ],
+      "manifest_sha256": "0b7e924c55bd464836883e848310c943da5c3ad1ac5105efa141a518cd2090cc",
+      "members": 20,
+      "scope": "Pure synthetic record codecs and history graph"
+    },
+    "integration-preparation": {
+      "limits": [
+        "Seven planned cases are not execution counts or skips.",
+        "Working source overlay hashes bind later committed files; observed precommit HEAD is preserved."
+      ],
+      "manifest_sha256": "8ef90670fa0ff72b37bdc23a72e01b84d8ca0b86230b0ed90fb7b81d42cd78fd",
+      "members": 20,
+      "scope": "Static fixture and native rollback preparation only"
+    },
+    "policy-consume": {
+      "limits": [
+        "Historical assertion-order failure, no-op mutation failure and Pint path error retained.",
+        "Cleanup 1/6 selects one added method, not a whole-file rerun.",
+        "Source inventory covers tracked paths; runtime and runner are identified before invocation, without retained after metadata checks."
+      ],
+      "manifest_sha256": "de0d1c54b931e44aed1c1e6e214f48745ae79613be99370a63a1a067fcf47ffe",
+      "members": 51,
+      "scope": "Pure v3 policy, historical invoice and consume ledger values"
+    },
+    "reader": {
+      "limits": [
+        "Four invocations are a source-mixed catalog, not a final suite.",
+        "No native or nonempty authenticated reader composition."
+      ],
+      "manifest_sha256": "ae43b227b0c033508f33588371a7595c3ad809ed7a9de433e015c35070671686",
+      "members": 31,
+      "scope": "Pure handles, bounded SQLite queries and installed-schema empty history"
+    },
+    "retained": {
+      "limits": [
+        "Files regression and Pint overlap is corrected by handoff.md; original receipt bytes retained.",
+        "No real renderer, member graph, MySQL or timing acceptance."
+      ],
+      "manifest_sha256": "7f1f830b9374c09d994e169a9971eba2011f21b4b16f3f7a6971d4b836ac209f",
+      "members": 14,
+      "scope": "Synthetic retained values and native files; inert SQLite handles only"
+    }
+  },
+  "runs": {
+    "authorization/pure-authorization-final": {
+      "command": "pure-authorization-final/command.json",
+      "counts": {
+        "assertions": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 37
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.265,
+      "head": "3646d50c46a546f72d19173937e75bd4f3d7e37c",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "pure-authorization-final/result.json",
+      "selection": [
+        "tests/Unit/MemberLicenseAuthorizationRecordsTest.php"
+      ],
+      "source": "authorization/bundles/89bb46cc6490eef2422ab18b7156f95b7ef09c6b025fa3307dbe95db7a868a5f.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "authorization/pure-authorization-initial": {
+      "command": "pure-authorization-initial/command.json",
+      "counts": {
+        "assertions": 10,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 2
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.215,
+      "head": "2468639fc3cf757c63afd6b202a44468abb4d396",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "pure-authorization-initial/result.json",
+      "selection": [
+        "tests/Unit/MemberLicenseAuthorizationRecordsTest.php"
+      ],
+      "source": "authorization/bundles/3c8bcb5600169f76a1f1cb2176733156534c4dfaf30293885f192457d89f4838.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "history-core/history-helper-corrected": {
+      "command": "history-helper-corrected/command.json",
+      "counts": {
+        "assertions": 39,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.716,
+      "head": "d0e81c46f660776a6f8b5fc171d570acd23f0540",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "history-helper-corrected/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberGrants/MemberActivationHistoryTest.php"
+      ],
+      "source": "history-core/bundles/4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "history-core/history-initial": {
+      "command": "history-initial/command.json",
+      "counts": null,
+      "declared_driver": "pure",
+      "duration_seconds": 0.165,
+      "head": "34a4938667fb1f58d5dee09bccd4fe4c34940cd7",
+      "kind": "PHPUnit",
+      "process_exit": 255,
+      "result": "history-initial/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberGrants/MemberActivationHistoryTest.php"
+      ],
+      "source": "history-core/bundles/474262b06838c1b3b4e1030db91e6c10471695206449d5aad616c43560c91931.json",
+      "source_unchanged": true,
+      "status": "aborted before test counts",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": "empty XML; no execution count inferred"
+    },
+    "history-core/records-initial": {
+      "command": "records-initial/command.json",
+      "counts": {
+        "assertions": 79,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 7
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.666,
+      "head": "433b84f3c6a7221c922bb2f36f0f0d87b231e486",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "records-initial/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberGrants/MemberActivationRecordsTest.php"
+      ],
+      "source": "history-core/bundles/6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "policy-consume/consume-first": {
+      "command_and_result": "consume-first/result.json",
+      "counts": {
+        "assertions": 47,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 20
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 1.4680043069965905,
+      "head": "fad28b10d0b5120931dc8ee40c5c57e770243eb7",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "selection": [
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php",
+        "tests/Unit/MembershipLedgerAuditTest.php"
+      ],
+      "source": "policy-consume/bundle-fad28b10d0b5-bb11c81c5416/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-consume/consume-later-cleanup": {
+      "command_and_result": "consume-later-cleanup/result.json",
+      "counts": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.3649064610071946,
+      "head": "558e4ec289c9eb66e547471a39c23c1133ad2702",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php",
+        "--filter",
+        "test_later_reserve_expiry_and_honor_cleanup_preserve_existing_consumed_history"
+      ],
+      "source": "policy-consume/bundle-558e4ec289c9-f5b920dd9412/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-consume/consume-mutation-fixed": {
+      "command_and_result": "consume-mutation-fixed/result.json",
+      "counts": {
+        "assertions": 139,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 75
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 2.7207801379990997,
+      "head": "3202ad0494e17370b030db76ec5e62a93d6358fe",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php",
+        "tests/Unit/MembershipLedgerAuditTest.php"
+      ],
+      "source": "policy-consume/bundle-3202ad0494e1-32b0aab5a0ae/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-consume/historical-canonical-fixed": {
+      "command_and_result": "historical-canonical-fixed/result.json",
+      "counts": {
+        "assertions": 124,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 64
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 1.5182376200100407,
+      "head": "3af459ff7e7daa83b037b11044ecad3e98aa5a20",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipHistoricalInvoiceTest.php",
+        "tests/Unit/MembershipLedgerAuditTest.php"
+      ],
+      "source": "policy-consume/bundle-3af459ff7e7d-9771a9d35394/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-consume/historical-first": {
+      "command_and_result": "historical-first/result.json",
+      "counts": {
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.3652003219904145,
+      "head": "e02fb79a5be74e3ff83cab316995da2d938208f3",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "selection": [
+        "tests/Unit/MembershipHistoricalInvoiceTest.php",
+        "tests/Unit/MembershipLedgerAuditTest.php"
+      ],
+      "source": "policy-consume/bundle-e02fb79a5be7-c623c2f66a76/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-consume/policy-first": {
+      "command_and_result": "policy-first/result.json",
+      "counts": {
+        "assertions": 201,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 82
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.16461719300423283,
+      "head": "a2e3b5ad1d22602388e575aa44fa308b715c9629",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipConsumptionPolicyTest.php",
+        "tests/Unit/MembershipRedemptionPolicyTest.php"
+      ],
+      "source": "policy-consume/bundle-a2e3b5ad1d22-293f951580b1/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "reader/handles-initial": {
+      "command": "handles-initial/command.json",
+      "counts": {
+        "assertions": 16,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.164,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "handles-initial/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberOriginals/MemberActivationHistoryHandlesTest.php"
+      ],
+      "source": "reader/bundles/8a7eaf1bfd43b6cb32cae452a01f13ee8f06990c4b45ef07c3286be723434dac.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "reader/queries-closure-followup": {
+      "command": "queries-closure-followup/command.json",
+      "counts": {
+        "assertions": 34,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 18
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 0.265,
+      "head": "33beeb02c65f05c6b41680b380f8a74a3afda541",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "queries-closure-followup/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberOriginals/MemberActivationHistoryQueriesTest.php"
+      ],
+      "source": "reader/bundles/d47462d7c200312101615598c52ad580147e70fe6f6eaa8a421962e232e3dc4d.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "reader/queries-initial": {
+      "command": "queries-initial/command.json",
+      "counts": {
+        "assertions": 32,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 16
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 0.265,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "queries-initial/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberOriginals/MemberActivationHistoryQueriesTest.php"
+      ],
+      "source": "reader/bundles/3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "reader/registered-empty-initial": {
+      "command": "registered-empty-initial/command.json",
+      "counts": {
+        "assertions": 23,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 7.841,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "registered-empty-initial/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberOriginals/MemberActivationHistoryReaderTest.php"
+      ],
+      "source": "reader/bundles/be6335ac83654561b5ee84f0f15938cf3e3bda4b784ae43a439200971df2f9eb.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "retained/existing-files-regression": {
+      "command": "existing-files-regression/command.json",
+      "counts": {
+        "assertions": 157,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 40
+      },
+      "declared_driver": null,
+      "duration_seconds": 3.5015619799960405,
+      "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "existing-files-regression/result.json",
+      "selection": "existing",
+      "source": "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No parallel workload launched by this lane; no native MySQL workload claimed.",
+      "xml_problem": null
+    },
+    "retained/pint-frozen": {
+      "command": "pint-frozen/command.json",
+      "counts": null,
+      "declared_driver": null,
+      "duration_seconds": 0.4272988450102275,
+      "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
+      "kind": "formatting",
+      "process_exit": 0,
+      "result": "pint-frozen/result.json",
+      "selection": "pint",
+      "source": "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No parallel workload launched by this lane; no native MySQL workload claimed.",
+      "xml_problem": null
+    },
+    "retained/retained-initial": {
+      "command": "retained-initial/command.json",
+      "counts": {
+        "assertions": 82,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 30
+      },
+      "declared_driver": null,
+      "duration_seconds": 1.9251035700144712,
+      "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "retained-initial/result.json",
+      "selection": "retained",
+      "source": "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No parallel workload launched by this lane; no native MySQL workload claimed.",
+      "xml_problem": null
+    }
+  },
+  "schema": "c4c-receipt-index-v1",
+  "sources": {
+    "authorization/bundles/3c8bcb5600169f76a1f1cb2176733156534c4dfaf30293885f192457d89f4838.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "3c8bcb5600169f76a1f1cb2176733156534c4dfaf30293885f192457d89f4838",
+      "git_matches": 1329,
+      "head": "2468639fc3cf757c63afd6b202a44468abb4d396",
+      "input_count": 1329,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "c75f94dfd94b7100d8d832b9c23cd8e5419d524225886d370d274bec1c3f818f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "authorization/bundles/89bb46cc6490eef2422ab18b7156f95b7ef09c6b025fa3307dbe95db7a868a5f.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "89bb46cc6490eef2422ab18b7156f95b7ef09c6b025fa3307dbe95db7a868a5f",
+      "git_matches": 1329,
+      "head": "3646d50c46a546f72d19173937e75bd4f3d7e37c",
+      "input_count": 1329,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "c75f94dfd94b7100d8d832b9c23cd8e5419d524225886d370d274bec1c3f818f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "history-core/bundles/4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d",
+      "git_matches": 1336,
+      "head": "d0e81c46f660776a6f8b5fc171d570acd23f0540",
+      "input_count": 1336,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d585d6c488166422d54adf8b7d0f389d543228ad6267f7bd35bfed6a263d266d",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "history-core/bundles/474262b06838c1b3b4e1030db91e6c10471695206449d5aad616c43560c91931.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "474262b06838c1b3b4e1030db91e6c10471695206449d5aad616c43560c91931",
+      "git_matches": 1336,
+      "head": "34a4938667fb1f58d5dee09bccd4fe4c34940cd7",
+      "input_count": 1336,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d585d6c488166422d54adf8b7d0f389d543228ad6267f7bd35bfed6a263d266d",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "history-core/bundles/6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a",
+      "git_matches": 1336,
+      "head": "433b84f3c6a7221c922bb2f36f0f0d87b231e486",
+      "input_count": 1336,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d585d6c488166422d54adf8b7d0f389d543228ad6267f7bd35bfed6a263d266d",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "policy-consume/bundle-3202ad0494e1-32b0aab5a0ae/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "c05f40ebbe820b35ef137239029806db1e513a51796c6cbefdfb18a461b8a0c6",
+      "git_matches": 1446,
+      "head": "3202ad0494e17370b030db76ec5e62a93d6358fe",
+      "input_count": 1446,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-consume/bundle-3af459ff7e7d-9771a9d35394/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "fdb097918f75e4b3fe9105b7265bb37f701dec7a8b912b31c61e3849c798e99d",
+      "git_matches": 1435,
+      "head": "3af459ff7e7daa83b037b11044ecad3e98aa5a20",
+      "input_count": 1435,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-consume/bundle-558e4ec289c9-f5b920dd9412/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "a04f25e5663fdc2af679adbe94c8268af9cd2be73e09bd3402faa4ccc982f9b9",
+      "git_matches": 1445,
+      "head": "558e4ec289c9eb66e547471a39c23c1133ad2702",
+      "input_count": 1445,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-consume/bundle-a2e3b5ad1d22-293f951580b1/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "cfde3d6cb14367e947df5b3e657228508783ca58a3c0290305345636f5d3c38b",
+      "git_matches": 1435,
+      "head": "a2e3b5ad1d22602388e575aa44fa308b715c9629",
+      "input_count": 1435,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-consume/bundle-e02fb79a5be7-c623c2f66a76/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "d92ef9ea342125f9d4733ff6042183553cf33cad0168b6bb46f73abd41780c45",
+      "git_matches": 1435,
+      "head": "e02fb79a5be74e3ff83cab316995da2d938208f3",
+      "input_count": 1435,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-consume/bundle-fad28b10d0b5-bb11c81c5416/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "2cbe58a3688fc13d95ef44fcdfde1d02ca20523ca6684dcbb241be6d0855bab6",
+      "git_matches": 1446,
+      "head": "fad28b10d0b5120931dc8ee40c5c57e770243eb7",
+      "input_count": 1446,
+      "limits": [
+        "Tracked source scope only; ignored/untracked additions are not inventoried.",
+        "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "reader/bundles/3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba",
+      "git_matches": 1338,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "input_count": 1338,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "fac356831fd00a7f6ca42627acf5b3c08353f62654fd53d3b894a43cc27f395f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "reader/bundles/8a7eaf1bfd43b6cb32cae452a01f13ee8f06990c4b45ef07c3286be723434dac.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "8a7eaf1bfd43b6cb32cae452a01f13ee8f06990c4b45ef07c3286be723434dac",
+      "git_matches": 1338,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "input_count": 1338,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "fac356831fd00a7f6ca42627acf5b3c08353f62654fd53d3b894a43cc27f395f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "reader/bundles/be6335ac83654561b5ee84f0f15938cf3e3bda4b784ae43a439200971df2f9eb.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "be6335ac83654561b5ee84f0f15938cf3e3bda4b784ae43a439200971df2f9eb",
+      "git_matches": 1338,
+      "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
+      "input_count": 1338,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "fac356831fd00a7f6ca42627acf5b3c08353f62654fd53d3b894a43cc27f395f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "reader/bundles/d47462d7c200312101615598c52ad580147e70fe6f6eaa8a421962e232e3dc4d.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "d47462d7c200312101615598c52ad580147e70fe6f6eaa8a421962e232e3dc4d",
+      "git_matches": 1338,
+      "head": "33beeb02c65f05c6b41680b380f8a74a3afda541",
+      "input_count": 1338,
+      "limits": [
+        "Executed Laravel base tests/TestCase.php was not captured; complete harness source binding is partial."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "fac356831fd00a7f6ca42627acf5b3c08353f62654fd53d3b894a43cc27f395f",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json": {
+      "autoload_count": 8,
+      "bundle_sha256": "a4daef66eed6e8e6989408c113b1dbecb76bffe77dc52c4f160ffe5df37f724b",
+      "git_matches": 1394,
+      "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
+      "input_count": 1394,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "02a25379a14d178133da7ff838eed5b818bf6cbea4d0b163ac01d3d83df4763d",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    }
+  },
+  "static": {
+    "integration-preparation/preparation-commit-binding.json": {
+      "behavioral_execution": false,
+      "git_verified": true,
+      "head": "8a4741630d4dfadfe45075468c90353118adfdbe",
+      "source_count": 3
+    },
+    "integration-preparation/static-initial.json": {
+      "before_after_equal": true,
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_head": "665602c1bca79091cffd84bc247b765c72e96359",
+      "source_count": 2
+    },
+    "integration-preparation/static-rollback.json": {
+      "before_after_equal": true,
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_head": "4bc0e54c19d76595868411c7df2562d2bfcea87b",
+      "source_count": 3
+    }
+  },
+  "storage": {
+    "archive_bytes": 611479,
+    "delta_objects": 9,
+    "original_unique_bytes": 3151616,
+    "release_members": 152,
+    "unique_objects_including_manifests": 123
+  }
+}
