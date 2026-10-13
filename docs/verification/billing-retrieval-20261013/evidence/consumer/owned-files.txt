@@ -1,0 +1,8 @@
+app/Domain/Memberships/Billing/BillingFreshnessWindow.php
+app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php
+app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php
+app/Domain/Memberships/Production/MembershipBillingEvidence.php
+app/Domain/Memberships/Production/MembershipAwardContext.php
+app/Domain/Memberships/Production/MembershipReservationContext.php
+tests/Unit/BillingFreshnessWindowTest.php
+tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php

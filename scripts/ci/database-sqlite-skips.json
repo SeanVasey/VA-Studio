@@ -925,6 +925,34 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
       "test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeDatabaseIntervalOwnershipRaceTest",
+      "test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest",
+      "test_native_database_utc_is_independent_of_session_timezone"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest",
+      "test_native_endpoint_lookup_uses_current_allocation_after_an_older_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalIdentitySchemaTest",
+      "test_native_old_snapshot_cannot_hide_a_competing_committed_interval_claim"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest",
+      "test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest",
+      "test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape"
     ]
   ]
 }

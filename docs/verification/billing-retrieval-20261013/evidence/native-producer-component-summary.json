@@ -1,0 +1,24 @@
+{
+  "id": "native-producer",
+  "output": "native-producer-component-summary.json",
+  "scope": "Two disjoint producer invocations at component source 5dc11691, not one suite invocation or final-schema integration result.",
+  "runs": [
+    "records/native-producer-canary",
+    "records/native-producer-remainder"
+  ],
+  "expected_counts": {
+    "tests": 12,
+    "assertions": 164,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "database_version": "MySQL 8.4.11",
+  "final_schema_correction_exercised": false,
+  "tests": 12,
+  "assertions": 164,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "disjoint_case_identities": true
+}

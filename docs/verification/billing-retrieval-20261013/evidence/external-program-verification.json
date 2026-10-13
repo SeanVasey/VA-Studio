@@ -1,0 +1,77 @@
+{
+  "scope": "External runtime probe/runner source bytes independently checked against retained before and after source-receipt fields. Private autoload and key inputs are not copied or attested here.",
+  "programs": [
+    {
+      "run": "records/baseline",
+      "path": "records/baseline/BillingPreC3RegressionTest.php",
+      "sha256": "1cb898473c7f7c659c18322f712b04e3fe53ab55ede993d81462be0319e7c71a",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/baseline",
+      "path": "records/baseline/run.sh",
+      "sha256": "2872ae75486dc155e59d7f590259e40875cbb59c10e064cc92cc94d7795e7cc6",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-old",
+      "path": "records/award-upgrade/OldWriterAwardTest.php",
+      "sha256": "4b17531fa165c65374529fb30875c87a4252b9fe8f7c2dbf15f58b678646f6b9",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-old",
+      "path": "records/award-upgrade/NewWriterAwardReplayTest.php",
+      "sha256": "3740761e6f19d4fb5f89be678c122c52ca59cd181020f56983fcd0361209499f",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-old",
+      "path": "records/award-upgrade/AwardUpgradeRuntime.php",
+      "sha256": "c18942f0d091914a3c46bfe06443b439ad7b94eff6d14e8d9277ead7e7a17e40",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-old",
+      "path": "records/award-upgrade/run-phase.sh",
+      "sha256": "d2bc83484ee4c5aaf45fca80895755641480786f6389f855b15e29ef190e9095",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-old",
+      "path": "records/award-upgrade/source_receipt.py",
+      "sha256": "ce3aaa7ef3280c777b4d97c446a18e1d1399bbbd479b89806fa5907b83b4a14a",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "path": "records/award-upgrade/OldWriterAwardTest.php",
+      "sha256": "4b17531fa165c65374529fb30875c87a4252b9fe8f7c2dbf15f58b678646f6b9",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "path": "records/award-upgrade/NewWriterAwardReplayTest.php",
+      "sha256": "3740761e6f19d4fb5f89be678c122c52ca59cd181020f56983fcd0361209499f",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "path": "records/award-upgrade/AwardUpgradeRuntime.php",
+      "sha256": "c18942f0d091914a3c46bfe06443b439ad7b94eff6d14e8d9277ead7e7a17e40",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "path": "records/award-upgrade/run-phase.sh",
+      "sha256": "d2bc83484ee4c5aaf45fca80895755641480786f6389f855b15e29ef190e9095",
+      "before_after_and_archived_bytes_match": true
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "path": "records/award-upgrade/source_receipt.py",
+      "sha256": "ce3aaa7ef3280c777b4d97c446a18e1d1399bbbd479b89806fa5907b83b4a14a",
+      "before_after_and_archived_bytes_match": true
+    }
+  ]
+}

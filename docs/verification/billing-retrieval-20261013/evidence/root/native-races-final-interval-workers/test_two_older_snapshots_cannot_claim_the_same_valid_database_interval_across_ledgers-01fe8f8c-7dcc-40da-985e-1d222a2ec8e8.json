@@ -1,0 +1,68 @@
+{
+    "case": "test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers",
+    "parent_pid": 220262,
+    "parent_connection_id": 191,
+    "mysql_version": "8.4.11",
+    "database": "vaseyaudio_billing_retrieval_root",
+    "scope": "Upgraded263 raw SQL arbitration over one real issued interval and explicit synthetic diagnostic records; no paid authority.",
+    "positive_controls": "Both exact candidate inserts passed independently and were rolled back before workers started.",
+    "start_id": 1,
+    "waits": [
+        {
+            "requester": 193,
+            "blocker": 191,
+            "start_id": 1
+        },
+        {
+            "requester": 192,
+            "blocker": 191,
+            "start_id": 1
+        }
+    ],
+    "workers": [
+        {
+            "result": {
+                "result": "saved",
+                "sqlstate": null,
+                "driver_code": null,
+                "connection_id": 193,
+                "pid": 221136,
+                "transaction_level": 0,
+                "snapshot_before": {
+                    "production_membership_billing_observations": 0,
+                    "production_membership_billing_attempts": 0
+                },
+                "snapshot_after": null,
+                "in_transaction": false
+            },
+            "stopped_by_cleanup": false,
+            "exit": 0,
+            "stdout": "{\"result\":\"saved\",\"sqlstate\":null,\"driver_code\":null,\"connection_id\":193,\"pid\":221136,\"transaction_level\":0,\"snapshot_before\":{\"production_membership_billing_observations\":0,\"production_membership_billing_attempts\":0},\"snapshot_after\":null,\"in_transaction\":false}",
+            "stderr": ""
+        },
+        {
+            "result": {
+                "result": "denied",
+                "sqlstate": "40001",
+                "driver_code": 1213,
+                "connection_id": 192,
+                "pid": 221137,
+                "transaction_level": 0,
+                "snapshot_before": {
+                    "production_membership_billing_observations": 0,
+                    "production_membership_billing_attempts": 0
+                },
+                "snapshot_after": null,
+                "in_transaction": false
+            },
+            "stopped_by_cleanup": false,
+            "exit": 0,
+            "stdout": "{\"result\":\"denied\",\"sqlstate\":\"40001\",\"driver_code\":1213,\"connection_id\":192,\"pid\":221137,\"transaction_level\":0,\"snapshot_before\":{\"production_membership_billing_observations\":0,\"production_membership_billing_attempts\":0},\"snapshot_after\":null,\"in_transaction\":false}",
+            "stderr": ""
+        }
+    ],
+    "worker_connections": [
+        193,
+        192
+    ]
+}

@@ -1,0 +1,119 @@
+<?php
+
+namespace Tests\Feature\ProductionMembershipBilling;
+
+use App\Domain\Memberships\Billing\BillingException;
+use App\Domain\Memberships\Billing\BillingRetrievalSchema;
+use App\Domain\Memberships\Billing\BillingSchema;
+use Illuminate\Support\Facades\DB;
+use PDO;
+use PDOException;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\TestCase;
+
+class BillingRetrievalGuardDefinitionTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    public function test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Named current trigger definitions through an older dictionary snapshot require native MySQL.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $config = DB::connection()->getConfig();
+        $address = empty($config['unix_socket']) ? 'host='.$config['host'].';port='.$config['port'] : 'unix_socket='.$config['unix_socket'];
+        $other = new PDO('mysql:'.$address.';dbname='.$config['database'].';charset=utf8mb4', $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $other->exec('SET SESSION lock_wait_timeout = 5');
+        $guard = DB::connection()->getTablePrefix().BillingSchema::TABLES[5].'_interval';
+        $table = (new BillingSchema)->table(BillingSchema::TABLES[5]);
+        $create = $other->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC)['SQL Original Statement'];
+        $catalog = "SELECT ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND TRIGGER_NAME = '".$guard."'";
+        $original = $other->query($catalog)->fetchColumn();
+        $this->assertIsString($original);
+        $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+        $unexpectedAdmissions = [];
+        foreach (['missing', 'replaced'] as $variant) {
+            DB::beginTransaction();
+            try {
+                // Dictionary read establishes the snapshot before the guard subject is opened.
+                $this->assertSame($original, $pdo->query($catalog)->fetchColumn());
+                $other->exec('DROP TRIGGER `'.$guard.'`');
+                if ($variant === 'replaced') {
+                    $other->exec('CREATE TRIGGER `'.$guard.'` BEFORE INSERT ON '.$table." FOR EACH ROW BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Changed billing guard fixture'; END");
+                }
+                $this->assertSame($original, $pdo->query($catalog)->fetchColumn(), 'Ordinary metadata still reports the retained dictionary snapshot: '.$variant);
+                try {
+                    $current = $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC)['SQL Original Statement'];
+                    $this->assertSame('replaced', $variant);
+                    $this->assertStringContainsString('Changed billing guard fixture', $current);
+                    $this->assertNotSame($create, $current);
+                } catch (PDOException $error) {
+                    $this->assertSame('missing', $variant);
+                    $this->assertSame(1360, $error->errorInfo[1]);
+                }
+                try {
+                    (new BillingRetrievalSchema)->assertOwned($pdo);
+                    $unexpectedAdmissions[] = $variant;
+                } catch (BillingException $error) {
+                    $this->assertSame('schema', $error->reason);
+                }
+            } finally {
+                DB::rollBack();
+                $other->exec('DROP TRIGGER IF EXISTS `'.$guard.'`');
+                $other->exec($create);
+            }
+        }
+        // Accumulate both variants so the pre-fix run proves both stale admissions.
+        $this->assertSame([], $unexpectedAdmissions, 'Required guard admission must compare the current named definition.');
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+    }
+
+    public function test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Current endpoint table shape through an older dictionary snapshot requires native MySQL.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $config = DB::connection()->getConfig();
+        $address = empty($config['unix_socket']) ? 'host='.$config['host'].';port='.$config['port'] : 'unix_socket='.$config['unix_socket'];
+        $other = new PDO('mysql:'.$address.';dbname='.$config['database'].';charset=utf8mb4', $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $other->exec('SET SESSION lock_wait_timeout = 5');
+        $name = DB::connection()->getTablePrefix().BillingSchema::TABLES[4];
+        $table = (new BillingSchema)->table(BillingSchema::TABLES[4]);
+        $tableCatalog = "SELECT ENGINE,TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$name."'";
+        $columnCatalog = "SELECT COLUMN_NAME,COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$name."' ORDER BY ORDINAL_POSITION";
+        $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+        $unexpectedAdmissions = [];
+        $variants = [
+            'engine' => ['ENGINE=MyISAM', 'ENGINE=InnoDB', 'ENGINE=MyISAM'],
+            'collation' => ['DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci', 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin', 'COLLATE=utf8mb4_unicode_ci'],
+            'column_width' => ['MODIFY COLUMN allocation_token VARCHAR(65) CHARACTER SET ascii COLLATE ascii_bin NULL', 'MODIFY COLUMN allocation_token VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL', '`allocation_token` varchar(65)'],
+            'extra_column' => ['ADD COLUMN schema_drift INTEGER NULL', 'DROP COLUMN schema_drift', '`schema_drift` int'],
+        ];
+        foreach ($variants as $variant => [$change, $restore, $currentFragment]) {
+            $columns = $other->query($columnCatalog)->fetchAll(PDO::FETCH_ASSOC);
+            DB::beginTransaction();
+            try {
+                $tables = $pdo->query($tableCatalog)->fetchAll(PDO::FETCH_ASSOC);
+                $this->assertSame([['ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin']], $tables);
+                $other->exec('ALTER TABLE '.$table.' '.$change);
+                $this->assertSame($tables, $pdo->query($tableCatalog)->fetchAll(PDO::FETCH_ASSOC), 'The ordinary table catalog retains its earlier snapshot: '.$variant);
+                $this->assertSame($columns, $pdo->query($columnCatalog)->fetchAll(PDO::FETCH_ASSOC), 'The ordinary column catalog retains its earlier snapshot: '.$variant);
+                $current = $pdo->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM)[1];
+                $this->assertStringContainsString($currentFragment, $current);
+                try {
+                    (new BillingRetrievalSchema)->assertOwned($pdo);
+                    $unexpectedAdmissions[] = $variant;
+                } catch (BillingException $error) {
+                    $this->assertSame('schema', $error->reason);
+                }
+            } finally {
+                DB::rollBack();
+                $other->exec('ALTER TABLE '.$table.' '.$restore);
+            }
+        }
+        $this->assertSame([], $unexpectedAdmissions, 'Required endpoint table ownership must bind its current definition.');
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+    }
+}

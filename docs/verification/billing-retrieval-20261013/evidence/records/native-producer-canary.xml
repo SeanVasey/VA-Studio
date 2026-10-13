@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" file="/workspace/VA-Studio-membership-ledger/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" tests="1" assertions="14" errors="0" failures="0" skipped="0" time="54.369267">
+    <testcase name="test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness" file="/workspace/VA-Studio-membership-ledger/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="107" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="14" time="54.369267"/>
+  </testsuite>
+</testsuites>

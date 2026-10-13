@@ -1,0 +1,6 @@
+{
+    "mysql_version": "8.4.11",
+    "port": 3306,
+    "socket": "\/run\/mysql-policy\/mysql.sock",
+    "datadir": "\/var\/lib\/mysql\/"
+}

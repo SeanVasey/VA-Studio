@@ -3,6 +3,8 @@
 namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Memberships\Billing\BillingDatabaseClock;
+use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingEvidenceRecord;
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
@@ -85,8 +87,16 @@ class MembershipPaidInvoiceProofTest extends TestCase
     public function test_newer_nonsettled_observation_and_original_freshness_deadline_refuse_authority(): void
     {
         $fixture = $this->awardFixture();
-        CarbonImmutable::setTestNow(CarbonImmutable::now('UTC')->addSeconds(600));
-        $this->refused(fn () => $this->proof($fixture), 'expired_invoice_proof');
+        DB::transaction(function () use ($fixture): void {
+            $rows = new MembershipRows;
+            $authority = new SealedMembershipPaidInvoice;
+            $buyer = $fixture['buyer'];
+            $proof = $authority->lock($fixture['invoice']['id'], $buyer['principal'], $buyer['user'], $rows);
+            $window = $authority->freshnessWindow($proof, $buyer['principal'], $buyer['user'], $rows);
+            // Synthetic consumption of the real issued cap; this is not 600 seconds of native elapsed time.
+            (new \ReflectionProperty($window, 'deadline'))->setValue($window, \hrtime(true) - 1);
+            $this->refused(fn () => $authority->proveCurrent($proof, $buyer['principal'], $buyer['user'], $rows), 'expired_invoice_proof');
+        });
         $this->awardObservation($fixture, new BillingVerdict('unknown', 'provider_unavailable', []));
         $this->refused(fn () => $this->proof($fixture), 'invoice_not_settled');
     }
@@ -109,11 +119,12 @@ class MembershipPaidInvoiceProofTest extends TestCase
         $secondRow = $this->awardObservation($fixture);
         $second = $this->proof($fixture)->binding();
         $this->assertNotSame($fixture['observation']['id'], $secondRow['id']);
-        $this->assertNotSame($first->evidenceDeadline, $second->evidenceDeadline);
+        $this->assertNotSame($first->observationId, $second->observationId);
+        $this->assertNotSame($first->observationSeal, $second->observationSeal);
         $this->assertSame($first->sourceGraphHash, $second->sourceGraphHash);
     }
 
-    public function test_existing_proof_refuses_a_new_observation_even_with_identical_facts_and_second(): void
+    public function test_existing_proof_refuses_a_new_observation_even_with_identical_payment_facts(): void
     {
         $fixture = $this->awardFixture();
         $ledger = new BillingLedger;
@@ -124,16 +135,20 @@ class MembershipPaidInvoiceProofTest extends TestCase
             $authority = new SealedMembershipPaidInvoice;
             $buyer = $fixture['buyer'];
             $proof = $authority->lock($fixture['invoice']['id'], $buyer['principal'], $buyer['user'], $rows);
-            $row = [...$fixture['observation'], 'id' => BillingValues::id(), 'sequence' => 2,
-                'retrieval_position' => $start, 'retrieval_end_position' => $end, 'prior_seal' => $fixture['observation']['seal']];
+            $instant = BillingDatabaseInstant::fromNativeValue($end->databaseAt, 0);
+            $row = [...$fixture['observation'], ...$end->columns(), 'id' => BillingValues::id(), 'sequence' => 2,
+                'retrieval_started_at' => $start->databaseAt, 'retrieved_at' => $instant->stamp19(),
+                'freshness_deadline' => BillingValues::utc($instant->seconds() + BillingLedger::FRESHNESS_SECONDS),
+                'created_at' => BillingDatabaseClock::sample($rows->identity(), DB::getDriverName())->stamp19(),
+                'prior_seal' => $fixture['observation']['seal']];
             $payload = BillingValues::decrypt($row['payload_ciphertext']);
-            unset($payload['schema_version'], $payload['row_binding']);
+            unset($payload['schema_version'], $payload['row_binding'], $payload['clock_basis']);
             $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, $payload);
             $row['seal'] = BillingValues::seal($row);
             $statement = $rows->identity()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2])
                 .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
             $statement->execute(array_values($row));
-            $this->assertSame($fixture['observation']['freshness_deadline'], $row['freshness_deadline']);
+            $this->assertSame($fixture['observation']['facts_hash'], $row['facts_hash']);
             $this->refused(fn () => $authority->proveCurrent($proof, $buyer['principal'], $buyer['user'], $rows), 'changed_invoice_facts');
         });
     }

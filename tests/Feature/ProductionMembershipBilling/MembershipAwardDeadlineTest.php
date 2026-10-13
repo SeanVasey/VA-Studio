@@ -3,6 +3,7 @@
 namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Production\MembershipAwards;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
@@ -91,6 +92,11 @@ class MembershipAwardDeadlineTest extends TestCase
             public function proveCurrent(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): void
             {
                 $this->delegate->proveCurrent($proof, $principal, $actor, $rows);
+            }
+
+            public function freshnessWindow(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): BillingFreshnessWindow
+            {
+                return $this->delegate->freshnessWindow($proof, $principal, $actor, $rows);
             }
         };
         $this->app->instance(MembershipPaidInvoiceAuthority::class, $authority);

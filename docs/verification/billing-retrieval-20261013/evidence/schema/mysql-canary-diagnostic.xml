@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingRetrievalSchemaUpgradeTest" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="74.974035">
+    <testcase name="test_populated_upgrade_preserves_old_columns_and_only_adds_null_evidence" file="/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php" line="27" class="Tests\Feature\ProductionMembershipBilling\BillingRetrievalSchemaUpgradeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingRetrievalSchemaUpgradeTest" assertions="1" time="74.974035">
+      <error type="App\Domain\Memberships\Billing\BillingException">Tests\Feature\ProductionMembershipBilling\BillingRetrievalSchemaUpgradeTest::test_populated_upgrade_preserves_old_columns_and_only_adds_null_evidence
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (schema).
+
+/workspace/VA-Studio-billing-retrieval-schema/app/Domain/Memberships/Billing/BillingException.php:19
+/workspace/VA-Studio-billing-retrieval-schema/app/Domain/Memberships/Billing/BillingSchema.php:891
+/workspace/VA-Studio-billing-retrieval-schema/app/Domain/Memberships/Billing/BillingSchema.php:166
+/workspace/VA-Studio-billing-retrieval-schema/app/Domain/Memberships/Billing/BillingSchema.php:541
+/workspace/VA-Studio-billing-retrieval-schema/app/Domain/Memberships/Billing/BillingRetrievalSchema.php:36
+/workspace/VA-Studio-billing-retrieval-schema/tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php:33</error>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -4,11 +4,11 @@ namespace App\Domain\Memberships\Production;
 
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
-use App\Domain\Memberships\Billing\BillingSchema;
+use App\Domain\Memberships\Billing\BillingRetrievalSchema;
 use App\Models\User;
 use App\Support\CanonicalJson;
-use Carbon\CarbonImmutable;
 use WeakMap;
 
 /** Retained, approved billing evidence only. Construction does not register a runtime capability. */
@@ -37,14 +37,14 @@ final class SealedMembershipPaidInvoice implements MembershipPaidInvoiceAuthorit
             && $configuration['provenance'] === $billing['provenance'], 'policy_not_approved');
         $access = new ProductionCustomerAccess;
         $current = $access->lock($principal, $actor, $rows->current());
-        $evidence = MembershipBillingEvidence::lock($rows, $locator, $billing);
+        $evidence = MembershipBillingEvidence::lock($rows, $locator, $billing, $deadlineNs);
         $binding = $evidence['binding'];
         $this->sameOwner($binding->originalBuyerBinding, $access->durableBinding($principal));
         $historical = $access->verifyHistoricalBinding($binding->originalBuyerBinding, $rows->current());
         $proof = MembershipPaidInvoiceToken::value($binding);
         $this->issued[$proof] = ['rows' => $rows, 'pdo' => $rows->identity(), 'principal' => $principal, 'actor' => $actor,
             'access' => $access, 'current' => $current, 'historical' => $historical, 'policy' => $policy,
-            'configuration' => $configuration, 'billing_policy' => $billingPolicy, 'billing' => $billing, 'deadline_ns' => $deadlineNs];
+            'configuration' => $configuration, 'billing_policy' => $billingPolicy, 'billing' => $billing, 'deadline_ns' => $deadlineNs, 'freshness' => $evidence['freshness']];
         $this->proveCurrent($proof, $principal, $actor, $rows);
 
         return $proof;
@@ -60,17 +60,23 @@ final class SealedMembershipPaidInvoice implements MembershipPaidInvoiceAuthorit
         $issued['billing_policy']->proveConfiguration($issued['billing']);
         $access = $issued['access'];
         $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
-        $snapshot = MembershipBillingEvidence::currentSnapshot($rows, $proof->binding(), $issued['billing']);
+        $snapshot = MembershipBillingEvidence::currentSnapshot($rows, $proof->binding(), $issued['billing'], $issued['freshness']);
         $access->proveHistoricalBindingCurrent($proof->binding()->originalBuyerBinding, $rows->current(), $issued['historical']);
-        $now = CarbonImmutable::now('UTC')->format('Y-m-d H:i:s');
-        MembershipException::require($proof->binding()->evidenceDeadline !== null && $now < $proof->binding()->evidenceDeadline, 'expired_invoice_proof');
         $access->proveCurrent($principal, $actor, $rows->current(), $issued['current']);
-        (new BillingSchema)->assertOwned($rows->identity());
+        (new BillingRetrievalSchema)->assertOwned($rows->identity());
         MembershipBillingEvidence::assertCurrentSnapshot($rows, $snapshot);
         $issued['policy']->proveConfiguration($issued['configuration']);
         $issued['billing_policy']->proveConfiguration($issued['billing']);
         $rows->assertCurrent();
         MembershipException::require(hrtime(true) < $issued['deadline_ns'], 'expired_invoice_proof');
+        $issued['freshness']->assertDeadline();
+    }
+
+    public function freshnessWindow(MembershipPaidInvoiceProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): BillingFreshnessWindow
+    {
+        $this->proveCurrent($proof, $principal, $actor, $rows);
+
+        return $this->issued[$proof]['freshness'];
     }
 
     private function sameOwner(array $original, array $current): void

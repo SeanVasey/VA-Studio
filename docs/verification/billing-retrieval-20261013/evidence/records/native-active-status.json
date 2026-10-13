@@ -1,0 +1,14 @@
+{
+    "sampled_utc": "2026-10-13 06:12:30",
+    "threads": [
+        {
+            "ID": 158,
+            "COMMAND": "Sleep",
+            "TIME": 0,
+            "STATE": "",
+            "trx_state": null,
+            "trx_wait_started": null
+        }
+    ],
+    "latest_migration": "2026_10_12_260000_membership_billing_retrieval_attempts"
+}

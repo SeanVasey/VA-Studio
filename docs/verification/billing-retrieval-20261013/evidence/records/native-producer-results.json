@@ -1,0 +1,129 @@
+{
+  "tests": 12,
+  "assertions": 164,
+  "errors": 0,
+  "failures": 0,
+  "skips": 0,
+  "cases": [
+    {
+      "run": "native-producer-canary",
+      "name": "test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 14,
+      "seconds": 54.369267,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 9,
+      "seconds": 57.455979,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before end\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 6,
+      "seconds": 95.843221,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"start before append\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 6,
+      "seconds": 59.615229,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before append\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 6,
+      "seconds": 52.24906,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set \"end before attempt\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 6,
+      "seconds": 70.172674,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 6,
+      "seconds": 46.923773,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 5,
+      "seconds": 84.337341,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 9,
+      "seconds": 125.263924,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
+      "assertions": 9,
+      "seconds": 121.525766,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v1 envelope\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest",
+      "assertions": 44,
+      "seconds": 89.298472,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    },
+    {
+      "run": "native-producer-remainder",
+      "name": "test_authenticated_future_legacy_tail_is_preserved_but_only_a_new_database_interval_is_current with data set \"original v2 row binding\"",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingLegacyObservationTransitionTest",
+      "assertions": 44,
+      "seconds": 90.053006,
+      "errors": 0,
+      "failures": 0,
+      "skips": 0
+    }
+  ]
+}

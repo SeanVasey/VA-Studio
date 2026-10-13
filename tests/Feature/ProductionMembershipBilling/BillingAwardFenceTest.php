@@ -14,11 +14,18 @@ use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
 
-/** Synthetic structural evidence only; no retained fixture is an approval or a paid-invoice proof. */
+/** Historical through-262 structural evidence; no retained fixture is an approval or a paid-invoice proof. */
 class BillingAwardFenceTest extends TestCase
 {
     use BillingIntervalFixtures;
-    use FinalizationDatabaseMigrations;
+    use FinalizationDatabaseMigrations {
+        migrateFreshUsing as private baselineMigrateFreshUsing;
+    }
+
+    protected function migrateFreshUsing(): array
+    {
+        return $this->legacyBillingMigrationOptions($this->baselineMigrateFreshUsing());
+    }
 
     public function test_exact_retained_six_table_upgrade_is_idempotent_and_keeps_every_row(): void
     {

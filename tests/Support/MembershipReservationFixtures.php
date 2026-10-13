@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingSettlement;
 use App\Domain\Memberships\Billing\BillingSnapshots;
@@ -108,18 +109,19 @@ trait MembershipReservationFixtures
     {
         $ledger = new BillingLedger;
         $start = $ledger->startRetrieval();
-        $at = CarbonImmutable::now('UTC');
-        $projected = BillingStripeFixtures::snapshots($fixture['provider_graph'], $at->timestamp);
+        $providerGraph = $fixture['provider_graph'];
+        $interval = $ledger->endRetrieval($start);
+        $retrievedAt = BillingDatabaseInstant::fromNativeValue($interval->databaseAt, 0)->seconds();
+        $projected = BillingStripeFixtures::snapshots($providerGraph, $retrievedAt);
         $snapshots = new BillingSnapshots($fixture['provider_invoice_ref'], $projected->account, $projected->invoice,
             $projected->lines, $projected->payments, $projected->paymentIntents, $projected->charges,
-            $projected->balanceTransactions, $projected->subscription, $at->timestamp, IdentityPolicy::REHEARSAL);
+            $projected->balanceTransactions, $projected->subscription, $retrievedAt, IdentityPolicy::REHEARSAL);
         $verdict = BillingSettlement::evaluate($snapshots, $fixture['approval']['expectation']);
 
-        return $ledger->append($fixture['invoice'], $verdict, $at->timestamp, IdentityPolicy::REHEARSAL,
-            $start, $ledger->endRetrieval($start), $at);
+        return $ledger->append($fixture['invoice'], $verdict, IdentityPolicy::REHEARSAL, $interval);
     }
 
-    /** A second actual invoice claims the adjacent, nonoverlapping synthetic service period. */
+    /** A second actual invoice claims an advance-paid adjacent, nonoverlapping synthetic service period. */
     protected function reservationNextPeriod(array $fixture): array
     {
         $references = [BillingStripeFixtures::INVOICE => 'in_SYNTHETICRESERVATION2',
@@ -139,11 +141,11 @@ trait MembershipReservationFixtures
             return $result;
         };
         $start = BillingStripeFixtures::PERIOD_END;
+        // Retain the original elapsed provider payment dates. Only the synthetic service period
+        // and business wall boundary move forward; the database retrieval clock stays native.
         $graph = $replace(BillingStripeFixtures::graph(['line' => ['id' => 'il_SYNTHETICRESERVATION2',
             'period' => ['start' => $start, 'end' => $start + 2678400]],
-            'invoice' => ['period_start' => BillingStripeFixtures::PERIOD_START, 'period_end' => $start],
-            'payment' => ['created' => $start, 'status_transitions' => ['canceled_at' => null, 'paid_at' => $start]],
-            'transaction' => ['available_on' => $start]]));
+            'invoice' => ['period_start' => BillingStripeFixtures::PERIOD_START, 'period_end' => $start]]));
         CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC($start + 1));
         $fixture['provider_invoice_ref'] = $references[BillingStripeFixtures::INVOICE];
         $fixture['provider_graph'] = $graph;

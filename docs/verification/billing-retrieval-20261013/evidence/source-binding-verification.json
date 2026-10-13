@@ -1,0 +1,687 @@
+{
+  "scope": "Actual Git blob SHA-256 comparisons against explicitly named component references and retained overlays. A partial historical match remains partial; it is not silently promoted to final-source evidence.",
+  "final_source_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "bindings": [
+    {
+      "id": "helpers-initial",
+      "receipt": "records/helpers-initial.sources.json",
+      "reference": "a8facf90b1360f5c9b593b4bad40a5962be423b6",
+      "keys": [],
+      "require_exact": false,
+      "limitation": "Initial helper version differs from final helper source.",
+      "captured_files": 8,
+      "matched_files": 5,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalInterval.php",
+          "receipt_sha256": "b88793723439e4e0615f1c0c8baa0ff4e5f3c9e1adf82d0080fe6161b5835f03",
+          "reference_sha256": "819bf83ffc99646e19b0d1303738e7a8569c7452f752996fbda460c3cde5ff9a"
+        },
+        {
+          "path": "tests/Unit/BillingDatabaseClockTest.php",
+          "receipt_sha256": "8093470fc9e4dce8af731a27863f80db7e708ff39ea98e85d3a0ba0c0c2fa941",
+          "reference_sha256": "ab4a18d28fcab6e56fd3940e84b2b552992ad8683772e387c42a28516fe834f0"
+        },
+        {
+          "path": "tests/Unit/BillingRetrievalRecordsTest.php",
+          "receipt_sha256": "ad53f1fabe7fdd504144de2d84c3dbd8342940fc21dceb73bfa0a37de75869ad",
+          "reference_sha256": "18fa191630a4bb5cbb2db3b597511453a0588d946589ee141b88a95ce4efec5e"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "helpers-final",
+      "receipt": "records/helpers-final.sources.json",
+      "reference": "a8facf90b1360f5c9b593b4bad40a5962be423b6",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 8,
+      "matched_files": 8,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "issuer-canary",
+      "receipt": "records/issuer-canary.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical source is compared with the later committed writer; any mismatches remain explicit, not final evidence.",
+      "captured_files": 1204,
+      "matched_files": 1202,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "receipt_sha256": "1689394d2fa31727d7b683a7d1b5764fbd602ebe6f690bd096fa0193c570adf7",
+          "reference_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php",
+          "receipt_sha256": "47b3d48b49399b36dee0c0dcfe6d8fcf644bfdad6c83204df000f64c0dd58161",
+          "reference_sha256": "8abe5b7b26ff001eae109f6e1a4560e0ec036f6d58d8b153994b33d3521e74dc"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "issuer-full",
+      "receipt": "records/issuer-full.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical source is compared with the later committed writer; any mismatches remain explicit, not final evidence.",
+      "captured_files": 1204,
+      "matched_files": 1202,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "receipt_sha256": "1689394d2fa31727d7b683a7d1b5764fbd602ebe6f690bd096fa0193c570adf7",
+          "reference_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php",
+          "receipt_sha256": "47b3d48b49399b36dee0c0dcfe6d8fcf644bfdad6c83204df000f64c0dd58161",
+          "reference_sha256": "8abe5b7b26ff001eae109f6e1a4560e0ec036f6d58d8b153994b33d3521e74dc"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "issuer-final",
+      "receipt": "records/issuer-final.sources.json",
+      "reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1204,
+      "matched_files": 1204,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "legacy-transition",
+      "receipt": "records/legacy-transition.sources.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1203,
+      "matched_files": 1203,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "native-producer-canary",
+      "receipt": "records/native-producer-canary.source.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 2105,
+      "matched_files": 2105,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "baseline",
+      "receipt": "records/baseline/source-before.json",
+      "reference": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 10288,
+      "matched_files": 10288,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "award-upgrade-old",
+      "receipt": "records/award-upgrade/old-source-before.json",
+      "reference": "45d1299406821627f4ba02af186e324a70c6ade0",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 10288,
+      "matched_files": 10288,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "award-upgrade-new",
+      "receipt": "records/award-upgrade/new-source-before.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 10631,
+      "matched_files": 10631,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-upgrade-initial",
+      "receipt": "schema/sqlite-upgrade-initial.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit.",
+      "captured_files": 1912,
+      "matched_files": 1909,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalSchema.php",
+          "receipt_sha256": "69b0070f1484985b5c467183c509e81f9d40962f2a97da1fa9635b6ee924f619",
+          "reference_sha256": "b75248f5fa288e77532d2a05f431c8e58b1a6650ff1ff79b310c3187e408009c"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "receipt_sha256": "75caf9adb72c0de941aeeaef849757a3eb5a9d6e8b88bf2962c5635e8e4fa99d",
+          "reference_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+          "receipt_sha256": "15a0347e7fb31f66a51fb4d0f0432e18a65779bba19786bae35db0c7eb35b92d",
+          "reference_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "sqlite-identity-initial",
+      "receipt": "schema/sqlite-identity-initial.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit.",
+      "captured_files": 1913,
+      "matched_files": 1910,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "receipt_sha256": "facd59a0b1a82d2186a5fbf69f10073ebe42b53b0c5a22ebfcd932c5a32fe297",
+          "reference_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php",
+          "receipt_sha256": "46b81cf3c990fd7f1600da8851f33e7b14d582f5cb2c717bcd854ef57506083a",
+          "reference_sha256": "bbfb96cb76ca082d0d894c90087dfabf2507d4412fb9eb3ae6b3541a048e09e2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+          "receipt_sha256": "15a0347e7fb31f66a51fb4d0f0432e18a65779bba19786bae35db0c7eb35b92d",
+          "reference_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "mysql-canary",
+      "receipt": "schema/mysql-canary.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit.",
+      "captured_files": 1913,
+      "matched_files": 1910,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "receipt_sha256": "facd59a0b1a82d2186a5fbf69f10073ebe42b53b0c5a22ebfcd932c5a32fe297",
+          "reference_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php",
+          "receipt_sha256": "107a0fc486a9cc81a618a0bb587cb88cc62681a184d787dd0e2d1bd30e3ecbe9",
+          "reference_sha256": "bbfb96cb76ca082d0d894c90087dfabf2507d4412fb9eb3ae6b3541a048e09e2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+          "receipt_sha256": "15a0347e7fb31f66a51fb4d0f0432e18a65779bba19786bae35db0c7eb35b92d",
+          "reference_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "mysql-canary-diagnostic",
+      "receipt": "schema/mysql-canary-diagnostic.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit.",
+      "captured_files": 1913,
+      "matched_files": 1911,
+      "mismatches": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "receipt_sha256": "facd59a0b1a82d2186a5fbf69f10073ebe42b53b0c5a22ebfcd932c5a32fe297",
+          "reference_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+          "receipt_sha256": "a084be15a9e1417bc7ffe7f78ed53352cad9545a968c5d7e9c92fa62e6c9f6a2",
+          "reference_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "mysql-canary-fixed",
+      "receipt": "schema/mysql-canary-fixed.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": false,
+      "limitation": "Historical pre-final or diagnostic source; differences to 57c9bf9f remain explicit.",
+      "captured_files": 1913,
+      "matched_files": 1912,
+      "mismatches": [
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",
+          "receipt_sha256": "15a0347e7fb31f66a51fb4d0f0432e18a65779bba19786bae35db0c7eb35b92d",
+          "reference_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+        }
+      ],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": false
+    },
+    {
+      "id": "sqlite-final",
+      "receipt": "schema/sqlite-final.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1913,
+      "matched_files": 1913,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "mysql-identity-final",
+      "receipt": "schema/mysql-identity-final.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1913,
+      "matched_files": 1913,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-fixtures-initial",
+      "receipt": "fixture/sqlite-fixtures-initial.source.json",
+      "reference": "a063e38067193562593a6e560db01c9daf4cf8c6",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1956,
+      "matched_files": 1956,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-schema-preparation",
+      "receipt": "fixture/sqlite-schema-preparation.source.json",
+      "reference": "822408d2a840a1de2154f5adcd63671f2b839e34",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1956,
+      "matched_files": 1956,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-cursor",
+      "receipt": "fixture/sqlite-cursor.source.json",
+      "reference": "a4c68a506ef6ef8a73533d342ca9d8c8c15a064a",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1956,
+      "matched_files": 1956,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-historical-migrations",
+      "receipt": "root/sqlite-historical-migrations.source.json",
+      "reference": "67fa03a72798997f95ffd1f0358707ca051b3dc9",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1275,
+      "matched_files": 1275,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-award-proof-integration",
+      "receipt": "root/sqlite-award-proof-integration.source.json",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1278,
+      "matched_files": 1278,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-billing-api-integration",
+      "receipt": "root/sqlite-billing-api-integration.source.json",
+      "reference": "3bcf22ca18b084683a101b322dc81809fc583c93",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1280,
+      "matched_files": 1280,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-hint-job-integration",
+      "receipt": "root/sqlite-hint-job-integration.source.json",
+      "reference": "8631279671e65396255b5876036daa9abbb2e130",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1280,
+      "matched_files": 1280,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-membership-admission-integration",
+      "receipt": "root/sqlite-membership-admission-integration.source.json",
+      "reference": "e050e7200e1ffe76b66b486e74383261fed1229d",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1276,
+      "matched_files": 1276,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "unit",
+      "receipt": "consumer/unit.before.sha256",
+      "reference": "cd58ada94e4e88c82d1d565dabc92cbaa01e112d",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 11,
+      "matched_files": 11,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "terminal-omission-red",
+      "receipt": "consumer/terminal-omission-red.before.sha256",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [],
+      "require_exact": true,
+      "overlay": "consumer/terminal-omission.overlay.patch",
+      "captured_files": 1243,
+      "matched_files": 1243,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "terminal-restored-green",
+      "receipt": "consumer/terminal-restored-green.before.sha256",
+      "reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 1243,
+      "matched_files": 1243,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "consumer-static",
+      "receipt": "consumer/static.before.sha256",
+      "reference": "cd58ada94e4e88c82d1d565dabc92cbaa01e112d",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 8,
+      "matched_files": 8,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "native-arbitration-static",
+      "receipt": "consumer/native-arbitration-static.before.sha256",
+      "reference": "b229f5bfa4ea0bedfd15dd687908bc9d92259d62",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 2,
+      "matched_files": 2,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "ci-policy-initial",
+      "receipt": "root/ci-policy-initial.source.json",
+      "reference": "e050e7200e1ffe76b66b486e74383261fed1229d",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1043,
+      "matched_files": 1043,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "native-producer-remainder",
+      "receipt": "records/native-producer-remainder.source.json",
+      "reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 2105,
+      "matched_files": 2105,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "mysql-currentness-red",
+      "receipt": "schema/mysql-currentness-red.source.json",
+      "reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "retained_overrides": {
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php": "schema/currentness-red-test-source.php.txt"
+      },
+      "captured_files": 1914,
+      "matched_files": 1914,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "mysql-currentness-fixed",
+      "receipt": "schema/mysql-currentness-fixed.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1914,
+      "matched_files": 1914,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "sqlite-currentness-final",
+      "receipt": "schema/sqlite-currentness-final.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1914,
+      "matched_files": 1914,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "discovery-initial",
+      "receipt": "selection/discovery.sources.json",
+      "reference": "67d85d6e07953a272118ec3d339ec2bb8b7ecaec",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 2111,
+      "matched_files": 2111,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "discovery-final",
+      "receipt": "selection/final-67d85d6e/discovery.sources.json",
+      "reference": "67d85d6e07953a272118ec3d339ec2bb8b7ecaec",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 2111,
+      "matched_files": 2111,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "quality-initial",
+      "receipt": "quality/sources-before.json",
+      "reference": "874d57fe1897569a520b4627acd4f34d5c3e6d80",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 2283,
+      "matched_files": 2283,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "quality-pint-v2",
+      "receipt": "quality/pint-v2/sources-before.json",
+      "reference": "51b6d59f3cc21a218a00b2480fc97c7bd076ffae",
+      "keys": [],
+      "require_exact": true,
+      "captured_files": 2283,
+      "matched_files": 2283,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "mysql-upgrade-final",
+      "receipt": "schema/mysql-upgrade-final.source.json",
+      "reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "keys": [
+        "sha256"
+      ],
+      "require_exact": true,
+      "captured_files": 1914,
+      "matched_files": 1914,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "native-canaries-final",
+      "receipt": "root/native-canaries-final.source.json",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1276,
+      "matched_files": 1276,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    },
+    {
+      "id": "native-races-final",
+      "receipt": "root/native-races-final.source.json",
+      "reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "keys": [
+        "files"
+      ],
+      "require_exact": true,
+      "captured_files": 1278,
+      "matched_files": 1278,
+      "mismatches": [],
+      "absent_at_reference": [],
+      "all_captured_hashes_match": true
+    }
+  ]
+}

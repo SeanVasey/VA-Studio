@@ -1,0 +1,16 @@
+{
+  "unchanged": true,
+  "files": 8,
+  "carried_tests": 34,
+  "carried_assertions": 57,
+  "source_sha256": {
+    "app/Domain/Memberships/Billing/BillingDatabaseInstant.php": "099d155e796a89c827e119dab90a82c19abc744997ea95bcfe5f834e9f9be5ac",
+    "app/Domain/Memberships/Billing/BillingDatabaseClock.php": "dafdda3d47fa04cb80f9b62cbbc6528f9978ffe6899c636206d367352cc0c4f2",
+    "app/Domain/Memberships/Billing/BillingRetrievalStart.php": "6facb7a5f32dea9d00cddabf159ee8387c5fb20f05f0fc4124e5786d73e1f4c7",
+    "app/Domain/Memberships/Billing/BillingRetrievalInterval.php": "819bf83ffc99646e19b0d1303738e7a8569c7452f752996fbda460c3cde5ff9a",
+    "app/Domain/Memberships/Billing/BillingEvidenceRecord.php": "5d3af20944cbd7c3192001d10268b9236502a3a545b486e126bae142ec1ce36c",
+    "app/Domain/Memberships/Billing/BillingAttemptRecord.php": "803def364e7b6c2771f4c99030bcaee26e96a131150f376beda0620b096b7a97",
+    "tests/Unit/BillingDatabaseClockTest.php": "ab4a18d28fcab6e56fd3940e84b2b552992ad8683772e387c42a28516fe834f0",
+    "tests/Unit/BillingRetrievalRecordsTest.php": "18fa191630a4bb5cbb2db3b597511453a0588d946589ee141b88a95ce4efec5e"
+  }
+}

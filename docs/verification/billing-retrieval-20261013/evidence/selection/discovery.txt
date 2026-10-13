@@ -1,0 +1,3 @@
+
+Fatal error: Cannot redeclare class ComposerAutoloaderInita945c17e6bd81edd1fbef49e338c3523 (previously declared in /workspace/VA-Studio-membership-reservations/vendor/composer/autoload_real.php:5) in /workspace/VA-Studio-billing-retrieval/vendor/composer/autoload_real.php on line 5
+PHPUnit partition rejected: PHPUnit test discovery failed

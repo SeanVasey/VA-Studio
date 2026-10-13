@@ -11,10 +11,18 @@ use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
 
+/** Retained through262 guard behavior; upgraded263 identity arbitration has separate coverage. */
 class BillingNativeIntervalSnapshotTest extends TestCase
 {
     use BillingIntervalFixtures;
-    use FinalizationDatabaseMigrations;
+    use FinalizationDatabaseMigrations {
+        migrateFreshUsing as private baselineMigrateFreshUsing;
+    }
+
+    protected function migrateFreshUsing(): array
+    {
+        return $this->legacyBillingMigrationOptions($this->baselineMigrateFreshUsing());
+    }
 
     public function test_prior_snapshot_sees_a_later_committed_endpoint_claim_in_both_ledger_directions(): void
     {

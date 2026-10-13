@@ -7,6 +7,8 @@ use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingProviderPin;
 use App\Domain\Memberships\Billing\BillingReconciliation;
+use App\Domain\Memberships\Billing\BillingRetrievalInterval;
+use App\Domain\Memberships\Billing\BillingRetrievalStart;
 use App\Domain\Memberships\Billing\BillingSettlement;
 use App\Domain\Memberships\Billing\BillingVerdict;
 use App\Domain\Memberships\Billing\BillingWebhookIntake;
@@ -70,14 +72,14 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $bStart = $ledger->startRetrieval();
         $bEnd = $ledger->endRetrieval($bStart);
         $aEnd = $ledger->endRetrieval($aStart);
-        $this->assertSame([$aStart + 1, $aStart + 2, $aStart + 3], [$bStart, $bEnd, $aEnd]);
+        $this->assertSame([$aStart->position + 1, $aStart->position + 2, $aStart->position + 3], [$bStart->position, $bEnd->endPosition, $aEnd->endPosition]);
 
-        $reversal = $this->append($ledger, $invoice, $this->reversed(), $aStart, $aEnd);
-        $this->assertSame(['reversed', 2, $aStart, $aEnd], [$reversal['outcome'], $reversal['sequence'], $reversal['retrieval_position'], $reversal['retrieval_end_position']]);
+        $reversal = $this->append($ledger, $invoice, $this->reversed(), $aEnd);
+        $this->assertSame(['reversed', 2, $aStart->position, $aEnd->endPosition], [$reversal['outcome'], $reversal['sequence'], $reversal['retrieval_position'], $reversal['retrieval_end_position']]);
 
-        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $bStart, $bEnd)));
+        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $bEnd)));
         $this->assertSame(['settled', 'reversed'], array_column($ledger->observations($invoice['id']), 'outcome'));
-        $this->assertNull($ledger->currentSettled($invoice['id'], self::T0 + 1), 'The older settled read must never become the tail.');
+        $this->assertNull($ledger->currentSettled($invoice['id']), 'The older settled read must never become the tail.');
     }
 
     /** Same positions, the other append order: B (settled) appends first, A's reversal overlaps it and retries with a fresh interval. */
@@ -89,17 +91,17 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $bEnd = $ledger->endRetrieval($bStart);
         $aEnd = $ledger->endRetrieval($aStart);
 
-        $settled = $this->append($ledger, $invoice, $this->settled(), $bStart, $bEnd);
+        $settled = $this->append($ledger, $invoice, $this->settled(), $bEnd);
         $this->assertSame(['settled', 2], [$settled['outcome'], $settled['sequence']]);
         // A's read began (1) before B's read finished (3): the database cannot order the two reads, so A is not a normal end.
-        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->reversed(), $aStart, $aEnd)));
+        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->reversed(), $aEnd)));
         $this->assertSame(['settled', 'settled'], array_column($ledger->observations($invoice['id']), 'outcome'));
 
         $retryStart = $ledger->startRetrieval();
         $retryEnd = $ledger->endRetrieval($retryStart);
-        $retry = $this->append($ledger, $invoice, $this->reversed(), $retryStart, $retryEnd);
+        $retry = $this->append($ledger, $invoice, $this->reversed(), $retryEnd);
         $this->assertSame(['reversed', 3], [$retry['outcome'], $retry['sequence']]);
-        $this->assertNull($ledger->currentSettled($invoice['id'], self::T0 + 1));
+        $this->assertNull($ledger->currentSettled($invoice['id']));
     }
 
     public function test_a_read_that_began_after_the_tails_read_finished_is_admitted_and_one_that_wholly_preceded_it_is_superseded(): void
@@ -110,14 +112,14 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $lateStart = $ledger->startRetrieval();
         $lateEnd = $ledger->endRetrieval($lateStart);
 
-        $late = $this->append($ledger, $invoice, $this->reversed(), $lateStart, $lateEnd);
+        $late = $this->append($ledger, $invoice, $this->reversed(), $lateEnd);
         $this->assertSame(['reversed', 2], [$late['outcome'], $late['sequence']]);
         // The early read ended (earlyEnd) before the tail's read began (lateStart): the tail is strictly newer, nothing to retry.
-        $this->assertSame('superseded_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $earlyStart, $earlyEnd)));
+        $this->assertSame('superseded_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $earlyEnd)));
 
         $laterStart = $ledger->startRetrieval();
         $laterEnd = $ledger->endRetrieval($laterStart);
-        $this->assertSame(3, $this->append($ledger, $invoice, $this->settled(), $laterStart, $laterEnd)['sequence']);
+        $this->assertSame(3, $this->append($ledger, $invoice, $this->settled(), $laterEnd)['sequence']);
         $this->assertSame(['settled', 'reversed', 'settled'], array_column($ledger->observations($invoice['id']), 'outcome'));
     }
 
@@ -129,10 +131,12 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $innerStart = $ledger->startRetrieval();
         $innerEnd = $ledger->endRetrieval($innerStart);
         $outerEnd = $ledger->endRetrieval($outerStart);
-        $this->append($ledger, $invoice, $this->reversed(), $innerStart, $innerEnd);
-        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $outerStart, $outerEnd)));
-        // A start position equal to the tail's end cannot be admitted: positions are never shared, and "after" is strict.
-        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $innerEnd, $ledger->endRetrieval($innerEnd))));
+        $this->append($ledger, $invoice, $this->reversed(), $innerEnd);
+        $this->assertSame('concurrent_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->settled(), $outerEnd)));
+        // Copying the tail's end into a purported start does not issue another retrieval.
+        $copiedEnd = new BillingRetrievalStart($innerEnd->endPosition, $innerEnd->endAllocationToken,
+            $innerEnd->start->retrievalToken, $innerEnd->databaseAt);
+        $this->assertSame('foreign_retrieval', $this->refusal(fn () => $ledger->endRetrieval($copiedEnd)));
         $this->assertSame(['settled', 'reversed'], array_column($ledger->observations($invoice['id']), 'outcome'));
     }
 
@@ -140,13 +144,15 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
     {
         [$ledger, $invoice] = $this->seeded();
         $start = $ledger->startRetrieval();
-        foreach ([fn () => $ledger->endRetrieval(0), fn () => $ledger->endRetrieval(-1)] as $invalid) {
-            $this->assertSame('invalid_value', $this->refusal($invalid));
+        foreach ([0, -1, $start->position] as $position) {
+            $unissued = new BillingRetrievalStart($position, $start->allocationToken, $start->retrievalToken, $start->databaseAt);
+            $this->assertSame('foreign_retrieval', $this->refusal(fn () => $ledger->endRetrieval($unissued)));
         }
         $end = $ledger->endRetrieval($start);
-        $this->assertGreaterThan($start, $end);
-        foreach ([[$start, $start], [$end, $start], [$start, 0]] as [$from, $to]) {
-            $this->assertSame('invalid_value', $this->refusal(fn () => $this->append($ledger, $invoice, $this->reversed(), $from, $to)));
+        $this->assertGreaterThan($start->position, $end->endPosition);
+        foreach ([$start->position, 0, $end->endPosition] as $position) {
+            $unissued = new BillingRetrievalInterval($start, $position, $end->endAllocationToken, $end->databaseAt);
+            $this->assertSame('foreign_retrieval', $this->refusal(fn () => $this->append($ledger, $invoice, $this->reversed(), $unissued)));
         }
         $this->assertCount(1, $ledger->observations($invoice['id']));
         DB::beginTransaction();
@@ -182,7 +188,7 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
 
         $this->assertSame([0, 0], [DB::table('production_membership_billing_invoices')->count(), DB::table('production_membership_billing_observations')->count()]);
         $this->assertSame(['retrieval', 'retrieval', 'retrieval', 'retrieval'], DB::table('production_membership_billing_positions')->orderBy('id')->pluck('kind')->all());
-        $this->assertSame(['created_at', 'id', 'kind'], collect(array_keys((array) DB::table('production_membership_billing_positions')->first()))->sort()->values()->all(),
+        $this->assertSame(['allocation_token', 'created_at', 'database_at', 'id', 'kind', 'phase', 'retrieval_token'], collect(array_keys((array) DB::table('production_membership_billing_positions')->first()))->sort()->values()->all(),
             'A position names no invoice, binding or provider reference.');
     }
 
@@ -204,7 +210,7 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $this->assertSame('concurrent_retrieval', $b->getReturn());
         $chain = (new BillingLedger)->observations($first['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
-        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 1), 'The stale settlement is never current evidence.');
+        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id']), 'The stale settlement is never current evidence.');
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
@@ -221,10 +227,10 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         $a->resume();
 
         $this->assertSame('concurrent_retrieval', $a->getReturn(), 'A read that began before the tail\'s read finished is retried, not ended.');
-        $this->assertNotNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 1));
+        $this->assertNotNull((new BillingLedger)->currentSettled($first['invoice_id']));
         $retry = $this->retrieve($binding['id'], F::graph(self::REFUND));
         $this->assertSame(['reversed', 3], [$retry['outcome'], $retry['sequence']]);
-        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 1));
+        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id']));
     }
 
     /** A stale read whose end position committed before a fresh retrieval began is wholly earlier: superseded, a normal end. */
@@ -272,9 +278,9 @@ class BillingRetrievalIntervalOrderingTest extends TestCase
         return [new BillingLedger, (array) DB::table('production_membership_billing_invoices')->where('id', $first['invoice_id'])->first()];
     }
 
-    private function append(BillingLedger $ledger, array $invoice, BillingVerdict $verdict, int $start, int $end): array
+    private function append(BillingLedger $ledger, array $invoice, BillingVerdict $verdict, BillingRetrievalInterval $interval): array
     {
-        return $ledger->append($invoice, $verdict, self::T0, IdentityPolicy::REHEARSAL, $start, $end, CarbonImmutable::now('UTC'));
+        return $ledger->append($invoice, $verdict, IdentityPolicy::REHEARSAL, $interval);
     }
 
     private function settled(): BillingVerdict

@@ -1,0 +1,26 @@
+warning: 36 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php, tests/Feature/ProductionMembership/MembershipPolicyClockTest.php, tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php, tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php, tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php, ...
+Proved 2068 selected MySQL-native tests in 199 files (of 8151 discovered tests in 599 files) across 24 nonempty shards.
+Shard 1: 85 tests; 1 complete files; estimated 122m 57s.
+Shard 2: 101 tests; 10 complete files; estimated 102m 28s.
+Shard 3: 88 tests; 7 complete files; estimated 103m 14s.
+Shard 4: 73 tests; 7 complete files; estimated 103m 03s.
+Shard 5: 99 tests; 7 complete files; estimated 102m 50s.
+Shard 6: 85 tests; 7 complete files; estimated 102m 28s.
+Shard 7: 86 tests; 8 complete files; estimated 103m 15s.
+Shard 8: 80 tests; 8 complete files; estimated 102m 57s.
+Shard 9: 93 tests; 7 complete files; estimated 102m 28s.
+Shard 10: 78 tests; 8 complete files; estimated 103m 06s.
+Shard 11: 69 tests; 8 complete files; estimated 102m 51s.
+Shard 12: 74 tests; 8 complete files; estimated 102m 29s.
+Shard 13: 68 tests; 8 complete files; estimated 102m 42s.
+Shard 14: 82 tests; 11 complete files; estimated 102m 28s.
+Shard 15: 103 tests; 13 complete files; estimated 102m 28s.
+Shard 16: 93 tests; 9 complete files; estimated 103m 17s.
+Shard 17: 85 tests; 9 complete files; estimated 103m 19s.
+Shard 18: 113 tests; 9 complete files; estimated 102m 37s.
+Shard 19: 101 tests; 9 complete files; estimated 102m 51s.
+Shard 20: 81 tests; 9 complete files; estimated 103m 18s.
+Shard 21: 88 tests; 9 complete files; estimated 103m 19s.
+Shard 22: 83 tests; 9 complete files; estimated 102m 42s.
+Shard 23: 78 tests; 9 complete files; estimated 103m 16s.
+Shard 24: 82 tests; 9 complete files; estimated 103m 13s.

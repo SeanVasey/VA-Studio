@@ -1,0 +1,37 @@
+{
+  "source_count": 1956,
+  "committed_source_mismatches": [],
+  "distinct_case_count": 47,
+  "case_count": 47,
+  "assertions": 429,
+  "classes": {
+    "Tests\\Feature\\ProductionMembershipBilling\\BillingWebhookRedeliveryTest": {
+      "tests": 20,
+      "assertions": 96,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest": {
+      "tests": 6,
+      "assertions": 122,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest": {
+      "tests": 5,
+      "assertions": 88,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest": {
+      "tests": 16,
+      "assertions": 123,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  }
+}

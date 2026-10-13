@@ -1,0 +1,158 @@
+{
+  "AwardUpgradeRuntime.php": {
+    "bytes": 4465,
+    "sha256": "c18942f0d091914a3c46bfe06443b439ad7b94eff6d14e8d9277ead7e7a17e40"
+  },
+  "NewWriterAwardReplayTest.php": {
+    "bytes": 6985,
+    "sha256": "3740761e6f19d4fb5f89be678c122c52ca59cd181020f56983fcd0361209499f"
+  },
+  "OldWriterAwardTest.php": {
+    "bytes": 3371,
+    "sha256": "4b17531fa165c65374529fb30875c87a4252b9fe8f7c2dbf15f58b678646f6b9"
+  },
+  "README.md": {
+    "bytes": 6923,
+    "sha256": "f7db843fac2536e8fadc482a548dd428e038248c29134b386463b4bb922d3e4c"
+  },
+  "award.sqlite": {
+    "bytes": 3137536,
+    "sha256": "defd0b08785f08457973e6ea63f13e6aa54d211cd1b4664a2b27d09886427d88"
+  },
+  "new-after.sqlite": {
+    "bytes": 3137536,
+    "sha256": "defd0b08785f08457973e6ea63f13e6aa54d211cd1b4664a2b27d09886427d88"
+  },
+  "new-billing.json": {
+    "bytes": 14245,
+    "sha256": "93892acb6fdbce345cf1f6a15153659fc881efa04c085bd2d9ca0f455c125485"
+  },
+  "new-database-after.sha256": {
+    "bytes": 147,
+    "sha256": "dd5dd190f7e8fec52be39051c1f65a2286cfa31fd09321f6e96389e60aa1c9c2"
+  },
+  "new-database-before.sha256": {
+    "bytes": 147,
+    "sha256": "3c7b0ab3a61bc941626f226fe71a74a7806d400bf57a0bb5fab9d1536cbf84b2"
+  },
+  "new-events.json": {
+    "bytes": 850,
+    "sha256": "390e621df3f46de73017211a2fcc8d6661300b0af97e3133e3702b0be94ec8fc"
+  },
+  "new-identity.json": {
+    "bytes": 5826,
+    "sha256": "1e9a2ebf67d703f133caa6ed6e467d28811e290daf1ccc567e557aa0b8271fdc"
+  },
+  "new-periods.json": {
+    "bytes": 3325,
+    "sha256": "ce0f9ac00275bf479ebaf0b82f316fd41b2c3cf9b2b95c948f248e9c99b14ab4"
+  },
+  "new-phpunit.exit": {
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "new-phpunit.log": {
+    "bytes": 94,
+    "sha256": "9fb902e6a490dc5f8c1d54ce11dc653ffaf1ba5f6dabc8e1b26684cf7477ec83"
+  },
+  "new-phpunit.xml": {
+    "bytes": 694,
+    "sha256": "12a85ebab1f3e8fe30460966c96826d97dc97567c6ce84c798ee98a2a8465527"
+  },
+  "new-receipt.json": {
+    "bytes": 272,
+    "sha256": "041333699c841125696be159acab5c6ca4f6f2dd45d5e68d5bfb4972cd68d075"
+  },
+  "new-result.json": {
+    "bytes": 1033,
+    "sha256": "e5aff88b71695f8c701f92cb19c5ae1c524618982746ca1b9e39102fae8accd9"
+  },
+  "new-runtime.txt": {
+    "bytes": 615,
+    "sha256": "fa38c2cb3a03bc9b84ef1eec37be190ddbc73a99a9608d757f12fb00533ce327"
+  },
+  "new-source-after.json": {
+    "bytes": 1711960,
+    "sha256": "ea35b4de20bb11bcce1b0ef812427c5de1c2efe412e1f02fc1458eb1688fbf53"
+  },
+  "new-source-before.json": {
+    "bytes": 1711960,
+    "sha256": "ea35b4de20bb11bcce1b0ef812427c5de1c2efe412e1f02fc1458eb1688fbf53"
+  },
+  "old-after.sqlite": {
+    "bytes": 3117056,
+    "sha256": "7665950b60d2faf010f2e2fd11d5c6a761395ccf7517ec9a175b96d13e1a7d42"
+  },
+  "old-billing.json": {
+    "bytes": 9121,
+    "sha256": "edad37073d3a16780d9fcb66a5b88ffa3742756728438f90090de9b90101cf06"
+  },
+  "old-context.json": {
+    "bytes": 1093,
+    "sha256": "66b69b91e8766e3770e628804065c94ed712079ec1eec797c2d42a249a524a92"
+  },
+  "old-database-after.sha256": {
+    "bytes": 147,
+    "sha256": "3c7b0ab3a61bc941626f226fe71a74a7806d400bf57a0bb5fab9d1536cbf84b2"
+  },
+  "old-database-before.sha256": {
+    "bytes": 147,
+    "sha256": "fb01345c51ec8c8e901681a12fb606ee50e6079dbcc81796b84cff64c177bfbf"
+  },
+  "old-events.json": {
+    "bytes": 850,
+    "sha256": "390e621df3f46de73017211a2fcc8d6661300b0af97e3133e3702b0be94ec8fc"
+  },
+  "old-identity.json": {
+    "bytes": 5826,
+    "sha256": "1e9a2ebf67d703f133caa6ed6e467d28811e290daf1ccc567e557aa0b8271fdc"
+  },
+  "old-periods.json": {
+    "bytes": 3325,
+    "sha256": "ce0f9ac00275bf479ebaf0b82f316fd41b2c3cf9b2b95c948f248e9c99b14ab4"
+  },
+  "old-phpunit.exit": {
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "old-phpunit.log": {
+    "bytes": 93,
+    "sha256": "daa4cc454134491ca7166b9f49cdf500af94b8f460ba62f324d46eee6c735006"
+  },
+  "old-phpunit.xml": {
+    "bytes": 648,
+    "sha256": "1d4af901f964c0bb066fb71b9ea2e1deeea362572f8efa3fc62296eec72096e6"
+  },
+  "old-plans.json": {
+    "bytes": 2006,
+    "sha256": "a1fa5a681b300822c151e0f3fbce47816f0e16d0b98547a1a9bf4a2d000e2abf"
+  },
+  "old-receipt.json": {
+    "bytes": 272,
+    "sha256": "041333699c841125696be159acab5c6ca4f6f2dd45d5e68d5bfb4972cd68d075"
+  },
+  "old-runtime.txt": {
+    "bytes": 607,
+    "sha256": "a1eca3b3d140350671d99e417bc15a8e2af10597de154faa38044a1254dc86a5"
+  },
+  "old-source-after.json": {
+    "bytes": 1647129,
+    "sha256": "6afb5707cfac21f518fc206aef3a3988a21ed9b7030ffbd7d5b4e5886fe48f40"
+  },
+  "old-source-before.json": {
+    "bytes": 1647129,
+    "sha256": "6afb5707cfac21f518fc206aef3a3988a21ed9b7030ffbd7d5b4e5886fe48f40"
+  },
+  "run-phase.sh": {
+    "bytes": 1960,
+    "sha256": "d2bc83484ee4c5aaf45fca80895755641480786f6389f855b15e29ef190e9095"
+  },
+  "source_receipt.py": {
+    "bytes": 1710,
+    "sha256": "ce3aaa7ef3280c777b4d97c446a18e1d1399bbbd479b89806fa5907b83b4a14a"
+  },
+  "verification.json": {
+    "bytes": 2697,
+    "sha256": "887eb6abb42f971e2d695a40b983401f1b49671481ff1f51462f95c9b9225bcb"
+  }
+}

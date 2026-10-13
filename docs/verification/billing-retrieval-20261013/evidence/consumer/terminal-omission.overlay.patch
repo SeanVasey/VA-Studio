@@ -1,0 +1,24 @@
+diff --git a/app/Domain/Memberships/Production/MembershipAwardContext.php b/app/Domain/Memberships/Production/MembershipAwardContext.php
+index e32c4679..d429c5e1 100644
+--- a/app/Domain/Memberships/Production/MembershipAwardContext.php
++++ b/app/Domain/Memberships/Production/MembershipAwardContext.php
+@@ -181,7 +181,6 @@ final class MembershipAwardContext
+         $this->billingPolicy->proveConfiguration($this->billingConfiguration);
+         MembershipAwardConfiguration::plainPrimary($this->rows->identity());
+         MembershipException::require(hrtime(true) < $this->deadline, 'operation_deadline');
+-        $this->invoiceFreshness?->assertDeadline();
+     }
+ 
+     private function insert(string $table, array $row): void
+diff --git a/app/Domain/Memberships/Production/MembershipReservationContext.php b/app/Domain/Memberships/Production/MembershipReservationContext.php
+index 976107d0..d308054c 100644
+--- a/app/Domain/Memberships/Production/MembershipReservationContext.php
++++ b/app/Domain/Memberships/Production/MembershipReservationContext.php
+@@ -461,7 +461,6 @@ final class MembershipReservationContext
+         $this->billingPolicy->proveConfiguration($this->billingConfiguration);
+         MembershipAwardConfiguration::plainPrimary($this->rows->identity());
+         MembershipException::require(hrtime(true) < min($this->deadline, $this->authorityDeadline), 'operation_deadline');
+-        $this->invoiceFreshness?->assertDeadline();
+     }
+ 
+     private function insert(string $table, array $row): void

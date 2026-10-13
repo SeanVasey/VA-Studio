@@ -1,0 +1,28 @@
+{
+  "scope": "All selected lane-manifest members reconciled to archived bytes. A manifest explicitly marked original_archive_hashes uses the original-copy hash for projected JSON and independently checks the projected archived digest; omitted metadata is not reconstructed.",
+  "manifests": [
+    {
+      "receipt": "quality/artifact-digests.json",
+      "directory": "quality",
+      "verified_members": 30
+    },
+    {
+      "receipt": "quality/pint-v2/artifact-digests.json",
+      "directory": "quality/pint-v2",
+      "verified_members": 13
+    },
+    {
+      "receipt": "schema/component-release-digests.json",
+      "directory": "schema",
+      "keys": [
+        "sha256"
+      ],
+      "path_overrides": {
+        "commands.md": "commands-final.md",
+        "runbook-facts.md": "runbook-facts-final.md"
+      },
+      "original_archive_hashes": true,
+      "verified_members": 63
+    }
+  ]
+}

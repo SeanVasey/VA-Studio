@@ -1,0 +1,68 @@
+{
+  "source": "45d1299406821627f4ba02af186e324a70c6ade0",
+  "result": "four intended baseline assertion failures",
+  "tests": 4,
+  "assertions": 53,
+  "failures": 4,
+  "errors": 0,
+  "skips": 0,
+  "exit": 1,
+  "files": {
+    "BillingPreC3RegressionTest.php": {
+      "sha256": "1cb898473c7f7c659c18322f712b04e3fe53ab55ede993d81462be0319e7c71a",
+      "bytes": 11312
+    },
+    "README.md": {
+      "sha256": "66dee0540db4a3dadc3f55b7336a0af882eb0c7bb31b7cb22e2056c5ff1d4a81",
+      "bytes": 6008
+    },
+    "cp2-end.json": {
+      "sha256": "a3a6e69614070d684b8b6fa7208488e3e3f5dcc48ff1cc0defc516b7692c7a37",
+      "bytes": 369
+    },
+    "cp2-start.json": {
+      "sha256": "18dc8a24baf8969aa7190b79cff0be60e6bfdddb8ef9e4866d9acd96beae310c",
+      "bytes": 371
+    },
+    "cp3-freshness.json": {
+      "sha256": "0951c71148979019047038287788fa29a4f6ca91d43b64be92a612fd5648ae68",
+      "bytes": 364
+    },
+    "cp3-reversal.json": {
+      "sha256": "abeba11559dab8b8fc3f0f9dc85f995102b39425757e789a70e07a46139c4cf0",
+      "bytes": 210
+    },
+    "phpunit.exit": {
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "phpunit.log": {
+      "sha256": "d54cad21099947c7e5eb1660589d7575248e2b432799215446f3f8bc1f886b6e",
+      "bytes": 1990
+    },
+    "phpunit.xml": {
+      "sha256": "9b9259f1f072238c823d97cf9792a0f82379c9823587dd50e91285e5d9da4fbf",
+      "bytes": 3841
+    },
+    "run.sh": {
+      "sha256": "2872ae75486dc155e59d7f590259e40875cbb59c10e064cc92cc94d7795e7cc6",
+      "bytes": 1375
+    },
+    "runtime.txt": {
+      "sha256": "cae0e24ef608b4bebc8f7e0e8973c5fdf9d11ac6559ee3f1beebb00306a5b574",
+      "bytes": 563
+    },
+    "source-after.json": {
+      "sha256": "8ca51aee0cf2d5566eabea685948eb0a32f67af25c8d9913f891d5682a20a39f",
+      "bytes": 1646801
+    },
+    "source-before.json": {
+      "sha256": "8ca51aee0cf2d5566eabea685948eb0a32f67af25c8d9913f891d5682a20a39f",
+      "bytes": 1646801
+    },
+    "source_receipt.py": {
+      "sha256": "b95dfb81e9d114e6a61fc3128bf6037398984e0c15d913d90ac785a8ebafa388",
+      "bytes": 1501
+    }
+  }
+}

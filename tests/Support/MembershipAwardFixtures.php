@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Domain\Memberships\Billing\BillingProviderPin;
@@ -66,11 +67,12 @@ trait MembershipAwardFixtures
     {
         $ledger = new BillingLedger;
         $start = $ledger->startRetrieval();
-        $started = CarbonImmutable::now('UTC');
-        $verdict ??= BillingSettlement::evaluate(BillingStripeFixtures::snapshots(BillingStripeFixtures::graph($graph), $started->timestamp), $fixture['approval']['expectation']);
+        $providerGraph = BillingStripeFixtures::graph($graph);
+        $interval = $ledger->endRetrieval($start);
+        $retrievedAt = BillingDatabaseInstant::fromNativeValue($interval->databaseAt, 0)->seconds();
+        $verdict ??= BillingSettlement::evaluate(BillingStripeFixtures::snapshots($providerGraph, $retrievedAt), $fixture['approval']['expectation']);
 
-        return $ledger->append($fixture['invoice'], $verdict, $started->timestamp, IdentityPolicy::REHEARSAL,
-            $start, $ledger->endRetrieval($start), $started);
+        return $ledger->append($fixture['invoice'], $verdict, IdentityPolicy::REHEARSAL, $interval);
     }
 
     protected function awardTestCapabilities(): void

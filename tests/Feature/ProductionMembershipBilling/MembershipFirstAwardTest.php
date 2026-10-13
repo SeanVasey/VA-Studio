@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Memberships\Billing\BillingDatabaseClock;
 use App\Domain\Memberships\Production\MembershipAwards;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
@@ -72,7 +73,8 @@ class MembershipFirstAwardTest extends TestCase
             'late_payment' => ['mode' => 'before_period_end', 'seconds' => 0]]], observe: false);
         $this->awardTestCapabilities();
         // Service period already ended, but the provider-paid time was inside that period.
-        $end = CarbonImmutable::now('UTC')->timestamp - 3600;
+        // Keep the provider payment in the elapsed past of the actual database clock.
+        $end = BillingDatabaseClock::sample(DB::connection()->getPdo(), DB::getDriverName())->seconds() - 3600;
         $this->awardObservation($fixture, graph: ['line' => ['period' => ['start' => $end - 86400, 'end' => $end]],
             'payment' => ['status_transitions' => ['paid_at' => $end - 1, 'canceled_at' => null]]]);
         $result = $this->award($fixture);
@@ -85,7 +87,8 @@ class MembershipFirstAwardTest extends TestCase
         $fixture = $this->awardFixture(['award_terms' => ['expiry' => ['mode' => 'none', 'seconds' => 0],
             'late_payment' => ['mode' => 'before_period_end', 'seconds' => 0]]], observe: false);
         $this->awardTestCapabilities();
-        $end = CarbonImmutable::now('UTC')->timestamp - 3600;
+        // Keep the provider payment in the elapsed past of the actual database clock.
+        $end = BillingDatabaseClock::sample(DB::connection()->getPdo(), DB::getDriverName())->seconds() - 3600;
         $this->awardObservation($fixture, graph: ['line' => ['period' => ['start' => $end - 86400, 'end' => $end]],
             'payment' => ['status_transitions' => ['paid_at' => $end, 'canceled_at' => null]]]);
         $this->refused(fn () => $this->award($fixture), 'late_payment');

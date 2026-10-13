@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="63" errors="0" failures="0" skipped="0" time="552.556133">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" tests="1" assertions="15" errors="0" failures="0" skipped="0" time="152.444735">
+      <testcase name="test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" line="36" class="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipFirstAwardTest" assertions="15" time="152.444735"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php" tests="1" assertions="21" errors="0" failures="0" skipped="0" time="260.225568">
+      <testcase name="test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php" line="34" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest" assertions="21" time="260.225568"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" tests="1" assertions="27" errors="0" failures="0" skipped="0" time="139.885830">
+      <testcase name="test_current_database_interval_producers_retain_immutable_versioned_rows_in_every_billing_table" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" line="84" class="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSchemaPreparationTest" assertions="27" time="139.885830"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

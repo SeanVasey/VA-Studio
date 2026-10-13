@@ -49,7 +49,7 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
         $ledger = new BillingLedger;
         $chain = $ledger->observations($seed['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
-        $this->assertNull($ledger->currentSettled($seed['invoice_id'], time()), 'The stale settled snapshot must never be current evidence.');
+        $this->assertNull($ledger->currentSettled($seed['invoice_id']), 'The stale settled snapshot must never be current evidence.');
         $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
@@ -79,7 +79,7 @@ class BillingNativeStaleRetrievalRaceTest extends TestCase
         $chain = $ledger->observations($seed['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
         $this->assertGreaterThan($chain[1]['retrieval_started_at'], $results['stale']['clock'], 'By its skewed clock the stale retrieval began after the fresh one.');
-        $this->assertNull($ledger->currentSettled($seed['invoice_id'], time()), 'The stale settled snapshot must never be current evidence.');
+        $this->assertNull($ledger->currentSettled($seed['invoice_id']), 'The stale settled snapshot must never be current evidence.');
         $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
     }
 

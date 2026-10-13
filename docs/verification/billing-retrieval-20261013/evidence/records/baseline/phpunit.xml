@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Runtime\BillingPreC3\BillingPreC3RegressionTest" file="/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php" tests="4" assertions="53" errors="0" failures="4" skipped="0" time="7.624981">
+    <testcase name="test_replaced_start_allocation_must_not_admit_the_retained_old_integer" file="/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php" line="41" class="Runtime\BillingPreC3\BillingPreC3RegressionTest" classname="Runtime.BillingPreC3.BillingPreC3RegressionTest" assertions="18" time="2.141525">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Runtime\BillingPreC3\BillingPreC3RegressionTest::test_replaced_start_allocation_must_not_admit_the_retained_old_integer
+Desired C3 behavior: refuse the lost start allocation before any observation is appended; old source admitted a settled observation.
+Failed asserting that 1 is identical to 0.
+
+/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php:64</failure>
+    </testcase>
+    <testcase name="test_replaced_end_allocation_must_not_admit_the_retained_old_integer" file="/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php" line="67" class="Runtime\BillingPreC3\BillingPreC3RegressionTest" classname="Runtime.BillingPreC3.BillingPreC3RegressionTest" assertions="18" time="1.723693">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Runtime\BillingPreC3\BillingPreC3RegressionTest::test_replaced_end_allocation_must_not_admit_the_retained_old_integer
+Desired C3 behavior: refuse the lost end allocation before any observation is appended; old source admitted a settled observation.
+Failed asserting that 1 is identical to 0.
+
+/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php:89</failure>
+    </testcase>
+    <testcase name="test_a_later_reversal_must_not_be_rejected_because_the_previous_worker_clock_was_ahead" file="/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php" line="92" class="Runtime\BillingPreC3\BillingPreC3RegressionTest" classname="Runtime.BillingPreC3.BillingPreC3RegressionTest" assertions="9" time="1.982074">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Runtime\BillingPreC3\BillingPreC3RegressionTest::test_a_later_reversal_must_not_be_rejected_because_the_previous_worker_clock_was_ahead
+Desired C3 behavior: retain the later reversal using database chronology; old source loses it with reason clock.
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'reversed'
++'clock'
+
+/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php:119</failure>
+    </testcase>
+    <testcase name="test_worker_clock_ahead_must_not_extend_freshness_beyond_the_original_database_window" file="/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php" line="122" class="Runtime\BillingPreC3\BillingPreC3RegressionTest" classname="Runtime.BillingPreC3.BillingPreC3RegressionTest" assertions="8" time="1.777689">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Runtime\BillingPreC3\BillingPreC3RegressionTest::test_worker_clock_ahead_must_not_extend_freshness_beyond_the_original_database_window
+Desired C3 behavior: immutable freshness deadline is no later than database read-end plus 600 seconds; old source derives it from the ahead worker clock.
+Failed asserting that 1791878001 is equal to 1791870801 or is less than 1791870801.
+
+/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php:142</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

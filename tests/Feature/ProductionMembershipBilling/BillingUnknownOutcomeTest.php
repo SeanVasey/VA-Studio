@@ -56,7 +56,7 @@ class BillingUnknownOutcomeTest extends TestCase
         $unknown = (new BillingReconciliation(new RehearsalBillingGateway(F::graph(), $stage), $ledger))->retrieve($binding['id'], F::INVOICE);
         $this->assertSame(['unknown', 2, $settled['seal'], null, null], [$unknown['outcome'], $unknown['sequence'], $unknown['prior_seal'], $unknown['amount_minor'], $unknown['line_period_start']]);
         $this->assertSame('provider_unavailable', BillingValues::decrypt($unknown['payload_ciphertext'])['reason']);
-        $this->assertNull($ledger->currentSettled($settled['invoice_id'], F::PERIOD_START + 3801));
+        $this->assertNull($ledger->currentSettled($settled['invoice_id']));
         CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(F::PERIOD_START + 3900));
         $retry = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
         $this->assertSame([$settled['invoice_id'], 3, $unknown['seal'], 'settled'], [$retry['invoice_id'], $retry['sequence'], $retry['prior_seal'], $retry['outcome']]);
