@@ -353,7 +353,7 @@ final class BillingSchema
         return $result;
     }
 
-    /** Both raw insert paths lock the same position rows, then use current reads across both ledgers. */
+    /** Both raw insert paths lock the same positions, then current-read the opposite ledger. */
     private function intervalGuard(string $driver, string $guard, string $table): array
     {
         $positions = $this->table(self::TABLES[4]);
@@ -368,7 +368,14 @@ final class BillingSchema
                 ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; SET found_kind = NULL; "
                 .'SELECT kind INTO found_kind FROM '.$positions.' WHERE id = NEW.retrieval_end_position FOR UPDATE; '
                 ."IF found_kind IS NULL OR found_kind <> 'retrieval' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; ";
-            foreach ($queries as $query) {
+            $ownIndex = $table === $this->table(self::TABLES[2]) ? 0 : 1;
+            foreach ($queries as $index => $query) {
+                // MySQL forbids a trigger's locking read of its own subject table (1442).
+                // Existing same-ledger guards/unique keys remain; the new current read
+                // closes cross-ledger reuse, serialized by the shared position locks.
+                if ($index === $ownIndex) {
+                    continue;
+                }
                 $body .= str_replace('COUNT(*) FROM', 'COUNT(*) INTO used_positions FROM', $query).' FOR UPDATE; '
                     ."IF used_positions <> 0 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing retrieval interval'; END IF; ";
             }
