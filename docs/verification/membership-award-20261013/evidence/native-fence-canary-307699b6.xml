@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php" tests="1" assertions="4" errors="0" failures="0" skipped="0" time="122.456526">
+    <testcase name="test_exact_retained_six_table_upgrade_is_idempotent_and_keeps_every_row" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php" line="23" class="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingAwardFenceTest" assertions="4" time="122.456526"/>
+  </testsuite>
+</testsuites>

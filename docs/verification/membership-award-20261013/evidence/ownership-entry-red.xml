@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php" tests="2" assertions="10" errors="0" failures="2" skipped="0" time="12.586668">
+    <testcase name="test_direct_context_cannot_write_using_policy_facts_and_only_two_real_capabilities" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php" line="46" class="Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipAwardOwnershipTest" assertions="4" time="5.378571">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_direct_context_cannot_write_using_policy_facts_and_only_two_real_capabilities
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'owned_invocation_required',
+-    1 =&gt; 0,
+-    2 =&gt; 0,
++    0 =&gt; null,
++    1 =&gt; 1,
++    2 =&gt; 1,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:63
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_invoice_callback_cannot_construct_a_second_context_on_the_owned_rows" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php" line="69" class="Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipAwardOwnershipTest" assertions="6" time="7.208097">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_invoice_callback_cannot_construct_a_second_context_on_the_owned_rows
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'owned_invocation_required',
++    0 =&gt; null,
+     1 =&gt; 1,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:106
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

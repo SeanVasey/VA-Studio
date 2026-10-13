@@ -1,0 +1,7 @@
+{"version":"8.4.11","before":[{"TRIGGER_NAME":"events_old","ACTION_STATEMENT":"SET @probe_only = 1"}]}
+{"plain":[{"TRIGGER_NAME":"events_old","ACTION_STATEMENT":"SET @probe_only = 1"}]}
+{"show":[{"Trigger":"events_old","Event":"INSERT","Table":"events","Statement":"SET @probe_only = 1","Timing":"BEFORE","Created":"2026-10-13 02:40:51.83","sql_mode":"ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION","Definer":"root@localhost","character_set_client":"utf8mb4","collation_connection":"utf8mb4_general_ci","Database Collation":"utf8mb4_0900_ai_ci"}]}
+{"locking":{"state":"42000","number":1142,"message":"SELECT with locking clause command denied to user 'root'@'localhost' for table 'TRIGGERS'"}}
+{"sharing":{"state":"HY000","number":3550,"message":"Information schema queries do not support the 'LOCK IN SHARE MODE' clause."}}
+{"show_old":{"state":"HY000","number":1360,"message":"Trigger does not exist"}}
+{"show_new":[{"Trigger":"events_new","sql_mode":"ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION","SQL Original Statement":"CREATE DEFINER=`root`@`localhost` TRIGGER `events_new` BEFORE INSERT ON `events` FOR EACH ROW SET @probe_only = 2","character_set_client":"utf8mb4","collation_connection":"utf8mb4_general_ci","Database Collation":"utf8mb4_0900_ai_ci","Created":"2026-10-13 02:40:51.84"}]}

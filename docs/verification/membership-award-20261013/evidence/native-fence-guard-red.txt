@@ -1,0 +1,39 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 01:50.030, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard
+SHOW must see the current trigger inventory.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    0 => Array &1 [
++        'Trigger' => 'production_membership_billing_events_award_fence',
++        'Event' => 'INSERT',
++        'Table' => 'production_membership_billing_events',
++        'Statement' => 'BEGIN DECLARE fence_id INTEGER DEFAULT NULL; SELECT id INTO fence_id FROM `production_membership_billing_award_fence` WHERE id = 1 FOR UPDATE; IF fence_id IS NULL OR fence_id <> 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing award fence'; END IF; END',
++        'Timing' => 'BEFORE',
++        'Created' => '2026-10-13 02:40:17.25',
++        'sql_mode' => 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
++        'Definer' => 'root@localhost',
++        'character_set_client' => 'utf8mb4',
++        'collation_connection' => 'utf8mb4_unicode_ci',
++        'Database Collation' => 'utf8mb4_unicode_ci',
++    ],
++]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php:34
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

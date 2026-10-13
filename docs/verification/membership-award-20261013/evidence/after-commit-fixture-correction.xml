@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="6.409710">
+    <testcase name="test_after_commit_owner_change_refuses_success_but_does_not_claim_rollback" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" line="121" class="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipFirstAwardTest" assertions="10" time="6.409710"/>
+  </testsuite>
+</testsuites>

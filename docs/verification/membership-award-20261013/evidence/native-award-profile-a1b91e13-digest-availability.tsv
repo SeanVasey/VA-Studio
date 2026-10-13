@@ -1,0 +1,6 @@
+Variable_name	Value
+Performance_schema_digest_lost	0
+digest_capacity
+10000
+retained_digests	retained_event_count
+783	953

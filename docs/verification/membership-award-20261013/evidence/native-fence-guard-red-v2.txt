@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:43.078, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard
+The current hint guard is absent, so an award fence cannot be admitted.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 5[0m[37;41m, Failures: 1[0m[37;41m.[0m

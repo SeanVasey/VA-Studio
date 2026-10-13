@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 01:44.978, Memory: 79.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open
+A current nontransactional fence must refuse despite the old InnoDB catalog snapshot.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 4[0m[37;41m, Failures: 1[0m[37;41m.[0m

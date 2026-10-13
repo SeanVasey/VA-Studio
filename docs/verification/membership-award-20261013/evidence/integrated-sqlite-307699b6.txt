@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+.............[41;37mF[0m..                                                  16 / 16 (100%)
+
+Time: 01:18.998, Memory: 89.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest::test_after_commit_owner_change_refuses_success_but_does_not_claim_rollback
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'committed_receipt_refused'
++'operation_refused'
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:192
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:132
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 16[0m[37;41m, Assertions: 120[0m[37;41m, Failures: 1[0m[37;41m.[0m
