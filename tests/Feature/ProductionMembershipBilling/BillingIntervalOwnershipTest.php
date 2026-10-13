@@ -11,10 +11,18 @@ use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\TestCase;
 
+/** Retained through262 guard behavior; upgraded263 identity arbitration has separate coverage. */
 class BillingIntervalOwnershipTest extends TestCase
 {
     use BillingIntervalFixtures;
-    use FinalizationDatabaseMigrations;
+    use FinalizationDatabaseMigrations {
+        migrateFreshUsing as private baselineMigrateFreshUsing;
+    }
+
+    protected function migrateFreshUsing(): array
+    {
+        return $this->legacyBillingMigrationOptions($this->baselineMigrateFreshUsing());
+    }
 
     public function test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination(): void
     {
