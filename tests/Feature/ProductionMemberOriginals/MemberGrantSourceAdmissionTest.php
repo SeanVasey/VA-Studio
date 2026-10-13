@@ -13,6 +13,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
+use LogicException;
 use Mockery;
 use PDO;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -237,6 +238,62 @@ class MemberGrantSourceAdmissionTest extends TestCase
             $this->refused(fn () => $policy->proveCurrent($baseline, $rows), 'capability_absent');
             $this->assertSame([1, 1, 1], $this->calls);
         });
+    }
+
+    public function test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters(): void
+    {
+        $container = new class extends Container
+        {
+            public bool $armed = false;
+
+            public array $getterCalls = [];
+
+            public function bound($abstract)
+            {
+                if ($this->armed) {
+                    $this->getterCalls[] = 'bound';
+                    throw new LogicException('Terminal source proof invoked a virtual container getter.');
+                }
+
+                return parent::bound($abstract);
+            }
+
+            public function isAlias($name)
+            {
+                if ($this->armed) {
+                    $this->getterCalls[] = 'isAlias';
+                    throw new LogicException('Terminal source proof invoked a virtual alias getter.');
+                }
+
+                return parent::isAlias($name);
+            }
+        };
+        // This is a real alternate captured container sharing the fixture's actual manager/repository,
+        // not a fabricated Rows or PDO. MembershipRows independently admits this exact combination.
+        $container->instance('config', $this->app->make('config'));
+        $container->instance('db', DB::getFacadeRoot());
+        $container->instance('env', 'testing');
+        foreach (self::CAPABILITIES as $capability) {
+            $container->instance($capability, Mockery::mock($capability));
+        }
+        Container::setInstance($container);
+        try {
+            DB::transaction(function () use ($container) {
+                $rows = new MembershipRows;
+                $policy = new MemberGrantPolicy;
+                $baseline = $policy->currentFor($rows);
+                $container->armed = true;
+                try {
+                    $policy->proveCurrent($baseline, $rows);
+                    $this->assertSame($baseline, $policy->currentFor($rows));
+                    $this->assertSame([], $container->getterCalls);
+                } finally {
+                    $container->armed = false;
+                }
+            });
+        } finally {
+            Container::setInstance($this->app);
+        }
     }
 
     public function test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission(): void

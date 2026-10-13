@@ -113,6 +113,20 @@ class MemberOriginalPreparationTest extends TestCase
         }
     }
 
+    public function test_capability_aliases_are_refused_before_any_factory_is_resolved(): void
+    {
+        $this->memberCapabilities();
+        $calls = 0;
+        $this->app->bind('member_alias_probe', function () use (&$calls) {
+            $calls++;
+
+            return Mockery::mock(MemberGrantFactsAuthority::class);
+        });
+        $this->app->alias('member_alias_probe', MemberGrantFactsAuthority::class);
+        $this->refused(fn () => (new MemberGrantPolicy)->current(), 'capability_absent');
+        $this->assertSame(0, $calls);
+    }
+
     public function test_configuration_only_admission_rechecks_after_each_factory(): void
     {
         foreach ([0, 1, 2] as $changedAt) {
