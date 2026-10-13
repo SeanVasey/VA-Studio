@@ -1,0 +1,23 @@
+{
+  "source_unchanged": true,
+  "results": {
+    "configuration": {
+      "tests": "22",
+      "assertions": "56",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.624631",
+      "exit": 0
+    },
+    "staging-configuration": {
+      "tests": "1",
+      "assertions": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.929473",
+      "exit": 0
+    }
+  }
+}

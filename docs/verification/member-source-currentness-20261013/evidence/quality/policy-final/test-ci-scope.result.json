@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-ci-scope.py"
+  ],
+  "completed_at_utc": "2026-10-13T07:30:43.279017+00:00",
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "duration_seconds": 0.837515,
+  "exit": 0,
+  "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+  "log_sha256": "29d7556fd1e509233345b5a6b54e2915fd33fdb75f92a2a4c10ab934f1e6e5f9",
+  "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+  "selected_php_files": null,
+  "started_at_utc": "2026-10-13T07:30:42.441240+00:00",
+  "unittest_reported_tests": 27
+}

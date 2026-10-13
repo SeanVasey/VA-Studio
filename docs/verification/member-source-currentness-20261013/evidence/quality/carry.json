@@ -1,0 +1,28 @@
+{
+  "pint_source": "cc612650217830d2972efeafa12d4d9652c48524",
+  "current_head": "0095e46aefa85463268027d89c829a4886537ad6",
+  "executed_php_files": [
+    "app/Domain/Grants/Member/MemberGrantPolicy.php",
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php",
+    "tests/Unit/MembershipCatalogDefinitionTest.php"
+  ],
+  "file_hashes": {
+    "app/Domain/Grants/Member/MemberGrantPolicy.php": "3bea0da5495aa6a45ced33527399701325a353ddec2a1b7c092917efa42d88b6",
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php": "e7314f8b2ceccab1a0d4737a9c2c2d99fcebe337f413c5bd92f2a846228d4a7f",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php": "4c33c52da247fbf346525cf15aa882d2d4e085ea79b8bbf9459b32a12e4f1e65",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "08db30501e6cac342154750a723b3be1abdee3066e0d102da1892b35674fe937"
+  },
+  "source_unchanged": true,
+  "policy_pass_source": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+  "later_diff": "diff --git a/.github/workflows/final-verification.yml b/.github/workflows/final-verification.yml\nindex 21028259..3d537fc1 100644\n--- a/.github/workflows/final-verification.yml\n+++ b/.github/workflows/final-verification.yml\n@@ -148,13 +148,13 @@ jobs:\n     name: backend-mysql (${{ matrix.shard }}/24)\n     runs-on: ubuntu-latest\n     # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning\n-    # SQLite-skipped methods, migration test files and a reviewed include list, 2068 of 8151 cases in 199 files (1765 in 163 when run 38037183233 ran).\n+    # SQLite-skipped methods, migration test files and a reviewed include list, 2103 of 8245 cases in 202 files (1765 in 163 when run 38037183233 ran).\n     # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes, and run 37967128232 showed\n     # 8 shards of this selection cannot either (186 minutes for the two that finished). Run 38037183233 ran\n     # all 24 shards to completion on hosted MySQL 8.4: 58 to 109 minutes each, 124.5 minutes for shard 1\n     # (BulkReplaceLicenseDraftSourceTest alone, which no partition can shorten), 127,466 s of test time in\n-    # all. scripts/ci/phpunit-timings-mysql.json retains those 24 JUnit logs' measurements. C3 discovery\n-    # uses fallback weights for 36 newer files; its estimates are not executed timings. The limit stays 210 minutes.\n+    # all. scripts/ci/phpunit-timings-mysql.json retains those 24 JUnit logs' measurements. C4a discovery\n+    # uses fallback weights for 39 newer files; its estimates are not executed timings. The limit stays 210 minutes.\n     # A hung test still cannot hold a runner for 6 hours.\n     timeout-minutes: 210\n     strategy:\ndiff --git a/.gitlab-ci.yml b/.gitlab-ci.yml\nindex e99532d7..0d6e942d 100644\n--- a/.gitlab-ci.yml\n+++ b/.gitlab-ci.yml\n@@ -110,11 +110,11 @@ backend-quality:\n \n backend-mysql:\n   extends: .database\n-  # Twenty-four shards of the reviewed native selection (2068 cases in 199 files; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub\n+  # Twenty-four shards of the reviewed native selection (2103 cases in 202 files; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub\n   # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for\n   # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the\n   # timings regenerated from that run the then-selected other shards balanced at about 87 minutes.\n-  # C3 discovery uses fallback weights for 36 newer files; its estimates are not executed timings.\n+  # C4a discovery uses fallback weights for 39 newer files; its estimates are not executed timings.\n   # GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the limit stays\n   # 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after this measured shard 1 is\n   # judged to fit them, and split that test file if GitLab would exceed this limit.\n",
+  "scope": "Pint pass is carried by exact file bytes; four policy suites ran at stated earlier source. Later change is only census/timing comments."
+}

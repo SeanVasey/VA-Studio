@@ -1,0 +1,22 @@
+{
+  "after": {
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "ec0f7e685fe8e0e6a0a8adbf86c480bcd353f2cba27e4b00b97c7c8f65c6f485",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "composer.lock": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403"
+  },
+  "exit": 1,
+  "junit": {
+    "assertions": "72",
+    "errors": "0",
+    "failures": "1",
+    "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Unit/MembershipCatalogDefinitionTest.php",
+    "name": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+    "skipped": "0",
+    "tests": "62",
+    "time": "0.014131"
+  },
+  "seconds": 0.179,
+  "source_unchanged": true
+}

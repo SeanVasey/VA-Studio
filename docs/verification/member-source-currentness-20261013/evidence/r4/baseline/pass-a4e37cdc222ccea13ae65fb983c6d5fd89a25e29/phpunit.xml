@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Runtime\MemberPolicyAdmission\MemberGrantMixedProvenanceRegressionTest" file="/workspace/runtime/member-policy-admission-evidence/baseline/MemberGrantMixedProvenanceRegressionTest.php" tests="1" assertions="10" errors="0" failures="0" skipped="0" time="0.005285">
+    <testcase name="test_verified_258_with_rehearsal_257_on_configured_sqlite_refuses_before_factory_callbacks" file="/workspace/runtime/member-policy-admission-evidence/baseline/MemberGrantMixedProvenanceRegressionTest.php" line="21" class="Runtime\MemberPolicyAdmission\MemberGrantMixedProvenanceRegressionTest" classname="Runtime.MemberPolicyAdmission.MemberGrantMixedProvenanceRegressionTest" assertions="10" time="0.005285"/>
+  </testsuite>
+</testsuites>

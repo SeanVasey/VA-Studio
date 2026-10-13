@@ -1,0 +1,15 @@
+{
+  "expected": "pass",
+  "expected_behavior_observed": true,
+  "tests": 1,
+  "assertions": 10,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit": 0,
+  "xml_duration_seconds": "0.005285",
+  "observed": {
+    "decision": "provenance_driver",
+    "factory_calls": []
+  }
+}

@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerListeningFreshnessTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/CustomerListeningFreshnessTest.php">
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read track" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read metadata" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read offer" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read file" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read configuration" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read rights" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read disk" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change track" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change metadata" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change offer" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change file" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change configuration" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change rights" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change disk" name="test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_callback_during_catalog_query_cannot_release_a_stale_retained_library_revision" name="test_callback_during_catalog_query_cannot_release_a_stale_retained_library_revision"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_saved_model_callback_cannot_rebind_expected_physical_evidence_to_another_valid_revision" name="test_saved_model_callback_cannot_rebind_expected_physical_evidence_to_another_valid_revision"/>
+   <testMethod id="Tests\Feature\CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main" name="test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main"/>
+  </testClass>
+  <testClass name="Tests\Feature\DiscoverySitemapConcurrencyTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/DiscoverySitemapConcurrencyTest.php">
+   <testMethod id="Tests\Feature\DiscoverySitemapConcurrencyTest::test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention" name="test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention"/>
+  </testClass>
+  <testClass name="Tests\Feature\HostedCheckoutConcurrencyTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/HostedCheckoutConcurrencyTest.php">
+   <testMethod id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions#0" name="test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions"/>
+   <testMethod id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions#1" name="test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions"/>
+   <testMethod id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence#0" name="test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence"/>
+   <testMethod id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence#1" name="test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence"/>
+  </testClass>
+  <testClass name="Tests\Feature\MediaWriterAuthorityTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/MediaWriterAuthorityTest.php">
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#queue" name="test_current_actor_is_read_inside_the_transaction_before_any_catalog_read"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#intake" name="test_current_actor_is_read_inside_the_transaction_before_any_catalog_read"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#bind" name="test_current_actor_is_read_inside_the_transaction_before_any_catalog_read"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / role" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / email" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / deleted" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / unsaved" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / customer" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / role" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / email" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / deleted" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / unsaved" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / customer" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / role" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / email" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / deleted" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / unsaved" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / customer" name="test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#queue" name="test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#intake" name="test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#bind" name="test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#queue / role" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#queue / email" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#intake / role" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#intake / email" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#bind / role" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#bind / email" name="test_old_repeatable_read_authority_is_not_used_by_media_mutation"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal#role" name="test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal"/>
+   <testMethod id="Tests\Feature\MediaWriterAuthorityTest::test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal#email" name="test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal"/>
+  </testClass>
+  <testClass name="Tests\Feature\MediaWriterConcurrencyTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/MediaWriterConcurrencyTest.php">
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / media first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+   <testMethod id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / publication first" name="test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"/>
+  </testClass>
+  <testClass name="Tests\Feature\NativeSchemaIsolationTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/NativeSchemaIsolationTest.php">
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration" name="test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#hyphen" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#dollar" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#non-ASCII" name="test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer view naming this schema" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer dynamic routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer foreign key" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local trigger" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local routine" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local view" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+   <testMethod id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema in upper case" name="test_dependencies_reaching_the_selected_schema_are_still_refused"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php">
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_current_mfa_author_retains_v2_and_real_producer_preserves_v1_without_mutating_or_upgrading_it" name="test_current_mfa_author_retains_v2_and_real_producer_preserves_v1_without_mutating_or_upgrading_it"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_v2_authoring_requires_current_staff_mfa_and_does_not_gain_an_exception_from_explicit_terms" name="test_v2_authoring_requires_current_staff_mfa_and_does_not_gain_an_exception_from_explicit_terms"/>
+   <testMethod id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_a_different_credit_policy_is_not_approved_by_the_old_hash_and_new_approval_does_not_upgrade_v1" name="test_a_different_credit_policy_is_not_approved_by_the_old_hash_and_new_approval_does_not_upgrade_v1"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard" name="test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open" name="test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open"/>
+  </testClass>
+  <testClass name="Tests\Feature\PromotionConcurrencyTest" file="/workspace/VA-Studio-member-source-currentness/tests/Feature/PromotionConcurrencyTest.php">
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#last_use" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_quote" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#conflicting_policy" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#expired_hold" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#pending_hold" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_attempt" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#different_attempt" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#clock_skew" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read track"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read metadata"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read offer"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read file"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read configuration"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read rights"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#read disk"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change track"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change metadata"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change offer"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change file"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change configuration"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change rights"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_terminal_account_callback_cannot_release_superseded_public_summary_or_commit#change disk"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_callback_during_catalog_query_cannot_release_a_stale_retained_library_revision"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_saved_model_callback_cannot_rebind_expected_physical_evidence_to_another_valid_revision"/>
+   <test id="Tests\Feature\CustomerListeningFreshnessTest::test_framework_reads_cannot_use_a_temporary_catalog_shadow_while_proof_reads_main"/>
+   <test id="Tests\Feature\DiscoverySitemapConcurrencyTest::test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention"/>
+   <test id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions#0"/>
+   <test id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions#1"/>
+   <test id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence#0"/>
+   <test id="Tests\Feature\HostedCheckoutConcurrencyTest::test_concurrent_provider_observations_cannot_regress_or_replace_terminal_evidence#1"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#queue"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#intake"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_current_actor_is_read_inside_the_transaction_before_any_catalog_read#bind"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / deleted"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / unsaved"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#queue / customer"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / deleted"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / unsaved"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#intake / customer"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / deleted"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / unsaved"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_missing_or_withdrawn_persisted_authority_has_no_catalog_or_audit_effect#bind / customer"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#queue"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#intake"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_existing_caller_transaction_can_rollback_mutation_and_attributed_audit_together#bind"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#queue / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#queue / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#intake / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#intake / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#bind / role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_old_repeatable_read_authority_is_not_used_by_media_mutation#bind / email"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal#role"/>
+   <test id="Tests\Feature\MediaWriterAuthorityTest::test_queued_worker_requester_attribution_survives_later_interactive_authority_withdrawal#email"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#queue / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#intake / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#bind / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#complete / publication first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / media first"/>
+   <test id="Tests\Feature\MediaWriterConcurrencyTest::test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle#failure / publication first"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#hyphen"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#dollar"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration#non-ASCII"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#capability: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#inquiry: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer view naming this schema"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer dynamic routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer foreign key"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local trigger"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local routine"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: local view"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer trigger naming this schema in upper case"/>
+   <test id="Tests\Feature\NativeSchemaIsolationTest::test_dependencies_reaching_the_selected_schema_are_still_refused#identity: peer routine naming this schema in upper case"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_current_mfa_author_retains_v2_and_real_producer_preserves_v1_without_mutating_or_upgrading_it"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_v2_authoring_requires_current_staff_mfa_and_does_not_gain_an_exception_from_explicit_terms"/>
+   <test id="Tests\Feature\ProductionMembership\MembershipRedemptionPolicyFactsTest::test_a_different_credit_policy_is_not_approved_by_the_old_hash_and_new_approval_does_not_upgrade_v1"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#last_use"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_quote"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#conflicting_policy"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#expired_hold"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#pending_hold"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_attempt"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#different_attempt"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#clock_skew"/>
+  </group>
+ </groups>
+</testSuite>

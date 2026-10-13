@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "php",
+    "-d",
+    "memory_limit=256M",
+    "-r",
+    "$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/phpunit/phpunit/phpunit\";",
+    "--",
+    "tests/Unit/MembershipCatalogDefinitionTest.php",
+    "--log-junit",
+    "/workspace/runtime/membership-catalog-currentness-evidence/pure-engine-boundary-red.xml"
+  ],
+  "cwd": "/workspace/VA-Studio-member-catalog-currentness",
+  "head": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "runner_sha256": "f90084c6a6586b2158570d27ab24d26ed294c1199b8b570594d2b6cbb5513480",
+  "scope": "Pure PHPUnit Framework TestCase only; no Laravel app or database fixture",
+  "source": {
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "ec0f7e685fe8e0e6a0a8adbf86c480bcd353f2cba27e4b00b97c7c8f65c6f485",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "composer.lock": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "7c62df85de48a4cbe7a72c851a3cdc59a9ef7553a55f91d99551462a0e76a403"
+  },
+  "started_utc": "2026-10-13T07:05:03.996015+00:00",
+  "status": " M app/Domain/Memberships/Production/MembershipCatalogEvidence.php\n?? app/Domain/Memberships/Production/MembershipCatalogDefinition.php\n?? tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php\n?? tests/Unit/MembershipCatalogDefinitionTest.php\n"
+}

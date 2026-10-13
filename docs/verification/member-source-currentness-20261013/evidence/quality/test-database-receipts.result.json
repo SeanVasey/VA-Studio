@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-database-receipts.py"
+  ],
+  "completed_at_utc": "2026-10-13T07:29:15.857117+00:00",
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "duration_seconds": 50.352702,
+  "exit": 0,
+  "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+  "log_sha256": "9d5296b3420fb5db5d97df585c451520d0f497130f6dca4ebcc6a300b6d8db51",
+  "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+  "selected_php_files": null,
+  "started_at_utc": "2026-10-13T07:28:25.504230+00:00",
+  "unittest_reported_tests": 61
+}

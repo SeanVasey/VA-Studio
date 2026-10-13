@@ -1,0 +1,75 @@
+{
+  "observations": [
+    {
+      "scope": "Independent full before/after equality plus retained external program bytes.",
+      "run": "r4/baseline-fail",
+      "full_paths": 10632,
+      "programs": {
+        "MemberGrantMixedProvenanceRegressionTest.php": "50c610a082d5767b09ca6fb86b477861b86e308ae1b2646301f42cb254fd2f25",
+        "run.sh": "443d9a9e93326990567435a04bed818da8ae4c56952398498a7f39df355662f4"
+      }
+    },
+    {
+      "scope": "Independent full before/after equality plus retained external program bytes.",
+      "run": "r4/baseline-pass",
+      "full_paths": 10633,
+      "programs": {
+        "MemberGrantMixedProvenanceRegressionTest.php": "50c610a082d5767b09ca6fb86b477861b86e308ae1b2646301f42cb254fd2f25",
+        "run.sh": "443d9a9e93326990567435a04bed818da8ae4c56952398498a7f39df355662f4"
+      }
+    },
+    {
+      "run": "catalog/pure-initial",
+      "scope": "Independent captured before/after map equality and runner bytes.",
+      "paths": 5
+    },
+    {
+      "run": "catalog/pure-quote-boundary",
+      "scope": "Independent captured before/after map equality and runner bytes.",
+      "paths": 5
+    },
+    {
+      "run": "catalog/pure-engine-boundary-red",
+      "scope": "Independent captured before/after map equality and runner bytes.",
+      "paths": 5
+    },
+    {
+      "run": "catalog/pure-engine-boundary-green",
+      "scope": "Independent captured before/after map equality and runner bytes.",
+      "paths": 5
+    },
+    {
+      "run": "catalog/pure-final",
+      "scope": "Independent captured before/after map equality and runner bytes.",
+      "paths": 5
+    },
+    {
+      "receipt": "r4/initial-results.json",
+      "scope": "Retained owner verification sidecar; no separate raw after-map in this release.",
+      "asserted_source_unchanged": true
+    },
+    {
+      "receipt": "r4/sqlite-final-verification.json",
+      "scope": "Retained owner verification sidecar; no separate raw after-map in this release.",
+      "asserted_source_unchanged": true
+    },
+    {
+      "run": "catalog/native-old-source-red",
+      "scope": "Owner unchanged-source sidecar and exact captured native runner/historical preloaded class bytes; setup error before counter mutation.",
+      "paths": 1961,
+      "overlay": {
+        "class": "App\\Domain\\Memberships\\Production\\MembershipCatalogEvidence",
+        "exact_source_commit": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+        "file": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+        "scope": "Single historical class preloaded, all other source uses candidate. New helper unused by this old class.",
+        "sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9"
+      }
+    },
+    {
+      "run": "r4/native-four",
+      "scope": "Owner reports unchanged full tracked source and runner; captured runner bytes verified independently. No separate raw after-map retained.",
+      "full_paths": 10633,
+      "mysql_version": "8.4.11"
+    }
+  ]
+}

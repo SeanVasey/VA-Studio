@@ -1,0 +1,1122 @@
+{
+  "scope": "Completed successful identities by driver+case, with component and final-root sources kept distinct. Frozen root native reservation canary is one case, not a whole suite. No fixture becomes operative grant evidence.",
+  "precedence": [
+    "r4/sqlite-final",
+    "catalog/pure-final",
+    "r4/native-four",
+    "catalog/native-fixed-five",
+    "catalog/sqlite-eligibility-whole",
+    "root/native-reservation-integration"
+  ],
+  "passed_cases": 138,
+  "assertions": 599,
+  "cases": [
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_rehearsal_admission_binds_the_real_frame_and_terminal_checks_do_not_resolve_factories",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_capability_callback_configuration_drift_refuses_before_the_remaining_factories",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_replaced_repository_or_container_is_refused_before_other_factories",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_callback_cannot_withdraw_a_later_capability_and_run_intervening_factories",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_transient_configuration_cannot_admit_a_nested_mismatched_frame",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_equal_configuration_cannot_transfer_an_issued_frame_to_another_policy_or_rows",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_reproof_rejects_policy_connection_name_and_capability_drift_without_callbacks",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_new_member_family_remains_default_off_without_actual_original_facts",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_claimed_enablement_hashes_do_not_supply_an_actual_member_original_capability",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_pure_policy_baseline_refuses_an_overloaded_parent_without_invoking_it",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_verified_member_and_rehearsal_membership_on_configured_sqlite_refuse_before_factories",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_all_capabilities_must_exist_before_a_factory_can_supply_a_missing_one",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_capability_aliases_are_refused_before_any_factory_is_resolved",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_configuration_only_admission_rechecks_after_each_factory",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #0",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #1",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #2",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #3",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #4",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #5",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #6",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #7",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #8",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #9",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #10",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_captured_scalar_configuration_is_detached_from_repository_references",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_manifest_values_never_admit_private_paths_or_duplicate_roles",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"local\"",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"testing\"",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"staging\"",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"production\"",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"an unlisted environment\"",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"a staging prefix\"",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"a cased variant\"",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_test_payment_exception_operations_reach_their_record_lookup_only_in_admitted_environments",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_stripe_live_mode_or_a_live_or_restricted_key",
+      "assertions": 37,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_production_identity_or_production_live_funds",
+      "assertions": 10,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_enables_the_operative_paid_grant_lane",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_verified_production_membership_or_member_grant_provenance",
+      "assertions": 4,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_development_only_and_testing_only_conveniences_still_refuse_staging",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_the_helper_names_exactly_three_test_commerce_environments_and_two_mfa_environments",
+      "assertions": 31,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit",
+      "assertions": 90,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/sqlite-final",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"escaped literal with competing outer close\"",
+      "assertions": 1,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/pure-final",
+      "driver": "none"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/native-four",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/native-four",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+      "assertions": 2,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/native-four",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+      "assertions": 3,
+      "status": "passed",
+      "detail": null,
+      "run": "r4/native-four",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+      "assertions": 18,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/native-fixed-five",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/native-fixed-five",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/native-fixed-five",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/native-fixed-five",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/native-fixed-five",
+      "driver": "mysql"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms",
+      "assertions": 12,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_locator_and_expected_revision_have_one_unambiguous_bounded_encoding",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_tokens_require_original_issuer_owner_rows_and_frame_and_cannot_be_copied",
+      "assertions": 13,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_a_new_published_revision_does_not_admit_an_old_selection_locator",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_unpublished_track_and_new_unverified_rights_refuse_catalog_authority",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_storage_callback_cannot_authenticate_a_later_graph_instead_of_the_selected_graph",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_raw_evidence_uses_no_file_callback_and_refuses_changed_complete_footprint",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "assertions": 5,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_readiness_boundary_and_configuration_change_refuse_existing_proof",
+      "assertions": 6,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_license_effective_until_caps_wall_and_monotonic_readiness",
+      "assertions": 11,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof",
+      "assertions": 7,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper",
+      "assertions": 8,
+      "status": "passed",
+      "detail": null,
+      "run": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite"
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "assertions": 21,
+      "status": "passed",
+      "detail": null,
+      "run": "root/native-reservation-integration",
+      "driver": "mysql"
+    }
+  ],
+  "pending": [
+    "final independent review and exact-head preflight"
+  ]
+}

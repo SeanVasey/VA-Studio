@@ -1,0 +1,27 @@
+diff --git a/app/Domain/Grants/Member/MemberGrantPolicy.php b/app/Domain/Grants/Member/MemberGrantPolicy.php
+index b49b10bd..565eb023 100644
+--- a/app/Domain/Grants/Member/MemberGrantPolicy.php
++++ b/app/Domain/Grants/Member/MemberGrantPolicy.php
+@@ -120,8 +120,21 @@ final class MemberGrantPolicy
+ 
+     private function capabilitiesPresent(): void
+     {
++        // Container getters are virtual and may execute application callbacks. The terminal
++        // source proof reads only captured raw maps, and supports direct bindings/instances only.
++        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
++        $bindings = (new ReflectionProperty(Container::class, 'bindings'))->getValue($this->container);
++        $aliases = (new ReflectionProperty(Container::class, 'aliases'))->getValue($this->container);
++        MemberGrantException::require(is_array($instances) && is_array($bindings) && is_array($aliases), 'capability_absent');
+         foreach (self::CAPABILITIES as $capability) {
+-            MemberGrantException::require($this->container->bound($capability), 'capability_absent');
++            MemberGrantException::require(! array_key_exists($capability, $aliases), 'capability_absent');
++            if (array_key_exists($capability, $instances)) {
++                MemberGrantException::require($instances[$capability] instanceof $capability, 'capability_absent');
++            } else {
++                $binding = $bindings[$capability] ?? null;
++                MemberGrantException::require(is_array($binding) && ($binding['concrete'] ?? null) instanceof Closure
++                    && is_bool($binding['shared'] ?? null), 'capability_absent');
++            }
+         }
+     }
+ 

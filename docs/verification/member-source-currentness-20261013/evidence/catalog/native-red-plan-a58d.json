@@ -1,0 +1,10 @@
+{
+  "baseline": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "source_overlay": "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+  "old_source_sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9",
+  "unchanged_test_body": "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+  "test_sha256": "4a76bf71cdb429ddae4a216b4b0ffe09d2b5e33e4849dd776e8bd9c4dc021670",
+  "case": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+  "status": "planned only; no native execution yet",
+  "expected_old_result": "changed_catalog_source after successful independent committed auto-id insert and unchanged selected rows"
+}

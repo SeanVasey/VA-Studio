@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-database-receipts.py"
+  ],
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+  "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+  "started_at_utc": "2026-10-13T07:29:53.128078+00:00"
+}
