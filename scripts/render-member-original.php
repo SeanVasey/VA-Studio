@@ -7,6 +7,10 @@ use App\Domain\Grants\Member\MemberOriginalPdfRenderer;
 require __DIR__.'/member-original-renderer-autoload.php';
 
 try {
+    // No inherited application values, including names introduced by a prelaunch observation hook.
+    if (array_diff(array_keys((array) getenv()), ['LANG', 'LC_ALL', 'TZ', 'TMPDIR', 'LD_LIBRARY_PATH', 'PWD', 'SHLVL', '_']) !== []) {
+        throw new RuntimeException;
+    }
     $raw = stream_get_contents(STDIN, 1048577);
     if (! is_string($raw) || strlen($raw) > 1048576) {
         throw new RuntimeException;

@@ -17,8 +17,8 @@ final class MemberOriginalRendererProcess
 
     private const MAX_OUTPUT = 24117248;
 
-    /** The optional factory supplies a process only for isolated transport tests. */
-    public function __construct(private readonly ?Closure $processFactory = null) {}
+    /** Optional observation only; callers never receive or replace transport, input or command state. */
+    public function __construct(private readonly ?Closure $beforeStart = null) {}
 
     public function render(MemberOriginalRenderInput $input, array $profile, MemberOriginalIoFrame $idle, MemberOriginalBudget $budget): RenderedContract
     {
@@ -50,6 +50,12 @@ final class MemberOriginalRendererProcess
                 $packages[] = $path;
             }
             $workspace = (new MemberOriginalFiles)->createRendererWorkspace($idle, $budget);
+            if ($this->beforeStart !== null) {
+                ($this->beforeStart)();
+            }
+            $budget->assertCurrent();
+            $idle->assertStillIdle();
+            // Scrub after the observation hook too, including any newly introduced environment name.
             $environment = [];
             foreach (array_unique([...array_keys((array) getenv()), ...array_keys($_ENV), ...array_keys($_SERVER)]) as $name) {
                 $environment[$name] = false;
@@ -88,19 +94,13 @@ final class MemberOriginalRendererProcess
                 '-d', 'upload_tmp_dir='.$workspace->path, '-d', 'sys_temp_dir='.$workspace->path,
                 '-d', 'disable_functions=curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open',
                 $projectRoot.'/scripts/render-member-original.php'];
-            $process = $this->processFactory === null
-                ? new Process($command, $projectRoot, $environment, $payload, 60)
-                : ($this->processFactory)($command, $projectRoot, $environment, $payload);
-            if (! $process instanceof Process) {
-                throw new ContractIssuanceException('render_failed');
-            }
-            // A factory may resolve an explicit CLI or run test callbacks. Recheck afterward.
+            // All callback-capable preparation has finished. The renderer owns the actual native process.
             MemberGrantRenderProfile::verifyRuntime($profile, $idle);
             $budget->assertCurrent();
             $idle->assertStillIdle();
             $remainingSeconds = ($budget->deadlineNs() - \hrtime(true)) / 1_000_000_000;
             MemberGrantException::require($remainingSeconds > 0, 'workflow_deadline');
-            $process->setTimeout(min(60.0, $remainingSeconds));
+            $process = new Process($command, $projectRoot, $environment, $payload, min(60.0, $remainingSeconds));
             $stdout = '';
             $stderrBytes = 0;
             $process->run(function (string $type, string $chunk) use ($process, $idle, $budget, &$stdout, &$stderrBytes, &$collectOutput): void {

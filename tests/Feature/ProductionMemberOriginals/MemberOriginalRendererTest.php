@@ -91,7 +91,7 @@ final class MemberOriginalRendererTest extends TestCase
         $launched = false;
         $renderer = new MemberOriginalRendererProcess(function () use (&$launched): never {
             $launched = true;
-            throw new \RuntimeException('must not reach factory');
+            throw new \RuntimeException('must not reach observation hook');
         });
         try {
             $renderer->render(MemberOriginalRendererFixtures::input(), $profile, $this->idle, MemberOriginalBudget::start());
@@ -112,22 +112,20 @@ final class MemberOriginalRendererTest extends TestCase
         $this->assertNotSame(CanonicalJson::hash($this->profile), CanonicalJson::hash(MemberGrantRenderProfile::released('verified_production')));
     }
 
-    public function test_factory_opening_a_native_transaction_cannot_start_child_or_close_it(): void
+    public function test_observation_hook_opening_a_native_transaction_refuses_without_closing_it(): void
     {
         $pdo = DB::connection()->getPdo();
-        $process = null;
-        $renderer = new MemberOriginalRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use ($pdo, &$process): Process {
+        $called = false;
+        $renderer = new MemberOriginalRendererProcess(function () use ($pdo, &$called): void {
+            $called = true;
             $pdo->beginTransaction();
-
-            return $process = new Process($command, $cwd, $environment, $payload, 60);
         });
         try {
             $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, MemberOriginalBudget::start());
             $this->fail('Native transaction admitted a child.');
         } catch (MemberGrantException $error) {
             $this->assertSame('io_transaction', $error->reason);
-            $this->assertNotNull($process);
-            $this->assertFalse($process->isStarted());
+            $this->assertTrue($called);
             $this->assertTrue($pdo->inTransaction());
         } finally {
             if ($pdo->inTransaction()) {
@@ -136,36 +134,33 @@ final class MemberOriginalRendererTest extends TestCase
         }
     }
 
-    public function test_factory_expiring_original_budget_cannot_start_child(): void
+    public function test_observation_hook_expiring_original_budget_refuses(): void
     {
         $budget = MemberOriginalBudget::start();
-        $process = null;
-        $renderer = new MemberOriginalRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use ($budget, &$process): Process {
+        $renderer = new MemberOriginalRendererProcess(function () use ($budget): void {
             $budget->shortenTo(hrtime(true) - 1);
-
-            return $process = new Process($command, $cwd, $environment, $payload, 60);
         });
         try {
             $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, $budget);
             $this->fail('Expired budget admitted a child.');
         } catch (MemberGrantException $error) {
             $this->assertSame('workflow_deadline', $error->reason);
-            $this->assertFalse($process->isStarted());
         }
     }
 
-    public function test_real_child_timeout_is_shortened_to_the_original_workflow_remainder(): void
+    public function test_original_budget_includes_time_spent_in_the_prelaunch_observation_hook(): void
     {
         $budget = MemberOriginalBudget::start();
-        $budget->shortenTo(hrtime(true) + 10_000_000_000);
-        $process = null;
-        $renderer = new MemberOriginalRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use (&$process): Process {
-            return $process = new Process($command, $cwd, $environment, $payload, 60);
+        $renderer = new MemberOriginalRendererProcess(function () use ($budget): void {
+            $budget->shortenTo(hrtime(true) + 5_000_000);
+            usleep(20000);
         });
-        $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, $budget);
-        $this->assertGreaterThan(0, $process->getTimeout());
-        $this->assertLessThan(10, $process->getTimeout());
-        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        try {
+            $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, $budget);
+            $this->fail('A delayed hook received a new workflow budget.');
+        } catch (MemberGrantException $error) {
+            $this->assertSame('workflow_deadline', $error->reason);
+        }
     }
 
     public function test_real_child_refuses_a_supported_script_character_without_a_pinned_glyph(): void
@@ -183,22 +178,49 @@ final class MemberOriginalRendererTest extends TestCase
 
     public function test_real_child_has_no_application_environment_and_transport_is_bounded(): void
     {
-        $seen = null;
+        $called = false;
         putenv('MEMBER_RENDER_TEST_SENTINEL=synthetic-not-a-secret');
-        $renderer = new MemberOriginalRendererProcess(function (array $command, string $cwd, array $environment, string $payload) use (&$seen): Process {
-            $seen = [$command, $environment, $payload];
-
-            return new Process($command, $cwd, $environment, $payload, 60);
+        $renderer = new MemberOriginalRendererProcess(function () use (&$called): void {
+            $called = true;
+            putenv('MEMBER_RENDER_LATE_SENTINEL=synthetic-not-a-secret');
         });
         try {
             $rendered = $renderer->render(MemberOriginalRendererFixtures::input(), $this->profile, $this->idle, MemberOriginalBudget::start());
         } finally {
             putenv('MEMBER_RENDER_TEST_SENTINEL');
+            putenv('MEMBER_RENDER_LATE_SENTINEL');
         }
-        $this->assertFalse($seen[1]['MEMBER_RENDER_TEST_SENTINEL']);
-        $this->assertSame([PHP_BINARY, '-n'], array_slice($seen[0], 0, 2));
-        $this->assertSame(base_path('scripts/render-member-original.php'), end($seen[0]));
-        $this->assertLessThanOrEqual(1048576, strlen($seen[2]));
+        // The real child refuses every environment name outside its fixed technical allowlist.
+        $this->assertTrue($called);
         $this->assertGreaterThan(32, $rendered->sizeBytes);
+    }
+
+    public function test_observation_hook_cannot_substitute_a_pdf_looking_transport_result(): void
+    {
+        $input = MemberOriginalRendererFixtures::input();
+        $bytes = "%PDF-1.7\nNONBINDING substitute output, not the pinned renderer.\n%%EOF\n";
+        $result = ['pdf_base64' => base64_encode($bytes), 'sha256' => hash('sha256', $bytes), 'size_bytes' => strlen($bytes),
+            'page_count' => 1, 'text_digest' => (new MemberOriginalText)->build($input)['text_digest'],
+            'profile_hash' => CanonicalJson::hash($this->profile)];
+        $payload = base64_encode(json_encode($result, JSON_THROW_ON_ERROR));
+        $substitute = null;
+        $renderer = new MemberOriginalRendererProcess(function () use ($payload, &$substitute): Process {
+            return $substitute = new Process([PHP_BINARY, '-n', '-r', 'fwrite(STDOUT, base64_decode("'.$payload.'"));']);
+        });
+        $rendered = $renderer->render($input, $this->profile, $this->idle, MemberOriginalBudget::start());
+        $this->assertNotSame($bytes, $rendered->pdfBytes);
+        $this->assertFalse($substitute->isStarted());
+        $this->assertStringContainsString('D:20261013000000', $rendered->pdfBytes);
+    }
+
+    public function test_real_child_preserves_crlf_and_bare_cr_source_with_exact_text_digest(): void
+    {
+        $terms = MemberOriginalRendererFixtures::terms();
+        $terms['authored_source'] = "NONBINDING synthetic first line\r\nSecond retained line\rThird retained line\nFinal line";
+        $input = MemberOriginalRenderInput::from(MemberOriginalRendererFixtures::document($terms));
+        $one = (new MemberOriginalRendererProcess)->render($input, $this->profile, $this->idle, MemberOriginalBudget::start());
+        $two = (new MemberOriginalRendererProcess)->render($input, $this->profile, $this->idle, MemberOriginalBudget::start());
+        $this->assertSame((new MemberOriginalText)->build($input)['text_digest'], $one->textDigest);
+        $this->assertSame($one->pdfBytes, $two->pdfBytes);
     }
 }

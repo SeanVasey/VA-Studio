@@ -19,12 +19,12 @@ final class MemberGrantRenderProfileRegistry
         'runtime_seconds' => 60, 'memory_bytes' => 134217728];
 
     // Filled from the complete new implementation before its first release. Never replace a released entry.
-    private const MANIFEST_HASH = '10c7cfe4d0ca037f8f5fd1ea83d239361a4f4669e60d5b2e2db8091c9176b20c';
+    private const MANIFEST_HASH = 'caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852';
 
     public const RELEASED = [
         'r1' => [
-            'synthetic_rehearsal' => '3964453761e443baac23a2373c7e946fe3adb095e6008546862fe747c031b88d',
-            'verified_production' => '2dc584d9840b8e11190a3641147e034c1249ec65e37c5fff84051eb0a5b27eda',
+            'synthetic_rehearsal' => '1c518ec10f5dce9cf538b48de4e1034cd1fe1574fe21c9f0819d0638972e434e',
+            'verified_production' => 'd9047a26ebdc6b2bbfc44d00f3fbd93bfc1504e61948bf9666e7acadde712cbd',
         ],
     ];
 
@@ -215,10 +215,10 @@ final class MemberGrantRenderProfileRegistry
             'files' => [
                 'app/Domain/Grants/Member/MemberOriginalRenderInput.php' => '6b470c6d2dfadbb74d24bc7263e347985ce92864c29b236aac50d70bd379e3c7',
                 'app/Domain/Grants/Member/MemberOriginalText.php' => '959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da',
-                'app/Domain/Grants/Member/MemberOriginalPdfRenderer.php' => 'c48ad0a3e49eac2adc48f92a6351eec8e7808db94421fe4c361a2a7ac88481c6',
-                'app/Domain/Grants/Member/MemberOriginalRendererProcess.php' => '9a4cdf3f2397f5d2fc23bdb0f419b53d0ecc5d3cc41905360276507d589924ae',
+                'app/Domain/Grants/Member/MemberOriginalPdfRenderer.php' => 'f3acf36fcf4938b14a8efb742ad46a17dc7c3001a478833d36a48d09ce5c7ed2',
+                'app/Domain/Grants/Member/MemberOriginalRendererProcess.php' => 'f0470e91b122b23588088a7361971b9e009f2098d86e9d1321a3cea47c610085',
                 'scripts/member-original-renderer-autoload.php' => 'adca75e6c55194265c0395df088cf77b8aab37a30923435e3b5e2704ada7193c',
-                'scripts/render-member-original.php' => '31fc3adbc8065cf3718cd6ce31462081fc99c530c3c586f32a53db8e5734b348',
+                'scripts/render-member-original.php' => '880ec7590bba84b24c0944986b9c71e6484cd0b63f25b0e55add1b6a7f4be0c3',
             ],
         ],
     ];

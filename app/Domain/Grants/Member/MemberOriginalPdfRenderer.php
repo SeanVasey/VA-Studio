@@ -67,7 +67,7 @@ final class MemberOriginalPdfRenderer implements ContractRenderer
             foreach (['B', ''] as $style) {
                 $font = $pdf->font->insert($pdf->pon, 'dejavusans', $style, 10);
                 foreach (array_unique(mb_str_split($document['text'])) as $char) {
-                    if ($char === "\n" || $char === "\t") {
+                    if ($char === "\n" || $char === "\r" || $char === "\t") {
                         continue;
                     }
                     $codepoint = mb_ord($char);
