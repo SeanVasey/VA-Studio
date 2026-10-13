@@ -52,11 +52,17 @@ class MembershipReservationClockClosureTest extends TestCase
 
             return $at;
         });
-        $this->refuses(fn () => $this->reserveFixture($fixture), 'operation_refused');
+        $reason = null;
+        try {
+            $this->reserveFixture($fixture);
+        } catch (MembershipException $error) {
+            $reason = $error->reason;
+        }
         $this->assertSame(1, $changed);
         $this->assertSame(0, DB::table(MembershipReservationRecords::TABLE)->count());
         $this->assertSame(1, DB::table(MembershipPeriodRecords::EVENTS)->count());
         $this->assertSame(1, (int) DB::table('customer_accounts')->where('id', $fixture['buyer']['principal']->accountId)->value('active'));
+        $this->assertSame('operation_refused', $reason);
     }
 
     public function test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation(): void
