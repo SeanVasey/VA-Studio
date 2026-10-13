@@ -19,7 +19,9 @@ use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 use ReflectionClass;
 use ReflectionProperty;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -152,14 +154,16 @@ class MemberOriginalCompositionTest extends TestCase
         $fixture = $this->memberOriginalFixture();
         $before = $this->memberOriginalEffects();
         $operation = $this->memberOriginalOperation();
-        $at = CarbonImmutable::now('UTC');
         $primary = DB::connection()->getPdo();
         $armed = false;
         $calls = 0;
         DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use (&$armed): void {
             $armed = true;
         });
-        CarbonImmutable::setTestNow(function () use ($fixture, $at, $primary, &$armed, &$calls) {
+        $real = Crypt::getFacadeRoot();
+        $observed = Mockery::mock();
+        $observed->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $fixture, $primary, &$armed, &$calls) {
+            $plain = $real->decryptString($ciphertext);
             if ($armed && self::inside(SealedMemberGrantFacts::class, 'currentCallbacks')) {
                 $armed = false;
                 $statement = $primary->prepare('UPDATE tracks SET status = ? WHERE id = ?');
@@ -167,10 +171,14 @@ class MemberOriginalCompositionTest extends TestCase
                 $calls += $statement->rowCount();
             }
 
-            return $at;
+            return $plain;
         });
-        $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'source_refused');
-        CarbonImmutable::setTestNow($at);
+        Crypt::swap($observed);
+        try {
+            $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'source_refused');
+        } finally {
+            Crypt::swap($real);
+        }
         $this->assertSame(1, $calls);
         $this->assertSame('published', DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
         $this->assertMemberOriginalEffectsUnchanged($before);
