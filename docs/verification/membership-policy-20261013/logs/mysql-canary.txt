@@ -1,0 +1,69 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-policy/phpunit.xml
+
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 01:48.300, Memory: 79.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent
+PDOException: SQLSTATE[HY000]: General error: 1100 Table 'users' was not locked with LOCK TABLES
+
+/workspace/VA-Studio-membership-policy/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:272
+/workspace/VA-Studio-membership-policy/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:25
+/workspace/VA-Studio-membership-policy/app/Domain/Memberships/Billing/BillingSchema.php:63
+/workspace/VA-Studio-membership-policy/app/Domain/Memberships/Billing/BillingSchema.php:402
+/workspace/VA-Studio-membership-policy/database/migrations/2026_10_13_261000_membership_billing_interval_ownership.php:13
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:517
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:442
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:451
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/View/Components/Task.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:853
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:253
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:211
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:138
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:118
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Migrations/Migrator.php:672
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:111
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/MigrateCommand.php:90
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:68
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Concerns/CallsCommands.php:29
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/FreshCommand.php:96
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:676
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithConsole.php:85
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/DatabaseMigrations.php:37
+/workspace/VA-Studio-membership-policy/tests/Support/FinalizationDatabaseMigrations.php:22
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:239
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:106
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:75
+/workspace/VA-Studio-membership-policy/tests/TestCase.php:15
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 0[0m[37;41m, Errors: 1[0m[37;41m.[0m

@@ -873,6 +873,14 @@
     [
       "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
       "test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalOwnershipRaceTest",
+      "test_independent_transactions_with_older_snapshots_cannot_share_any_endpoint_across_ledgers"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalSnapshotTest",
+      "test_prior_snapshot_sees_a_later_committed_endpoint_claim_in_both_ledger_directions"
     ]
   ]
 }

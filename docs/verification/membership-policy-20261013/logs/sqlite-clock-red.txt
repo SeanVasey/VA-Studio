@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-policy/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:02.941, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembership\MembershipPolicyClockTest::test_terminal_clock_callback_cannot_withdraw_policy_or_replace_the_transaction
+A terminal clock mutation must invalidate the proof: configuration
+
+/workspace/VA-Studio-membership-policy/tests/Feature/ProductionMembership/MembershipPolicyClockTest.php:46
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 1[0m[37;41m, Failures: 1[0m[37;41m.[0m

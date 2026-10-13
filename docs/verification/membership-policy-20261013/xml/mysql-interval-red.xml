@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalOwnershipRaceTest" file="/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php" tests="1" assertions="5" errors="0" failures="1" skipped="0" time="98.819585">
+    <testcase name="test_independent_transactions_with_older_snapshots_cannot_share_any_endpoint_across_ledgers" file="/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php" line="20" class="Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalOwnershipRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeIntervalOwnershipRaceTest" assertions="5" time="98.819585">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingNativeIntervalOwnershipRaceTest::test_independent_transactions_with_older_snapshots_cannot_share_any_endpoint_across_ledgers
+[{"result":"saved","sqlstate":null,"driver_code":null,"connection_id":24,"pid":90180,"transaction_level":0},{"result":"saved","sqlstate":null,"driver_code":null,"connection_id":25,"pid":90181,"transaction_level":0}]
+Failed asserting that actual size 2 matches expected size 1.
+
+/workspace/VA-Studio-membership-policy-red/tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php:37
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

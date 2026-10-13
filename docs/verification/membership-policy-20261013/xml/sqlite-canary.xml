@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" file="/workspace/VA-Studio-membership-policy/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="2.058000">
+    <testcase name="test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent" file="/workspace/VA-Studio-membership-policy/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" line="24" class="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSchemaPreparationTest" assertions="8" time="2.058000"/>
+  </testsuite>
+</testsuites>

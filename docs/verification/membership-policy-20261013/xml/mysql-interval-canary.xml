@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" file="/workspace/VA-Studio-membership-policy/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" tests="1" assertions="27" errors="0" failures="0" skipped="0" time="117.824646">
+    <testcase name="test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination" file="/workspace/VA-Studio-membership-policy/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" line="19" class="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIntervalOwnershipTest" assertions="27" time="117.824646"/>
+  </testsuite>
+</testsuites>

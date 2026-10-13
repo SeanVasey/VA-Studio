@@ -37,26 +37,48 @@ final class MembershipPolicy
     /** Configuration is an internal baseline, never paid invoice or seller-policy proof. */
     public function current(): array
     {
+        $configuration = $this->facts();
+        // An approved policy proof alone cannot enable commerce.
+        foreach ([MembershipPaidInvoiceAuthority::class, MembershipPolicyFactsAuthority::class,
+            MembershipEligibleLicenseAuthority::class, MemberGrantAuthority::class] as $capability) {
+            MembershipException::require($this->container->bound($capability), 'source_capability_absent');
+            MembershipException::require($this->container->make($capability) instanceof $capability, 'source_capability_absent');
+        }
+        $this->proveConfiguration($configuration);
+
+        return $configuration;
+    }
+
+    /** Preparation does not require or install the other operative capabilities. */
+    public function authoring(): array
+    {
+        $configuration = $this->configuration();
+        MembershipException::require($configuration['authoring_enabled'] === true && $configuration['version'] === self::VERSION, 'disabled');
+        $this->provenance($configuration);
+
+        return $configuration;
+    }
+
+    /** Approved policy admission only; the complete operative gate remains current(). */
+    public function facts(): array
+    {
         $configuration = $this->configuration();
         MembershipException::require($configuration['enabled'] === true && $configuration['version'] === self::VERSION, 'disabled');
+        $this->provenance($configuration);
+        MembershipException::require(is_string($configuration['approved_policy_hash'])
+            && preg_match('/\A[a-f0-9]{64}\z/D', $configuration['approved_policy_hash']) === 1, 'policy_facts_absent');
+
+        return $configuration;
+    }
+
+    private function provenance(array $configuration): void
+    {
         MembershipException::require(in_array($configuration['provenance'], [IdentityPolicy::REHEARSAL, IdentityPolicy::PRODUCTION], true)
             && ($configuration['provenance'] !== IdentityPolicy::REHEARSAL || in_array($configuration['environment'], ['local', 'testing'], true))
             // Staging is a test installation: verified production provenance is refused there.
             && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || ! TestEnvironment::isStaging($configuration['environment']))
             // Only the native driver can serve verified evidence; SQLite callbacks are not fully enumerable.
             && ($configuration['provenance'] !== IdentityPolicy::PRODUCTION || $configuration['driver'] === 'mysql'), 'provenance');
-        MembershipException::require(is_string($configuration['approved_policy_hash'])
-            && preg_match('/\A[a-f0-9]{64}\z/D', $configuration['approved_policy_hash']) === 1, 'policy_facts_absent');
-        // No implementation is supplied here. Actual reviewed invoice/policy/eligibility/grant
-        // providers are needed before an operative writer can be registered.
-        foreach ([MembershipPaidInvoiceAuthority::class, MembershipPolicyFactsAuthority::class,
-            MembershipEligibleLicenseAuthority::class, MemberGrantAuthority::class] as $capability) {
-            MembershipException::require($this->container->bound($capability), 'source_capability_absent');
-            MembershipException::require($this->container->make($capability) instanceof $capability, 'source_capability_absent');
-        }
-        MembershipException::require($this->configuration() === $configuration, 'changed_policy');
-
-        return $configuration;
     }
 
     public function proveConfiguration(array $expected): void
@@ -78,12 +100,13 @@ final class MembershipPolicy
             && is_array($database['connections'] ?? null) && is_array($database['connections'][$database['default']] ?? null), 'changed_policy');
         $driver = $database['connections'][$database['default']]['driver'] ?? null;
         MembershipException::require(is_bool($policy['enabled'] ?? null)
+            && is_bool($policy['authoring_enabled'] ?? false)
             && is_string($policy['version'] ?? null)
             && (($policy['provenance'] ?? null) === null || is_string($policy['provenance']))
             && (($policy['approved_policy_hash'] ?? null) === null || is_string($policy['approved_policy_hash']))
             && ($environment === null || is_string($environment)) && is_string($driver), 'changed_policy');
 
-        return ['enabled' => $policy['enabled'] ?? null, 'version' => $policy['version'] ?? null,
+        return ['enabled' => $policy['enabled'] ?? null, 'authoring_enabled' => $policy['authoring_enabled'] ?? false, 'version' => $policy['version'] ?? null,
             'provenance' => $policy['provenance'] ?? null, 'approved_policy_hash' => $policy['approved_policy_hash'] ?? null,
             'environment' => $environment, 'driver' => $driver];
     }
