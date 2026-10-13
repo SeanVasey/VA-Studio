@@ -79,6 +79,7 @@
     "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsLegacyUpgradeTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalGuardDefinitionTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php",

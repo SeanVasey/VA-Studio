@@ -945,6 +945,14 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingIssuedRetrievalTest",
       "test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest",
+      "test_old_dictionary_snapshot_cannot_admit_a_missing_or_replaced_required_interval_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingRetrievalGuardDefinitionTest",
+      "test_old_dictionary_snapshot_cannot_admit_changed_current_endpoint_table_shape"
     ]
   ]
 }
