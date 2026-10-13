@@ -1,0 +1,17 @@
+{
+  "sqlite-billing-parent-floor-initial.txt": "69e1f2c6caab7ac6decb3636e11cd3b13f86eab354a09d1ea4f35dd0f886975e",
+  "sqlite-billing-parent-floor.sources": "d97cfe3189ddf730a48e4fc6fa77d9a8ac95715fef6456e6002125ef1947489a",
+  "sqlite-billing-parent-floor-notes.md": "fbeaf7899232651d98607962019326d02d6c3fb63af60e5cac21317e64dbcd97",
+  "sqlite-billing-parent-floor.sh": "c8f358483dd6ee97e3f58e4c3032bc3695f98e6feedead82adf7edd129b0cddf",
+  "sqlite-billing-parent-floor-initial.sh": "c8f358483dd6ee97e3f58e4c3032bc3695f98e6feedead82adf7edd129b0cddf",
+  "sqlite-billing-parent-floor-initial.xml": "52003013dd9cba0c01f81dd573c3c5db57c76a0e6aa2799ee41aa926cafe4513",
+  "sqlite-billing-parent-floor-initial.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+  "sqlite-billing-parent-floor-source-check.txt": "67628745710e4386d4400b502e0ef182a862933bc81d4259afa4c5c91549b131",
+  "sqlite-billing-parent-floor.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "sqlite-billing-parent-floor.txt": "50b49818033a57bc8811682e0b379cdb923484cd6996eb144fb157beedce6eed",
+  "sqlite-billing-parent-floor.xml": "6fd10fc37af16c663723bb712aec0c28164b05f2c021da053d7ae922fcb8faec",
+  "sqlite-billing-parent-floor-initial.sources": "cc6d66d31565e28f94517398d068bcff3ab76126933689c8667f779644b9a5b2",
+  "sqlite-billing-parent-floor-initial-source-check.txt": "67628745710e4386d4400b502e0ef182a862933bc81d4259afa4c5c91549b131",
+  "BillingParentFloorCompatibilityTest.php": "ededc5465475233162622841bcddcce37a7779cb8458fc55bd13a9e1b2c82d17",
+  "BillingParentFloorCompatibilityTest-initial.php": "70dad3a8f1f60b27b60c018ba5a9de17e0e87cf6b2a1dc04aad1158d6b75392d"
+}

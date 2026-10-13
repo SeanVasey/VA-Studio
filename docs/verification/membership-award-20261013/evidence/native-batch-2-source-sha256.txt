@@ -1,0 +1,3 @@
+cc5d5ed89c11db96a6ab4a90b30871de700c27fb988a4eb59bfa96b1352db8bf  app/Domain/Memberships/Production/MembershipSchema.php
+0318f1831f5670aa666c91762e931b89f73d7ec8a4066423fd248a9aafa38d79  app/Domain/Memberships/Billing/BillingSchema.php
+d6ab1c31742c474467abe38dbe5efb3b04a00eef6174ee2223fd5ad924392552  app/Domain/Memberships/Production/MembershipSchemaCatalog.php

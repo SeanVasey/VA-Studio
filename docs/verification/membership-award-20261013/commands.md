@@ -1,6 +1,6 @@
 # Commands, source identities and retained outcomes
 
-This is an **interim packet**, not final acceptance. Application correction `9302e1c0` has green SQLite evidence, but its three-case native selection contains **two passes and one `operation_deadline` error**. The ownership correction has separate green SQLite evidence at `9ec09073`; native metadata performance work is still ongoing. The separate review of `307699b6` says **REQUEST CHANGES**; no later approval is implied.
+This is an **interim packet**, not final acceptance. The native first-award commit/replay canary now passes at source matching application `bf498055` and selected test/support bytes in `904f08d5`: **1 test, 15 assertions, zero failures/errors/skips**. Its broad source check separately failed for an unrelated deadline-test cleanup; the exact failure and subsequent relevant-source verification are retained below. Native schema selection and race completion, fresh final-source review and exact-head preflight remain pending at this append. Earlier deadline errors remain visible. The full review of `307699b6` says **REQUEST CHANGES**; the later `9ec09073` review approves only the four-file entry/gate correction.
 
 `source-map.json` records completed JUnit selections, every observed case status, shell exit files, source identities and their limits. `evidence/artifact-digests.json` pins the archived bytes. Earlier failures, fixture corrections and incomplete setup attempts remain visible. An output filename alone is not used to establish a tested checkout.
 
@@ -111,3 +111,88 @@ The isolated profile's exact commands, limits and interpretation are retained in
 Observed result: **1 test, 8 assertions, 1 error, zero failures/skips, exit 2**. The unchanged owned award refused with `operation_deadline` after **15.430449810 seconds**, before effects; durable periods and award events were both zero, and the connection was outside a transaction. This remains a failing normal award attempt measured by a diagnostic, never an acceptance pass.
 
 The award-window native thread reported 11,180 prepares and 11,590 prepared executions. Its separate count of 66 SQL event-name records represents transaction controls, not the total database queries. Long statement history was disabled, so no call-site digest history is claimed. The fallback digest TSV covers the entire process, including migration and fixture setup, and cannot be treated as award-only attribution. A subsequent optimization must retain current metadata/shape checks and the original deadline; no cache or larger budget is approved by this measurement.
+
+
+## Uncommitted metadata batching variants
+
+Both native canaries use application base `9ec090737e66e7f89075600cca96a6174ef2076d` plus frozen changes to `MembershipSchema.php`, `BillingSchema.php` and new `MembershipSchemaCatalog.php`. The exact original patch and pre-run SHA256 inventory for each variant are retained. Packet assembly applied each patch to the committed base in a disposable directory and independently matched all three reconstructed files to their receipts; results are recorded in [native-batch-patch-verification.json](evidence/native-batch-patch-verification.json). These variants are uncommitted source identities, not new commit SHAs.
+
+| NAME | Variant / exact command record | Tests / assertions | Failures / errors / skips | Observed exit |
+| --- | --- | --- | --- | --- |
+| sqlite-schema-batch | `native-batch-1`; [retained runner](evidence/sqlite-schema-batch.sh) and post-run source check | 49 / 298 | 0 / 0 / 3 | 0 |
+| native-batch-1 | First patch and hash receipt; [native command record](evidence/native-batch-commands.md) | 1 / 0 | 0 / 1 / 0 | 2 |
+| native-batch-2 | Second patch and hash receipt; same native command record | 1 / 5 | 0 / 1 / 0 | 2 |
+
+The SQLite run covers `MembershipSchemaPreparationTest`, `BillingSchemaPreparationTest`, `MembershipPaidInvoiceProofTest`, `MembershipFirstAwardTest` and `MembershipAwardOwnershipTest`. Its three skipped cases are the native foreign-check reservation, foreign table-local unique namespace and changed-enum-check methods in `MembershipSchemaPreparationTest`. The runner records all three metadata source hashes before execution and verifies them afterwards. Those hashes match **batch 1**, so this pass is not transferred to batch 2 or any later optimization.
+
+Native batch 1 errors during migration setup: `array_all` passes both value and key, while the supplied built-in `is_string` accepts one argument. No award runs, and no performance improvement follows from that attempt. Batch 2 uses the explicit callback correction and positive native table opens before batched metadata inspection. Setup completes, but the owned-award canary still errors with **`operation_deadline`**, before first inserts. Its 133.638-second elapsed test time includes migrations and fixture preparation; it is not an award-duration measurement. Both runs retain their original errors and exit 2. There is still no successful native first-award acceptance.
+
+[final-pint-command.json](evidence/final-pint-command.json) retains the exact `php vendor/bin/pint --test` argument array and SHA256 map for **33 PHP files**. The check returned exit 0. Packet assembly verified every file against the committed base plus the batch-2 patch. The run label `final-pint` names this formatting receipt; it is not a final-candidate or runtime acceptance claim.
+
+The [entry correction review](evidence/review-entry-9ec09073.md) records **APPROVE the entry/gate correction only, with no remaining P0/P1 in that four-file delta**, at exact commit `9ec090737e66e7f89075600cca96a6174ef2076d`. The reviewer explicitly leaves metadata/performance edits, native completion and final evidence review unapproved. Root's corresponding [independent entry review](independent-entry-review.md) remains unchanged.
+
+The additional isolated function-timing profile has completed and is retained below. Source limits for all earlier precommit runs remain unchanged. No product code, test code, CI policy, README or ledger was edited while assembling this evidence.
+
+
+## Native function timing diagnostic at the original deadline
+
+The [exact diagnostic command and interpretation](evidence/native-function-profile-commands.md), [original release receipt](evidence/native-function-profile-evidence-sha256.txt), external test, full report, log, XML and exit are retained. The separate profile worktree was based on `36fc22d0d94585ba13724e14093ceabc725c762a`, with the exact uncommitted `native-batch-2` metadata patch and three diagnostic timing wrappers. Packet assembly reconstructed that source in a disposable directory and independently matched **all 363 recorded app/tests/Support hashes** to both before/after maps. All three original unwrapped files and instrumented pairs match their receipts; the [source verification record](evidence/native-function-profile-source-verification.json) records those checks. This identity includes diagnostic instrumentation and does not claim an unmodified commit or complete environment/vendor inventory.
+
+On private MySQL **8.4.11**, schema `vaseyaudio_membership_award_profile`, the observed result was **1 test, 8 assertions, 1 error, zero failures/skips, exit 2**. The original **ten-second bound** remained unchanged. The public award took **13.841690479 seconds** and refused `operation_deadline` in `MembershipAwardContext::proveSources`, before award effects. Durable periods and award events were both **zero**; Laravel transaction level was zero and PDO reported no transaction. The log's **119.296-second** total includes migrations and fixture setup. This is a failing diagnostic, not a native award acceptance pass.
+
+| Function | Calls | Inclusive seconds |
+| --- | ---: | ---: |
+| `IdentityMigrationOwnership::inspect` | 64 | 11.096746386 |
+| `MembershipSchema::up` | 35 | 8.096291572 |
+| `BillingSchema::inspect` | 5 | 1.574834307 |
+
+These function timers are **inclusive and nested; never sum them**. Identity inspection accounts for approximately 80.17% of the measured public interval, which supports investigating repeated identity checks. The measurement does not attribute individual SQL call sites or establish performance acceptance.
+
+The thread deltas record **9,110 prepares**, **9,110 prepared executions** and **9,110 close-statement events**. Their server times are 6.039507858, 6.716369495 and 0.204876944 seconds respectively. The separate 66 SQL events are transaction/savepoint controls, not a total query count. Protocol and nested categories can overlap; completion of the summary baseline can appear in the deltas. Long statement history was disabled, so no complete digest history is claimed. The read-only [object census](evidence/native-function-profile-object-census.tsv) did not support the proposed explanation of many stale application schemas amplifying inspection cost.
+
+At this diagnostic checkpoint, positive native award acceptance and the concurrency race proofs remained untested. No later source or budget revision inherits this measurement as a pass.
+
+
+## Admission deadline correction and preserved failed attempts
+
+The [exact command/source record](evidence/admission-budget-commands.md) and all three source capsules, logs, XML and exits are retained. The production operation now captures one **sixty-second admission deadline** before connection callbacks, source resolution, waits, writes, commit delegates and receipt verification. A newer producer lease cannot renew it. Blocking calls are not interrupted merely by this deadline; subsequent checks refuse admission after elapsed time. Synthetic offsets in these tests establish deadline behavior, not host timing or native performance.
+
+| Run | Tests / assertions | Failures / errors / skips | Observed exit |
+| --- | --- | --- | --- |
+| `admission-budget-red` | 1 / 6 | 1 / 0 / 0 | 1 |
+| `admission-budget-green` | 18 / 176 | 0 / 1 / 0 | 2 |
+| `admission-budget-green-v2` | 18 / 176 | 0 / 0 / 0 | 0 |
+
+The red retains the unchanged ten-second `MembershipAwards.php` from `36fc22d0` and the initial new test/shim; twenty synthetic seconds correctly reaches the intended refusal assertion. Its three-file receipt is not a complete working-tree inventory. The first green run completes the new assertions but errors during teardown because a test wrapper retained a `MembershipRows`/SQLite pin and VACUUM reports `SQL statements in progress`. That failed attempt is preserved. Only test cleanup changed for v2; its application and clock shim are identical to the first green. All five v2 receipt/source-capsule hashes match `904f08d55fe832aacb37b76cbd04bd0d8a02d314`.
+
+The final 18 cases comprise three deadline checks, six ownership checks and nine existing first-award checks. They cover admission after twenty synthetic seconds, expiry at forty plus twenty-one seconds despite a newer valid invoice lease, and a refused receipt after a sixty-one-second post-commit advance while the durable period/event remain present. The deadline test/helper are test-only and introduce no production clock hook. These SQLite cases do not establish native race behavior.
+
+## Billing parent-floor compatibility probes
+
+The [retained notes](evidence/sqlite-billing-parent-floor-notes.md), [runner](evidence/sqlite-billing-parent-floor.sh), original [initial runner](evidence/sqlite-billing-parent-floor-initial.sh), both runtime-only test sources and source checks are archived. The initial runner was copied before the output files were renamed with `-initial`; its literal paths use the original unsuffixed basename. The initial runtime fixture removed an interior identity guard and reached the earlier `LogicException`, resulting in **3 tests, 12 assertions, 1 error, zero failures/skips, exit 2**. Product bytes did not change before correcting that fixture to remove the final empty identity guard.
+
+The corrected SQLite run passes **3 tests, 15 assertions, zero failures/errors/skips, exit 0**: two external runtime probes and the existing fresh-schema retry case. It confirms the delegated missing-parent refusal remains `BillingException(parent_floor)` without repair or writes, while the unrelated temporary-membership-table refusal retains `MembershipException(shadowed_schema)` and its marker. The three product file hashes match both `bf498055` and `904f08d5`; the fourth receipt binds the external probe. These two external cases are excluded from the committed-test census and are not native verification.
+
+## Native first-award canary and source-check exception
+
+The [exact runner](evidence/native-final-canary.sh), [pre-run 1,841-file inventory](evidence/native-final-canary.sources.json), tracked diff, logs, XML and captured PHPUnit exit are retained. The command selects only `MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result` on the private MySQL server described above. It passes **1 test, 15 assertions, zero failures/errors/skips, PHPUnit exit 0**. Its 161.391-second whole-test time includes migrations, fixtures, first award and replay; it is not a single-operation duration.
+
+The original broad post-run check **failed**: [its retained result](evidence/native-final-canary.source-check.json) records a change to `MembershipAwardDeadlineTest.php`, and the runner's Python `assert not changed` raised `AssertionError`. This failure is not relabeled green. No separate exit file for that Python check was retained; the runner has no `errexit` and returns the previously captured PHPUnit result after the check. The PHPUnit exit and source verification outcome are distinct.
+
+[Independent source comparison](evidence/native-final-canary-relevant-source-verification.json) verifies all **1,840 other inventoried files** against `904f08d5`, including **1,177** application, migration, support, base-test and selected-test files. Of that broader relevant set, **1,176** also match application commit `bf498055`; the sole additional clock helper was uncommitted there and matches `904f08d5`. The changed deadline test is outside the explicit PHPUnit file selection and is not loaded by that selected test or its shared fixtures; it alone loads the synthetic clock shim. This conclusion follows from the retained command and static source references, not an invented runtime include trace. No functional rerun or whole-worktree immutability is claimed.
+
+This is positive acceptance of the selected commit/replay path. The two timing profiles remain **erroring diagnostics**, each **1 test / 8 assertions / 1 error / exit 2**, and are not counted as acceptance. Earlier setup errors, native red regressions and the two native metadata passes remain recorded at their own source identities. The still-unfinished final native schema selection and the pending race cases contribute no passing counts here.
+
+## Final deadline-case discovery and formatting receipts
+
+The [selection command record](evidence/selection-deadline-commands.md) retains the exact commands and environment. Policy suites pass **50** and **52** Python tests. Final PHPUnit listing discovers **1,930 selected cases / 180 files** from **7,900 total cases / 577 files**, with eight nonempty local listing shards and the three deadline methods selected exactly once. All recorded commands return exit 0. These are `--list-tests-xml` discovery results; no functional test or migration ran during discovery. Hosted configuration remains 24 shards, with unchanged triggers and cost policy; 17 untimed files retain existing fallback weights.
+
+The first census also returned exit 0, but its post-listing source check detected the deadline-test cleanup. Its [superseded status](evidence/selection-deadline-initial/status.json), source receipt, log, exit and compact manifest remain archived. Final discovery repeated the same command on the frozen final inputs; all five policy/test/helper hashes match `904f08d5`. Large derivative listing/configuration files remain in runtime storage with [exact digest and size receipts](evidence/selection-deadline-listing-digests.json); both compact manifests are in this packet.
+
+[The final formatting runner](evidence/final-pint-v2.sh) and [35-file command/hash receipt](evidence/final-pint-v2-command.json) record `vendor/bin/pint --test` returning **exit 0**. Every recorded source hash independently matches `904f08d5`. This is formatting evidence, not runtime acceptance.
+
+## Unique completed SQLite case census
+
+The [case-by-case census](evidence/sqlite-unique-completed-case-census.json) contains **277 unique committed test identities: 262 passes and 15 native-only skips**, with **1,478 assertions** from each identity's latest applicable completed passing selection. It starts with the 255-case whole Billing run at `a1b91e13`, then updates overlapping identities from the ownership green, 49-case schema batch, corrected parent-floor selection and final 18-case admission selection. All earlier completed green SQLite selections are subsets of those identities. The two external runtime probes are excluded; together they contribute seven additional assertions in their own three-case selection.
+
+These totals deduplicate full class and JUnit case names, including dataset suffixes. Each identity retains its originating run and source limit. They are **historical coverage across multiple sources**, not a single 277-case execution or final-head verification. Skips are never counted as passes. Native functional results and failed diagnostics remain separate.

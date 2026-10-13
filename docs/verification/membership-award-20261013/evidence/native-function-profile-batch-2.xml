@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipAwardFunctionDiagnosticTest" file="/workspace/runtime/membership-award-evidence/MembershipAwardFunctionDiagnosticTest.php" tests="1" assertions="8" errors="1" failures="0" skipped="0" time="119.295185">
+    <testcase name="test_public_award_reports_current_thread_statement_cost_and_preserves_its_real_outcome" file="/workspace/runtime/membership-award-evidence/MembershipAwardFunctionDiagnosticTest.php" line="28" class="Tests\Feature\ProductionMembershipBilling\MembershipAwardFunctionDiagnosticTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipAwardFunctionDiagnosticTest" assertions="8" time="119.295185">
+      <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembershipBilling\MembershipAwardFunctionDiagnosticTest::test_public_award_reports_current_thread_statement_cost_and_preserves_its_real_outcome
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-membership-award-profile/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-membership-award-profile/app/Domain/Memberships/Production/MembershipAwardContext.php:174
+/workspace/VA-Studio-membership-award-profile/app/Domain/Memberships/Production/MembershipAwardContext.php:147
+/workspace/VA-Studio-membership-award-profile/app/Domain/Memberships/Production/MembershipAwardContext.php:80
+/workspace/VA-Studio-membership-award-profile/app/Domain/Memberships/Production/MembershipAwards.php:76
+/workspace/runtime/membership-award-evidence/MembershipAwardFunctionDiagnosticTest.php:63
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

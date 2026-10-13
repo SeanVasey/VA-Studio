@@ -1,0 +1,72 @@
+--- before/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
++++ profile/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php
+@@ -16,6 +16,21 @@
+     private array $batches = [];
+ 
+     public function inspect(PDO $pdo, string $driver): array
++    {
++        $timed = ($GLOBALS['va_membership_schema_profile_enabled'] ?? false) === true;
++        $started = $timed ? hrtime(true) : 0;
++        try {
++            return $this->profiledInspectBody($pdo, $driver);
++        } finally {
++            if ($timed) {
++                $GLOBALS['va_membership_schema_profile']['IdentityMigrationOwnership::inspect'] ??= ['calls' => 0, 'inclusive_ns' => 0];
++                $GLOBALS['va_membership_schema_profile']['IdentityMigrationOwnership::inspect']['calls']++;
++                $GLOBALS['va_membership_schema_profile']['IdentityMigrationOwnership::inspect']['inclusive_ns'] += hrtime(true) - $started;
++            }
++        }
++    }
++
++    private function profiledInspectBody(PDO $pdo, string $driver): array
+     {
+         $this->database = null;
+         $this->batches = [];
+--- before/app/Domain/Memberships/Production/MembershipSchema.php
++++ profile/app/Domain/Memberships/Production/MembershipSchema.php
+@@ -28,6 +28,21 @@
+     }
+ 
+     public function up(bool $ddl = true): void
++    {
++        $timed = ($GLOBALS['va_membership_schema_profile_enabled'] ?? false) === true;
++        $started = $timed ? hrtime(true) : 0;
++        try {
++            $this->profiledUpBody($ddl);
++        } finally {
++            if ($timed) {
++                $GLOBALS['va_membership_schema_profile']['MembershipSchema::up'] ??= ['calls' => 0, 'inclusive_ns' => 0];
++                $GLOBALS['va_membership_schema_profile']['MembershipSchema::up']['calls']++;
++                $GLOBALS['va_membership_schema_profile']['MembershipSchema::up']['inclusive_ns'] += hrtime(true) - $started;
++            }
++        }
++    }
++
++    private function profiledUpBody(bool $ddl = true): void
+     {
+         $pdo = DB::connection()->getPdo();
+         $driver = DB::getDriverName();
+--- before/app/Domain/Memberships/Billing/BillingSchema.php
++++ profile/app/Domain/Memberships/Billing/BillingSchema.php
+@@ -64,6 +64,21 @@
+ 
+     /** Only the explicit successor may admit the exact old six-table graph without the new interval guards. */
+     private function inspect(bool $ddl, bool $intervalUpgrade, bool $billingTablesLocked = false): void
++    {
++        $timed = ($GLOBALS['va_membership_schema_profile_enabled'] ?? false) === true;
++        $started = $timed ? hrtime(true) : 0;
++        try {
++            $this->profiledInspectBody($ddl, $intervalUpgrade, $billingTablesLocked);
++        } finally {
++            if ($timed) {
++                $GLOBALS['va_membership_schema_profile']['BillingSchema::inspect'] ??= ['calls' => 0, 'inclusive_ns' => 0];
++                $GLOBALS['va_membership_schema_profile']['BillingSchema::inspect']['calls']++;
++                $GLOBALS['va_membership_schema_profile']['BillingSchema::inspect']['inclusive_ns'] += hrtime(true) - $started;
++            }
++        }
++    }
++
++    private function profiledInspectBody(bool $ddl, bool $intervalUpgrade, bool $billingTablesLocked = false): void
+     {
+         $pdo = DB::connection()->getPdo();
+         $driver = DB::getDriverName();

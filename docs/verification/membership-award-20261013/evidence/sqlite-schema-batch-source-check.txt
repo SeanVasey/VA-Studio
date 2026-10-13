@@ -1,0 +1,3 @@
+app/Domain/Memberships/Production/MembershipSchema.php: OK
+app/Domain/Memberships/Production/MembershipSchemaCatalog.php: OK
+app/Domain/Memberships/Billing/BillingSchema.php: OK
