@@ -62,6 +62,25 @@ final class MemberOriginalFinishBoundary
             && is_array($deferred) && ! array_key_exists('config', $deferred) && ! array_key_exists('db', $deferred), 'finish_route');
     }
 
+    /** Only the captured primary may be active in either owned proof phase. */
+    public function assertFrame(PDO $primary, bool $committed): void
+    {
+        $this->assertCurrent();
+        $found = false;
+        foreach ($this->baseline['connections'] as $entry) {
+            $owned = $entry['pdo'] === $primary;
+            $found = $found || $owned;
+            MemberGrantException::require(self::raw(Connection::class, 'transactions', $entry['connection'])
+                === ($owned && ! $committed ? 1 : 0), 'changed_transaction');
+            foreach (['pdo', 'readPdo', 'directPdo'] as $slot) {
+                $handle = $entry[$slot];
+                MemberGrantException::require($handle === null || $handle->inTransaction() === ($handle === $primary),
+                    'changed_transaction');
+            }
+        }
+        MemberGrantException::require($found, 'changed_transaction');
+    }
+
     private function routing(): array
     {
         $instances = self::raw(Container::class, 'instances', $this->application);

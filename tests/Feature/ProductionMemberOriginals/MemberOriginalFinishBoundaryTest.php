@@ -8,6 +8,7 @@ use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use ReflectionProperty;
 use Tests\TestCase;
 
@@ -149,6 +150,44 @@ class MemberOriginalFinishBoundaryTest extends TestCase
         } finally {
             $application->contextual = [];
         }
+    }
+
+    public function test_only_the_captured_primary_can_be_active_during_current_and_committed_raw_proofs(): void
+    {
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $read = new PDO('sqlite::memory:');
+        $direct = new PDO('sqlite::memory:');
+        $connection->setReadPdo($read);
+        $connection->setDirectPdo($direct);
+        $boundary = MemberOriginalFinishBoundary::capture();
+        $connection->beginTransaction();
+        try {
+            $boundary->assertFrame($primary, false);
+            foreach ([$read, $direct] as $foreign) {
+                $foreign->beginTransaction();
+                try {
+                    $this->refused(fn () => $boundary->assertFrame($primary, false), 'changed_transaction');
+                    $this->assertTrue($foreign->inTransaction());
+                    $this->assertTrue($primary->inTransaction());
+                } finally {
+                    $foreign->rollBack();
+                }
+            }
+        } finally {
+            $connection->rollBack();
+        }
+        $frame = IdentityCommittedFrame::begin(new CurrentRows($primary, 'sqlite'), hrtime(true) + 1_000_000_000);
+        try {
+            $boundary->assertFrame($primary, true);
+            $direct->beginTransaction();
+            $this->refused(fn () => $boundary->assertFrame($primary, true), 'changed_transaction');
+            $this->assertTrue($direct->inTransaction());
+        } finally {
+            $direct->rollBack();
+            $frame->close();
+        }
+        $this->assertFalse($primary->inTransaction());
     }
 
     private function refused(callable $operation, string $reason): void
