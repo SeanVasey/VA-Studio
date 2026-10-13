@@ -12,11 +12,12 @@ use App\Domain\Memberships\Production\MembershipRecords;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Domain\Memberships\Production\SealedMembershipPolicyFacts;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Mockery;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MembershipPolicyFixtures;
 use Tests\TestCase;
@@ -74,7 +75,7 @@ class MembershipPolicyFactsTest extends TestCase
                 $query = DB::table(MembershipRecords::TABLE)->where('id', $created['id']);
                 $verb === 'update' ? $query->update(['created_at' => '2026-01-01 00:00:00']) : $query->delete();
                 $this->fail('Retained policy rows must be immutable.');
-            } catch (\Illuminate\Database\QueryException) {
+            } catch (QueryException) {
                 $this->assertTrue(true);
             }
         }
@@ -133,7 +134,7 @@ class MembershipPolicyFactsTest extends TestCase
     {
         $actor = $this->policyStaff();
         $real = Crypt::getFacadeRoot();
-        $fake = Mockery::mock(\Illuminate\Contracts\Encryption\Encrypter::class);
+        $fake = Mockery::mock(Encrypter::class);
         $fake->shouldReceive('encryptString')->once()->andReturnUsing(function ($plain) use ($real) {
             config(['production-memberships.authoring_enabled' => false]);
 

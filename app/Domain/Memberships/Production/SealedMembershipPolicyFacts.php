@@ -52,9 +52,11 @@ final class SealedMembershipPolicyFacts implements MembershipPolicyFactsAuthorit
         $document = MembershipPolicyVersions::document($row);
         MembershipException::require($document->hash() === $issued['configuration']['approved_policy_hash']
             && $document->facts['provenance'] === $issued['configuration']['provenance'], 'policy_not_approved');
+        // Clock hooks run before the terminal configuration and transaction checks.
+        $this->deadline($issued);
         $issued['policy']->proveConfiguration($issued['configuration']);
         $rows->assertCurrent();
-        $this->deadline($issued);
+        MembershipException::require(hrtime(true) < $issued['deadline_ns'], 'expired_policy_proof');
     }
 
     private function deadline(array $issued): void
