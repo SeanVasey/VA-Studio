@@ -53,63 +53,80 @@ class MembershipNativeCatalogCurrentnessTest extends TestCase
     {
         $fixture = $this->fixture();
         $other = $this->independentConnection();
-        DB::transaction(function () use ($fixture, $other): void {
+        $snapshot = $this->snapshot($fixture);
+        $pdo = $snapshot->pdo;
+        $this->assertFalse($pdo->inTransaction());
+        $before = $this->shown($pdo);
+        $counterBefore = $this->counter($before);
+        $plansBefore = $this->planRows($snapshot);
+        $this->assertSame(array_column($snapshot->plans, 'rows'), $plansBefore);
+
+        // Use the actual post-commit receipt window. The original locking footprint
+        // is closed; the same snapshot and its original deadline are retained.
+        $other->beginTransaction();
+        try {
+            $statement = $other->prepare('INSERT INTO tracks (title, slug, artist, status) VALUES (?, ?, ?, ?)');
+            $statement->execute(['SYNTHETIC unrelated draft', 'synthetic-counter-'.bin2hex(random_bytes(12)), 'Synthetic only', 'draft']);
+            $insertedId = (int) $other->lastInsertId();
+            $other->commit();
+        } finally {
+            if ($other->inTransaction()) {
+                $other->rollBack();
+            }
+        }
+        $this->assertFalse($other->inTransaction());
+        $this->assertNotSame($fixture['track']->id, $insertedId);
+        $this->assertSame(1, (int) $other->query('SELECT COUNT(*) FROM tracks WHERE id = '.$insertedId)->fetchColumn());
+        $after = $this->shown($pdo);
+        $counterAfter = $this->counter($after);
+        $this->assertGreaterThan($counterBefore, $counterAfter);
+        // Independent fixture control: an auto-id row, not ALTER or an explicit id,
+        // advanced exactly the table option while the selected footprint stayed fixed.
+        $this->assertSame(str_replace(' AUTO_INCREMENT='.$counterBefore.' ', ' ', $before),
+            str_replace(' AUTO_INCREMENT='.$counterAfter.' ', ' ', $after));
+        $this->assertSame($plansBefore, $this->planRows($snapshot));
+        $this->receipt(['case' => __FUNCTION__, 'stage' => 'unrelated_insert_committed',
+            'mysql_version' => $pdo->query('SELECT VERSION()')->fetchColumn(),
+            'primary_connection_id' => (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn(),
+            'other_connection_id' => (int) $other->query('SELECT CONNECTION_ID()')->fetchColumn(),
+            'inserted_id' => $insertedId, 'counter_before' => $counterBefore, 'counter_after' => $counterAfter,
+            'raw_before' => $before, 'raw_after' => $after,
+            'raw_before_sha256' => hash('sha256', $before), 'raw_after_sha256' => hash('sha256', $after),
+            'selected_plans_unchanged' => true, 'phase' => 'original_snapshot_after_commit']);
+
+        $frame = IdentityCommittedFrame::begin(new CurrentRows($pdo, 'mysql'), $snapshot->deadlineNs);
+        try {
+            MembershipCatalogEvidence::proveBytes($snapshot);
+            try {
+                // Old source must fail this exact positive comparison, after real
+                // insertion succeeded; the reason is retained before PHPUnit reports it.
+                MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql', false);
+            } catch (MembershipException $error) {
+                $this->receipt(['case' => __FUNCTION__, 'stage' => 'original_snapshot_reproof_refused', 'refusal' => $error->reason]);
+                throw $error;
+            }
+            $this->assertSame($plansBefore, $this->planRows($snapshot));
+            $frame->finish();
+        } finally {
+            $frame->close();
+        }
+        $this->assertFalse($pdo->inTransaction());
+        $this->receipt(['case' => __FUNCTION__, 'stage' => 'original_committed_snapshot_retained',
+            'original_deadline_ns' => $snapshot->deadlineNs]);
+
+        // A new independently admitted current frame owns this negative. No original
+        // proof token is reused across transactions or given a renewed deadline.
+        DB::transaction(function () use ($fixture): void {
             $rows = new MembershipRows;
             $authority = new CurrentEligibleLicenses;
             $proof = $authority->lock((string) $fixture['offer']->id, $fixture['revision']->id,
                 $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
-            $snapshot = $authority->snapshot($proof, $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
-            $pdo = $rows->identity();
-            MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql');
-            $before = $this->shown($pdo);
-            $counterBefore = $this->counter($before);
-            $plansBefore = $this->planRows($snapshot);
-            $this->assertSame(array_column($snapshot->plans, 'rows'), $plansBefore);
-
-            $other->beginTransaction();
-            try {
-                $statement = $other->prepare('INSERT INTO tracks (title, slug, artist, status) VALUES (?, ?, ?, ?)');
-                $statement->execute(['SYNTHETIC unrelated draft', 'synthetic-counter-'.bin2hex(random_bytes(12)), 'Synthetic only', 'draft']);
-                $insertedId = (int) $other->lastInsertId();
-                $other->commit();
-            } finally {
-                if ($other->inTransaction()) {
-                    $other->rollBack();
-                }
-            }
-            $this->assertFalse($other->inTransaction());
-            $this->assertNotSame($fixture['track']->id, $insertedId);
-            $this->assertSame(1, (int) $other->query('SELECT COUNT(*) FROM tracks WHERE id = '.$insertedId)->fetchColumn());
-            $after = $this->shown($pdo);
-            $counterAfter = $this->counter($after);
-            $this->assertGreaterThan($counterBefore, $counterAfter);
-            // Independent fixture control: the native row, not ALTER or an explicit id,
-            // advanced exactly the table option while the selected footprint stayed fixed.
-            $this->assertSame(str_replace(' AUTO_INCREMENT='.$counterBefore.' ', ' ', $before),
-                str_replace(' AUTO_INCREMENT='.$counterAfter.' ', ' ', $after));
-            $this->assertSame($plansBefore, $this->planRows($snapshot));
-            $this->receipt(['case' => __FUNCTION__, 'stage' => 'unrelated_insert_committed',
-                'mysql_version' => $pdo->query('SELECT VERSION()')->fetchColumn(),
-                'primary_connection_id' => (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn(),
-                'other_connection_id' => (int) $other->query('SELECT CONNECTION_ID()')->fetchColumn(),
-                'inserted_id' => $insertedId, 'counter_before' => $counterBefore, 'counter_after' => $counterAfter,
-                'raw_before' => $before, 'raw_after' => $after,
-                'raw_before_sha256' => hash('sha256', $before), 'raw_after_sha256' => hash('sha256', $after),
-                'selected_plans_unchanged' => true]);
-
-            // This exact positive reproof is the old-source regression: it must succeed.
-            $authority->proveCurrent($proof, $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
-            MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql');
             $current = $authority->snapshot($proof, $fixture['buyer']['principal'], $fixture['buyer']['user'], $rows);
-            $this->assertSame($snapshot, $current);
-            $this->assertSame($proof->binding(), $current->binding);
-            $this->assertSame($plansBefore, $this->planRows($snapshot));
-
-            $pdo->prepare('UPDATE tracks SET title = ? WHERE id = ?')
+            MembershipCatalogEvidence::assertCurrent($current, $rows->identity(), 'mysql');
+            $rows->identity()->prepare('UPDATE tracks SET title = ? WHERE id = ?')
                 ->execute(['SYNTHETIC selected row changed', $fixture['track']->id]);
-            $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($snapshot, $pdo, 'mysql'), 'changed_catalog');
-            $this->receipt(['case' => __FUNCTION__, 'stage' => 'original_proof_retained_selected_change_refused',
-                'original_deadline_ns' => $snapshot->deadlineNs, 'refusal' => 'changed_catalog']);
+            $this->refused(fn () => MembershipCatalogEvidence::assertCurrent($current, $rows->identity(), 'mysql'), 'changed_catalog');
+            $this->receipt(['case' => __FUNCTION__, 'stage' => 'selected_change_refused_in_fresh_current_frame', 'refusal' => 'changed_catalog']);
         });
         $this->noMembershipEffects();
     }
