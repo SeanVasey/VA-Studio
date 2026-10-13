@@ -9,6 +9,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Grants\Member\MemberActivationHistory;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Grants\Member\MemberActivationHistorySnapshot;
+use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Domain\Memberships\Billing\BillingSchema;
@@ -23,6 +24,8 @@ use WeakMap;
 final class MembershipReservationContext
 {
     private ProductionCustomerAccess $access;
+
+    private MemberOriginalFinishBoundary $finish;
 
     private array $identity;
 
@@ -120,6 +123,7 @@ final class MembershipReservationContext
                 $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $operation, $locator, $arguments);
         }
         MembershipException::require(in_array($operation, ['reserve', 'release', 'expire', 'inspect'], true), 'unsupported_operation');
+        $this->finish = MemberOriginalFinishBoundary::capture();
         $this->admit();
         $this->memberHistoryReader = new MemberActivationHistoryReader;
         $this->access = new ProductionCustomerAccess;
@@ -200,7 +204,9 @@ final class MembershipReservationContext
     public function proveCommitted(IdentityCommittedFrame $frame): void
     {
         $this->committedRaw($frame, $this->committedCallbacks($frame));
+        $this->finish->assertFrame($this->rows->identity(), true);
         $frame->finish();
+        $this->finish->assertCurrent();
         $this->admit();
     }
 
@@ -296,6 +302,7 @@ final class MembershipReservationContext
     public function memberPostFinish(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {
         $this->member($capture);
+        $this->finish->assertCurrent();
         $this->admit();
     }
 
@@ -321,6 +328,7 @@ final class MembershipReservationContext
 
     private function currentRaw(array $billing): void
     {
+        $this->finish->assertFrame($this->rows->identity(), false);
         // All participating producer callbacks must have completed before entering this phase.
         $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
         $this->assertEffects(false);
@@ -360,6 +368,7 @@ final class MembershipReservationContext
 
     private function committedRaw(IdentityCommittedFrame $frame, array $billing): void
     {
+        $this->finish->assertFrame($this->rows->identity(), true);
         $this->memberHistoryReader->committedRaw($this->memberHistory, $frame);
         $this->assertEffects(true);
         MembershipBillingEvidence::assertCapturedSnapshot($this->rows->identity(), $billing);

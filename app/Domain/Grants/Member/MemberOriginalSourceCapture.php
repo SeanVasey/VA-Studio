@@ -442,9 +442,14 @@ final class MemberOriginalSourceCapture
             // All issuer registrations retaining the live frame are retired before detached I/O.
             unset($entry, $proof, $inspection, $rows, $observer);
         }
-        $configuration->admit();
-        $budget->assertCurrent();
-        $idle->assertStillIdle();
+        try {
+            $configuration->admit();
+            $budget->assertCurrent();
+            $idle->assertStillIdle();
+        } catch (Throwable $error) {
+            // The physical commit has already completed, including its separate retained proof.
+            throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
+        }
 
         return $values;
     }

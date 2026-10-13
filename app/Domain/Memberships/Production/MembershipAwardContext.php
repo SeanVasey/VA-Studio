@@ -8,6 +8,7 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Grants\Member\MemberActivationHistorySnapshot;
+use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Models\User;
@@ -18,6 +19,8 @@ use PDO;
 final class MembershipAwardContext
 {
     private ProductionCustomerAccess $access;
+
+    private MemberOriginalFinishBoundary $finish;
 
     private array $identity;
 
@@ -63,6 +66,7 @@ final class MembershipAwardContext
     ) {
         MembershipAwards::consumeContextPermit($rows, $configuration, $policy, $membershipConfiguration,
             $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator);
+        $this->finish = MemberOriginalFinishBoundary::capture();
         $this->admit();
         $this->memberHistoryReader = new MemberActivationHistoryReader;
         $this->access = new ProductionCustomerAccess;
@@ -125,6 +129,7 @@ final class MembershipAwardContext
             (int) $this->historical['origin']['id'], $this->redemptions, $this->memberHistory->value());
         $this->access->proveCurrent($this->principal, $this->actor, $this->rows->current(), $this->identity);
         $this->assertHistoryScope($this->period, $this->events, $this->redemptions);
+        $this->finish->assertFrame($this->rows->identity(), false);
         // Nothing below decrypts, resolves a capability or invokes a clock hook.
         $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
         $this->assertEffects(false);
@@ -153,12 +158,15 @@ final class MembershipAwardContext
         $this->access->proveHistoricalBindingCommitted($this->invoice->originalBuyerBinding, $frame, $this->historical);
         $this->access->proveCommitted($this->principal, $this->actor, $frame, $this->identity);
         $this->assertHistoryScope($period[0], $events, $redemptions);
+        $this->finish->assertFrame($this->rows->identity(), true);
         // Finish all callback-capable proof work before the final raw retained-row closure.
         $this->memberHistoryReader->committedRaw($this->memberHistory, $frame);
         $this->assertEffects(true);
-        MembershipBillingEvidence::assertCommittedSnapshot($frame, $billing);
+        MembershipBillingEvidence::assertCapturedSnapshot($this->rows->identity(), $billing);
         $this->admit();
+        $this->finish->assertFrame($this->rows->identity(), true);
         $frame->finish();
+        $this->finish->assertCurrent();
         $this->admit();
     }
 
