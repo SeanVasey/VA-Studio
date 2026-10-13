@@ -58,6 +58,10 @@ final class MembershipReservationContext
 
     private ?array $newEvent = null;
 
+    private int $createdAtNs;
+
+    private int $createdAtMicros;
+
     private static ?WeakMap $inspectionPermits = null;
 
     private static ?WeakMap $reservationPermits = null;
@@ -120,7 +124,10 @@ final class MembershipReservationContext
         $this->period = $rows->one(MembershipPeriodRecords::PERIODS, 'source_invoice_hash = ?', [$this->invoice->sourceInvoiceHash]);
         MembershipException::require($this->period !== [], 'paid_period_absent');
         $this->refreshLedger();
-        $at = CarbonImmutable::now('UTC')->format('Y-m-d H:i:s');
+        $this->createdAtNs = hrtime(true);
+        $capturedAt = CarbonImmutable::now('UTC');
+        $this->createdAtMicros = (int) $capturedAt->format('Uu');
+        $at = $capturedAt->format('Y-m-d H:i:s');
         if ($operation === 'reserve') {
             $this->reserve($at);
         } elseif ($operation === 'release') {
@@ -367,7 +374,7 @@ final class MembershipReservationContext
             MembershipException::require($reservation['terminal'] === null
                 && $now->format('Y-m-d H:i:s') < $reservation['record']['honor_deadline'], 'reservation_terminal');
             $honorMicros = (int) (new \DateTimeImmutable($reservation['record']['honor_deadline'], new \DateTimeZone('UTC')))->format('Uu');
-            $this->authorityDeadline = min($this->authorityDeadline, $startedNs + ($honorMicros - (int) $now->format('Uu')) * 1000);
+            $this->capWallDeadline($honorMicros, (int) $now->format('Uu'), $startedNs);
         }
         $expiry = $this->period['credit_expires_at'];
         if ($this->newEvent !== null && $expiry !== null) {
@@ -376,7 +383,7 @@ final class MembershipReservationContext
             if ($this->newEvent['kind'] === 'reserve' || $returnsAvailable) {
                 MembershipException::require($now->format('Y-m-d H:i:s') < $expiry, 'credit_expired');
                 $expiryMicros = (int) (new \DateTimeImmutable($expiry, new \DateTimeZone('UTC')))->format('Uu');
-                $this->authorityDeadline = min($this->authorityDeadline, $startedNs + ($expiryMicros - (int) $now->format('Uu')) * 1000);
+                $this->capWallDeadline($expiryMicros, (int) $now->format('Uu'), $startedNs);
             } else {
                 MembershipException::require($now->format('Y-m-d H:i:s') >= $expiry, 'credit_not_expired');
             }
@@ -390,9 +397,17 @@ final class MembershipReservationContext
         if ($this->catalog !== null) {
             MembershipException::require((int) $now->format('Uu') < $this->catalog->binding->validUntilUnixMicros
                 && hrtime(true) < $this->catalog->deadlineNs, 'expired_license_proof');
-            $this->authorityDeadline = min($this->authorityDeadline, $this->catalog->deadlineNs,
-                $startedNs + ($this->catalog->binding->validUntilUnixMicros - (int) $now->format('Uu')) * 1000);
+            $this->authorityDeadline = min($this->authorityDeadline, $this->catalog->deadlineNs);
+            $this->capWallDeadline($this->catalog->binding->validUntilUnixMicros, (int) $now->format('Uu'), $startedNs);
         }
+    }
+
+    private function capWallDeadline(int $wallMicros, int $nowMicros, int $startedNs): void
+    {
+        // Preserve the first paired clock capture made with the retained event time, before encrypt/proof callbacks.
+        $this->authorityDeadline = min($this->authorityDeadline,
+            $this->createdAtNs + ($wallMicros - $this->createdAtMicros) * 1000,
+            $startedNs + ($wallMicros - $nowMicros) * 1000);
     }
 
     private function assertCatalog(bool $locking): void
