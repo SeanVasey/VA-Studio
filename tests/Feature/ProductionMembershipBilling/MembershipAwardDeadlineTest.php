@@ -47,6 +47,7 @@ class MembershipAwardDeadlineTest extends TestCase
     {
         $fixture = $this->awardFixture();
         $this->awardTestCapabilities();
+        $started = MembershipAwardMonotonicClock::freeze();
         $calls = 0;
         DB::connection()->getEventDispatcher()->listen(TransactionBeginning::class, function () use (&$calls): void {
             $calls++;
@@ -59,6 +60,7 @@ class MembershipAwardDeadlineTest extends TestCase
             $refusal = $error->reason;
         }
         $this->assertNull($refusal, 'Twenty synthetic seconds must remain inside the original admission deadline.');
+        $this->assertSame($started + 20_000_000_000, \App\Domain\Memberships\Production\hrtime(true));
         $this->assertSame(1, $calls);
         $this->assertSame($result['period_id'], DB::table(MembershipPeriodRecords::PERIODS)->sole()->id);
         $this->assertSame($result['award_event_id'], DB::table(MembershipPeriodRecords::EVENTS)->sole()->id);
@@ -70,6 +72,7 @@ class MembershipAwardDeadlineTest extends TestCase
     {
         $fixture = $this->awardFixture();
         $this->awardTestCapabilities();
+        $started = MembershipAwardMonotonicClock::freeze();
         $authority = new class(new SealedMembershipPaidInvoice) implements MembershipPaidInvoiceAuthority
         {
             public ?MembershipPaidInvoiceProof $proof = null;
@@ -113,6 +116,7 @@ class MembershipAwardDeadlineTest extends TestCase
             $authority->rows = null;
         }
         $this->assertSame([1, 1], [$beginning, $newerProofChecks]);
+        $this->assertSame($started + 61_000_000_000, \App\Domain\Memberships\Production\hrtime(true));
         $this->assertSame(0, DB::table(MembershipPeriodRecords::PERIODS)->count());
         $this->assertSame(0, DB::table(MembershipPeriodRecords::EVENTS)->count());
         $this->assertSame(0, DB::transactionLevel());
@@ -123,12 +127,14 @@ class MembershipAwardDeadlineTest extends TestCase
     {
         $fixture = $this->awardFixture();
         $this->awardTestCapabilities();
+        $started = MembershipAwardMonotonicClock::freeze();
         $calls = 0;
         DB::connection()->getEventDispatcher()->listen(TransactionCommitted::class, function () use (&$calls): void {
             $calls++;
             MembershipAwardMonotonicClock::advance(61);
         });
         $this->refused(fn () => $this->award($fixture), 'committed_receipt_refused');
+        $this->assertSame($started + 61_000_000_000, \App\Domain\Memberships\Production\hrtime(true));
         $this->assertSame(1, $calls);
         $this->assertSame(1, DB::table(MembershipPeriodRecords::PERIODS)->count());
         $this->assertSame(1, DB::table(MembershipPeriodRecords::EVENTS)->count());
