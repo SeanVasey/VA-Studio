@@ -2,7 +2,6 @@
 
 namespace App\Domain\Memberships\Billing;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -28,26 +27,20 @@ final class BillingReconciliation
         $policy = new BillingPolicy;
         $configuration = $policy->current();
         foreach (DB::getConnections() as $connection) {
-            BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
+            BillingException::require($connection->transactionLevel() === 0 && ! $connection->getPdo()->inTransaction(), 'transaction_open');
         }
         $provenance = $this->gateway->provenance();
         BillingException::require($provenance === $configuration['provenance'], 'provenance');
         $binding = $this->ledger->binding($bindingId, $configuration);
         // An identity this binding already owns is reused; a new one is claimed only after the verdict (see below).
         $invoice = $this->ledger->existingInvoice($binding, $invoiceRef);
-        // The retrieval's database-issued start position, committed before the first provider read. A webhook hint is covered only by
-        // a retrieval whose start is above the hint's position; the append time says nothing, and no application clock is compared
-        // (Codex P1 on PR #54, review L2-3). The start alone does not order the reads (a retrieval can stall after taking it), so the
-        // reads are bracketed by an end position too, below. The worker clock at the start is recorded as information only.
-        $position = $this->ledger->startRetrieval();
-        $startedAt = CarbonImmutable::now('UTC');
-        $attemptedAt = $startedAt->timestamp;
+        // Anonymous committed endpoints bracket all provider I/O. Only their native end
+        // supplies retrieval time; the provider's paid_at remains an independent fact.
+        $start = $this->ledger->startRetrieval();
         $validated = false;
+        $graph = null;
         try {
-            $snapshots = $this->snapshots($invoiceRef, $provenance);
-            $verdict = BillingSettlement::evaluate($snapshots, $binding['expectation']);
-            $validated = BillingSettlement::bindingValidated($snapshots, $binding['expectation']);
-            $retrievedAt = $snapshots->retrievedAt;
+            $graph = $this->graph($invoiceRef);
         } catch (BillingException $error) {
             if ($error->reason === 'provider_incomplete') {
                 $verdict = new BillingVerdict('refused', 'provider_incomplete', ['invoice_ref' => $invoiceRef]);
@@ -56,12 +49,14 @@ final class BillingReconciliation
             } else {
                 throw $error;
             }
-            $retrievedAt = $attemptedAt;
         }
-        // The end position, committed after the last provider read (or the provider failure that ended the reads) and before anything
-        // is appended. The append admits this observation only if its start is above the tail's end: its reads began after the tail's
-        // reads ended. An overlapping read is refused as `concurrent_retrieval` and retried (Codex P1 on PR #54, :42).
-        $end = $this->ledger->endRetrieval($position);
+        $interval = $this->ledger->endRetrieval($start);
+        if ($graph !== null) {
+            $snapshots = new BillingSnapshots($invoiceRef, ...$graph,
+                retrievedAt: BillingDatabaseInstant::fromNativeValue($interval->databaseAt, 0)->seconds(), provenance: $provenance);
+            $verdict = BillingSettlement::evaluate($snapshots, $binding['expectation']);
+            $validated = BillingSettlement::bindingValidated($snapshots, $binding['expectation']);
+        }
         // Configuration withdrawn during provider I/O records nothing.
         $policy->proveConfiguration($configuration);
         // The invoice-identity row is immutable and its unique hash can never move to another binding, so it is claimed only
@@ -84,13 +79,13 @@ final class BillingReconciliation
                 default => null,
             };
             if ($refusal !== null) {
-                (new BillingRetrievalAttempts)->record($binding, $invoiceRef, $refusal, $position, $end, $hintEventId, $configuration);
+                (new BillingRetrievalAttempts)->record($binding, $invoiceRef, $refusal, $interval, $hintEventId, $configuration);
                 throw new BillingException($refusal);
             }
-            $invoice = $this->ledger->invoice($binding, $invoiceRef);
+            $invoice = $this->ledger->invoiceForRetrieval($binding, $invoiceRef, $interval);
         }
 
-        return $this->ledger->append($invoice, $verdict, $retrievedAt, $provenance, $position, $end, $startedAt);
+        return $this->ledger->append($invoice, $verdict, $provenance, $interval);
     }
 
     /**
@@ -107,31 +102,39 @@ final class BillingReconciliation
             && (BillingValues::decrypt($observation['payload_ciphertext'])['reason'] ?? null) === 'provider_incomplete';
     }
 
-    private function snapshots(string $invoiceRef, string $provenance): BillingSnapshots
+    private function provider(\Closure $read): array
     {
-        $account = $this->gateway->account();
-        $invoice = $this->gateway->retrieveInvoice($invoiceRef);
-        $payments = $this->gateway->listInvoicePayments($invoiceRef);
+        foreach (DB::getConnections() as $connection) {
+            BillingException::require($connection->transactionLevel() === 0 && ! $connection->getPdo()->inTransaction(), 'transaction_open');
+        }
+
+        return $read();
+    }
+
+    private function graph(string $invoiceRef): array
+    {
+        $account = $this->provider(fn () => $this->gateway->account());
+        $invoice = $this->provider(fn () => $this->gateway->retrieveInvoice($invoiceRef));
+        $payments = $this->provider(fn () => $this->gateway->listInvoicePayments($invoiceRef));
         $intents = $charges = $transactions = [];
         foreach ($payments as $payment) {
             $intentRef = $payment['payment']['type'] === 'payment_intent' ? $payment['payment']['payment_intent'] : null;
             if (! BillingValues::is('payment_intent', $intentRef) || isset($intents[$intentRef])) {
                 continue;
             }
-            $intents[$intentRef] = $this->gateway->retrievePaymentIntent($intentRef);
+            $intents[$intentRef] = $this->provider(fn () => $this->gateway->retrievePaymentIntent($intentRef));
             $chargeRef = $intents[$intentRef]['latest_charge'];
             if (BillingValues::is('charge', $chargeRef) && ! isset($charges[$chargeRef])) {
-                $charges[$chargeRef] = $this->gateway->retrieveCharge($chargeRef);
+                $charges[$chargeRef] = $this->provider(fn () => $this->gateway->retrieveCharge($chargeRef));
                 $transactionRef = $charges[$chargeRef]['balance_transaction'];
                 if (BillingValues::is('balance_transaction', $transactionRef) && ! isset($transactions[$transactionRef])) {
-                    $transactions[$transactionRef] = $this->gateway->retrieveBalanceTransaction($transactionRef);
+                    $transactions[$transactionRef] = $this->provider(fn () => $this->gateway->retrieveBalanceTransaction($transactionRef));
                 }
             }
         }
         $subscriptionRef = $invoice['parent']['subscription_details']['subscription'] ?? null;
-        $subscription = BillingValues::is('subscription', $subscriptionRef) ? $this->gateway->retrieveSubscription($subscriptionRef) : null;
+        $subscription = BillingValues::is('subscription', $subscriptionRef) ? $this->provider(fn () => $this->gateway->retrieveSubscription($subscriptionRef)) : null;
 
-        return new BillingSnapshots($invoiceRef, $account, $invoice, $invoice['lines']['data'], $payments, $intents, $charges, $transactions,
-            $subscription, CarbonImmutable::now('UTC')->timestamp, $provenance);
+        return [$account, $invoice, $invoice['lines']['data'], $payments, $intents, $charges, $transactions, $subscription];
     }
 }

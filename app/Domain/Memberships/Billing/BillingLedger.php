@@ -3,10 +3,10 @@
 namespace App\Domain\Memberships\Billing;
 
 use App\Support\CanonicalJson;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use PDOException;
+use WeakMap;
 
 /**
  * Billing evidence rows. Subscription bindings are read here; the separate MFA staff approval writer
@@ -22,6 +22,20 @@ final class BillingLedger
     public const MAX_OBSERVATIONS = 1000;
 
     private const ZERO = '0000000000000000000000000000000000000000000000000000000000000000';
+
+    private WeakMap $starts;
+
+    private static ?WeakMap $intervals = null;
+
+    public function __construct()
+    {
+        $this->starts = new WeakMap;
+    }
+
+    public function __clone(): void
+    {
+        throw new BillingException('foreign_retrieval');
+    }
 
     /** @return array{row: array, payload: array, expectation: BillingExpectation} */
     public function binding(string $bindingId, array $configuration): array
@@ -44,6 +58,24 @@ final class BillingLedger
     /** The same provider invoice always resolves to the same identity row; another binding conflicts. */
     public function invoice(array $binding, string $invoiceRef): array
     {
+        return $this->retainInvoice($binding, $invoiceRef, null);
+    }
+
+    /** The operative first claim keeps both original endpoints locked across identity creation. */
+    public function invoiceForRetrieval(array $binding, string $invoiceRef, BillingRetrievalInterval $interval): array
+    {
+        self::outsideTransactions();
+        BillingException::require(self::$intervals !== null && isset(self::$intervals[$interval]) && self::$intervals[$interval]['issuer'] === $this, 'foreign_retrieval');
+
+        return DB::transaction(function () use ($binding, $invoiceRef, $interval): array {
+            self::assertIssuedInterval($interval, DB::connection()->getPdo());
+
+            return $this->retainInvoice($binding, $invoiceRef, $interval);
+        });
+    }
+
+    private function retainInvoice(array $binding, string $invoiceRef, ?BillingRetrievalInterval $interval): array
+    {
         BillingException::require(BillingValues::is('invoice', $invoiceRef), 'invalid_value');
         $expectation = $binding['expectation'];
         $account = $expectation->accountRef;
@@ -58,13 +90,18 @@ final class BillingLedger
             'provider_account_hash' => $binding['row']['provider_account_hash'], 'mode' => $mode,
             'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_invoice',
                 'invoice_ref' => $invoiceRef, 'subscription_binding_id' => $binding['row']['id']]),
-            'created_at' => BillingValues::utc(CarbonImmutable::now('UTC')->timestamp)];
+            'created_at' => BillingDatabaseClock::sample(DB::connection()->getPdo(), DB::getDriverName())->stamp19()];
         $row['seal'] = BillingValues::seal($row);
         try {
-            DB::transaction(fn () => $this->insert(BillingSchema::TABLES[1], $row));
+            DB::transaction(function () use ($row, $interval): void {
+                if ($interval !== null) {
+                    self::assertIssuedInterval($interval, DB::connection()->getPdo());
+                }
+                $this->insert(BillingSchema::TABLES[1], $row);
+            });
         } catch (PDOException $error) {
             // A concurrent first retrieval inserted the identity: re-read it, never a second row.
-            $existing = $this->invoiceIdentity($refHash, $binding);
+            $existing = $this->invoiceIdentity($refHash, $binding, $interval !== null);
             BillingException::require($existing !== null, 'invoice_identity');
 
             return $existing;
@@ -73,85 +110,110 @@ final class BillingLedger
         return $this->invoiceIdentity($refHash, $binding) ?? throw new BillingException('invoice_identity');
     }
 
-    /**
-     * Begins one retrieval: allocates its database-issued start position in its own short committed transaction, before any provider
-     * read (Codex P1 on PR #54, review L2-3). The start decides whether a webhook hint is covered (the read began after the hint) and,
-     * with the end position (endRetrieval()), orders overlapping retrievals of one invoice; no application clock is compared for
-     * either. The row records only that a retrieval began: it names no invoice, binding or provider reference, so it claims no
-     * identity (review R-3).
-     */
-    public function startRetrieval(): int
+    /** Commit an anonymous, uniquely identified start before the first provider read. */
+    public function startRetrieval(): BillingRetrievalStart
     {
-        return $this->committedRetrievalPosition();
+        self::outsideTransactions();
+        $issued = DB::transaction(function (): array {
+            $source = self::source();
+            $row = self::allocate($source['pdo'], $source['driver'], 'retrieval', 'start', bin2hex(random_bytes(32)));
+
+            return [...$source, 'row' => $row];
+        });
+        self::assertSource($issued, $issued['pdo']);
+        $row = $issued['row'];
+        $start = new BillingRetrievalStart($row['id'], $row['allocation_token'], $row['retrieval_token'], $row['database_at']);
+        $this->starts[$start] = $issued;
+
+        return $start;
     }
 
-    /**
-     * Ends one retrieval's provider reads: allocates its database-issued end position in its own short committed transaction, after
-     * the last provider read and before the append (Codex P1 on PR #54, `BillingReconciliation.php:42`). A start position alone does
-     * not order the reads: a retrieval can take an early start, stall, and then read newer provider state than one that started
-     * later. The [start, end] interval brackets the reads, so "this read began after that read ended" is a comparison of two
-     * positions from one database counter. Like the start, the row names nothing and claims no identity.
-     */
-    public function endRetrieval(int $start): int
+    /** Commit an end only for this issuer's unchanged original start, after all provider reads. */
+    public function endRetrieval(BillingRetrievalStart $start): BillingRetrievalInterval
     {
-        BillingException::require($start > 0, 'invalid_value');
-        $end = $this->committedRetrievalPosition();
-        BillingException::require($end > $start, 'position');
+        self::outsideTransactions();
+        BillingException::require(isset($this->starts[$start]), 'foreign_retrieval');
+        $issued = $this->starts[$start];
+        $end = DB::transaction(function () use ($start, $issued): array {
+            $pdo = DB::connection()->getPdo();
+            self::assertSource($issued, $pdo);
+            $current = self::readPosition($pdo, $issued['driver'], $start->position, true);
+            BillingException::require($current === $issued['row'], 'changed_retrieval');
+            $end = self::allocate($pdo, $issued['driver'], 'retrieval', 'end', $start->retrievalToken);
+            $interval = new BillingRetrievalInterval($start, $end['id'], $end['allocation_token'], $end['database_at']);
+            BillingRetrievalInterval::verifyRows($interval->columns(), $current, $end);
+            self::assertSource($issued, $pdo);
 
-        return $end;
+            return $end;
+        });
+        self::assertSource($issued, $issued['pdo']);
+        unset($this->starts[$start]);
+        $interval = new BillingRetrievalInterval($start, $end['id'], $end['allocation_token'], $end['database_at']);
+        self::$intervals ??= new WeakMap;
+        self::$intervals[$interval] = [...$issued, 'issuer' => $this, 'end' => $end];
+
+        return $interval;
     }
 
-    /**
-     * Allocates the next database-issued position of one kind inside the caller's transaction and returns it. The database assigns
-     * the id (the insert guard refuses an explicit one); AUTO_INCREMENT and SQLite AUTOINCREMENT hand ids out in strictly increasing
-     * order of allocation and never reuse a committed one, so a larger position was allocated later.
-     */
+    /** Hint allocation remains inside its caller's transaction; retrieval allocation requires the typed issuer path. */
     public function position(string $kind): int
     {
-        BillingException::require(in_array($kind, BillingSchema::POSITION_KINDS, true) && DB::transactionLevel() > 0, 'invalid_value');
-        $pdo = DB::connection()->getPdo();
-        (new BillingSchema)->assertOwned($pdo);
-        $table = (new BillingSchema)->table(BillingSchema::TABLES[4]);
-        $statement = $pdo->prepare('INSERT INTO '.$table.' (kind, created_at) VALUES (?, ?)');
-        $statement->execute([$kind, BillingValues::utc(CarbonImmutable::now('UTC')->timestamp)]);
-        BillingException::require($statement->rowCount() === 1, 'ambiguous_effect');
-        $id = $pdo->lastInsertId();
-        BillingException::require(is_string($id) && preg_match('/\A[1-9][0-9]{0,18}\z/D', $id) === 1, 'position');
-        $check = $pdo->prepare('SELECT kind FROM '.$table.' WHERE id = ?');
-        $check->execute([(int) $id]);
-        BillingException::require($check->fetchAll(PDO::FETCH_COLUMN) === [$kind], 'position');
+        BillingException::require($kind === 'hint', 'invalid_value');
 
-        return (int) $id;
+        return $this->hintPosition()['id'];
+    }
+
+    /** Exact native allocation receipt; caller retains its hint in the same transaction. */
+    public function hintPosition(): array
+    {
+        BillingException::require(DB::transactionLevel() > 0, 'invalid_value');
+        $source = self::source();
+
+        return self::allocate($source['pdo'], $source['driver'], 'hint', 'hint', null);
+    }
+
+    /** Retained current observation validation for hint recovery; legacy rows never cover a new hint. */
+    public function assertRetainedObservationInterval(array $row): void
+    {
+        BillingEvidenceRecord::verify($row, BillingEvidenceRecord::OBSERVATION);
+        $source = self::source();
+        $pdo = $source['pdo'];
+        BillingRetrievalInterval::verifyRows($row,
+            self::readPosition($pdo, $source['driver'], $row['retrieval_position'], $pdo->inTransaction()),
+            self::readPosition($pdo, $source['driver'], $row['retrieval_end_position'], $pdo->inTransaction()));
+    }
+
+    /** Original in-process issuance plus exact current endpoint identity, before append or diagnostic retention. */
+    public static function assertIssuedInterval(BillingRetrievalInterval $interval, PDO $pdo): array
+    {
+        BillingException::require(self::$intervals !== null && isset(self::$intervals[$interval]) && $pdo->inTransaction(), 'foreign_retrieval');
+        $issued = self::$intervals[$interval];
+        self::assertSource($issued, $pdo);
+        $start = self::readPosition($pdo, $issued['driver'], $interval->start->position, true);
+        $end = self::readPosition($pdo, $issued['driver'], $interval->endPosition, true);
+        BillingException::require($start === $issued['row'] && $end === $issued['end'], 'changed_retrieval');
+        BillingRetrievalInterval::verifyRows($interval->columns(), $start, $end);
+
+        return [$start, $end];
     }
 
     /**
-     * Append one observation after the current tail. A concurrent append retries on the new tail.
-     *
-     * `$position` and `$endPosition` are the retrieval's database-issued start and end positions (startRetrieval(), committed before
-     * its first provider read; endRetrieval(), committed after its last), and `$startedAt` the worker's clock at the start, kept only
-     * as information: it never orders anything. Overlapping retrievals of one invoice append in commit order, not in provider-read
-     * order, so an older snapshot could land after a newer one and become the tail (review R-6). Under a row lock on the invoice
-     * identity (MySQL; the lock covers only this short append, never provider I/O) the append admits a retrieval only when its read
-     * began after the tail's read ended: its start is above the tail's end (Codex P1 on PR #54, `BillingReconciliation.php:42`).
-     * Otherwise it refuses, writing nothing:
-     *  - `superseded_retrieval` when the read wholly preceded the tail's (its end is below the tail's start): the tail already records
-     *    a strictly later read, so this is a normal end with nothing to retry;
-     *  - `concurrent_retrieval` when the two reads overlapped: the database cannot tell which read saw the later provider state, so
-     *    the job retries with a fresh interval, which converges on a read that began after the tail's ended.
-     * It is refused rather than appended as a "superseded" row so that the outcome vocabulary, the CHECKs and every reader of the tail
-     * stay unchanged: no consumer has to learn to skip a row type, and a stale snapshot has no row to be mistaken for current evidence.
-     * Positions are unique, so no two retrievals tie, and the order is the database's own, whatever the workers' clocks read.
+     * Append only after the tail's complete read interval. Overlap is concurrent_retrieval;
+     * an interval wholly before the tail is superseded_retrieval. Positions order reads,
+     * native database times bound freshness, and provider paid_at stays in the verdict.
      */
-    public function append(array $invoice, BillingVerdict $verdict, int $retrievedAt, string $provenance, int $position, int $endPosition, CarbonImmutable $startedAt): array
+    public function append(array $invoice, BillingVerdict $verdict, string $provenance, BillingRetrievalInterval $interval): array
     {
-        BillingException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true) && $position > 0 && $endPosition > $position, 'invalid_value');
-        foreach (DB::getConnections() as $connection) {
-            BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
-        }
-        $started = BillingValues::utcMicro($startedAt);
+        BillingException::require(in_array($provenance, ['synthetic_rehearsal', 'verified_production'], true), 'invalid_value');
+        self::outsideTransactions();
+        BillingException::require(self::$intervals !== null && isset(self::$intervals[$interval]) && self::$intervals[$interval]['issuer'] === $this, 'foreign_retrieval');
         for ($attempt = 0; $attempt < 3; $attempt++) {
             try {
-                return DB::transaction(function () use ($invoice, $verdict, $retrievedAt, $provenance, $position, $endPosition, $started): array {
+                return DB::transaction(function () use ($invoice, $verdict, $provenance, $interval): array {
+                    $pdo = DB::connection()->getPdo();
+                    [$start, $end] = self::assertIssuedInterval($interval, $pdo);
+                    $position = $start['id'];
+                    $endPosition = $end['id'];
                     if (DB::getDriverName() === 'mysql') {
                         $this->lockIdentity($invoice['id']);
                     }
@@ -161,22 +223,28 @@ final class BillingLedger
                     if ($last !== null && $last['retrieval_end_position'] >= $position) {
                         throw new BillingException($endPosition < $last['retrieval_position'] ? 'superseded_retrieval' : 'concurrent_retrieval');
                     }
-                    $now = CarbonImmutable::now('UTC')->timestamp;
-                    $createdAt = BillingValues::utc($now);
-                    BillingException::require($last === null || $last['created_at'] <= $createdAt, 'clock');
+                    $readEnd = BillingDatabaseInstant::fromNativeValue($end['database_at'], 0);
+                    $now = BillingDatabaseClock::sample($pdo, DB::getDriverName());
+                    $createdAt = $now->stamp19();
+                    BillingException::require($now->utcMicros >= $readEnd->utcMicros, 'clock');
+                    $legacyTail = $last !== null && ($last['retrieval_token'] ?? null) === null
+                        && ($last['start_allocation_token'] ?? null) === null && ($last['end_allocation_token'] ?? null) === null;
+                    BillingException::require($last === null || $legacyTail || $last['created_at'] <= $createdAt, 'clock');
                     $facts = ['outcome' => $verdict->outcome, 'reason' => $verdict->reason, 'facts' => $verdict->facts];
                     $row = ['id' => BillingValues::id(), 'invoice_id' => $invoice['id'], 'sequence' => ($last['sequence'] ?? 0) + 1,
                         'outcome' => $verdict->outcome, 'facts_hash' => CanonicalJson::hash($facts),
                         'line_period_start' => $verdict->facts['line_period_start'] ?? null, 'line_period_end' => $verdict->facts['line_period_end'] ?? null,
                         'amount_minor' => $verdict->outcome === 'settled' ? $verdict->facts['amount_minor'] : null,
                         'currency' => $verdict->outcome === 'settled' ? $verdict->facts['currency'] : null,
-                        'retrieved_at' => BillingValues::utc($retrievedAt), 'retrieval_started_at' => $started, 'retrieval_position' => $position, 'retrieval_end_position' => $endPosition, 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
+                        'retrieved_at' => $readEnd->stamp19(), 'retrieval_started_at' => $start['database_at'],
+                        ...$interval->columns(), 'freshness_deadline' => BillingValues::utc($readEnd->seconds() + self::FRESHNESS_SECONDS),
                         'api_version' => BillingProviderPin::API_VERSION, 'sdk_reference' => BillingProviderPin::SDK_REFERENCE,
                         'prior_seal' => $last['seal'] ?? self::ZERO,
                         'created_at' => $createdAt];
                     $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, ['purpose' => 'production_membership_billing_observation',
                         ...$facts, 'provenance' => $provenance]);
                     $row['seal'] = BillingValues::seal($row);
+                    BillingRetrievalInterval::verifyRows($row, ...self::assertIssuedInterval($interval, $pdo));
                     $this->insert(BillingSchema::TABLES[2], $row);
                     $stored = $this->observations($invoice['id']);
 
@@ -196,13 +264,21 @@ final class BillingLedger
         $rows = $this->rows(BillingSchema::TABLES[2], 'invoice_id = ?', [$invoiceId], 'sequence', self::MAX_OBSERVATIONS + 1);
         BillingException::require(count($rows) <= self::MAX_OBSERVATIONS, 'technical_bound');
         $prior = self::ZERO;
+        $previous = null;
+        $priorVersion = null;
         foreach ($rows as $index => $row) {
-            BillingException::require($row['sequence'] === $index + 1 && hash_equals($prior, $row['prior_seal'])
-                && hash_equals(BillingValues::seal($row), $row['seal']), 'tampered_ledger');
-            $payload = BillingValues::decrypt($row['payload_ciphertext']);
-            BillingException::require(($payload['outcome'] ?? null) === $row['outcome']
-                && hash_equals(CanonicalJson::hash(['outcome' => $payload['outcome'], 'reason' => $payload['reason'] ?? null, 'facts' => $payload['facts'] ?? null]), $row['facts_hash']), 'tampered_ledger');
+            BillingException::require($row['sequence'] === $index + 1 && hash_equals($prior, $row['prior_seal']), 'tampered_ledger');
+            $payload = BillingEvidenceRecord::read($row, BillingEvidenceRecord::OBSERVATION);
+            BillingException::require($row['retrieval_position'] > ($previous['retrieval_end_position'] ?? 0)
+                && $row['retrieval_end_position'] > $row['retrieval_position'], 'tampered_ledger');
+            if ($previous !== null) {
+                $transition = $priorVersion < 3 && $payload['schema_version'] === 3;
+                BillingException::require(($priorVersion !== 3 || $payload['schema_version'] === 3)
+                    && ($transition || $previous['created_at'] <= $row['created_at']), 'tampered_ledger');
+            }
             $prior = $row['seal'];
+            $previous = $row;
+            $priorVersion = $payload['schema_version'];
         }
 
         return $rows;
@@ -212,22 +288,88 @@ final class BillingLedger
      * The latest observation only if it is a settled one still inside its original freshness deadline.
      * A newer non-settled observation therefore hides an older settled one, and no deadline is renewed.
      */
-    public function currentSettled(string $invoiceId, int $now): ?array
+    public function currentSettled(string $invoiceId): ?array
     {
         $rows = $this->observations($invoiceId);
         $latest = $rows === [] ? null : $rows[array_key_last($rows)];
+        if ($latest === null || $latest['outcome'] !== 'settled') {
+            return null;
+        }
+        $payload = BillingEvidenceRecord::read($latest, BillingEvidenceRecord::OBSERVATION);
+        if ($payload['schema_version'] !== 3) {
+            return null;
+        }
+        $source = self::source();
+        $pdo = $source['pdo'];
+        $start = self::readPosition($pdo, $source['driver'], $latest['retrieval_position'], $pdo->inTransaction());
+        $end = self::readPosition($pdo, $source['driver'], $latest['retrieval_end_position'], $pdo->inTransaction());
+        BillingRetrievalInterval::verifyRows($latest, $start, $end);
+        $now = BillingDatabaseClock::sample($pdo, $source['driver']);
+        $readEnd = BillingDatabaseInstant::fromNativeValue($end['database_at'], 0);
 
-        return $latest !== null && $latest['outcome'] === 'settled' && BillingValues::utc($now) < $latest['freshness_deadline'] ? $latest : null;
+        return $now->utcMicros >= $readEnd->utcMicros && $now->stamp19() < $latest['freshness_deadline'] ? $latest : null;
     }
 
-    /** One `retrieval` position committed in its own short transaction; no transaction may be open (no provider I/O inside one). */
-    private function committedRetrievalPosition(): int
+    private static function outsideTransactions(): void
     {
         foreach (DB::getConnections() as $connection) {
-            BillingException::require($connection->transactionLevel() === 0, 'transaction_open');
+            BillingException::require($connection->transactionLevel() === 0 && ! $connection->getPdo()->inTransaction(), 'transaction_open');
         }
+    }
 
-        return DB::transaction(fn (): int => $this->position('retrieval'));
+    private static function source(): array
+    {
+        $pdo = DB::connection()->getPdo();
+        $driver = DB::getDriverName();
+        BillingDatabaseClock::assertNative($pdo, $driver);
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+        $schema = $driver === 'mysql' ? $pdo->query('SELECT DATABASE()')->fetchColumn() : 'main';
+        BillingException::require(is_string($schema) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $schema) === 1, 'changed_primary');
+
+        return ['pdo' => $pdo, 'driver' => $driver, 'schema' => $schema];
+    }
+
+    private static function assertSource(array $issued, PDO $pdo): void
+    {
+        $connection = DB::connection();
+        BillingException::require($connection->getPdo() === $pdo && $pdo === $issued['pdo']
+            && $connection->getDriverName() === $issued['driver'], 'changed_primary');
+        BillingDatabaseClock::assertNative($pdo, $issued['driver']);
+        $schema = $issued['driver'] === 'mysql' ? $pdo->query('SELECT DATABASE()')->fetchColumn() : 'main';
+        BillingException::require($schema === $issued['schema'], 'changed_primary');
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+    }
+
+    private static function allocate(PDO $pdo, string $driver, string $kind, string $phase, ?string $retrievalToken): array
+    {
+        BillingException::require($pdo->inTransaction(), 'transaction_open');
+        BillingDatabaseClock::assertNative($pdo, $driver);
+        $table = (new BillingSchema)->table(BillingSchema::TABLES[4]);
+        $token = bin2hex(random_bytes(32));
+        $statement = $pdo->prepare('INSERT INTO '.$table.' (kind, created_at, allocation_token, retrieval_token, phase, database_at) '
+            .'SELECT ?, SUBSTR(issued_at, 1, 19), ?, ?, ?, issued_at FROM (SELECT '.BillingDatabaseClock::expression($driver).' AS issued_at) AS billing_clock');
+        $statement->execute([$kind, $token, $retrievalToken, $phase]);
+        BillingException::require($statement->rowCount() === 1, 'ambiguous_effect');
+        $id = $pdo->lastInsertId();
+        BillingException::require(is_string($id) && preg_match('/\A[1-9][0-9]{0,18}\z/D', $id) === 1 && (string) (int) $id === $id, 'position');
+        $row = self::readPosition($pdo, $driver, (int) $id, true);
+        BillingException::require($row['kind'] === $kind && $row['allocation_token'] === $token
+            && $row['retrieval_token'] === $retrievalToken && $row['phase'] === $phase, 'position');
+        $at = BillingDatabaseInstant::fromNativeValue($row['database_at'], 0);
+        BillingException::require($row['created_at'] === $at->stamp19(), 'database_clock');
+
+        return $row;
+    }
+
+    private static function readPosition(PDO $pdo, string $driver, int $id, bool $locking): array
+    {
+        $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table(BillingSchema::TABLES[4]).' WHERE id = ?'
+            .($driver === 'mysql' && $locking ? ' FOR UPDATE' : ''));
+        $statement->execute([$id]);
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        BillingException::require(count($rows) === 1, 'changed_retrieval');
+
+        return BillingValues::integers($rows[0], ['id']);
     }
 
     /** Serializes appends to one invoice's chain. Held only for the append transaction. */
@@ -238,9 +380,9 @@ final class BillingLedger
         BillingException::require(count($statement->fetchAll(PDO::FETCH_COLUMN)) === 1, 'invoice_identity');
     }
 
-    private function invoiceIdentity(string $refHash, array $binding): ?array
+    private function invoiceIdentity(string $refHash, array $binding, bool $current = false): ?array
     {
-        $row = $this->one(BillingSchema::TABLES[1], 'invoice_ref_hash = ?', [$refHash]);
+        $row = $this->one(BillingSchema::TABLES[1], 'invoice_ref_hash = ?', [$refHash], $current);
         if ($row === null) {
             return null;
         }
@@ -250,19 +392,20 @@ final class BillingLedger
         return $row;
     }
 
-    private function one(string $table, string $where, array $bindings): ?array
+    private function one(string $table, string $where, array $bindings, bool $current = false): ?array
     {
-        $rows = $this->rows($table, $where, $bindings, 'id', 2);
+        $rows = $this->rows($table, $where, $bindings, 'id', 2, $current);
         BillingException::require(count($rows) <= 1, 'ambiguous_source');
 
         return $rows[0] ?? null;
     }
 
-    private function rows(string $table, string $where, array $bindings, string $order, int $limit): array
+    private function rows(string $table, string $where, array $bindings, string $order, int $limit, bool $current = false): array
     {
         $pdo = DB::connection()->getPdo();
-        (new BillingSchema)->assertOwned($pdo);
-        $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table($table).' WHERE '.$where.' ORDER BY '.$order.' LIMIT '.$limit);
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+        $statement = $pdo->prepare('SELECT * FROM '.(new BillingSchema)->table($table).' WHERE '.$where.' ORDER BY '.$order.' LIMIT '.$limit
+            .($current && DB::getDriverName() === 'mysql' && $pdo->inTransaction() ? ' FOR UPDATE' : ''));
         $statement->execute($bindings);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         foreach ($rows as &$row) {
