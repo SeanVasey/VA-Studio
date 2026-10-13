@@ -2,28 +2,28 @@
   "scope": "Evidence-lane commands, source/coverage maps and evidence only. Excludes this self-digest, root README, contracts, design, independent DECISION and ledgers.",
   "files": {
     "commands.md": {
-      "bytes": 7627,
-      "sha256": "608c60339a68ac0b560e6e4ff25745da19522bcce6ad51da55624716286b6c9b"
+      "bytes": 8248,
+      "sha256": "aceb87fd631781941321789cf8010fe2733555fc3284fde880a82d283ba59bac"
     },
     "coverage-map.md": {
-      "bytes": 3678,
-      "sha256": "d9a1cade0d8a62e327fb50027194ed29aa640f3e6ee3182e54e3f467da076c03"
+      "bytes": 3810,
+      "sha256": "bc4ba1f80ab1ffc8d92e5ec594b3f9635424086842a38fbebbdd15b23c590a88"
     },
     "coverage-review.md": {
-      "bytes": 4032,
-      "sha256": "190ebc12fb408f72010476dea123b13c3d30708979f5f01e037abc95656216f9"
+      "bytes": 4427,
+      "sha256": "90b30b57adc4e0259f8c403fea31a89061e9a2d7a80a94582294152ef0260bc0"
     },
     "evidence/archive-index.json": {
-      "bytes": 357932,
-      "sha256": "995ac5d4b3d9415f4acb1d2db8e84d92b9c5ab3f55f8e0374acf4ea56b1574d8"
+      "bytes": 365765,
+      "sha256": "5da58473147a8f86514f782fec9573ae7b1f889174ac957b84e99b5b1d33e6d3"
     },
     "evidence/collect-released.py": {
       "bytes": 3975,
       "sha256": "1ded3188cf3bb4335541e05ca779bef910ea66a8919b609ba4e3aee0f7ecd5c1"
     },
     "evidence/coverage-summary.json": {
-      "bytes": 23447,
-      "sha256": "de7999bba3d3d2781cbf5e39979e7b7c8efc1545bfd2f9099a7b6de892d6f566"
+      "bytes": 23457,
+      "sha256": "cd3e1230b75f137f3406c06eaaac7d9f73a515cea5e5c42e01e930735f027cfb"
     },
     "evidence/facts/authoring-canary-fixed-source.php": {
       "bytes": 10261,
@@ -1722,12 +1722,12 @@
       "sha256": "205aaafffe1590c72d1fa408631e961c63fe2ad1287bdf04a1f785cd1d955c73"
     },
     "evidence/release-plan.json": {
-      "bytes": 231950,
-      "sha256": "630c2476ae8fee0b7e348f75352e4cf6b8bd5ae5e2bf4d044c5b9bf6055c1764"
+      "bytes": 236575,
+      "sha256": "519242f848c37c16f12d635706f3df07bfda20ce5e0e335fadf04093bb2dcb94"
     },
     "evidence/release-verification.json": {
-      "bytes": 31453,
-      "sha256": "0ace5dace3aa804f18fe729fc0c857b739e2d928dfca6e6461e486f4f67c77e1"
+      "bytes": 32359,
+      "sha256": "0ea0d0c8bb63cdd8731fade0f8ecb933cc4268b53fe085101712c5ec7c4d2938"
     },
     "evidence/renderer/README.md": {
       "bytes": 13607,
@@ -1821,6 +1821,42 @@
       "bytes": 2155,
       "sha256": "7c144e7dff67bce5a0b02adcc6849a3736cb3e7681a5aa224c44a5e3b5afd38c"
     },
+    "evidence/root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.exit": {
+      "bytes": 2,
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    "evidence/root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.log": {
+      "bytes": 1140,
+      "sha256": "80150fb5e0732c468bffe5f23bf4e0b62152dcee71e4f5e0a7f1e6328c7c4df5"
+    },
+    "evidence/root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.result.json": {
+      "bytes": 454,
+      "sha256": "3006ae4e011b487ad3d67c5fe267c06979b526a92380563c4e6d83b4b5138e2b"
+    },
+    "evidence/root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz": {
+      "bytes": 79104,
+      "sha256": "045e96478f51ecad647609209a45e6c70c9c3cbbd8c024d66ad9de52f1b2f919"
+    },
+    "evidence/root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.xml": {
+      "bytes": 1760,
+      "sha256": "8aca4d0abeed829909adf259ae042dd34e1f29b361a47816c9ff6ca9181ac85c"
+    },
+    "evidence/root/native-initial-f4732dbe/native-setup.json": {
+      "bytes": 642,
+      "sha256": "bd56aae0563a15b0fafc692dba296b7534a6f2ce3881dece6da6660b56e5fd16"
+    },
+    "evidence/root/native-initial-f4732dbe/public-release-native-initial.json": {
+      "bytes": 1979,
+      "sha256": "e249017e2facff8143d8aedab9d961607faf8ce4a01fdbefbc48e8ea0c4284fa"
+    },
+    "evidence/root/native-initial-f4732dbe/run-native-focused.py": {
+      "bytes": 4313,
+      "sha256": "d83d217d3f81a2a169c3a20f148f06baa934c7f2b4fd72bdb361186cd7c69a60"
+    },
+    "evidence/root/native-initial-f4732dbe/setup-private-native.py": {
+      "bytes": 2416,
+      "sha256": "d68af3f34a78e519a299616299faeb1b341d0c26a266b218a84096617819064b"
+    },
     "evidence/root/pure-4962943d/integrated-pure-4962943d.exit": {
       "bytes": 2,
       "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
@@ -1850,24 +1886,24 @@
       "sha256": "d83d217d3f81a2a169c3a20f148f06baa934c7f2b4fd72bdb361186cd7c69a60"
     },
     "evidence/runs.json": {
-      "bytes": 82517,
-      "sha256": "cd16b9539c3282d9f4cb0ff89a1891c31c100505b68667104475987ecc77eab2"
+      "bytes": 84673,
+      "sha256": "38bbc0c45c78742121079af0d753de9b205002fbe44aea1b875cdda455a8f7f3"
     },
     "evidence/source-verification.json": {
-      "bytes": 80084,
-      "sha256": "2bb3d99c704538cf913b68a23670b329f44a735d876741a9b7761e62267a76be"
+      "bytes": 80738,
+      "sha256": "b54d812fd1d1a3dea817d93a58f9ac5ceb3b55f42446cd9e9bce7874864ae6e2"
     },
     "evidence/stability-and-programs.json": {
-      "bytes": 17160,
-      "sha256": "fc55b9e7fcdc5195d49c2941c061658c48db4112841738dbcc709bcf040a9dda"
+      "bytes": 17836,
+      "sha256": "b22165c032f92fde99e9c8b43a29599df6d368e15ecc73fbca43079464afd5de"
     },
     "evidence/test-summary.json": {
-      "bytes": 245256,
-      "sha256": "94c2d0cf6aa452edec3fd34538e41a9af894acf96e086394026362d63d235a76"
+      "bytes": 246577,
+      "sha256": "4f4bb1b47d29efa62cd1237f18dedd8dcce88553f45e37069f350649fd34c6a8"
     },
     "source-map.md": {
-      "bytes": 18880,
-      "sha256": "5f2b8e51e3bc8817f28e4ab071dbd5236a5aa7985b74f136245f1e9a456ae3d8"
+      "bytes": 20370,
+      "sha256": "2b306c7d5869e0afd9cdfb24c975309cb5a86ce9619622fa9fb9418f34f533e4"
     }
   }
 }

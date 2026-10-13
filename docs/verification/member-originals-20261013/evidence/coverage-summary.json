@@ -540,7 +540,7 @@
     }
   ],
   "pending": [
-    "Root pure107/220, complete SQLite composition15/432 and quality/discovery are archived; root native integration and candidate source comparison pending.",
+    "Root native first integration at f4732dbe failed1/16 with one error; second selected case unrun. Bounded diagnosis/correction and final source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
   ]
 }

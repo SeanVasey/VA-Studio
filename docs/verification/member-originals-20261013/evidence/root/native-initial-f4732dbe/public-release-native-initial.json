@@ -1,0 +1,46 @@
+{
+  "scope": "Actual first native integration invocation on private synthetic MySQL 8.4.11; stopped after first error, second selected case unrun. No host/provider claim.",
+  "head": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+  "result": {
+    "tests": 1,
+    "assertions": 16,
+    "errors": 1,
+    "failures": 0,
+    "skipped": 0,
+    "exit": 2
+  },
+  "artifacts": [
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.log",
+      "sha256": "80150fb5e0732c468bffe5f23bf4e0b62152dcee71e4f5e0a7f1e6328c7c4df5"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.xml",
+      "sha256": "8aca4d0abeed829909adf259ae042dd34e1f29b361a47816c9ff6ca9181ac85c"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.source.json",
+      "sha256": "a385579d7c01f392394a23960ac9ed2bd428cdb302c82f4ac29395b5fefd1202"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.result.json",
+      "sha256": "3006ae4e011b487ad3d67c5fe267c06979b526a92380563c4e6d83b4b5138e2b"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/run-native-focused.py",
+      "sha256": "d83d217d3f81a2a169c3a20f148f06baa934c7f2b4fd72bdb361186cd7c69a60"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/setup-private-native.py",
+      "sha256": "d68af3f34a78e519a299616299faeb1b341d0c26a266b218a84096617819064b"
+    },
+    {
+      "path": "/workspace/runtime/member-originals-root-evidence/native-setup.json",
+      "sha256": "bd56aae0563a15b0fafc692dba296b7534a6f2ce3881dece6da6660b56e5fd16"
+    }
+  ]
+}

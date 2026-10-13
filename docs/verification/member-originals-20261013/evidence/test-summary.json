@@ -5538,6 +5538,37 @@
           "status": "passed"
         }
       ]
+    },
+    {
+      "id": "root/native-preparation-integration-f4732dbe",
+      "driver": "mysql",
+      "xml": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.xml",
+      "exit_file": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.exit",
+      "command_receipt": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "command_status": "Exact original two-case argv and public environment retained; --stop-on-defect prevents second case from running.",
+      "source_binding": "root/native-preparation-integration-f4732dbe",
+      "scope": "First actual root native composed integration fails in committed source proof; unresolved diagnostic, not expected red.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "tests": 1,
+      "assertions": 16,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 2,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects",
+          "assertions": 16,
+          "status": "error"
+        }
+      ]
     }
   ],
   "component_slices": [

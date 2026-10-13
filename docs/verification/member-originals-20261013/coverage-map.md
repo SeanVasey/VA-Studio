@@ -1,6 +1,6 @@
 # C4b behavior and evidence boundaries
 
-The released renderer component passes 76 / 243 at `4837930`. The final authored SQLite composition passes 15 / 432; root native composed checks remain pending. [Coverage reconciliation](coverage-review.md) explains overlap and historical exclusions.
+The released renderer component passes 76 / 243 at `4837930`. The final authored SQLite composition passes 15 / 432; the first root native composed check fails 1 / 16 with one error, and correction remains pending. [Coverage reconciliation](coverage-review.md) explains overlap and historical exclusions.
 
 | Requirement | Released evidence | Remaining boundary |
 | --- | --- | --- |
@@ -11,7 +11,7 @@ The released renderer component passes 76 / 243 at `4837930`. The final authored
 | Existing profile preservation | Five manifests and 38 declared member entries match baseline/final bytes | New member descriptor is technical identity; commercial/legal/host approval remains separate |
 | Immutable authoring and full facts/current schema | Historical bd3661ec document 30 / 66, pure schema 24 / 49, SQLite schema 6 / 17 and authoring 8 / 34 components, facts 4 / 17; native schema old 2 / 10 with two failures then fixed 4 / 19; E9 old 6 / 18 with six failures then corrected facts 10 / 35 at 5d6c58da; timestamp/document compatibility 51 / 95 at a7265e8c | Native schema covers current tables and required known guards, not unknown-trigger inventory or native authoring/facts; pure formatter compatibility is not composed preparation |
 | Native I/O admission and issuer/frame ownership | Operation I/O final 18 / 65, native I/O 3 / 24, source values 5 / 20, committed lightweight issuer/frame 10 / 45 at 5bbebd77 | Broad historical source maps include explicit unrelated draft differences; complete corrected composition is recorded separately |
-| Source capture and fresh readiness composition | Final exact authored SQLite composition 15 / 432 at 2cfd9a0d; existing wrappers 17 / 345 at 9d8abd45 and clock 1 / 18 at 2cfd9a0d; exact old Inspection 2 / 43 failures, same-byte fixed cases 2 / 56 | Separate sources/invocations; wrapper carry has three explicit input deltas; root native composed checks pending |
+| Source capture and fresh readiness composition | Final exact authored SQLite composition 15 / 432 at 2cfd9a0d; existing wrappers 17 / 345 at 9d8abd45 and clock 1 / 18 at 2cfd9a0d; exact old Inspection 2 / 43 failures, same-byte fixed cases 2 / 56 | Separate sources/invocations; wrapper carry has three explicit input deltas; root first native composed invocation fails 1 / 16 with one error; second selected case unrun, correction pending |
 | Integrated pure dependencies | Root nine-file unit selection 107 / 220 at 4962943d, all 1,396 captured inputs exact | No migration/native bodies or composed preparation; final carry remains pending |
 | Policy, style and discovery | Root 78ef16be: 159 policy self-tests, 78 operative PHP files pass Pint; discovery selects 2,143 cases / 210 files in 24 nonempty shards | Discovery is not application execution; 47 fallback timing weights remain warnings |
 | Final development acceptance | Root/reviewer checks pending | Independent DECISION and exact-head preflight are not authored by this packet lane |

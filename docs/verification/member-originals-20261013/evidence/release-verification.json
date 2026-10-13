@@ -639,6 +639,25 @@
       ]
     },
     {
+      "receipt": "root/native-initial-f4732dbe/public-release-native-initial.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "root/native-initial-f4732dbe/",
+      "absolute_paths": true,
+      "verified_members": 8,
+      "archived_paths": [
+        "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.log",
+        "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.xml",
+        "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.exit",
+        "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+        "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.result.json",
+        "root/native-initial-f4732dbe/run-native-focused.py",
+        "root/native-initial-f4732dbe/setup-private-native.py",
+        "root/native-initial-f4732dbe/native-setup.json"
+      ]
+    },
+    {
       "receipt": "quality/public-artifacts.json",
       "key": [
         "files"

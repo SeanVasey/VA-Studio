@@ -3439,6 +3439,70 @@
       "released_sha256": "7e207f21b19df98867220ef090cb392426f61419255d8fef78a0052385d79ff3",
       "released_bytes": 48091,
       "authorization": "Child renderer_receipt_audit explicitly released v2 portable path/blob mapping; all 18 prior records byte-equivalent, current53bindings24refs verified, 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.log",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.log",
+      "released_sha256": "80150fb5e0732c468bffe5f23bf4e0b62152dcee71e4f5e0a7f1e6328c7c4df5",
+      "released_bytes": 1140,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.xml",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.xml",
+      "released_sha256": "8aca4d0abeed829909adf259ae042dd34e1f29b361a47816c9ff6ca9181ac85c",
+      "released_bytes": 1760,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.exit",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "released_bytes": 2,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.source.json",
+      "released_sha256": "a385579d7c01f392394a23960ac9ed2bd428cdb302c82f4ac29395b5fefd1202",
+      "released_bytes": 268437,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13",
+      "gzip": true
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.result.json",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-preparation-integration-f4732dbe.result.json",
+      "released_sha256": "3006ae4e011b487ad3d67c5fe267c06979b526a92380563c4e6d83b4b5138e2b",
+      "released_bytes": 454,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/run-native-focused.py",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/run-native-focused.py",
+      "released_sha256": "d83d217d3f81a2a169c3a20f148f06baa934c7f2b4fd72bdb361186cd7c69a60",
+      "released_bytes": 4313,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/setup-private-native.py",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/setup-private-native.py",
+      "released_sha256": "d68af3f34a78e519a299616299faeb1b341d0c26a266b218a84096617819064b",
+      "released_bytes": 2416,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/native-setup.json",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/native-setup.json",
+      "released_sha256": "bd56aae0563a15b0fafc692dba296b7534a6f2ce3881dece6da6660b56e5fd16",
+      "released_bytes": 642,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
+    },
+    {
+      "path": "root/native-initial-f4732dbe/public-release-native-initial.json",
+      "runtime_path": "/workspace/runtime/member-originals-root-evidence/public-release-native-initial.json",
+      "released_sha256": "e249017e2facff8143d8aedab9d961607faf8ce4a01fdbefbc48e8ea0c4284fa",
+      "released_bytes": 1979,
+      "authorization": "Root /root explicitly released public-release-native-initial.json, first actual MySQL composed failure at f4732dbe; second selected case unrun; 2026-10-13"
     }
   ]
 }

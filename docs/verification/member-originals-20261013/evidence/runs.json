@@ -1098,6 +1098,24 @@
         "skipped": 0,
         "exit": 0
       }
+    },
+    {
+      "id": "root/native-preparation-integration-f4732dbe",
+      "driver": "mysql",
+      "xml": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.xml",
+      "exit_file": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.exit",
+      "command_receipt": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "command_status": "Exact original two-case argv and public environment retained; --stop-on-defect prevents second case from running.",
+      "source_binding": "root/native-preparation-integration-f4732dbe",
+      "scope": "First actual root native composed integration fails in committed source proof; unresolved diagnostic, not expected red.",
+      "expected": {
+        "tests": 1,
+        "assertions": 16,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      }
     }
   ],
   "source_bindings": [
@@ -1660,6 +1678,16 @@
       "reference": "78ef16be7626c81de49d103d581551b707201eda",
       "require_exact": true,
       "scope": "Exact quality/discovery root inventory; no application body execution."
+    },
+    {
+      "id": "root/native-preparation-integration-f4732dbe",
+      "source": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "All 1,388 captured application/config/resource/dependency and selected test inputs match exact root f4732dbe; initial failed run, no final acceptance."
     }
   ],
   "frozen_profiles": [
@@ -1672,7 +1700,7 @@
     "renderer/lane-combined-final"
   ],
   "pending": [
-    "Root pure107/220, complete SQLite composition15/432 and quality/discovery are archived; root native integration and candidate source comparison pending.",
+    "Root native first integration at f4732dbe failed1/16 with one error; second selected case unrun. Bounded diagnosis/correction and final source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
   ],
   "release_manifests": [
@@ -1740,6 +1768,14 @@
       ],
       "prefix": "quality/",
       "hash_values": true
+    },
+    {
+      "receipt": "root/native-initial-f4732dbe/public-release-native-initial.json",
+      "key": [
+        "artifacts"
+      ],
+      "prefix": "root/native-initial-f4732dbe/",
+      "absolute_paths": true
     }
   ],
   "component_slices": [
@@ -1906,6 +1942,12 @@
       "source": "operation/reservation-clock-wrapper-final.source.json.gz",
       "runner": "operation/run-composed.py",
       "result": "operation/reservation-clock-wrapper-final.result.json"
+    },
+    {
+      "run": "root/native-preparation-integration-f4732dbe",
+      "source": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "runner": "root/native-initial-f4732dbe/run-native-focused.py",
+      "result": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.result.json"
     }
   ],
   "before_after_receipts": [
@@ -2108,6 +2150,13 @@
         "sha256"
       ],
       "artifact": "operation/retained-deadline-old-inspection.php.txt"
+    },
+    {
+      "receipt": "root/native-initial-f4732dbe/native-setup.json",
+      "key": [
+        "runner_sha256"
+      ],
+      "artifact": "root/native-initial-f4732dbe/setup-private-native.py"
     }
   ],
   "allowlist_receipts": [

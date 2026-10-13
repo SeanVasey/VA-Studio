@@ -1549,6 +1549,21 @@
       "matched_paths": 2254,
       "all_captured_paths_match": true,
       "differences": []
+    },
+    {
+      "id": "root/native-preparation-integration-f4732dbe",
+      "source": "root/native-initial-f4732dbe/native-preparation-integration-f4732dbe.source.json.gz",
+      "key": [
+        "files"
+      ],
+      "reference": "f4732dbe21b9e40eb386b6115be1283ff563f511",
+      "require_exact": true,
+      "scope": "All 1,388 captured application/config/resource/dependency and selected test inputs match exact root f4732dbe; initial failed run, no final acceptance.",
+      "reference_resolution": "direct Git reference",
+      "captured_paths": 1388,
+      "matched_paths": 1388,
+      "all_captured_paths_match": true,
+      "differences": []
     }
   ],
   "frozen_profiles": [
