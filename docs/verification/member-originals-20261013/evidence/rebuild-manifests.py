@@ -150,17 +150,29 @@ for spec in registry.get('before_after_receipts', []):
 for spec in registry.get('capsule_checks', []):
     captured = field(load(spec['source']), spec['key'])
     assert sha(raw(spec['capsule'])) == captured[spec['path']], spec['capsule']
+for spec in registry.get('digest_checks', []):
+    expected = field(load(spec['receipt']), spec['key'])
+    assert sha(raw(spec['artifact'])) == expected, spec['artifact']
 save('stability-and-programs.json', {
     'scope': 'Independent full before/after equality where retained; other unchanged-source claims are identified as owner result sidecars. Runner and exact historical capsule bytes are checked independently.',
     'observations': stability, 'capsules': registry.get('capsule_checks', []),
+    'digest_checks': registry.get('digest_checks', []),
 })
 
 trees = {}
 blob_hashes = {}
+portable = load('portable-git-map.json') if (HERE / 'portable-git-map.json').exists() else {'references': []}
+portable_refs = {item['original_reference']: item for item in portable['references']}
+if portable_refs:
+    reachable = set(subprocess.check_output(['git', '-C', args.git_repo, 'rev-list', portable['derived_from_root_head']], text=True).splitlines())
+    for spec in portable_refs.values():
+        assert spec['default_reachable_reference'] in reachable, spec['original_reference']
+        assert all(item['reference'] in reachable for item in spec['path_overrides'].values()), spec['original_reference']
+resolved_pairs = {ref: {} for ref in portable_refs}
 process = subprocess.Popen(['git', '-C', args.git_repo, 'cat-file', '--batch'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
 
-def git_hash(ref, path):
+def git_oid(ref, path):
     if ref not in trees:
         tree = subprocess.check_output(['git', '-C', args.git_repo, 'ls-tree', '-r', '-z', ref])
         trees[ref] = {}
@@ -171,7 +183,27 @@ def git_hash(ref, path):
             _, kind, oid = left.decode().split()
             if kind == 'blob':
                 trees[ref][name.decode()] = oid
-    oid = trees[ref].get(path)
+    return trees[ref].get(path)
+
+
+def resolved_oid(ref, path):
+    if ref not in portable_refs:
+        return git_oid(ref, path)
+    spec = portable_refs[ref]
+    assert path not in spec['unavailable_paths'], (ref, path)
+    if path in spec['absent_paths']:
+        oid = None
+    else:
+        override = spec['path_overrides'].get(path)
+        oid = git_oid(override['reference'], override['path']) if override else git_oid(spec['default_reachable_reference'], path)
+        if override:
+            assert oid == override['original_git_blob'], (ref, path)
+    resolved_pairs[ref][path] = oid
+    return oid
+
+
+def git_hash(ref, path):
+    oid = resolved_oid(ref, path)
     if oid is None:
         return None
     if oid not in blob_hashes:
@@ -205,11 +237,14 @@ try:
                 differences.append({'path': path, 'captured_sha256': expected, 'reference_sha256': actual})
         if binding.get('require_exact'):
             assert not differences, (binding['id'], differences)
-        bindings.append(binding | {'captured_paths': len(captured), 'matched_paths': len(captured) - len(differences),
+        bindings.append(binding | {'reference_resolution': 'portable reachable-root path mapping' if binding['reference'] in portable_refs else 'direct Git reference',
+                                   'captured_paths': len(captured), 'matched_paths': len(captured) - len(differences),
                                    'all_captured_paths_match': not differences, 'differences': differences})
     frozen = []
     for spec in registry.get('frozen_profiles', []):
         inventory = load(spec['receipt'])
+        assert sum(x['kind'] == 'manifest' for x in inventory['entries']) == inventory['manifests']
+        assert sum(x['kind'] == 'member' for x in inventory['entries']) == inventory['member_entries']
         for item in inventory['entries']:
             assert git_hash(inventory['baseline'], item['path']) == item['sha256'], item['path']
             assert git_hash(spec['reference'], item['path']) == item['sha256'], item['path']
@@ -217,13 +252,34 @@ try:
                 assert item['declared_sha256'] == item['sha256'], item['path']
         frozen.append(spec | {'manifests': inventory['manifests'], 'member_entries': inventory['member_entries'],
                              'entries_verified_against_baseline_and_reference': len(inventory['entries'])})
+    profiles = []
+    for spec in registry.get('profile_manifests', []):
+        assert git_hash(spec['reference'], spec['path']) == spec['sha256'], spec['path']
+        manifest = json.loads(subprocess.check_output(['git', '-C', args.git_repo, 'cat-file', 'blob', resolved_oid(spec['reference'], spec['path'])]))
+        for name, expected in manifest['files'].items():
+            assert git_hash(spec['reference'], name) == expected, name
+        profiles.append(spec | {'members': manifest['files'], 'member_count': len(manifest['files'])})
+    portable_checks = []
+    for ref, pairs in resolved_pairs.items():
+        spec = portable_refs[ref]
+        assert len(pairs) == spec['requested_paths_count'], ref
+        canonical = lambda value: json.dumps(value, separators=(',', ':'), ensure_ascii=False).encode()
+        assert sha(canonical(sorted(pairs))) == spec['requested_sorted_paths_sha256'], ref
+        assert sha(canonical(sorted(pairs.items()))) == spec['original_path_blob_pairs_sha256'], ref
+        for path, override in spec['path_overrides'].items():
+            assert git_hash(ref, path) == override['original_sha256'], (ref, path)
+        portable_checks.append({'original_reference': ref, 'reachable_default': spec['default_reachable_reference'],
+                                'verified_path_pairs': len(pairs), 'overrides': len(spec['path_overrides']),
+                                'preserved_absences': len(spec['absent_paths']),
+                                'original_path_blob_pairs_sha256': spec['original_path_blob_pairs_sha256']})
 finally:
     process.stdin.close()
     process.wait()
     assert process.returncode == 0
 save('source-verification.json', {
     'scope': 'Captured paths compared to actual Git blob bytes or explicitly retained source overrides. A partial comparison remains partial. This does not attest unlisted source or execute a suite.',
-    'bindings': bindings, 'frozen_profiles': frozen,
+    'bindings': bindings, 'frozen_profiles': frozen, 'new_member_profiles': profiles,
+    'portable_git_checks': portable_checks,
 })
 
 coverage = {}

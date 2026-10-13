@@ -1,0 +1,9 @@
+{
+  "application_head": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+  "test_path": "/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php",
+  "test_sha256": "2e9679ee2a2857229acae9000b219c07df43307041e57f62a2adc41de9603e61",
+  "test_bytes": 5850,
+  "app_manifest": "../final-bd3661ec-source.json",
+  "configuration": "SQLite :memory: synthetic isolated; PHP8.4.26; no nativeworkload",
+  "method": "existing currentCallbacks/currentRaw and committedCallbacks/committedRaw methods; no absent API"
+}

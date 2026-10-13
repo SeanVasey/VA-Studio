@@ -4095,6 +4095,446 @@
           "status": "passed"
         }
       ]
+    },
+    {
+      "id": "facts/facts-review/old",
+      "driver": "sqlite",
+      "xml": "facts/facts-review/old.xml",
+      "exit_file": "facts/facts-review/old.exit",
+      "command_receipt": "facts/facts-review/README.md",
+      "command_status": "Original full shell retained; exact same external six-case test author-attested for both runs.",
+      "source_binding": "facts-bd3661ec-final",
+      "expected": {
+        "tests": 6,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 6,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 6,
+      "assertions": 18,
+      "errors": 0,
+      "failures": 6,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current identity_configuration\"",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current actor_id_reference\"",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current actor_exists\"",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed identity_configuration\"",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed actor_id_reference\"",
+          "assertions": 3,
+          "status": "failure"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed actor_exists\"",
+          "assertions": 3,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "facts/facts-review/fixed",
+      "driver": "sqlite",
+      "xml": "facts/facts-review/fixed.xml",
+      "exit_file": "facts/facts-review/fixed.exit",
+      "command_receipt": "facts/facts-review/README.md",
+      "command_status": "Original full shell retained; exact same external six-case test author-attested for both runs.",
+      "source_binding": "facts-5d6c58da-final",
+      "expected": {
+        "tests": 10,
+        "assertions": 35,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 10,
+      "assertions": 35,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current identity_configuration\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current actor_id_reference\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"current actor_exists\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed identity_configuration\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed actor_id_reference\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set \"committed actor_exists\"",
+          "assertions": 3,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_real_authored_facts_yield_detached_snapshot_and_one_combined_committed_frame",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_raw_closure_detects_owner_change_after_callback_phase",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_public_token_values_foreign_issuers_and_unregistered_closures_have_no_admission",
+          "assertions": 7,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantFactsTest::test_required_full_customer_gate_is_not_replaced_by_authoring_flag",
+          "assertions": 2,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "facts/timestamp-compatibility/old",
+      "driver": "none",
+      "xml": "facts/timestamp-compatibility/old.xml",
+      "exit_file": "facts/timestamp-compatibility/old.exit",
+      "command_receipt": "facts/timestamp-compatibility/README.md",
+      "command_status": "Original full shell retained; existing actual catalog pure timestamp formatter and complete document reader. No DB body.",
+      "source_binding": "facts-5d6c58da-final",
+      "expected": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "tests": 1,
+      "assertions": 3,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "exit": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes",
+          "assertions": 3,
+          "status": "failure"
+        }
+      ]
+    },
+    {
+      "id": "facts/timestamp-compatibility/fixed",
+      "driver": "none",
+      "xml": "facts/timestamp-compatibility/fixed.xml",
+      "exit_file": "facts/timestamp-compatibility/fixed.exit",
+      "command_receipt": "facts/timestamp-compatibility/README.md",
+      "command_status": "Original full shell retained; existing actual catalog pure timestamp formatter and complete document reader. No DB body.",
+      "source_binding": "facts-a7265e8c-final",
+      "expected": {
+        "tests": 51,
+        "assertions": 95,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "tests": 51,
+      "assertions": 95,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "exit": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes",
+          "assertions": 5,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #0",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #1",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #2",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_mixed_precision_bounds_compare_instants_and_preserve_spelling with data set #3",
+          "assertions": 2,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_equal_or_reversed_effective_instants_are_refused with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #0",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #1",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #2",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #3",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #4",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #5",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #6",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #7",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #8",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #9",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #10",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentTimestampTest::test_malformed_catalog_timestamp_is_refused with data set #11",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_hashes_bind_every_authored_document_and_preserve_original_bytes",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_authored_source_at_the_released_renderer_limit_is_retained_exactly",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_nested_input_references_and_getter_results_cannot_change_retained_values",
+          "assertions": 4,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source exceeds member renderer capacity\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"profile extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"technical descriptor changed\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms float\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"terms duplicate role\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"definition extra\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong family\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"wrong version type\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad policy digest\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"bad plan uuid\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"source hash mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset unknown column\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset role mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"asset float size\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention unknown\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention absent\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"retention too large\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage wrong retention\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage private path\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"storage provenance mismatch\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"object refused\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set \"invalid UTF8\"",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_complete_profile_definition_envelopes_round_trip_and_join",
+          "assertions": 6,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_every_physical_retained_column_is_sealed",
+          "assertions": 24,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_even_resealed_unknown_physical_columns_are_refused",
+          "assertions": 1,
+          "status": "passed"
+        },
+        {
+          "identity": "Tests\\Unit\\ProductionMemberOriginals\\MemberGrantRecordsTest::test_resealed_wrong_profile_join_cannot_replace_exact_authored_profile",
+          "assertions": 1,
+          "status": "passed"
+        }
+      ]
     }
   ],
   "component_slices": [

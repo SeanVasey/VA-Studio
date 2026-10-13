@@ -33,13 +33,15 @@ Counts overlap; they must not be summed as one suite. `unknown` means the origin
 
 The renderer owner inventory records all 32 changed implementation, fixture, test and imported dependency entries from baseline `7edd614497b930c5bc02141537cc7e24dce6fb27`. [Source verification](evidence/source-verification.json) compares each hash with actual Git blob bytes at the final renderer commit. It is a complete baseline-diff inventory, not a contemporaneous full-tree before/after capture. The owner's clean final worktree and execution statement remain separately identified in the released README.
 
+Original author commit labels remain unchanged throughout the packet. For public-checkout portability, [the explicit fallback map](evidence/portable-git-map.json) resolves equivalent path bytes from root history reachable at `c2a23b86ab9d6b246387df6338a649061f37adf9`. Canonical fingerprints cover all 56,452 requested path/blob pairs across 18 original refs. Thirty-five per-path overrides and 48 original absences preserve the original comparison results exactly, including the 14 partial historical comparisons. This is selected-path equivalence, not whole-tree equivalence or a reassignment of old runs to root source. The verifier does not require an unpublished author branch.
+
 Nine additional comparisons verify retrospective E1, E6/E8 and E7 old/fixed implementation/test capsule hashes against their declared Git references. They do not reconstruct every historical running tree. E6/E8 red XML identifies test methods at lines 205/223, while the retained corrective test file identifies them at 198/216; therefore that corrective file does not establish the exact red-run test bytes. Original E1/E6/E8 full shell invocations were not retained; the README explicitly supplies reproduction commands instead. E1 and E7 failure locations are consistent with their named source mappings, but that consistency is not an independent historical environment capture.
 
 The five pre-existing frozen manifests and their 38 member entries match baseline and renderer-final Git bytes. The new member manifest is separately identified by SHA-256 `caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852`. Its technical descriptor hashes are owner-reported released API results, not production approvals: synthetic `1c518ec10f5dce9cf538b48de4e1034cd1fe1574fe21c9f0819d0638972e434e`, verified `d9047a26ebdc6b2bbfc44d00f3fbd93bfc1504e61948bf9666e7acadde712cbd`.
 
 ## Facts component and schema-only native results
 
-The facts component release belongs to `bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08`. It is historical review evidence: subsequent identity-config/actor callback findings require their own correction receipts. Passing authoring/facts components below are not acceptance of that superseded source. Every retained exit is an actual `.exit` file.
+The first facts component release belongs to `bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08`. It is historical review evidence: the separately retained identity-config/actor callback correction advances source to `5d6c58da50267a636e393ce3754ef473516923aa`. Passing earlier authoring/facts components below are not acceptance of the superseded source. Every retained exit is an actual `.exit` file.
 
 | Invocation | Driver | Tests / assertions | Errors | Failures | Skips | Exit |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -59,6 +61,10 @@ The facts component release belongs to `bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08
 | sqlite-facts-fixed | sqlite | 4 / 17 | 0 | 0 | 0 | 0 |
 | schema/native-old-01 | mysql | 2 / 10 | 0 | 2 | 0 | 1 |
 | schema/native-fixed-01 | mysql | 4 / 19 | 0 | 0 | 0 | 0 |
+| facts-review/old | sqlite | 6 / 18 | 0 | 6 | 0 | 1 |
+| facts-review/fixed | sqlite | 10 / 35 | 0 | 0 | 0 | 0 |
+| timestamp-compatibility/old | none | 1 / 3 | 0 | 1 | 0 | 1 |
+| timestamp-compatibility/fixed | none | 51 / 95 | 0 | 0 | 0 | 0 |
 
 The complete SQLite schema component is 6 / 17 inside the errored seven-case canary. The whole authoring component is 8 / 34 inside the errored nine-case authoring/facts run. Their class-specific JUnit leaves are independently extracted in `test-summary.json`; both parent invocations retain exit 2 and their real errors. The initial authoring error requested a locking staff lookup in a Laravel-level-zero committed frame. Diagnostic attempts and the corrected 1 / 9 positive remain distinct. The facts teardown error exposed a WeakMap value retaining its own key; the real issuer lifetime correction produces the complete 4 / 17 facts pass. No teardown suppression is claimed.
 
@@ -67,6 +73,10 @@ The first document failure lacks a complete contemporaneous source inventory and
 The final historical facts inventory has all 11,503 tracked paths matching actual `bd3661ec` Git bytes. Earlier full canary and authoring/facts captures differ from it in 12 and four paths respectively; every difference is retained. Sixteen separately retained untracked application/test capsules match their corresponding captured hashes, and the two-file lifetime correction exactly matches the later commit. These are explicit overlays, not execution of a clean later tree.
 
 Native old source is exact `15a65e0761382a9ad50c4b279605a644a4eeb285` with the released external existing-API probe. All 10,633 tracked hashes and external runner/test bytes are identical before/after. Fixed source is exact `bd3661ec`, with all 11,503 tracked hashes and the same external program identities stable. Old PHPUnit exit 1 is the intended pair of incorrect-admission failures; the verification runner exits successfully after confirming that outcome. Fixed native source passes 4 / 19. This establishes actual current table definitions and known required guard checks under the tested old repeatable-read dictionary snapshot. Unknown extra-trigger inventory, native facts/authoring and complete preparation remain outside this schema selection.
+
+E9 changes three mutable inputs during the actual retained-profile decrypt callback: identity configuration, a caller-referenced actor ID, and actor.exists. The six current/committed-phase cases fail on clean `bd3661ec` with 6 / 18 and no setup errors. Fixed production bytes at `5d6c58da` pass the same external six cases plus the unchanged four-case facts file, 10 / 35. All 11,504 captured final tracked hashes match the fixed commit. The executed external regression file is retained verbatim; its repository version differs by the recorded Pint/import-formatting diff, so the repository test is not substituted for the exact external executed bytes. This is SQLite-only source closure; the reviewer report is not a final DECISION.
+
+The later pure catalog timestamp correction uses the actual `PreparationSelection` formatter and complete member definition reader. Old `5d6c58da` refuses valid six-digit UTC timestamps: 1 / 3, one intended assertion failure. Fixed `a7265e8c5365421f2110623f685cbc67d21a99b0` preserves exact input strings and passes 21 timestamp cases plus the previous 30 document/record cases, 51 / 95. All 11,505 tracked final hashes match that source. Five old dependencies and retained old/fixed document source capsules are independently checked. This is pure compatibility evidence; the initial composed canary's separate setup error is not relabelled as this expected red regression.
 
 ## Operation dependency and issuer checkpoint
 

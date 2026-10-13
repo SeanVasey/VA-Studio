@@ -272,6 +272,57 @@
       ],
       "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
       "capsule": "operation/composition-issuer-initial-test.php.txt"
+    },
+    {
+      "source": "facts/timestamp-compatibility/old-source.json",
+      "key": [
+        "sha256"
+      ],
+      "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+      "capsule": "facts/timestamp-compatibility/old-MemberGrantDocumentValues.php"
+    },
+    {
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+      "capsule": "facts/timestamp-compatibility/fixed-MemberGrantDocumentValues.php"
+    },
+    {
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentTimestampTest.php",
+      "capsule": "facts/timestamp-compatibility/repository-test-source.php"
+    }
+  ],
+  "digest_checks": [
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "external_test_sha256"
+      ],
+      "artifact": "facts/facts-review/MemberGrantFactsCallbackClosureTest.php"
+    },
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "changed_inputs",
+        "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+        "fixed"
+      ],
+      "artifact": "facts/facts-review/fixed-app-source.php"
+    },
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "changed_inputs",
+        "tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php",
+        "fixed"
+      ],
+      "artifact": "facts/facts-review/repository-test-source.php"
     }
   ]
 }

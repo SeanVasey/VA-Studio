@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" tests="6" assertions="18" errors="0" failures="6" skipped="0" time="24.216024">
+    <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs" tests="6" assertions="18" errors="0" failures="6" skipped="0" time="24.216024">
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;current identity_configuration&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="4.338073">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current identity_configuration"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;current actor_id_reference&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="3.967980">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current actor_id_reference"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;current actor_exists&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="3.978527">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current actor_exists"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;committed identity_configuration&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="3.921309">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed identity_configuration"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;committed actor_id_reference&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="3.961625">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed actor_id_reference"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+      <testcase name="test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set &quot;committed actor_exists&quot;" file="/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php" line="68" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsCallbackClosureTest" assertions="3" time="4.048510">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed actor_exists"
+Changed owner input was admitted after the record decrypt callback.
+Failed asserting that false is true.
+
+/workspace/runtime/member-original-facts-evidence/facts-review/MemberGrantFactsCallbackClosureTest.php:118</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

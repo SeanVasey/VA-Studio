@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentTimestampTest" file="/workspace/runtime/member-original-facts-evidence/timestamp-compatibility/MemberGrantDocumentTimestampTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="0.020393">
+    <testcase name="test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes" file="/workspace/runtime/member-original-facts-evidence/timestamp-compatibility/MemberGrantDocumentTimestampTest.php" line="16" class="Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentTimestampTest" classname="Tests.Unit.ProductionMemberOriginals.MemberGrantDocumentTimestampTest" assertions="3" time="0.020393">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentTimestampTest::test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes
+Valid catalog timestamp spelling was refused: invalid_document
+
+/workspace/runtime/member-original-facts-evidence/timestamp-compatibility/MemberGrantDocumentTimestampTest.php:29</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

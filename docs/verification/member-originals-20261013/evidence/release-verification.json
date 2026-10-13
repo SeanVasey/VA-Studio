@@ -294,6 +294,60 @@
         "operation/source-values-initial.source.json.gz",
         "operation/source-values-initial.xml"
       ]
+    },
+    {
+      "receipt": "facts/facts-review-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/",
+      "verified_members": 17,
+      "archived_paths": [
+        "facts/facts-review/MemberGrantFactsCallbackClosureTest.php",
+        "facts/facts-review/README.md",
+        "facts/facts-review/SealedMemberGrantFacts.proposed.php",
+        "facts/facts-review/external-to-repository-test-format.diff.gz",
+        "facts/facts-review/fixed-app-source.php",
+        "facts/facts-review/fixed-pint.exit",
+        "facts/facts-review/fixed-pint.txt",
+        "facts/facts-review/fixed.exit",
+        "facts/facts-review/fixed.txt",
+        "facts/facts-review/fixed.xml",
+        "facts/facts-review/old-test-source.json",
+        "facts/facts-review/old.exit",
+        "facts/facts-review/old.txt",
+        "facts/facts-review/old.xml",
+        "facts/facts-review/repository-test-source.php",
+        "facts/facts-review/source-relationship.json",
+        "facts/final-5d6c58da-source.json.gz"
+      ]
+    },
+    {
+      "receipt": "facts/timestamp-compatibility-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/",
+      "verified_members": 17,
+      "archived_paths": [
+        "facts/timestamp-compatibility/MemberGrantDocumentTimestampTest.php",
+        "facts/timestamp-compatibility/README.md",
+        "facts/timestamp-compatibility/external-to-repository.diff.gz",
+        "facts/timestamp-compatibility/final-source.json.gz",
+        "facts/timestamp-compatibility/fixed-MemberGrantDocumentValues.php",
+        "facts/timestamp-compatibility/fixed.exit",
+        "facts/timestamp-compatibility/fixed.txt",
+        "facts/timestamp-compatibility/fixed.xml",
+        "facts/timestamp-compatibility/old-MemberGrantDocumentValues.php",
+        "facts/timestamp-compatibility/old-source.json",
+        "facts/timestamp-compatibility/old.exit",
+        "facts/timestamp-compatibility/old.txt",
+        "facts/timestamp-compatibility/old.xml",
+        "facts/timestamp-compatibility/pint.exit",
+        "facts/timestamp-compatibility/pint.txt",
+        "facts/timestamp-compatibility/repository-test-source.php",
+        "facts/timestamp-compatibility/source-change.diff.gz"
+      ]
     }
   ]
 }

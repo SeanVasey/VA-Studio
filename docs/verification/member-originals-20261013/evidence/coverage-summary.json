@@ -540,7 +540,7 @@
     }
   ],
   "pending": [
-    "Facts bd3661ec historical component plus old/fixed native schema archived; E9/E4 facts corrections remain pending.",
+    "Facts E9 and timestamp corrections archived; operation initial composed canary setup-error receipt and corrected composition release pending.",
     "Operation and composed integration final source/results pending.",
     "Root focused quality/discovery and final source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."

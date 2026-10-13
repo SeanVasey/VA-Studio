@@ -869,6 +869,74 @@
         "skipped": 0,
         "exit": 1
       }
+    },
+    {
+      "id": "facts/facts-review/old",
+      "driver": "sqlite",
+      "xml": "facts/facts-review/old.xml",
+      "exit_file": "facts/facts-review/old.exit",
+      "command_receipt": "facts/facts-review/README.md",
+      "command_status": "Original full shell retained; exact same external six-case test author-attested for both runs.",
+      "source_binding": "facts-bd3661ec-final",
+      "expected": {
+        "tests": 6,
+        "assertions": 18,
+        "errors": 0,
+        "failures": 6,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "facts/facts-review/fixed",
+      "driver": "sqlite",
+      "xml": "facts/facts-review/fixed.xml",
+      "exit_file": "facts/facts-review/fixed.exit",
+      "command_receipt": "facts/facts-review/README.md",
+      "command_status": "Original full shell retained; exact same external six-case test author-attested for both runs.",
+      "source_binding": "facts-5d6c58da-final",
+      "expected": {
+        "tests": 10,
+        "assertions": 35,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
+    },
+    {
+      "id": "facts/timestamp-compatibility/old",
+      "driver": "none",
+      "xml": "facts/timestamp-compatibility/old.xml",
+      "exit_file": "facts/timestamp-compatibility/old.exit",
+      "command_receipt": "facts/timestamp-compatibility/README.md",
+      "command_status": "Original full shell retained; existing actual catalog pure timestamp formatter and complete document reader. No DB body.",
+      "source_binding": "facts-5d6c58da-final",
+      "expected": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      }
+    },
+    {
+      "id": "facts/timestamp-compatibility/fixed",
+      "driver": "none",
+      "xml": "facts/timestamp-compatibility/fixed.xml",
+      "exit_file": "facts/timestamp-compatibility/fixed.exit",
+      "command_receipt": "facts/timestamp-compatibility/README.md",
+      "command_status": "Original full shell retained; existing actual catalog pure timestamp formatter and complete document reader. No DB body.",
+      "source_binding": "facts-a7265e8c-final",
+      "expected": {
+        "tests": 51,
+        "assertions": 95,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      }
     }
   ],
   "source_bindings": [
@@ -1286,6 +1354,36 @@
       "reference": "3cc2a0d39ad21a98ca238cffcb76ff7939f18b95",
       "require_exact": true,
       "scope": "Owner selected-executed dependency/source binding; does not attest unrelated broad-inventory drafts."
+    },
+    {
+      "id": "facts-5d6c58da-final",
+      "source": "facts/final-5d6c58da-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "require_exact": true,
+      "scope": "Complete tracked owner inventory after E9 correction; fixed executed production bytes match commit, external executed probe differs from Pint-formatted repository test by retained exact diff."
+    },
+    {
+      "id": "facts-a7265e8c-final",
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "reference": "a7265e8c5365421f2110623f685cbc67d21a99b0",
+      "require_exact": true,
+      "scope": "Complete11,505 tracked owner inventory after catalog timestamp compatibility correction. Exact external probe and its repository formatting diff retained."
+    },
+    {
+      "id": "facts-timestamp-old-dependencies",
+      "source": "facts/timestamp-compatibility/old-source.json",
+      "key": [
+        "sha256"
+      ],
+      "reference": "5d6c58da50267a636e393ce3754ef473516923aa",
+      "require_exact": true,
+      "scope": "Five captured old formatter/document dependencies; external regression file is separately retained, not in committed old source."
     }
   ],
   "frozen_profiles": [
@@ -1298,7 +1396,7 @@
     "renderer/lane-combined-final"
   ],
   "pending": [
-    "Facts bd3661ec historical component plus old/fixed native schema archived; E9/E4 facts corrections remain pending.",
+    "Facts E9 and timestamp corrections archived; operation initial composed canary setup-error receipt and corrected composition release pending.",
     "Operation and composed integration final source/results pending.",
     "Root focused quality/discovery and final source comparison pending.",
     "Independent implementation DECISION and exact-head preflight are root/reviewer responsibilities."
@@ -1331,6 +1429,20 @@
         "artifacts"
       ],
       "prefix": "operation/"
+    },
+    {
+      "receipt": "facts/facts-review-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/"
+    },
+    {
+      "receipt": "facts/timestamp-compatibility-release.json",
+      "key": [
+        "files"
+      ],
+      "prefix": "facts/"
     }
   ],
   "component_slices": [
@@ -1579,6 +1691,64 @@
       ],
       "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php",
       "capsule": "operation/composition-issuer-initial-test.php.txt"
+    },
+    {
+      "source": "facts/timestamp-compatibility/old-source.json",
+      "key": [
+        "sha256"
+      ],
+      "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+      "capsule": "facts/timestamp-compatibility/old-MemberGrantDocumentValues.php"
+    },
+    {
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+      "capsule": "facts/timestamp-compatibility/fixed-MemberGrantDocumentValues.php"
+    },
+    {
+      "source": "facts/timestamp-compatibility/final-source.json.gz",
+      "key": [
+        "sha256"
+      ],
+      "path": "tests/Unit/ProductionMemberOriginals/MemberGrantDocumentTimestampTest.php",
+      "capsule": "facts/timestamp-compatibility/repository-test-source.php"
+    }
+  ],
+  "profile_manifests": [
+    {
+      "reference": "483793065c3f7a66057907a777f938f608bf7036",
+      "path": "resources/contracts/production-member-v1/profile-assets.json",
+      "sha256": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852"
+    }
+  ],
+  "digest_checks": [
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "external_test_sha256"
+      ],
+      "artifact": "facts/facts-review/MemberGrantFactsCallbackClosureTest.php"
+    },
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "changed_inputs",
+        "app/Domain/Grants/Member/SealedMemberGrantFacts.php",
+        "fixed"
+      ],
+      "artifact": "facts/facts-review/fixed-app-source.php"
+    },
+    {
+      "receipt": "facts/facts-review/source-relationship.json",
+      "key": [
+        "changed_inputs",
+        "tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php",
+        "fixed"
+      ],
+      "artifact": "facts/facts-review/repository-test-source.php"
     }
   ]
 }

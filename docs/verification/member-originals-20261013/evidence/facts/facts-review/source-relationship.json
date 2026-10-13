@@ -1,0 +1,18 @@
+{
+  "old_head": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+  "fixed_head": "5d6c58da50267a636e393ce3754ef473516923aa",
+  "changed_inputs": {
+    "app/Domain/Grants/Member/SealedMemberGrantFacts.php": {
+      "old": "a0e01850b81f291fa866d3dee02e11f0b7b1510ca08d0f92287cded946dce406",
+      "fixed": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+    },
+    "tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php": {
+      "old": null,
+      "fixed": "cfbd4b869aa824dcec0efbbba237c617286bbbc459439984b9d13d91376c531f"
+    }
+  },
+  "external_test_sha256": "2e9679ee2a2857229acae9000b219c07df43307041e57f62a2adc41de9603e61",
+  "same_external_test_used_for_old_and_fixed": true,
+  "repository_test_changes": "Pint formatting, separation and unused-import removal only; exact diff retained",
+  "native_schema_files_unchanged": true
+}

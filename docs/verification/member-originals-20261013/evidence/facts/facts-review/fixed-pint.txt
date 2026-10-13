@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ProductionMemberOriginals\/MemberGrantFactsCallbackClosureTest.php","fixers":["class_attributes_separation","unary_operator_spaces","no_unused_imports","no_extra_blank_lines","ordered_imports","binary_operator_spaces"]}]}
