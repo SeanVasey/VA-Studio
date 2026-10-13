@@ -5,7 +5,9 @@ This bounded development batch starts from C3 PR #114's actual merge
 `1b88c0548f45a2e95ddc025bdc9c1adb7a9aaa7b`; selection and explanatory CI comments
 follow at `0095e46aefa85463268027d89c829a4886537ad6`. Focused verification is
 complete, including the integrated native reservation check at that source.
-Independent final DECISION and exact-head Development preflight remain pending.
+Separate non-author [DECISION](DECISION.md) approves exact candidate
+`c25185136ddf99b6a27b3dcb7c195fe1e6a0e5f8` with no unresolved P0/P1 or new P2.
+Receipt-only review carry and exact-head Development preflight remain merge gates.
 
 ## Changes
 
