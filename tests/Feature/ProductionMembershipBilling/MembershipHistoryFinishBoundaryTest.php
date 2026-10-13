@@ -59,6 +59,7 @@ class MembershipHistoryFinishBoundaryTest extends TestCase
         });
         $real = Crypt::getFacadeRoot();
         $observed = Mockery::mock();
+        $observed->shouldReceive('encryptString')->andReturnUsing($real->encryptString(...));
         $observed->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $application, $repository, $context, &$armed, &$installed, &$executed) {
             $plain = $real->decryptString($ciphertext);
             if ($armed && (self::inside($context, 'proveCommitted') || self::inside($context, 'committedCallbacks'))) {
