@@ -192,9 +192,14 @@ class MemberGrantSourceAdmissionTest extends TestCase
                     config([$key => $driver]);
                 }
             });
-            $this->refused(fn () => (new MemberGrantPolicy)->currentFor($rows), 'provenance_driver');
-            $this->assertSame($driver, config($key));
-            $this->assertSame([1, 0, 0], $this->calls);
+            try {
+                $this->refused(fn () => (new MemberGrantPolicy)->currentFor($rows), 'provenance_driver');
+                $this->assertSame($driver, config($key));
+                $this->assertSame([1, 0, 0], $this->calls);
+            } finally {
+                // Do not retain the captured Rows/SQLite statement in a container callback past this fixture.
+                $this->factories();
+            }
         });
     }
 
