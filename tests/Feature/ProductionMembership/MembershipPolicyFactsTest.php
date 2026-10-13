@@ -35,6 +35,7 @@ class MembershipPolicyFactsTest extends TestCase
     protected function tearDown(): void
     {
         CarbonImmutable::setTestNow();
+        $this->app->detectEnvironment(fn () => 'testing');
         parent::tearDown();
     }
 
@@ -179,6 +180,7 @@ class MembershipPolicyFactsTest extends TestCase
             $source = new SealedMembershipPolicyFacts;
             $proof = $source->lock($created['id'], $rows);
             $this->refused(fn () => (new SealedMembershipPolicyFacts)->proveCurrent($proof, $rows), 'foreign_policy_proof');
+            $this->refused(fn () => clone $source, 'clone_refused');
             $this->refused(fn () => $source->proveCurrent($proof, new MembershipRows), 'foreign_policy_proof');
             $this->refused(fn () => $source->proveCurrent(MembershipPolicyFactsToken::value($proof->binding()), $rows), 'foreign_policy_proof');
             $this->refused(fn () => clone $proof, 'clone_refused');

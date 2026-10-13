@@ -55,16 +55,18 @@ final class BillingSchema
     }
 
     /** Only the explicit successor may admit the exact old six-table graph without the new interval guards. */
-    private function inspect(bool $ddl, bool $intervalUpgrade): void
+    private function inspect(bool $ddl, bool $intervalUpgrade, bool $billingTablesLocked = false): void
     {
         $pdo = DB::connection()->getPdo();
         $driver = DB::getDriverName();
         BillingException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
-        [$parents] = (new IdentityMigrationOwnership)->inspect($pdo, $driver);
-        BillingException::require(! in_array(false, $parents, true), 'parent_floor');
-        // Plan versions are the 257 parent of every subscription binding.
-        (new MembershipSchema)->assertOwned($pdo);
-        $this->assertNamespace($pdo, $driver);
+        if (! $billingTablesLocked) {
+            [$parents] = (new IdentityMigrationOwnership)->inspect($pdo, $driver);
+            BillingException::require(! in_array(false, $parents, true), 'parent_floor');
+            // Plan versions are the 257 parent of every subscription binding.
+            (new MembershipSchema)->assertOwned($pdo);
+        }
+        $this->assertNamespace($pdo, $driver, $billingTablesLocked);
         $plans = [];
         $absent = false;
         $prefixEnded = false;
@@ -399,7 +401,7 @@ final class BillingSchema
         }
         try {
             // Reinspect after acquiring locks, closing the pre-lock metadata window.
-            $this->inspect(false, true);
+            $this->inspect(false, true, $driver === 'mysql');
             $this->assertRetainedIntervals($pdo);
             foreach ([self::TABLES[2], self::TABLES[5]] as $logical) {
                 $table = $this->table($logical);
@@ -440,7 +442,7 @@ final class BillingSchema
         BillingException::require($pdo->query($query)->fetchColumn() === false, 'retained_interval_conflict');
     }
 
-    private function assertNamespace(PDO $pdo, string $driver): void
+    private function assertNamespace(PDO $pdo, string $driver, bool $billingTablesLocked = false): void
     {
         $reserved = [];
         foreach (self::TABLES as $logical) {
@@ -495,7 +497,10 @@ final class BillingSchema
             }
             $rows = $pdo->query("SELECT TABLE_NAME AS name, 'table' AS type FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() UNION ALL SELECT TRIGGER_NAME AS name, 'trigger' AS type FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE()")->fetchAll(PDO::FETCH_ASSOC);
             foreach ($reserved as $expected) {
-                if ($expected['type'] === 'trigger') {
+                // The same connection was checked before LOCK TABLES. Probing a nonexistent
+                // table named after a trigger is illegal while table locks are held; no
+                // callback runs between these checks, so session-local shadows cannot appear.
+                if ($expected['type'] === 'trigger' && ! $billingTablesLocked) {
                     try {
                         $pdo->query('SHOW CREATE TABLE `'.$expected['name'].'`')->fetchAll();
                         throw new BillingException('schema_namespace');

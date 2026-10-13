@@ -15,6 +15,11 @@ final class SealedMembershipPolicyFacts implements MembershipPolicyFactsAuthorit
         $this->issued = new WeakMap;
     }
 
+    public function __clone(): void
+    {
+        throw new MembershipException('clone_refused');
+    }
+
     public function lock(string $planVersion, MembershipRows $rows): MembershipPolicyFactsProof
     {
         MembershipValues::id($planVersion);
