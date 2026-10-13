@@ -41,6 +41,8 @@ final class MemberOriginalInspection
             $configuration, $finish, $budget, $deadline, $definitionId, $redemptionId, $principal, $actor);
         try {
             $this->reservation = $reservations->beginMemberCapture($permit, $redemptionId, $principal, $actor, $rows);
+            $budget->shortenTo($reservations->memberHonorDeadline($this->reservation));
+            $budget->assertCurrent();
             $this->intent = $reservations->memberIntent($this->reservation, $rows);
             $this->factsProof = $facts->lock($definitionId, $principal, $actor, $rows);
             $snapshot = $facts->snapshot($this->factsProof, $principal, $actor, $rows);
@@ -91,6 +93,7 @@ final class MemberOriginalInspection
         MemberGrantException::require(! $this->retired && ! $this->committed, 'foreign_inspection');
         $this->facts->currentCallbacks($this->factsClosure, $this->rows);
         $this->reservations->memberCurrentCallbacks($this->reservation, $this->rows);
+        $this->budget->shortenTo($this->reservations->memberHonorDeadline($this->reservation));
         // No callback-capable sibling phase may follow either raw source closure.
         $this->finish->assertFrame($this->rows->identity(), false);
         $this->facts->currentRaw($this->factsClosure, $this->rows);
@@ -109,6 +112,7 @@ final class MemberOriginalInspection
         $this->committed = true;
         $this->facts->committedCallbacks($this->factsClosure, $frame);
         $this->reservations->memberCommittedCallbacks($this->reservation, $frame);
+        $this->budget->shortenTo($this->reservations->memberHonorDeadline($this->reservation));
         $this->finish->assertFrame($this->rows->identity(), true);
         $this->facts->committedRaw($this->factsClosure, $frame);
         $this->reservations->memberCommittedRaw($this->reservation, $frame);
@@ -116,6 +120,7 @@ final class MemberOriginalInspection
         $this->finish->assertFrame($this->rows->identity(), true);
         $frame->finish();
         $this->finish->assertCurrent();
+        $this->reservations->memberPostFinish($this->reservation, $frame);
         $this->admit();
     }
 

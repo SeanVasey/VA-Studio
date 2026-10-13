@@ -59,6 +59,9 @@ final class MembershipReservationContext
 
     private int $authorityDeadline = PHP_INT_MAX;
 
+    /** Honor alone survives detached member work; catalog/invoice leases do not cross frames. */
+    private int $honorDeadlineNs = PHP_INT_MAX;
+
     private ?array $newEvent = null;
 
     private int $createdAtNs;
@@ -248,6 +251,21 @@ final class MembershipReservationContext
         MembershipException::require($this->licenseProof !== null && $reservation->binding() == $this->reservationBinding(), 'foreign_member_capture');
 
         return new MemberGrantIntent($this->invoiceProof, $this->licenseProof, $reservation);
+    }
+
+    public function memberHonorDeadline(MembershipMemberCapture $capture): int
+    {
+        $this->member($capture);
+        MembershipException::require($this->honorDeadlineNs !== PHP_INT_MAX, 'foreign_member_capture');
+
+        return $this->honorDeadlineNs;
+    }
+
+    /** Final elapsed/configuration admission only; never calls a closed Rows proof or renews a producer. */
+    public function memberPostFinish(MembershipMemberCapture $capture): void
+    {
+        $this->member($capture);
+        $this->admit();
     }
 
     private function member(MembershipMemberCapture $capture): void
@@ -499,6 +517,9 @@ final class MembershipReservationContext
             MembershipException::require($reservation['terminal'] === null
                 && $now->format('Y-m-d H:i:s') < $reservation['record']['honor_deadline'], 'reservation_terminal');
             $honorMicros = (int) (new \DateTimeImmutable($reservation['record']['honor_deadline'], new \DateTimeZone('UTC')))->format('Uu');
+            $this->honorDeadlineNs = min($this->honorDeadlineNs,
+                $this->createdAtNs + ($honorMicros - $this->createdAtMicros) * 1000,
+                $startedNs + ($honorMicros - (int) $now->format('Uu')) * 1000);
             $this->capWallDeadline($honorMicros, (int) $now->format('Uu'), $startedNs);
         }
         $expiry = $this->period['credit_expires_at'];

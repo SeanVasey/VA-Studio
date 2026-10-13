@@ -18,6 +18,7 @@ use Illuminate\Container\Container;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
 use ReflectionProperty;
@@ -239,6 +240,63 @@ class MemberOriginalCompositionTest extends TestCase
             $this->assertSame(0, $executed);
         } finally {
             $property->setValue($application, $original);
+            CarbonImmutable::setTestNow($at);
+        }
+        $this->assertMemberOriginalEffectsUnchanged($before);
+    }
+
+    public function test_regular_committed_delegate_cannot_replace_the_owned_dispatcher_and_receive_a_source(): void
+    {
+        $fixture = $this->memberOriginalFixture();
+        $before = $this->memberOriginalEffects();
+        $operation = $this->memberOriginalOperation();
+        $connection = DB::connection();
+        $original = $connection->getEventDispatcher();
+        $replacement = new Dispatcher($this->app);
+        $calls = 0;
+        $original->listen(TransactionCommitted::class, function () use ($connection, $replacement, &$calls): void {
+            $connection->setEventDispatcher($replacement);
+            $calls++;
+        });
+        try {
+            $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'committed_source_refused');
+            $this->assertSame(1, $calls);
+            $this->assertSame($replacement, $connection->getEventDispatcher());
+        } finally {
+            $connection->setEventDispatcher($original);
+        }
+        $this->assertMemberOriginalEffectsUnchanged($before);
+    }
+
+    public function test_last_current_callback_cannot_replace_the_dispatcher_after_observer_admission(): void
+    {
+        $fixture = $this->memberOriginalFixture();
+        $before = $this->memberOriginalEffects();
+        $operation = $this->memberOriginalOperation();
+        $connection = DB::connection();
+        $original = $connection->getEventDispatcher();
+        $replacement = new Dispatcher($this->app);
+        $at = CarbonImmutable::now('UTC');
+        $armed = false;
+        $calls = 0;
+        $original->listen(TransactionCommitting::class, static function () use (&$armed): void {
+            $armed = true;
+        });
+        CarbonImmutable::setTestNow(function () use ($connection, $replacement, $at, &$armed, &$calls) {
+            if ($armed && self::inside(MembershipReservationContext::class, 'checkDeadlines')) {
+                $armed = false;
+                $connection->setEventDispatcher($replacement);
+                $calls++;
+            }
+
+            return $at;
+        });
+        try {
+            $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'source_refused');
+            $this->assertSame(1, $calls);
+            $this->assertSame($replacement, $connection->getEventDispatcher());
+        } finally {
+            $connection->setEventDispatcher($original);
             CarbonImmutable::setTestNow($at);
         }
         $this->assertMemberOriginalEffectsUnchanged($before);

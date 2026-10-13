@@ -50,6 +50,13 @@ final class MemberOriginalObserver implements Dispatcher
         MemberGrantException::require($this->proved, 'commit_not_proved');
     }
 
+    /** Normal delegates must leave the exact owned dispatcher and callback manager in place. */
+    public function requireCommittedOwnership(): void
+    {
+        $this->requireProof();
+        $this->admit();
+    }
+
     public function abort(): void
     {
         if ($this->transaction !== null) {
@@ -88,6 +95,7 @@ final class MemberOriginalObserver implements Dispatcher
             $this->rows()->assertCurrent();
             $this->admit();
             $this->context->proveCurrent();
+            $this->admit();
             $this->proved = true;
         }
 

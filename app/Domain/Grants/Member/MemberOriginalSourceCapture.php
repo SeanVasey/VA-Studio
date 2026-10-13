@@ -182,7 +182,7 @@ final class MemberOriginalSourceCapture
                 }
                 $connection->commit();
                 $committed = true;
-                $observer->requireProof();
+                $observer->requireCommittedOwnership();
             } catch (Throwable $error) {
                 $observer->abort();
                 throw new MemberGrantException($committed ? 'committed_source_refused' : 'source_refused');

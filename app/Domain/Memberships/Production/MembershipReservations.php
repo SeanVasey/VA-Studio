@@ -114,6 +114,15 @@ final class MembershipReservations implements MembershipReservationAuthority
         return $this->memberCurrent($capture, $rows)['intent'];
     }
 
+    /** Value from the exact registered capture, valid only until retirement; never a renewed lease. */
+    public function memberHonorDeadline(MembershipMemberCapture $capture): int
+    {
+        $entry = $this->memberCaptures[$capture] ?? null;
+        MembershipException::require(is_array($entry), 'foreign_member_capture');
+
+        return $entry['context']->memberHonorDeadline($capture);
+    }
+
     public function memberCurrentCallbacks(MembershipMemberCapture $capture, MembershipRows $rows): void
     {
         $this->memberCurrent($capture, $rows)['context']->memberCurrentCallbacks($capture);
@@ -143,6 +152,16 @@ final class MembershipReservations implements MembershipReservationAuthority
         $entry['state'] = 'finished';
         $this->memberCaptures[$capture] = $entry;
         $entry['context']->memberCommittedRaw($capture, $frame);
+    }
+
+    public function memberPostFinish(MembershipMemberCapture $capture, IdentityCommittedFrame $frame): void
+    {
+        $entry = $this->memberCaptures[$capture] ?? null;
+        MembershipException::require(is_array($entry) && $entry['state'] === 'finished' && $entry['frame'] === $frame
+            && ! $entry['pdo']->inTransaction(), 'foreign_member_capture');
+        $entry['state'] = 'closed';
+        $this->memberCaptures[$capture] = $entry;
+        $entry['context']->memberPostFinish($capture);
     }
 
     public function retireMemberCapture(MembershipMemberCapture $capture): void
