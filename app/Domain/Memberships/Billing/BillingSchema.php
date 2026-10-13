@@ -47,6 +47,14 @@ final class BillingSchema
     {
         BillingException::require(DB::connection()->getPdo() === $pdo, 'changed_connection');
         $this->up(false);
+        (new BillingAwardFence)->assertOwned($pdo);
+    }
+
+    /** Migration 262 must recheck the historical graph while its native table locks are held. */
+    public function assertRetainedGraph(PDO $pdo, bool $tablesLocked = false): void
+    {
+        BillingException::require(DB::connection()->getPdo() === $pdo, 'changed_connection');
+        $this->inspect(false, false, $tablesLocked);
     }
 
     public function up(bool $ddl = true): void
@@ -67,6 +75,8 @@ final class BillingSchema
             (new MembershipSchema)->assertOwned($pdo);
         }
         $this->assertNamespace($pdo, $driver, $billingTablesLocked);
+        // The later fence is optional for historical migrations, but never an unowned extra trigger.
+        (new BillingAwardFence)->assertEventGuardIfPresent($pdo, $billingTablesLocked);
         $plans = [];
         $absent = false;
         $prefixEnded = false;
@@ -76,6 +86,10 @@ final class BillingSchema
             $definition = $this->definition($logical, $driver);
             $create = 'CREATE TABLE '.$table.' ('.$definition['sql'].')'.($driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin' : '');
             $guards = $this->guards($logical, $driver, $name, $table);
+            $allowedGuards = array_keys($guards);
+            if ($logical === self::TABLES[3]) {
+                $allowedGuards[] = (new BillingAwardFence)->eventGuardName();
+            }
             if ($driver === 'sqlite') {
                 $statement = $pdo->prepare('SELECT name, tbl_name FROM sqlite_temp_master');
                 $statement->execute();
@@ -94,7 +108,7 @@ final class BillingSchema
                 }
                 $statement = $pdo->prepare("SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND tbl_name = ?");
                 $statement->execute([$name]);
-                BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), array_keys($guards)) === [], 'schema');
+                BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), $allowedGuards) === [], 'schema');
             } else {
                 $statement = $pdo->prepare('SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)');
                 $statement->execute([$name]);
@@ -119,7 +133,7 @@ final class BillingSchema
                 }
                 $statement = $pdo->prepare('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?');
                 $statement->execute([$name]);
-                BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), array_keys($guards)) === [], 'schema');
+                BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), $allowedGuards) === [], 'schema');
             }
             BillingException::require(! (($absent || $prefixEnded) && $actual !== false), 'schema_prefix');
             $absent = $absent || $actual === false;

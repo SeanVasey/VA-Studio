@@ -9,8 +9,8 @@ use PDO;
 use PDOException;
 
 /**
- * Billing evidence rows. Subscription bindings are read and seal-checked here but never written
- * (the MFA staff approval writer is not part of this lane). Invoice identities are deduplicated by
+ * Billing evidence rows. Subscription bindings are read here; the separate MFA staff approval writer
+ * retains v2 approval records. Invoice identities are deduplicated by
  * the provider reference hash, and observations are appended in short transactions as a contiguous
  * hash-linked chain. Nothing is updated, deleted, renewed or reversed, and nothing awards a credit.
  */
@@ -27,25 +27,9 @@ final class BillingLedger
     public function binding(string $bindingId, array $configuration): array
     {
         $row = $this->one(BillingSchema::TABLES[0], 'id = ?', [$bindingId]);
-        BillingException::require($row !== null && hash_equals(BillingValues::seal($row), $row['seal']), 'binding_absent');
-        $payload = BillingValues::decrypt($row['payload_ciphertext']);
-        $keys = array_keys($payload);
-        sort($keys);
-        BillingException::require($keys === ['account_ref', 'amount_minor', 'currency', 'customer_ref', 'mode', 'plan_version_id', 'price_ref',
-            'purpose', 'schema_version', 'subscription_ref'] && $payload['schema_version'] === 1
-            && $payload['purpose'] === 'production_membership_billing_subscription', 'binding_payload');
-        $expectation = new BillingExpectation($payload['account_ref'], $payload['mode'], $payload['customer_ref'], $payload['subscription_ref'],
-            $payload['price_ref'], $payload['currency'], $payload['amount_minor']);
-        $account = $expectation->accountRef;
-        $mode = $expectation->mode;
-        BillingException::require($account === $configuration['account_ref'] && $mode === $configuration['mode']
-            && $row['mode'] === $mode && $row['provenance'] === $configuration['provenance'] && $row['plan_version_id'] === $payload['plan_version_id']
-            && hash_equals(BillingValues::hash('provider-account', $account, $mode, $account), $row['provider_account_hash'])
-            && hash_equals(BillingValues::hash('customer', $account, $mode, $expectation->customerRef), $row['customer_ref_hash'])
-            && hash_equals(BillingValues::hash('subscription', $account, $mode, $expectation->subscriptionRef), $row['subscription_ref_hash'])
-            && hash_equals(BillingValues::hash('price', $account, $mode, $expectation->priceRef), $row['price_ref_hash']), 'binding_mismatch');
+        BillingException::require($row !== null, 'binding_absent');
 
-        return ['row' => $row, 'payload' => $payload, 'expectation' => $expectation];
+        return BillingSubscriptionRecord::read($row, $configuration);
     }
 
     /** The identity row this binding already owns for the invoice, or null. Never inserts; another binding's row conflicts. */
@@ -189,9 +173,9 @@ final class BillingLedger
                         'retrieved_at' => BillingValues::utc($retrievedAt), 'retrieval_started_at' => $started, 'retrieval_position' => $position, 'retrieval_end_position' => $endPosition, 'freshness_deadline' => BillingValues::utc($retrievedAt + self::FRESHNESS_SECONDS),
                         'api_version' => BillingProviderPin::API_VERSION, 'sdk_reference' => BillingProviderPin::SDK_REFERENCE,
                         'prior_seal' => $last['seal'] ?? self::ZERO,
-                        'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_observation',
-                            ...$facts, 'provenance' => $provenance]),
                         'created_at' => $createdAt];
+                    $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, ['purpose' => 'production_membership_billing_observation',
+                        ...$facts, 'provenance' => $provenance]);
                     $row['seal'] = BillingValues::seal($row);
                     $this->insert(BillingSchema::TABLES[2], $row);
                     $stored = $this->observations($invoice['id']);

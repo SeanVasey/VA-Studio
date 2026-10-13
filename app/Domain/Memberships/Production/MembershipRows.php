@@ -57,7 +57,7 @@ final class MembershipRows
 
     private ?PDOStatement $pin = null;
 
-    public function __construct()
+    public function __construct(private readonly ?MembershipAwardTransaction $ownedTransaction = null)
     {
         $this->container = Container::getInstance();
         $this->manager = DB::getFacadeRoot();
@@ -79,8 +79,12 @@ final class MembershipRows
             && in_array($this->driver, ['sqlite', 'mysql'], true) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $this->schema) === 1
             && preg_match('/\A[a-zA-Z0-9_]*\z/D', $this->prefix) === 1, 'changed_connection');
         $this->context();
-        $this->marker = 'membership_'.bin2hex(random_bytes(16));
-        $this->primary->exec('SAVEPOINT '.$this->marker);
+        if ($this->ownedTransaction === null) {
+            $this->marker = 'membership_'.bin2hex(random_bytes(16));
+            $this->primary->exec('SAVEPOINT '.$this->marker);
+        } else {
+            $this->ownedTransaction->admit($this->primary);
+        }
         $this->assertCurrent();
     }
 
@@ -125,8 +129,12 @@ final class MembershipRows
             $this->context();
             // A commit/rollback, including direct PDO commit/reopen, destroys this original marker.
             // Releasing/recreating it never rolls back consumer writes or bypasses Laravel events.
-            $this->primary->exec('RELEASE SAVEPOINT '.$this->marker);
-            $this->primary->exec('SAVEPOINT '.$this->marker);
+            if ($this->ownedTransaction === null) {
+                $this->primary->exec('RELEASE SAVEPOINT '.$this->marker);
+                $this->primary->exec('SAVEPOINT '.$this->marker);
+            } else {
+                $this->ownedTransaction->admit($this->primary);
+            }
             (new MembershipSchema)->assertOwned($this->primary);
             $this->context();
         } catch (Throwable) {
