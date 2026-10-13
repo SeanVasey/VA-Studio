@@ -2,6 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Grants\Member\MemberGrantException;
+use App\Domain\Grants\Member\MemberLicenseAuthorizationRecords;
+use App\Domain\Grants\Member\MemberLicenseReviewDisplay;
+use App\Domain\Grants\Member\MemberOriginalSourceValues;
 use App\Domain\Memberships\Production\MembershipAwardTerms;
 use App\Domain\Memberships\Production\MembershipConsumptionTerms;
 use App\Domain\Memberships\Production\MembershipException;
@@ -12,6 +16,7 @@ use App\Support\CanonicalJson;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Tests\Support\MemberLicenseAuthorizationValues;
 use Tests\Support\MembershipPolicyFixtures;
 
 final class MembershipConsumptionPolicyTest extends TestCase
@@ -178,5 +183,54 @@ final class MembershipConsumptionPolicyTest extends TestCase
             }
         }
         self::assertSame($binding->consumptionTerms->hash(), MembershipConsumptionTerms::from($binding->consumptionTerms->value())->hash());
+    }
+
+    public function test_policy_parser_refuses_controls_rejected_by_the_actual_confirmation_display(): void
+    {
+        $f = MemberLicenseAuthorizationValues::fixture();
+        $display = MemberLicenseAuthorizationRecords::display($f['source'], $f['policy']);
+        $accepted = [];
+        foreach ([['reference', 'consumption_reference', "a\nb"], ['text', 'consumption_text', "a\x01b"],
+            ['authorization_policy.display_reference', 'authorization_policy.display_reference', "a\tb"],
+            ['authorization_policy.display_text', 'authorization_policy.display_text', "a\x7fb"]] as [$policyPath, $displayPath, $value]) {
+            $badDisplay = $display;
+            Arr::set($badDisplay, $displayPath, $value);
+            try {
+                MemberLicenseReviewDisplay::from($badDisplay);
+                self::fail('The actual display accepted a forbidden control.');
+            } catch (MemberGrantException) {
+                self::addToAssertionCount(1);
+            }
+            $input = $f['policy_document']->facts;
+            Arr::set($input, 'consumption_terms.'.$policyPath, $value);
+            try {
+                MembershipPolicyDocument::from($input);
+                $accepted[] = $policyPath;
+            } catch (MembershipException) {
+                self::addToAssertionCount(1);
+            }
+        }
+        self::assertSame([], $accepted, 'An authored policy must not admit text its mandatory confirmation display rejects.');
+    }
+
+    public function test_policy_text_accepted_for_confirmation_preserves_multiline_and_unicode_bytes(): void
+    {
+        $f = MemberLicenseAuthorizationValues::fixture();
+        $input = $f['policy_document']->facts;
+        $input['consumption_terms']['reference'] = 'NONBINDING Ελληνικά';
+        $input['consumption_terms']['text'] = "NONBINDING\r\n\t Preserve these bytes. \n";
+        $input['consumption_terms']['authorization_policy']['display_reference'] = 'NONBINDING Кириллица';
+        $input['consumption_terms']['authorization_policy']['display_text'] = "NONBINDING confirmation\n\twith tabs and\r\nlines.";
+        $document = MembershipPolicyDocument::from($input);
+        $policy = $document->binding($f['policy']->planVersionId);
+        $source = $f['source']->document();
+        $source['invoice']['policy_hash'] = $policy->policyHash;
+        $source['invoice']['original_terms_hash'] = $policy->originalTermsHash;
+        $source['definition']['document']['policy_hash'] = $policy->policyHash;
+        $display = MemberLicenseAuthorizationRecords::display(MemberOriginalSourceValues::from($source), $policy);
+        self::assertSame($input['consumption_terms']['reference'], $display['consumption_reference']);
+        self::assertSame($input['consumption_terms']['text'], $display['consumption_text']);
+        self::assertSame(CanonicalJson::encode($input['consumption_terms']['authorization_policy']), CanonicalJson::encode($display['authorization_policy']));
+        self::assertSame(CanonicalJson::hash($input), $document->hash());
     }
 }
