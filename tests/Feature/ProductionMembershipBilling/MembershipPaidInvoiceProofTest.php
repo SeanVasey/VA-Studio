@@ -142,7 +142,7 @@ class MembershipPaidInvoiceProofTest extends TestCase
                 'created_at' => BillingDatabaseClock::sample($rows->identity(), DB::getDriverName())->stamp19(),
                 'prior_seal' => $fixture['observation']['seal']];
             $payload = BillingValues::decrypt($row['payload_ciphertext']);
-            unset($payload['schema_version'], $payload['row_binding']);
+            unset($payload['schema_version'], $payload['row_binding'], $payload['clock_basis']);
             $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, $payload);
             $row['seal'] = BillingValues::seal($row);
             $statement = $rows->identity()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2])
