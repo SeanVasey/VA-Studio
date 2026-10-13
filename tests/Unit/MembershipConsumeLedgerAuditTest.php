@@ -180,6 +180,28 @@ class MembershipConsumeLedgerAuditTest extends TestCase
         $this->assertSame(1, $this->audit($f)['balances']['consumed']);
     }
 
+    public function test_later_reserve_expiry_and_honor_cleanup_preserve_existing_consumed_history(): void
+    {
+        $f = $this->fixture();
+        $retained = CanonicalJson::encode($f['history']->rows());
+        $second = Reservation::create($f['period'], $f['invoice'], $f['policy'], $f['license'],
+            'NONBINDING later reserve', '2026-10-13 00:03:00');
+        $reserve = Reservation::reserveEvent($this->audit($f), $second, $f['actor'], $second['created_at']);
+        $events = [...$f['events'], $reserve];
+        $redemptions = [$second, $f['redemption']];
+        $audit = Audit::verify($f['period'], $events, $redemptions, $f['invoice'], $f['policy'], 17, $f['history']);
+        $this->assertSame(['available' => 1, 'reserved' => 1, 'consumed' => 1, 'expired' => 0], $audit['balances']);
+        $events[] = Reservation::expireEvent($audit, $f['policy'], $f['actor'], $f['period']['credit_expires_at']);
+        $audit = Audit::verify($f['period'], $events, $redemptions, $f['invoice'], $f['policy'], 17, $f['history']);
+        $this->assertSame(['available' => 0, 'reserved' => 1, 'consumed' => 1, 'expired' => 1], $audit['balances']);
+        $events[] = Reservation::releaseEvent($audit, $second['id'], $f['policy'], $f['actor'], $f['period']['credit_expires_at']);
+        $audit = Audit::verify($f['period'], $events, $redemptions, $f['invoice'], $f['policy'], 17, $f['history']);
+        $this->assertSame(['available' => 0, 'reserved' => 0, 'consumed' => 1, 'expired' => 2], $audit['balances']);
+        $this->assertSame('consume', $audit['reservations'][$f['redemption']['id']]['terminal']['kind']);
+        $this->assertSame('release', $audit['reservations'][$second['id']]['terminal']['kind']);
+        $this->assertSame($retained, CanonicalJson::encode($f['history']->rows()));
+    }
+
     #[DataProvider('consumeMutations')]
     public function test_resealed_consume_changes_cannot_escape_complete_history_and_conservation(string $field): void
     {
@@ -276,7 +298,7 @@ class MembershipConsumeLedgerAuditTest extends TestCase
         $activation = MemberActivationRecords::activation($origin, $artifact, $consume, $f['policy'], $f['activation']['id'], $f['actor'], $effectAt);
         $history = MemberActivationHistory::fromRows([$origin], [$artifact], [$activation], [$f['profile']], [$f['definition']], [$f['plan']], 1);
 
-        return [...$f, ...compact('invoice', 'period', 'award', 'redemption', 'reserve', 'reserved', 'source', 'manifest',
+        return [...$f, ...compact('invoice', 'period', 'award', 'license', 'redemption', 'reserve', 'reserved', 'source', 'manifest',
             'readiness', 'origin', 'artifact', 'consume', 'activation', 'history'), 'authorization' => $a,
             'events' => [$award, $reserve, $consume], 'effect_at' => $effectAt];
     }
