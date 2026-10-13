@@ -126,7 +126,9 @@ class MembershipFirstAwardTest extends TestCase
         DB::connection()->getEventDispatcher()->listen(TransactionBeginning::class, function () use ($fixture, &$calls): void {
             DB::afterCommit(function () use ($fixture, &$calls): void {
                 $calls++;
-                DB::table('customer_accounts')->where('id', $fixture['buyer']['principal']->accountId)->update(['active' => false]);
+                DB::table('customer_accounts')->where('id', $fixture['buyer']['principal']->accountId)->update([
+                    'active' => false, 'access_version' => DB::raw('access_version + 1'), 'updated_at' => CarbonImmutable::now('UTC'),
+                ]);
             });
         });
         $this->refused(fn () => $this->award($fixture), 'committed_receipt_refused');
