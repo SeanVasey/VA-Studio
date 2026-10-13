@@ -158,6 +158,18 @@ class MemberActivationHistoryQueriesTest extends TestCase
         $this->refuses($this->read(...), 'history_scope');
     }
 
+    public function test_orphan_artifact_for_a_known_period_redemption_is_not_hidden_by_its_missing_origin(): void
+    {
+        $this->insert('artifacts');
+        $this->refuses($this->read(...), 'history_scope');
+    }
+
+    public function test_orphan_activation_with_a_known_origin_candidate_and_foreign_redemption_is_not_hidden(): void
+    {
+        $this->insert('activations', ['redemption_id' => self::FOREIGN]);
+        $this->refuses($this->read(...), 'history_scope');
+    }
+
     public function test_zero_redemptions_still_queries_invoice_scope_with_one_overflow_row(): void
     {
         $this->state['pdo']->exec('DELETE FROM redemptions');

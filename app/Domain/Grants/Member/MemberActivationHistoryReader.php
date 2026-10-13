@@ -203,8 +203,14 @@ final class MemberActivationHistoryReader
                 && $origin['identity_origin_id'] === $period['identity_origin_id'], 'history_scope');
         }
         $originIds = array_keys($sets['origins']);
-        self::byKeys($state, 'activations', 'origin_id', $originIds, $r, $committed, $sets, $bytes);
-        self::byKeys($state, 'artifacts', 'origin_id', $originIds, $r, $committed, $sets, $bytes);
+        // A historical foreign-key violation must not hide a pointer simply because its origin is
+        // missing. These fixed candidates are known from this period; they never authorize adoption.
+        $originCandidates = [...$redemptionIds, ...$declared, ...$activated, ...$originIds];
+        self::byKeys($state, 'activations', 'origin_id', $originCandidates, $r, $committed, $sets, $bytes);
+        self::byKeys($state, 'artifacts', 'origin_id', $originCandidates, $r, $committed, $sets, $bytes);
+        foreach ($sets['artifacts'] as $artifact) {
+            MemberGrantException::require(isset($sets['origins'][$artifact['origin_id']]), 'history_scope');
+        }
         foreach ($sets['activations'] as $activation) {
             MemberGrantException::require(isset($sets['origins'][$activation['origin_id']])
                 && isset($sets['redemptions'][$activation['redemption_id']])
