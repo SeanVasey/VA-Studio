@@ -23,6 +23,27 @@ final class MemberOriginalRenderInputTest extends TestCase
         $this->assertSame($document, $input->value());
     }
 
+    public function test_caller_held_nested_references_cannot_change_validated_values_or_returned_projections(): void
+    {
+        $document = MemberOriginalRendererFixtures::document();
+        $text = $document['original_terms']['authored_source'];
+        $buyer = $document['buyer_account_id'];
+        $features = $document['original_terms']['structured_terms']['features'];
+        $document['original_terms']['authored_source'] = &$text;
+        $document['buyer_account_id'] = &$buyer;
+        $document['original_terms']['structured_terms']['features'] = &$features;
+        $expectedHash = CanonicalJson::hash($document);
+        $input = MemberOriginalRenderInput::from($document);
+        $text = 'Changed after validation';
+        $buyer = -1;
+        $features[] = 'Changed feature';
+        $this->assertSame($expectedHash, $input->hash());
+        $this->assertSame(1, $input->value()['buyer_account_id']);
+        $copy = $input->value();
+        $copy['original_terms']['structured_terms']['features'][0] = 'Changed returned projection';
+        $this->assertSame($expectedHash, $input->hash());
+    }
+
     public static function invalid(): array
     {
         return [

@@ -55,7 +55,7 @@ final readonly class MemberOriginalRenderInput
             self::require(strlen(CanonicalJson::encode($document)) <= 1048576
                 && CanonicalJson::hash($terms) === $document['selection']['original_terms_hash']);
 
-            return new self($document);
+            return new self(self::detached($document));
         } catch (ContractIssuanceException $error) {
             throw $error;
         } catch (Throwable) {
@@ -110,5 +110,16 @@ final readonly class MemberOriginalRenderInput
         if (! $condition) {
             throw new ContractIssuanceException('unsupported_input');
         }
+    }
+
+    /** Validation bounded every node first; assignment of each scalar breaks caller reference cells. */
+    private static function detached(array $value): array
+    {
+        $copy = [];
+        foreach ($value as $key => $item) {
+            $copy[$key] = is_array($item) ? self::detached($item) : $item;
+        }
+
+        return $copy;
     }
 }
