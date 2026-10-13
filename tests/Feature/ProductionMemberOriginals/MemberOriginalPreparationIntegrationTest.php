@@ -12,7 +12,6 @@ use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberOriginalFixtures;
 use Tests\TestCase;
@@ -82,14 +81,14 @@ class MemberOriginalPreparationIntegrationTest extends TestCase
         $fixture = $this->memberOriginalFixture();
         $before = $this->memberOriginalEffects();
         $calls = 0;
-        $operation = $this->memberOriginalOperation(function (array $command, string $cwd, array $environment, string $payload) use ($fixture, &$calls): Process {
+        $operation = $this->memberOriginalOperation(function () use ($fixture, &$calls): void {
             $calls++;
             $this->assertSame(0, DB::transactionLevel());
             $this->assertFalse(DB::connection()->getPdo()->inTransaction());
             $this->assertSame(1, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']));
 
-            // The actual child still renders the previously admitted source. Fresh DB proof must refuse it.
-            return new Process($command, $cwd, $environment, $payload);
+            // The renderer owns and launches the real child after this observation hook.
+            // Fresh DB proof must refuse its previously admitted source after materialization.
         });
         $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'source_refused');
         $this->assertSame(1, $calls);
@@ -104,11 +103,9 @@ class MemberOriginalPreparationIntegrationTest extends TestCase
     {
         $fixture = $this->memberOriginalFixture();
         $before = $this->memberOriginalEffects();
-        $childCalls = 0;
-        $operation = $this->memberOriginalOperation(function (array $command, string $cwd, array $environment, string $payload) use (&$childCalls): Process {
-            $childCalls++;
-
-            return new Process($command, $cwd, $environment, $payload);
+        $beforeStartCalls = 0;
+        $operation = $this->memberOriginalOperation(function () use (&$beforeStartCalls): void {
+            $beforeStartCalls++;
         });
         $armed = true;
         $withdrawals = 0;
@@ -126,7 +123,7 @@ class MemberOriginalPreparationIntegrationTest extends TestCase
         });
         $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'committed_source_refused');
         $this->assertSame(1, $withdrawals);
-        $this->assertSame(0, $childCalls);
+        $this->assertSame(0, $beforeStartCalls);
         $this->assertSame([], $this->candidateFiles($fixture['reservation']['redemption_id']));
         $this->assertFalse((bool) DB::table('customer_accounts')->where('id', $fixture['buyer']['principal']->accountId)->value('active'));
         $this->assertMemberOriginalEffectsUnchanged($before);

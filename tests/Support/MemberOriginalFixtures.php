@@ -87,11 +87,11 @@ trait MemberOriginalFixtures
             'member_definition' => $definition, 'member_authored' => $authored];
     }
 
-    protected function memberOriginalOperation(?Closure $processFactory = null): MemberOriginals
+    protected function memberOriginalOperation(?Closure $beforeStart = null): MemberOriginals
     {
         $facts = new SealedMemberGrantFacts;
         $reservations = new MembershipReservations;
-        $operation = new MemberOriginals($facts, $reservations, new MemberOriginalRendererProcess($processFactory), new MemberOriginalFiles);
+        $operation = new MemberOriginals($facts, $reservations, new MemberOriginalRendererProcess($beforeStart), new MemberOriginalFiles);
         $this->app->instance(MemberGrantFactsAuthority::class, $facts);
         $this->app->instance(MembershipReservationAuthority::class, $reservations);
         $this->app->instance(MemberOriginalArtifactAuthority::class, $operation->artifactAuthority());
