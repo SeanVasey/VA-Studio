@@ -109,3 +109,9 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 - R-4 and catalog AUTO_INCREMENT false conflict remain one C4a/currentness batch. Isolated implementation can proceed while C3 evidence is reviewed; its integration/publication follows actual C3 merge. Keep P1B-1/L2-1/R-5, queue coalescing, unexpected-trigger inventory and commercial/legal/account/host inputs open. No Foundation/GitLab, provider, real entitlement, host or cutover claim.
 
 - Separate independent final DECISION approves C3 candidate `526e6f5b12068ca3d9571dfcb47dc25194e24598` for development merge with no unresolved P0/P1 in scope. It independently reconciles the frozen archive and mixed-source coverage; receipt-only carry and exact-head Development preflight remain required. Actual merge is not yet claimed.
+
+## #114 C3 retrieval identity/freshness merge receipt — October 13
+
+- PR #114 merged at `7b467c3824e2da81174a5445b6ee639cf0a59d93`, expected head `7e01ccb9cd770eff897986d0db176421043c9d24`. Separate non-author DECISION and final carry APPROVE; Development preflight `38362174080` passed on that head. No inline P0/P1 was open at merge.
+- Current guard/table P1 findings were fixed and independently reviewed before publication. CP-2/CP-3 corrections have the focused evidence in [the C3 packet](../../verification/billing-retrieval-20261013/README.md), including integrated native 11/215; no component pass is relabelled a final suite.
+- C4a integrates R-4 native source admission and the catalog AUTO_INCREMENT P2 against this actual merge. The PR #113 P2 thread remains open until its correction merges. Other activation conditions and unanswered inputs remain unchanged. No Foundation/GitLab dispatch, host/provider verification or activation is authorized by this merge.

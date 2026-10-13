@@ -2,11 +2,11 @@
 
 This development batch follows PR #113, merged at
 `6c871b9c5b510c1926437bbdf6e96d661e2c2f30`. Its integrated native verification
-source is `0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371`. Focused verification is
-complete. The [separate independent review](DECISION.md) approves candidate
-`526e6f5b12068ca3d9571dfcb47dc25194e24598` for development merge with no open P0/P1
-in C3. Receipt-only review carry and exact-head Development preflight remain
-merge gates. This is not activation or full Foundation acceptance.
+source is `0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371`. Focused verification and separate independent approval are complete.
+PR [#114](https://github.com/SeanVasey/VA-Studio/pull/114) merged at
+`7b467c3824e2da81174a5445b6ee639cf0a59d93` after green Development preflight on
+exact head `7e01ccb9cd770eff897986d0db176421043c9d24`; see the
+[merge receipt](merge-receipt.md). This is not activation or full Foundation acceptance.
 
 ## Behavior
 
