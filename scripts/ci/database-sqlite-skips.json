@@ -3,6 +3,14 @@
   "purpose": "reviewed-mysql-only-sqlite-skip-methods",
   "methods": [
     [
+      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
+      "test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
+      "test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"
+    ],
+    [
       "Tests\\Feature\\BulkTrackTagsConcurrencyTest",
       "test_authority_withdrawal_and_batch_serialize_on_the_persisted_actor_row"
     ],
@@ -95,6 +103,54 @@
       "test_withdrawal_at_the_exact_user_lock_prevents_claim_commit"
     ],
     [
+      "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+      "test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
+      "test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionNativeAdmissionTest",
+      "test_foreign_reserved_constraint_is_refused_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapConcurrencyTest",
+      "test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_native_check_and_fk_names_have_separate_constraint_namespaces"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_native_fk_collision_preserves_complete_existing_prefix_and_retry_after_foreign_removal"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_native_foreign_case_variant_check_is_refused_without_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_native_foreign_fk_reserved_symbol_is_refused_before_owned_tables_or_guards"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
+      "test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySitemapSchemaTest",
+      "test_native_case_variant_reserved_name_refuses_admission"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_committed_writers_before_final_fence_refuse_prechange_capture"
+    ],
+    [
+      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
+      "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
+    ],
+    [
       "Tests\\Feature\\ExclusiveOfferConcurrencyTest",
       "test_independent_connections_preserve_preparation_identity_and_scope_controls"
     ],
@@ -111,6 +167,10 @@
       "test_atomic_exclusive_pricing_and_attempts_under_real_lock_contention"
     ],
     [
+      "Tests\\Feature\\FreeGrantConcurrencyTest",
+      "test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity"
+    ],
+    [
       "Tests\\Feature\\HostedCheckoutConcurrencyTest",
       "test_concurrent_initial_creation_reuses_one_committed_intent_and_cannot_bind_two_provider_sessions"
     ],
@@ -125,6 +185,26 @@
     [
       "Tests\\Feature\\InquiryConversationConcurrencyTest",
       "test_committed_inquiry_and_actor_fences_decide_waiting_conversation_operations"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationConcurrencyTest",
+      "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
+    ],
+    [
+      "Tests\\Feature\\InquiryNotificationMigrationTest",
+      "test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl"
     ],
     [
       "Tests\\Feature\\LicenseTemplateAuthoringConcurrencyTest",
@@ -159,6 +239,30 @@
       "test_media_and_publication_writers_serialize_without_a_late_actor_fk_cycle"
     ],
     [
+      "Tests\\Feature\\MembershipCreditConcurrencyTest",
+      "test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write"
+    ],
+    [
+      "Tests\\Feature\\MembershipCreditConcurrencyTest",
+      "test_independent_primary_processes_serialize_exact_ledger_and_plan_effects"
+    ],
+    [
+      "Tests\\Feature\\MembershipCreditEngineTest",
+      "test_an_altered_myisam_session_cannot_replace_membership_innodb_constraints_or_atomicity"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_dependencies_reaching_the_selected_schema_are_still_refused"
+    ],
+    [
+      "Tests\\Feature\\NativeSchemaIsolationTest",
+      "test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"
+    ],
+    [
       "Tests\\Feature\\OrderInquiryConcurrencyTest",
       "test_current_publication_operator_and_customer_fences_serialize_both_commit_orders"
     ],
@@ -173,6 +277,26 @@
     [
       "Tests\\Feature\\OrderPreparationConcurrencyTest",
       "test_scope_block_committed_before_owner_mutex_acquisition_prevents_both_orders"
+    ],
+    [
+      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
+      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
+      "test_committed_role_or_required_mfa_withdrawal_wins_the_exact_actor_fence"
+    ],
+    [
+      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
+      "test_distinct_actor_competing_reviews_wait_on_the_exact_parent_and_only_first_commits"
+    ],
+    [
+      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
+      "test_duplicate_create_capture_waits_on_actor_and_returns_one_definition_without_duplicate_history"
+    ],
+    [
+      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
+      "test_snapshot_reads_the_after_fence_committed_history_despite_a_callback_created_mvcc_snapshot"
     ],
     [
       "Tests\\Feature\\ProductDraftConcurrencyTest",
@@ -197,6 +321,178 @@
     [
       "Tests\\Feature\\ProductMemberRefreshConcurrencyTest",
       "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutCommittedRowsTest",
+      "test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutMigrationTest",
+      "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutMigrationTest",
+      "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutMigrationTest",
+      "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
+      "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"
+    ],
+    [
+      "Tests\\Feature\\ProductionFeatures\\ProductionFeatureNativeAdmissionTest",
+      "test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFeatures\\ProductionFeatureNativeAdmissionTest",
+      "test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_temporary_shadow_of_an_owned_table_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
+      "test_native_plain_closed_prefix_does_not_wait_for_or_acquire_mutable_identity_row_locks"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+      "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
+      "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
+      "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "test_competing_completion_waits_on_exact_address_and_retains_one_verification"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
+      "test_competing_workers_wait_on_exact_address_then_handoff_only_once"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_concurrent_first_requests_for_new_addresses_create_one_fence_with_one_or_two_keys"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_mixed_configuration_processes_create_two_fences_and_the_address_is_then_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
+      "test_two_candidate_recoveries_wait_on_the_exact_old_key_fence_then_serialize_without_deadlock"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
+      "test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeCrossInvoiceClaimTest",
+      "test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalOwnershipRaceTest",
+      "test_independent_transactions_with_older_snapshots_cannot_share_any_endpoint_across_ledgers"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
+      "test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+      "test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
+      "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_changed_enum_check_is_not_normalized_into_owned_provenance"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary"
+    ],
+    [
+      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
+      "test_native_installation_has_exact_lineage_and_retention_guards"
+    ],
+    [
+      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
+      "test_owned_table_name_used_by_a_foreign_trigger_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
+      "test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
+      "test_temporary_shadow_of_an_owned_table_refuses_held_admission"
+    ],
+    [
+      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
+      "test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+      "test_native_installer_refuses_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+      "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPolicyConcurrencyTest",
+      "test_exact_source_review_and_authority_serialize_both_commit_orders"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPolicyEngineTest",
+      "test_owned_policy_tables_require_innodb_when_session_defaults_to_myisam"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_changed_capture_cannot_recover_winner_in_either_worker_order"
+    ],
+    [
+      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
+      "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"
     ],
     [
       "Tests\\Feature\\PromotionAdministrationMySqlConcurrencyTest",
@@ -284,11 +580,31 @@
     ],
     [
       "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
+      "test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
       "test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"
     ],
     [
       "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
       "test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectCommittedReadTest",
+      "test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectCommittedSchemaIndependentTest",
+      "test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectConcurrencyTest",
+      "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"
+    ],
+    [
+      "Tests\\Feature\\ServiceProjectCurrentAuthorityTest",
+      "test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback"
     ],
     [
       "Tests\\Feature\\SharedInventoryConcurrencyTest",
@@ -381,6 +697,14 @@
     [
       "Tests\\Feature\\StripeWebhookConcurrencyTest",
       "test_simultaneous_equivalent_deliveries_acknowledge_one_committed_receipt"
+    ],
+    [
+      "Tests\\Feature\\SupportAttachmentNativeConcurrencyTest",
+      "test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"
+    ],
+    [
+      "Tests\\Feature\\SupportAttachmentSchemaClosureTest",
+      "test_native_case_variant_reserved_name_is_not_exact_owned_namespace"
     ],
     [
       "Tests\\Feature\\TestContractIssuanceConcurrencyTest",
@@ -535,50 +859,6 @@
       "test_publication_writer_committed_first_is_observed_after_the_exact_track_row_wait"
     ],
     [
-      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
-      "test_all_selected_draft_template_lifecycle_and_current_authority_fences_serialize_both_commit_orders"
-    ],
-    [
-      "Tests\\Feature\\BulkReplaceLicenseDraftSourceConcurrencyTest",
-      "test_explicit_capture_reads_only_the_after_fence_committed_state_and_later_apply_retains_that_exact_review"
-    ],
-    [
-      "Tests\\Feature\\MembershipCreditConcurrencyTest",
-      "test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write"
-    ],
-    [
-      "Tests\\Feature\\MembershipCreditConcurrencyTest",
-      "test_independent_primary_processes_serialize_exact_ledger_and_plan_effects"
-    ],
-    [
-      "Tests\\Feature\\MembershipCreditEngineTest",
-      "test_an_altered_myisam_session_cannot_replace_membership_innodb_constraints_or_atomicity"
-    ],
-    [
-      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
-      "test_committed_role_or_required_mfa_withdrawal_wins_the_exact_actor_fence"
-    ],
-    [
-      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
-      "test_distinct_actor_competing_reviews_wait_on_the_exact_parent_and_only_first_commits"
-    ],
-    [
-      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
-      "test_duplicate_create_capture_waits_on_actor_and_returns_one_definition_without_duplicate_history"
-    ],
-    [
-      "Tests\\Feature\\PrivateProductDraftConcurrencyTest",
-      "test_snapshot_reads_the_after_fence_committed_history_despite_a_callback_created_mvcc_snapshot"
-    ],
-    [
-      "Tests\\Feature\\ProductionTrackPolicyConcurrencyTest",
-      "test_exact_source_review_and_authority_serialize_both_commit_orders"
-    ],
-    [
-      "Tests\\Feature\\ProductionTrackPolicyEngineTest",
-      "test_owned_policy_tables_require_innodb_when_session_defaults_to_myisam"
-    ],
-    [
       "Tests\\Feature\\TransactionalNotificationConcurrencyTest",
       "test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write"
     ],
@@ -595,284 +875,8 @@
       "test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"
     ],
     [
-      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
-      "test_same_capture_miss_gap_replays_exact_packet_in_both_commit_orders"
-    ],
-    [
-      "Tests\\Feature\\ProductionTrackPreparationReplayConcurrencyTest",
-      "test_changed_capture_cannot_recover_winner_in_either_worker_order"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
-      "test_committed_writers_before_final_fence_refuse_prechange_capture"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySnapshotConcurrencyTest",
-      "test_writer_waits_on_actual_final_epoch_record_and_retained_capture_then_refuses_consumption"
-    ],
-    [
-      "Tests\\Feature\\InquiryNotificationMigrationTest",
-      "test_nonempty_notification_table_with_a_missing_mysql_foreign_key_is_never_retroactively_adopted"
-    ],
-    [
-      "Tests\\Feature\\InquiryNotificationMigrationTest",
-      "test_changed_mysql_notification_foreign_key_is_refused_before_any_ddl"
-    ],
-    [
-      "Tests\\Feature\\InquiryNotificationMigrationTest",
-      "test_shortened_mysql_notification_due_index_prefix_is_refused_before_any_ddl"
-    ],
-    [
-      "Tests\\Feature\\InquiryNotificationMigrationTest",
-      "test_changed_mysql_notification_fk_support_index_in_a_partial_installation_is_refused_before_any_ddl"
-    ],
-    [
-      "Tests\\Feature\\InquiryNotificationConcurrencyTest",
-      "test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"
-    ],
-    [
-      "Tests\\Feature\\ServiceProjectConcurrencyTest",
-      "test_two_staff_quotes_wait_on_the_exact_project_and_current_reads_reject_old_mvcc_state"
-    ],
-    [
-      "Tests\\Feature\\ServiceProjectCurrentAuthorityTest",
-      "test_temporary_users_copy_cannot_mask_permanent_required_mfa_withdrawal_after_real_audit_callback"
-    ],
-    [
       "Tests\\Unit\\MysqlConnectionTimezoneTest",
       "test_native_session_is_utc_and_a_local_dst_gap_instant_round_trips_byte_identical"
-    ],
-    [
-      "Tests\\Feature\\NativeSchemaIsolationTest",
-      "test_a_peer_schema_whose_name_extends_the_selected_name_does_not_block_a_fresh_migration"
-    ],
-    [
-      "Tests\\Feature\\NativeSchemaIsolationTest",
-      "test_dependencies_reaching_the_selected_schema_are_still_refused"
-    ],
-    [
-      "Tests\\Feature\\NativeSchemaIsolationTest",
-      "test_same_named_objects_in_a_parallel_schema_do_not_block_a_fresh_migration"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\IdentityInspectionCostTest",
-      "test_one_native_inspection_issues_a_small_fixed_number_of_statements"
-    ],
-    [
-      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
-      "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
-    ],
-    [
-      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
-      "test_native_installer_refuses_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
-      "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
-    ],
-    [
-      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
-      "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
-    ],
-    [
-      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
-      "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
-      "test_native_schema_global_check_symbol_collision_is_refused_before_the_first_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
-      "test_native_temporary_shadow_of_an_owned_table_is_refused"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
-      "test_two_candidate_recoveries_wait_on_the_exact_old_key_fence_then_serialize_without_deadlock"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
-      "test_concurrent_first_requests_for_new_addresses_create_one_fence_with_one_or_two_keys"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ReviewIdentityKeyRotationNativeRaceTest",
-      "test_mixed_configuration_processes_create_two_fences_and_the_address_is_then_refused"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
-      "test_a_stale_settled_retrieval_from_a_second_process_is_refused_after_a_newer_reversal"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
-      "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
-      "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
-      "test_native_changed_enum_check_is_not_normalized_into_owned_provenance"
-    ],
-    [
-      "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalSchemaPreparationTest",
-      "test_native_global_check_reservation_is_inspected_before_the_first_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeStaleRetrievalRaceTest",
-      "test_a_stale_retrieval_whose_worker_clock_runs_ahead_is_still_refused_after_a_newer_reversal"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
-      "test_a_retrieval_stalled_before_its_reads_appends_the_reversal_and_the_overlapping_older_settled_read_cannot_follow_it"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalRetrievalRaceTest",
-      "test_a_retrieval_stalled_before_its_reads_is_refused_for_retry_after_an_overlapping_settled_append_and_the_retry_records_the_reversal"
-    ],
-    [
-      "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeCrossInvoiceClaimTest",
-      "test_claiming_and_retrieving_unrelated_invoices_never_waits_for_another_invoices_append_lock"
-    ],
-    [
-      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
-      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
-      "test_foreign_reserved_native_foreign_key_refuses_before_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\CustomerSuppressionKeyAdmissionTest",
-      "test_native_dictionary_collation_alias_of_reserved_constraint_refuses_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\CustomerSuppressionNativeAdmissionTest",
-      "test_foreign_reserved_constraint_is_refused_before_any_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapConcurrencyTest",
-      "test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
-      "test_native_check_and_fk_names_have_separate_constraint_namespaces"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
-      "test_native_fk_collision_preserves_complete_existing_prefix_and_retry_after_foreign_removal"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
-      "test_native_foreign_case_variant_check_is_refused_without_any_ddl"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
-      "test_native_foreign_fk_reserved_symbol_is_refused_before_owned_tables_or_guards"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapNamespaceAdmissionTest",
-      "test_native_foreign_table_local_unique_names_do_not_reserve_owned_constraint_names"
-    ],
-    [
-      "Tests\\Feature\\DiscoverySitemapSchemaTest",
-      "test_native_case_variant_reserved_name_refuses_admission"
-    ],
-    [
-      "Tests\\Feature\\FreeGrantConcurrencyTest",
-      "test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity"
-    ],
-    [
-      "Tests\\Feature\\ProductionCheckoutCommittedRowsTest",
-      "test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks"
-    ],
-    [
-      "Tests\\Feature\\ProductionCheckoutMigrationTest",
-      "test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table"
-    ],
-    [
-      "Tests\\Feature\\ProductionCheckoutMigrationTest",
-      "test_native_foreign_constraint_dictionary_identity_refuses_before_any_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionCheckoutMigrationTest",
-      "test_native_unowned_stored_routine_reference_refuses_before_any_owned_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionCheckoutNativeRaceTest",
-      "test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order"
-    ],
-    [
-      "Tests\\Feature\\ProductionFeatures\\ProductionFeatureNativeAdmissionTest",
-      "test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionFeatures\\ProductionFeatureNativeAdmissionTest",
-      "test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentityAdapters\\IdentityHistoricalCommittedReceiptTest",
-      "test_native_plain_closed_prefix_does_not_wait_for_or_acquire_mutable_identity_row_locks"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
-      "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityMigrationTest",
-      "test_native_dictionary_unicode_guard_alias_on_foreign_table_is_refused"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
-      "test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
-      "test_competing_completion_waits_on_exact_address_and_retains_one_verification"
-    ],
-    [
-      "Tests\\Feature\\ProductionIdentity\\ProductionIdentityNativeRaceTest",
-      "test_competing_workers_wait_on_exact_address_then_handoff_only_once"
-    ],
-    [
-      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
-      "test_native_installation_has_exact_lineage_and_retention_guards"
-    ],
-    [
-      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
-      "test_owned_table_name_used_by_a_foreign_trigger_refuses_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
-      "test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
-      "test_temporary_shadow_of_an_owned_table_refuses_held_admission"
-    ],
-    [
-      "Tests\\Feature\\ProductionSuppression\\ProductionSuppressionNativeAdmissionTest",
-      "test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"
-    ],
-    [
-      "Tests\\Feature\\ServiceProjectCommittedReadTest",
-      "test_permanent_native_view_cannot_replace_any_captured_table_even_with_identical_original_rows"
-    ],
-    [
-      "Tests\\Feature\\ServiceProjectCommittedSchemaIndependentTest",
-      "test_permanent_view_cannot_replace_the_captured_source_event_table_after_commit"
-    ],
-    [
-      "Tests\\Feature\\SupportAttachmentNativeConcurrencyTest",
-      "test_native_last_file_reservation_serializes_real_contenders_and_retains_exact_originals"
-    ],
-    [
-      "Tests\\Feature\\SupportAttachmentSchemaClosureTest",
-      "test_native_case_variant_reserved_name_is_not_exact_owned_namespace"
-    ],
-    [
-      "Tests\\Feature\\RightsScopeWriterConcurrencyTest",
-      "test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"
     ]
   ]
 }

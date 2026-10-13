@@ -65,6 +65,8 @@
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
+    "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
