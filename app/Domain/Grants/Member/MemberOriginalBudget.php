@@ -41,6 +41,11 @@ final class MemberOriginalBudget implements JsonSerializable
         throw new MemberGrantException('private_budget');
     }
 
+    public function __unserialize(array $data): void
+    {
+        throw new MemberGrantException('private_budget');
+    }
+
     public function __clone(): never
     {
         throw new MemberGrantException('private_budget');

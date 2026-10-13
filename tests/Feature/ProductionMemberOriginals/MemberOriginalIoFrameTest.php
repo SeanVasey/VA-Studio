@@ -7,8 +7,10 @@ use App\Domain\Grants\Member\MemberOriginalIoFrame;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use PDO;
 use ReflectionProperty;
 use Tests\TestCase;
@@ -83,6 +85,79 @@ class MemberOriginalIoFrameTest extends TestCase
             $this->assertFalse($connection->getPdo()->inTransaction());
         } finally {
             $read->rollBack();
+        }
+    }
+
+    public function test_direct_handle_transaction_at_framework_zero_is_refused_and_preserved(): void
+    {
+        $connection = DB::connection();
+        $direct = new PDO('sqlite::memory:');
+        $connection->setDirectPdo($direct);
+        $frame = MemberOriginalIoFrame::captureIdle();
+        $direct->beginTransaction();
+        try {
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->refused(fn () => $frame->assertStillIdle(), 'io_transaction');
+            $this->refused(fn () => MemberOriginalIoFrame::captureIdle(), 'io_transaction');
+            $this->assertTrue($direct->inTransaction());
+            $this->assertFalse($connection->getPdo()->inTransaction());
+        } finally {
+            $direct->rollBack();
+        }
+    }
+
+    public function test_direct_handle_replacement_and_lazy_slot_are_refused_without_resolution(): void
+    {
+        $connection = DB::connection();
+        $connection->setDirectPdo(new PDO('sqlite::memory:'));
+        $frame = MemberOriginalIoFrame::captureIdle();
+        $connection->setDirectPdo(new PDO('sqlite::memory:'));
+        $this->refused(fn () => $frame->assertStillIdle(), 'io_frame');
+        $calls = 0;
+        $connection->setDirectPdo(function () use (&$calls) {
+            $calls++;
+
+            return new PDO('sqlite::memory:');
+        });
+        $this->refused(fn () => MemberOriginalIoFrame::captureIdle(), 'io_frame');
+        $this->assertSame(0, $calls);
+    }
+
+    public function test_database_facade_cannot_point_to_a_foreign_resolved_manager(): void
+    {
+        $manager = app('db');
+        $frame = MemberOriginalIoFrame::captureIdle();
+        $foreign = clone $manager;
+        $connections = new ReflectionProperty(DatabaseManager::class, 'connections');
+        $native = new PDO('sqlite::memory:');
+        $foreignConnection = new SQLiteConnection($native, ':memory:', '', ['driver' => 'sqlite']);
+        $connections->setValue($foreign, ['member_io' => $foreignConnection]);
+        DB::swap($foreign);
+        app()->instance('db', $manager);
+        $native->beginTransaction();
+        try {
+            $this->assertSame($manager, app('db'));
+            $this->assertSame($foreign, DB::getFacadeRoot());
+            $this->refused(fn () => $frame->assertStillIdle(), 'io_frame');
+            $this->refused(fn () => MemberOriginalIoFrame::captureIdle(), 'io_frame');
+            $this->assertTrue($native->inTransaction());
+        } finally {
+            $native->rollBack();
+            DB::swap($manager);
+        }
+    }
+
+    public function test_facade_application_identity_cannot_change_behind_the_captured_container(): void
+    {
+        $frame = MemberOriginalIoFrame::captureIdle();
+        $application = app();
+        Facade::setFacadeApplication(new Container);
+        try {
+            $this->assertSame($application, Container::getInstance());
+            $this->refused(fn () => $frame->assertStillIdle(), 'io_frame');
+            $this->refused(fn () => MemberOriginalIoFrame::captureIdle(), 'io_frame');
+        } finally {
+            Facade::setFacadeApplication($application);
         }
     }
 
@@ -192,6 +267,12 @@ class MemberOriginalIoFrameTest extends TestCase
         foreach ([fn () => clone $frame, fn () => serialize($frame), fn () => json_encode($frame)] as $copy) {
             $this->refused($copy, 'private_io_frame');
         }
+    }
+
+    public function test_io_frame_object_restoration_is_explicitly_refused(): void
+    {
+        $name = MemberOriginalIoFrame::class;
+        $this->refused(fn () => unserialize('O:'.strlen($name).':"'.$name.'":0:{}'), 'private_io_frame');
     }
 
     private function refused(callable $operation, string $reason): void

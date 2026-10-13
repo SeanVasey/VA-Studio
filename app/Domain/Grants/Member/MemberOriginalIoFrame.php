@@ -8,6 +8,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Facades\Facade;
 use JsonSerializable;
 use PDO;
 use Pdo\Mysql;
@@ -74,8 +75,11 @@ final class MemberOriginalIoFrame implements JsonSerializable
     {
         MemberGrantException::require(Container::getInstance() === $this->container, 'io_frame');
         $instances = self::raw(Container::class, 'instances', $this->container);
+        $facades = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         MemberGrantException::require(is_array($instances) && ($instances['config'] ?? null) === $this->repository
             && ($instances['db'] ?? null) === $this->manager
+            && (new ReflectionProperty(Facade::class, 'app'))->getValue() === $this->container
+            && is_array($facades) && ($facades['db'] ?? null) === $this->manager
             && self::raw(DatabaseManager::class, 'app', $this->manager) === $this->container, 'io_frame');
         $items = self::raw(Repository::class, 'items', $this->repository);
         MemberGrantException::require(is_array($items), 'io_frame');
@@ -89,10 +93,12 @@ final class MemberOriginalIoFrame implements JsonSerializable
         MemberGrantException::require(self::raw(Connection::class, 'transactions', $connection) === 0, 'io_transaction');
         $write = self::raw(Connection::class, 'pdo', $connection);
         $read = self::raw(Connection::class, 'readPdo', $connection);
+        $direct = self::raw(Connection::class, 'directPdo', $connection);
         // Lazy handles must be resolved during setup, before taking this complete snapshot.
-        MemberGrantException::require($write instanceof PDO && ($read === null || $read instanceof PDO), 'io_frame');
+        MemberGrantException::require($write instanceof PDO && ($read === null || $read instanceof PDO)
+            && ($direct === null || $direct instanceof PDO), 'io_frame');
         $driver = get_class($connection) === SQLiteConnection::class ? 'sqlite' : 'mysql';
-        foreach ([$write, $read] as $pdo) {
+        foreach ([$write, $read, $direct] as $pdo) {
             if ($pdo === null) {
                 continue;
             }
@@ -104,10 +110,12 @@ final class MemberOriginalIoFrame implements JsonSerializable
         $remaining = 10000;
         $config = self::raw(Connection::class, 'config', $connection);
         $readConfig = self::raw(Connection::class, 'readPdoConfig', $connection);
-        MemberGrantException::require(is_array($config) && is_array($readConfig)
+        $directConfig = self::raw(Connection::class, 'directPdoConfig', $connection);
+        MemberGrantException::require(is_array($config) && is_array($readConfig) && is_array($directConfig)
             && ($config['driver'] ?? null) === $driver, 'io_frame');
 
-        return [$write, $read, self::copy($config, $remaining), self::copy($readConfig, $remaining)];
+        return [$write, $read, $direct, self::copy($config, $remaining), self::copy($readConfig, $remaining),
+            self::copy($directConfig, $remaining)];
     }
 
     private static function raw(string $class, string $property, object $object): mixed
@@ -139,6 +147,11 @@ final class MemberOriginalIoFrame implements JsonSerializable
     }
 
     public function jsonSerialize(): never
+    {
+        throw new MemberGrantException('private_io_frame');
+    }
+
+    public function __unserialize(array $data): void
     {
         throw new MemberGrantException('private_io_frame');
     }

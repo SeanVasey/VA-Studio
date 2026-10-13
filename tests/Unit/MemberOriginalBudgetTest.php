@@ -40,4 +40,13 @@ class MemberOriginalBudgetTest extends TestCase
             }
         }
     }
+
+    public function test_budget_cannot_be_restored_with_a_caller_selected_deadline(): void
+    {
+        $name = MemberOriginalBudget::class;
+        $private = "\0".$name."\0deadline";
+        $payload = 'O:'.strlen($name).':"'.$name.'":1:{s:'.strlen($private).':"'.$private.'";i:'.PHP_INT_MAX.';}';
+        $this->expectExceptionObject(new MemberGrantException('private_budget'));
+        unserialize($payload);
+    }
 }
