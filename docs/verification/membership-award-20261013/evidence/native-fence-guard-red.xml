@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php" tests="1" assertions="3" errors="0" failures="1" skipped="0" time="110.029211">
+    <testcase name="test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php" line="16" class="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingAwardFenceDefinitionTest" assertions="3" time="110.029211">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard
+SHOW must see the current trigger inventory.
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &amp;0 []
++Array &amp;0 [
++    0 =&gt; Array &amp;1 [
++        'Trigger' =&gt; 'production_membership_billing_events_award_fence',
++        'Event' =&gt; 'INSERT',
++        'Table' =&gt; 'production_membership_billing_events',
++        'Statement' =&gt; 'BEGIN DECLARE fence_id INTEGER DEFAULT NULL; SELECT id INTO fence_id FROM `production_membership_billing_award_fence` WHERE id = 1 FOR UPDATE; IF fence_id IS NULL OR fence_id &lt;&gt; 1 THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain billing award fence'; END IF; END',
++        'Timing' =&gt; 'BEFORE',
++        'Created' =&gt; '2026-10-13 02:40:17.25',
++        'sql_mode' =&gt; 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',
++        'Definer' =&gt; 'root@localhost',
++        'character_set_client' =&gt; 'utf8mb4',
++        'collation_connection' =&gt; 'utf8mb4_unicode_ci',
++        'Database Collation' =&gt; 'utf8mb4_unicode_ci',
++    ],
++]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php:34
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

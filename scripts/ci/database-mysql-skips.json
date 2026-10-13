@@ -51,6 +51,14 @@
       "test_parent_floor_drift_is_refused_before_the_first_owned_ddl"
     ],
     [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest",
+      "test_sqlite_replay_lock_holds_writer_intent_even_without_a_period_insert"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingSubscriptionApprovalTest",
+      "test_encryption_callback_cannot_remove_a_billing_guard_before_the_write"
+    ],
+    [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
       "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references"
     ],

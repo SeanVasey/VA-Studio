@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+  "pre_run_inventory_files": 1841,
+  "all_1841_pre_run_hashes_match_commit": true,
+  "post_run_receipt_unchanged": true,
+  "inventory_scope": "PHP files under app/, tests/ and database/migrations/; not a complete vendor/environment inventory.",
+  "pre_run_receipt": "evidence/native-races-final.sources.json",
+  "post_run_receipt": "evidence/native-races-final.source-check.json",
+  "later_commit": "2534d99a84c67f33fad841a2a46c25769b434857",
+  "later_commit_changed_files": 120,
+  "later_commit_docs_only": true,
+  "concurrent_workload": {
+    "basis": "Development lead records overlapping ten-case native schema selection; runner DB settings independently inspected, no result inferred while that run remains pending.",
+    "same_private_instance": true,
+    "mysql_version": "8.4.11",
+    "socket": "/workspace/runtime/mysql-policy-run/mysql.sock",
+    "port": 33413,
+    "race_database": "vaseyaudio_membership_award_profile",
+    "concurrent_schema_database": "vaseyaudio_membership_award",
+    "concurrent_schema_selected_cases": 10,
+    "concurrent_schema_result": "pending at this race evidence append"
+  },
+  "not_claimed": "No serialized-server performance measurement, host/provider verification, pending schema result or isolated clock-test result."
+}

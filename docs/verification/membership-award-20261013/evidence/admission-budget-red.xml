@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php" tests="1" assertions="6" errors="0" failures="1" skipped="0" time="3.479791">
+    <testcase name="test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php" line="46" class="Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipAwardDeadlineTest" assertions="6" time="3.479791">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline
+Twenty synthetic seconds must remain inside the original admission deadline.
+Failed asserting that 'operation_deadline' is null.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php:61
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

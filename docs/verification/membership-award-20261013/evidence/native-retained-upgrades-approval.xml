@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="25" errors="0" failures="0" skipped="0" time="252.276120">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php" tests="1" assertions="11" errors="0" failures="0" skipped="0" time="79.846650">
+      <testcase name="test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php" line="45" class="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingAwardFenceTest" assertions="11" time="79.846650"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="88.227737">
+      <testcase name="test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php" line="55" class="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIntervalOwnershipTest" assertions="5" time="88.227737"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="84.201734">
+      <testcase name="test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="50" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="9" time="84.201734"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

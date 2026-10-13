@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipNativeAwardRaceTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php" tests="3" assertions="69" errors="0" failures="0" skipped="0" time="412.830522">
+    <testcase name="test_concurrent_owned_awards_return_identical_ids_and_commit_one_period_and_one_event" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php" line="65" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeAwardRaceTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeAwardRaceTest" assertions="25" time="146.402379"/>
+    <testcase name="test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php" line="94" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeAwardRaceTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeAwardRaceTest" assertions="21" time="132.743389"/>
+    <testcase name="test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php" line="122" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeAwardRaceTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeAwardRaceTest" assertions="23" time="133.684754"/>
+  </testsuite>
+</testsuites>

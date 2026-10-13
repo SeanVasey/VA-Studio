@@ -1,0 +1,32 @@
+{
+  "base_application_commit": "9ec090737e66e7f89075600cca96a6174ef2076d",
+  "variants": {
+    "native-batch-1": {
+      "patch_sha256": "51ac92f11f81e136aaa27843bf3470326ed38afe1e75dfb8fcd6bbe3e3ae74c5",
+      "source_sha256": {
+        "app/Domain/Memberships/Production/MembershipSchema.php": "30d2107e8d42f07ada6cf9b1f96e15157fc2f8a9db322058efcd9e4f72120849",
+        "app/Domain/Memberships/Billing/BillingSchema.php": "6591bc163b2c5d2b456d906f169aca23f167236540c30a648f15ac5f26001c0f",
+        "app/Domain/Memberships/Production/MembershipSchemaCatalog.php": "73b718abacbda9b904a61742f89e8f63199ef8a1bbcd3dff505de7784abeaf97"
+      },
+      "patch_applies_to_base": true,
+      "all_reconstructed_hashes_match_recorded_receipt": true
+    },
+    "native-batch-2": {
+      "patch_sha256": "c12677963e57bf056f48bb1aa4085b136da3575840f181e453f730f1304019f2",
+      "source_sha256": {
+        "app/Domain/Memberships/Production/MembershipSchema.php": "cc5d5ed89c11db96a6ab4a90b30871de700c27fb988a4eb59bfa96b1352db8bf",
+        "app/Domain/Memberships/Billing/BillingSchema.php": "0318f1831f5670aa666c91762e931b89f73d7ec8a4066423fd248a9aafa38d79",
+        "app/Domain/Memberships/Production/MembershipSchemaCatalog.php": "d6ab1c31742c474467abe38dbe5efb3b04a00eef6174ee2223fd5ad924392552"
+      },
+      "patch_applies_to_base": true,
+      "all_reconstructed_hashes_match_recorded_receipt": true
+    }
+  },
+  "sqlite_schema_batch_variant": "native-batch-1",
+  "final_pint": {
+    "recorded_files": 33,
+    "base_plus_native_batch_2_hashes_match": true,
+    "source_sha256_record": "final-pint-command.json"
+  },
+  "verified_at_utc": "2026-10-13T03:29:03.516120+00:00"
+}

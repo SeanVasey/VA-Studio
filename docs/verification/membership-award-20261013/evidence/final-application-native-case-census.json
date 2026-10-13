@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "kind": "four_completed_final_application_native_selections",
+  "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+  "integrated_source_reference": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+  "run_names": [
+    "native-final-canary",
+    "native-races-final",
+    "native-schema-final",
+    "deadline-frozen-clock-native"
+  ],
+  "totals": {
+    "tests": 17,
+    "assertions": 162,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "single_phpunit_run": false,
+  "all_full_case_identities_disjoint": true,
+  "synthetic_membership_clock_subset": {
+    "tests": 3,
+    "assertions": 38
+  },
+  "other_selected_native_cases": {
+    "tests": 14,
+    "assertions": 124
+  },
+  "excluded_historical_green_runs": [
+    "native-fence-canary-307699b6",
+    "native-retained-upgrades-approval"
+  ],
+  "excluded_scope": "All earlier native red/error runs, timing diagnostics, metadata probes and discovery listings remain archived but do not inflate final-app acceptance. This is focused coverage, not the whole native suite or a physical timing guarantee.",
+  "cases": [
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest",
+      "name": "test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+      "status": "passed",
+      "assertions": 15,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "run": "native-final-canary",
+      "source": {
+        "identity": "pre_run_inventory_plus_failed_broad_check_and_independent_relevant_source_verification",
+        "base_head_record": "evidence/native-final-canary.base",
+        "pre_run_inventory": "evidence/native-final-canary.sources.json",
+        "tracked_diff": "evidence/native-final-canary.patch",
+        "original_broad_post_run_check": "evidence/native-final-canary.source-check.json",
+        "independent_relevant_verification": "evidence/native-final-canary-relevant-source-verification.json",
+        "all_relevant_hashes_match_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+        "whole_tree_commit": null
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "name": "test_concurrent_owned_awards_return_identical_ids_and_commit_one_period_and_one_event",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+      "status": "passed",
+      "assertions": 25,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_concurrent_owned_awards_return_identical_ids_and_commit_one_period_and_one_event",
+      "run": "native-races-final",
+      "source": {
+        "identity": "committed_PHP_source_with_unchanged_before_after_inventory",
+        "application_test_migration_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "pre_run_head": "evidence/native-races-final.head",
+        "pre_run_inventory": "evidence/native-races-final.sources.json",
+        "post_run_source_check": "evidence/native-races-final.source-check.json",
+        "independent_verification": "evidence/native-races-final-source-verification.json",
+        "verified_files": 1841,
+        "later_docs_only_commit": "2534d99a84c67f33fad841a2a46c25769b434857",
+        "basis": "All 1841 recorded source hashes independently match 904f08d5; retained post-run check has no changed files. 2534d99a changed only docs after the run started."
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "name": "test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+      "status": "passed",
+      "assertions": 21,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award",
+      "run": "native-races-final",
+      "source": {
+        "identity": "committed_PHP_source_with_unchanged_before_after_inventory",
+        "application_test_migration_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "pre_run_head": "evidence/native-races-final.head",
+        "pre_run_inventory": "evidence/native-races-final.sources.json",
+        "post_run_source_check": "evidence/native-races-final.source-check.json",
+        "independent_verification": "evidence/native-races-final-source-verification.json",
+        "verified_files": 1841,
+        "later_docs_only_commit": "2534d99a84c67f33fad841a2a46c25769b434857",
+        "basis": "All 1841 recorded source hashes independently match 904f08d5; retained post-run check has no changed files. 2534d99a changed only docs after the run started."
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "name": "test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeAwardRaceTest.php",
+      "status": "passed",
+      "assertions": 23,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest::test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads",
+      "run": "native-races-final",
+      "source": {
+        "identity": "committed_PHP_source_with_unchanged_before_after_inventory",
+        "application_test_migration_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "pre_run_head": "evidence/native-races-final.head",
+        "pre_run_inventory": "evidence/native-races-final.sources.json",
+        "post_run_source_check": "evidence/native-races-final.source-check.json",
+        "independent_verification": "evidence/native-races-final-source-verification.json",
+        "verified_files": 1841,
+        "later_docs_only_commit": "2534d99a84c67f33fad841a2a46c25769b434857",
+        "basis": "All 1841 recorded source hashes independently match 904f08d5; retained post-run check has no changed files. 2534d99a changed only docs after the run started."
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+      "name": "test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+      "status": "passed",
+      "assertions": 5,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest::test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+      "name": "test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php",
+      "status": "passed",
+      "assertions": 4,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest::test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "name": "test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl",
+      "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 3,
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest::test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "name": "test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary",
+      "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 2,
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest::test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "name": "test_native_changed_enum_check_is_not_normalized_into_owned_provenance",
+      "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 2,
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest::test_native_changed_enum_check_is_not_normalized_into_owned_provenance",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest",
+      "name": "test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows",
+      "file": "tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 2,
+      "identity": "Tests\\Feature\\ProductionMembership\\MembershipSchemaPreparationTest::test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest",
+      "name": "test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 4,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest",
+      "name": "test_reserved_guard_name_collision_refuses_and_retains_foreign_marker",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+      "status": "passed",
+      "assertions": 2,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingSchemaPreparationTest::test_reserved_guard_name_collision_refuses_and_retains_foreign_marker",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest",
+      "name": "test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+      "status": "passed",
+      "assertions": 11,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceTest::test_each_missing_guard_and_empty_owned_seed_recover_without_changing_evidence",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest",
+      "name": "test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row",
+      "file": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+      "status": "passed",
+      "assertions": 5,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\BillingIntervalOwnershipTest::test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row",
+      "run": "native-schema-final",
+      "source": {
+        "identity": "committed_source_with_broad_unchanged_inventory",
+        "source_commit": "904f08d55fe832aacb37b76cbd04bd0d8a02d314",
+        "source_receipt": "evidence/native-schema-final.sources.json",
+        "post_run_check": "evidence/native-schema-final-source-check.txt",
+        "independent_verification": "evidence/native-schema-final-source-verification.json",
+        "verified_files": 2061,
+        "application_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d"
+      },
+      "synthetic_membership_clock": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+      "name": "test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+      "status": "passed",
+      "assertions": 12,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+      "run": "deadline-frozen-clock-native",
+      "source": {
+        "identity": "clean_isolated_committed_source_equivalent_to_integrated_source",
+        "source_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+        "pre_run_inventory": "evidence/deadline-frozen-clock-native.sources.json",
+        "post_run_source_check": "evidence/deadline-frozen-clock-native.source-check.json",
+        "independent_verification": "evidence/deadline-frozen-clock-native-source-verification.json",
+        "verified_php_files": 1841,
+        "all_declared_integrated_scope_files_equal": 2062
+      },
+      "synthetic_membership_clock": true
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+      "name": "test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+      "status": "passed",
+      "assertions": 14,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+      "run": "deadline-frozen-clock-native",
+      "source": {
+        "identity": "clean_isolated_committed_source_equivalent_to_integrated_source",
+        "source_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+        "pre_run_inventory": "evidence/deadline-frozen-clock-native.sources.json",
+        "post_run_source_check": "evidence/deadline-frozen-clock-native.source-check.json",
+        "independent_verification": "evidence/deadline-frozen-clock-native-source-verification.json",
+        "verified_php_files": 1841,
+        "all_declared_integrated_scope_files_equal": 2062
+      },
+      "synthetic_membership_clock": true
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest",
+      "name": "test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+      "status": "passed",
+      "assertions": 12,
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back",
+      "run": "deadline-frozen-clock-native",
+      "source": {
+        "identity": "clean_isolated_committed_source_equivalent_to_integrated_source",
+        "source_commit": "53070a8b8ca8a6b495c4b63296e2e065e553c859",
+        "integrated_equivalent_commit": "3a36ae0a7db5588fc45954a83e4ef024ed29bf07",
+        "application_and_migrations_commit": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+        "pre_run_inventory": "evidence/deadline-frozen-clock-native.sources.json",
+        "post_run_source_check": "evidence/deadline-frozen-clock-native.source-check.json",
+        "independent_verification": "evidence/deadline-frozen-clock-native-source-verification.json",
+        "verified_php_files": 1841,
+        "all_declared_integrated_scope_files_equal": 2062
+      },
+      "synthetic_membership_clock": true
+    }
+  ]
+}

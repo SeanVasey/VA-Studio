@@ -1,0 +1,110 @@
+[
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-1-tests.xml",
+    "bytes": 95202,
+    "sha256": "dcdcd5addd02df5808bca389a5ca95a6795efea72b2199d16eb6078a0ebf90b4",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-1.xml",
+    "bytes": 79669,
+    "sha256": "6b2594cc349e94b884c728220fbbf8ab26b74b61d1bbd5c1235b9c619683d26f",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-2-tests.xml",
+    "bytes": 99848,
+    "sha256": "28f009e97c8fba9ba1378965a583a855e10f53354aa3ac6a18dff4dd0a8e78bb",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-2.xml",
+    "bytes": 79047,
+    "sha256": "aec84f041ffb7561f2f4dd8b03baa2f1cddc8aedb07384e03b641b154cb536b5",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-3-tests.xml",
+    "bytes": 97113,
+    "sha256": "7f74d30f9ed907f8e33d82a47fa82e9e7180dd9f9e3eb2ff3c136388657aff4a",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-3.xml",
+    "bytes": 79567,
+    "sha256": "cd62423239a54bb0c986a4365ed7b3c0555fc0709e229d29a357ad3a2a2f7515",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-4-tests.xml",
+    "bytes": 88661,
+    "sha256": "61dc5ceb979bd8bc399035765f4c02b90e0485c68fd4fde7b7b67cd26ddf3fc1",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-4.xml",
+    "bytes": 79649,
+    "sha256": "c51f482d4a1186c84366f80b8e40bd40b797a9f76b135cf9b16d78dc6ddabdc3",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-5-tests.xml",
+    "bytes": 112748,
+    "sha256": "66fadff3c51196d5017f3e2c54f215efabdaf434343d21f223d7fcd9b43ecd95",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-5.xml",
+    "bytes": 79597,
+    "sha256": "323f138a29926af9afa0cb6a0ac4343f856f1564d52d6cbce2855f1baf6ce96b",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-6-tests.xml",
+    "bytes": 111606,
+    "sha256": "bd835eca9530085e2ae5fe7efba6c05275b30cddd2f032222bc91d1e2d00fcc0",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-6.xml",
+    "bytes": 78511,
+    "sha256": "c34b081a76adbc4c86b9804d20304c856a6af123d32864e2bf866c08f374c30f",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-7-tests.xml",
+    "bytes": 97164,
+    "sha256": "3f7855d91c06a9f17f0bfc01f852f5b59f32d7e40468aab2ac17a5045ee78a4d",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-7.xml",
+    "bytes": 79471,
+    "sha256": "7375f3de400d0dabbf056adc1aaf45a69ebf03ce4957e6a2e5babeaa69bef7a0",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-8-tests.xml",
+    "bytes": 100479,
+    "sha256": "4cc4ad66faf712776ece12d23cf1443781937bd50359eb2553ceb3c4eddcc99e",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-8.xml",
+    "bytes": 79547,
+    "sha256": "8f0e8efc8bed329406731732ceb70733381d39adadfcc9b571175444df444d62",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-manifest.json",
+    "bytes": 15540,
+    "sha256": "5444525c3a2e0f3037570a6ff4d14f8f06c43f5cf714e04f6e3bd918117b16e2",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  },
+  {
+    "runtime_path": "/workspace/runtime/membership-award-evidence/selection-census-files/phpunit-ci-mysql-source-tests.xml",
+    "bytes": 3052369,
+    "sha256": "6c1d394d01c98bacdc5555f037d03297b784330e61526bf568e3e1119b2b155b",
+    "archive": "Not copied: derivative --list-tests-xml output/configuration; selection-native-manifest.json and selection-summary.json are retained."
+  }
+]

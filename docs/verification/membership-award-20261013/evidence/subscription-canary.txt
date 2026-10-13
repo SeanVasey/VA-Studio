@@ -1,0 +1,40 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:03.203, Memory: 81.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'schema_version' => 1,
++    'account_id' => 1,
++    'account_public_id' => '9b51627e-f13a-400d-a130-76fe1861c783',
++    'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
++    'identity_policy_version' => 'personal-store-customer-identity-v1',
+     'origin_id' => '4c6433e4-9dee-4cc0-ad87-5f379ee7e3a4',
+     'provenance' => 'synthetic_rehearsal',
+-    'account_id' => 1,
+-    'account_public_id' => '9b51627e-f13a-400d-a130-76fe1861c783',
++    'schema_version' => 1,
+     'user_id' => 2,
++    'verification_observation_hash' => 'b0cc1e30d27afbf8f4662af941c605dfa7a499e2c6784092a4b3f1e21d80b67a',
+     'verification_observation_id' => '00ed3f19-ef8c-447d-ba15-a34ba2723ca4',
+-    'verification_observation_hash' => 'b0cc1e30d27afbf8f4662af941c605dfa7a499e2c6784092a4b3f1e21d80b67a',
+-    'identity_policy_version' => 'personal-store-customer-identity-v1',
+-    'identity_policy_hash' => 'eff029e47c7fe2364f25ab3ed68694b485531b542b6e3f82d18c29a361ea991c',
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php:59
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

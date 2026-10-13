@@ -1,0 +1,1907 @@
+{
+    "purpose": "single synthetic native owned-award diagnostic; no host or provider verification",
+    "metadata": {
+        "mysql_version": "8.4.11",
+        "connection_id": 39,
+        "thread": {
+            "THREAD_ID": 10485,
+            "INSTRUMENTED": "YES",
+            "HISTORY": "YES"
+        },
+        "consumers": [
+            {
+                "NAME": "events_statements_cpu",
+                "ENABLED": "NO"
+            },
+            {
+                "NAME": "events_statements_current",
+                "ENABLED": "YES"
+            },
+            {
+                "NAME": "events_statements_history",
+                "ENABLED": "YES"
+            },
+            {
+                "NAME": "events_statements_history_long",
+                "ENABLED": "NO"
+            },
+            {
+                "NAME": "global_instrumentation",
+                "ENABLED": "YES"
+            },
+            {
+                "NAME": "thread_instrumentation",
+                "ENABLED": "YES"
+            }
+        ],
+        "history_long_capacity": 10000,
+        "statement_instruments": [
+            {
+                "NAME": "statement/abstract/clone",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/abstract/new_packet",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/abstract/Query",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/abstract/relay_log",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Binlog Dump",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Binlog Dump GTID",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Change user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Close stmt",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Connect",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Connect Out",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Create DB",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Daemon",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Debug",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Delayed insert",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Drop DB",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Error",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Execute",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Fetch",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Field List",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Group Replication Data Stream subscription",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Init DB",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Kill",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Long Data",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Ping",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Prepare",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Processlist",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Quit",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Refresh",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Register Replica",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Reset Connection",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Reset stmt",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Set option",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Shutdown",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Sleep",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Statistics",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Table Dump",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/com/Time",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/scheduler/event",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sp/cclose",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/cfetch",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/copen",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/cpop",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/cpush",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/error",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/freturn",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/hpop",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/hpush_jump",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/hreturn",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/jump",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/jump_if_not",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/set",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/set_case_expr",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/set_trigger_field",
+                "ENABLED": "NO",
+                "TIMED": "NO"
+            },
+            {
+                "NAME": "statement/sp/stmt",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_db",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_event",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_function",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_instance",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_procedure",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_resource_group",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_server",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_table",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_tablespace",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/alter_user_default_role",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/analyze",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/assign_to_keycache",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/begin",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/binlog",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/call_procedure",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/change_db",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/change_repl_filter",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/change_replication_source",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/check",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/checksum",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/commit",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_db",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_event",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_function",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_index",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_procedure",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_resource_group",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_role",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_server",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_spatial_reference_system",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_table",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_trigger",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_udf",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/create_view",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/dealloc_sql",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/delete",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/delete_multi",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/do",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_db",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_event",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_function",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_index",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_procedure",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_resource_group",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_role",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_server",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_spatial_reference_system",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_table",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_trigger",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/drop_view",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/empty_query",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/error",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/execute_sql",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/explain_other",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/flush",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/get_diagnostics",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/grant",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/grant_roles",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/group_replication_start",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/group_replication_stop",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/ha_close",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/ha_open",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/ha_read",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/help",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/import",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/insert",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/insert_select",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/install_component",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/install_plugin",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/kill",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/load",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/lock_instance",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/lock_tables",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/optimize",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/preload_keys",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/prepare_sql",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/purge",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/purge_before_date",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/release_savepoint",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/rename_table",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/rename_user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/repair",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/replace",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/replace_select",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/replica_start",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/replica_stop",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/reset",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/resignal",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/restart",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/revoke",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/revoke_all",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/revoke_roles",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/rollback",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/rollback_to_savepoint",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/savepoint",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/select",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/set_option",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/set_password",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/set_resource_group",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/set_role",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_binary_log_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_binlog_events",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_binlogs",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_charsets",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_collations",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_db",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_event",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_func",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_proc",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_table",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_trigger",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_create_user",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_databases",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_engine_logs",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_engine_mutex",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_engine_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_errors",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_events",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_fields",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_function_code",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_function_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_grants",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_keys",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_open_tables",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_parse_tree",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_plugins",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_privileges",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_procedure_code",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_procedure_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_processlist",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_profile",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_profiles",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_relaylog_events",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_replica_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_replicas",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_storage_engines",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_table_status",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_tables",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_triggers",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_variables",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/show_warnings",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/shutdown",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/signal",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/truncate",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/uninstall_component",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/uninstall_plugin",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/unlock_instance",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/unlock_tables",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/update",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/update_multi",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_commit",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_end",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_prepare",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_recover",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_rollback",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            },
+            {
+                "NAME": "statement/sql/xa_start",
+                "ENABLED": "YES",
+                "TIMED": "YES"
+            }
+        ]
+    },
+    "wall_seconds": 15.43044981,
+    "outcome": {
+        "returned": false,
+        "error_class": "App\\Domain\\Memberships\\Production\\MembershipException",
+        "reason": "operation_deadline",
+        "durable_periods": 0,
+        "durable_award_events": 0,
+        "transaction_level": 0,
+        "pdo_transaction": false
+    },
+    "source_sha256_before": {
+        "app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php": "42b9e84d1e5543e3af48a3221deb9bca9cccbe8f3a195ab68bc90debb77b1a37",
+        "app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php": "60757cb1d9242eec6594956756a8adc4e31ca2162547fdc6e3c2360ed792c2f2",
+        "app/Domain/Commerce/ProductionPolicy/CloseProductionTrackCapabilities.php": "d27f621a42650453f6b5aaeba833fca077b213e5561c112553523ae7f122bf40",
+        "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e",
+        "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php": "a42d2b216d7815a44ad7743896edd92d3b001d4307dfe287aee97bedb79d4a7e",
+        "app/Domain/Commerce/ProductionPolicy/Models/ImmutableCapabilityEvidence.php": "c410d3df1f7a6166a3d383341070241b3f81fef73e06a3686fe709ee922cd14c",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityApproval.php": "5711b9e4bab2ecf899f490d24276f5636b6115375a2feef1af6c3c1b67bbd9a9",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityCandidate.php": "5e2566a169c95a90e056453c625998ce77e6db83b4717f7746069052491530d6",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityClosure.php": "098ddaeda17e75191c731c82aa7ec15e8a907e6f7d2903e10cb27c8ed06ca614",
+        "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php": "1e022477267c0b65a1b3d74b4aa81e76e89a1b5e543604be4f4528a9b553db05",
+        "app/Domain/Commerce/ProductionPolicy/PrepareProductionTrackCapabilities.php": "776464566491b43c4730b2142d3dc65cfd9d13e418291bc31a851c282dd47114",
+        "app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php": "510b5ade1cb84b0a475e258862c1448c6f9f9c8747a63796869dfb992fb50762",
+        "app/Domain/Commerce/ProductionPolicy/ReadProductionTrackCapabilities.php": "84219d870080b6d875653587fa80c3e0d66b4cba5517592927b65445804524d5",
+        "app/Domain/Commerce/ProductionPolicy/ReviewProductionTrackCapabilities.php": "024c867e62149f5a600d5742c32306610d89fc6889ee5339ff6f6195d3c375b6",
+        "app/Domain/Commerce/ProductionPolicy/SaveProductionTrackCapabilities.php": "af33007445f23118d1a000af691307357a3601dffe1281380ea77123d0be6b64",
+        "app/Domain/Commerce/ProductionPolicy/SourceCommitment.php": "4784f7794c2818d0b1b12e9f7173a470bf366c34d53ea74c678891693e6566b8",
+        "app/Domain/Customers/CustomerAccess.php": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+        "app/Domain/Customers/CustomerAccessException.php": "d838f9067c450f58b828effd8a148824a18cad766cb7bf3f3f59cba225e83e87",
+        "app/Domain/Customers/CustomerAccessPolicy.php": "3f4009de66e71b72a2138562631f6b7182af6c1c8ad7ee1178c7f55bf60d92b3",
+        "app/Domain/Customers/CustomerAccounts.php": "b61996873f9e3a1bcac6820b5d9696b3778fa75aced6221c6025d14c7198572f",
+        "app/Domain/Customers/CustomerIdentityCapture.php": "7237200aa79df4445715d8030668328eb4dadf24203914eaee75ac6bc9c791d8",
+        "app/Domain/Customers/CustomerIdentityChallenges.php": "ddef3fa4b2a9b664811efa36f9b872876b7031bc0abc7939a7df39e2e650352b",
+        "app/Domain/Customers/CustomerIdentityPolicy.php": "5ac7896fa90c2a68e0aa6efc93ebe5066e72da1a562bb28be53b4ac2a58ecb5d",
+        "app/Domain/Customers/CustomerPrincipal.php": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10",
+        "app/Domain/Customers/CustomerPurchaseClaimPolicy.php": "8d1c311fa41dccf13a8b5b0dbe61d9a0021049f817c28a54bcd7ff235d9b032c",
+        "app/Domain/Customers/CustomerPurchaseClaims.php": "06b280c6ad46e247e8287eeb02586e1a56c7fa657249718a15e50e1df9c88c31",
+        "app/Domain/Customers/CustomerSessions.php": "9d60f144d28c3baf93f5d0f8690ddecec16cc7b23e7ec5f41f1281fab97da5c8",
+        "app/Domain/Customers/Listening/ListeningEvidence.php": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+        "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+        "app/Domain/Customers/Listening/ListeningLibrary.php": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+        "app/Domain/Customers/Listening/ListeningRollout.php": "87889d622833bf06a4a6c23b0aa6d662ee48e1bfff1766eb7f5107507632eedd",
+        "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+        "app/Domain/Customers/Models/CustomerAccount.php": "4c58d768353c9281ced1231aba72bca9c853963b25c61f4c9a1732530e068f33",
+        "app/Domain/Customers/Models/CustomerIdentityChallenge.php": "2e9cf4e3789baff1712321248234c7c5f3e3c0df0f1469448e165a4d4abfbaff",
+        "app/Domain/Customers/Models/CustomerPurchaseChallenge.php": "ec62a32734bb75bcfa774b1c39e9f4299c93d70fd9fafe05013bcf2cc958110f",
+        "app/Domain/Customers/Models/CustomerPurchaseClaim.php": "3181aba8b49482a7657c1f3c0a68c90ca3f4d8b076e4295d81e9d2c61719932a",
+        "app/Domain/Customers/Preferences/ConsentEvidence.php": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+        "app/Domain/Customers/Preferences/ConsentException.php": "0f1c8ecc7372fb4ad8370a9dafeb9fb55e96a722210ff78fbe38397bdf6d93c2",
+        "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": "152586ce87d3f380de6b11f50f8b27152f02b8b343faa37cf7cc232785335ed6",
+        "app/Domain/Customers/Preferences/ConsentPolicy.php": "faf7bf988a35534cc9e18c6f68af3ec00f5185c1e5f196bf8eeaa08fa2639da1",
+        "app/Domain/Customers/Preferences/ConsentRuntime.php": "2115006f35a6929c0b4b439ecc58c06b51705b96a770ee607f0ecf9c13ae3490",
+        "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+        "app/Domain/Customers/Preferences/LocalConsentRuntime.php": "d7273df96fb10ae6f283303da40c5ec193d1bd0d4813055067ea8802363a3a75",
+        "app/Domain/Customers/Preferences/Models/ConsentEvent.php": "20cb33ca5d06d700375187840ca5bd90f6b6f5cdeed691dbe6bc499112371b05",
+        "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php": "113bfed543a32c8948dd40190363f32a8288a451fb5b4c3078c013c7b0c0b462",
+        "app/Domain/Customers/Preferences/Models/ConsentState.php": "1975503b1fd021f2867b0f1296127b67becdc43bddf283942aad8be6c87fa051",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionAttempt.php": "70974f48d0f621a222af38ac855eb3088299e4e65e18238e31e5ed9195244810",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionConfirmation.php": "6748f0ad19e6c670d0e775160fd7847c348200aa189fd8c923c5ecf19d573927",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionIntent.php": "21647934f9c2179fc7cff20dcf0a1a874696eb08c4f32d7190805868bc6dc3c5",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionTarget.php": "1430ea2f99824fce33ebda712ebca40be1ffecb1a7818be5638fad63a6905e6a",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionAdapter.php": "f0010a502909978510e31e53cf6a67a5b35fd25dfeca46e0890e9553ce026796",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php": "ca579a9a3a4cdf2e3cbdef26715f250a6393bc5f48ae670885af3e6a3a829b2b",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php": "220acdf3d6fe7d0de4d1276e5b0dcf25577f009639fa82b653d182e856309733",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php": "45d06200401644c2d35d7e55b3125817aa7f20c7a390e79a0f1808dbf030d386",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionReceipt.php": "9b572aa14ea9818c03173482d22fd71689c293534e349fc6503fb52d556cc113",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionRequest.php": "fcd19c6f1af35ebd9ca6ec7a7c26ec737eac222a890c54e57a9a82c0ae3fc5e1",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php": "c4af7197b02621dcf52c429e9e1aaa5c757c2e4231d3433dbd585859008fc986",
+        "app/Domain/Customers/Preferences/Suppression/UnboundSuppressionAdapter.php": "b7bc628e61b57b11d65fa7537ddea20c1f5854d7fb5ac30840f25827c722e644",
+        "app/Domain/Customers/ProductionCustomerAccess.php": "f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7",
+        "app/Domain/Customers/ProductionCustomerPrincipal.php": "d49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningPublicEvidence.php": "3e61ae3de6ea4d4188da42d976a250277f026c2be758c5d1ac4386a08c3cb2fa",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningRollout.php": "6713d276073fd810f3bf3e7122445537d0884674c4fc6f1e6e736a3275121091",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningState.php": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentEvent.php": "4d0098581374f9911055211340d23611cfccd6def0c512ea4f83e98bdd9d05be",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentPolicySnapshot.php": "53ac2f046fb371f58f1cd6e51c73907a9db24b24de6879a32a4d920ec6444c07",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentState.php": "c1de4609ae53d40814aa914f437f2ea1cd12cbcf7cb072f9ab81b5d9e3435480",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionFeatureBinding.php": "b56d04afd981af3818ab8e35061ef2fe91dbf5ee253b8ffd5660bbea905eef5c",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionListeningLibrary.php": "060d7134c87da475dcfcdcd729436b8d5eef454b4310fd0e8cefa40f9117b171",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php": "56233c910f3db0e6304bd7f14fcd58e5e3faa7027d741587ec608a30880c9796",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPurposePolicy.php": "f1201242871add11aed82bd3b75b203def72e24dd1a1b6419d16d8aa5af9c4a9",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentRecords.php": "1f952fece22787ab24fd8960d417b96fb5db7f1d8cae91b2d42fa717c89f12f3",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php": "034dccd1ce2360841f991f5b07ee3b50cf7b7e21616c55d97299aa5d13b7689b",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php": "9156530ed4cb7f64674f36269d1a6475d2950ab8bd59e5b73fd96095be3eeb13",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php": "14aea5dc3d5220cf493fe63348e2c7f440c4accdba73838111d9f79f75daf1ce",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureException.php": "a9a387a8066f575db4375d36a383d4aa6048c36845ed7de1e06fdca77c23cd59",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "841c2c7b7f5b44f6808dec09e53007168468773995f96ee2c5e92e8b2c91b1bd",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php": "e1a79d748dbdfc3e87ea6e709d7ccb754d172fbbca66a2eac7e52f6bedf77883",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureShape.php": "f309456d487db802ccd3f9a8f6364385efc9cefb724d9ef495b619dfe61d9c15",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "d48288131d585653614c23b6d635d169fc882e933e86d87965660fd90d196f2e",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionConfiguration.php": "2040beebae676750167ea1435a36ed035fa992f78c1033093d5f67750df74b56",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionIntents.php": "048da1c023d7131489e105435f944ca59224feb1e7beb23302fddce128f906da",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionReceipt.php": "19794cad64aff043207949130de975f578ba1acfc60ae4c45f1bfb820419a985",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRecords.php": "a78ff46d5145c666e06d765f125a90edb60668268a4bf7c5e6bc8a2930a4a712",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRequest.php": "960b7a6a72acb6cca642357f2311aa075379e38992b60d0d59af024b01fa1a7c",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRows.php": "dee78fa8de2a6dba143b950f5c04b0a71691d7c2d978fe8a9ae0ccf4ca053b28",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php": "25843834cf85acef11d7e3c9284ac7eb94c11f4fceb13a3c5402e5b043f814ac",
+        "app/Domain/Customers/ProductionFeatures/Suppression/UnboundProductionSuppressionProvider.php": "e509f683cd908972c9af78a226b35f47cacc01ef772284b02f7652fb14b473f7",
+        "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php": "cdf339408d4dfd9e73eefa81021085a089b64cf7e4353c5a3f33748ed3551e33",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "65098069d146e0c4a437acefd672f29ac43e7181541a545c97c3c007cdea8126",
+        "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732",
+        "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php": "7b6a2b4d41316cd4e272793499f997a7cd7dc33148c1f460080f0004725e4c1b",
+        "app/Domain/Customers/ProductionIdentity/IdentityException.php": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php": "e446fae4857af2cd3737e465fbe1dee7e5fbfca2a799d16f00396e988ad2e3cb",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+        "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4",
+        "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php": "0d6a2026e00763caba67fcf3cd8391e4d0d774c00bd97208ece36c3746490cb0",
+        "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775",
+        "app/Domain/Customers/ProductionIdentity/IdentityRequests.php": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc",
+        "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+        "app/Domain/Customers/ProductionIdentity/IdentitySchema.php": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc",
+        "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454",
+        "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+        "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+        "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682",
+        "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f",
+        "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e",
+        "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+        "app/Domain/Customers/PurchaseAccess.php": "91456b65f3505fc9c2057e55eb595b409633132499def7aa9fc9e62589aea988",
+        "app/Domain/Memberships/Billing/BillingAwardFence.php": "bbf0f351994b657391359f5abe7a10c6e32545c119eedbaf4e2debb503125b0f",
+        "app/Domain/Memberships/Billing/BillingEvidenceRecord.php": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+        "app/Domain/Memberships/Billing/BillingException.php": "8e9490b3ba5085d8df52723cb1780359abde63cc5ea85cc6199ceafec025c23b",
+        "app/Domain/Memberships/Billing/BillingExpectation.php": "a6a34b14611b7713ec588d009c2a37e8c952331540b3bbad917d638551054ee2",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+        "app/Domain/Memberships/Billing/BillingHintSweep.php": "af33e40feb33e1bd1778be3a06dc5ac96c314138086a96dd9f5ae454ef07b292",
+        "app/Domain/Memberships/Billing/BillingLedger.php": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+        "app/Domain/Memberships/Billing/BillingPolicy.php": "974e44a65c868cf28456a24662f42c0202a919c16aa3688b001dde93a4d6991d",
+        "app/Domain/Memberships/Billing/BillingProjection.php": "de8a6fb54974a45c958b70b5182326849b78e43f2de1541a950478f2ae40522b",
+        "app/Domain/Memberships/Billing/BillingProviderGateway.php": "4dbd2f51a5843a2450e03407eda85426bb1042b37fcf6d6210fba64de3c25231",
+        "app/Domain/Memberships/Billing/BillingProviderPin.php": "a68dbca0eccc5ee5f217e269f094add3ecb37dbf9c7e514c9805e34b08f73456",
+        "app/Domain/Memberships/Billing/BillingReconciliation.php": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+        "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+        "app/Domain/Memberships/Billing/BillingSchema.php": "bc0a757ceb39ba628998ba6cf12c533cd45ed48a0195dfff49b97c106cccca54",
+        "app/Domain/Memberships/Billing/BillingSettlement.php": "f7ff18a61127cba2e9785a750c2364513b5ffe88e72f71cbc61432f1d06b18e2",
+        "app/Domain/Memberships/Billing/BillingSnapshots.php": "0753aafcddbcb76430011ca478930b782706c69eee8632f28080dd60d422777f",
+        "app/Domain/Memberships/Billing/BillingSubscriptionApprovals.php": "08c4a4ae7b4ba52f602d6d203b59e74e1ed2323b24e0bfe99979631f50f144a0",
+        "app/Domain/Memberships/Billing/BillingSubscriptionRecord.php": "c407914917395bcc1dc152bcb00fdbed000e6c301b573ca5dd2ba34160ecea72",
+        "app/Domain/Memberships/Billing/BillingValues.php": "175c6767de35fa0313599c3d609d8089e837e2208e0b4add45eebee2cbb9e776",
+        "app/Domain/Memberships/Billing/BillingVerdict.php": "0cb4a98594559a85eb381d2961c2806d7cee1ef55cf5815db50f6dfec6efc2cc",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+        "app/Domain/Memberships/Billing/StripeSdkBillingGateway.php": "cf853c8a284f10c5dd54b419d5e5e631ab32147d9227b139fd50813bdf4f438f",
+        "app/Domain/Memberships/CreditLedger.php": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac",
+        "app/Domain/Memberships/MembershipAdministration.php": "c482b725adb55b280ffe1f97a78be1913ed6443969522afb9db71f5ad526e43c",
+        "app/Domain/Memberships/MembershipCustomerHistory.php": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de",
+        "app/Domain/Memberships/MembershipEvidence.php": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532",
+        "app/Domain/Memberships/MembershipPlans.php": "dee36cc481d80e47bc08d9d8ba0b61d9128719fda628c4c3f0be7d5ffff71b5d",
+        "app/Domain/Memberships/MembershipPolicy.php": "282a362c36976095ef3ab611dd08d409762628c8a4e0317f6dd92b2c0c5d0943",
+        "app/Domain/Memberships/Models/MembershipCreditBucket.php": "27e3c5994baa3e7b7283ccb3f4549f8a9b1626383b2aaf4f038ea6d49b42e2b6",
+        "app/Domain/Memberships/Models/MembershipCreditEvent.php": "51d0b2003f7650b2ba230210c28491039453be2e2b371eebaf4e20ae601244bc",
+        "app/Domain/Memberships/Models/MembershipPlan.php": "50244578407b5a9c51390621c07878aad065e1aa3992efd2ad86f03b68b85410",
+        "app/Domain/Memberships/Models/MembershipPlanVersion.php": "15710d8bdca1954f33eafcb5108ad6f42729d61db10bcdb7b2cab459aac547c1",
+        "app/Domain/Memberships/Production/MemberGrantAuthority.php": "02b32f1aa885dc9b6272d7b6643493131bc447c7a7d6ba7d77b45965abb4177e",
+        "app/Domain/Memberships/Production/MemberGrantBinding.php": "e8ec6951a419ed46ecffb537aca2ac323367b2b346efe1ca939c8585a0a3bc61",
+        "app/Domain/Memberships/Production/MemberGrantIntent.php": "7bd43b0410567621d264b8fa92a1b7d1e959d631563cab6c0fa6109b9ec9459c",
+        "app/Domain/Memberships/Production/MemberGrantReceipt.php": "ee87a595896faba469ef06f563e39c79f68248bbbb7c53c64aa6c684baa37926",
+        "app/Domain/Memberships/Production/MembershipAwardConfiguration.php": "0a71bc52fbad106a201bf0615f9bc0b5e64888871eb643ab7f2c43b38d96247d",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php": "a364310f71d11f26a62f0fe14ef238203f5bf7a2ebd5a40caf1f55762726e325",
+        "app/Domain/Memberships/Production/MembershipAwardObserver.php": "70e7895a3df12509accc81b570aa6284f20a36d84288812b69169234b4bcd57d",
+        "app/Domain/Memberships/Production/MembershipAwardTerms.php": "773018b013c2bb6fe5b6fce01df516aa865f2209a1239a96d8da7a7711d33827",
+        "app/Domain/Memberships/Production/MembershipAwardTransaction.php": "1dba1372fb5f165a995d45043c99f9afb2de9029098c976a3d9959adb8b1c35b",
+        "app/Domain/Memberships/Production/MembershipAwards.php": "eafb8223d6d8196d8c9c6f8162d69a4bc365a1b2b3d1385f8776b8c3559b4f00",
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+        "app/Domain/Memberships/Production/MembershipEligibleLicenseAuthority.php": "601c8df8a23eadb2c902c459e18a61f10ead9ddfc4527a59d6a73b848ebbcce6",
+        "app/Domain/Memberships/Production/MembershipEligibleLicenseProof.php": "9475b15707b6a66d9a9e8e6847d2c29504cb8baa0b16bb46cef8dd3582a72f8b",
+        "app/Domain/Memberships/Production/MembershipException.php": "c04533684f2981ecfb21423a7987f4c4ee5d59e146325fad37a3fa68f1fb2070",
+        "app/Domain/Memberships/Production/MembershipInvoiceBinding.php": "c9207194c8858a9a03ed2e62249df05eeef2f952726fd970f1a67946a884ab35",
+        "app/Domain/Memberships/Production/MembershipLicenseBinding.php": "367efc2212c55fd2164f64eb89d69b3b636d242bd26d310d463d55a51397bc54",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceProof.php": "e471af3bcbff4bf6855a0a0eafa4459222fd8f69d8deacd79af493171ef818cc",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceToken.php": "3044ff01513e902fba022de24a68a4b7ecdb661bce2a77109aba686c5638c8e3",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "952a74e553e3894e42dbddcc81fda745830b2c179a8e11ada1b0d4d3a923889c",
+        "app/Domain/Memberships/Production/MembershipPolicy.php": "21528d642460d812965a4302096699b6736a328bdf2af63d01af4e195e28fc7f",
+        "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "a169808a1f26b023210741454c840cf5309a019518b397f954f9f5566b81fd74",
+        "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "ad4646282ab0451db9728d47d83c804cce1ec2a688d281fbc5e0eb1c1a4557b1",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsAuthority.php": "918cc499531858932dd3a91c54910f41640ff5fde7f0b9dfaa40fd3cd5b466a3",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsProof.php": "0485a7c18f1bc1aa53d9396119ef05fc557bfc45a646c245048cc4e12e32847b",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsToken.php": "15a4cfac9a1d91db5c66e2e2fc6d485c8964ec0227d0bb033a50b7a66ec4a041",
+        "app/Domain/Memberships/Production/MembershipPolicyStaff.php": "86a139fc0f70238ca377fad8193622f65c96fbed5f59740dd0d02dee809032c7",
+        "app/Domain/Memberships/Production/MembershipPolicyVersions.php": "876b259c479eb9a6a8a8934900f586f81932cebee52d73a82a9e57a1b63cb224",
+        "app/Domain/Memberships/Production/MembershipRecords.php": "c46a4699d7075e4de83519ac82cbe45708091a85040dfc2dcb221d0675a1f4ec",
+        "app/Domain/Memberships/Production/MembershipReservationAuthority.php": "0d0a50e0a52570087d47ab9482d8b883cbda17063187fb531f124beaecfa9771",
+        "app/Domain/Memberships/Production/MembershipReservationBinding.php": "b4ac92ebe404ba4974c00ac06485d3a30a5cbf7e6dd5e9e50110d68fd9bd1268",
+        "app/Domain/Memberships/Production/MembershipReservationProof.php": "71068504f41cf95cb11d9e9f5d9be93082a72ae9b6c71c446cee3fbc47b2c540",
+        "app/Domain/Memberships/Production/MembershipRows.php": "3284fde61868cb7cf1a0427f53ae991183782383917e51bf94034174ba9caff4",
+        "app/Domain/Memberships/Production/MembershipSchema.php": "93898457684c9005853e539d344142b1c8bc1141a0554e1e76466bc378ced799",
+        "app/Domain/Memberships/Production/MembershipValues.php": "0a6f2279012adbfbe11cfa3bfb4e55b13bd17715b270bb7aeef5310656d2fe65",
+        "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+        "app/Domain/Memberships/Production/SealedMembershipPolicyFacts.php": "395cedddf0e4d784395c561d68d8cc94a276214b8fa6519986d06d285446bbe4",
+        "tests/Support/ActivationFixtures.php": "2a2e1664078f8886d1e99e1ae6c783cf56950cb1ad0ad1ab452c25524e5bc51e",
+        "tests/Support/ActivationRace.php": "56f786a5d45acbafdc9f9c8dfb1bab1c41a00beada8ee94d9beca9662e1a5acf",
+        "tests/Support/BillingHttpFixture.php": "78ce7e010ae2bf8c92b527fa9b797a49a7fc4d1e311d5134b4dfebbbfea7d439",
+        "tests/Support/BillingIntervalFixtures.php": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+        "tests/Support/BillingStripeFixtures.php": "cd90a3acf4fb922a77134e21a13b6a9859b3c2802824df9f01f258a3ddf08436",
+        "tests/Support/BulkReplaceLicenseDraftSourceFixtures.php": "7563e98acd2e818bc9cebdefc573c12bad8ae44b497c9670f3f3a129ddfca540",
+        "tests/Support/CapabilityRollbackFixture.php": "90d4e1ab18f7442131859afbff22018dd41742ffe10862cc3409d33a83ef9def",
+        "tests/Support/CheckoutFixtures.php": "9015ea746021c49cef185947d44e67bbfe4bccd75f75dc024bab521a613b5cd8",
+        "tests/Support/CheckoutRace.php": "ea9792d37564bac27fdfc54730f991ba82d057a1122e93b092aa05d0ab024f9e",
+        "tests/Support/ConsentFixtures.php": "bbccae78ee99f140f334341b2b965f2dc7496afcd3b24befbcf8996a62588dc7",
+        "tests/Support/ContractFixtures.php": "b41f45ee4fef2969e4cb3292d2d810902c13be7b140da85201ea7950f634ad62",
+        "tests/Support/ContractRace.php": "307730168e3824770271fb98da757d3efb7c6ba736bbcc8e8b078ed6e488f3bd",
+        "tests/Support/ContractRendererFixtures.php": "dc7d954552e582e882158dcbac3762d474d04e177f72ae16b6ca37caabcc085e",
+        "tests/Support/CustomerFixtures.php": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8",
+        "tests/Support/CustomerIdentityFixtures.php": "5ef1166fa240f10dbed472931db583fd0d534815d53b1b3032b783c37bd1d1ff",
+        "tests/Support/DeliveryFixtures.php": "72ec996b0d6e38f8184215e12470c8d00c1ad703e1e9a1f7c9d94c22bd8d73e4",
+        "tests/Support/DeliveryRace.php": "648877ccd2232d17e9e7751e7753b5e68f98f9e465a9fdca4534cf681b559735",
+        "tests/Support/DisposableNativeDatabase.php": "34399fe6bbb82344636f8e81b9b588ad892fa2b6377bde516c68253d048e3e01",
+        "tests/Support/EconomicLicenseFixtures.php": "6852a47392ca97fff0c67b2f2fea9763001b05000e7f6b9172184cb52ca97387",
+        "tests/Support/ExclusiveOfferFixtures.php": "9b28aed8bec919ed6e5ee00ef8933305ddc2e3ea1dd259ced652d4a4ee038bed",
+        "tests/Support/ExclusiveSelectionFixtures.php": "6d087f48d170e5ccf3dcd1d2c9aaa813bb08af07d0106eba1c16504049513888",
+        "tests/Support/FakeProductionFreeSources.php": "602b34dfd75ea1d3a75aa9ecb7ab38099caa76c353bfcc291832585ba3b7c898",
+        "tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+        "tests/Support/FinalizationFixtures.php": "f0f7905564f183a29bb972ec1cfd7d20eafb00511f338c73cf870f4251226f63",
+        "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6",
+        "tests/Support/FinalizationRace.php": "b994d19edb735ef10686b0451c91febd4ea20f39ca30f82679b2815e9de5bcc1",
+        "tests/Support/FreeGrantFixtures.php": "edeb790c79f3991e1eea3adad5e6282108a0e24b70fe0f3a9f71b7485138aa11",
+        "tests/Support/FullDiskStream.php": "769f9cb277a0fedba03f36001beecd03c93096b2920957df29426240f89e1651",
+        "tests/Support/IdentityHistoricalCommitFixture.php": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2",
+        "tests/Support/InquiryAdministrationRace.php": "7b1c07046393dbdf0c1658ecfeef4d029ea83132fd27e117872152d8f38d6dd7",
+        "tests/Support/InquiryConversationFixtures.php": "045952429e8a864497bbc7eeb4be89d03665af9e3575b68f01e8f1405ed7cfa5",
+        "tests/Support/InquiryNotificationRace.php": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d",
+        "tests/Support/InquiryOperatorRace.php": "9357b2d390525b2cddaad01187efffa501131bffa30f41d3b88ebaf5b010372a",
+        "tests/Support/InquiryRace.php": "e37d564dec05e2b1dee51a94f0291be16a9e06ba4c37d2035e816d537b1809e0",
+        "tests/Support/InterleavingBillingGateway.php": "990d4e06e1b491b68d976f34df6a5eacc43c87bb359a86318e3ccea4ce0283a4",
+        "tests/Support/InventoryFixtures.php": "e88a53c2792ffe1c0444bae4ccf62966c2b97dac0167f9248cee67872ec76d64",
+        "tests/Support/InventoryRace.php": "76fbaa16e9efb8554db2f1228575ae55de0f8824c1dc03da21113c35e54435bc",
+        "tests/Support/LicenseFixtures.php": "fae78d27bb5cc66084268f3766a84d03d7b419b02e1a11e9401dd30c78d0559d",
+        "tests/Support/ListeningNotesFixtures.php": "f7c2d001f448f3937b008fb55bffa6650b38dc65eead292ec8ce95b390cbfdc3",
+        "tests/Support/MediaFixtures.php": "c8922bd4fd0073e10fe645d5bbf286c12d0e42d1465a1ebcd6df2f3267c06787",
+        "tests/Support/MemberCreditEventFixtures.php": "4ef69f13dcdb8174bd236817791ffb2d808c92e1167faf2b83d601179656c041",
+        "tests/Support/MembershipAwardFixtures.php": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+        "tests/Support/MembershipFixtures.php": "628bd19125bd331231575033b3418ecc24a5df9dcb28aef3c821ac0edde9dcc9",
+        "tests/Support/MembershipPolicyFixtures.php": "4a3a9cd4fb7e81235c5700b557adc09bc2cfbaf7cc2021a48db937911c9a68e3",
+        "tests/Support/NormalizedCatalogFixtures.php": "5f102463ab4d3d50e1a9a44c9243f50cb0ea9faed9e95a9c3e493f9e947350a7",
+        "tests/Support/OrderFixtures.php": "532c189e973faaa5f78ccd13feadad47b73e0040d6290af45259392b79732110",
+        "tests/Support/OrderInquiryFixtures.php": "7b3c2f2b9ab45d2300e48ea64ca4eba2a684875c8c65ca9587cc4e9075f07c35",
+        "tests/Support/OrderRace.php": "e78816cafba4c1145cb7638762cc42044bb59369805dbc03344177ed0bd876f5",
+        "tests/Support/PaidGrantClockedAssetFiles.php": "f490ff59aa823186f3b6e2f08a400c442202b77207fda1b99aa51c2943cfa352",
+        "tests/Support/PaidGrantCommitFrameProbe.php": "f91b31543f076fe7bd2bc1d74d151d6a7825153340b925f3208cb3cef06c0098",
+        "tests/Support/PaidGrantDependencyFixtures.php": "569bc03f59ff5a2f60e7585c5e9f82d3ceaadd53447db52d225cde23bfc38efe",
+        "tests/Support/PaidGrantMonotonicClock.php": "9ef5a0be4d32b6d173a7d3eb812cc358e7ee98d85a4d7ab1c30d56485c131950",
+        "tests/Support/PaymentFinancialFixtures.php": "fd8161c56f38297f1130eb34f99bd73c0e10e5dd5ce4f50aa0fb301c757eda51",
+        "tests/Support/PaymentFixtures.php": "088dccf7c7ac17b515cbc491c087fd664b6eff01be78662a9e072c282cd4a4b2",
+        "tests/Support/PaymentRace.php": "785fdcdfedec839c51a8d34e3456c66c9d2d0682dfad566c1681a791046867d6",
+        "tests/Support/PhpCliWrapperFixture.php": "bb88c8121776b3df712481f06581f761f82384a33b382c1901fd83110f10bf9b",
+        "tests/Support/PreviousListeningV1.php": "7e5403a27df33c4cc5f9a6abed6ac4db5b66e513e82881aaedfa61c12db6eaeb",
+        "tests/Support/PricingFixtures.php": "7790207deee9c2f2f51c9be68c52ef223bc09cbb5d4f482a568242aee85336fe",
+        "tests/Support/PrivateProductDraftFixtures.php": "c3a3e22de8cb11183ecb8cb40f8c15d6a93b78e202255a6c81d4cd96c4dfc7fd",
+        "tests/Support/ProductionCheckoutFixtures.php": "173a091d8bf56116cd3bfabdb6633d992188ec26ea55338526e99d8741af42b4",
+        "tests/Support/ProductionCheckoutGatewayFixture.php": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130",
+        "tests/Support/ProductionCheckoutJourneyFixture.php": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4",
+        "tests/Support/ProductionCheckoutProviderFixtures.php": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6",
+        "tests/Support/ProductionFeatureFixtures.php": "6a93e458d0a275f81043984f844552c07fcce64d0a21020b8f86967a44ffccc6",
+        "tests/Support/ProductionFreeGrantFixtures.php": "0d4b72b7959c97412ecca53d52d8e3106b07e2051c1b5947a163f8729ec0cd81",
+        "tests/Support/ProductionIdentityFixture.php": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+        "tests/Support/ProductionIdentityTlsSmtpFixture.php": "03d5ddb1d3ecf63ce908e04d32e856e4b1a68f657578cbe20418adfaeb0241a6",
+        "tests/Support/ProductionSuppressionFixtures.php": "e3c7e09124afffe1dbe3507fe86b76ba915bc183abe5b82f6b7b54e325600cfb",
+        "tests/Support/ProductionTaxCheckoutFixtures.php": "bce1f19d183e46fa85cd791a48d41bc7a93825878cea2f40252b7eee4c8a83bc",
+        "tests/Support/ProductionTrackCapabilitiesFixtures.php": "f0038e32679d026a029f9c41073d3043e25213a4e3cb9a7a43869fad3165a1ee",
+        "tests/Support/ProductionTrackPolicyFixtures.php": "b8ad6e6a32ae3de7f979063128cd8ce8b0527e1a62e94660fc36025cd204636e",
+        "tests/Support/ProductionTrackPreparationFixtures.php": "cd480582f53f12a68cfe1a364200836b5c57fa34958f88d102670831d7405004",
+        "tests/Support/ProductionTrackPreparationReplayRace.php": "50a8a07040037521fccd51c8f4a2de811047a4f11983a98ebee4e2117417c493",
+        "tests/Support/PromotionAdministrationRace.php": "6ef7cdd1c41ed137b60918937d93ed5ef970a8b7b5a77c045803e460508b15b0",
+        "tests/Support/PromotionFixtures.php": "ba19ff0c7d723d2a08001ce3e65a0d091500e52e09c84b59e280d29555d81358",
+        "tests/Support/QuoteFixtures.php": "7e2d583743c06000ee99a7330a5f509adaaf8fcda8783e904280ffd9f79d2570",
+        "tests/Support/RecordingFixtures.php": "0789b5ebbbee936bc5882543603cfb388aad91a3e34773c00d78bba25f4bfcf8",
+        "tests/Support/RecordingSuppressionProvider.php": "aec8969f43703b246b912027ce3602e0f9705a076bfafe73bed77cc33de1ba9f",
+        "tests/Support/RecordingTaxCheckoutTransport.php": "7d53c029d8e8ce1e4a28eb707acd690c838c20934cc0d21d1b44c8a9c2b98aac",
+        "tests/Support/RefundResolutionFixtures.php": "64fac51be32206a2c5174f6cfe10e08dd31322e068ebd158c1cb861f6dee1052",
+        "tests/Support/RehearsalBillingGateway.php": "7f2cde6fd7ba656dd5b300191a9cea851cb00cbc925b95d77bda69b16b2c8f09",
+        "tests/Support/ReviewedOfferDraftFixtures.php": "62612ef747eab11a08278ef00ea9be8bfd89edc2976b7be13d7683650a84ced8",
+        "tests/Support/ScopedLicenseFixtures.php": "0b1c916317bcda0672aaab2456e0856c66a1c11f5fd1ba4fb8021c93771573cc",
+        "tests/Support/ServiceProjectFixtures.php": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f",
+        "tests/Support/ShortReadMediaStream.php": "7aae23691090c1d80b8657961566855e5ecd33f326512d42c3f2cde9fac607b0",
+        "tests/Support/SiteContentRace.php": "4b7364d7ba63142fd1119e3a1f7773d63a85c3647ee8d3c5af599d4650917aa1",
+        "tests/Support/SiteEditorialFixtures.php": "091e35a2d009b61dee7c88cc0d8790884cbf9c916c60eed470ce0a3b4d0d17b0",
+        "tests/Support/SiteImageFixtures.php": "b78a95c1d617f23df7934c995c90f3d5496b02fce7e5a205a2ffccd408ee4ac4",
+        "tests/Support/SiteRelatedTrackFixtures.php": "f1af023adbd1e29b99d9b7bc2da2c084e4b98717404e7ea822a31fb340eb6adf",
+        "tests/Support/StemsFixtures.php": "07d86d1083ae41d9ea5c6a98e1ccee02a62e1aa7a14263cdb9462bc3e5d92b01",
+        "tests/Support/StripeWebhookFixtures.php": "70f070cf86e34fefcfe31f23a81c13e56b061a95edf30cf799fd01ee25019344",
+        "tests/Support/SuppressionFixtures.php": "35cb972ffa1d2dedb2d4be9870a4327198e79abf7304fece3028504273e03f60",
+        "tests/Support/SuspendingBillingGateway.php": "254819ea88c991e9396a7bed403982ca26bbf64b1e2f92c790d3267f47a2eccd",
+        "tests/Support/TestOnlyMediaScanner.php": "f43f882f5dc1f0d93be1dd640cc73a9c2dc7720f3ac654540bc2eb4373507bf2",
+        "tests/Support/TransactionalNotificationFixtures.php": "662f8ca8284a88592fc410362159195e180d952415b4752975f60319452c776f",
+        "tests/Support/TypedLicenseFixtures.php": "3d96d2968b1343647eb90991e49351865a1a75c0c1098fe2e46a39e429aaa891",
+        "tests/Support/UnpaidReleaseFixtures.php": "854b882ab1ce8e12abfedd90421fbd928d6bfa07e89e4f592d1dc2a18ef022c0",
+        "tests/Support/activation-race-worker.php": "eba4fb27566e630fc878d0ab94dbe09da0157c851cd0313dcd7f05e33f126f4d",
+        "tests/Support/bulk-replace-license-draft-source-worker.php": "020d409a16a6dc6eae12482082a90008ced2bef40c739504996774a2103a274f",
+        "tests/Support/bulk-track-metadata-race-worker.php": "a7f0ab194e201a1a6b5f5e97e65dfece1f663b7994d3985806058e75e75a8e2f",
+        "tests/Support/bulk-track-tags-race-worker.php": "abb672fa630dfee15422166b405d96ddd6fd5e25fa2cfef5ca068016c2cbcfc3",
+        "tests/Support/checkout-race-worker.php": "ff5e5ad200843cf85f80b7ef04d09f331a29488287d583a77d23e2010e78301a",
+        "tests/Support/commerce-audit-actor-worker.php": "3ec6e16d9302d7601115b90b0dae7ade68b5ee06a937a5cdad31111939728f7f",
+        "tests/Support/contract-race-worker.php": "4a1e7a51b4e936e416861b3ef178079ec78be4845b8260f6ca3fa14f2606cd46",
+        "tests/Support/contract-storage-race-worker.php": "4d5c4f88056ae50f144763f6c7f9cd7dc0a51949b5ae35f4666b1b6365a7bfd5",
+        "tests/Support/customer-access-worker.php": "b693c4203b5ab728d4e6ab7506d30bf3a3a8f2593b131ef219a97a29e0525e22",
+        "tests/Support/customer-identity-worker.php": "a02cbbaeaa20e6ac5a0091549bf0b6897d0c582e9febd7cd0684e8f158c447ac",
+        "tests/Support/customer-purchase-claim-worker.php": "b6deab9da430700323c10d10872a12e8cbd46ac615680970195631ac8e94e5ae",
+        "tests/Support/delivery-race-worker.php": "fe80880fdf15e73e5e3ba73b2b0a80f6687f4e242cefb212469feae3d78a26a0",
+        "tests/Support/delivery-stream-worker.php": "670a053a4c1d6de0fbc5eca50670e77f2448a9e897cd5d48af0219a39614f0eb",
+        "tests/Support/discovery-sitemap-native-worker.php": "54ff572d98e4529b72dffd5350d43ba6d360147720d3c253bd869720bfba112b",
+        "tests/Support/discovery-snapshot-worker.php": "570cacf72433c7753b8a4b8bc2ed8ee67d45d3d88a53715b77910bd5b2532afb",
+        "tests/Support/finalization-race-worker.php": "3c7882fc658d04c87d790af4dcd863eb1d4768f94328602d3e042d061a82e64d",
+        "tests/Support/free-grant-race-worker.php": "2b7e87af2c1b1651b16dd555b52efa2c2ace64b3415943d357cd2a20a29a29a1",
+        "tests/Support/inquiry-administration-race-worker.php": "868b8b5a1f9c935aa85d2458309d5e88f901ac0be60a28aa81ed189cd4361eb5",
+        "tests/Support/inquiry-browser-catalog-cleanup-worker.php": "7a63158ef747005112d4bcb6560d8973301dc0535b1ea4fbef50c711325fe805",
+        "tests/Support/inquiry-conversation-race-worker.php": "12bfe812104a24ec5d1be30439218af98d3c079759b200a79c8cccabd046e74e",
+        "tests/Support/inquiry-notification-race-worker.php": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba",
+        "tests/Support/inquiry-operator-race-worker.php": "7c6711d539e7b78edfa1f22dea726bc3699432bb3c63dab9ab7a3fade4fab3f0",
+        "tests/Support/inquiry-race-worker.php": "42573b858447ecd25e523e342d097b61c381e9907146612341806e4cc1debe54",
+        "tests/Support/inventory-race-worker.php": "ce957c703d5b5f793166317bbfc3822235557ce21633613372f9bbe1a1494845",
+        "tests/Support/license-template-authoring-worker.php": "c71cd3f7e1cadc50e46ca90e55460cfce17a7c0c58f7a7b9fd41f170be4bee33",
+        "tests/Support/license-writer-worker.php": "5117b544afe4b7afb4607fd54a05fba48abd4255594952be138100f8f4e7907c",
+        "tests/Support/media-writer-worker.php": "c27e69b27e4d8cad66cf4f5b7f109e7a0a0feab8b2f0237319c649694596fdfb",
+        "tests/Support/membership-award-race-worker.php": "bb8c930657828240bc3cf2b450f26113d8957adcae7ceb70d200c78124edb403",
+        "tests/Support/membership-billing-cross-invoice-worker.php": "8bf47d343879a54aeaed4aaf785141e0ee8aa3bdcfca5b8b764ee16828505652",
+        "tests/Support/membership-billing-interval-race-worker.php": "ee09436457ffe502989dd26b378e00242c8a78773b20f02628ac7097ef427ce3",
+        "tests/Support/membership-billing-race-worker.php": "dbba3dbc351ee91ce72627094751f918f63bf229a92fa8c95ce999428aafc76f",
+        "tests/Support/membership-billing-stale-race-worker.php": "e0615d24aac2b49c97871f5207ea66f785213be1e94cad4353be09b44b5f5a07",
+        "tests/Support/membership-credit-worker.php": "9697ca1d514f6c8a9f94bb908cb445449b2c0ab29d4cda23b92b58e5185142a6",
+        "tests/Support/membership-interval-race-worker.php": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+        "tests/Support/order-inquiry-worker.php": "c52cba51f81e5418643ff98cd9763e7a3e44071e00e5713a27048292e62707aa",
+        "tests/Support/order-race-worker.php": "5ebb7b8352e584a069bb0ec320d756312e162c2a0d84d56d41eeee01df302852",
+        "tests/Support/paid-development-bootstrap.php": "b3aa4463c71505d4e471d2659e7e0bf468566533ef20166b1bda2d97a8d433f6",
+        "tests/Support/payment-race-worker.php": "f10b9690bd167ee9e3e491d2bfd7c8243bdf7046f779518bc28244a95a14fb09",
+        "tests/Support/pricing-race-worker.php": "e77744cbd7ba308b5b7f0f918a051e21b11659cc2bad326246acfa808146f9b6",
+        "tests/Support/private-product-draft-worker.php": "eb4fc8ec32c3c06569ee281b3f8eda189ad2e19d89d2c12a5d7e3e47e2aab1ce",
+        "tests/Support/product-draft-worker.php": "e9c7cd63465c71940eb67f56b89a944ca31d9e62d9583c0767523190015afbea",
+        "tests/Support/product-member-refresh-worker.php": "85ad897bda5bf2a8193453ec620446b66e854958dfcc511dd90959009b1c579c",
+        "tests/Support/production-checkout-race-worker.php": "f0974f25d5ee0ffe696edf3c4ebec19f3ab0cb636b459458af44d96f400d4e00",
+        "tests/Support/production-identity-race-worker.php": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33",
+        "tests/Support/production-track-policy-worker.php": "04a9bfa369af9d13b3e91ac68595a21a2e61e0ba22afe0600487630a688340f9",
+        "tests/Support/production-track-preparation-replay-worker.php": "f086adb5621b1aa1dbe82dcd8c393bbb93f5fdb9c168be426fb6d88e84066f40",
+        "tests/Support/promotion-administration-race-worker.php": "0722145254f61a507ef3da0f24367fafbe7e0c69c6f3d3a21b2c2a86010902ef",
+        "tests/Support/promotion-race-worker.php": "d8957a9039a0c9acfb07c53bb9a228350f73759f31de2b6d3d4f9f96b699e341",
+        "tests/Support/public-embed-route-cache-worker.php": "5ecabccaac462cf178ae2f1ba01c203dbafd1851ad4507da490d72a2159c737e",
+        "tests/Support/quote-race-worker.php": "4110b6de753b58aa8b64d3713eff93c4894d6c4a4ca9674a2e7bf78bcf15d13e",
+        "tests/Support/refund-resolution-worker.php": "bd83cef94ceb22d58ec8c067f220ee977be53b43f35141fae20dcfaf1db468f3",
+        "tests/Support/resumable-media-upload-worker.php": "5c8aac8e00a7d8552ec681accb128556e353de3a0a6ef96687754c7364e65d2d",
+        "tests/Support/review-identity-rotation-race-worker.php": "4ba543cb7f7ae88ae7dd6aab0efaba8fe9ab301b25d33b259849a304b400438e",
+        "tests/Support/reviewed-license-draft-worker.php": "717ebb00a86117d6746fe7fc5c3561683f93b3e8645da908e1abd7d670a8979f",
+        "tests/Support/reviewed-offer-draft-worker.php": "ed10e23b20e1c34609806b8dcbdfc4556acae1ced3fbf1577e5be56f043d5d79",
+        "tests/Support/rights-declaration-writer-worker.php": "78c2432021338ae493c1df3510738e4c6f09d6c9abf80f00885babe75430a8b4",
+        "tests/Support/rights-evidence-guard-race-worker.php": "907fc7920617bc911ccdf8be65229ef47b9ff06124fb7c731f767ef55069b71e",
+        "tests/Support/rights-scope-writer-worker.php": "687a96e1b6ac365901bb5c31e45f49186a1dda1641f9b0d5711b11b3ef929817",
+        "tests/Support/service-project-worker.php": "e9ee562508a485d227a3779f81c7acb838daec63e5efb1100e7eefbc0357195d",
+        "tests/Support/site-content-race-worker.php": "d698503d33b3c05f57bdbcfd4e6fbfd30633e2eb81e03785f1c423027cd3ae4c",
+        "tests/Support/sound-kit-upload-worker.php": "2e54ee046325eee55bbe05fd9da62ea57e5e08f9762dba65a5abdc3f2f65ac88",
+        "tests/Support/sound-kit-worker.php": "65b8a27915bde9ab13de82f95beb0de3c650ba768678d4068e03589f6c3155e1",
+        "tests/Support/stems-recording-preview-worker.php": "45928e541948c5cf867c9425d42c96c1e15b5b0f0faa6cf1dd3e74f2cab03be1",
+        "tests/Support/stems-recording-race-worker.php": "460b9e71dab84dd988ebbe6bf15ba64f0ed89d8a91cb04d731c1e261ed7e14d3",
+        "tests/Support/stripe-webhook-race-worker.php": "cddd0d1e20fa3f2448c3ec3d29717f950b8b489005d7147ef1ca74464c740a18",
+        "tests/Support/support-attachment-race-worker.php": "2b4f57ed90abeac47f44fd667f00bd7517ceb48592ce67cefa08860fca8b9e0a",
+        "tests/Support/test-exception-operations-worker.php": "5bd4501ef6450b475c04b13c6101c9a0ddaff00de6bf18e565ea64e4f482bf8f",
+        "tests/Support/track-metadata-presets-race-worker.php": "2c2f5bfd99bbfd6a2e606d6622d09e74b627e54e5dbd3621d5914810ed29c654",
+        "tests/Support/track-metadata-race-worker.php": "97610c2a45bd57a0b5d00bea24c19278a10d3fdd243c9e4e3119c76f4345e22e",
+        "tests/Support/track-publication-apply-race-worker.php": "f2fe8cb54ead36b1658f63fc19c6b5413df37e95e1d1c511b9244bf3e6673c2a",
+        "tests/Support/track-publication-guard-race-worker.php": "277fed78b2a909834270fea086c895b59a9d784c9046dee0f2ff544dbd5b79cd",
+        "tests/Support/track-publication-manifest-race-worker.php": "50dff898c1fe9fb707c4484576c265151808c00175bc47aa5047b9ba64699cf8",
+        "tests/Support/transactional-notification-worker.php": "15f0c9c962ee7e065ebcf3890ea63ae27b4ffc5f0cce8e001c7a5d2bba862777",
+        "tests/Support/unpaid-release-worker.php": "803f5e780c5f488b6713b535293b4a3662dc9840da3d47fe1e09e7cd4e1f053c"
+    },
+    "source_sha256_after": {
+        "app/Domain/Commerce/ProductionPolicy/CapabilityHistory.php": "42b9e84d1e5543e3af48a3221deb9bca9cccbe8f3a195ab68bc90debb77b1a37",
+        "app/Domain/Commerce/ProductionPolicy/CapabilityMigrationOwnership.php": "60757cb1d9242eec6594956756a8adc4e31ca2162547fdc6e3c2360ed792c2f2",
+        "app/Domain/Commerce/ProductionPolicy/CloseProductionTrackCapabilities.php": "d27f621a42650453f6b5aaeba833fca077b213e5561c112553523ae7f122bf40",
+        "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e",
+        "app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php": "a42d2b216d7815a44ad7743896edd92d3b001d4307dfe287aee97bedb79d4a7e",
+        "app/Domain/Commerce/ProductionPolicy/Models/ImmutableCapabilityEvidence.php": "c410d3df1f7a6166a3d383341070241b3f81fef73e06a3686fe709ee922cd14c",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityApproval.php": "5711b9e4bab2ecf899f490d24276f5636b6115375a2feef1af6c3c1b67bbd9a9",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityCandidate.php": "5e2566a169c95a90e056453c625998ce77e6db83b4717f7746069052491530d6",
+        "app/Domain/Commerce/ProductionPolicy/Models/ProductionTrackCapabilityClosure.php": "098ddaeda17e75191c731c82aa7ec15e8a907e6f7d2903e10cb27c8ed06ca614",
+        "app/Domain/Commerce/ProductionPolicy/PreparationContextV1.php": "1e022477267c0b65a1b3d74b4aa81e76e89a1b5e543604be4f4528a9b553db05",
+        "app/Domain/Commerce/ProductionPolicy/PrepareProductionTrackCapabilities.php": "776464566491b43c4730b2142d3dc65cfd9d13e418291bc31a851c282dd47114",
+        "app/Domain/Commerce/ProductionPolicy/ProductionTrackCapabilities.php": "510b5ade1cb84b0a475e258862c1448c6f9f9c8747a63796869dfb992fb50762",
+        "app/Domain/Commerce/ProductionPolicy/ReadProductionTrackCapabilities.php": "84219d870080b6d875653587fa80c3e0d66b4cba5517592927b65445804524d5",
+        "app/Domain/Commerce/ProductionPolicy/ReviewProductionTrackCapabilities.php": "024c867e62149f5a600d5742c32306610d89fc6889ee5339ff6f6195d3c375b6",
+        "app/Domain/Commerce/ProductionPolicy/SaveProductionTrackCapabilities.php": "af33007445f23118d1a000af691307357a3601dffe1281380ea77123d0be6b64",
+        "app/Domain/Commerce/ProductionPolicy/SourceCommitment.php": "4784f7794c2818d0b1b12e9f7173a470bf366c34d53ea74c678891693e6566b8",
+        "app/Domain/Customers/CustomerAccess.php": "cb59745ecbdea2a9cedce51be535d428f2e1a3613829547716e9633fbff061bd",
+        "app/Domain/Customers/CustomerAccessException.php": "d838f9067c450f58b828effd8a148824a18cad766cb7bf3f3f59cba225e83e87",
+        "app/Domain/Customers/CustomerAccessPolicy.php": "3f4009de66e71b72a2138562631f6b7182af6c1c8ad7ee1178c7f55bf60d92b3",
+        "app/Domain/Customers/CustomerAccounts.php": "b61996873f9e3a1bcac6820b5d9696b3778fa75aced6221c6025d14c7198572f",
+        "app/Domain/Customers/CustomerIdentityCapture.php": "7237200aa79df4445715d8030668328eb4dadf24203914eaee75ac6bc9c791d8",
+        "app/Domain/Customers/CustomerIdentityChallenges.php": "ddef3fa4b2a9b664811efa36f9b872876b7031bc0abc7939a7df39e2e650352b",
+        "app/Domain/Customers/CustomerIdentityPolicy.php": "5ac7896fa90c2a68e0aa6efc93ebe5066e72da1a562bb28be53b4ac2a58ecb5d",
+        "app/Domain/Customers/CustomerPrincipal.php": "e7407ed4c9aa90f8bb9850d4d91f2d7dc5aa650a12c767e529db44c08cf63e10",
+        "app/Domain/Customers/CustomerPurchaseClaimPolicy.php": "8d1c311fa41dccf13a8b5b0dbe61d9a0021049f817c28a54bcd7ff235d9b032c",
+        "app/Domain/Customers/CustomerPurchaseClaims.php": "06b280c6ad46e247e8287eeb02586e1a56c7fa657249718a15e50e1df9c88c31",
+        "app/Domain/Customers/CustomerSessions.php": "9d60f144d28c3baf93f5d0f8690ddecec16cc7b23e7ec5f41f1281fab97da5c8",
+        "app/Domain/Customers/Listening/ListeningEvidence.php": "fbd6bc655b50ed16d717121f5c34db8f0d33da4e9ecf0b42754d77cadb2727a3",
+        "app/Domain/Customers/Listening/ListeningException.php": "753bceac6616693eeba91a160640ff554dc81d5ba1db41e714731af95daed03c",
+        "app/Domain/Customers/Listening/ListeningLibrary.php": "cb7ebe24aa6acf92c0a1dff217d22985b983ae4dbf8d7487d7a051f27ad2979e",
+        "app/Domain/Customers/Listening/ListeningRollout.php": "87889d622833bf06a4a6c23b0aa6d662ee48e1bfff1766eb7f5107507632eedd",
+        "app/Domain/Customers/Listening/SavedListeningLibrary.php": "a16d0d1fc1095563ffee8409633ea1a53a1f2dc34718f5ef0fba0cd4706d863c",
+        "app/Domain/Customers/Models/CustomerAccount.php": "4c58d768353c9281ced1231aba72bca9c853963b25c61f4c9a1732530e068f33",
+        "app/Domain/Customers/Models/CustomerIdentityChallenge.php": "2e9cf4e3789baff1712321248234c7c5f3e3c0df0f1469448e165a4d4abfbaff",
+        "app/Domain/Customers/Models/CustomerPurchaseChallenge.php": "ec62a32734bb75bcfa774b1c39e9f4299c93d70fd9fafe05013bcf2cc958110f",
+        "app/Domain/Customers/Models/CustomerPurchaseClaim.php": "3181aba8b49482a7657c1f3c0a68c90ca3f4d8b076e4295d81e9d2c61719932a",
+        "app/Domain/Customers/Preferences/ConsentEvidence.php": "af03ae8feab2a85cf592fe9414b9425389a60286553080288b9bc115b223b96a",
+        "app/Domain/Customers/Preferences/ConsentException.php": "0f1c8ecc7372fb4ad8370a9dafeb9fb55e96a722210ff78fbe38397bdf6d93c2",
+        "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php": "152586ce87d3f380de6b11f50f8b27152f02b8b343faa37cf7cc232785335ed6",
+        "app/Domain/Customers/Preferences/ConsentPolicy.php": "faf7bf988a35534cc9e18c6f68af3ec00f5185c1e5f196bf8eeaa08fa2639da1",
+        "app/Domain/Customers/Preferences/ConsentRuntime.php": "2115006f35a6929c0b4b439ecc58c06b51705b96a770ee607f0ecf9c13ae3490",
+        "app/Domain/Customers/Preferences/CustomerConsentPreferences.php": "f6b069fbbef8849a9539af1b20b8684266a0c93a24148b8a03284698377e0546",
+        "app/Domain/Customers/Preferences/LocalConsentRuntime.php": "d7273df96fb10ae6f283303da40c5ec193d1bd0d4813055067ea8802363a3a75",
+        "app/Domain/Customers/Preferences/Models/ConsentEvent.php": "20cb33ca5d06d700375187840ca5bd90f6b6f5cdeed691dbe6bc499112371b05",
+        "app/Domain/Customers/Preferences/Models/ConsentPolicySnapshot.php": "113bfed543a32c8948dd40190363f32a8288a451fb5b4c3078c013c7b0c0b462",
+        "app/Domain/Customers/Preferences/Models/ConsentState.php": "1975503b1fd021f2867b0f1296127b67becdc43bddf283942aad8be6c87fa051",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionAttempt.php": "70974f48d0f621a222af38ac855eb3088299e4e65e18238e31e5ed9195244810",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionConfirmation.php": "6748f0ad19e6c670d0e775160fd7847c348200aa189fd8c923c5ecf19d573927",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionIntent.php": "21647934f9c2179fc7cff20dcf0a1a874696eb08c4f32d7190805868bc6dc3c5",
+        "app/Domain/Customers/Preferences/Suppression/Models/SuppressionTarget.php": "1430ea2f99824fce33ebda712ebca40be1ffecb1a7818be5638fad63a6905e6a",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionAdapter.php": "f0010a502909978510e31e53cf6a67a5b35fd25dfeca46e0890e9553ce026796",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionDelivery.php": "ca579a9a3a4cdf2e3cbdef26715f250a6393bc5f48ae670885af3e6a3a829b2b",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionEvidence.php": "220acdf3d6fe7d0de4d1276e5b0dcf25577f009639fa82b653d182e856309733",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionOutbox.php": "45d06200401644c2d35d7e55b3125817aa7f20c7a390e79a0f1808dbf030d386",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionPolicy.php": "9f9197694aa138f65f6d3bb2f6e3bbd73414d2d13461928e35285d7af60d0595",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionReceipt.php": "9b572aa14ea9818c03173482d22fd71689c293534e349fc6503fb52d556cc113",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionRequest.php": "fcd19c6f1af35ebd9ca6ec7a7c26ec737eac222a890c54e57a9a82c0ae3fc5e1",
+        "app/Domain/Customers/Preferences/Suppression/SuppressionSchema.php": "c4af7197b02621dcf52c429e9e1aaa5c757c2e4231d3433dbd585859008fc986",
+        "app/Domain/Customers/Preferences/Suppression/UnboundSuppressionAdapter.php": "b7bc628e61b57b11d65fa7537ddea20c1f5854d7fb5ac30840f25827c722e644",
+        "app/Domain/Customers/ProductionCustomerAccess.php": "f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7",
+        "app/Domain/Customers/ProductionCustomerPrincipal.php": "d49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php": "cc097ab23f579485661260fed613b1f57edd83c000e538b6a36cec7acdffb716",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningPublicEvidence.php": "3e61ae3de6ea4d4188da42d976a250277f026c2be758c5d1ac4386a08c3cb2fa",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningRollout.php": "6713d276073fd810f3bf3e7122445537d0884674c4fc6f1e6e736a3275121091",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningState.php": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentEvent.php": "4d0098581374f9911055211340d23611cfccd6def0c512ea4f83e98bdd9d05be",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentPolicySnapshot.php": "53ac2f046fb371f58f1cd6e51c73907a9db24b24de6879a32a4d920ec6444c07",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionConsentState.php": "c1de4609ae53d40814aa914f437f2ea1cd12cbcf7cb072f9ab81b5d9e3435480",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionFeatureBinding.php": "b56d04afd981af3818ab8e35061ef2fe91dbf5ee253b8ffd5660bbea905eef5c",
+        "app/Domain/Customers/ProductionFeatures/Models/ProductionListeningLibrary.php": "060d7134c87da475dcfcdcd729436b8d5eef454b4310fd0e8cefa40f9117b171",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php": "56233c910f3db0e6304bd7f14fcd58e5e3faa7027d741587ec608a30880c9796",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPurposePolicy.php": "f1201242871add11aed82bd3b75b203def72e24dd1a1b6419d16d8aa5af9c4a9",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentRecords.php": "1f952fece22787ab24fd8960d417b96fb5db7f1d8cae91b2d42fa717c89f12f3",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawal.php": "034dccd1ce2360841f991f5b07ee3b50cf7b7e21616c55d97299aa5d13b7689b",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentWithdrawalReader.php": "9156530ed4cb7f64674f36269d1a6475d2950ab8bd59e5b73fd96095be3eeb13",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php": "14aea5dc3d5220cf493fe63348e2c7f440c4accdba73838111d9f79f75daf1ce",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "aacbf0c04bb6b55704a0772927e3c88f2fe36389e2a3d8ff790c12da9f186db9",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureException.php": "a9a387a8066f575db4375d36a383d4aa6048c36845ed7de1e06fdca77c23cd59",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "841c2c7b7f5b44f6808dec09e53007168468773995f96ee2c5e92e8b2c91b1bd",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureSchema.php": "e1a79d748dbdfc3e87ea6e709d7ccb754d172fbbca66a2eac7e52f6bedf77883",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureShape.php": "f309456d487db802ccd3f9a8f6364385efc9cefb724d9ef495b619dfe61d9c15",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "c20a3cc8c7c2e0ad681d2a4eb01efcfe30f4ec3711fc502a9751fe6fd3cc9797",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "d48288131d585653614c23b6d635d169fc882e933e86d87965660fd90d196f2e",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionConfiguration.php": "2040beebae676750167ea1435a36ed035fa992f78c1033093d5f67750df74b56",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionIntents.php": "048da1c023d7131489e105435f944ca59224feb1e7beb23302fddce128f906da",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionReceipt.php": "19794cad64aff043207949130de975f578ba1acfc60ae4c45f1bfb820419a985",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRecords.php": "a78ff46d5145c666e06d765f125a90edb60668268a4bf7c5e6bc8a2930a4a712",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRequest.php": "960b7a6a72acb6cca642357f2311aa075379e38992b60d0d59af024b01fa1a7c",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionRows.php": "dee78fa8de2a6dba143b950f5c04b0a71691d7c2d978fe8a9ae0ccf4ca053b28",
+        "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionSchema.php": "25843834cf85acef11d7e3c9284ac7eb94c11f4fceb13a3c5402e5b043f814ac",
+        "app/Domain/Customers/ProductionFeatures/Suppression/UnboundProductionSuppressionProvider.php": "e509f683cd908972c9af78a226b35f47cacc01ef772284b02f7652fb14b473f7",
+        "app/Domain/Customers/ProductionIdentity/CompleteIdentity.php": "cdf339408d4dfd9e73eefa81021085a089b64cf7e4353c5a3f33748ed3551e33",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "7b47e7ae6617581d18d25687e35ea28d6804394ead13550555b81b7a91f02fd6",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureIdentity.php": "940a64d2f0bc9f0f60719a38fa4436fcfcca5ecbc81e059f4b5130e37c5a2ad7",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeaturePolicy.php": "6438997b0e13e2b8e7b39b43ab983ace8151bf2bd3d08164e78ed0a32213001e",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "65098069d146e0c4a437acefd672f29ac43e7181541a545c97c3c007cdea8126",
+        "app/Domain/Customers/ProductionIdentity/IdentityDatabase.php": "03a9411dc14cf1883226ae552a3333c74a349a8d5c6a6fea588a9544d5dfc732",
+        "app/Domain/Customers/ProductionIdentity/IdentityEvidence.php": "7b6a2b4d41316cd4e272793499f997a7cd7dc33148c1f460080f0004725e4c1b",
+        "app/Domain/Customers/ProductionIdentity/IdentityException.php": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommitSeal.php": "3a0686a3f04bf3679d384ce06a33bdfa0c6599a593d7f0cc59476f3cf4937b97",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php": "e446fae4857af2cd3737e465fbe1dee7e5fbfca2a799d16f00396e988ad2e3cb",
+        "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php": "2117a278b26b7b643429f460e549adcbe0b499efdfca8ee14ab8939c4a048769",
+        "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": "656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4",
+        "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php": "0d6a2026e00763caba67fcf3cd8391e4d0d774c00bd97208ece36c3746490cb0",
+        "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775",
+        "app/Domain/Customers/ProductionIdentity/IdentityRequests.php": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc",
+        "app/Domain/Customers/ProductionIdentity/IdentityRows.php": "470a2a4816739aef151ad429f9b8b6c359a0eba0b8068a60d1f215b6547794a4",
+        "app/Domain/Customers/ProductionIdentity/IdentitySchema.php": "6ca4d4ca4260e13b8a26752ebd8466f3c3edd7047c9ddc71004e45f242e619dc",
+        "app/Domain/Customers/ProductionIdentity/Notifications/ConfigurationBoundIdentityTransport.php": "4c369241dde1ff5d4214434f284745b8d7ed53fb9488a03c8b72b397083dd454",
+        "app/Domain/Customers/ProductionIdentity/Notifications/ConfiguredSmtpIdentityTransport.php": "75068247694ea5024387ac66b97698aeafd3c5993ac34442f85f72d4c3f316f0",
+        "app/Domain/Customers/ProductionIdentity/Notifications/DefinitelyNotSubmitted.php": "042cb2c999c0b275083ad0df6dba31a19a682dafcc666911eafaebd554089ee4",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityAcceptance.php": "65d588591c45e30b6511f2c3a175418f90df0df97f60391199a97823a6b1d30a",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityEsmtpClient.php": "88877b44bfb1f6901aced5a31249637b2a18b9164fda9a750374272d2e421374",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityMail.php": "7c2aae31553bf34f9ea33f57fa350976e1ab91e93e9333061504c3f9b488b715",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentityNoticeTransport.php": "9877286016507f010adcd7b3bae0d95071fb2fdf91a519d5df74b4f3424ba3e1",
+        "app/Domain/Customers/ProductionIdentity/Notifications/IdentitySmtpFactory.php": "a294f78b62fa353eb1a80e1adacac8b93acae14aba0e7b5b5b8b6fd5db0e41b9",
+        "app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php": "8569b270d19b981334ee506db4046c74bf2d80b143712506adbea6307b38c682",
+        "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f",
+        "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e",
+        "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+        "app/Domain/Customers/PurchaseAccess.php": "91456b65f3505fc9c2057e55eb595b409633132499def7aa9fc9e62589aea988",
+        "app/Domain/Memberships/Billing/BillingAwardFence.php": "bbf0f351994b657391359f5abe7a10c6e32545c119eedbaf4e2debb503125b0f",
+        "app/Domain/Memberships/Billing/BillingEvidenceRecord.php": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+        "app/Domain/Memberships/Billing/BillingException.php": "8e9490b3ba5085d8df52723cb1780359abde63cc5ea85cc6199ceafec025c23b",
+        "app/Domain/Memberships/Billing/BillingExpectation.php": "a6a34b14611b7713ec588d009c2a37e8c952331540b3bbad917d638551054ee2",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+        "app/Domain/Memberships/Billing/BillingHintSweep.php": "af33e40feb33e1bd1778be3a06dc5ac96c314138086a96dd9f5ae454ef07b292",
+        "app/Domain/Memberships/Billing/BillingLedger.php": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+        "app/Domain/Memberships/Billing/BillingPolicy.php": "974e44a65c868cf28456a24662f42c0202a919c16aa3688b001dde93a4d6991d",
+        "app/Domain/Memberships/Billing/BillingProjection.php": "de8a6fb54974a45c958b70b5182326849b78e43f2de1541a950478f2ae40522b",
+        "app/Domain/Memberships/Billing/BillingProviderGateway.php": "4dbd2f51a5843a2450e03407eda85426bb1042b37fcf6d6210fba64de3c25231",
+        "app/Domain/Memberships/Billing/BillingProviderPin.php": "a68dbca0eccc5ee5f217e269f094add3ecb37dbf9c7e514c9805e34b08f73456",
+        "app/Domain/Memberships/Billing/BillingReconciliation.php": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+        "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+        "app/Domain/Memberships/Billing/BillingSchema.php": "bc0a757ceb39ba628998ba6cf12c533cd45ed48a0195dfff49b97c106cccca54",
+        "app/Domain/Memberships/Billing/BillingSettlement.php": "f7ff18a61127cba2e9785a750c2364513b5ffe88e72f71cbc61432f1d06b18e2",
+        "app/Domain/Memberships/Billing/BillingSnapshots.php": "0753aafcddbcb76430011ca478930b782706c69eee8632f28080dd60d422777f",
+        "app/Domain/Memberships/Billing/BillingSubscriptionApprovals.php": "08c4a4ae7b4ba52f602d6d203b59e74e1ed2323b24e0bfe99979631f50f144a0",
+        "app/Domain/Memberships/Billing/BillingSubscriptionRecord.php": "c407914917395bcc1dc152bcb00fdbed000e6c301b573ca5dd2ba34160ecea72",
+        "app/Domain/Memberships/Billing/BillingValues.php": "175c6767de35fa0313599c3d609d8089e837e2208e0b4add45eebee2cbb9e776",
+        "app/Domain/Memberships/Billing/BillingVerdict.php": "0cb4a98594559a85eb381d2961c2806d7cee1ef55cf5815db50f6dfec6efc2cc",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+        "app/Domain/Memberships/Billing/StripeSdkBillingGateway.php": "cf853c8a284f10c5dd54b419d5e5e631ab32147d9227b139fd50813bdf4f438f",
+        "app/Domain/Memberships/CreditLedger.php": "da00984fc8dfb9e610d19c18d63ed91520efe6d846cc879010ae67156ef139ac",
+        "app/Domain/Memberships/MembershipAdministration.php": "c482b725adb55b280ffe1f97a78be1913ed6443969522afb9db71f5ad526e43c",
+        "app/Domain/Memberships/MembershipCustomerHistory.php": "e80d3069501883ccbcc6bef8adad91b60a04c93747bb91a5af7068fc633604de",
+        "app/Domain/Memberships/MembershipEvidence.php": "efa3205598a107798c974ba3e2bce801423d71b62879dc96f1b981a822bb2532",
+        "app/Domain/Memberships/MembershipPlans.php": "dee36cc481d80e47bc08d9d8ba0b61d9128719fda628c4c3f0be7d5ffff71b5d",
+        "app/Domain/Memberships/MembershipPolicy.php": "282a362c36976095ef3ab611dd08d409762628c8a4e0317f6dd92b2c0c5d0943",
+        "app/Domain/Memberships/Models/MembershipCreditBucket.php": "27e3c5994baa3e7b7283ccb3f4549f8a9b1626383b2aaf4f038ea6d49b42e2b6",
+        "app/Domain/Memberships/Models/MembershipCreditEvent.php": "51d0b2003f7650b2ba230210c28491039453be2e2b371eebaf4e20ae601244bc",
+        "app/Domain/Memberships/Models/MembershipPlan.php": "50244578407b5a9c51390621c07878aad065e1aa3992efd2ad86f03b68b85410",
+        "app/Domain/Memberships/Models/MembershipPlanVersion.php": "15710d8bdca1954f33eafcb5108ad6f42729d61db10bcdb7b2cab459aac547c1",
+        "app/Domain/Memberships/Production/MemberGrantAuthority.php": "02b32f1aa885dc9b6272d7b6643493131bc447c7a7d6ba7d77b45965abb4177e",
+        "app/Domain/Memberships/Production/MemberGrantBinding.php": "e8ec6951a419ed46ecffb537aca2ac323367b2b346efe1ca939c8585a0a3bc61",
+        "app/Domain/Memberships/Production/MemberGrantIntent.php": "7bd43b0410567621d264b8fa92a1b7d1e959d631563cab6c0fa6109b9ec9459c",
+        "app/Domain/Memberships/Production/MemberGrantReceipt.php": "ee87a595896faba469ef06f563e39c79f68248bbbb7c53c64aa6c684baa37926",
+        "app/Domain/Memberships/Production/MembershipAwardConfiguration.php": "0a71bc52fbad106a201bf0615f9bc0b5e64888871eb643ab7f2c43b38d96247d",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php": "a364310f71d11f26a62f0fe14ef238203f5bf7a2ebd5a40caf1f55762726e325",
+        "app/Domain/Memberships/Production/MembershipAwardObserver.php": "70e7895a3df12509accc81b570aa6284f20a36d84288812b69169234b4bcd57d",
+        "app/Domain/Memberships/Production/MembershipAwardTerms.php": "773018b013c2bb6fe5b6fce01df516aa865f2209a1239a96d8da7a7711d33827",
+        "app/Domain/Memberships/Production/MembershipAwardTransaction.php": "1dba1372fb5f165a995d45043c99f9afb2de9029098c976a3d9959adb8b1c35b",
+        "app/Domain/Memberships/Production/MembershipAwards.php": "eafb8223d6d8196d8c9c6f8162d69a4bc365a1b2b3d1385f8776b8c3559b4f00",
+        "app/Domain/Memberships/Production/MembershipBillingEvidence.php": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+        "app/Domain/Memberships/Production/MembershipEligibleLicenseAuthority.php": "601c8df8a23eadb2c902c459e18a61f10ead9ddfc4527a59d6a73b848ebbcce6",
+        "app/Domain/Memberships/Production/MembershipEligibleLicenseProof.php": "9475b15707b6a66d9a9e8e6847d2c29504cb8baa0b16bb46cef8dd3582a72f8b",
+        "app/Domain/Memberships/Production/MembershipException.php": "c04533684f2981ecfb21423a7987f4c4ee5d59e146325fad37a3fa68f1fb2070",
+        "app/Domain/Memberships/Production/MembershipInvoiceBinding.php": "c9207194c8858a9a03ed2e62249df05eeef2f952726fd970f1a67946a884ab35",
+        "app/Domain/Memberships/Production/MembershipLicenseBinding.php": "367efc2212c55fd2164f64eb89d69b3b636d242bd26d310d463d55a51397bc54",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceProof.php": "e471af3bcbff4bf6855a0a0eafa4459222fd8f69d8deacd79af493171ef818cc",
+        "app/Domain/Memberships/Production/MembershipPaidInvoiceToken.php": "3044ff01513e902fba022de24a68a4b7ecdb661bce2a77109aba686c5638c8e3",
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "952a74e553e3894e42dbddcc81fda745830b2c179a8e11ada1b0d4d3a923889c",
+        "app/Domain/Memberships/Production/MembershipPolicy.php": "21528d642460d812965a4302096699b6736a328bdf2af63d01af4e195e28fc7f",
+        "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "a169808a1f26b023210741454c840cf5309a019518b397f954f9f5566b81fd74",
+        "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "ad4646282ab0451db9728d47d83c804cce1ec2a688d281fbc5e0eb1c1a4557b1",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsAuthority.php": "918cc499531858932dd3a91c54910f41640ff5fde7f0b9dfaa40fd3cd5b466a3",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsProof.php": "0485a7c18f1bc1aa53d9396119ef05fc557bfc45a646c245048cc4e12e32847b",
+        "app/Domain/Memberships/Production/MembershipPolicyFactsToken.php": "15a4cfac9a1d91db5c66e2e2fc6d485c8964ec0227d0bb033a50b7a66ec4a041",
+        "app/Domain/Memberships/Production/MembershipPolicyStaff.php": "86a139fc0f70238ca377fad8193622f65c96fbed5f59740dd0d02dee809032c7",
+        "app/Domain/Memberships/Production/MembershipPolicyVersions.php": "876b259c479eb9a6a8a8934900f586f81932cebee52d73a82a9e57a1b63cb224",
+        "app/Domain/Memberships/Production/MembershipRecords.php": "c46a4699d7075e4de83519ac82cbe45708091a85040dfc2dcb221d0675a1f4ec",
+        "app/Domain/Memberships/Production/MembershipReservationAuthority.php": "0d0a50e0a52570087d47ab9482d8b883cbda17063187fb531f124beaecfa9771",
+        "app/Domain/Memberships/Production/MembershipReservationBinding.php": "b4ac92ebe404ba4974c00ac06485d3a30a5cbf7e6dd5e9e50110d68fd9bd1268",
+        "app/Domain/Memberships/Production/MembershipReservationProof.php": "71068504f41cf95cb11d9e9f5d9be93082a72ae9b6c71c446cee3fbc47b2c540",
+        "app/Domain/Memberships/Production/MembershipRows.php": "3284fde61868cb7cf1a0427f53ae991183782383917e51bf94034174ba9caff4",
+        "app/Domain/Memberships/Production/MembershipSchema.php": "93898457684c9005853e539d344142b1c8bc1141a0554e1e76466bc378ced799",
+        "app/Domain/Memberships/Production/MembershipValues.php": "0a6f2279012adbfbe11cfa3bfb4e55b13bd17715b270bb7aeef5310656d2fe65",
+        "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+        "app/Domain/Memberships/Production/SealedMembershipPolicyFacts.php": "395cedddf0e4d784395c561d68d8cc94a276214b8fa6519986d06d285446bbe4",
+        "tests/Support/ActivationFixtures.php": "2a2e1664078f8886d1e99e1ae6c783cf56950cb1ad0ad1ab452c25524e5bc51e",
+        "tests/Support/ActivationRace.php": "56f786a5d45acbafdc9f9c8dfb1bab1c41a00beada8ee94d9beca9662e1a5acf",
+        "tests/Support/BillingHttpFixture.php": "78ce7e010ae2bf8c92b527fa9b797a49a7fc4d1e311d5134b4dfebbbfea7d439",
+        "tests/Support/BillingIntervalFixtures.php": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+        "tests/Support/BillingStripeFixtures.php": "cd90a3acf4fb922a77134e21a13b6a9859b3c2802824df9f01f258a3ddf08436",
+        "tests/Support/BulkReplaceLicenseDraftSourceFixtures.php": "7563e98acd2e818bc9cebdefc573c12bad8ae44b497c9670f3f3a129ddfca540",
+        "tests/Support/CapabilityRollbackFixture.php": "90d4e1ab18f7442131859afbff22018dd41742ffe10862cc3409d33a83ef9def",
+        "tests/Support/CheckoutFixtures.php": "9015ea746021c49cef185947d44e67bbfe4bccd75f75dc024bab521a613b5cd8",
+        "tests/Support/CheckoutRace.php": "ea9792d37564bac27fdfc54730f991ba82d057a1122e93b092aa05d0ab024f9e",
+        "tests/Support/ConsentFixtures.php": "bbccae78ee99f140f334341b2b965f2dc7496afcd3b24befbcf8996a62588dc7",
+        "tests/Support/ContractFixtures.php": "b41f45ee4fef2969e4cb3292d2d810902c13be7b140da85201ea7950f634ad62",
+        "tests/Support/ContractRace.php": "307730168e3824770271fb98da757d3efb7c6ba736bbcc8e8b078ed6e488f3bd",
+        "tests/Support/ContractRendererFixtures.php": "dc7d954552e582e882158dcbac3762d474d04e177f72ae16b6ca37caabcc085e",
+        "tests/Support/CustomerFixtures.php": "7eb6b9ff2154a17f847b4b131e0f9bd3eb1df1e12096026ca858739ce4f56ec8",
+        "tests/Support/CustomerIdentityFixtures.php": "5ef1166fa240f10dbed472931db583fd0d534815d53b1b3032b783c37bd1d1ff",
+        "tests/Support/DeliveryFixtures.php": "72ec996b0d6e38f8184215e12470c8d00c1ad703e1e9a1f7c9d94c22bd8d73e4",
+        "tests/Support/DeliveryRace.php": "648877ccd2232d17e9e7751e7753b5e68f98f9e465a9fdca4534cf681b559735",
+        "tests/Support/DisposableNativeDatabase.php": "34399fe6bbb82344636f8e81b9b588ad892fa2b6377bde516c68253d048e3e01",
+        "tests/Support/EconomicLicenseFixtures.php": "6852a47392ca97fff0c67b2f2fea9763001b05000e7f6b9172184cb52ca97387",
+        "tests/Support/ExclusiveOfferFixtures.php": "9b28aed8bec919ed6e5ee00ef8933305ddc2e3ea1dd259ced652d4a4ee038bed",
+        "tests/Support/ExclusiveSelectionFixtures.php": "6d087f48d170e5ccf3dcd1d2c9aaa813bb08af07d0106eba1c16504049513888",
+        "tests/Support/FakeProductionFreeSources.php": "602b34dfd75ea1d3a75aa9ecb7ab38099caa76c353bfcc291832585ba3b7c898",
+        "tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+        "tests/Support/FinalizationFixtures.php": "f0f7905564f183a29bb972ec1cfd7d20eafb00511f338c73cf870f4251226f63",
+        "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6",
+        "tests/Support/FinalizationRace.php": "b994d19edb735ef10686b0451c91febd4ea20f39ca30f82679b2815e9de5bcc1",
+        "tests/Support/FreeGrantFixtures.php": "edeb790c79f3991e1eea3adad5e6282108a0e24b70fe0f3a9f71b7485138aa11",
+        "tests/Support/FullDiskStream.php": "769f9cb277a0fedba03f36001beecd03c93096b2920957df29426240f89e1651",
+        "tests/Support/IdentityHistoricalCommitFixture.php": "c36d6def466cb27d742c1b9596177a295d9d3f0820a7b51314a0b43425c450a2",
+        "tests/Support/InquiryAdministrationRace.php": "7b1c07046393dbdf0c1658ecfeef4d029ea83132fd27e117872152d8f38d6dd7",
+        "tests/Support/InquiryConversationFixtures.php": "045952429e8a864497bbc7eeb4be89d03665af9e3575b68f01e8f1405ed7cfa5",
+        "tests/Support/InquiryNotificationRace.php": "50be75435d2db84a432b5fb043b83512b09d954e8dc6378fb63545ccfa0f5d3d",
+        "tests/Support/InquiryOperatorRace.php": "9357b2d390525b2cddaad01187efffa501131bffa30f41d3b88ebaf5b010372a",
+        "tests/Support/InquiryRace.php": "e37d564dec05e2b1dee51a94f0291be16a9e06ba4c37d2035e816d537b1809e0",
+        "tests/Support/InterleavingBillingGateway.php": "990d4e06e1b491b68d976f34df6a5eacc43c87bb359a86318e3ccea4ce0283a4",
+        "tests/Support/InventoryFixtures.php": "e88a53c2792ffe1c0444bae4ccf62966c2b97dac0167f9248cee67872ec76d64",
+        "tests/Support/InventoryRace.php": "76fbaa16e9efb8554db2f1228575ae55de0f8824c1dc03da21113c35e54435bc",
+        "tests/Support/LicenseFixtures.php": "fae78d27bb5cc66084268f3766a84d03d7b419b02e1a11e9401dd30c78d0559d",
+        "tests/Support/ListeningNotesFixtures.php": "f7c2d001f448f3937b008fb55bffa6650b38dc65eead292ec8ce95b390cbfdc3",
+        "tests/Support/MediaFixtures.php": "c8922bd4fd0073e10fe645d5bbf286c12d0e42d1465a1ebcd6df2f3267c06787",
+        "tests/Support/MemberCreditEventFixtures.php": "4ef69f13dcdb8174bd236817791ffb2d808c92e1167faf2b83d601179656c041",
+        "tests/Support/MembershipAwardFixtures.php": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+        "tests/Support/MembershipFixtures.php": "628bd19125bd331231575033b3418ecc24a5df9dcb28aef3c821ac0edde9dcc9",
+        "tests/Support/MembershipPolicyFixtures.php": "4a3a9cd4fb7e81235c5700b557adc09bc2cfbaf7cc2021a48db937911c9a68e3",
+        "tests/Support/NormalizedCatalogFixtures.php": "5f102463ab4d3d50e1a9a44c9243f50cb0ea9faed9e95a9c3e493f9e947350a7",
+        "tests/Support/OrderFixtures.php": "532c189e973faaa5f78ccd13feadad47b73e0040d6290af45259392b79732110",
+        "tests/Support/OrderInquiryFixtures.php": "7b3c2f2b9ab45d2300e48ea64ca4eba2a684875c8c65ca9587cc4e9075f07c35",
+        "tests/Support/OrderRace.php": "e78816cafba4c1145cb7638762cc42044bb59369805dbc03344177ed0bd876f5",
+        "tests/Support/PaidGrantClockedAssetFiles.php": "f490ff59aa823186f3b6e2f08a400c442202b77207fda1b99aa51c2943cfa352",
+        "tests/Support/PaidGrantCommitFrameProbe.php": "f91b31543f076fe7bd2bc1d74d151d6a7825153340b925f3208cb3cef06c0098",
+        "tests/Support/PaidGrantDependencyFixtures.php": "569bc03f59ff5a2f60e7585c5e9f82d3ceaadd53447db52d225cde23bfc38efe",
+        "tests/Support/PaidGrantMonotonicClock.php": "9ef5a0be4d32b6d173a7d3eb812cc358e7ee98d85a4d7ab1c30d56485c131950",
+        "tests/Support/PaymentFinancialFixtures.php": "fd8161c56f38297f1130eb34f99bd73c0e10e5dd5ce4f50aa0fb301c757eda51",
+        "tests/Support/PaymentFixtures.php": "088dccf7c7ac17b515cbc491c087fd664b6eff01be78662a9e072c282cd4a4b2",
+        "tests/Support/PaymentRace.php": "785fdcdfedec839c51a8d34e3456c66c9d2d0682dfad566c1681a791046867d6",
+        "tests/Support/PhpCliWrapperFixture.php": "bb88c8121776b3df712481f06581f761f82384a33b382c1901fd83110f10bf9b",
+        "tests/Support/PreviousListeningV1.php": "7e5403a27df33c4cc5f9a6abed6ac4db5b66e513e82881aaedfa61c12db6eaeb",
+        "tests/Support/PricingFixtures.php": "7790207deee9c2f2f51c9be68c52ef223bc09cbb5d4f482a568242aee85336fe",
+        "tests/Support/PrivateProductDraftFixtures.php": "c3a3e22de8cb11183ecb8cb40f8c15d6a93b78e202255a6c81d4cd96c4dfc7fd",
+        "tests/Support/ProductionCheckoutFixtures.php": "173a091d8bf56116cd3bfabdb6633d992188ec26ea55338526e99d8741af42b4",
+        "tests/Support/ProductionCheckoutGatewayFixture.php": "b91274f94105fd49bb8aa5a555c2987e3306624063f2ddc37dd511116d6e4130",
+        "tests/Support/ProductionCheckoutJourneyFixture.php": "b3c3a32f284066d1c78132841facbfa86bcf162cd7f835c743df1a40e0bf24b4",
+        "tests/Support/ProductionCheckoutProviderFixtures.php": "edb2774496bfad0825d42f29b4c7d5d9c55692e7a1afd4bfb5010318b02a60d6",
+        "tests/Support/ProductionFeatureFixtures.php": "6a93e458d0a275f81043984f844552c07fcce64d0a21020b8f86967a44ffccc6",
+        "tests/Support/ProductionFreeGrantFixtures.php": "0d4b72b7959c97412ecca53d52d8e3106b07e2051c1b5947a163f8729ec0cd81",
+        "tests/Support/ProductionIdentityFixture.php": "558b6269d305b7b213e4b8c102c7e9e117dfb8cce30c4c76a7520482609391b7",
+        "tests/Support/ProductionIdentityTlsSmtpFixture.php": "03d5ddb1d3ecf63ce908e04d32e856e4b1a68f657578cbe20418adfaeb0241a6",
+        "tests/Support/ProductionSuppressionFixtures.php": "e3c7e09124afffe1dbe3507fe86b76ba915bc183abe5b82f6b7b54e325600cfb",
+        "tests/Support/ProductionTaxCheckoutFixtures.php": "bce1f19d183e46fa85cd791a48d41bc7a93825878cea2f40252b7eee4c8a83bc",
+        "tests/Support/ProductionTrackCapabilitiesFixtures.php": "f0038e32679d026a029f9c41073d3043e25213a4e3cb9a7a43869fad3165a1ee",
+        "tests/Support/ProductionTrackPolicyFixtures.php": "b8ad6e6a32ae3de7f979063128cd8ce8b0527e1a62e94660fc36025cd204636e",
+        "tests/Support/ProductionTrackPreparationFixtures.php": "cd480582f53f12a68cfe1a364200836b5c57fa34958f88d102670831d7405004",
+        "tests/Support/ProductionTrackPreparationReplayRace.php": "50a8a07040037521fccd51c8f4a2de811047a4f11983a98ebee4e2117417c493",
+        "tests/Support/PromotionAdministrationRace.php": "6ef7cdd1c41ed137b60918937d93ed5ef970a8b7b5a77c045803e460508b15b0",
+        "tests/Support/PromotionFixtures.php": "ba19ff0c7d723d2a08001ce3e65a0d091500e52e09c84b59e280d29555d81358",
+        "tests/Support/QuoteFixtures.php": "7e2d583743c06000ee99a7330a5f509adaaf8fcda8783e904280ffd9f79d2570",
+        "tests/Support/RecordingFixtures.php": "0789b5ebbbee936bc5882543603cfb388aad91a3e34773c00d78bba25f4bfcf8",
+        "tests/Support/RecordingSuppressionProvider.php": "aec8969f43703b246b912027ce3602e0f9705a076bfafe73bed77cc33de1ba9f",
+        "tests/Support/RecordingTaxCheckoutTransport.php": "7d53c029d8e8ce1e4a28eb707acd690c838c20934cc0d21d1b44c8a9c2b98aac",
+        "tests/Support/RefundResolutionFixtures.php": "64fac51be32206a2c5174f6cfe10e08dd31322e068ebd158c1cb861f6dee1052",
+        "tests/Support/RehearsalBillingGateway.php": "7f2cde6fd7ba656dd5b300191a9cea851cb00cbc925b95d77bda69b16b2c8f09",
+        "tests/Support/ReviewedOfferDraftFixtures.php": "62612ef747eab11a08278ef00ea9be8bfd89edc2976b7be13d7683650a84ced8",
+        "tests/Support/ScopedLicenseFixtures.php": "0b1c916317bcda0672aaab2456e0856c66a1c11f5fd1ba4fb8021c93771573cc",
+        "tests/Support/ServiceProjectFixtures.php": "86b5ed7ab50a90a2c3b1c543f70167f6697cbaed810311ffdbe093c333da777f",
+        "tests/Support/ShortReadMediaStream.php": "7aae23691090c1d80b8657961566855e5ecd33f326512d42c3f2cde9fac607b0",
+        "tests/Support/SiteContentRace.php": "4b7364d7ba63142fd1119e3a1f7773d63a85c3647ee8d3c5af599d4650917aa1",
+        "tests/Support/SiteEditorialFixtures.php": "091e35a2d009b61dee7c88cc0d8790884cbf9c916c60eed470ce0a3b4d0d17b0",
+        "tests/Support/SiteImageFixtures.php": "b78a95c1d617f23df7934c995c90f3d5496b02fce7e5a205a2ffccd408ee4ac4",
+        "tests/Support/SiteRelatedTrackFixtures.php": "f1af023adbd1e29b99d9b7bc2da2c084e4b98717404e7ea822a31fb340eb6adf",
+        "tests/Support/StemsFixtures.php": "07d86d1083ae41d9ea5c6a98e1ccee02a62e1aa7a14263cdb9462bc3e5d92b01",
+        "tests/Support/StripeWebhookFixtures.php": "70f070cf86e34fefcfe31f23a81c13e56b061a95edf30cf799fd01ee25019344",
+        "tests/Support/SuppressionFixtures.php": "35cb972ffa1d2dedb2d4be9870a4327198e79abf7304fece3028504273e03f60",
+        "tests/Support/SuspendingBillingGateway.php": "254819ea88c991e9396a7bed403982ca26bbf64b1e2f92c790d3267f47a2eccd",
+        "tests/Support/TestOnlyMediaScanner.php": "f43f882f5dc1f0d93be1dd640cc73a9c2dc7720f3ac654540bc2eb4373507bf2",
+        "tests/Support/TransactionalNotificationFixtures.php": "662f8ca8284a88592fc410362159195e180d952415b4752975f60319452c776f",
+        "tests/Support/TypedLicenseFixtures.php": "3d96d2968b1343647eb90991e49351865a1a75c0c1098fe2e46a39e429aaa891",
+        "tests/Support/UnpaidReleaseFixtures.php": "854b882ab1ce8e12abfedd90421fbd928d6bfa07e89e4f592d1dc2a18ef022c0",
+        "tests/Support/activation-race-worker.php": "eba4fb27566e630fc878d0ab94dbe09da0157c851cd0313dcd7f05e33f126f4d",
+        "tests/Support/bulk-replace-license-draft-source-worker.php": "020d409a16a6dc6eae12482082a90008ced2bef40c739504996774a2103a274f",
+        "tests/Support/bulk-track-metadata-race-worker.php": "a7f0ab194e201a1a6b5f5e97e65dfece1f663b7994d3985806058e75e75a8e2f",
+        "tests/Support/bulk-track-tags-race-worker.php": "abb672fa630dfee15422166b405d96ddd6fd5e25fa2cfef5ca068016c2cbcfc3",
+        "tests/Support/checkout-race-worker.php": "ff5e5ad200843cf85f80b7ef04d09f331a29488287d583a77d23e2010e78301a",
+        "tests/Support/commerce-audit-actor-worker.php": "3ec6e16d9302d7601115b90b0dae7ade68b5ee06a937a5cdad31111939728f7f",
+        "tests/Support/contract-race-worker.php": "4a1e7a51b4e936e416861b3ef178079ec78be4845b8260f6ca3fa14f2606cd46",
+        "tests/Support/contract-storage-race-worker.php": "4d5c4f88056ae50f144763f6c7f9cd7dc0a51949b5ae35f4666b1b6365a7bfd5",
+        "tests/Support/customer-access-worker.php": "b693c4203b5ab728d4e6ab7506d30bf3a3a8f2593b131ef219a97a29e0525e22",
+        "tests/Support/customer-identity-worker.php": "a02cbbaeaa20e6ac5a0091549bf0b6897d0c582e9febd7cd0684e8f158c447ac",
+        "tests/Support/customer-purchase-claim-worker.php": "b6deab9da430700323c10d10872a12e8cbd46ac615680970195631ac8e94e5ae",
+        "tests/Support/delivery-race-worker.php": "fe80880fdf15e73e5e3ba73b2b0a80f6687f4e242cefb212469feae3d78a26a0",
+        "tests/Support/delivery-stream-worker.php": "670a053a4c1d6de0fbc5eca50670e77f2448a9e897cd5d48af0219a39614f0eb",
+        "tests/Support/discovery-sitemap-native-worker.php": "54ff572d98e4529b72dffd5350d43ba6d360147720d3c253bd869720bfba112b",
+        "tests/Support/discovery-snapshot-worker.php": "570cacf72433c7753b8a4b8bc2ed8ee67d45d3d88a53715b77910bd5b2532afb",
+        "tests/Support/finalization-race-worker.php": "3c7882fc658d04c87d790af4dcd863eb1d4768f94328602d3e042d061a82e64d",
+        "tests/Support/free-grant-race-worker.php": "2b7e87af2c1b1651b16dd555b52efa2c2ace64b3415943d357cd2a20a29a29a1",
+        "tests/Support/inquiry-administration-race-worker.php": "868b8b5a1f9c935aa85d2458309d5e88f901ac0be60a28aa81ed189cd4361eb5",
+        "tests/Support/inquiry-browser-catalog-cleanup-worker.php": "7a63158ef747005112d4bcb6560d8973301dc0535b1ea4fbef50c711325fe805",
+        "tests/Support/inquiry-conversation-race-worker.php": "12bfe812104a24ec5d1be30439218af98d3c079759b200a79c8cccabd046e74e",
+        "tests/Support/inquiry-notification-race-worker.php": "a4f4028019e668d087cd9c00df25bce283ff7835598bc94169e730aeee968cba",
+        "tests/Support/inquiry-operator-race-worker.php": "7c6711d539e7b78edfa1f22dea726bc3699432bb3c63dab9ab7a3fade4fab3f0",
+        "tests/Support/inquiry-race-worker.php": "42573b858447ecd25e523e342d097b61c381e9907146612341806e4cc1debe54",
+        "tests/Support/inventory-race-worker.php": "ce957c703d5b5f793166317bbfc3822235557ce21633613372f9bbe1a1494845",
+        "tests/Support/license-template-authoring-worker.php": "c71cd3f7e1cadc50e46ca90e55460cfce17a7c0c58f7a7b9fd41f170be4bee33",
+        "tests/Support/license-writer-worker.php": "5117b544afe4b7afb4607fd54a05fba48abd4255594952be138100f8f4e7907c",
+        "tests/Support/media-writer-worker.php": "c27e69b27e4d8cad66cf4f5b7f109e7a0a0feab8b2f0237319c649694596fdfb",
+        "tests/Support/membership-award-race-worker.php": "bb8c930657828240bc3cf2b450f26113d8957adcae7ceb70d200c78124edb403",
+        "tests/Support/membership-billing-cross-invoice-worker.php": "8bf47d343879a54aeaed4aaf785141e0ee8aa3bdcfca5b8b764ee16828505652",
+        "tests/Support/membership-billing-interval-race-worker.php": "ee09436457ffe502989dd26b378e00242c8a78773b20f02628ac7097ef427ce3",
+        "tests/Support/membership-billing-race-worker.php": "dbba3dbc351ee91ce72627094751f918f63bf229a92fa8c95ce999428aafc76f",
+        "tests/Support/membership-billing-stale-race-worker.php": "e0615d24aac2b49c97871f5207ea66f785213be1e94cad4353be09b44b5f5a07",
+        "tests/Support/membership-credit-worker.php": "9697ca1d514f6c8a9f94bb908cb445449b2c0ab29d4cda23b92b58e5185142a6",
+        "tests/Support/membership-interval-race-worker.php": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+        "tests/Support/order-inquiry-worker.php": "c52cba51f81e5418643ff98cd9763e7a3e44071e00e5713a27048292e62707aa",
+        "tests/Support/order-race-worker.php": "5ebb7b8352e584a069bb0ec320d756312e162c2a0d84d56d41eeee01df302852",
+        "tests/Support/paid-development-bootstrap.php": "b3aa4463c71505d4e471d2659e7e0bf468566533ef20166b1bda2d97a8d433f6",
+        "tests/Support/payment-race-worker.php": "f10b9690bd167ee9e3e491d2bfd7c8243bdf7046f779518bc28244a95a14fb09",
+        "tests/Support/pricing-race-worker.php": "e77744cbd7ba308b5b7f0f918a051e21b11659cc2bad326246acfa808146f9b6",
+        "tests/Support/private-product-draft-worker.php": "eb4fc8ec32c3c06569ee281b3f8eda189ad2e19d89d2c12a5d7e3e47e2aab1ce",
+        "tests/Support/product-draft-worker.php": "e9c7cd63465c71940eb67f56b89a944ca31d9e62d9583c0767523190015afbea",
+        "tests/Support/product-member-refresh-worker.php": "85ad897bda5bf2a8193453ec620446b66e854958dfcc511dd90959009b1c579c",
+        "tests/Support/production-checkout-race-worker.php": "f0974f25d5ee0ffe696edf3c4ebec19f3ab0cb636b459458af44d96f400d4e00",
+        "tests/Support/production-identity-race-worker.php": "67a526ef790be061f0661d58a8b19a0069e3a3972d74d591df0c80dfe2cd1a33",
+        "tests/Support/production-track-policy-worker.php": "04a9bfa369af9d13b3e91ac68595a21a2e61e0ba22afe0600487630a688340f9",
+        "tests/Support/production-track-preparation-replay-worker.php": "f086adb5621b1aa1dbe82dcd8c393bbb93f5fdb9c168be426fb6d88e84066f40",
+        "tests/Support/promotion-administration-race-worker.php": "0722145254f61a507ef3da0f24367fafbe7e0c69c6f3d3a21b2c2a86010902ef",
+        "tests/Support/promotion-race-worker.php": "d8957a9039a0c9acfb07c53bb9a228350f73759f31de2b6d3d4f9f96b699e341",
+        "tests/Support/public-embed-route-cache-worker.php": "5ecabccaac462cf178ae2f1ba01c203dbafd1851ad4507da490d72a2159c737e",
+        "tests/Support/quote-race-worker.php": "4110b6de753b58aa8b64d3713eff93c4894d6c4a4ca9674a2e7bf78bcf15d13e",
+        "tests/Support/refund-resolution-worker.php": "bd83cef94ceb22d58ec8c067f220ee977be53b43f35141fae20dcfaf1db468f3",
+        "tests/Support/resumable-media-upload-worker.php": "5c8aac8e00a7d8552ec681accb128556e353de3a0a6ef96687754c7364e65d2d",
+        "tests/Support/review-identity-rotation-race-worker.php": "4ba543cb7f7ae88ae7dd6aab0efaba8fe9ab301b25d33b259849a304b400438e",
+        "tests/Support/reviewed-license-draft-worker.php": "717ebb00a86117d6746fe7fc5c3561683f93b3e8645da908e1abd7d670a8979f",
+        "tests/Support/reviewed-offer-draft-worker.php": "ed10e23b20e1c34609806b8dcbdfc4556acae1ced3fbf1577e5be56f043d5d79",
+        "tests/Support/rights-declaration-writer-worker.php": "78c2432021338ae493c1df3510738e4c6f09d6c9abf80f00885babe75430a8b4",
+        "tests/Support/rights-evidence-guard-race-worker.php": "907fc7920617bc911ccdf8be65229ef47b9ff06124fb7c731f767ef55069b71e",
+        "tests/Support/rights-scope-writer-worker.php": "687a96e1b6ac365901bb5c31e45f49186a1dda1641f9b0d5711b11b3ef929817",
+        "tests/Support/service-project-worker.php": "e9ee562508a485d227a3779f81c7acb838daec63e5efb1100e7eefbc0357195d",
+        "tests/Support/site-content-race-worker.php": "d698503d33b3c05f57bdbcfd4e6fbfd30633e2eb81e03785f1c423027cd3ae4c",
+        "tests/Support/sound-kit-upload-worker.php": "2e54ee046325eee55bbe05fd9da62ea57e5e08f9762dba65a5abdc3f2f65ac88",
+        "tests/Support/sound-kit-worker.php": "65b8a27915bde9ab13de82f95beb0de3c650ba768678d4068e03589f6c3155e1",
+        "tests/Support/stems-recording-preview-worker.php": "45928e541948c5cf867c9425d42c96c1e15b5b0f0faa6cf1dd3e74f2cab03be1",
+        "tests/Support/stems-recording-race-worker.php": "460b9e71dab84dd988ebbe6bf15ba64f0ed89d8a91cb04d731c1e261ed7e14d3",
+        "tests/Support/stripe-webhook-race-worker.php": "cddd0d1e20fa3f2448c3ec3d29717f950b8b489005d7147ef1ca74464c740a18",
+        "tests/Support/support-attachment-race-worker.php": "2b4f57ed90abeac47f44fd667f00bd7517ceb48592ce67cefa08860fca8b9e0a",
+        "tests/Support/test-exception-operations-worker.php": "5bd4501ef6450b475c04b13c6101c9a0ddaff00de6bf18e565ea64e4f482bf8f",
+        "tests/Support/track-metadata-presets-race-worker.php": "2c2f5bfd99bbfd6a2e606d6622d09e74b627e54e5dbd3621d5914810ed29c654",
+        "tests/Support/track-metadata-race-worker.php": "97610c2a45bd57a0b5d00bea24c19278a10d3fdd243c9e4e3119c76f4345e22e",
+        "tests/Support/track-publication-apply-race-worker.php": "f2fe8cb54ead36b1658f63fc19c6b5413df37e95e1d1c511b9244bf3e6673c2a",
+        "tests/Support/track-publication-guard-race-worker.php": "277fed78b2a909834270fea086c895b59a9d784c9046dee0f2ff544dbd5b79cd",
+        "tests/Support/track-publication-manifest-race-worker.php": "50dff898c1fe9fb707c4484576c265151808c00175bc47aa5047b9ba64699cf8",
+        "tests/Support/transactional-notification-worker.php": "15f0c9c962ee7e065ebcf3890ea63ae27b4ffc5f0cce8e001c7a5d2bba862777",
+        "tests/Support/unpaid-release-worker.php": "803f5e780c5f488b6713b535293b4a3662dc9840da3d47fe1e09e7cd4e1f053c"
+    },
+    "event_name_deltas": [
+        {
+            "event_name": "statement/com/Execute",
+            "count": 11590,
+            "timer_ps": 7504157157000,
+            "server_seconds": 7.504157157
+        },
+        {
+            "event_name": "statement/com/Prepare",
+            "count": 11180,
+            "timer_ps": 6439131470000,
+            "server_seconds": 6.43913147
+        },
+        {
+            "event_name": "statement/com/Close stmt",
+            "count": 11180,
+            "timer_ps": 232154207000,
+            "server_seconds": 0.232154207
+        },
+        {
+            "event_name": "statement/sql/release_savepoint",
+            "count": 32,
+            "timer_ps": 1298729000,
+            "server_seconds": 0.001298729
+        },
+        {
+            "event_name": "statement/sql/savepoint",
+            "count": 32,
+            "timer_ps": 522081000,
+            "server_seconds": 0.000522081
+        },
+        {
+            "event_name": "statement/sql/rollback",
+            "count": 1,
+            "timer_ps": 116628000,
+            "server_seconds": 0.000116628
+        },
+        {
+            "event_name": "statement/sql/begin",
+            "count": 1,
+            "timer_ps": 34545000,
+            "server_seconds": 3.4545e-5
+        }
+    ],
+    "sql_event_count": 66,
+    "history": {
+        "start_event_id": 0,
+        "observed_rows": 0,
+        "digests": []
+    },
+    "measurement_limits": [
+        "Per-thread before/after deltas include completion of the baseline summary SELECT; the timed PHP interval excludes both summary reads.",
+        "Protocol and nested SQL event names can overlap; event-name totals must not be described as distinct queries without examining the instrumentation.",
+        "Digest history is optional and may be disabled or truncated by the global history ring; it is not a complete-query claim.",
+        "No native consumers or timing instruments were enabled and no shared counters were reset by this diagnostic.",
+        "Function-level PHP timings are not available; the server summaries identify SQL categories, not application call sites.",
+        "Real operation failures are rethrown after evidence is written; a diagnostic failure is never reported as an award pass."
+    ]
+}

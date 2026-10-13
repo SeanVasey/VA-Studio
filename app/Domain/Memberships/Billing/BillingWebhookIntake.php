@@ -67,22 +67,23 @@ final class BillingWebhookIntake
             'provider_account_hash' => BillingValues::hash('provider-account', $account, $mode, $account),
             'invoice_ref_hash' => $invoiceRef === null ? null : BillingValues::hash('invoice', $account, $mode, $invoiceRef),
             'received_at' => BillingValues::utc(CarbonImmutable::now('UTC')->timestamp), 'payload_hash' => hash('sha256', $payload),
-            'disposition' => $disposition,
-            'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_event_hint',
-                'event_ref' => $event['id'], 'type' => $type, 'api_version' => is_string($event['api_version'] ?? null) ? $event['api_version'] : null,
-                'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
-                'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null])];
+            'disposition' => $disposition];
+        $hintPayload = ['purpose' => 'production_membership_billing_event_hint',
+            'event_ref' => $event['id'], 'type' => $type, 'api_version' => is_string($event['api_version'] ?? null) ? $event['api_version'] : null,
+            'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
+            'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null];
         $row['created_at'] = $row['received_at'];
         $existing = $this->event($eventHash);
         if ($existing !== null) {
             return ['event' => $existing, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($existing, $configuration, $policy)];
         }
         try {
-            $row = DB::transaction(function () use ($row): array {
+            $row = DB::transaction(function () use ($row, $hintPayload): array {
                 // The hint's database-issued position, allocated after the hint arrived and in the same transaction as its row, so a
                 // retrieval covers the hint only if its own position (committed before its provider reads) is larger. `received_at`
                 // is the intake host's clock and is information only (Codex P1 on PR #54, review L2-3).
                 $row['hint_position'] = (new BillingLedger)->position('hint');
+                $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, $hintPayload);
                 $row['seal'] = BillingValues::seal($row);
                 $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[3])
                     .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');

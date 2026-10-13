@@ -16,4 +16,4 @@ The terminal clock correction resolves the prior callback-ordering finding. Dete
 
 Approval covers unmounted, default-off policy preparation and cross-ledger endpoint ownership only. It does not close CP-2/CP-3/P1B-1, R-4/R-5/A1-5, L2-1 or authorize operative commerce, host/provider readiness or release. Existing merge gates remain: cheap preflight at the exact final head, no P0/P1, and expected-SHA merge. The final integrated candidate still requires separate manual Foundation verification at its exact reviewed SHA.
 
-The receipt/status-only final delta requires the reviewer's confirmation before publishing the frozen candidate.
+The reviewer explicitly confirmed that APPROVE carries to exact final head `6a2824b36ad183aad4214c0d8bc39bb481b14c4c`, after checking the receipt, README and two status ledgers; source, tests, workflows and evidence artifacts were unchanged. Preflight `38335442946` passed. PR #111 merged at `7f0bfe9a531d082f1716358518333bb5ba68ae08` with an expected-head check and no open P0/P1.

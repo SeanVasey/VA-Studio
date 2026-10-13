@@ -1,0 +1,33 @@
+{
+  "head": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+  "sha256": {
+    "scripts/ci/database-mysql-selection.json": "155b8f2c7255f5028446c2257dc20897ed63cf716c26822d93dd346b8ef812be",
+    "scripts/ci/database-mysql-skips.json": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+    "scripts/ci/database-sqlite-skips.json": "fa9d520524915c779eec183694b5cf48f71aee5073a499ad021123e78b12cbbc",
+    "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php": "e8df808fa1b4a5a3767cc4f8554127e10102a3f4a859504a87af04a754dfdb5b",
+    "tests/Support/MembershipAwardMonotonicClock.php": "8e11c40ba38bd03e7ae696ff8f2479602c7a145c220ecc76e2204d56a5fe12bf"
+  },
+  "command": [
+    "python3",
+    "scripts/ci/phpunit-shards.py",
+    "--shards",
+    "8",
+    "--prefix",
+    "phpunit-ci-mysql",
+    "--mysql-native-selection",
+    "--timings",
+    "scripts/ci/phpunit-timings-mysql.json"
+  ],
+  "environment": {
+    "TMPDIR": "/tmp/va-studio-membership-policy-20261013",
+    "APP_ENV": "testing",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "mysql",
+    "DB_DATABASE": "selection_discovery_only",
+    "DB_URL": "",
+    "DB_SOCKET": "",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync"
+  }
+}

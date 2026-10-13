@@ -881,6 +881,26 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingNativeIntervalSnapshotTest",
       "test_prior_snapshot_sees_a_later_committed_endpoint_claim_in_both_ledger_directions"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+      "test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingAwardFenceDefinitionTest",
+      "test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "test_concurrent_owned_awards_return_identical_ids_and_commit_one_period_and_one_event"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "test_hint_insert_waits_for_award_fence_then_refuses_committed_receipt_without_undoing_award"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
+      "test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads"
     ]
   ]
 }

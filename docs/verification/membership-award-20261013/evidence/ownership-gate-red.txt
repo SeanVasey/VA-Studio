@@ -1,0 +1,30 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:06.140, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipAwardOwnershipTest::test_capability_resolution_cannot_remove_a_remaining_capability_before_capture
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'source_capability_absent',
+-    1 => 0,
+-    2 => 0,
++    0 => null,
++    1 => 1,
++    2 => 1,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php:132
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 8[0m[37;41m, Failures: 1[0m[37;41m.[0m

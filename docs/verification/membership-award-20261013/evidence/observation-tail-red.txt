@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-award/phpunit.xml
+
+[41;37mF[0m                                                                   1 / 1 (100%)
+
+Time: 00:04.618, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest::test_existing_proof_refuses_a_new_observation_even_with_identical_facts_and_second
+Expected retained invoice proof refusal.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php:177
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php:122
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m

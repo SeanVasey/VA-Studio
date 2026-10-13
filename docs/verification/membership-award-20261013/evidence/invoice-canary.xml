@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="4.287663">
+    <testcase name="test_real_retained_billing_proves_original_buyer_and_provider_paid_time" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php" line="42" class="Tests\Feature\ProductionMembershipBilling\MembershipPaidInvoiceProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipPaidInvoiceProofTest" assertions="9" time="4.287663"/>
+  </testsuite>
+</testsuites>
