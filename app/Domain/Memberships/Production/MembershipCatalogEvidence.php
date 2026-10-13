@@ -263,8 +263,8 @@ final class MembershipCatalogEvidence
             if ($driver === 'mysql') {
                 $definition = $pdo->query('SHOW CREATE TABLE '.self::qualified($schema, $table))->fetchAll(PDO::FETCH_NUM);
                 MembershipException::require(count($definition) === 1 && $definition[0][0] === $table
-                    && is_string($definition[0][1] ?? null) && str_starts_with($definition[0][1], 'CREATE TABLE ')
-                    && preg_match('/\bENGINE=InnoDB\b/', $definition[0][1]) === 1, 'catalog_shadow_or_engine');
+                    && is_string($definition[0][1] ?? null), 'catalog_shadow_or_engine');
+                $definition[0][1] = MembershipCatalogDefinition::mysql($definition[0][1], $table);
             } else {
                 $definition = self::query($pdo, 'SELECT name, type, sql FROM main.sqlite_schema WHERE name = ? COLLATE NOCASE', [$table]);
                 MembershipException::require(count($definition) === 1 && $definition[0]['name'] === $table && $definition[0]['type'] === 'table'
