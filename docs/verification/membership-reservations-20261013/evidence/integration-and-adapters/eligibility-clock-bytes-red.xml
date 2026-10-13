@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" tests="2" assertions="5" errors="0" failures="2" skipped="0" time="7.507632">
+    <testcase name="test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="278" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="2" time="3.996424">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:375
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:287
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:281
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_committed_snapshot_checks_native_bytes_after_later_clock_callback" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="297" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="3" time="3.511208">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:375
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:314
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,6 @@
+MySQL 8.4.11
+schema vaseyaudio_membership_shadow_probe
+original SQL: expected MySQL error 1066
+replacement SQL: temporary definition admitted; 2 rows exactly equal including PDO types
+durable source unchanged after shadow removal
+owned probe schema removed

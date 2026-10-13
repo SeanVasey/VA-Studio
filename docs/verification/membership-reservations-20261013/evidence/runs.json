@@ -1,0 +1,388 @@
+{
+  "status": "All requested focused native invocations complete; final corrected four-case race selection passed, original failed/errored invocations retained. Scope remains development evidence, not release/host/provider acceptance.",
+  "runs": [
+    {
+      "id": "integration-and-adapters/entry-sqlite",
+      "xml": "integration-and-adapters/entry-sqlite.xml",
+      "exit": "integration-and-adapters/entry-sqlite.exit",
+      "driver": "sqlite",
+      "source_description": "Base670f9caa plus three new entry-lane files; setup error from missing TMPDIR, not a product red. Same three source hashes as corrected run.",
+      "source_receipts": [
+        "integration-and-adapters/entry-sqlite.sources",
+        "integration-and-adapters/entry-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/entry-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/entry-sqlite-v2",
+      "xml": "integration-and-adapters/entry-sqlite-v2.xml",
+      "exit": "integration-and-adapters/entry-sqlite-v2.exit",
+      "driver": "sqlite",
+      "source_description": "Same source after creating TMPDIR; three files subsequently committed unchanged as3b1f087a, integrated5bdeb350. Admission-only refusals.",
+      "source_receipts": [
+        "integration-and-adapters/entry-sqlite.sources",
+        "integration-and-adapters/entry-sqlite-v2-source-check.txt",
+        "integration-and-adapters/entry-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/entry-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/license-binding-unit",
+      "xml": "integration-and-adapters/license-binding-unit.xml",
+      "exit": "integration-and-adapters/license-binding-unit.exit",
+      "driver": "sqlite",
+      "source_description": "Exact two-file hashes; source subsequently committed a1a492c2. Pure binding unit checks.",
+      "source_receipts": [
+        "integration-and-adapters/license-binding-unit.sources"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-canary",
+      "xml": "integration-and-adapters/eligibility-canary.xml",
+      "exit": "integration-and-adapters/eligibility-canary.exit",
+      "driver": "sqlite",
+      "source_description": "Exploratory earlier adapter; no exact source inventory for this canary is retained. Superseded; no final-source credit.",
+      "source_receipts": [],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-clock-bytes-red",
+      "xml": "integration-and-adapters/eligibility-clock-bytes-red.xml",
+      "exit": "integration-and-adapters/eligibility-clock-bytes-red.exit",
+      "driver": "sqlite",
+      "source_description": "Explicit intermediate new adapter with its final native-byte loop omitted; not a pre-adapter base regression. Exact intermediate and restored helper retained.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-clock-bytes-red.sources",
+        "integration-and-adapters/catalog-evidence-clock-bytes-red.php",
+        "integration-and-adapters/catalog-evidence-native-byte-fixed.php"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-sqlite",
+      "xml": "integration-and-adapters/eligibility-sqlite.xml",
+      "exit": "integration-and-adapters/eligibility-sqlite.exit",
+      "driver": "sqlite",
+      "source_description": "Six exact hashes and source capsule subsequently committed unchanged0c4bc2c4. Historical full14-case file before review corrections.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-sqlite.sources",
+        "integration-and-adapters/eligibility-sqlite.source-check",
+        "integration-and-adapters/eligibility-sqlite-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-review-red",
+      "xml": "integration-and-adapters/eligibility-review-red.xml",
+      "exit": "integration-and-adapters/eligibility-review-red.exit",
+      "driver": "sqlite",
+      "source_description": "Unchanged0c4bc2c4 application plus two new regressions; one intended failure and one double-wrapper-restore cleanup error. Initial test source retained.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-review-red.sources",
+        "integration-and-adapters/eligibility-review-regressions.php"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-review-red-v2",
+      "xml": "integration-and-adapters/eligibility-review-red-v2.xml",
+      "exit": "integration-and-adapters/eligibility-review-red-v2.exit",
+      "driver": "sqlite",
+      "source_description": "Unchanged0c4bc2c4 application with test cleanup repaired; two intended refusals fail. Exact source capsule retained.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-review-red-v2.sources",
+        "integration-and-adapters/eligibility-review-red-v2-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-review-green",
+      "xml": "integration-and-adapters/eligibility-review-green.xml",
+      "exit": "integration-and-adapters/eligibility-review-green.exit",
+      "driver": "sqlite",
+      "source_description": "Corrected application; complete16-case file before native-only shadow-fixture strengthening. Exact six-file source capsule retained.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-review-green.sources",
+        "integration-and-adapters/eligibility-review-green.source-check",
+        "integration-and-adapters/eligibility-review-green-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/eligibility-review-final",
+      "xml": "integration-and-adapters/eligibility-review-final.xml",
+      "exit": "integration-and-adapters/eligibility-review-final.exit",
+      "driver": "sqlite",
+      "source_description": "Final adapter application and strengthened native-only test branch committeda54ffb6a and integrateddefe9580. SQLite does not execute that MySQL branch.",
+      "source_receipts": [
+        "integration-and-adapters/eligibility-review-final.sources",
+        "integration-and-adapters/eligibility-review-final.source-check",
+        "integration-and-adapters/eligibility-review-final-source/"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/eligibility-commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/award-replay-integration",
+      "xml": "integration-and-adapters/award-replay-integration.xml",
+      "exit": "integration-and-adapters/award-replay-integration.exit",
+      "driver": "sqlite",
+      "source_description": "HEAD94c190b6 with uncommitted award-context integration; eight exact hashes retained. Source equivalence is checked against later09fd6df9; do not label as clean94c190b6.",
+      "source_receipts": [
+        "integration-and-adapters/award-replay-integration-source.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/award-replay-integration.sh"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/context-clock-order-red",
+      "xml": "integration-and-adapters/context-clock-order-red.xml",
+      "exit": "integration-and-adapters/context-clock-order-red.exit",
+      "driver": "sqlite",
+      "source_description": "Integrated565f19d1 source plus explicit single-class MembershipReservationContext overlay restoring earlier clock order; one intended failure. Not a merged-base regression.",
+      "source_receipts": [
+        "integration-and-adapters/context-clock-order-red.source.json",
+        "integration-and-adapters/context-clock-order-red.result.json",
+        "integration-and-adapters/Context-clock-order-red.php"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/context-clock-regression.md"
+      ]
+    },
+    {
+      "id": "policy/unit-initial",
+      "xml": "policy/unit-initial.xml",
+      "exit": "policy/unit-initial.exit",
+      "driver": "sqlite",
+      "source_description": "Base670f9caa plus new policy work; seven refusal assertions mistakenly compared minimized message instead of reason; exact five source hashes retained, no initial source capsule.",
+      "source_receipts": [
+        "policy/unit-initial.source.json",
+        "policy/results.json"
+      ],
+      "command_receipts": [
+        "policy/commands.md"
+      ]
+    },
+    {
+      "id": "policy/sqlite-policy",
+      "xml": "policy/sqlite-policy.xml",
+      "exit": "policy/sqlite-policy.exit",
+      "driver": "sqlite",
+      "source_description": "Intermediate new policy source; one new roundtrip assertion incorrectly required associative insertion order after canonical JSON; no initial source capsule.",
+      "source_receipts": [
+        "policy/sqlite-policy.source.json",
+        "policy/results.json"
+      ],
+      "command_receipts": [
+        "policy/commands.md"
+      ]
+    },
+    {
+      "id": "policy/sqlite-policy-final",
+      "xml": "policy/sqlite-policy-final.xml",
+      "exit": "policy/sqlite-policy-final.exit",
+      "driver": "sqlite",
+      "source_description": "Final five owned hashes match87e0dc42, integrated8f042747; includes three existing policy/preparation files. Component source, not later whole integration.",
+      "source_receipts": [
+        "policy/sqlite-policy-final.source.json",
+        "policy/results.json"
+      ],
+      "command_receipts": [
+        "policy/commands.md"
+      ]
+    },
+    {
+      "id": "ledger/ledger-initial",
+      "xml": "ledger/ledger-initial.xml",
+      "exit": "ledger/ledger-initial.exit",
+      "driver": "sqlite",
+      "source_description": "Initial pure45-case record suite; no separate source receipt retained for this invocation. Later focused source is independently bound; no invented initial exact commit.",
+      "source_receipts": [],
+      "command_receipts": [
+        "ledger/commands.md"
+      ]
+    },
+    {
+      "id": "ledger/ledger-focused",
+      "xml": "ledger/ledger-focused.xml",
+      "exit": "ledger/ledger-focused.exit",
+      "driver": "sqlite",
+      "source_description": "Ledger worktree with binding/policy dependencies and four owned files subsequently committed unchanged9c38a4cb, integrated94c190b6. Nine source hashes unchanged. Pure45-case audit plus existing9-case first award.",
+      "source_receipts": [
+        "ledger/ledger-focused.sources.json",
+        "ledger/ledger-focused-source-check.json",
+        "ledger/committed-source-check.json"
+      ],
+      "command_receipts": [
+        "ledger/ledger-focused.sh",
+        "ledger/commands.md"
+      ]
+    },
+    {
+      "id": "lifecycle/sqlite-initial",
+      "xml": "lifecycle/sqlite-initial.xml",
+      "exit": "lifecycle/sqlite-initial.exit",
+      "driver": "sqlite",
+      "source_description": "Worktree69eb2739 plus two new test files later committed0823230d (integrated12f2dba6); source includes earlier eligibility0c4bc2c4 and provisional Context, not laterdefe9580.",
+      "source_receipts": [
+        "lifecycle/sqlite-initial.source.json",
+        "lifecycle/results.json"
+      ],
+      "command_receipts": [
+        "lifecycle/run-lifecycle.py",
+        "lifecycle/commands.md"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/sqlite-integrated-lifecycle",
+      "xml": "integration-and-adapters/sqlite-integrated-lifecycle.xml",
+      "exit": "integration-and-adapters/sqlite-integrated-lifecycle.exit",
+      "driver": "sqlite",
+      "source_description": "Exact integrated defe95802e7d09e7df12c61a98c1ebf1caee99c0; full lifecycle, ownership and clock-closure files. Thirteen discovered cases include one declared native-only skip. Source unchanged. Includes the corrected counterpart to the explicit Context overlay red.",
+      "source_receipts": [
+        "integration-and-adapters/sqlite-integrated-lifecycle.source.json",
+        "integration-and-adapters/sqlite-integrated-lifecycle.result.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-focused.py",
+        "integration-and-adapters/sqlite-integrated-lifecycle.source.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-integrated-canary",
+      "xml": "integration-and-adapters/native-integrated-canary.xml",
+      "exit": "integration-and-adapters/native-integrated-canary.exit",
+      "driver": "mysql",
+      "source_description": "Exact integrated defe95802e7d09e7df12c61a98c1ebf1caee99c0, unchanged hashes. Private MySQL 8.4.11 owned canary schema; real synthetic lifecycle sources, exact retry and first-award replay. No native race proof from this single case.",
+      "source_receipts": [
+        "integration-and-adapters/native-integrated-canary.source.json",
+        "integration-and-adapters/native-integrated-canary.result.json",
+        "integration-and-adapters/mysql-environment.txt"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-focused.py",
+        "integration-and-adapters/native-integrated-canary.source.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-reservation-races",
+      "xml": "integration-and-adapters/native-reservation-races.xml",
+      "exit": "integration-and-adapters/native-reservation-races.exit",
+      "driver": "mysql",
+      "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First different-key race passed; second same-key race failed because worker two refused operation_deadline. Stop-on-defect left three methods unexecuted. This failed invocation is not native concurrency acceptance. Concurrent focused suite used a separate schema on the same private MySQL instance.",
+      "source_receipts": [
+        "integration-and-adapters/native-reservation-races.source.json",
+        "integration-and-adapters/native-reservation-races.result.json",
+        "integration-and-adapters/native-race-initial-diagnosis.json",
+        "integration-and-adapters/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-native-focused.py",
+        "integration-and-adapters/native-reservation-races.source.json"
+      ],
+      "worker_receipts": [
+        "integration-and-adapters/native-race-workers/test_different_request_keys_cannot_spend_the_same_last_credit-7fab95bf-646d-45a7-b7ab-ab1363c6cba7.json",
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-2a2c8fcc-1583-4557-8bae-a9de74b2617e.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-focused-boundaries",
+      "xml": "integration-and-adapters/native-focused-boundaries.xml",
+      "exit": "integration-and-adapters/native-focused-boundaries.exit",
+      "driver": "mysql",
+      "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First three clock/ownership cases passed with 57 assertions; fourth identical-row temporary-shadow fixture setup errored (MySQL1066 CREATE TEMPORARY TABLE tracks LIKE tracks) before its intended application assertion; fifth selected case unexecuted. Overall invocation errored, not a passing selection.",
+      "source_receipts": [
+        "integration-and-adapters/native-focused-boundaries.source.json",
+        "integration-and-adapters/native-focused-boundaries.result.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-native-focused.py",
+        "integration-and-adapters/native-focused-boundaries.source.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-reservation-races-isolated",
+      "xml": "integration-and-adapters/native-reservation-races-isolated.xml",
+      "exit": "integration-and-adapters/native-reservation-races-isolated.exit",
+      "driver": "mysql",
+      "source_description": "Unchanged defe95802e7d09e7df12c61a98c1ebf1caee99c0. Isolated same-key race still failed on second-worker operation_deadline; three later selected race methods unexecuted. No competing full suite; small standalone shadow SQL probe overlapped on separate schema. No native concurrency acceptance.",
+      "source_receipts": [
+        "integration-and-adapters/native-reservation-races-isolated.source.json",
+        "integration-and-adapters/native-reservation-races-isolated.result.json",
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08b39674-93e3-4926-9612-115027583ef7.json",
+        "integration-and-adapters/native-race-isolated-diagnosis.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-native-focused.py",
+        "integration-and-adapters/native-reservation-races-isolated.source.json"
+      ],
+      "worker_receipts": [
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08b39674-93e3-4926-9612-115027583ef7.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-eligibility-final",
+      "xml": "integration-and-adapters/native-eligibility-final.xml",
+      "exit": "integration-and-adapters/native-eligibility-final.exit",
+      "driver": "mysql",
+      "source_description": "Integrated 9e2496c7192a6b71fd61ca6fbe6a0a5a934841bf; application unchanged from defe9580, only MySQL temporary-shadow test setup corrected (owner 222b6e3d). Two native eligibility cases pass, source unchanged. This does not relabel the original focused-native error.",
+      "source_receipts": [
+        "integration-and-adapters/native-eligibility-final.source.json",
+        "integration-and-adapters/native-eligibility-final.result.json",
+        "integration-and-adapters/eligibility-shadow-fixture-commands.md"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-native-focused.py",
+        "integration-and-adapters/native-eligibility-final.source.json"
+      ]
+    },
+    {
+      "id": "integration-and-adapters/native-reservation-races-contract",
+      "xml": "integration-and-adapters/native-reservation-races-contract.xml",
+      "exit": "integration-and-adapters/native-reservation-races-contract.exit",
+      "driver": "mysql",
+      "source_description": "Exact integrated 45d1299406821627f4ba02af186e324a70c6ade0, source unchanged; application/migrations still defe9580. Four revised/remaining native races passed. Same-key loser refused operation_deadline after60.823447676 seconds; independent parent retry returned original receipt with identical full audit/raw rows. Both release races returned identical concurrent receipts and preserved audited rows across independent retries. Equality expiry refused new reserve with credit_expired. Frozen wall equality is synthetic; monotonic clocks/locks/processes are real.",
+      "source_receipts": [
+        "integration-and-adapters/native-reservation-races-contract.source.json",
+        "integration-and-adapters/native-reservation-races-contract.result.json",
+        "integration-and-adapters/native-race-workers/test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance-71ac82d9-b0c8-4779-9281-c837ca7862fd.json",
+        "integration-and-adapters/native-race-workers/test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation-c01ef043-e094-41f2-af3a-c2b3e7abd58f.json",
+        "integration-and-adapters/native-race-workers/test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it-cb3a3fed-9db6-4b0f-95c9-845e7545eb92.json",
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08adb5b6-7676-402e-930c-7ba2ddc64c9e.json"
+      ],
+      "command_receipts": [
+        "integration-and-adapters/run-native-focused.py",
+        "integration-and-adapters/native-reservation-races-contract.source.json"
+      ],
+      "worker_receipts": [
+        "integration-and-adapters/native-race-workers/test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance-71ac82d9-b0c8-4779-9281-c837ca7862fd.json",
+        "integration-and-adapters/native-race-workers/test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation-c01ef043-e094-41f2-af3a-c2b3e7abd58f.json",
+        "integration-and-adapters/native-race-workers/test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it-cb3a3fed-9db6-4b0f-95c9-845e7545eb92.json",
+        "integration-and-adapters/native-race-workers/test_same_key_and_intent_return_the_same_retained_reservation_and_event-08adb5b6-7676-402e-930c-7ba2ddc64c9e.json"
+      ]
+    }
+  ],
+  "pending_native_selections": []
+}

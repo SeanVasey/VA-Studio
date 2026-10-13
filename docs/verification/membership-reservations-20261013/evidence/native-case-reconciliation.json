@@ -1,0 +1,210 @@
+{
+  "scope": "Latest completed native case results with full invocation status and prior history. Passing leaves in failed/errored invocations are identified individually; those invocations are never relabeled green. Pending selections are excluded, and this reconciliation alone is not final acceptance.",
+  "pending_selections": [],
+  "latest_completed_cases": 11,
+  "latest_status_counts": {
+    "passed": 11,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "assertions_in_latest_passed_cases": 336,
+  "nonzero_invocations": [
+    {
+      "run": "integration-and-adapters/native-reservation-races",
+      "exit": 1,
+      "tests": 2,
+      "assertions": 76,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/native-focused-boundaries",
+      "exit": 2,
+      "tests": 4,
+      "assertions": 58,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0
+    },
+    {
+      "run": "integration-and-adapters/native-reservation-races-isolated",
+      "exit": 1,
+      "tests": 1,
+      "assertions": 33,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0
+    }
+  ],
+  "case_histories": [
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+          "assertions": 5,
+          "status": "passed",
+          "run": "integration-and-adapters/native-eligibility-final",
+          "invocation_exit": 0,
+          "source_description": "Integrated 9e2496c7192a6b71fd61ca6fbe6a0a5a934841bf; application unchanged from defe9580, only MySQL temporary-shadow test setup corrected (owner 222b6e3d). Two native eligibility cases pass, source unchanged. This does not relabel the original focused-native error."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+          "assertions": 1,
+          "status": "error",
+          "run": "integration-and-adapters/native-focused-boundaries",
+          "invocation_exit": 2,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First three clock/ownership cases passed with 57 assertions; fourth identical-row temporary-shadow fixture setup errored (MySQL1066 CREATE TEMPORARY TABLE tracks LIKE tracks) before its intended application assertion; fifth selected case unexecuted. Overall invocation errored, not a passing selection."
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+          "assertions": 7,
+          "status": "passed",
+          "run": "integration-and-adapters/native-eligibility-final",
+          "invocation_exit": 0,
+          "source_description": "Integrated 9e2496c7192a6b71fd61ca6fbe6a0a5a934841bf; application unchanged from defe9580, only MySQL temporary-shadow test setup corrected (owner 222b6e3d). Two native eligibility cases pass, source unchanged. This does not relabel the original focused-native error."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance",
+          "assertions": 43,
+          "status": "passed",
+          "run": "integration-and-adapters/native-reservation-races-contract",
+          "invocation_exit": 0,
+          "source_description": "Exact integrated 45d1299406821627f4ba02af186e324a70c6ade0, source unchanged; application/migrations still defe9580. Four revised/remaining native races passed. Same-key loser refused operation_deadline after60.823447676 seconds; independent parent retry returned original receipt with identical full audit/raw rows. Both release races returned identical concurrent receipts and preserved audited rows across independent retries. Equality expiry refused new reserve with credit_expired. Frozen wall equality is synthetic; monotonic clocks/locks/processes are real."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_different_request_keys_cannot_spend_the_same_last_credit",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_different_request_keys_cannot_spend_the_same_last_credit",
+          "assertions": 43,
+          "status": "passed",
+          "run": "integration-and-adapters/native-reservation-races",
+          "invocation_exit": 1,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First different-key race passed; second same-key race failed because worker two refused operation_deadline. Stop-on-defect left three methods unexecuted. This failed invocation is not native concurrency acceptance. Concurrent focused suite used a separate schema on the same private MySQL instance."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation",
+          "assertions": 52,
+          "status": "passed",
+          "run": "integration-and-adapters/native-reservation-races-contract",
+          "invocation_exit": 0,
+          "source_description": "Exact integrated 45d1299406821627f4ba02af186e324a70c6ade0, source unchanged; application/migrations still defe9580. Four revised/remaining native races passed. Same-key loser refused operation_deadline after60.823447676 seconds; independent parent retry returned original receipt with identical full audit/raw rows. Both release races returned identical concurrent receipts and preserved audited rows across independent retries. Equality expiry refused new reserve with credit_expired. Frozen wall equality is synthetic; monotonic clocks/locks/processes are real."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it",
+          "assertions": 54,
+          "status": "passed",
+          "run": "integration-and-adapters/native-reservation-races-contract",
+          "invocation_exit": 0,
+          "source_description": "Exact integrated 45d1299406821627f4ba02af186e324a70c6ade0, source unchanged; application/migrations still defe9580. Four revised/remaining native races passed. Same-key loser refused operation_deadline after60.823447676 seconds; independent parent retry returned original receipt with identical full audit/raw rows. Both release races returned identical concurrent receipts and preserved audited rows across independent retries. Equality expiry refused new reserve with credit_expired. Frozen wall equality is synthetic; monotonic clocks/locks/processes are real."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+          "assertions": 33,
+          "status": "failure",
+          "run": "integration-and-adapters/native-reservation-races",
+          "invocation_exit": 1,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First different-key race passed; second same-key race failed because worker two refused operation_deadline. Stop-on-defect left three methods unexecuted. This failed invocation is not native concurrency acceptance. Concurrent focused suite used a separate schema on the same private MySQL instance."
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+          "assertions": 33,
+          "status": "failure",
+          "run": "integration-and-adapters/native-reservation-races-isolated",
+          "invocation_exit": 1,
+          "source_description": "Unchanged defe95802e7d09e7df12c61a98c1ebf1caee99c0. Isolated same-key race still failed on second-worker operation_deadline; three later selected race methods unexecuted. No competing full suite; small standalone shadow SQL probe overlapped on separate schema. No native concurrency acceptance."
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+          "assertions": 54,
+          "status": "passed",
+          "run": "integration-and-adapters/native-reservation-races-contract",
+          "invocation_exit": 0,
+          "source_description": "Exact integrated 45d1299406821627f4ba02af186e324a70c6ade0, source unchanged; application/migrations still defe9580. Four revised/remaining native races passed. Same-key loser refused operation_deadline after60.823447676 seconds; independent parent retry returned original receipt with identical full audit/raw rows. Both release races returned identical concurrent receipts and preserved audited rows across independent retries. Equality expiry refused new reserve with credit_expired. Frozen wall equality is synthetic; monotonic clocks/locks/processes are real."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation",
+          "assertions": 19,
+          "status": "passed",
+          "run": "integration-and-adapters/native-focused-boundaries",
+          "invocation_exit": 2,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First three clock/ownership cases passed with 57 assertions; fourth identical-row temporary-shadow fixture setup errored (MySQL1066 CREATE TEMPORARY TABLE tracks LIKE tracks) before its intended application assertion; fifth selected case unexecuted. Overall invocation errored, not a passing selection."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest::test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check",
+          "assertions": 18,
+          "status": "passed",
+          "run": "integration-and-adapters/native-focused-boundaries",
+          "invocation_exit": 2,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First three clock/ownership cases passed with 57 assertions; fourth identical-row temporary-shadow fixture setup errored (MySQL1066 CREATE TEMPORARY TABLE tracks LIKE tracks) before its intended application assertion; fifth selected case unexecuted. Overall invocation errored, not a passing selection."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+          "assertions": 21,
+          "status": "passed",
+          "run": "integration-and-adapters/native-integrated-canary",
+          "invocation_exit": 0,
+          "source_description": "Exact integrated defe95802e7d09e7df12c61a98c1ebf1caee99c0, unchanged hashes. Private MySQL 8.4.11 owned canary schema; real synthetic lifecycle sources, exact retry and first-award replay. No native race proof from this single case."
+        }
+      ]
+    },
+    {
+      "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+      "results": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame",
+          "assertions": 20,
+          "status": "passed",
+          "run": "integration-and-adapters/native-focused-boundaries",
+          "invocation_exit": 2,
+          "source_description": "Exact defe95802e7d09e7df12c61a98c1ebf1caee99c0, source unchanged. First three clock/ownership cases passed with 57 assertions; fourth identical-row temporary-shadow fixture setup errored (MySQL1066 CREATE TEMPORARY TABLE tracks LIKE tracks) before its intended application assertion; fifth selected case unexecuted. Overall invocation errored, not a passing selection."
+        }
+      ]
+    }
+  ]
+}

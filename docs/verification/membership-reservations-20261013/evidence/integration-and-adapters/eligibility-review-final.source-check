@@ -1,0 +1,6 @@
+app/Domain/Memberships/Production/CurrentEligibleLicenses.php: OK
+app/Domain/Memberships/Production/MembershipCatalogEvidence.php: OK
+app/Domain/Memberships/Production/MembershipCatalogSnapshot.php: OK
+app/Domain/Memberships/Production/MembershipEligibleLicenseToken.php: OK
+app/Domain/Memberships/Production/MembershipLicenseBinding.php: OK
+tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php: OK

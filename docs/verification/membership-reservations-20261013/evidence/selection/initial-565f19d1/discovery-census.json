@@ -1,0 +1,81 @@
+{
+  "source": "565f19d1",
+  "source_files": 587,
+  "source_cases": 8045,
+  "native_files": 187,
+  "native_cases": 1971,
+  "sqlite_skip_methods": 231,
+  "mysql_skip_methods": 16,
+  "files": [
+    {
+      "file": "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php",
+      "discovered_cases": 3,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "discovered_cases": 14,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php",
+      "discovered_cases": 6,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php",
+      "discovered_cases": 6,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php",
+      "discovered_cases": 5,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php",
+      "discovered_cases": 2,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 1,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php",
+      "discovered_cases": 5,
+      "mysql_selected": true,
+      "sqlite_skip_cases": 5,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Unit/MembershipLicenseBindingTest.php",
+      "discovered_cases": 7,
+      "mysql_selected": false,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Unit/MembershipLedgerAuditTest.php",
+      "discovered_cases": 45,
+      "mysql_selected": false,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    },
+    {
+      "file": "tests/Unit/MembershipRedemptionPolicyTest.php",
+      "discovered_cases": 52,
+      "mysql_selected": false,
+      "sqlite_skip_cases": 0,
+      "mysql_skip_cases": 0
+    }
+  ]
+}

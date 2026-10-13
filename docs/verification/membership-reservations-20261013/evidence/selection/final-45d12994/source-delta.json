@@ -1,0 +1,8 @@
+{
+  "prior_source": "defe95802e7d09e7df12c61a98c1ebf1caee99c0",
+  "source": "45d1299406821627f4ba02af186e324a70c6ade0",
+  "changed_files": [
+    "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php"
+  ]
+}

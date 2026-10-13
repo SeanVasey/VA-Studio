@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipNativeReservationRaceTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php" tests="2" assertions="76" errors="0" failures="1" skipped="0" time="461.365553">
+    <testcase name="test_different_request_keys_cannot_spend_the_same_last_credit" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php" line="81" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeReservationRaceTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeReservationRaceTest" assertions="43" time="255.669428"/>
+    <testcase name="test_same_key_and_intent_return_the_same_retained_reservation_and_event" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php" line="95" class="Tests\Feature\ProductionMembershipBilling\MembershipNativeReservationRaceTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipNativeReservationRaceTest" assertions="33" time="205.696125">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event
+{"class":"App\\Domain\\Memberships\\Production\\MembershipException","reason":"operation_deadline"}
+Failed asserting that 'App\Domain\Memberships\Production\MembershipException' is null.
+
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php:308
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php:101
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

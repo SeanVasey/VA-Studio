@@ -1,0 +1,185 @@
+{
+  "checks": [
+    {
+      "receipt": "integration-and-adapters/entry-sqlite.sources",
+      "compared_commit": "3b1f087a",
+      "file_count": 3,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/license-binding-unit.sources",
+      "compared_commit": "a1a492c2",
+      "file_count": 2,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-sqlite.sources",
+      "compared_commit": "0c4bc2c4",
+      "file_count": 6,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-review-final.sources",
+      "compared_commit": "a54ffb6a",
+      "file_count": 6,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-race-preparation.sources",
+      "compared_commit": "2e26a6ba",
+      "file_count": 2,
+      "mismatches": []
+    },
+    {
+      "receipt": "policy/sqlite-policy-final.source.json",
+      "compared_commit": "87e0dc42",
+      "file_count": 5,
+      "mismatches": []
+    },
+    {
+      "receipt": "ledger/ledger-focused.sources.json",
+      "compared_commit": "9c38a4cb",
+      "file_count": 9,
+      "mismatches": []
+    },
+    {
+      "receipt": "lifecycle/sqlite-initial.source.json",
+      "compared_commit": "0823230d",
+      "file_count": 52,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/award-replay-integration-source.json",
+      "compared_commit": "09fd6df9",
+      "file_count": 8,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/context-clock-order-red.source.json",
+      "compared_commit": "565f19d1d19c9a7a513670c169a6c2e181083648",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-review-red-v2.sources",
+      "compared_capsule": "integration-and-adapters/eligibility-review-red-v2-source",
+      "file_count": 3,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-sqlite.sources",
+      "compared_capsule": "integration-and-adapters/eligibility-sqlite-source",
+      "file_count": 6,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-review-green.sources",
+      "compared_capsule": "integration-and-adapters/eligibility-review-green-source",
+      "file_count": 6,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/entry-sqlite.sources",
+      "compared_capsule": "integration-and-adapters/entry-source",
+      "file_count": 3,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-review-final.sources",
+      "compared_capsule": "integration-and-adapters/eligibility-review-final-source",
+      "file_count": 6,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/sqlite-integrated-lifecycle.source.json",
+      "compared_reference": "reference-defe9580.json",
+      "file_count": 1268,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-integrated-canary.source.json",
+      "compared_reference": "reference-defe9580.json",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races.source.json",
+      "compared_reference": "reference-defe9580.json",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-focused-boundaries.source.json",
+      "compared_reference": "reference-defe9580.json",
+      "file_count": 1268,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races-isolated.source.json",
+      "compared_reference": "reference-defe9580.json",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-focused-boundaries.source.json",
+      "compared_runner": "integration-and-adapters/run-native-focused.py",
+      "file_count": 1,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races.source.json",
+      "compared_runner": "integration-and-adapters/run-native-focused.py",
+      "file_count": 1,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races-isolated.source.json",
+      "compared_runner": "integration-and-adapters/run-native-focused.py",
+      "file_count": 1,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/eligibility-shadow-fixture.sources",
+      "compared_commit_or_probe": "222b6e3d901c2c08a20a8e99180c2955d4a1cb62",
+      "file_count": 2,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-race-contract.sources",
+      "compared_commit_or_probe": "7f51996ce5a14b2fb42ec8aa5ad21409b662a8d0",
+      "file_count": 1,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-eligibility-final.source.json",
+      "compared_reference": "reference-45d12994.json",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/final-45d12994-pint.source.json",
+      "compared_reference": "reference-45d12994.json",
+      "file_count": 29,
+      "mismatches": []
+    },
+    {
+      "receipt": "selection/final-45d12994/discovery.sources.json",
+      "compared_reference": "reference-45d12994.json",
+      "file_count": 2091,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races-contract.source.json",
+      "compared_reference": "reference-45d12994.json",
+      "file_count": 1266,
+      "mismatches": []
+    },
+    {
+      "receipt": "integration-and-adapters/native-reservation-races-contract.source.json",
+      "compared_runner": "integration-and-adapters/run-native-focused.py",
+      "file_count": 1,
+      "mismatches": []
+    }
+  ],
+  "all_match": true
+}

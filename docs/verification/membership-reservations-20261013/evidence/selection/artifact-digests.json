@@ -1,0 +1,22 @@
+{
+  "commands.md": "2738143407137887834855a768224781e8d14a4913e5bb97f4491ec57e0f7297",
+  "discovery-census.json": "bc6166fc695b0c612ab7b89f30876e3180e40febc9f46142251b398ecc1f660e",
+  "discovery-generated-artifacts.json": "b6a902f162b508b18687aee5f4f4736ba371108a50f131bc661e058c6fd9175c",
+  "discovery-manifest.json": "4dc4232a7feab58af2b0010a58326854ef540df89770984b9df14a7093b0254c",
+  "discovery-source-check.json": "952691e80146c3558ff6ede1de1facbeaac38f0d9644a77fdced4bf37524bf7e",
+  "discovery.base": "6b28a5a41bf65723c78d5f60c1b05cf867ef795060ae393a5f316cd7995a5521",
+  "discovery.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "discovery.sh": "a2989e76ca0bd5460d80d3f58d14123f06a849cc9ee1a5f779f251d9ae899204",
+  "discovery.sources.json": "d0ba60feb007568bcf5ebae71d806706b850d6d643f5323721d7b3b30f93d5a4",
+  "discovery.txt": "d6768074a65bbf06ab1399bdae5654523e2913821aacb34fc70765094aed2fc5",
+  "policy-carry-verification.json": "ca501f33c0f3be2858b81391270c83d023d1b3d8f40913572c6c29ec2e53bcec",
+  "policy.base": "952e41ea18b5e0175c5f3abcb2cbc1aa2edb83f746b5c4255a3bdd6eacb99fb8",
+  "policy.patch": "9cf115e0ed78b512d227c0cf776853d921f1dc9d098b3bc8abc590379af7eb52",
+  "policy.sources.json": "7e5733b58b9e26fe4f9158799ecc961fca53a13f6cecad33ee80a333cbd2d8da",
+  "test-database-receipts.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "test-database-receipts.txt": "3b401d9856c9c197b290abaa6b716889f7f2f871545f63a4ee1ad078a22b3b95",
+  "test-gitlab-database-receipts.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "test-gitlab-database-receipts.txt": "dd55bd04c54f784971542bd8d07095a078a29520eaac465e041d4c7f6d0b223d",
+  "test-phpunit-shards.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "test-phpunit-shards.txt": "e8687c1dffebe26f987d32e56dcaef713525c27cfada9c4217c6c004a8ea4f42"
+}
