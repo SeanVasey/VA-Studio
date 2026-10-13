@@ -48,7 +48,7 @@ final class MemberActivationHistoryTest extends TestCase
             $rows = $this->rows($f);
             $rows[$kind] = [];
             try {
-                $this->from($rows, 1);
+                $this->historyFrom($rows, 1);
                 $this->fail('Incomplete graph admitted: '.$kind);
             } catch (MemberGrantException) {
                 $this->addToAssertionCount(1);
@@ -58,7 +58,7 @@ final class MemberActivationHistoryTest extends TestCase
             $rows = array_fill_keys(array_keys($this->rows($f)), []);
             $rows[$kind] = $this->rows($f)[$kind];
             try {
-                $this->from($rows, 1);
+                $this->historyFrom($rows, 1);
                 $this->fail('Surplus support admitted');
             } catch (MemberGrantException) {
                 $this->addToAssertionCount(1);
@@ -73,14 +73,14 @@ final class MemberActivationHistoryTest extends TestCase
             $rows = $this->rows($f);
             $rows[$kind][] = $rows[$kind][0];
             try {
-                $this->from($rows, 2);
+                $this->historyFrom($rows, 2);
                 $this->fail('Duplicate physical identity admitted');
             } catch (MemberGrantException $error) {
                 $this->assertSame('duplicate_history', $error->reason);
             }
         }
         $this->expectException(MemberGrantException::class);
-        $this->from($this->rows($f), 0);
+        $this->historyFrom($this->rows($f), 0);
     }
 
     public function test_complete_consume_set_is_exact_and_immutable_between_calls(): void
@@ -127,7 +127,7 @@ final class MemberActivationHistoryTest extends TestCase
                 'row' => MemberGrantRecords::strings($row)]), config('app.key'));
             $rows[$kind][0] = $row;
             try {
-                $h = $this->from($rows, 1);
+                $h = $this->historyFrom($rows, 1);
                 // A D consume locator needs actual 257 linkage; assertComplete closes that independent scope here.
                 $h->assertComplete([$f['consume']['id']]);
                 $this->fail('Resealed crosslink admitted');
@@ -146,7 +146,7 @@ final class MemberActivationHistoryTest extends TestCase
             $rows['origins'][] = [...$f['origin'], 'id' => Fixture::id($i), 'payload_ciphertext' => $body];
         }
         try {
-            $this->from($rows, 16);
+            $this->historyFrom($rows, 16);
             $this->fail('Raw member history overflow admitted');
         } catch (MemberGrantException $error) {
             $this->assertSame('history_capacity', $error->reason);
@@ -178,10 +178,10 @@ final class MemberActivationHistoryTest extends TestCase
 
     private function history(array $f): MemberActivationHistory
     {
-        return $this->from($this->rows($f), 1);
+        return $this->historyFrom($this->rows($f), 1);
     }
 
-    private function from(array $rows, int $count): MemberActivationHistory
+    private function historyFrom(array $rows, int $count): MemberActivationHistory
     {
         return MemberActivationHistory::fromRows($rows['origins'], $rows['artifacts'], $rows['activations'],
             $rows['profiles'], $rows['definitions'], $rows['plans'], $count);
