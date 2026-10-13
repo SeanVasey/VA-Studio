@@ -310,6 +310,63 @@ class MemberOriginalCompositionTest extends TestCase
         $this->assertMemberOriginalEffectsUnchanged($before);
     }
 
+    public function test_initial_facts_lock_cannot_publish_a_source_after_withdrawing_its_reservation_catalog(): void
+    {
+        $this->assertFactsMintWithdrawal(1);
+    }
+
+    public function test_final_facts_lock_cannot_mint_readiness_after_withdrawing_its_reservation_catalog(): void
+    {
+        $this->assertFactsMintWithdrawal(2);
+    }
+
+    private function assertFactsMintWithdrawal(int $targetPhase): void
+    {
+        $fixture = $this->memberOriginalFixture();
+        $before = $this->memberOriginalEffects();
+        $begins = 0;
+        $commits = 0;
+        $starts = 0;
+        $changed = 0;
+        $operation = $this->memberOriginalOperation(function () use (&$starts): void {
+            $starts++;
+        });
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $connection->getEventDispatcher()->listen(TransactionBeginning::class, static function () use (&$begins): void {
+            $begins++;
+        });
+        $connection->getEventDispatcher()->listen(TransactionCommitting::class, static function () use (&$commits): void {
+            $commits++;
+        });
+        $real = Crypt::getFacadeRoot();
+        $observed = Mockery::mock();
+        $observed->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $fixture, $primary, $targetPhase, &$begins, &$changed) {
+            $plain = $real->decryptString($ciphertext);
+            if ($begins === $targetPhase && $changed === 0 && self::inside(SealedMemberGrantFacts::class, 'lock')) {
+                $statement = $primary->prepare('UPDATE tracks SET status = ? WHERE id = ?');
+                $statement->execute(['draft', $fixture['catalog']['track']->id]);
+                $changed += $statement->rowCount();
+            }
+
+            return $plain;
+        });
+        Crypt::swap($observed);
+        try {
+            $this->refused(fn () => $this->prepareMemberOriginal($fixture, $operation), 'source_refused');
+        } finally {
+            Crypt::swap($real);
+        }
+        $this->assertSame(1, $changed, 'The real initial facts decrypt must withdraw the earlier reservation source.');
+        $this->assertSame($targetPhase, $begins);
+        // First capture refuses during its terminal observer proof. Final capture must refuse
+        // in public readiness, before a second normal commit can be attempted.
+        $this->assertSame(1, $commits);
+        $this->assertSame($targetPhase - 1, $starts);
+        $this->assertSame('published', DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
+        $this->assertMemberOriginalEffectsUnchanged($before);
+    }
+
     private static function raw(object $object, string $property): mixed
     {
         return (new ReflectionProperty($object, $property))->getValue($object);

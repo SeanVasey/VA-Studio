@@ -15,13 +15,18 @@ use App\Domain\Grants\Member\MemberOriginalSourceCapture;
 use App\Domain\Grants\Member\MemberOriginalSourceClaim;
 use App\Domain\Grants\Member\MemberOriginalSourceValues;
 use App\Domain\Grants\Member\SealedMemberGrantFacts;
+use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Production\MembershipAwardConfiguration;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipMemberCapture;
+use App\Domain\Memberships\Production\MembershipPolicy;
+use App\Domain\Memberships\Production\MembershipReservationContext;
 use App\Domain\Memberships\Production\MembershipReservations;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
+use ReflectionProperty;
 use Tests\Support\MemberOriginalRendererFixtures;
 use Tests\TestCase;
 
@@ -62,6 +67,27 @@ class MemberOriginalIssuerOwnershipTest extends TestCase
             $this->assertSame('foreign_member_capture', $error->reason);
         }
         $this->assertSame([], DB::getConnections());
+    }
+
+    public function test_a_caller_cannot_select_pending_member_initialization_for_any_context_operation(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $rows = (new ReflectionClass(MembershipRows::class))->newInstanceWithoutConstructor();
+        (new ReflectionProperty($rows, 'primary'))->setValue($rows, $pdo);
+        $configuration = (new ReflectionClass(MembershipAwardConfiguration::class))->newInstanceWithoutConstructor();
+        $principal = (new ReflectionClass(ProductionCustomerPrincipal::class))->newInstanceWithoutConstructor();
+        foreach (['inspect', 'reserve', 'release', 'expire'] as $operation) {
+            try {
+                new MembershipReservationContext($rows, $configuration, new MembershipPolicy, [],
+                    new BillingPolicy, [], $principal, new User, hrtime(true) + 60_000_000_000,
+                    $operation, 'unused', [], MembershipMemberCapture::value());
+                $this->fail('A shaped capture cannot authorize deferred initialization.');
+            } catch (MembershipException $error) {
+                $this->assertSame('owned_invocation_required', $error->reason);
+            }
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse($pdo->inTransaction());
     }
 
     public function test_opaque_value_shapes_refuse_restoration_without_calling_a_constructor(): void

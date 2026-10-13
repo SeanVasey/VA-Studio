@@ -90,6 +90,7 @@ final class MembershipReservationContext
         private readonly string $operation,
         string $locator,
         private readonly array $arguments,
+        ?MembershipMemberCapture $memberInitialization = null,
     ) {
         if ($operation === 'inspect') {
             $permit = self::$inspectionPermits[$rows] ?? null;
@@ -97,8 +98,9 @@ final class MembershipReservationContext
                 unset(self::$inspectionPermits[$rows]);
             }
             MembershipException::require($permit === [$rows->identity(), $configuration, $policy, $membershipConfiguration,
-                $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $operation, $locator, $arguments], 'owned_invocation_required');
+                $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $operation, $locator, $arguments, $memberInitialization], 'owned_invocation_required');
         } else {
+            MembershipException::require($memberInitialization === null, 'owned_invocation_required');
             MembershipReservationOperations::consumeContextPermit($rows, $configuration, $policy, $membershipConfiguration,
                 $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $operation, $locator, $arguments);
         }
@@ -153,7 +155,15 @@ final class MembershipReservationContext
                 $this->period, $this->invoice, $this->facts, $this->licenseProof->binding())), 'changed_reservation_intent');
             $this->projection = [];
         }
-        $this->proveCurrent();
+        if ($memberInitialization === null) {
+            $this->proveCurrent();
+        } else {
+            // Only the exact issuer-permitted member inspection defers duplicate reinspection.
+            // Keep the original paired honor/authority bounds before later facts callbacks. Its
+            // owner must still complete both source phases before readiness or any source ticket.
+            $this->checkDeadlines();
+            $this->admit();
+        }
     }
 
     public function projection(): array
@@ -353,11 +363,11 @@ final class MembershipReservationContext
     {
         MembershipReservations::consumeMemberInspectionPermit($capture, $redemptionId, $principal, $actor, $rows, $deadline);
 
-        return self::inspectAt($redemptionId, $principal, $actor, $rows, $deadline);
+        return self::inspectAt($redemptionId, $principal, $actor, $rows, $deadline, $capture);
     }
 
     private static function inspectAt(string $redemptionId, ProductionCustomerPrincipal $principal, User $actor,
-        MembershipRows $rows, int $deadline): self
+        MembershipRows $rows, int $deadline, ?MembershipMemberCapture $memberInitialization = null): self
     {
         MembershipValues::id($redemptionId);
         MembershipException::require(hrtime(true) < $deadline, 'operation_deadline');
@@ -394,10 +404,10 @@ final class MembershipReservationContext
         $locator = $route[0]['invoice_id'];
         self::$inspectionPermits ??= new WeakMap;
         self::$inspectionPermits[$rows] = [$rows->identity(), $configuration, $policy, $membership,
-            $billingPolicy, $billing, $principal, $actor, $deadline, 'inspect', $locator, $arguments];
+            $billingPolicy, $billing, $principal, $actor, $deadline, 'inspect', $locator, $arguments, $memberInitialization];
         try {
             return new self($rows, $configuration, $policy, $membership, $billingPolicy, $billing,
-                $principal, $actor, $deadline, 'inspect', $locator, $arguments);
+                $principal, $actor, $deadline, 'inspect', $locator, $arguments, $memberInitialization);
         } finally {
             unset(self::$inspectionPermits[$rows]);
         }

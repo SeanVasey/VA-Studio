@@ -55,7 +55,9 @@ final class MemberOriginalInspection
                         'document' => $snapshot->definitionDocument->value()],
                     'profile' => ['id' => $snapshot->profileBinding->id, 'seal' => $snapshot->profileSeal,
                         'document' => $snapshot->profileDocument->value()]]);
-            $this->proveCurrent();
+            // These detached values stay inside the registered inspection. Readiness and the
+            // committing observer each require a fresh complete combined proof before authority
+            // can leave this frame; repeating that proof here needlessly consumes its original cap.
         } catch (\Throwable $error) {
             $this->retire();
             throw $error;
