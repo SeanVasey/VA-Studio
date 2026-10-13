@@ -29,3 +29,9 @@ The early reviewer identified that exact `DatabaseManager::getDefaultConnection(
 ## Renderer observation hook
 
 Early review C4B-E6 requires the renderer to own the actual standard `Process` construction and launch. The correction removes transport substitution. An optional no-argument `beforeStart` observation hook may run before final profile/budget/native admission; it receives no process, command, environment or input and its return value supplies no output. The renderer rebuilds its trusted launch state after the hook. Integration fixtures use this observation hook; the packet retains the actual old/fixed renderer evidence and separate source review.
+
+## Private initialization proof deferral
+
+The first actual native preparation exhausted its original 60-second frame budget after repeatedly running complete proofs during private construction. The `9399dd99` correction removes the combined proof from the private `MemberOriginalInspection` constructor and binds an optional exact member-capture identity into the consumed reservation constructor permit. Only that registered member path defers the constructor's final full proof; it still establishes the original honor/authority deadlines and calls admission immediately. Ordinary inspection and every writer retain their full constructor proof; a shaped non-null capture cannot select this path.
+
+Constructed values remain inside the owned inspection. Both readiness APIs still require the complete combined proof, as does the committing observer; the separate committed callback/raw/finish sequence and post-finish checks remain unchanged. No proof is cached across callbacks and no deadline is extended. New real facts-decryption withdrawal tests cover initial capture and final readiness, including refusal before the final committing delegate. Actual native timing acceptance belongs to the verification packet, not this source rationale.
