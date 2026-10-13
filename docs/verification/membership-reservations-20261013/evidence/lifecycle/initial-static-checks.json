@@ -1,0 +1,38 @@
+{
+  "head": "87e0dc42b1a046b4dc122d2bbaff1dd1cabdde5a",
+  "checks": [
+    {
+      "command": [
+        "php",
+        "vendor/bin/pint",
+        "tests/Support/MembershipReservationFixtures.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php"
+      ],
+      "exit": 0,
+      "output": "{\"tool\":\"pint\",\"result\":\"passed\"}"
+    },
+    {
+      "command": [
+        "php",
+        "-l",
+        "tests/Support/MembershipReservationFixtures.php"
+      ],
+      "exit": 0,
+      "output": "No syntax errors detected in tests/Support/MembershipReservationFixtures.php\n"
+    },
+    {
+      "command": [
+        "php",
+        "-l",
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php"
+      ],
+      "exit": 0,
+      "output": "No syntax errors detected in tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php\n"
+    }
+  ],
+  "sha256": {
+    "tests/Support/MembershipReservationFixtures.php": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+    "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php": "5d7e644e8d6a746dd7b138a756b0c72be8b828863686278e2890b13114600eb2"
+  },
+  "application_tests": "not yet run; integrated application dependencies pending"
+}

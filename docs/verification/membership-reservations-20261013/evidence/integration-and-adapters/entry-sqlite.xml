@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" tests="6" assertions="0" errors="6" failures="0" skipped="0" time="10.870909">
+    <testcase name="test_each_operation_requires_every_member_of_the_complete_capability_gate" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="44" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="2.105978">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:46
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="63" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="1.774330">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:65
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_each_operation_refuses_an_existing_transaction_on_another_connection" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="77" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="1.813872">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:79
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_capability_callback_cannot_open_another_transaction_after_the_initial_admission" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="96" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="1.733547">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:98
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_capability_callback_cannot_remove_a_remaining_capability_during_capture" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="126" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="1.719974">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:128
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+    <testcase name="test_transient_registration_cannot_make_an_incomplete_baseline_authoritative" file="/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php" line="145" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationEntryTest" assertions="0" time="1.723209">
+      <error type="ErrorException">Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:147
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

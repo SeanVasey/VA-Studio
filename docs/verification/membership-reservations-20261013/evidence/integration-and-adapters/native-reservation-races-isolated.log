@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-reservations/phpunit.xml
+
+[41;37mF[0m
+
+Time: 02:50.534, Memory: 90.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipNativeReservationRaceTest::test_same_key_and_intent_return_the_same_retained_reservation_and_event
+{"class":"App\\Domain\\Memberships\\Production\\MembershipException","reason":"operation_deadline"}
+Failed asserting that 'App\Domain\Memberships\Production\MembershipException' is null.
+
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php:308
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php:101
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 33[0m[37;41m, Failures: 1[0m[37;41m.[0m

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="4" assertions="58" errors="1" failures="0" skipped="0" time="745.918434">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php" tests="2" assertions="37" errors="0" failures="0" skipped="0" time="431.175867">
+      <testcase name="test_terminal_clock_callback_cannot_withdraw_identity_after_the_last_precommit_owner_check" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php" line="35" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationClockClosureTest" assertions="18" time="228.827799"/>
+      <testcase name="test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php" line="68" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationClockClosureTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationClockClosureTest" assertions="19" time="202.348068"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" tests="1" assertions="20" errors="0" failures="0" skipped="0" time="207.576245">
+      <testcase name="test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest" assertions="20" time="207.576245"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" tests="1" assertions="1" errors="1" failures="0" skipped="0" time="107.166322">
+      <testcase name="test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="181" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="1" time="107.166322">
+        <error type="PDOException">Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'tracks'
+
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:187
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

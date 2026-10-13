@@ -1,0 +1,104 @@
+{
+    "case": "test_same_key_and_intent_return_the_same_retained_reservation_and_event",
+    "parent_pid": 146194,
+    "parent_connection_id": 83,
+    "database": "vaseyaudio_membership_reservation_races",
+    "mysql_version": "8.4.11",
+    "timing_scope": "Explicit synthetic Carbon wall time; real hrtime, process scheduling, native row waits and admission bounds.",
+    "authority_scope": "Real retained invoice, policy and eligible-license producers; unused fixture-only C4 grant gate; no provider\/host claim.",
+    "barriers": [
+        {
+            "requester": 85,
+            "blocker": 83,
+            "table": "production_membership_billing_award_fence",
+            "primary_key": 1,
+            "observed_ns": 47663219524305
+        },
+        {
+            "requester": 86,
+            "blocker": 85,
+            "table": "users",
+            "primary_key": 4,
+            "observed_ns": 47664623270571
+        }
+    ],
+    "workers": [
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 149483,
+            "operation": "reserve",
+            "request_key": "native-same-key",
+            "redemption_id": null,
+            "at": "2026-10-13 12:00:00.000000",
+            "ready": {
+                "connection_id": 85,
+                "pid": 149483,
+                "ready_ns": 47658721100993,
+                "at": "2026-10-13 12:00:00.000000"
+            },
+            "released_ns": 47660195193391,
+            "exit": 0,
+            "stdout": "{\"value\":{\"period_id\":\"aef27a7d-e3bd-4dd3-bfc6-1c162e916c86\",\"redemption_id\":\"65ee1c1f-5ab1-4049-a8b9-3b9812481154\",\"reservation_event_id\":\"52a0e3c3-de91-47eb-bc73-48175e639912\",\"credit_amount\":1,\"honor_deadline\":\"2026-10-13 12:01:00\",\"status\":\"reserved\",\"balances\":{\"available\":0,\"reserved\":1,\"consumed\":0,\"expired\":0}},\"error_class\":null,\"reason\":null,\"operation\":\"reserve\",\"at\":\"2026-10-13 12:00:00.000000\",\"entered_ns\":47660198162533,\"finished_ns\":47715141464866,\"connection_id\":85,\"pid\":149483,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": {
+                    "period_id": "aef27a7d-e3bd-4dd3-bfc6-1c162e916c86",
+                    "redemption_id": "65ee1c1f-5ab1-4049-a8b9-3b9812481154",
+                    "reservation_event_id": "52a0e3c3-de91-47eb-bc73-48175e639912",
+                    "credit_amount": 1,
+                    "honor_deadline": "2026-10-13 12:01:00",
+                    "status": "reserved",
+                    "balances": {
+                        "available": 0,
+                        "reserved": 1,
+                        "consumed": 0,
+                        "expired": 0
+                    }
+                },
+                "error_class": null,
+                "reason": null,
+                "operation": "reserve",
+                "at": "2026-10-13 12:00:00.000000",
+                "entered_ns": 47660198162533,
+                "finished_ns": 47715141464866,
+                "connection_id": 85,
+                "pid": 149483,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        },
+        {
+            "command": "'\/workspace\/.va-studio-toolchain\/root\/usr\/bin\/php8.4' '\/workspace\/VA-Studio-membership-reservations\/tests\/Support\/membership-reservation-race-worker.php'",
+            "spawned_pid": 149484,
+            "operation": "reserve",
+            "request_key": "native-same-key",
+            "redemption_id": null,
+            "at": "2026-10-13 12:00:00.000000",
+            "ready": {
+                "connection_id": 86,
+                "pid": 149484,
+                "ready_ns": 47660170708063,
+                "at": "2026-10-13 12:00:00.000000"
+            },
+            "released_ns": 47663219527481,
+            "exit": 0,
+            "stdout": "{\"value\":null,\"error_class\":\"App\\\\Domain\\\\Memberships\\\\Production\\\\MembershipException\",\"reason\":\"operation_deadline\",\"operation\":\"reserve\",\"at\":\"2026-10-13 12:00:00.000000\",\"entered_ns\":47663224033139,\"finished_ns\":47729972290574,\"connection_id\":86,\"pid\":149484,\"transaction_level\":0,\"pdo_transaction\":false}",
+            "stderr": "",
+            "result": {
+                "value": null,
+                "error_class": "App\\Domain\\Memberships\\Production\\MembershipException",
+                "reason": "operation_deadline",
+                "operation": "reserve",
+                "at": "2026-10-13 12:00:00.000000",
+                "entered_ns": 47663224033139,
+                "finished_ns": 47729972290574,
+                "connection_id": 86,
+                "pid": 149484,
+                "transaction_level": 0,
+                "pdo_transaction": false
+            },
+            "stopped_by_teardown": false
+        }
+    ]
+}

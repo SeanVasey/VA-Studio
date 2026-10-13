@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-reservations/phpunit.xml
+
+...[31;1mE[0m
+
+Time: 12:25.922, Memory: 104.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical
+PDOException: SQLSTATE[42000]: Syntax error or access violation: 1066 Not unique table/alias: 'tracks'
+
+/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:187
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 4[0m[37;41m, Assertions: 58[0m[37;41m, Errors: 1[0m[37;41m.[0m

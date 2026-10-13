@@ -1,0 +1,73 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-reservation-entry/phpunit.xml
+
+[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m[31;1mE[0m                                                              6 / 6 (100%)
+
+Time: 00:10.872, Memory: 85.00 MB
+
+There were 6 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_requires_every_member_of_the_complete_capability_gate
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:46
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_primary_transaction_without_rolling_it_back
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:65
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_each_operation_refuses_an_existing_transaction_on_another_connection
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:79
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_capability_callback_cannot_open_another_transaction_after_the_initial_admission
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:98
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_capability_callback_cannot_remove_a_remaining_capability_during_capture
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:128
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\ProductionMembershipBilling\MembershipReservationEntryTest::test_transient_registration_cannot_make_an_incomplete_baseline_authoritative
+ErrorException: tempnam(): file created in the system's temporary directory
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:90
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/ProductionIdentityFixture.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Support/MembershipAwardFixtures.php:51
+/workspace/VA-Studio-membership-reservation-entry/tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php:147
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 6[0m[37;41m, Assertions: 0[0m[37;41m, Errors: 6[0m[37;41m.[0m

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Throwable;
 
-/** Retained first-award records. Every column is covered by a table/purpose-bound keyed seal. */
+/** Original first-award bytes and seals, shared with the complete retained credit ledger audit. */
 final class MembershipPeriodRecords
 {
     public const PERIODS = 'production_membership_paid_periods';
@@ -52,8 +52,14 @@ final class MembershipPeriodRecords
         return [$period, $event];
     }
 
-    /** Only the operative first-event format is admitted; later ledger operations extend this audit. */
-    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId): array
+    /** Preserve the original award projection after auditing every retained ledger effect. */
+    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId, array $redemptions = []): array
+    {
+        return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $policy, $originId)['award'];
+    }
+
+    /** The original first-event format. Creation, payload purpose and keyed seal bytes stay unchanged. */
+    public static function verifyFirstAward(array $period, array $event, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId): array
     {
         MembershipPolicyDocument::keys($period, ['id', 'account_id', 'user_id', 'identity_origin_id', 'plan_version_id',
             'source_invoice_hash', 'invoice_graph_hash', 'owner_binding_hash', 'allowance', 'period_start', 'period_end',
@@ -82,15 +88,7 @@ final class MembershipPeriodRecords
             && (string) $period['allowance'] === (string) $policy->creditAllowance
             && $period['period_start'] === $invoice->periodStart && $period['period_end'] === $invoice->periodEnd
             && $period['credit_expires_at'] === $policy->awardTerms->expiresAt($invoice->periodEnd), 'conflicting_invoice');
-        MembershipException::require(count($events) === 1, 'unsupported_credit_history');
-        $event = $events[0];
-        MembershipPolicyDocument::keys($event, ['id', 'period_id', 'sequence', 'kind', 'amount', 'redemption_id', 'reservation_event_id',
-            'grant_origin_id', 'grant_receipt_hash', 'grant_purpose', 'key_hash', 'request_hash', 'prior_seal', 'actor_binding_hash',
-            'before_available', 'before_reserved', 'before_consumed', 'before_expired', 'after_available', 'after_reserved',
-            'after_consumed', 'after_expired', 'seal', 'created_at']);
-        self::verifySeal(self::EVENTS, $event);
-        MembershipValues::id($event['id']);
-        MembershipValues::hash($event['actor_binding_hash']);
+        self::verifyEvent($event);
         MembershipException::require($event['period_id'] === $period['id'] && (string) $event['sequence'] === '1'
             && $event['kind'] === 'award' && (string) $event['amount'] === (string) $policy->creditAllowance
             && $event['prior_seal'] === str_repeat('0', 64) && $event['created_at'] === $period['created_at']
@@ -108,6 +106,19 @@ final class MembershipPeriodRecords
         return ['period_id' => $period['id'], 'award_event_id' => $event['id'], 'allowance' => $policy->creditAllowance,
             'period_start' => $period['period_start'], 'period_end' => $period['period_end'],
             'credit_expires_at' => $period['credit_expires_at'], 'provenance' => $invoice->provenance];
+    }
+
+    /** Authenticate the exact event column set before interpreting balances or joins. */
+    public static function verifyEvent(array $event): void
+    {
+        MembershipPolicyDocument::keys($event, ['id', 'period_id', 'sequence', 'kind', 'amount', 'redemption_id', 'reservation_event_id',
+            'grant_origin_id', 'grant_receipt_hash', 'grant_purpose', 'key_hash', 'request_hash', 'prior_seal', 'actor_binding_hash',
+            'before_available', 'before_reserved', 'before_consumed', 'before_expired', 'after_available', 'after_reserved',
+            'after_consumed', 'after_expired', 'seal', 'created_at']);
+        self::verifySeal(self::EVENTS, $event);
+        MembershipValues::id($event['id']);
+        MembershipValues::hash($event['actor_binding_hash']);
+        MembershipValues::utc($event['created_at']);
     }
 
     public static function seal(string $table, array $row, ?string $key = null): string

@@ -132,8 +132,10 @@ the schema's actual binding, not a cross-operation authority cache.
 
 Reserve within one owned outer transaction, audit the complete period history,
 derive the cost and balances under the period lock, and insert redemption plus
-reserve event atomically. Domain-separated request-key scope should bind original
-buyer origin and selected period. Its retained intent must bind the full policy,
+reserve event atomically. Domain-separated request-key scope binds original buyer origin, the operation
+purpose and the opaque request key. The selected period belongs in the authenticated
+intent, so reusing the same key for another period refuses rather than creating
+another request identity. Its retained intent must bind the full policy,
 invoice identity, owner, selection/revision, license/assets/terms and derived
 cost. Same key/same full intent returns original IDs; same key/changed intent
 refuses. A duplicate-key error is not permission to return an unaudited row.

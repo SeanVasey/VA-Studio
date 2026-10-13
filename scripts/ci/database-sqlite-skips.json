@@ -901,6 +901,30 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeAwardRaceTest",
       "test_hint_committed_after_repeatable_read_snapshot_is_seen_by_the_owned_awards_current_reads"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest",
+      "test_native_committed_clock_callback_owner_withdrawal_refuses_receipt_without_undoing_reservation"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+      "test_different_request_keys_cannot_spend_the_same_last_credit"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+      "test_same_key_and_intent_return_the_same_retained_reservation_and_event"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+      "test_duplicate_release_at_honor_equality_creates_one_terminal_without_inflation"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+      "test_release_after_period_expiry_moves_credit_to_expired_and_cannot_resurrect_it"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeReservationRaceTest",
+      "test_available_expiry_and_reserve_at_synthetic_equality_conserve_the_allowance"
     ]
   ]
 }

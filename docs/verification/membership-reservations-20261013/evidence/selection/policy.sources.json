@@ -1,0 +1,11 @@
+{
+  "scripts/ci/database-mysql-selection.json": "7e658e505f9f66705ef121935030ed3393b2e1a2f76d3d03583f4f37d1c4a6e0",
+  "scripts/ci/database-sqlite-skips.json": "6f9049e4f43f49eb6135e74ee972d51ed8b82cf1dc5cf69069697894bace3930",
+  "scripts/ci/database-mysql-skips.json": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+  "scripts/ci/phpunit-shards.py": "313d716a69fd3e214b785d1c150819fb985114a32234a4c3ffc57d18d8683812",
+  "scripts/ci/database-receipts.py": "9d4462d36deda454eaa870979198ee2228459463fba7898a2c8c75a07a15b7de",
+  "scripts/ci/gitlab-database-receipts.py": "825ec5de96ac2df7a6fa210dcc375f6a67b519d700114dec0f781a6b5d1b390d",
+  "scripts/ci/test-phpunit-shards.py": "78313cdd56510caa29558dc8693d5c2f0496419a3d40570558c86d944992cb2f",
+  "scripts/ci/test-database-receipts.py": "440d8edd7d4fd3e7f0b25138be991f8e3c9625aa796344f2f4860ff063f10455",
+  "scripts/ci/test-gitlab-database-receipts.py": "525f82ded2a5ba75c5edddad008897ad78798578e394c55846c187e5972a0003"
+}

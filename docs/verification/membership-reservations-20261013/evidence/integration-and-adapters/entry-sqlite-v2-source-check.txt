@@ -1,0 +1,3 @@
+app/Domain/Memberships/Production/MembershipReservationOperations.php: OK
+app/Domain/Memberships/Production/MembershipReservationObserver.php: OK
+tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php: OK

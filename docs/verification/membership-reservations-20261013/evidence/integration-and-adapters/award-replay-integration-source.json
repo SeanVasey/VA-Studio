@@ -1,0 +1,14 @@
+{
+  "head": "94c190b6d3ee624b2f434d8f1cd4f33a135d232f",
+  "worktree_delta": true,
+  "files": {
+    "app/Domain/Memberships/Production/MembershipAwardContext.php": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+    "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "8ff55a353e824b55e93e5407fc28851e880b4dc0e5bd7afecc26dc4fa79a9f5d",
+    "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "8c44b2d53d8b0178ac3a0c9657f856712523cb68c56d62e3f3013043d1980443",
+    "app/Domain/Memberships/Production/MembershipReservationRecords.php": "949fa4a9276bebc4f19dbfe93b5c538e593a317075dc3084bdfa26fdd888a2ea",
+    "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "96b62f5f6b3fc4603fd9df5f1a4c0c5f6060e20e54c3e8249ce04e0d999c8e86",
+    "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "1545367e9c167458e401ba90950c286e8fadb7aa9918360de9170328e613092e",
+    "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php": "689f5a9eed933f4c669d0efc4908c45434611d287b24ec151f074e9bce347307",
+    "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php": "72d9f0a5a6038aeff74d0e0ed109f15e382e750845c1191664d5bd2b8f49ac76"
+  }
+}
