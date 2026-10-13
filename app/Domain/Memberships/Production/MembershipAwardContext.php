@@ -34,6 +34,8 @@ final class MembershipAwardContext
 
     private array $events;
 
+    private array $redemptions;
+
     private array $tables;
 
     private array $projection;
@@ -69,7 +71,7 @@ final class MembershipAwardContext
         $this->historical = $this->access->verifyHistoricalBinding($this->invoice->originalBuyerBinding, $rows->current());
         $database = $rows->driver() === 'mysql' ? $rows->identity()->query('SELECT DATABASE()')->fetchColumn() : 'main';
         MembershipException::require(is_string($database) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $database) === 1, 'changed_schema');
-        foreach ([MembershipRecords::TABLE, MembershipPeriodRecords::PERIODS, MembershipPeriodRecords::EVENTS] as $table) {
+        foreach ([MembershipRecords::TABLE, MembershipPeriodRecords::PERIODS, MembershipReservationRecords::TABLE, MembershipPeriodRecords::EVENTS] as $table) {
             $physical = (new MembershipSchema)->table($table);
             $this->tables[$table] = $rows->driver() === 'mysql' ? '`'.$database.'`.'.$physical : $physical;
         }
@@ -82,9 +84,10 @@ final class MembershipAwardContext
             $this->insert(MembershipPeriodRecords::EVENTS, $event);
             $this->period = $rows->one(MembershipPeriodRecords::PERIODS, 'id = ?', [$period['id']]);
         }
+        $this->redemptions = $rows->rows(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
         $this->events = $rows->rows(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
         $this->projection = MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id']);
+            (int) $this->historical['origin']['id'], $this->redemptions);
         $this->proveCurrent();
     }
 
@@ -105,7 +108,7 @@ final class MembershipAwardContext
         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
         MembershipPolicyVersions::document($plan);
         MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id']);
+            (int) $this->historical['origin']['id'], $this->redemptions);
         $this->access->proveCurrent($this->principal, $this->actor, $this->rows->current(), $this->identity);
         // Nothing below decrypts, resolves a capability or invokes a clock hook.
         $this->assertEffects(false);
@@ -128,7 +131,8 @@ final class MembershipAwardContext
         $period = $this->read(MembershipPeriodRecords::PERIODS, 'id = ?', [$this->period['id']], 2, false);
         MembershipException::require(count($period) === 1, 'changed_period');
         $events = $this->read(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
-        MembershipPeriodRecords::verify($period[0], $events, $this->invoice, $this->facts, (int) $this->historical['origin']['id']);
+        $redemptions = $this->read(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
+        MembershipPeriodRecords::verify($period[0], $events, $this->invoice, $this->facts, (int) $this->historical['origin']['id'], $redemptions);
         $this->access->proveHistoricalBindingCommitted($this->invoice->originalBuyerBinding, $frame, $this->historical);
         $this->access->proveCommitted($this->principal, $this->actor, $frame, $this->identity);
         // Finish all callback-capable proof work before the final raw retained-row closure.
@@ -152,7 +156,7 @@ final class MembershipAwardContext
     {
         $buyer = $this->invoice->originalBuyerBinding;
         $current = $this->access->durableBinding($this->principal);
-        MembershipException::require($this->facts->supportedOperations === ['paid_period_award'] && $this->facts->awardTerms !== null
+        MembershipException::require($this->facts->supports('paid_period_award') && $this->facts->awardTerms !== null
             && $this->facts->planVersionId === $this->invoice->planVersionId
             && $this->facts->policyHash === $this->invoice->planPolicyHash
             && $this->facts->policyHash === $this->membershipConfiguration['approved_policy_hash']
@@ -184,6 +188,7 @@ final class MembershipAwardContext
     {
         foreach ([[MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, [$this->plan]],
             [MembershipPeriodRecords::PERIODS, 'source_invoice_hash = ?', [$this->invoice->sourceInvoiceHash], 2, [$this->period]],
+            [MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, $this->redemptions],
             [MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, $this->events]] as [$table, $where, $bindings, $limit, $expected]) {
             $actual = $this->read($table, $where, $bindings, $limit, ! $committed);
             MembershipException::require(CanonicalJson::encode(array_map(MembershipRecords::strings(...), $actual))
