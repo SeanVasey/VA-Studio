@@ -11,6 +11,7 @@ use App\Domain\Memberships\Production\MembershipPolicy;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
 use App\Support\Environment\TestEnvironment;
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
@@ -19,6 +20,7 @@ use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Facade;
+use ReflectionFunction;
 use ReflectionProperty;
 
 /** Explicit historical-read gate. Approved live hashes and renderer availability confer no retained-read authority. */
@@ -53,7 +55,7 @@ final class MemberActivationReadConfiguration
             $instance = $this->baseline['instances'][$capability];
             $binding = $this->baseline['bindings'][$capability];
             MemberGrantException::require($instance !== null ? $instance instanceof $capability
-                : (is_array($binding) && ($binding['concrete'] ?? null) instanceof \Closure
+                : (is_array($binding) && ($binding['concrete'] ?? null) instanceof Closure
                     && is_bool($binding['shared'] ?? null)), 'capability_absent');
         }
         $this->gate();
@@ -113,7 +115,7 @@ final class MemberActivationReadConfiguration
         $items = self::raw(Repository::class, 'items', $this->repository);
         $connections = self::raw(DatabaseManager::class, 'connections', $this->manager);
         MemberGrantException::require(is_array($items) && is_array($connections) && $connections !== [], 'changed_configuration');
-        $result = ['configuration' => self::copy($items, $remaining), 'environment' => $instances['env'] ?? null, 'connections' => []];
+        $result = ['configuration' => self::copy($items, $remaining), 'environment' => $this->environment($instances), 'connections' => []];
         foreach ($connections as $name => $connection) {
             MemberGrantException::require(is_object($connection)
                 && in_array(get_class($connection), [MySqlConnection::class, SQLiteConnection::class], true), 'changed_configuration');
@@ -134,6 +136,27 @@ final class MemberActivationReadConfiguration
         }
 
         return $result;
+    }
+
+    /** Same callback-free Laravel scalar-binding admission used by MemberGrantPolicy. */
+    private function environment(array $instances): mixed
+    {
+        if (array_key_exists('env', $instances)) {
+            return $instances['env'];
+        }
+        $bindings = self::raw(Container::class, 'bindings', $this->container);
+        $concrete = is_array($bindings) ? ($bindings['env']['concrete'] ?? null) : null;
+        if ($concrete === null) {
+            return null;
+        }
+        MemberGrantException::require($concrete instanceof Closure, 'changed_configuration');
+        $function = new ReflectionFunction($concrete);
+        $variables = $function->getStaticVariables();
+        MemberGrantException::require($function->getClosureScopeClass()?->getName() === Container::class
+            && $function->getClosureThis() === $this->container && array_keys($variables) === ['value']
+            && is_string($variables['value']), 'changed_configuration');
+
+        return $variables['value'];
     }
 
     private static function raw(string $class, string $property, object $object): mixed
