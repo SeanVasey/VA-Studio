@@ -80,14 +80,20 @@ final class MemberGrantDocumentValues
         self::provenance($document['provenance']);
     }
 
-    public static function iso(mixed $value, bool $nullable = false): void
+    public static function iso(mixed $value, bool $nullable = false): ?DateTimeImmutable
     {
         if ($nullable && $value === null) {
-            return;
+            return null;
         }
-        MemberGrantException::require(is_string($value), 'invalid_document');
-        $date = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i:s\Z', $value, new DateTimeZone('UTC'));
-        MemberGrantException::require($date !== false && $date->format('Y-m-d\TH:i:s\Z') === $value, 'invalid_document');
+        // Catalog snapshots use Carbon's six-digit UTC spelling; earlier retained values use seconds.
+        // Parse only for validation/comparison. The document retains the original string and hash.
+        MemberGrantException::require(is_string($value)
+            && preg_match('/\A[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{6})?Z\z/D', $value) === 1, 'invalid_document');
+        $format = strlen($value) === 27 ? 'Y-m-d\TH:i:s.u\Z' : 'Y-m-d\TH:i:s\Z';
+        $date = DateTimeImmutable::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'));
+        MemberGrantException::require($date !== false && $date->format($format) === $value, 'invalid_document');
+
+        return $date;
     }
 
     public static function roles(mixed $roles): void
@@ -259,10 +265,9 @@ final class MemberGrantDocumentValues
         }
         self::text($license['approval_reference'], 1024);
         self::iso($license['approved_at']);
-        self::iso($license['effective_from'], true);
-        self::iso($license['effective_until'], true);
-        MemberGrantException::require($license['effective_from'] === null || $license['effective_until'] === null
-            || $license['effective_from'] < $license['effective_until'], 'invalid_document');
+        $from = self::iso($license['effective_from'], true);
+        $until = self::iso($license['effective_until'], true);
+        MemberGrantException::require($from === null || $until === null || $from < $until, 'invalid_document');
     }
 
     public static function termsProjection(array $license): array
