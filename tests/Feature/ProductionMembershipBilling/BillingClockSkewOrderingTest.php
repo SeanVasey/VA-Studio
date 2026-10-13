@@ -61,7 +61,7 @@ class BillingClockSkewOrderingTest extends TestCase
         $this->assertSame('concurrent_retrieval', $outcome);
         $chain = $ledger->observations($first['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
-        $this->assertNull($ledger->currentSettled($first['invoice_id'], self::T0 + 31), 'A snapshot read before the refund is never current evidence.');
+        $this->assertNull($ledger->currentSettled($first['invoice_id']), 'A snapshot read before the refund is never current evidence.');
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 
@@ -75,7 +75,7 @@ class BillingClockSkewOrderingTest extends TestCase
         $this->assertSame('concurrent_retrieval', $outcome);
         $invoiceId = (string) DB::table('production_membership_billing_invoices')->value('id');
         $this->assertSame(['reversed'], array_column((new BillingLedger)->observations($invoiceId), 'outcome'));
-        $this->assertNull((new BillingLedger)->currentSettled($invoiceId, self::T0 + 31));
+        $this->assertNull((new BillingLedger)->currentSettled($invoiceId));
     }
 
     public function test_a_newer_retrieval_on_a_clock_behind_worker_is_admitted_after_an_older_one(): void
@@ -91,8 +91,8 @@ class BillingClockSkewOrderingTest extends TestCase
 
         $this->assertSame(['reversed', 2], [$newer['outcome'], $newer['sequence']]);
         $this->assertGreaterThan($first['retrieval_position'], $newer['retrieval_position']);
-        $this->assertLessThan($first['retrieval_started_at'], $newer['retrieval_started_at'], 'The worker clock was behind; it decided nothing.');
-        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 26));
+        $this->assertGreaterThanOrEqual($first['retrieval_started_at'], $newer['retrieval_started_at'], 'Retained start time comes from the database despite the worker clock moving backward.');
+        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id']));
     }
 
     public function test_overlapping_retrievals_with_identical_clock_readings_are_still_ordered_and_the_stale_one_is_refused(): void
@@ -107,7 +107,7 @@ class BillingClockSkewOrderingTest extends TestCase
         $this->assertSame('concurrent_retrieval', $outcome);
         $chain = (new BillingLedger)->observations($first['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
-        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id'], self::T0 + 11));
+        $this->assertNull((new BillingLedger)->currentSettled($first['invoice_id']));
     }
 
     public function test_a_retrieval_that_began_before_a_hint_does_not_cover_it_even_when_the_worker_clock_is_ahead_of_the_intake_clock(): void
@@ -124,8 +124,8 @@ class BillingClockSkewOrderingTest extends TestCase
         });
         $straddling = (new BillingReconciliation($open))->retrieve($binding['id'], F::INVOICE);
         $this->assertSame(['not_settled', 2], [$straddling['outcome'], $straddling['sequence']]);
-        $this->assertGreaterThan(DB::table('production_membership_billing_events')->value('received_at'), $straddling['retrieval_started_at'],
-            'By the skewed clocks the retrieval began after the hint; it did not.');
+        $this->assertLessThan((int) DB::table('production_membership_billing_events')->value('hint_position'), $straddling['retrieval_position'],
+            'The native allocation proves retrieval began before the hint despite worker clock skew.');
 
         $this->at(120);
         Queue::fake();
@@ -145,7 +145,7 @@ class BillingClockSkewOrderingTest extends TestCase
 
         // Begins after the hint was received, on a worker whose clock reads 30 s behind the intake host.
         $covering = $this->retrieve($binding['id'], 20);
-        $this->assertLessThan(DB::table('production_membership_billing_events')->value('received_at'), $covering['retrieval_started_at']);
+        $this->assertGreaterThan((int) DB::table('production_membership_billing_events')->value('hint_position'), $covering['retrieval_position']);
 
         $this->at(60);
         Queue::fake();

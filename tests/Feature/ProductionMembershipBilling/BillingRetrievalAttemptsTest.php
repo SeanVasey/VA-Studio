@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Memberships\Billing\BillingDatabaseClock;
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingPolicy;
@@ -107,9 +108,10 @@ class BillingRetrievalAttemptsTest extends TestCase
         $ledger = new BillingLedger;
         $start = $ledger->startRetrieval();
         $end = $ledger->endRetrieval($start);
-        $candidate = [...$row, 'id' => BillingValues::id(), 'retrieval_position' => $start, 'retrieval_end_position' => $end];
+        $candidate = [...$row, ...$end->columns(), 'id' => BillingValues::id(),
+            'created_at' => BillingDatabaseClock::sample($pdo, DB::getDriverName())->stamp19()];
         foreach ([['outcome' => 'settled'], ['reason' => 'unbounded_provider_body'], ['provider_account_hash' => str_repeat('f', 64)],
-            ['mode' => 'live'], ['hint_event_id' => BillingValues::id()], ['retrieval_end_position' => $start],
+            ['mode' => 'live'], ['hint_event_id' => BillingValues::id()], ['retrieval_end_position' => $start->position],
             ['retrieval_position' => $row['retrieval_position']], ['retrieval_position' => $row['retrieval_end_position']],
             ['retrieval_end_position' => $row['retrieval_position']], ['retrieval_end_position' => $row['retrieval_end_position']]] as $change) {
             $this->pdoRefuses(fn () => $this->insert([...$candidate, ...$change]));
@@ -183,13 +185,14 @@ class BillingRetrievalAttemptsTest extends TestCase
         $hint['seal'] = BillingValues::seal($hint);
         $pdo = DB::connection()->getPdo();
         $pdo->prepare('INSERT INTO production_membership_billing_events ('.implode(', ', array_keys($hint)).') VALUES ('.implode(', ', array_fill(0, count($hint), '?')).')')->execute(array_values($hint));
-        $this->refusal(fn () => (new BillingRetrievalAttempts)->record($verified, F::INVOICE, 'provider_unavailable', $start, $end, $hint['id'], $configuration), 'attempt_hint');
+        $this->refusal(fn () => (new BillingRetrievalAttempts)->record($verified, F::INVOICE, 'provider_unavailable', $end, $hint['id'], $configuration), 'attempt_hint');
 
         $row = ['id' => BillingValues::id(), 'subscription_binding_id' => $binding['id'], 'invoice_ref_hash' => $invoiceHash,
             'provider_account_hash' => $binding['provider_account_hash'], 'mode' => 'test', 'provenance' => $binding['provenance'],
-            'hint_event_id' => $hint['id'], 'retrieval_position' => $start, 'retrieval_end_position' => $end,
+            'hint_event_id' => $hint['id'], ...$end->columns(),
             'outcome' => 'unknown', 'reason' => 'provider_unavailable',
-            'payload_ciphertext' => BillingValues::encrypt(['purpose' => 'synthetic_attempt_fixture']), 'created_at' => '2026-10-07 00:00:00'];
+            'payload_ciphertext' => BillingValues::encrypt(['purpose' => 'synthetic_attempt_fixture']),
+            'created_at' => BillingDatabaseClock::sample($pdo, DB::getDriverName())->stamp19()];
         $row['seal'] = BillingValues::seal($row);
         $this->pdoRefuses(fn () => $this->insert($row));
         $this->assertSame(0, DB::table(self::TABLE)->count());

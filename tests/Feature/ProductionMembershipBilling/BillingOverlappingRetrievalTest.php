@@ -62,7 +62,7 @@ class BillingOverlappingRetrievalTest extends TestCase
         $outcome = $this->staleSettledAroundAFreshRefund($binding['id'], 10, 20, 30);
 
         $chain = $ledger->observations($first['invoice_id']);
-        $this->assertNull($ledger->currentSettled($first['invoice_id'], self::T0 + 31), 'A snapshot read before the refund is not current evidence.');
+        $this->assertNull($ledger->currentSettled($first['invoice_id']), 'A snapshot read before the refund is not current evidence.');
         // The fresh retrieval ran between the stale one's last provider read and its end position, so the two reads overlap by
         // position and the database cannot order them: refused for retry, never appended (Codex P1 on PR #54, :42). A read that
         // wholly preceded the tail's is `superseded_retrieval` (BillingRetrievalIntervalOrderingTest).
@@ -72,7 +72,7 @@ class BillingOverlappingRetrievalTest extends TestCase
         // The retry reads afresh after the tail's read ended and is admitted; the ledger converges on the later state.
         $retry = $this->retrieve($binding['id'], 40, ['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]]);
         $this->assertSame(['reversed', 3], [$retry['outcome'], $retry['sequence']]);
-        $this->assertNull($ledger->currentSettled($first['invoice_id'], self::T0 + 41));
+        $this->assertNull($ledger->currentSettled($first['invoice_id']));
     }
 
     public function test_a_stale_first_retrieval_cannot_claim_the_tail_after_a_fresh_one_created_the_identity(): void
@@ -87,7 +87,7 @@ class BillingOverlappingRetrievalTest extends TestCase
         // The fresh retrieval ran between the stale one's last provider read and its end position, so the two reads overlap by
         // position and the database cannot order them: refused for retry, never appended (Codex P1 on PR #54, :42). A read that
         // wholly preceded the tail's is `superseded_retrieval` (BillingRetrievalIntervalOrderingTest).
-        $this->assertNull((new BillingLedger)->currentSettled($invoiceId, self::T0 + 31));
+        $this->assertNull((new BillingLedger)->currentSettled($invoiceId));
         $this->assertSame('concurrent_retrieval', $outcome);
     }
 

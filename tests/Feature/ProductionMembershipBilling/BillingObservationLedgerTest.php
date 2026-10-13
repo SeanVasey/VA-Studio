@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Memberships\Billing\BillingDatabaseClock;
+use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingException;
 use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingPolicy;
@@ -42,16 +44,19 @@ class BillingObservationLedgerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_settled_observation_is_current_only_inside_its_original_deadline(): void
+    public function test_settled_observation_uses_database_read_end_and_ignores_worker_clock_for_freshness(): void
     {
         $binding = F::binding();
         $ledger = new BillingLedger;
         $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
         $this->assertSame(['settled', F::AMOUNT, F::CURRENCY, '2026-10-07 00:00:00', '2026-11-07 00:00:00'],
             [$settled['outcome'], $settled['amount_minor'], $settled['currency'], $settled['line_period_start'], $settled['line_period_end']]);
-        $this->assertSame([F::PERIOD_START + 3600 + BillingLedger::FRESHNESS_SECONDS], [strtotime($settled['freshness_deadline'].' UTC')]);
-        $this->assertSame($settled['id'], $ledger->currentSettled($settled['invoice_id'], self::AT + BillingLedger::FRESHNESS_SECONDS - 1)['id']);
-        $this->assertNull($ledger->currentSettled($settled['invoice_id'], self::AT + BillingLedger::FRESHNESS_SECONDS));
+        $this->assertSame(strtotime($settled['retrieved_at'].' UTC') + BillingLedger::FRESHNESS_SECONDS, strtotime($settled['freshness_deadline'].' UTC'));
+        $end = DB::table('production_membership_billing_positions')->where('id', $settled['retrieval_end_position'])->sole();
+        $this->assertSame(substr($end->database_at, 0, 19), $settled['retrieved_at']);
+        $this->assertSame($settled['id'], $ledger->currentSettled($settled['invoice_id'])['id']);
+        CarbonImmutable::setTestNow(CarbonImmutable::parse($settled['freshness_deadline'], 'UTC')->addDay());
+        $this->assertSame($settled['id'], $ledger->currentSettled($settled['invoice_id'])['id']);
     }
 
     public function test_newer_non_settled_observation_hides_an_older_settled_one_and_nothing_is_renewed(): void
@@ -63,12 +68,12 @@ class BillingObservationLedgerTest extends TestCase
         $refunded = (new BillingReconciliation(new RehearsalBillingGateway(F::graph(['charge' => ['refunded' => true, 'amount_refunded' => F::AMOUNT]])), $ledger))
             ->retrieve($binding['id'], F::INVOICE);
         $this->assertSame(['reversed', 2, $settled['seal']], [$refunded['outcome'], $refunded['sequence'], $refunded['prior_seal']]);
-        $this->assertNull($ledger->currentSettled($settled['invoice_id'], self::AT + 20));
+        $this->assertNull($ledger->currentSettled($settled['invoice_id']));
         // The settled row is retained unchanged; a reversal observation never deletes or rewrites it.
         $this->assertSame($settled, $ledger->observations($settled['invoice_id'])[0]);
         CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(self::AT + 30));
         $again = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
-        $this->assertSame(BillingLedger::FRESHNESS_SECONDS + self::AT + 30, strtotime($again['freshness_deadline'].' UTC'));
+        $this->assertSame(BillingLedger::FRESHNESS_SECONDS + strtotime($again['retrieved_at'].' UTC'), strtotime($again['freshness_deadline'].' UTC'));
         $this->assertSame($settled['freshness_deadline'], $ledger->observations($settled['invoice_id'])[0]['freshness_deadline']);
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
@@ -189,11 +194,16 @@ class BillingObservationLedgerTest extends TestCase
         $settled = (new BillingReconciliation(new RehearsalBillingGateway(F::graph()), $ledger))->retrieve($binding['id'], F::INVOICE);
         // A structurally valid next row (triggers admit it) whose seal is not the canonical row hash.
         $start = $ledger->startRetrieval();
-        $forged = [...$settled, 'id' => (string) Str::uuid(), 'sequence' => 2, 'retrieval_position' => $start,
-            'retrieval_end_position' => $ledger->endRetrieval($start), 'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
+        $interval = $ledger->endRetrieval($start);
+        $end = BillingDatabaseInstant::fromNativeValue($interval->databaseAt, 0);
+        $created = BillingDatabaseClock::sample(DB::connection()->getPdo(), DB::getDriverName());
+        $forged = [...$settled, ...$interval->columns(), 'id' => (string) Str::uuid(), 'sequence' => 2,
+            'retrieval_started_at' => $start->databaseAt, 'retrieved_at' => $end->stamp19(),
+            'freshness_deadline' => BillingValues::utc($end->seconds() + BillingLedger::FRESHNESS_SECONDS),
+            'created_at' => $created->stamp19(), 'prior_seal' => $settled['seal'], 'seal' => hash('sha256', 'forged')];
         DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[2]).' ('.implode(',', array_keys($forged))
             .') VALUES ('.implode(',', array_fill(0, count($forged), '?')).')')->execute(array_values($forged));
-        foreach ([fn () => $ledger->observations($settled['invoice_id']), fn () => $ledger->currentSettled($settled['invoice_id'], self::AT)] as $read) {
+        foreach ([fn () => $ledger->observations($settled['invoice_id']), fn () => $ledger->currentSettled($settled['invoice_id'])] as $read) {
             try {
                 $read();
                 $this->fail('A forged observation must not be read as evidence.');
