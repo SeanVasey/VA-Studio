@@ -65,6 +65,8 @@
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
+    "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
     "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
@@ -76,9 +78,7 @@
     "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",
     "tests/Feature/SupportAttachmentsTest.php",
-    "tests/Unit/SchemaQualifierDelimiterTest.php",
-    "tests/Feature/ProductionMembership/MembershipPolicyFactsTest.php",
-    "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php"
+    "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [
     "tests/Feature/CustomerConsentAdmissionTest.php",
@@ -182,6 +182,7 @@
     "tests/Support/membership-billing-race-worker.php",
     "tests/Support/membership-billing-stale-race-worker.php",
     "tests/Support/membership-credit-worker.php",
+    "tests/Support/membership-interval-race-worker.php",
     "tests/Support/order-inquiry-worker.php",
     "tests/Support/order-race-worker.php",
     "tests/Support/payment-race-worker.php",
