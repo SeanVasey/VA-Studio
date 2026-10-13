@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Models\User;
 use App\Support\CanonicalJson;
@@ -21,6 +22,8 @@ final class MembershipAwardContext
     private array $historical;
 
     private MembershipPaidInvoiceProof $invoiceProof;
+
+    private ?BillingFreshnessWindow $invoiceFreshness = null;
 
     private MembershipPolicyFactsProof $policyProof;
 
@@ -60,6 +63,7 @@ final class MembershipAwardContext
         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
         $this->invoiceProof = $configuration->invoices->lock($locator, $principal, $actor, $rows);
         $this->invoice = $this->invoiceProof->binding();
+        $this->invoiceFreshness = $configuration->invoices->freshnessWindow($this->invoiceProof, $principal, $actor, $rows);
         MembershipException::require($this->invoice->planVersionId !== null && $this->invoice->paidAt !== null
             && $this->invoice->invoiceId !== null && $this->invoice->evidenceDeadline !== null, 'source_facts_absent');
         $this->policyProof = $configuration->policies->lock($this->invoice->planVersionId, $rows);
@@ -104,7 +108,7 @@ final class MembershipAwardContext
     public function proveCurrent(): void
     {
         $this->proveSources();
-        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration);
+        $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration, $this->invoiceFreshness);
         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
         MembershipPolicyVersions::document($plan);
         MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
@@ -124,7 +128,7 @@ final class MembershipAwardContext
         MembershipException::require($frame->reader()->identityPrimary() === $this->rows->identity(), 'changed_primary');
         $this->admit();
         (new MembershipSchema)->assertOwned($this->rows->identity());
-        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline);
+        $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline, $this->invoiceFreshness);
         $plan = $this->read(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, false);
         MembershipException::require(count($plan) === 1, 'changed_policy_facts');
         MembershipPolicyVersions::document($plan[0]);
@@ -140,6 +144,7 @@ final class MembershipAwardContext
         MembershipBillingEvidence::assertCommittedSnapshot($frame, $billing);
         $this->admit();
         $frame->finish();
+        $this->admit();
     }
 
     private function proveSources(): void
@@ -176,6 +181,7 @@ final class MembershipAwardContext
         $this->billingPolicy->proveConfiguration($this->billingConfiguration);
         MembershipAwardConfiguration::plainPrimary($this->rows->identity());
         MembershipException::require(hrtime(true) < $this->deadline, 'operation_deadline');
+        $this->invoiceFreshness?->assertDeadline();
     }
 
     private function insert(string $table, array $row): void
