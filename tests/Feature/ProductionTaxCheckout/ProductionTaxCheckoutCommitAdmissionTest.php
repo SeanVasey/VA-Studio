@@ -150,6 +150,11 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $before = $this->snapshot();
         $table = TaxCheckoutSchema::TABLES[$kind];
         $account = DB::table('customer_accounts')->where('user_id', $fixture['buyer']['user']->id)->sole();
+        // Damaged-restore fixture only: healthy immutable account guards prevent this mutation.
+        $otherOwner = (array) DB::table('quote_owners')->where('owner_key', $account->owner_key)->sole();
+        $otherOwner['owner_key'] = hash('sha256', 'NONBINDING-OWNER-WITHDRAWAL');
+        DB::table('quote_owners')->insert($otherOwner);
+        DB::unprepared('DROP TRIGGER customer_accounts_update');
         $connection = DB::connection();
         $primary = $connection->getPdo();
         $dispatcher = $connection->getEventDispatcher();
@@ -202,7 +207,7 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $this->assertInstanceOf(CheckoutException::class, $refusal);
         $this->assertSame(['provider_unbound', 503], [$refusal->reason, $refusal->status]);
         $row = (array) DB::table(TaxCheckoutSchema::TABLES['request'])->sole();
-        $request = Evidence::open($row, 'production_tax_checkout_request');
+        $request = Evidence::open($row, 'production_tax_checkout_provider_request');
         $this->assertSame($at->format('Y-m-d\\TH:i:s\\Z'), $row['created_at']);
         $this->assertSame($order['expires_at'], $request['provider_expires_at']);
         $this->assertSame([], $fixture['transport']->calls);
