@@ -135,18 +135,23 @@ final class PaidGrantDownloads
      *                                                    identity proof (`receivedAt()`); null means now. It is not re-checked
      *                                                    here, so a slow identity proof cannot age it out (Codex 4224939409).
      */
-    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantRequestInstant $receivedAt = null): PaidGrantTransfer
+    public function redeem(string $id, string $token, ProductionCustomerPrincipal $principal, User $actor, ?PaidGrantRequestInstant $receivedAt = null,
+        ?PaidGrantRequestBudget $requestBudget = null): PaidGrantTransfer
     {
         PaidGrantInput::uuid($id);
         PaidGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 403);
-        $deadline = PaidGrantDeadline::start();
+        PaidGrantException::require($requestBudget === null || $receivedAt === null || $receivedAt === $requestBudget->receivedAt);
+        $receivedAt = $requestBudget?->receivedAt ?? $receivedAt;
+        $deadline = $requestBudget?->initialDeadline() ?? PaidGrantDeadline::start();
         // The authorization lifetime is the valid-to-start deadline, judged at the moment the server began this request (as
         // Free256 does with its request time): before the identity proof and before locating, so a slow proof, locate or
         // first frame cannot turn a redemption that started in time into an expired one (Codex 4223825193, 4224514947).
         // Both frames and the post-frame check compare that same admitted instant, so a slow snapshot cannot either. The
         // instant was validated against the clock when the controller captured it; it is used as captured (Codex 4224939409).
         $admitted = $receivedAt?->at ?? CarbonImmutable::now('UTC');
-        $locator = $this->locate($id, $principal, $actor);
+        $deadline->proveCurrent();
+        $locator = $this->locate($id, $principal, $actor, $deadline);
+        $deadline->proveCurrent();
         // Three budgets follow, none extendable: this 60 s observation budget bounds locating and the first frame; the
         // snapshot gets its own `snapshot_seconds` bound from when the first frame closes; the commit frame and the
         // before-first-byte proof get a fresh 60 s observation budget. The stream then gets a transfer deadline derived from
@@ -176,20 +181,24 @@ final class PaidGrantDownloads
         // attempt is recorded). The digest only names the account inside the private spool.
         $holder = hash('sha256', 'paid-spool-holder-v1:'.$before['graph']['batch']['account_id']);
         // Started when the first frame closes, so a slow first frame cannot leave the snapshot only its leftover seconds.
-        $snapshotDeadline = hrtime(true) + app(PaidGrantPolicy::class)->snapshotSeconds() * 1_000_000_000;
+        $snapshotDeadline = $requestBudget?->snapshotDeadline() ?? hrtime(true) + app(PaidGrantPolicy::class)->snapshotSeconds() * 1_000_000_000;
         $prepared = app(PaidGrantPrepareStream::class)->handle($before['payload']['target'], $snapshotDeadline, $holder);
-        $projectionRead = PaidGrantProjectionRead::begin();
         try {
+            PaidGrantException::require(hrtime(true) <= $snapshotDeadline, 410);
+            $requestBudget?->proveCurrent();
+            $projectionRead = PaidGrantProjectionRead::begin();
             // Derived and validated before the attempt is consumed, so a refused transfer policy records nothing.
             $seconds = app(PaidGrantPolicy::class)->transferSeconds($prepared->sizeBytes);
             // A fresh observation budget for the commit frame and the before-first-byte proof, so time spent before the
             // snapshot finished cannot fail the post-commit proof after the attempt is recorded. The frame re-proves
             // everything itself: the same inspection and admitted instant, unchanged state and the attempt limit.
-            $commit = PaidGrantDeadline::start();
-            $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before): array {
+            $commit = $requestBudget?->commitDeadline() ?? PaidGrantDeadline::start();
+            $commands->run($locator['batch_id'], $principal, $actor, function (array $graph, PaidGrantRows $rows) use ($inspect, $before, $commit, $requestBudget): array {
                 $current = $inspect($graph, $rows);
                 PaidGrantException::require($current === $before, 409);
                 PaidGrantException::require(count($this->attempts((int) $current['line']['origin']['id'], $rows)) < $graph['payload']['delivery_policy']['max_downloads'], 409);
+                $requestBudget?->proveCurrent();
+                $commit->proveCurrent();
                 PaidGrantRecords::insert('paid_redemptions', ['authorization_id' => (int) $current['auth']['id'], 'created_at' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s')], $rows);
 
                 return [];
@@ -198,19 +207,21 @@ final class PaidGrantDownloads
 
             // Counted from the redemption commit; the first byte still needs the commit frame's observation budget (proveBeforeBytes).
             return new PaidGrantTransfer($prepared, $this->filename($before['line']['origin']['public_id'], $before['auth']['target']), $this->mime($before['auth']['target']),
-                $projectionRead, $this->tick() + $seconds * 1_000_000_000, $this->clock);
+                $projectionRead, $this->tick() + $seconds * 1_000_000_000, $this->clock, $requestBudget);
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;
         }
     }
 
-    private function locate(string $id, ProductionCustomerPrincipal $principal, User $actor): array
+    private function locate(string $id, ProductionCustomerPrincipal $principal, User $actor, PaidGrantDeadline $deadline): array
     {
         (new PaidGrants)->outsideTransactions();
         app(PaidGrantPolicy::class)->capture();
+        $deadline->proveCurrent();
         try {
             app(ProductionCustomerAccess::class)->current($principal, $actor);
+            $deadline->proveCurrent();
         } catch (IdentityException) {
             throw new PaidGrantException(403);
         }
@@ -218,12 +229,13 @@ final class PaidGrantDownloads
         $receipt = null;
         $held = null;
         try {
-            $result = DB::transaction(function () use ($id, $principal, $actor, &$receipt, &$held): array {
+            $result = DB::transaction(function () use ($id, $principal, $actor, $deadline, &$receipt, &$held): array {
                 $rows = new PaidGrantRows;
                 $held = $rows;
                 $policy = app(PaidGrantPolicy::class)->capture();
                 $access = app(ProductionCustomerAccess::class);
                 $authority = $access->lock($principal, $actor, $rows->current());
+                $deadline->proveCurrent();
                 $auth = $rows->one('paid_authorizations', 'public_id = ? AND account_id = ?', [$id, $principal->accountId]);
                 PaidGrantException::require($auth !== [], 404);
                 $origin = $rows->one('paid_grant_origins', 'id = ?', [$auth['origin_id']]);
@@ -234,11 +246,13 @@ final class PaidGrantDownloads
                 $receipt->proveLive();
                 $access->proveCurrent($principal, $actor, $rows->current(), $authority);
                 PaidGrantPolicy::provePure($policy, $rows->configuration, $rows->environment);
+                $deadline->proveCurrent();
                 $rows->finish();
 
                 return ['batch_id' => $batch['public_id'], 'origin_id' => $origin['id'], 'auth' => $auth];
             });
             $receipt->proveClosed();
+            $deadline->proveCurrent();
 
             return $result;
         } catch (Throwable $error) {

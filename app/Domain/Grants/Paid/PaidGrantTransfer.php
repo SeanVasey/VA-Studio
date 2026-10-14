@@ -19,7 +19,7 @@ final class PaidGrantTransfer
 
     public function __construct(private readonly PreparedDeliveryStream $stream, public readonly string $filename,
         public readonly string $mimeType, private readonly PaidGrantProjectionRead $closedRead, private readonly int $deadline,
-        private readonly ?Closure $clock = null)
+        private readonly ?Closure $clock = null, private readonly ?PaidGrantRequestBudget $requestBudget = null)
     {
         $this->sizeBytes = $stream->sizeBytes;
         $this->sha256 = $stream->sha256;
@@ -28,7 +28,9 @@ final class PaidGrantTransfer
     public function writeTo(callable $consumer): void
     {
         try {
+            $this->requestBudget?->proveCurrent();
             $this->closedRead->proveBeforeBytes();
+            $this->requestBudget?->proveCurrent();
             $this->within();
             $this->stream->writeTo(function (string $bytes) use ($consumer): void {
                 $this->within();
