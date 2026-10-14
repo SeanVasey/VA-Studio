@@ -1,0 +1,33 @@
+{
+  "actual_inventory_inputs_equal_captured_and_successor_git": 2340,
+  "application_database_tests_ci_executed": false,
+  "approval_from": "59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a",
+  "archive_bytes": 381258,
+  "archive_members_unchanged": 54,
+  "archive_sha256": "ef51972fa3af3a5a620070e53f9283006be52b66dc09777e8e8ea5ddf38c542b",
+  "archived_invocations_unchanged": 4,
+  "clean_exact_head_before_after": true,
+  "copied_receipt_sha256": {
+    "independent-packet-verification.json": "13ce58466fcef767cefc483142e6ff4c20fc0ee64df197056ae4ac272d4b7c32",
+    "independent-review-DECISION.md": "0a2ce4548fd84e4b6e23d7fe538ed62e02cba6c53aadc215e56128d8046d7d02"
+  },
+  "current_loader_hashes_equal_captured": 13,
+  "decision": "APPROVE WITH CONDITIONS",
+  "exact_changed_paths": {
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "M",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "M",
+    "docs/verification/tax-v2-integration-20261014/README.md": "M",
+    "docs/verification/tax-v2-integration-20261014/independent-packet-verification.json": "A",
+    "docs/verification/tax-v2-integration-20261014/independent-review-DECISION.md": "A"
+  },
+  "index_sha256": "35bfa99e80c3bcb4c0ecda508f6cd8f543e75528c98644e5ae67ee758d47a9a2",
+  "non_blocking_document_clarity": "Opening README retains the historical source checkpoint pending-DECISION wording; explicit final approval addendum records the current result. Clarify checkpoint wording when updating publication/merge status.",
+  "operative_source": "128f423d59316b530996c8d2cec8622d8b216601",
+  "operative_tests_routes_config_workflows_unchanged": true,
+  "packaging_helper_unchanged_sha256": "19d9b10684438b715ac359ccee3cd40d354e6b284cc390657a32fca3bfc099a1",
+  "recorded_utc": "2026-10-14T21:52:47.410167+00:00",
+  "reviewed_successor": "0fa1a38c92d648570e0ee83f1827a3ceb48f55d4",
+  "route_inputs": 16,
+  "source_bundles_unchanged": 3,
+  "source_note_unchanged_sha256": "ae97e289da205cccb8eb21ec6c0a1ae9ea562040e5a45092a56cd088d5aa926b"
+}

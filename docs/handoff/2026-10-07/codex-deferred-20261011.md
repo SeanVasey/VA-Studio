@@ -210,3 +210,8 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Separate non-author APPROVE WITH CONDITIONS at exact clean `59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a`, no open P0/P1 or required correction. Unchanged [DECISION/report](../../verification/tax-v2-integration-20261014/independent-review-DECISION.md) bind54members/3Gitbundles/2340actualinputs/16routes/13loaders, four independently observed recorder OS exits and all original/current receipt limits.
 - Receipt-only carry, exact published-head preflight/protections and expected-head merge remain required. Terminal consumer/NEW-write/V2 wiring and all host/provider/activation conditions stay open; ordinary membership afterCommit P2 stays frozen for its related batch.
+
+### #119 Tax255 V2 prerequisite merge receipt — 2026-10-14
+
+- PR #119 merged at `cd73b3226531abb6f7a79cc779becb61ea5d166a` from exact reviewed head `0fa1a38c92d648570e0ee83f1827a3ceb48f55d4`. Separate APPROVE WITH CONDITIONS/carry, preflight38643440958 success, empty final review inventory and fetched tree equality are recorded in [the actual merge receipt](../../verification/tax-v2-integration-20261014/merge-receipt.md). Original failures/setup/127 and all focused coverage limits remain unchanged.
+- A1-1 adapter held-current/expected-order and A1-2 five Journey cases are addressed within the recorded scope. A1-1 terminal consumer proof, V2 committed-read/NEW-write admission, forward Paid252 schema/consumer integration and root registration remain. Next coherent dependency-ready slice is Tax255 NEW-write physical commit admission; no activation or live transport. Ordinary membership afterCommit P2 remains frozen for its related batch.

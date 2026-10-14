@@ -1,0 +1,15 @@
+{
+  "headRefName": "harness/tax-v2-integration-20261014",
+  "headRefOid": "0fa1a38c92d648570e0ee83f1827a3ceb48f55d4",
+  "isDraft": false,
+  "mergeCommit": {
+    "oid": "cd73b3226531abb6f7a79cc779becb61ea5d166a"
+  },
+  "mergedAt": "2026-10-14T21:56:19Z",
+  "number": 119,
+  "state": "MERGED",
+  "url": "https://github.com/SeanVasey/VA-Studio/pull/119",
+  "approved_head_tree": "fceb287eebd556a92663b91b6a28a26df9b0e5ef",
+  "actual_merge_tree": "fceb287eebd556a92663b91b6a28a26df9b0e5ef",
+  "merge_tree_equals_approved_head": true
+}

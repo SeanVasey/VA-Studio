@@ -1,6 +1,6 @@
 # Tax255 V2 consumer prerequisites — 2026-10-14
 
-Operative source `128f423d59316b530996c8d2cec8622d8b216601`, based on actual A2 PR #118 merge `cfce548b4f0893a3634422062099d930428856a3` and its receipt-only carry `291a0d90`. [Design](design.md) and [bounded independent source review](independent-source-review.md) describe the scope. The separate non-author source reviewer found no required source/test repair or P0/P1; final sealed-packet DECISION, exact-head preflight and merge are still pending.
+Operative source `128f423d59316b530996c8d2cec8622d8b216601`, based on actual A2 PR #118 merge `cfce548b4f0893a3634422062099d930428856a3` and its receipt-only carry `291a0d90`. [Design](design.md) and [bounded independent source review](independent-source-review.md) describe the scope. Separate non-author final approval/carry and exact-head preflight completed; PR #119 is merged. See [the actual merge receipt](merge-receipt.md) for current status. The bounded source note remains the original earlier checkpoint.
 
 The V2 adapter now requires the caller's current reader and expected order ID, proves the original held source is current, then binds the exact line and order before acceptance. It returns unchanged producer bytes. Its pure self-consistency helper is explicitly internal and supplies no authentication. The actual checkout journey now covers five previously reviewer-only cases: PaymentIntent livemode, metadata and on_behalf_of, line currency and a non-succeeded PaymentIntent while the session is paid. Each refuses503 without retained reviewed payment, leaves payment unverified, then admits the original unchanged positive fixture.
 
@@ -46,3 +46,5 @@ These changes address the adapter and Journey portions of recorded A1-1/A1-2 wit
 ## Independent final development decision
 
 Separate non-author APPROVE WITH CONDITIONS at exact clean `59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a`, no open P0/P1 or required correction. The unchanged [DECISION](independent-review-DECISION.md) and [verification report](independent-packet-verification.json) independently bind all54 archive members,3 reachable Git bundles,2340 actual current inputs/16routes/13loaders, four actual PHP and independently observed recorder OS exits, both current passes and original failures/setup/formatting limits. Receipt-only final-head carry and exact published-head preflight/protections remain merge gates. All terminal consumer/NEW-write/V2 wiring/host/provider/activation conditions and adjacent ordinary afterCommit P2 remain open.
+
+Actual publication/merge observations and unchanged receipt-only carry are recorded in [the merge receipt](merge-receipt.md). Historical pending statements above are superseded by that actual receipt.
