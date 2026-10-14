@@ -93,18 +93,22 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
             'release' => CarbonImmutable::parse($fixture['reservation']['honor_deadline'], 'UTC')->format('Y-m-d H:i:s.u')];
         $this->transcript['walls'] = $walls;
         $this->transcript['scheduled_winner'] = $winnerRole;
-        $activate = $this->worker($fixture, 'activate', $winnerRole === 'activate', $walls);
-        $release = $this->worker($fixture, 'release', $winnerRole === 'release', $walls);
+        // Prepare the scheduled winner first. In release-wins order the genuine activation
+        // ticket is therefore issued last and does not wait through release-worker startup.
+        $this->worker($fixture, $winnerRole, true, $walls);
+        $loserRole = $winnerRole === 'activate' ? 'release' : 'activate';
+        $this->worker($fixture, $loserRole, false, $walls);
+        $activate = $this->workers['activate'];
+        $release = $this->workers['release'];
         $this->assertCount(3, array_unique([getmypid(), $activate['pid'], $release['pid']]));
         $this->assertCount(3, array_unique([$this->connectionId(), $activate['connection_id'], $release['connection_id']]));
         $this->assertNotNull($activate['authorization']);
         $this->assertNull($release['authorization']);
         $this->assertSame($before, $this->memberOriginalEffects());
-        $loserRole = $winnerRole === 'activate' ? 'release' : 'activate';
         $winner = $this->workers[$winnerRole];
         $loser = $this->workers[$loserRole];
         $this->start($winner);
-        $this->await(fn (): bool => is_file($this->directory.'/held-'.$winnerRole), 120);
+        $this->await(fn (): bool => is_file($this->directory.'/held-'.$winnerRole), 90);
         $held = json_decode(file_get_contents($this->directory.'/held-'.$winnerRole), true, 8, JSON_THROW_ON_ERROR);
         $this->assertSame(1, $held['transaction_level']);
         $this->assertTrue($held['pdo_transaction']);
