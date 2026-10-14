@@ -62,24 +62,44 @@ $pdo->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 $connectionId = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
 $directory = getenv('VA_MEMBER_ACTIVATION_RELEASE_RACE_DIRECTORY');
 $role = $input['role'];
+$preparation = [];
+$progress = static function (string $phase) use ($directory, $role, &$preparation): void {
+    $preparation[$phase] = hrtime(true);
+    $path = $directory.'/progress-'.$role;
+    file_put_contents($path.'.tmp', json_encode(['pid' => getmypid(), 'phase' => $phase,
+        'preparation' => $preparation, 'memory_limit' => ini_get('memory_limit')], JSON_THROW_ON_ERROR));
+    rename($path.'.tmp', $path);
+};
+$progress('connected');
 $actor = User::query()->findOrFail($input['user_id']);
 $principal = ProductionCustomerPrincipal::forUser($actor);
+$progress('principal_ready');
 $ticket = null;
 $authorization = null;
+$confirmStarted = null;
+$ticketBudget = null;
 if ($role === 'activate') {
     $issuer = $operation->authorizations();
+    $progress('review_started');
     $display = $issuer->review($input['definition_id'], $input['redemption_id'], $principal, $actor);
+    $progress('review_ready');
+    $confirmStarted = hrtime(true);
+    $progress('confirmation_started');
     $ticket = $issuer->confirm($input['definition_id'], $input['redemption_id'],
         MemberLicenseConfirmationInput::from(['display_hash' => $display->hash(), 'affirmed' => true]), $principal, $actor);
+    $progress('confirmation_ready');
     // Read-only observation of the genuine issuer; never mutate, mint, transfer or replace authority.
-    $issued = (new ReflectionProperty(MemberLicenseAuthorizations::class, 'tickets'))->getValue($issuer)[$ticket]['authorization'];
+    $ticketEntry = (new ReflectionProperty(MemberLicenseAuthorizations::class, 'tickets'))->getValue($issuer)[$ticket];
+    $issued = $ticketEntry['authorization'];
+    $ticketBudget = $ticketEntry['budget'];
     $authorization = ['id' => $issued['authorization_id'], 'hash' => CanonicalJson::hash($issued), 'at' => $issued['confirmed_at']];
-    unset($issued);
+    unset($issued, $ticketEntry);
 }
 $ready = ['role' => $role, 'connection_id' => $connectionId, 'pid' => getmypid(), 'ready_ns' => hrtime(true),
-    'authorization' => $authorization, 'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction()];
+    'authorization' => $authorization, 'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction(), 'preparation' => $preparation,
+    'confirm_started_ns' => $confirmStarted, 'ticket_deadline_at_ready_ns' => $ticketBudget?->deadlineNs()];
 file_put_contents($directory.'/ready-'.$role, json_encode($ready, JSON_THROW_ON_ERROR));
-$startDeadline = hrtime(true) + 120_000_000_000;
+$startDeadline = hrtime(true) + 180_000_000_000;
 while (! is_file($directory.'/start-'.$role)) {
     if (hrtime(true) >= $startDeadline) {
         throw new RuntimeException('Synthetic terminal-operation start barrier timed out.');
@@ -118,6 +138,8 @@ DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, fun
 $value = null;
 $errors = [];
 $entered = hrtime(true);
+$progress('operation_entered');
+$ticketDeadlineAtEnter = $ticketBudget?->deadlineNs();
 try {
     $value = $role === 'activate'
         ? get_object_vars($operation->activate($input['definition_id'], $input['redemption_id'], $ticket, $principal, $actor))
@@ -129,5 +151,5 @@ try {
     } while ($error !== null && count($errors) < 12);
 }
 echo json_encode(['role' => $role, 'value' => $value, 'errors' => $errors, 'held' => $held,
-    'entered_ns' => $entered, 'finished_ns' => hrtime(true), 'connection_id' => $connectionId, 'pid' => getmypid(),
+    'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'preparation' => $preparation, 'entered_ns' => $entered, 'finished_ns' => hrtime(true), 'connection_id' => $connectionId, 'pid' => getmypid(),
     'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);

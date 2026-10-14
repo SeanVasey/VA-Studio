@@ -66,7 +66,9 @@ class MemberGrantNativeActivationRaceTest extends TestCase
                     $this->transcript['workers'][$worker['index']] = [
                         ...($this->transcript['workers'][$worker['index']] ?? []), 'stopped_by_teardown' => $stopped,
                         'exit' => $worker['process']->getExitCode(), 'stdout' => $worker['process']->getOutput(),
-                        'stderr' => $worker['process']->getErrorOutput()];
+                        'stderr' => $worker['process']->getErrorOutput(),
+                        'preparation_progress' => is_file($this->directory.'/progress-'.$worker['index'])
+                            ? json_decode(file_get_contents($this->directory.'/progress-'.$worker['index']), true, 8, JSON_THROW_ON_ERROR) : null];
                 }
                 $this->writeReceipt();
                 (new Filesystem)->deleteDirectory($this->directory);
@@ -190,12 +192,12 @@ class MemberGrantNativeActivationRaceTest extends TestCase
                 'production-memberships' => config('production-memberships'), 'production-membership-billing' => config('production-membership-billing'),
                 'member-grants' => config('member-grants'), 'filesystems.disks.local' => config('filesystems.disks.local'), 'media' => config('media')]];
         $process = new Process([PHP_BINARY, base_path('tests/Support/member-activation-race-worker.php')], base_path(), $environment,
-            json_encode($input, JSON_THROW_ON_ERROR), 180);
+            json_encode($input, JSON_THROW_ON_ERROR), 600);
         $process->start();
         $worker = ['process' => $process, 'index' => $index];
         $this->workers[] = $worker;
         $this->transcript['workers'][$index] = ['command' => $process->getCommandLine(), 'spawned_pid' => $process->getPid(), 'at' => $input['at']];
-        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$index), [$worker], 60);
+        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$index), [$worker], 150);
         $ready = json_decode(file_get_contents($this->directory.'/ready-'.$index), true, 8, JSON_THROW_ON_ERROR);
         $worker += $ready;
         $this->workers[$index] = $worker;

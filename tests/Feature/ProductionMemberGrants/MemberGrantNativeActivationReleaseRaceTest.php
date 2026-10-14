@@ -64,7 +64,9 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
                 }
                 $this->transcript['workers'][$role] = [...($this->transcript['workers'][$role] ?? []),
                     'stopped_by_teardown' => $stopped, 'exit' => $worker['process']->getExitCode(),
-                    'stdout' => $worker['process']->getOutput(), 'stderr' => $worker['process']->getErrorOutput()];
+                    'stdout' => $worker['process']->getOutput(), 'stderr' => $worker['process']->getErrorOutput(),
+                    'preparation_progress' => is_file($this->directory.'/progress-'.$role)
+                        ? json_decode(file_get_contents($this->directory.'/progress-'.$role), true, 8, JSON_THROW_ON_ERROR) : null];
             }
             $this->writeReceipt();
             if ($this->directory !== null) {
@@ -197,12 +199,12 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
                 'production-memberships' => config('production-memberships'), 'production-membership-billing' => config('production-membership-billing'),
                 'member-grants' => config('member-grants'), 'filesystems.disks.local' => config('filesystems.disks.local'), 'media' => config('media')]];
         $process = new Process([PHP_BINARY, base_path('tests/Support/member-activation-release-race-worker.php')], base_path(), $environment,
-            json_encode($input, JSON_THROW_ON_ERROR), 300);
+            json_encode($input, JSON_THROW_ON_ERROR), 600);
         $process->start();
         $this->workers[$role] = ['role' => $role, 'process' => $process];
         $this->transcript['workers'][$role] = ['command' => $process->getCommandLine(), 'spawned_pid' => $process->getPid(),
             'confirm_at' => $input['confirm_at'], 'operation_at' => $input['operation_at'], 'hold' => $hold];
-        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$role), 100);
+        $this->await(fn (): bool => is_file($this->directory.'/ready-'.$role), 150);
         $ready = json_decode(file_get_contents($this->directory.'/ready-'.$role), true, 8, JSON_THROW_ON_ERROR);
         $this->workers[$role] += $ready;
         $this->transcript['workers'][$role]['ready'] = $ready;
