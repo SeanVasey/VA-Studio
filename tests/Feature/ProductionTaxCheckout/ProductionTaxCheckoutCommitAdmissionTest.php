@@ -4,7 +4,10 @@ namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxExecutionContext;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
@@ -43,6 +46,12 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
     public static function retainedWrites(): array
     {
         return ['binding' => ['binding'], 'reviewed' => ['reviewed']];
+    }
+
+    public static function currentWithdrawals(): array
+    {
+        return ['order catalog' => ['order', 'catalog'], 'request catalog' => ['request', 'catalog'],
+            'order credential' => ['order', 'credential'], 'request credential' => ['request', 'credential']];
     }
 
     private function fixture(string $kind): array
@@ -256,6 +265,130 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $this->assertSame(0, $connection->transactionLevel());
         $this->assertFalse($primary->inTransaction());
         $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    #[DataProvider('currentWithdrawals')]
+    public function test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry(string $kind, string $withdrawal): void
+    {
+        $fixture = $this->fixture($kind);
+        $before = $this->snapshot();
+        $table = TaxCheckoutSchema::TABLES[$kind];
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $password = DB::table('users')->where('id', $fixture['buyer']['user']->id)->value('password');
+        $offer = DB::table('offers')->where('track_id', $fixture['catalog']['items'][0]['trackId'])->sole();
+        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($fixture, $connection, $primary, $table, $before, $withdrawal, $offer, &$hits): void {
+            if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
+                && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before[$table]['count'] + 1) {
+                $hits++;
+                $statement = $primary->prepare($withdrawal === 'catalog'
+                    ? 'UPDATE offers SET is_active = 0 WHERE id = ?' : 'UPDATE users SET password = ? WHERE id = ?');
+                $statement->execute($withdrawal === 'catalog' ? [$offer->id]
+                    : [password_hash('NONBINDING-CURRENT-WITHDRAWAL', PASSWORD_BCRYPT), $fixture['buyer']['user']->id]);
+            }
+        });
+        $refusal = null;
+        try {
+            $this->write($fixture, $kind);
+        } catch (CheckoutException $error) {
+            $refusal = $error;
+        } finally {
+            $dispatcher->forget(TransactionCommitting::class);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame($before, $this->snapshot());
+        $this->assertSame($password, DB::table('users')->where('id', $fixture['buyer']['user']->id)->value('password'));
+        $this->assertSame(1, (int) DB::table('offers')->where('id', $offer->id)->value('is_active'));
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $this->write($fixture, $kind);
+        $this->assertSame($before[$table]['count'] + 1, DB::table($table)->count());
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads(): void
+    {
+        $fixture = $this->fixture('reviewed');
+        $transport = new class($fixture['transport']) implements TaxCheckoutTransport
+        {
+            public bool $read = false;
+
+            public int $identities = 0;
+
+            public function __construct(private TaxCheckoutTransport $delegate) {}
+
+            public function boundTo(): string
+            {
+                $this->identities++;
+
+                return $this->read ? 'NONBINDING-CHANGED-IDENTITY' : $this->delegate->boundTo();
+            }
+
+            public function create(TaxExecutionContext $context, array $params, string $idempotencyKey): array
+            {
+                return $this->delegate->create($context, $params, $idempotencyKey);
+            }
+
+            public function retrieve(TaxExecutionContext $context, string $sessionId): array
+            {
+                $this->read = true;
+
+                return $this->delegate->retrieve($context, $sessionId);
+            }
+
+            public function paymentIntent(TaxExecutionContext $context, string $paymentId): array
+            {
+                return $this->delegate->paymentIntent($context, $paymentId);
+            }
+        };
+        $checkout = new ProductionTaxCheckout($fixture['access'], $transport);
+        $result = $checkout->reconcile($fixture['buyer']['principal'], $fixture['buyer']['user'], $fixture['order']['orderId']);
+        $reviewed = Evidence::open((array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole(), 'production_tax_checkout_reviewed_session');
+        $this->assertSame('verified', $result['paymentStatus']);
+        $this->assertSame(self::SYNTHETIC_PROVIDER, $reviewed['transport']);
+        $this->assertSame(2, $transport->identities);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    #[DataProvider('writes')]
+    public function test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment(string $kind): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Requires the private MySQL server and structured storage-engine metadata.');
+        }
+        $fixture = $this->fixture($kind);
+        $before = $this->snapshot();
+        $primary = DB::connection()->getPdo();
+        $wait = (int) $primary->query('SELECT @@session.lock_wait_timeout')->fetchColumn();
+        $bad = TaxCheckoutSchema::TABLES['reviewed'];
+        // Explicit disposable damaged-restore fixture, outside an application transaction.
+        foreach (['binding_id', 'request_id', 'order_id'] as $field) {
+            $primary->exec('ALTER TABLE '.$bad.' DROP FOREIGN KEY ptx_s_f_'.$field);
+        }
+        $primary->exec('ALTER TABLE '.$bad." ENGINE=MyISAM COMMENT='restore annotation ENGINE=InnoDB'");
+        $probe = $primary->prepare('SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?');
+        $probe->execute([$bad]);
+        $this->assertSame('MyISAM', $probe->fetchColumn());
+        $this->assertStringContainsString('ENGINE=InnoDB', $primary->query('SHOW CREATE TABLE '.$bad)->fetch(\PDO::FETCH_NUM)[1]);
+        $refusal = null;
+        try {
+            $this->write($fixture, $kind);
+        } catch (CheckoutException $error) {
+            $refusal = $error;
+        }
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame(['permanent_schema', 503], [$refusal->reason, $refusal->status]);
+        $this->assertSame($before, $this->snapshot(), 'Damaged storage must refuse before target DML.');
+        $this->assertSame($wait, (int) $primary->query('SELECT @@session.lock_wait_timeout')->fetchColumn());
+        $this->assertSame(0, DB::connection()->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
         $this->assertDatabaseCount('paid_order_origins', 0);
         $this->assertDatabaseCount('license_grants', 0);
     }
