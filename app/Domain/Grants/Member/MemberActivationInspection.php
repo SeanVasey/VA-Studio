@@ -233,7 +233,12 @@ final class MemberActivationInspection
             && $this->intent === $intent && $this->principal === $principal && $this->actor === $actor && $this->rows === $rows
             && ! $this->inserted && ! $this->committed && ! $this->retired, 'foreign_grant_plan');
         $this->grantMinting = false;
-        $this->proveCurrent();
+        // This receipt stays provisional inside the exact owned plan. The full combined
+        // proof follows all record/audit callbacks immediately before native insertion.
+        $this->admit();
+        $this->finish->assertFrame($this->rows->identity(), false);
+        $this->rows->assertCurrent();
+        $this->admit();
 
         return $this->grantBinding;
     }
