@@ -44,7 +44,8 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      defaults. After the first byte, the per-write timeout applies.
    - `document`: at least the whole-request bound plus a margin: 3,900 s.
    - nginx's 60 s default is too short for both.
-   - The `redeem` bound starts when PHP begins the controller, but the proxy's clock starts earlier. Before
+   - The controller captures a monotonic request budget before identity proof, deducting the validated server-start
+     age once from both the initial 60 s and overall first-byte allowance. Before
      `redeem()` runs there is the session-lock wait (up to 5 s) and the customer identity proof. The proof has no
      deadline of its own. On MySQL it issues 4 × (9 + k) `SELECT … FOR UPDATE` reads, where k is the account's
      verification count (1 to 128): 40 to 548 locking reads. Each also runs schema checks whose metadata-lock waits
@@ -52,10 +53,17 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      Redemption is judged at the request's start, so a slow proof no longer refuses a token that was live on arrival
      (Codex round 23). But if the proof plus the first-byte path outlasts the proxy timeout, the server can record the
      attempt while the customer gets a 504. Lowering `innodb_lock_wait_timeout` alone cannot close this: at its 1 s
-     minimum the worst case is still 548 s. Before mount, add an explicit budget measured from the captured request
-     start and checked before anything is recorded (before `locate()` and again before the commit frame inserts the
-     attempt). If database timeouts are also used, set both `lock_wait_timeout` and `innodb_lock_wait_timeout` on the
-     paid connection, sized for 4 × (9 + 128) statements (condition C11 (k), open for Sean).
+     minimum the worst case is still 548 s. `PaidGrantRequestBudget` caps locating/first frame at the original request's
+     initial allowance, the snapshot at the smaller captured/current snapshot setting and overall remainder, and the
+     commit/first-byte frame at the original overall remainder. Checks run after identity/access/locate, immediately
+     before attempt insertion, in final commit admission and immediately before the first chunk. A later min-only
+     reduction reaches the same admission budget; the later chunks keep their separate transfer allowance.
+     These checks refuse late work after SQL returns; they do not interrupt a blocked SQL statement. Missing or
+     implausible SAPI start values retain stricter token admission fallback but cannot prove elapsed proxy time.
+     Verify valid per-request SAPI values/clock, queue/proxy margins and real blocking behavior before mount. If database
+     timeouts are also used, set both `lock_wait_timeout` and `innodb_lock_wait_timeout` on the paid connection, sized for
+     4 × (9 + 128) statements. The source budget closes the implementation portion of C11 (k); host verification remains
+     open for Sean. A trusted domain call without a captured HTTP budget retains its entry-time allowance.
 3. **Proxy response buffering on** for `redeem`, with a temp-file cap at least the largest deliverable. With nginx that
    means `fastcgi_buffering on` and `fastcgi_max_temp_file_size 1024m` (1 GiB, `DeliveryAssetFiles::MAX_BYTES`). PHP
    then finishes writing at disk speed and releases its spool slot, while the proxy serves slow clients.
