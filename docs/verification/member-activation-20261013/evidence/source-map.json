@@ -1,148 +1,593 @@
 {
-  "anchor": "ec151b20a9af83118ab9d85e65eadf9c703c941d",
+  "anchor": "75629871a75868b4e67299f0c5017350d302812c",
   "author_to_integration": {
+    "00867c742843bde196e492a25277c4e9e3d66783": "00867c742843bde196e492a25277c4e9e3d66783",
+    "014709a35b1454ae87ad50d900eee2c296876e46": "c74a9c85e1766dfcca8fe0903ff8739d3d7e6fe6",
+    "02cefb83cbc8a314f8da00191349f76303f9a693": "3598015defb2179a6a163f29d7f411815a94c892",
+    "05e66dfb97931cd4f172bb741ded75da6f95d4ee": "4f83aa054da50bc2cbf1b914809b063fd39692cd",
+    "207a56712b4d8718db991a80f2fbc90ed2300739": "3366ecb05e8c506390ae9c33df9fd7411d7a97ad",
     "2468639fc3cf757c63afd6b202a44468abb4d396": "0dd2ea1b5dbd3e04d86552ad7559aaea215cf29b",
+    "26b873de40104fbe8597105f65aa773c69558e86": "26b873de40104fbe8597105f65aa773c69558e86",
+    "30f7fc533dedc217edbb42e3c473aa6561523b31": "0f57ad05fdab5f6cd14b5a54c3714dcbbad85185",
     "3202ad0494e17370b030db76ec5e62a93d6358fe": "77289a7b9ece25095e6d52bc633f5dce4cec39e9",
     "33beeb02c65f05c6b41680b380f8a74a3afda541": "010826b641a4ae7afa4ab73176e908ba4c300046",
     "34a4938667fb1f58d5dee09bccd4fe4c34940cd7": "59d73ad9732676348d23daf0ae99a65b48694f84",
+    "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+    "3598015defb2179a6a163f29d7f411815a94c892": "3598015defb2179a6a163f29d7f411815a94c892",
     "3646d50c46a546f72d19173937e75bd4f3d7e37c": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
     "3af459ff7e7daa83b037b11044ecad3e98aa5a20": "350f35ba60edf96fb6cfdd804316bae03c02cbae",
     "433b84f3c6a7221c922bb2f36f0f0d87b231e486": "83b0dedaee621341bac7926f073cc10e77c20edf",
+    "4990315a31b2b7b87dd46282559ba9ebb5f75310": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
     "4bc0e54c19d76595868411c7df2562d2bfcea87b": "e58d5aa8870829e93bb2a7d480b20b7ed5e1e357",
+    "4c84b0445fc9ea3e56f4ef184bb9de2507904253": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
     "558e4ec289c9eb66e547471a39c23c1133ad2702": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
+    "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8": "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8",
+    "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc": "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc",
+    "67002abd1143413f06cbb4c5fc6dd2d6b280f85c": "67002abd1143413f06cbb4c5fc6dd2d6b280f85c",
+    "68bd2864c0589e06297d0e69120bb0dc26d3aa1d": "c84c967d0fc2026936c9a7811e1cb66f60636b4e",
+    "72dbd1b45d547d2be608cd77e7f3fe15528dead5": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+    "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+    "75629871a75868b4e67299f0c5017350d302812c": "75629871a75868b4e67299f0c5017350d302812c",
+    "766569fc65c945b7fd942edcefa983613f80a4fc": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+    "81b71cfc0d7cc8fec45efb00b2deae54ebe627bb": "de7863b9320fe03329f9a77414861d1b7b7137a1",
+    "89cf40f0129822df82f44777811c709c704c6c62": "89cf40f0129822df82f44777811c709c704c6c62",
     "8a4741630d4dfadfe45075468c90353118adfdbe": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+    "8f62c7cb1725e9215f606e19db18fc16213e2c18": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+    "91581edb48ac430fd9e059c6d1592114d386b821": "91581edb48ac430fd9e059c6d1592114d386b821",
+    "9af2f8f0e6ce80803bad6b8c250c0073ad50867d": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+    "a24979ae2ffa2814ee3cdc8ea5558384149230ff": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
     "a2e3b5ad1d22602388e575aa44fa308b715c9629": "665602c1bca79091cffd84bc247b765c72e96359",
+    "a47e0d69ca593efd0ed945aebff7b4007bebe5f5": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+    "aef13ed47e4d57b17a47a53d2502084d70838291": "e9e4fcebfa777b6d760d075eaf1b67a0a820418d",
+    "b5e309b4d2da8f7e5a73a5ada79459fae5f226bb": "f5b3956a1a883d8066505dcc148821a0cd3d9eae",
+    "c2523e9834af29122ddcc51e74ebe21d9b176a3c": "c2523e9834af29122ddcc51e74ebe21d9b176a3c",
     "c8c76f82965d2a3a116b00b2160d18e6b16958f1": "3a252c02858ae64336469d40600b81467024c77a",
     "d0e81c46f660776a6f8b5fc171d570acd23f0540": "81f4cd2d5a9aed836fffd498919cc6263b294b4a",
+    "d25f160c0722ee2e07653fad40d2faeaa6c13029": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
     "e02fb79a5be74e3ff83cab316995da2d938208f3": "39db5e4a6e343853e5212cca9652660240e72f84",
     "fad28b10d0b5120931dc8ee40c5c57e770243eb7": "d67637f81019d791bcfc12aa00f49a6c1b64c00f",
-    "feb05d227d42cb8d07415178295306ffd9f69fe2": "1b4328e04735df22a092b3273ec258a3a69f3dea"
+    "feb05d227d42cb8d07415178295306ffd9f69fe2": "1b4328e04735df22a092b3273ec258a3a69f3dea",
+    "ff80d278c424fc19ecef6ed309ff77a0f348ab17": "e6158008c83166267a481973eaa5ef20db61228c"
   },
   "base": "a108aca947ae0d3f661e9feef8a19441d5c3a165",
   "meaning": "Exact named path-byte equivalence to reachable root versions; not execution of those versions or complete uncaptured harness proof.",
   "schema": "c4c-portable-source-map-v1",
   "sources": {
+    "acceptance-preparation/static-result.json": {
+      "author_head": "014709a35b1454ae87ad50d900eee2c296876e46",
+      "default_ref": "c74a9c85e1766dfcca8fe0903ff8739d3d7e6fe6",
+      "input_count": 2,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
     "authorization/bundles/3c8bcb5600169f76a1f1cb2176733156534c4dfaf30293885f192457d89f4838.json": {
       "author_head": "2468639fc3cf757c63afd6b202a44468abb4d396",
       "default_ref": "0dd2ea1b5dbd3e04d86552ad7559aaea215cf29b",
       "input_count": 1329,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "authorization/bundles/89bb46cc6490eef2422ab18b7156f95b7ef09c6b025fa3307dbe95db7a868a5f.json": {
       "author_head": "3646d50c46a546f72d19173937e75bd4f3d7e37c",
       "default_ref": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
       "input_count": 1329,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "historical-read/composed-745ccddc/result.json": {
+      "author_head": "766569fc65c945b7fd942edcefa983613f80a4fc",
+      "default_ref": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+      "input_count": 1540,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "history-core/bundles/4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d.json": {
       "author_head": "d0e81c46f660776a6f8b5fc171d570acd23f0540",
       "default_ref": "81f4cd2d5a9aed836fffd498919cc6263b294b4a",
       "input_count": 1336,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "history-core/bundles/474262b06838c1b3b4e1030db91e6c10471695206449d5aad616c43560c91931.json": {
       "author_head": "34a4938667fb1f58d5dee09bccd4fe4c34940cd7",
       "default_ref": "59d73ad9732676348d23daf0ae99a65b48694f84",
       "input_count": 1336,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "history-core/bundles/6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a.json": {
       "author_head": "433b84f3c6a7221c922bb2f36f0f0d87b231e486",
       "default_ref": "83b0dedaee621341bac7926f073cc10e77c20edf",
       "input_count": 1336,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "integration-preparation/preparation-commit-binding.json": {
       "author_head": "8a4741630d4dfadfe45075468c90353118adfdbe",
       "default_ref": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
       "input_count": 3,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "operation-ownership/bundles/cfe2233c1e341f42e0fe27f3d3748c2f88d83f51cb363d3249a0b9a49d39884c.json": {
+      "author_head": "9af2f8f0e6ce80803bad6b8c250c0073ad50867d",
+      "default_ref": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "input_count": 1363,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "ordinary-finish/bundles/2de0502c0c145d1047a114d5cf5953fe828e9c5630adeb9c7df6b29a0629c70f.json": {
+      "author_head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "default_ref": "0f57ad05fdab5f6cd14b5a54c3714dcbbad85185",
+      "input_count": 1369,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "ordinary-finish/bundles/3804f05a9efa34041499d496a9463329a66251df4e094c36b28c1116d8d0c696.json": {
+      "author_head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "default_ref": "0f57ad05fdab5f6cd14b5a54c3714dcbbad85185",
+      "input_count": 1369,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "ordinary-finish/ordinary-finish-old-contexts/overlay.json": {
+      "author_head": "9af2f8f0e6ce80803bad6b8c250c0073ad50867d",
+      "default_ref": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "input_count": 2,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-3202ad0494e1-32b0aab5a0ae/manifest.json": {
       "author_head": "3202ad0494e17370b030db76ec5e62a93d6358fe",
       "default_ref": "77289a7b9ece25095e6d52bc633f5dce4cec39e9",
       "input_count": 1446,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-3af459ff7e7d-9771a9d35394/manifest.json": {
       "author_head": "3af459ff7e7daa83b037b11044ecad3e98aa5a20",
       "default_ref": "350f35ba60edf96fb6cfdd804316bae03c02cbae",
       "input_count": 1435,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-558e4ec289c9-f5b920dd9412/manifest.json": {
       "author_head": "558e4ec289c9eb66e547471a39c23c1133ad2702",
       "default_ref": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
       "input_count": 1445,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-a2e3b5ad1d22-293f951580b1/manifest.json": {
       "author_head": "a2e3b5ad1d22602388e575aa44fa308b715c9629",
       "default_ref": "665602c1bca79091cffd84bc247b765c72e96359",
       "input_count": 1435,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-e02fb79a5be7-c623c2f66a76/manifest.json": {
       "author_head": "e02fb79a5be74e3ff83cab316995da2d938208f3",
       "default_ref": "39db5e4a6e343853e5212cca9652660240e72f84",
       "input_count": 1435,
+      "non_git_inputs": {},
       "overrides": {}
     },
     "policy-consume/bundle-fad28b10d0b5-bb11c81c5416/manifest.json": {
       "author_head": "fad28b10d0b5120931dc8ee40c5c57e770243eb7",
       "default_ref": "d67637f81019d791bcfc12aa00f49a6c1b64c00f",
       "input_count": 1446,
+      "non_git_inputs": {},
       "overrides": {}
+    },
+    "policy-corrections/bundle-05e66dfb9793-0cad85a0f435/manifest.json": {
+      "author_head": "05e66dfb97931cd4f172bb741ded75da6f95d4ee",
+      "default_ref": "4f83aa054da50bc2cbf1b914809b063fd39692cd",
+      "input_count": 1447,
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "overrides": {}
+    },
+    "policy-corrections/bundle-81b71cfc0d7c-c3fd469b8a9c/manifest.json": {
+      "author_head": "81b71cfc0d7cc8fec45efb00b2deae54ebe627bb",
+      "default_ref": "de7863b9320fe03329f9a77414861d1b7b7137a1",
+      "input_count": 1447,
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "overrides": {}
+    },
+    "policy-corrections/bundle-ff80d278c424-7fd4b0c12a4b/manifest.json": {
+      "author_head": "ff80d278c424fc19ecef6ed309ff77a0f348ab17",
+      "default_ref": "e6158008c83166267a481973eaa5ef20db61228c",
+      "input_count": 1447,
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "overrides": {}
+    },
+    "read-environment/green/source.json": {
+      "author_head": "02cefb83cbc8a314f8da00191349f76303f9a693",
+      "default_ref": "3598015defb2179a6a163f29d7f411815a94c892",
+      "input_count": 1540,
+      "non_git_inputs": {},
+      "overrides": {
+        "app/Domain/Grants/Member/MemberOriginalSourceCapture.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipReservationContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "scripts/ci/database-mysql-selection.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab",
+        "scripts/ci/database-sqlite-skips.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab"
+      }
+    },
+    "read-environment/red-v2/source.json": {
+      "author_head": "207a56712b4d8718db991a80f2fbc90ed2300739",
+      "default_ref": "3366ecb05e8c506390ae9c33df9fd7411d7a97ad",
+      "input_count": 1540,
+      "non_git_inputs": {},
+      "overrides": {
+        "app/Domain/Grants/Member/MemberOriginalSourceCapture.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipReservationContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "scripts/ci/database-mysql-selection.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab",
+        "scripts/ci/database-sqlite-skips.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab"
+      }
+    },
+    "read-environment/red/source.json": {
+      "author_head": "b5e309b4d2da8f7e5a73a5ada79459fae5f226bb",
+      "default_ref": "f5b3956a1a883d8066505dcc148821a0cd3d9eae",
+      "input_count": 1540,
+      "non_git_inputs": {},
+      "overrides": {
+        "app/Domain/Grants/Member/MemberOriginalSourceCapture.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipAwardContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "app/Domain/Memberships/Production/MembershipReservationContext.php": "a36df78c97dc6572b8f506d0c4dd160ca3fe3409",
+        "scripts/ci/database-mysql-selection.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab",
+        "scripts/ci/database-sqlite-skips.json": "7b26621c7ad9f9e6432443361ec3ac0e226d35ab"
+      }
     },
     "reader/bundles/3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba.json": {
       "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
       "input_count": 1338,
+      "non_git_inputs": {},
       "overrides": {
-        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
         "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
-        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65"
       }
     },
     "reader/bundles/8a7eaf1bfd43b6cb32cae452a01f13ee8f06990c4b45ef07c3286be723434dac.json": {
       "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
       "input_count": 1338,
+      "non_git_inputs": {},
       "overrides": {
-        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
         "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
-        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65"
       }
     },
     "reader/bundles/be6335ac83654561b5ee84f0f15938cf3e3bda4b784ae43a439200971df2f9eb.json": {
       "author_head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "default_ref": "1b4328e04735df22a092b3273ec258a3a69f3dea",
       "input_count": 1338,
+      "non_git_inputs": {},
       "overrides": {
-        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
         "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
-        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65"
       }
     },
     "reader/bundles/d47462d7c200312101615598c52ad580147e70fe6f6eaa8a421962e232e3dc4d.json": {
       "author_head": "33beeb02c65f05c6b41680b380f8a74a3afda541",
       "default_ref": "010826b641a4ae7afa4ab73176e908ba4c300046",
       "input_count": 1338,
+      "non_git_inputs": {},
       "overrides": {
-        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
+        "app/Domain/Memberships/Production/MembershipLedgerAudit.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
         "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a",
-        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "89419cfab2b6241fe0daf8f4a34da1d09e11f06a"
+        "app/Domain/Memberships/Production/MembershipReservationRecords.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65"
       }
     },
     "retained/bundle-c8c76f82965d2a3a116b00b2160d18e6b16958f1.json": {
       "author_head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
       "default_ref": "3a252c02858ae64336469d40600b81467024c77a",
       "input_count": 1394,
+      "non_git_inputs": {},
       "overrides": {
-        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "cf9a8236419bebf04deb272c05d4d0e9c7686df9",
-        "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "f8f648905eceae0808285d3bbe453328b73b3b05",
-        "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "f8f648905eceae0808285d3bbe453328b73b3b05",
-        "tests/Support/MembershipPolicyFixtures.php": "f8f648905eceae0808285d3bbe453328b73b3b05"
+        "app/Domain/Memberships/Production/MembershipPeriodRecords.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
+        "app/Domain/Memberships/Production/MembershipPolicyBinding.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
+        "app/Domain/Memberships/Production/MembershipPolicyDocument.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65",
+        "tests/Support/MembershipPolicyFixtures.php": "8c98a5279dade62203c5eb3f6c3e02864532ad65"
+      }
+    },
+    "root-activation-initial/bundle-c2523e9834af-96a12a44aba1fd67/manifest.json": {
+      "author_head": "c2523e9834af29122ddcc51e74ebe21d9b176a3c",
+      "default_ref": "c2523e9834af29122ddcc51e74ebe21d9b176a3c",
+      "input_count": 2309,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-activation-mysql-initial/bundle-3598015defb2-b44c83d7cd7aceb0/manifest.json": {
+      "author_head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "default_ref": "3598015defb2179a6a163f29d7f411815a94c892",
+      "input_count": 2312,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-activation-mysql-private-plan/bundle-61bebdcfaf2f-7537d058f36ad230/manifest.json": {
+      "author_head": "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc",
+      "default_ref": "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc",
+      "input_count": 2312,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-activation-sqlite-atomic-capture/bundle-d25f160c0722-4930f6a1cef33f4a/manifest.json": {
+      "author_head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "default_ref": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "input_count": 2312,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-activation-sqlite-fixed/bundle-3598015defb2-2dc9023a49ee7a2c/manifest.json": {
+      "author_head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "default_ref": "3598015defb2179a6a163f29d7f411815a94c892",
+      "input_count": 2312,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-ci-policy/result.json": {
+      "author_head": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "default_ref": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "input_count": 43,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-completed-readback-mysql-positive/bundle-a24979ae2ffa-afaee327952d8c8e/manifest.json": {
+      "author_head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "default_ref": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-completed-readback-ownership/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json": {
+      "author_head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "default_ref": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-completed-readback-sqlite-positive/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json": {
+      "author_head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "default_ref": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-durable-recorder-smoke/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-final-ci-policy/result.json": {
+      "author_head": "75629871a75868b4e67299f0c5017350d302812c",
+      "default_ref": "75629871a75868b4e67299f0c5017350d302812c",
+      "input_count": 43,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-final-frozen-bindings/member-activation-final-bindings-20261014.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 50,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-final-quality-discovery/result.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2327,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-final-sqlite-integration-retention-phase/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-lifecycle-current-balances/bundle-00867c742843-2f82e314ce429ec4/manifest.json": {
+      "author_head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "default_ref": "00867c742843bde196e492a25277c4e9e3d66783",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-consume-release-failure/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json": {
+      "author_head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "default_ref": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-phase-diagnostic/bundle-d25f160c0722-0dc44b3d39dfcec2/manifest.json": {
+      "author_head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "default_ref": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "input_count": 2312,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-postcommit-recovery/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json": {
+      "author_head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "default_ref": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-private-batching-readback-error/bundle-00867c742843-23cf2e3db76d2461/manifest.json": {
+      "author_head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "default_ref": "00867c742843bde196e492a25277c4e9e3d66783",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-race-contention-failure/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json": {
+      "author_head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "default_ref": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-race-preparation-failure/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json": {
+      "author_head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "default_ref": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-race-refusal-locations/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json": {
+      "author_head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "default_ref": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-rollback-recovery-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-terminal-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-native-write-denial/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json": {
+      "author_head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "default_ref": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "input_count": 2318,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-ordinary-award/bundle-745ccddc2eb3-5cd5f61e1aceaa25/manifest.json": {
+      "author_head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "default_ref": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "input_count": 2301,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-ordinary-reservation/bundle-26b873de4010-f4da21f40459ace8/manifest.json": {
+      "author_head": "26b873de40104fbe8597105f65aa773c69558e86",
+      "default_ref": "26b873de40104fbe8597105f65aa773c69558e86",
+      "input_count": 2301,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-private-batching-ownership-fixed/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json": {
+      "author_head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "default_ref": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-private-batching-ownership-fixture-error/bundle-89cf40f01298-26cc0521eebdb32e/manifest.json": {
+      "author_head": "89cf40f0129822df82f44777811c709c704c6c62",
+      "default_ref": "89cf40f0129822df82f44777811c709c704c6c62",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-private-batching-sqlite-lifecycle-expectation-error/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json": {
+      "author_head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "default_ref": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-native-full-race/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-native-parent-codec-error/bundle-4990315a31b2-9771cbed42785838/manifest.json": {
+      "author_head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "default_ref": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-native-rollback-recovery-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-native-terminal-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "author_head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "default_ref": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-sqlite-cleanup/bundle-5a5790f16bbc-304be34b9f5bed8f/manifest.json": {
+      "author_head": "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8",
+      "default_ref": "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-sqlite-initial/bundle-67002abd1143-1218be174edfdf10/manifest.json": {
+      "author_head": "67002abd1143413f06cbb4c5fc6dd2d6b280f85c",
+      "default_ref": "67002abd1143413f06cbb4c5fc6dd2d6b280f85c",
+      "input_count": 2319,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-shared-coordination-sqlite-tail/bundle-4990315a31b2-a638010cf33d9b73/manifest.json": {
+      "author_head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "default_ref": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "input_count": 2320,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "root-withdrawal-oracles-fixed/bundle-91581edb48ac-c4b7dfe1caba23fe/manifest.json": {
+      "author_head": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "default_ref": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "input_count": 2317,
+      "non_git_inputs": {},
+      "overrides": {}
+    },
+    "selection-join/bundles/944e0d38d2f183268cc9ef5469e556f8914c56e00209398734e3738268893b1d.json": {
+      "author_head": "68bd2864c0589e06297d0e69120bb0dc26d3aa1d",
+      "default_ref": "c84c967d0fc2026936c9a7811e1cb66f60636b4e",
+      "input_count": 1340,
+      "non_git_inputs": {},
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipConsumptionTerms.php": "e6158008c83166267a481973eaa5ef20db61228c",
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php": "010826b641a4ae7afa4ab73176e908ba4c300046"
+      }
+    },
+    "selection-join/bundles/9ab77113deb7f079d3e3fdab259ed1975dd1892745e91dae8ea5b602e7d593ba.json": {
+      "author_head": "aef13ed47e4d57b17a47a53d2502084d70838291",
+      "default_ref": "e9e4fcebfa777b6d760d075eaf1b67a0a820418d",
+      "input_count": 1341,
+      "non_git_inputs": {},
+      "overrides": {
+        "app/Domain/Memberships/Production/MembershipConsumptionTerms.php": "e6158008c83166267a481973eaa5ef20db61228c",
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php": "010826b641a4ae7afa4ab73176e908ba4c300046"
       }
     }
   }

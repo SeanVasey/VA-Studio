@@ -4,23 +4,89 @@
     "authorization/pure-authorization-final/exit": 0,
     "authorization/pure-authorization-initial/exit": 1,
     "authorization/pure-authorization-pint.exit": 0,
+    "historical-read/autoload-initial.exit": 0,
+    "historical-read/composed-745ccddc/autoload.exit": 0,
+    "historical-read/composed-745ccddc/entry-refusal.exit": 0,
+    "historical-read/composed-745ccddc/lint-0.exit": 0,
+    "historical-read/composed-745ccddc/lint-1.exit": 0,
+    "historical-read/composed-745ccddc/lint-2.exit": 0,
+    "historical-read/composed-745ccddc/lint-3.exit": 0,
+    "historical-read/composed-745ccddc/lint-4.exit": 0,
+    "historical-read/composed-745ccddc/ownership.exit": 0,
+    "historical-read/composed-745ccddc/pint.exit": 0,
+    "historical-read/pint-format.exit": 0,
     "history-core/history-helper-corrected/exit": 0,
     "history-core/history-initial/exit": 255,
     "history-core/records-initial/exit": 0,
     "integration-preparation/autoload-initial.exit": 0,
+    "operation-ownership/pure-ownership-initial/exit": 0,
+    "ordinary-finish/ordinary-finish-fixed/exit": 0,
+    "ordinary-finish/ordinary-finish-old-award/exit": 1,
+    "ordinary-finish/ordinary-finish-old-reservation/exit": 1,
     "policy-consume/consume-cleanup-pint.exit": 0,
     "policy-consume/consume-pint.exit": 0,
     "policy-consume/historical-pint-corrected.exit": 0,
     "policy-consume/historical-pint.exit": 255,
     "policy-consume/policy-pint.exit": 0,
     "policy-consume/setup-composer.exit": 0,
+    "policy-corrections/capacity-pint.exit": 0,
+    "policy-corrections/control-fixed-pint.exit": 0,
+    "policy-corrections/control-repro-pint.exit": 0,
+    "read-environment/pint-format.exit": 0,
+    "read-environment/pint.exit": 0,
+    "read-environment/syntax-app.exit": 0,
+    "read-environment/syntax-test.exit": 0,
+    "read-environment/whitespace.exit": 0,
     "reader/handles-initial/exit": 0,
     "reader/queries-closure-followup/exit": 0,
     "reader/queries-initial/exit": 0,
-    "reader/registered-empty-initial/exit": 0
+    "reader/registered-empty-initial/exit": 0,
+    "root-activation-initial/sqlite-activation-first/process.exit": 2,
+    "root-activation-mysql-initial/mysql-activation-first/process.exit": 2,
+    "root-activation-mysql-private-plan/mysql-activation-private-plan-fixed/process.exit": 2,
+    "root-activation-sqlite-atomic-capture/sqlite-activation-atomic-capture-selection/process.exit": 0,
+    "root-activation-sqlite-fixed/sqlite-activation-environment-fixed/process.exit": 0,
+    "root-completed-readback-mysql-positive/mysql-activation-completed-readback-positive/process.exit": 0,
+    "root-completed-readback-ownership/pure-activation-completed-readback-ownership/process.exit": 0,
+    "root-completed-readback-sqlite-positive/sqlite-activation-completed-readback-positive/process.exit": 0,
+    "root-durable-recorder-smoke/pure-activation-durable-recorder-smoke/process.exit": 0,
+    "root-final-sqlite-integration-retention-phase/sqlite-activation-final-integration-retention-phase/process.exit": 0,
+    "root-lifecycle-current-balances/sqlite-activation-ordinary-lifecycle-current-balances/process.exit": 0,
+    "root-native-consume-release-failure/mysql-activation-consume-release-orders/process.exit": 1,
+    "root-native-phase-diagnostic/mysql-atomic-capture-phase-diagnostic/process.exit": 2,
+    "root-native-postcommit-recovery/mysql-activation-postcommit-recovery/process.exit": 0,
+    "root-native-private-batching-readback-error/mysql-activation-private-batching-positive/process.exit": 2,
+    "root-native-race-contention-failure/mysql-activation-same-redemption-race-preparation-fixed/process.exit": 1,
+    "root-native-race-preparation-failure/mysql-activation-same-redemption-race/process.exit": 1,
+    "root-native-race-refusal-locations/mysql-activation-same-redemption-race-refusal-locations/process.exit": 1,
+    "root-native-write-denial/mysql-activation-native-write-denial-rollback/process.exit": 0,
+    "root-ordinary-award/sqlite-ordinary-award-first/process.exit": 0,
+    "root-ordinary-reservation/sqlite-ordinary-reservation-first/process.exit": 0,
+    "root-private-batching-ownership-fixed/pure-activation-private-batching-ownership-fixture-fixed/process.exit": 0,
+    "root-private-batching-ownership-fixture-error/pure-activation-private-batching-ownership/process.exit": 2,
+    "root-private-batching-sqlite-lifecycle-expectation-error/sqlite-activation-private-batching-selection/process.exit": 1,
+    "root-shared-coordination-native-full-race/mysql-activation-same-redemption-stored-plan-oracle/process.exit": 0,
+    "root-shared-coordination-native-parent-codec-error/mysql-activation-same-redemption-shared-coordination/process.exit": 2,
+    "root-shared-coordination-native-rollback-recovery-pass/mysql-activation-rollback-recovery-durable/process.exit": 0,
+    "root-shared-coordination-native-terminal-pass/mysql-activation-consume-release-recovered-runner/process.exit": 0,
+    "root-shared-coordination-sqlite-cleanup/sqlite-activation-shared-coordination-cleanup-caps/process.exit": 0,
+    "root-shared-coordination-sqlite-initial/sqlite-activation-shared-coordination-focused/process.exit": 0,
+    "root-shared-coordination-sqlite-tail/sqlite-activation-shared-coordination-final-tail/process.exit": 0,
+    "root-withdrawal-oracles-fixed/sqlite-activation-withdrawal-oracles-fixed/process.exit": 0,
+    "selection-join/selection-fixed-source/exit": 0,
+    "selection-join/selection-old-source/exit": 1
   },
   "git_source_check": true,
   "releases": {
+    "acceptance-preparation": {
+      "limits": [
+        "No PHPUnit or database execution, native concurrency or behavior count.",
+        "Author 014709a3 integrated at root c74a9c85; static source binding only."
+      ],
+      "manifest_sha256": "43f51b72ff5f4eef9f906315d7dacad8644524b99f56ad9024fe53f1e2bb26c8",
+      "members": 6,
+      "scope": "Static acceptance and native test preparation only"
+    },
     "authorization": {
       "limits": [
         "Initial assertion failure retained; final test-only correction.",
@@ -29,6 +95,17 @@
       "manifest_sha256": "bc1f08faadbb7f56af382bddddc5151d0030cde7a6ca0a0d57f156433bfd1b09",
       "members": 16,
       "scope": "Pure authorization records only"
+    },
+    "historical-read": {
+      "limits": [
+        "Observed 745ccddc plus five untracked new classes later bound to 766569fc; no exact 766569fc execution claim.",
+        "Autoload regenerated within command block; no unchanged per-test runtime metadata claim.",
+        "No DB, actual owner/history/renderer authority; three smoke entry refusals are not PHPUnit case counts.",
+        "Initial Pint failure capsules and narrative-only archive-verifier path typo retained."
+      ],
+      "manifest_sha256": "d221ab51a0490fabbe901323fda5be7a90972fda0eda5703781a100d154d33d0",
+      "members": 53,
+      "scope": "Historical read helper preparation, pure ownership and entry refusals"
     },
     "history-core": {
       "limits": [
@@ -49,6 +126,25 @@
       "members": 20,
       "scope": "Static fixture and native rollback preparation only"
     },
+    "operation-ownership": {
+      "limits": [
+        "Seven tests / 11 assertions pass; 1,363 declared inputs and runner/autoload unchanged.",
+        "Pre-finish and pre-read-environment source; no final integrated application or six confirmation-case claim."
+      ],
+      "manifest_sha256": "7369b443128128d8ca6d16f6b974a74584fdb859d6242c4dc6d9675f366e23ca",
+      "members": 8,
+      "scope": "Historical pure ownership invocation at author 9af2f8f0"
+    },
+    "ordinary-finish": {
+      "limits": [
+        "Two separately filtered old Context overlays each fail 1/14; corrected source passes 2/44.",
+        "Overlays preload exact historical class capsules; physical working source inventory remains the fixed source.",
+        "No activation final-tail or six prepared phase-case behavior claim."
+      ],
+      "manifest_sha256": "b2670910d3c2e8582691043b677531872608db0aaa963ae26f13b73b823f939b",
+      "members": 23,
+      "scope": "Affected ordinary finish closure regression on SQLite"
+    },
     "policy-consume": {
       "limits": [
         "Historical assertion-order failure, no-op mutation failure and Pint path error retained.",
@@ -58,6 +154,27 @@
       "manifest_sha256": "de0d1c54b931e44aed1c1e6e214f48745ae79613be99370a63a1a067fcf47ffe",
       "members": 51,
       "scope": "Pure v3 policy, historical invoice and consume ledger values"
+    },
+    "policy-corrections": {
+      "limits": [
+        "Old control/display failure retained; corrected whole v3 file 32/89.",
+        "Near-capacity 1/17 is pure real codec/ledger work; no database or renderer.",
+        "All three invocations use 1 GiB PHP memory limit; no 512 MiB invocation claim.",
+        "Each bundle captures 1,447 inputs, including two generated bootstrap/cache hashes outside Git source."
+      ],
+      "manifest_sha256": "a4db8570131c4f6fa8eefd9c29db7c5980c2c49940e6a8836d084d3a36a89a2b",
+      "members": 26,
+      "scope": "Pure policy/display correction and near-capacity complete ledger cleanup"
+    },
+    "read-environment": {
+      "limits": [
+        "Initial setup 4/0 with four errors retained; old-reader 4/7 with three failures; corrected 4/9 passes.",
+        "No database or actual owner/frame admission.",
+        "Source and autoload are observed before/after; external runner digest is recorded before execution only."
+      ],
+      "manifest_sha256": "298a35783f38789b7f3b6b91e361a44fa8ad73cc063da43e54f0bff8f98efc63",
+      "members": 30,
+      "scope": "Pure actual Container environment binding correction"
     },
     "reader": {
       "limits": [
@@ -76,6 +193,396 @@
       "manifest_sha256": "7f1f830b9374c09d994e169a9971eba2011f21b4b16f3f7a6971d4b836ac209f",
       "members": 14,
       "scope": "Synthetic retained values and native files; inert SQLite handles only"
+    },
+    "root-activation-initial": {
+      "limits": [
+        "Actual 1/18 setup/runtime error, process exit2; not an intended assertion-red case.",
+        "No successful activation or subsequent phases inferred.",
+        "Captured 2,309 declared source inputs and runtime identities unchanged at exact c2523e98."
+      ],
+      "manifest_sha256": "cb1c3b5e41e695411cb5bbcffe4ecb34586342eef5fec3889cee60a0355255b6",
+      "members": 10,
+      "scope": "Initial actual SQLite confirmation/conservation/activation/readback selection; failed before activation write"
+    },
+    "root-activation-mysql-initial": {
+      "limits": [
+        "Native1/18,error1,process2/verifier1. No native inserts or successful activation inferred.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "bee29e1ed2bfa8fc1924308437cc980ea738568280517fda0203a155efdf681e",
+      "members": 10,
+      "scope": "Original unmodified MySQL8.4.11 activation canary; failed in mandatory preinsert proof"
+    },
+    "root-activation-mysql-private-plan": {
+      "limits": [
+        "Native1/18,error1,process2/verifier1. Reached inserts and fresh graph audit, refused before physical commit; no durable activation inferred.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "496c21eb8b9731670a256dbb58d957312e03b424ded826a4b96aa1c29d0dbb25",
+      "members": 10,
+      "scope": "Unmodified MySQL8.4.11 private grant-plan correction; failed during final committing closure"
+    },
+    "root-activation-sqlite-atomic-capture": {
+      "limits": [
+        "13/328 passes with zero errors/failures/skips; separate source from later private batching. No native concurrency claim.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "191a9f9c2ffa3e48ca26b64d48c934951bd68891230f0d92a8b4b904094d1089",
+      "members": 10,
+      "scope": "Actual SQLite integration3, retention4 and phase6 selection at atomic capture source"
+    },
+    "root-activation-sqlite-fixed": {
+      "limits": [
+        "One selected test / 57 assertions pass; process/verifier exits 0, zero errors/failures/skips.",
+        "All 2,312 captured inputs plus runner/autoload/HEAD/status unchanged.",
+        "The earlier actual canary error remains in a separate immutable release. No native or production claim."
+      ],
+      "manifest_sha256": "4e3eb5eb03ecf481c098963c90c00a78c23664956a9eeaa557a8a5722a52ab81",
+      "members": 10,
+      "scope": "Actual corrected SQLite confirmation, conserved activation and readback canary at root 3598015d"
+    },
+    "root-ci-policy": {
+      "limits": [
+        "Five Python unittest selections52/50/61/32/14 pass,209 reportedchecks; not PHP/application or hosted database execution.",
+        "Only named public synthetic text released. Source/runner/runtime/overlay hashes are preserved; no environment files, generated PDF/audio, key or database bytes."
+      ],
+      "manifest_sha256": "791ebf91d0384f3b076b1a8e90fc59608f248dc93f15b960c1b6959e6e8cb285",
+      "members": 7,
+      "scope": "Local synthetic CI policy self-tests at915"
+    },
+    "root-completed-readback-mysql-positive": {
+      "limits": [
+        "1 test /59 assertions; focused native canary only, not representative performance or host evidence.",
+        "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+        "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+      ],
+      "manifest_sha256": "7fd051e85b8e922b3115893994054866ab0ae71696eccf1f1f22d704195fa085",
+      "members": 10,
+      "scope": "Unmodified private MySQL8.4.11 completion, atomic graph, conservation, original readback and registry cleanup"
+    },
+    "root-completed-readback-ownership": {
+      "limits": [
+        "11 tests /17 assertions; not real carrier replay.",
+        "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+        "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+      ],
+      "manifest_sha256": "95b2041dad05601f027a0cc98020498b8b2b367653d3d592763ce5d2c5290322",
+      "members": 10,
+      "scope": "Pure completed-handoff ownership and restoration refusals"
+    },
+    "root-completed-readback-sqlite-positive": {
+      "limits": [
+        "1 test /59 assertions; genuine synthetic producers, no native concurrency claim.",
+        "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+        "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+      ],
+      "manifest_sha256": "595e8a21be054ae129d12e17a4c38e1eb08c1753613071ba7fa40fe93a2737eb",
+      "members": 10,
+      "scope": "Actual SQLite completion, atomic graph, conservation, original readback and registry cleanup"
+    },
+    "root-durable-recorder-smoke": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 27, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "Actual 14 tests /27 assertions, zero failures/errors/skips, process/verifier 0. This is a pure launch-supervision smoke, not native or full-suite acceptance.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "e5e9f528a2935dd31a8e095ea53e6e972c5476297214a60ca84a14e54aaa2473",
+      "members": 13,
+      "scope": "Pure ownership smoke after detached launcher return; actual recorder completion and immutable launch provenance"
+    },
+    "root-final-ci-policy": {
+      "limits": [
+        "Actual52+50+61+32+14 Python unittest checks, allfive command exits0,43inputs/runner/HEAD/status unchanged.",
+        "No application DB bodies, hosted preflight, Foundation CI or GitLab dispatch."
+      ],
+      "manifest_sha256": "bd881bd0b02af6eb2abb7f1754f3f39b1b80faf4be85d5124e5b7d3cd1e2ce71",
+      "members": 7,
+      "scope": "Local CI policy self-tests after actual census documentation update"
+    },
+    "root-final-frozen-bindings": {
+      "limits": [
+        "Six profiles and44member entries match actual C4b merge bytes; no profile/member edits or re-pins.",
+        "Exact499-to3543 diff contains only two native-parent test corrections; this is source carry, not new execution.",
+        "Initial legacy-manifest helper failure and no-write documentation replacement interruption disclosed separately."
+      ],
+      "manifest_sha256": "d76ca72bd30a5f4ff6e876f0867967f9b8c70140ba1c2d8080fe368996b99708",
+      "members": 3,
+      "scope": "Read-only frozen profiles and original contract checks plus exact selected SQLite source carry"
+    },
+    "root-final-quality-discovery": {
+      "limits": [
+        "Pint94 and 24-shard list-only discovery2200/8715 cases in219/647files; no application database bodies or hosted jobs.",
+        "All50 generated outputs captured and exact-hash cleaned. Complete2327 source/CI inputs plus autoload/runner/helper unchanged.",
+        "61 allowed MySQL skip cases across17 methods is a derived census, not an executed skip count."
+      ],
+      "manifest_sha256": "b9316c9406d4f62f5ec7488005398a0ac09f6ca3c62bbca3263725fb1d392119",
+      "members": 57,
+      "scope": "Final operative Pint and native list-only partition discovery with exact generated cleanup"
+    },
+    "root-final-sqlite-integration-retention-phase": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 348, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "Actual14/348, zero failures/errors/skips, process/verifier0,2320inputs unchanged. Focused three-file selection; not the whole repository or a native concurrency claim.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "72fa00f1e17152fb9638bb6556865de652bf33f1eacaf22dee6474312f3b8152",
+      "members": 13,
+      "scope": "Whole affected actual integration, retention and confirmation-phase files on final coordination product source"
+    },
+    "root-lifecycle-current-balances": {
+      "limits": [
+        "2/90 pass,zeroall,0/0. Fixes stale replay-balance assertion only; previous15/407failure retained separately.",
+        "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+        "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+      ],
+      "manifest_sha256": "43c07b59e6777d9720bc8124eb483e3aeabb2937d968e0d879540a9263c30675",
+      "members": 10,
+      "scope": "Actual SQLite ordinary lifecycle and genuine no-prior-terminal exact-honor refusal"
+    },
+    "root-native-consume-release-failure": {
+      "limits": [
+        "First consume-wins provider failed1/36 with one failure, zero errors/skips, process/verifier1; release-wins unrun under stop-on-defect.",
+        "Actual owned consume committing hold and independent loser users.PRIMARY wait observed; release loser reservation_terminal; winner final readback workflow_deadline. Strict successful-writer oracle failed before graph/conservation queries.",
+        "All2318 captured inputs/runner/autoload/HEAD/status unchanged at72db. Public bounded metadata only; no product cap/clock changes, no synthetic fixture upgraded to host/provider claim."
+      ],
+      "manifest_sha256": "eb98fc7427d04f902cfa5242775f71e64e72bfb6dd25e17fed375cbf3143e3d6",
+      "members": 11,
+      "scope": "Native consume/release actual row contention with refused winner receipt"
+    },
+    "root-native-phase-diagnostic": {
+      "limits": [
+        "Eight class timing overlays plus native STDERR helper. Diagnostic only; not unmodified acceptance or performance proof.",
+        "Only named public synthetic text released. Source/runner/runtime/overlay hashes are preserved; no environment files, generated PDF/audio, key or database bytes."
+      ],
+      "manifest_sha256": "6100e9b21f91cf1d97c6a92c9867f0bc671ead6282aa361ca288f7ae7b998004",
+      "members": 24,
+      "scope": "Timing-only native failure at d25 with explicitly preloaded instrumented classes"
+    },
+    "root-native-postcommit-recovery": {
+      "limits": [
+        "1/30 pass, zero failures/errors/skips, process/verifier0. One durable graph retained and recovered; focused synthetic case only.",
+        "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+        "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+      ],
+      "manifest_sha256": "4585d4e2c000c707796c9d06d2be94f77a73124a366f1c7a3edbff7183a29078",
+      "members": 10,
+      "scope": "Actual private MySQL8.4.11 postcommit flag withdrawal, receipt refusal and explicit read recovery"
+    },
+    "root-native-private-batching-readback-error": {
+      "limits": [
+        "1/18,error1,2/1. Completion distinctcommitted/finish/postfinish returned; first historical inspection and detached byte observe/verify returned; failure is SECOND/final inspect committing raw, not first. No successful native return or post-return durablegraph assertions.",
+        "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+        "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+      ],
+      "manifest_sha256": "22a6d8dbee78c154f93f33cd3635e35e67beaa7116a223b658103a814c377113",
+      "members": 10,
+      "scope": "Unmodified MySQL8.4.11 positive activation canary; final post-I/O historical readback Budget refusal"
+    },
+    "root-native-race-contention-failure": {
+      "limits": [
+        "1/33 with one failure, process/verifier1. Two real owner-row waits but neither worker returned receipt. Exact failed frame and persisted effects were not recorded.",
+        "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+        "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+      ],
+      "manifest_sha256": "6669eb3088f55e85373daff62dcf1d98473c75ab3b4380f4a8256e20071c792e",
+      "members": 11,
+      "scope": "Authentic two-worker contention with failed strict successful-writer requirement"
+    },
+    "root-native-race-preparation-failure": {
+      "limits": [
+        "1/13 with one failure, process/verifier1. Worker1 readiness expired before worker2 or contention; teardown terminated worker. No race proof.",
+        "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+        "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+      ],
+      "manifest_sha256": "c547a092208157cf7767fa74d54c9e19a265c1186bf76308816be0f8cc90c01e",
+      "members": 11,
+      "scope": "Original outer preparation failure, before contention"
+    },
+    "root-native-race-refusal-locations": {
+      "limits": [
+        "1/33 with one failure, zero errors/skips, process/verifier1; strict successful-writer requirement remains unmet.",
+        "Diagnostic worker metadata only, no product overlays/cap changes. Both completeActivation refusals occurred in reservation source proof (preinsert/final committing). Effective Budget min-shortened; original300 samples do not locate which minimum by themselves.",
+        "Parent raw observation has zero origins/artifacts/activations and award/reserve events; it is not a complete authenticated graph/conservation audit.",
+        "All2318 source inputs/runner/autoload/HEAD/status unchanged at72db. Explicit public synthetic text only, no secrets/PDF/audio/database bytes."
+      ],
+      "manifest_sha256": "fb3532a1d106fdb738ca176912e2fd3e9f0e69dff0da81686699e5c5f7de9496",
+      "members": 11,
+      "scope": "Native early-race failure with bounded sanitized exception locations and raw postworker effect observation"
+    },
+    "root-native-rollback-recovery-interrupted": {
+      "limits": [
+        "Actual JUnit/log: 5 tests /970 assertions, zero failures/errors/skips. Original process and recorder exits are unobserved and remain null.",
+        "Fresh 2320-input metadata reconciliation does not recreate uninterrupted runner closure.",
+        "Read recovery-wording-correction.md alongside the unchanged original recovery-observation.json: this selection is five testcases, not two.",
+        "No native acceptance or exit-zero claim from this partial receipt; no generated PDF/audio, secret or database bytes released."
+      ],
+      "manifest_sha256": "c11f2aa2fb4b809af4930fe3d9fe3a1e9ac94399e7c760b96c07974d52c0e53c",
+      "members": 10,
+      "scope": "Interrupted recorder after four native INSERT-denial datasets and postcommit recovery; original null exits and additive wording correction"
+    },
+    "root-native-terminal-interrupted": {
+      "limits": [
+        "Original terminal JUnit/log2/129 zeroall and completed behavior transcripts, but parent process/runner exits unobserved; Partial, not a full pass.",
+        "Fresh metadata reconciliation confirms2320 captured inputs/head/status/autoload/runner match before and Git; cannot recreate uninterrupted original source-after observation or original exit.",
+        "Actual private MySQL8.4.11 provider bodies only; no representative performance, host/provider or production claim."
+      ],
+      "manifest_sha256": "a5370974215fa1e5f8740fa4a2997ed72c62eba63ed1e46b1b4ae20f5aa34ff2",
+      "members": 11,
+      "scope": "Interrupted parent runner after two completed native terminal datasets; explicit null exits and fresh reconciliation"
+    },
+    "root-native-write-denial": {
+      "limits": [
+        "4/940 pass, zero failures/errors/skips, process/verifier0. Exact target error and complete rollback/idle/account cleanup asserted.",
+        "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+        "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+      ],
+      "manifest_sha256": "e6525babbe0b322d19ee27dcde6c77b50f1456825ebde237f9d3ca9823f4e90e",
+      "members": 10,
+      "scope": "Actual private MySQL8.4.11 INSERT1142 rollback at all four atomic target tables"
+    },
+    "root-ordinary-award": {
+      "limits": [
+        "One ordinary award case only; no activation or native claim.",
+        "Root exclusive DB slot; no performance claim.",
+        "All 2,301 observed declared source inputs match exact root 745ccddc and remain unchanged."
+      ],
+      "manifest_sha256": "fb70b0c1277a9c459a12c7535fefe00a3ce24958960d2397d08c80c48743a099",
+      "members": 10,
+      "scope": "Actual affected ordinary award commit and replay on SQLite"
+    },
+    "root-ordinary-reservation": {
+      "limits": [
+        "One affected ordinary reservation case only; no activation or native claim.",
+        "Root exclusive DB slot; no performance claim.",
+        "All 2,301 observed declared source inputs match exact root 26b873de and remain unchanged."
+      ],
+      "manifest_sha256": "2e73804013aaf6e5bfc6f66c6b02f5586788a58b98a52e43ca523d54ddba406f",
+      "members": 10,
+      "scope": "Actual ordinary reservation once, exact retry and award replay on SQLite"
+    },
+    "root-private-batching-ownership-fixed": {
+      "limits": [
+        "9/13 passes zero errors/failures/skips. Exact source and fixture correction; no comprehensive real permit replay/materialization proof.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "14d5a1acd08571cfd1c033e62ca5f17740b8352e202c655464b903c0f7080020",
+      "members": 10,
+      "scope": "Corrected pure ownership refusal selection at a47"
+    },
+    "root-private-batching-ownership-fixture-error": {
+      "limits": [
+        "8/9,error1,process2/verifier1; setup fixture error is not intended behavioral red. Later selected case unrun.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "709725f748f7d140d01e8ace7b8d1ca2454252a7730e9b969bf29a6890c652b7",
+      "members": 10,
+      "scope": "Pure ownership selection with invalid manifest fixture before intended refusal"
+    },
+    "root-private-batching-sqlite-lifecycle-expectation-error": {
+      "limits": [
+        "15/407,failure1,process1/verifier1. Integration3, retention5 and phase6 passed. Lifecycle failed after release; last honor case unrun. No native acceptance.",
+        "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+        "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+      ],
+      "manifest_sha256": "04d665adaad6953cd47278aeff3a4253d3fdb96bb5d330f61b8c8909b73dbf3c",
+      "members": 10,
+      "scope": "Actual SQLite private batching selection; lifecycle replay expected stale balances"
+    },
+    "root-shared-coordination-native-full-race": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 78, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 1}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "Strict full case passed1/78 at3543, zero failures/errors/skips and process/verifier0. One actual successful writer plus bounded loser; not two successful replay receipts or host/performance evidence.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "2ed695253576e8a2278328118c62df83ee8e38c4374bbc68006ec8b432dda0bd",
+      "members": 11,
+      "scope": "Actual native scheduling ownership, two genuine confirmations, winner graph/conservation/bytes/recovery and bounded loser"
+    },
+    "root-shared-coordination-native-parent-codec-error": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 60, \"errors\": 1, \"failures\": 0, \"skipped\": 0, \"tests\": 1}, \"process_exit\": 2, \"verifier_exit\": 1}",
+        "1 test /60 assertions /1 error, process2/verifier1; no overall native race pass. First worker actual activated receipt95.029s, second actual bounded source_deadline60.005s, actual users/USER LEVEL LOCK waits.",
+        "Raw one origin/artifact/activation and award/reserve/consume counts were observed and counted. Authenticated winner A/R/D, conservation, bytes and explicit recovery assertions after the invalid parent codec remained unrun.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "ba9334677bde809079ca30d0d3501cc4ba542f396281dc173bee7fc498f812d6",
+      "members": 11,
+      "scope": "Actual native coordination ownership and worker receipts, followed by parent stored-plan codec error"
+    },
+    "root-shared-coordination-native-rollback-recovery-pass": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 970, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 5}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "Actual5/970, zero failures/errors/skips, observed process/verifier0 and2320inputs unchanged. Prior interrupted5/970 remains Partial; no ordinary throwing afterCommit callback claim.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "62a048b6a750c941b1c88ca1c22be54d99118cef0edcf2ace863a1f32fb3cfee",
+      "members": 13,
+      "scope": "Current-source native four INSERT1142 rollback datasets and postcommit withdrawal with explicit single-graph recovery, completed under durable recorder"
+    },
+    "root-shared-coordination-native-terminal-pass": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 129, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 2}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "2/129 pass zero failures/errors/skips, process/verifier0, all2320 captured inputs/runner/autoload/HEAD/status unchanged at3543. Original interrupted2/129 remains separate Partial, not overwritten.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "1b515487bcf880beaee84b4a6a64042a316ee249f39754d2192082682c45a229",
+      "members": 12,
+      "scope": "Observed complete native runner for both consume/release orders with writer receipts, terminal losers and graph conservation"
+    },
+    "root-shared-coordination-sqlite-cleanup": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 166, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "5a source only, before the final private retained-replay terminal wrapper; no native scheduling result.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "70486fc4189c23787dbcc7b3753b5bb5c5d292315863e2873b2734fc67e4893a",
+      "members": 10,
+      "scope": "SQLite focused regression after cleanup cause and acquisition cap corrections"
+    },
+    "root-shared-coordination-sqlite-initial": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 166, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "67002 source only, before cleanup and acquisition cap corrections; no native scheduling result.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "d1504973a1ba2b5f39613d8189abd5354859c960ac7b036558b8eb7798c5650e",
+      "members": 10,
+      "scope": "SQLite ownership, actual activation and ordinary lifecycle at initial native scheduling source"
+    },
+    "root-shared-coordination-sqlite-tail": {
+      "limits": [
+        "{\"actual_junit\": {\"assertions\": 176, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 17}, \"process_exit\": 0, \"verifier_exit\": 0}",
+        "Ownership14 includes pure shaped tail values and causes, not completed graph/file/unlock authority. Actual positive1 and ordinary lifecycle2 are genuine synthetic producers. No native scheduling result yet.",
+        "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+      ],
+      "manifest_sha256": "1e1ef19a25d87cc6159c969bde18cace9d43f5b294b1d0626c9f0229a14dd241",
+      "members": 10,
+      "scope": "SQLite focused activation/lifecycle regression and pure final tail classification at reviewed499"
+    },
+    "root-withdrawal-oracles-fixed": {
+      "limits": [
+        "3/66 pass,zeroall,0/0. Actual hook/update/transaction observations asserted outside wrapped domain refusal, closing callback false-positive oracle.",
+        "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+        "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+      ],
+      "manifest_sha256": "cc9e1df12f6a519869f645a52618edebaaef4ad16562f9b802b7527007c6641b",
+      "members": 10,
+      "scope": "Actual SQLite rendering, normal final committing and origin encryption catalog withdrawal with observations asserted outside catches"
+    },
+    "selection-join": {
+      "limits": [
+        "Old-source intended failure retained; fixed full selected 43/129 pass.",
+        "No actual issuer, database statements, renderer or native concurrency.",
+        "New runner includes TestCase.php and the reflected fixture test; it does not repair earlier capture limits."
+      ],
+      "manifest_sha256": "d1ae0a2b5ecd3d8f1a315e8e427b09993418a10d6c096c86110200361971b9a3",
+      "members": 14,
+      "scope": "Pure complete ledger selection-join correction"
     }
   },
   "runs": {
@@ -92,6 +599,7 @@
       "duration_seconds": 0.265,
       "head": "3646d50c46a546f72d19173937e75bd4f3d7e37c",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "pure-authorization-final/result.json",
       "selection": [
@@ -116,6 +624,7 @@
       "duration_seconds": 0.215,
       "head": "2468639fc3cf757c63afd6b202a44468abb4d396",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 1,
       "result": "pure-authorization-initial/result.json",
       "selection": [
@@ -125,6 +634,36 @@
       "source_unchanged": true,
       "status": "failed",
       "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "historical-read/composed-745ccddc/ownership": {
+      "command_and_result": "composed-745ccddc/result.json",
+      "counts": {
+        "assertions": 11,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 7
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.10608308100199793,
+      "head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "kind": "PHPUnit",
+      "later_source_binding": "766569fc65c945b7fd942edcefa983613f80a4fc",
+      "owned_overlay": [
+        "app/Domain/Grants/Member/MemberActivationReadConfiguration.php",
+        "app/Domain/Grants/Member/MemberActivationReads.php",
+        "app/Domain/Grants/Member/MemberActivationHistoryInspection.php",
+        "app/Domain/Grants/Member/MemberActivationReadObserver.php",
+        "app/Domain/Grants/Member/MemberActivationReadCommittedProof.php"
+      ],
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "historical-read/composed-745ccddc/result.json",
+      "source_unchanged": true,
+      "status": "pass",
       "xml_problem": null
     },
     "history-core/history-helper-corrected": {
@@ -140,6 +679,7 @@
       "duration_seconds": 0.716,
       "head": "d0e81c46f660776a6f8b5fc171d570acd23f0540",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "history-helper-corrected/result.json",
       "selection": [
@@ -158,6 +698,7 @@
       "duration_seconds": 0.165,
       "head": "34a4938667fb1f58d5dee09bccd4fe4c34940cd7",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 255,
       "result": "history-initial/result.json",
       "selection": [
@@ -182,6 +723,7 @@
       "duration_seconds": 0.666,
       "head": "433b84f3c6a7221c922bb2f36f0f0d87b231e486",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "records-initial/result.json",
       "selection": [
@@ -190,6 +732,106 @@
       "source": "history-core/bundles/6535c0a1a4fcfd708a577f53af28d3f43b75aec943d6d02075b4990cdfe36d5a.json",
       "source_unchanged": true,
       "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "operation-ownership/pure-ownership-initial": {
+      "command": "pure-ownership-initial/command.json",
+      "counts": {
+        "assertions": 11,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 7
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.215,
+      "head": "9af2f8f0e6ce80803bad6b8c250c0073ad50867d",
+      "kind": "PHPUnit",
+      "overlay_source": null,
+      "process_exit": 0,
+      "result": "pure-ownership-initial/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "operation-ownership/bundles/cfe2233c1e341f42e0fe27f3d3748c2f88d83f51cb363d3249a0b9a49d39884c.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "ordinary-finish/ordinary-finish-fixed": {
+      "command": "ordinary-finish-fixed/command.json",
+      "counts": {
+        "assertions": 44,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 24.589,
+      "head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "kind": "PHPUnit",
+      "overlay_source": null,
+      "process_exit": 0,
+      "result": "ordinary-finish-fixed/result.json",
+      "selection": [
+        "tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php"
+      ],
+      "source": "ordinary-finish/bundles/2de0502c0c145d1047a114d5cf5953fe828e9c5630adeb9c7df6b29a0629c70f.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "ordinary-finish/ordinary-finish-old-award": {
+      "command": "ordinary-finish-old-award/command.json",
+      "counts": {
+        "assertions": 14,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 12.151,
+      "head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "kind": "PHPUnit",
+      "overlay_source": "ordinary-finish/ordinary-finish-old-contexts/overlay.json",
+      "process_exit": 1,
+      "result": "ordinary-finish-old-award/result.json",
+      "selection": [
+        "tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php"
+      ],
+      "source": "ordinary-finish/bundles/3804f05a9efa34041499d496a9463329a66251df4e094c36b28c1116d8d0c696.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "ordinary-finish/ordinary-finish-old-reservation": {
+      "command": "ordinary-finish-old-reservation/command.json",
+      "counts": {
+        "assertions": 14,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "duration_seconds": 13.361,
+      "head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "kind": "PHPUnit",
+      "overlay_source": "ordinary-finish/ordinary-finish-old-contexts/overlay.json",
+      "process_exit": 1,
+      "result": "ordinary-finish-old-reservation/result.json",
+      "selection": [
+        "tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php"
+      ],
+      "source": "ordinary-finish/bundles/3804f05a9efa34041499d496a9463329a66251df4e094c36b28c1116d8d0c696.json",
+      "source_unchanged": true,
+      "status": "failed",
       "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
       "xml_problem": null
     },
@@ -338,6 +980,143 @@
       "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
       "xml_problem": null
     },
+    "policy-corrections/capacity-first": {
+      "command_and_result": "capacity-first/result.json",
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 15.910849602005328,
+      "head": "81b71cfc0d7cc8fec45efb00b2deae54ebe627bb",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipHistoryCapacityCleanupTest.php"
+      ],
+      "source": "policy-corrections/bundle-81b71cfc0d7c-c3fd469b8a9c/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-corrections/control-fixed": {
+      "command_and_result": "control-fixed/result.json",
+      "counts": {
+        "assertions": 89,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 32
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.1644414879992837,
+      "head": "05e66dfb97931cd4f172bb741ded75da6f95d4ee",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MembershipConsumptionPolicyTest.php"
+      ],
+      "source": "policy-corrections/bundle-05e66dfb9793-0cad85a0f435/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "policy-corrections/control-old": {
+      "command_and_result": "control-old/result.json",
+      "counts": {
+        "assertions": 5,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.11425517700263299,
+      "head": "ff80d278c424fc19ecef6ed309ff77a0f348ab17",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "selection": [
+        "tests/Unit/MembershipConsumptionPolicyTest.php",
+        "--filter",
+        "test_policy_parser_refuses_controls_rejected_by_the_actual_confirmation_display"
+      ],
+      "source": "policy-corrections/bundle-ff80d278c424-7fd4b0c12a4b/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "pure unit bodies; no DB-backed workload in this lane; other lanes may perform separately authorized work",
+      "xml_problem": null
+    },
+    "read-environment/green": {
+      "command_and_result": "green/result.json",
+      "counts": {
+        "assertions": 9,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.10119689800194465,
+      "head": "02cefb83cbc8a314f8da00191349f76303f9a693",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "selection": [
+        "tests/Unit/MemberActivationReadEnvironmentTest.php"
+      ],
+      "source": "read-environment/green/source.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "xml_problem": null
+    },
+    "read-environment/red": {
+      "command_and_result": "red/result.json",
+      "counts": {
+        "assertions": 0,
+        "errors": 4,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.09205296900472604,
+      "head": "b5e309b4d2da8f7e5a73a5ada79459fae5f226bb",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "selection": [
+        "tests/Unit/MemberActivationReadEnvironmentTest.php"
+      ],
+      "source": "read-environment/red/source.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "xml_problem": null
+    },
+    "read-environment/red-v2": {
+      "command_and_result": "red-v2/result.json",
+      "counts": {
+        "assertions": 7,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 4
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.1014716739882715,
+      "head": "207a56712b4d8718db991a80f2fbc90ed2300739",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "selection": [
+        "tests/Unit/MemberActivationReadEnvironmentTest.php"
+      ],
+      "source": "read-environment/red-v2/source.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "xml_problem": null
+    },
     "reader/handles-initial": {
       "command": "handles-initial/command.json",
       "counts": {
@@ -351,6 +1130,7 @@
       "duration_seconds": 0.164,
       "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "handles-initial/result.json",
       "selection": [
@@ -375,6 +1155,7 @@
       "duration_seconds": 0.265,
       "head": "33beeb02c65f05c6b41680b380f8a74a3afda541",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "queries-closure-followup/result.json",
       "selection": [
@@ -399,6 +1180,7 @@
       "duration_seconds": 0.265,
       "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "queries-initial/result.json",
       "selection": [
@@ -423,6 +1205,7 @@
       "duration_seconds": 7.841,
       "head": "feb05d227d42cb8d07415178295306ffd9f69fe2",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "registered-empty-initial/result.json",
       "selection": [
@@ -447,6 +1230,7 @@
       "duration_seconds": 3.5015619799960405,
       "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "existing-files-regression/result.json",
       "selection": "existing",
@@ -463,6 +1247,7 @@
       "duration_seconds": 0.4272988450102275,
       "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
       "kind": "formatting",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "pint-frozen/result.json",
       "selection": "pint",
@@ -485,6 +1270,7 @@
       "duration_seconds": 1.9251035700144712,
       "head": "c8c76f82965d2a3a116b00b2160d18e6b16958f1",
       "kind": "PHPUnit",
+      "overlay_source": null,
       "process_exit": 0,
       "result": "retained-initial/result.json",
       "selection": "retained",
@@ -492,6 +1278,1008 @@
       "source_unchanged": true,
       "status": "pass",
       "workload_overlap": "No parallel workload launched by this lane; no native MySQL workload claimed.",
+      "xml_problem": null
+    },
+    "root-activation-initial/sqlite-activation-first": {
+      "command": "sqlite-activation-first/command.json",
+      "counts": {
+        "assertions": 18,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 21.031117226011702,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "c2523e9834af29122ddcc51e74ebe21d9b176a3c",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "sqlite-activation-first/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-activation-initial/bundle-c2523e9834af-96a12a44aba1fd67/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-activation-mysql-initial/mysql-activation-first": {
+      "command": "mysql-activation-first/command.json",
+      "counts": {
+        "assertions": 18,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 439.3944794209965,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "mysql-activation-first/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-activation-mysql-initial/bundle-3598015defb2-b44c83d7cd7aceb0/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-activation-mysql-private-plan/mysql-activation-private-plan-fixed": {
+      "command": "mysql-activation-private-plan-fixed/command.json",
+      "counts": {
+        "assertions": 18,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 421.290184396,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "mysql-activation-private-plan-fixed/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-activation-mysql-private-plan/bundle-61bebdcfaf2f-7537d058f36ad230/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-activation-sqlite-atomic-capture/sqlite-activation-atomic-capture-selection": {
+      "command": "sqlite-activation-atomic-capture-selection/command.json",
+      "counts": {
+        "assertions": 328,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 13
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 318.84604670299996,
+      "filter": null,
+      "head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-atomic-capture-selection/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberLicenseAuthorizationPhaseTest.php"
+      ],
+      "source": "root-activation-sqlite-atomic-capture/bundle-d25f160c0722-4930f6a1cef33f4a/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-activation-sqlite-fixed/sqlite-activation-environment-fixed": {
+      "command": "sqlite-activation-environment-fixed/command.json",
+      "counts": {
+        "assertions": 57,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 35.9083731869905,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-environment-fixed/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-activation-sqlite-fixed/bundle-3598015defb2-2dc9023a49ee7a2c/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-completed-readback-mysql-positive/mysql-activation-completed-readback-positive": {
+      "command": "mysql-activation-completed-readback-positive/command.json",
+      "counts": {
+        "assertions": 59,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 482.58181934300046,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-completed-readback-positive/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-completed-readback-mysql-positive/bundle-a24979ae2ffa-afaee327952d8c8e/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-completed-readback-ownership/pure-activation-completed-readback-ownership": {
+      "command": "pure-activation-completed-readback-ownership/command.json",
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 11
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 0.11421984400021756,
+      "filter": null,
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "pure-activation-completed-readback-ownership/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "root-completed-readback-ownership/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-completed-readback-sqlite-positive/sqlite-activation-completed-readback-positive": {
+      "command": "sqlite-activation-completed-readback-positive/command.json",
+      "counts": {
+        "assertions": 59,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 30.1391898389993,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-completed-readback-positive/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-completed-readback-sqlite-positive/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-durable-recorder-smoke/pure-activation-durable-recorder-smoke": {
+      "command": "pure-activation-durable-recorder-smoke/command.json",
+      "counts": {
+        "assertions": 27,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 0.16448527900138288,
+      "filter": null,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "pure-activation-durable-recorder-smoke/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "root-durable-recorder-smoke/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-final-sqlite-integration-retention-phase/sqlite-activation-final-integration-retention-phase": {
+      "command": "sqlite-activation-final-integration-retention-phase/command.json",
+      "counts": {
+        "assertions": 348,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 332.67609724799695,
+      "filter": null,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-final-integration-retention-phase/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberLicenseAuthorizationPhaseTest.php"
+      ],
+      "source": "root-final-sqlite-integration-retention-phase/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-lifecycle-current-balances/sqlite-activation-ordinary-lifecycle-current-balances": {
+      "command": "sqlite-activation-ordinary-lifecycle-current-balances/command.json",
+      "counts": {
+        "assertions": 90,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 74.1173367929996,
+      "filter": null,
+      "head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-ordinary-lifecycle-current-balances/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php"
+      ],
+      "source": "root-lifecycle-current-balances/bundle-00867c742843-2f82e314ce429ec4/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-consume-release-failure/mysql-activation-consume-release-orders": {
+      "command": "mysql-activation-consume-release-orders/command.json",
+      "counts": {
+        "assertions": 36,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 366.46186769900123,
+      "filter": null,
+      "head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "mysql-activation-consume-release-orders/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationReleaseRaceTest.php"
+      ],
+      "source": "root-native-consume-release-failure/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-phase-diagnostic/mysql-atomic-capture-phase-diagnostic": {
+      "command": "mysql-atomic-capture-phase-diagnostic/command.json",
+      "counts": {
+        "assertions": 18,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": true,
+      "duration_seconds": 418.3974547429998,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "kind": "PHPUnit",
+      "overlay_count": 9,
+      "process_exit": 2,
+      "result": "mysql-atomic-capture-phase-diagnostic/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-native-phase-diagnostic/bundle-d25f160c0722-0dc44b3d39dfcec2/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-postcommit-recovery/mysql-activation-postcommit-recovery": {
+      "command": "mysql-activation-postcommit-recovery/command.json",
+      "counts": {
+        "assertions": 30,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 352.5806618759998,
+      "filter": "test_postcommit_flag_withdrawal_refuses_receipt_and_later_explicit_read_recovers_the_single_graph",
+      "head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-postcommit-recovery/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php"
+      ],
+      "source": "root-native-postcommit-recovery/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-private-batching-readback-error/mysql-activation-private-batching-positive": {
+      "command": "mysql-activation-private-batching-positive/command.json",
+      "counts": {
+        "assertions": 18,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 395.4022412430004,
+      "filter": "test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes",
+      "head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "mysql-activation-private-batching-positive/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php"
+      ],
+      "source": "root-native-private-batching-readback-error/bundle-00867c742843-23cf2e3db76d2461/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-race-contention-failure/mysql-activation-same-redemption-race-preparation-fixed": {
+      "command": "mysql-activation-same-redemption-race-preparation-fixed/command.json",
+      "counts": {
+        "assertions": 33,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 462.15026400999886,
+      "filter": null,
+      "head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "mysql-activation-same-redemption-race-preparation-fixed/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationRaceTest.php"
+      ],
+      "source": "root-native-race-contention-failure/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-race-preparation-failure/mysql-activation-same-redemption-race": {
+      "command": "mysql-activation-same-redemption-race/command.json",
+      "counts": {
+        "assertions": 13,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 305.7179280399996,
+      "filter": null,
+      "head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "mysql-activation-same-redemption-race/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationRaceTest.php"
+      ],
+      "source": "root-native-race-preparation-failure/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-race-refusal-locations/mysql-activation-same-redemption-race-refusal-locations": {
+      "command": "mysql-activation-same-redemption-race-refusal-locations/command.json",
+      "counts": {
+        "assertions": 33,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 509.4980688510004,
+      "filter": null,
+      "head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "mysql-activation-same-redemption-race-refusal-locations/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationRaceTest.php"
+      ],
+      "source": "root-native-race-refusal-locations/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-rollback-recovery-interrupted/mysql-activation-shared-coordination-rollback-recovery": {
+      "command": "mysql-activation-shared-coordination-rollback-recovery/command.json",
+      "counts": {
+        "assertions": 970,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "declared_driver": "mysql",
+      "duration_seconds": null,
+      "filter": "MemberGrantNativeWriteRollbackTest|test_postcommit_flag_withdrawal_refuses_receipt_and_later_explicit_read_recovers_the_single_graph",
+      "fresh_metadata_verifier_exit": 0,
+      "fresh_source_equals_before": true,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "limits": [
+        "Original process exit and uninterrupted source-after observation are unavailable.",
+        "The fresh comparisons do not recreate the original runner completion or establish its process exit.",
+        "Both original provider testcases have green JUnit/log; this receipt is partial until observed execution/runner closure is available.",
+        "Read mysql-activation-shared-coordination-rollback-recovery/recovery-wording-correction.md alongside the unchanged original recovery wording."
+      ],
+      "process_exit": null,
+      "recovery_observation": "mysql-activation-shared-coordination-rollback-recovery/recovery-observation.json",
+      "recovery_wording_correction": "mysql-activation-shared-coordination-rollback-recovery/recovery-wording-correction.md",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeWriteRollbackTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php"
+      ],
+      "source": "root-native-rollback-recovery-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json",
+      "source_unchanged": null,
+      "status": "partial; original process and runner exits unobserved",
+      "verifier_exit": null,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-terminal-interrupted/mysql-activation-consume-release-shared-coordination": {
+      "command": "mysql-activation-consume-release-shared-coordination/command.json",
+      "counts": {
+        "assertions": 129,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "declared_driver": "mysql",
+      "duration_seconds": null,
+      "filter": null,
+      "fresh_metadata_verifier_exit": 0,
+      "fresh_source_equals_before": true,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "limits": [
+        "Original process exit and uninterrupted source-after observation are unavailable.",
+        "The fresh comparisons do not recreate the original runner completion or establish its process exit.",
+        "Both original provider testcases have green JUnit/log; this receipt is partial until observed execution/runner closure is available."
+      ],
+      "process_exit": null,
+      "recovery_observation": "mysql-activation-consume-release-shared-coordination/recovery-observation.json",
+      "recovery_wording_correction": null,
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationReleaseRaceTest.php"
+      ],
+      "source": "root-native-terminal-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json",
+      "source_unchanged": null,
+      "status": "partial; original process and runner exits unobserved",
+      "verifier_exit": null,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-native-write-denial/mysql-activation-native-write-denial-rollback": {
+      "command": "mysql-activation-native-write-denial-rollback/command.json",
+      "counts": {
+        "assertions": 940,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 1600.7178988409996,
+      "filter": null,
+      "head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-native-write-denial-rollback/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeWriteRollbackTest.php"
+      ],
+      "source": "root-native-write-denial/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-ordinary-award/sqlite-ordinary-award-first": {
+      "command": "sqlite-ordinary-award-first/command.json",
+      "counts": {
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 10.491370288000326,
+      "filter": "test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result",
+      "head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-ordinary-award-first/result.json",
+      "selection": [
+        "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php"
+      ],
+      "source": "root-ordinary-award/bundle-745ccddc2eb3-5cd5f61e1aceaa25/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-ordinary-reservation/sqlite-ordinary-reservation-first": {
+      "command": "sqlite-ordinary-reservation-first/command.json",
+      "counts": {
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 20.220394125994062,
+      "filter": "test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+      "head": "26b873de40104fbe8597105f65aa773c69558e86",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-ordinary-reservation-first/result.json",
+      "selection": [
+        "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php"
+      ],
+      "source": "root-ordinary-reservation/bundle-26b873de4010-f4da21f40459ace8/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-private-batching-ownership-fixed/pure-activation-private-batching-ownership-fixture-fixed": {
+      "command": "pure-activation-private-batching-ownership-fixture-fixed/command.json",
+      "counts": {
+        "assertions": 13,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 9
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 0.16487685700030852,
+      "filter": null,
+      "head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "pure-activation-private-batching-ownership-fixture-fixed/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "root-private-batching-ownership-fixed/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-private-batching-ownership-fixture-error/pure-activation-private-batching-ownership": {
+      "command": "pure-activation-private-batching-ownership/command.json",
+      "counts": {
+        "assertions": 9,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 0.1646280069999193,
+      "filter": null,
+      "head": "89cf40f0129822df82f44777811c709c704c6c62",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "pure-activation-private-batching-ownership/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php"
+      ],
+      "source": "root-private-batching-ownership-fixture-error/bundle-89cf40f01298-26cc0521eebdb32e/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-private-batching-sqlite-lifecycle-expectation-error/sqlite-activation-private-batching-selection": {
+      "command": "sqlite-activation-private-batching-selection/command.json",
+      "counts": {
+        "assertions": 407,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 15
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 381.43941605800046,
+      "filter": null,
+      "head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "kind": "PHPUnit",
+      "process_exit": 1,
+      "result": "sqlite-activation-private-batching-selection/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberLicenseAuthorizationPhaseTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php"
+      ],
+      "source": "root-private-batching-sqlite-lifecycle-expectation-error/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-native-full-race/mysql-activation-same-redemption-stored-plan-oracle": {
+      "command": "mysql-activation-same-redemption-stored-plan-oracle/command.json",
+      "counts": {
+        "assertions": 78,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 493.11646804200063,
+      "filter": null,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-same-redemption-stored-plan-oracle/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationRaceTest.php"
+      ],
+      "source": "root-shared-coordination-native-full-race/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-native-parent-codec-error/mysql-activation-same-redemption-shared-coordination": {
+      "command": "mysql-activation-same-redemption-shared-coordination/command.json",
+      "counts": {
+        "assertions": 60,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 438.1063128269998,
+      "filter": null,
+      "head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "kind": "PHPUnit",
+      "process_exit": 2,
+      "result": "mysql-activation-same-redemption-shared-coordination/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationRaceTest.php"
+      ],
+      "source": "root-shared-coordination-native-parent-codec-error/bundle-4990315a31b2-9771cbed42785838/manifest.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "verifier_exit": 1,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-native-rollback-recovery-pass/mysql-activation-rollback-recovery-durable": {
+      "command": "mysql-activation-rollback-recovery-durable/command.json",
+      "counts": {
+        "assertions": 970,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 1727.4740871569993,
+      "filter": "MemberGrantNativeWriteRollbackTest|test_postcommit_flag_withdrawal_refuses_receipt_and_later_explicit_read_recovers_the_single_graph",
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-rollback-recovery-durable/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeWriteRollbackTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php"
+      ],
+      "source": "root-shared-coordination-native-rollback-recovery-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-native-terminal-pass/mysql-activation-consume-release-recovered-runner": {
+      "command": "mysql-activation-consume-release-recovered-runner/command.json",
+      "counts": {
+        "assertions": 129,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "declared_driver": "mysql",
+      "diagnostic_only": false,
+      "duration_seconds": 745.7296988870003,
+      "filter": null,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "mysql-activation-consume-release-recovered-runner/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantNativeActivationReleaseRaceTest.php"
+      ],
+      "source": "root-shared-coordination-native-terminal-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-sqlite-cleanup/sqlite-activation-shared-coordination-cleanup-caps": {
+      "command": "sqlite-activation-shared-coordination-cleanup-caps/command.json",
+      "counts": {
+        "assertions": 166,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 103.92812776500068,
+      "filter": "MemberActivationOwnershipTest|test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes|MemberGrantOrdinaryLifecycleTest",
+      "head": "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-shared-coordination-cleanup-caps/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php"
+      ],
+      "source": "root-shared-coordination-sqlite-cleanup/bundle-5a5790f16bbc-304be34b9f5bed8f/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-sqlite-initial/sqlite-activation-shared-coordination-focused": {
+      "command": "sqlite-activation-shared-coordination-focused/command.json",
+      "counts": {
+        "assertions": 166,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 104.0641872670003,
+      "filter": "MemberActivationOwnershipTest|test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes|MemberGrantOrdinaryLifecycleTest",
+      "head": "67002abd1143413f06cbb4c5fc6dd2d6b280f85c",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-shared-coordination-focused/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php"
+      ],
+      "source": "root-shared-coordination-sqlite-initial/bundle-67002abd1143-1218be174edfdf10/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-shared-coordination-sqlite-tail/sqlite-activation-shared-coordination-final-tail": {
+      "command": "sqlite-activation-shared-coordination-final-tail/command.json",
+      "counts": {
+        "assertions": 176,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 17
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 104.17269378600031,
+      "filter": "MemberActivationOwnershipTest|test_actual_confirmation_creates_one_conserved_graph_and_readback_preserves_exact_rows_and_bytes|MemberGrantOrdinaryLifecycleTest",
+      "head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-shared-coordination-final-tail/result.json",
+      "selection": [
+        "tests/Unit/MemberActivationOwnershipTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php"
+      ],
+      "source": "root-shared-coordination-sqlite-tail/bundle-4990315a31b2-a638010cf33d9b73/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "root-withdrawal-oracles-fixed/sqlite-activation-withdrawal-oracles-fixed": {
+      "command": "sqlite-activation-withdrawal-oracles-fixed/command.json",
+      "counts": {
+        "assertions": 66,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 3
+      },
+      "declared_driver": "sqlite",
+      "diagnostic_only": false,
+      "duration_seconds": 72.91947362599967,
+      "filter": "test_current_source_withdrawal_during_real_rendering|test_real_final_committing_callback_source_withdrawal|test_catalog_withdrawal_during_actual_origin_encryption",
+      "head": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "kind": "PHPUnit",
+      "process_exit": 0,
+      "result": "sqlite-activation-withdrawal-oracles-fixed/result.json",
+      "selection": [
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
+        "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php"
+      ],
+      "source": "root-withdrawal-oracles-fixed/bundle-91581edb48ac-c4b7dfe1caba23fe/manifest.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "verifier_exit": 0,
+      "workload_overlap": "Root-serialized focused database workload; other component pure work may continue. No performance claim.",
+      "xml_problem": null
+    },
+    "selection-join/selection-fixed-source": {
+      "command": "selection-fixed-source/command.json",
+      "counts": {
+        "assertions": 129,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 43
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 2.772,
+      "head": "aef13ed47e4d57b17a47a53d2502084d70838291",
+      "kind": "PHPUnit",
+      "overlay_source": null,
+      "process_exit": 0,
+      "result": "selection-fixed-source/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberGrants/MemberActivationSelectionJoinTest.php",
+        "tests/Unit/MembershipConsumeLedgerAuditTest.php",
+        "tests/Unit/ProductionMemberGrants/MemberActivationHistoryTest.php"
+      ],
+      "source": "selection-join/bundles/9ab77113deb7f079d3e3fdab259ed1975dd1892745e91dae8ea5b602e7d593ba.json",
+      "source_unchanged": true,
+      "status": "pass",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
+      "xml_problem": null
+    },
+    "selection-join/selection-old-source": {
+      "command": "selection-old-source/command.json",
+      "counts": {
+        "assertions": 5,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "declared_driver": "pure",
+      "duration_seconds": 0.465,
+      "head": "68bd2864c0589e06297d0e69120bb0dc26d3aa1d",
+      "kind": "PHPUnit",
+      "overlay_source": null,
+      "process_exit": 1,
+      "result": "selection-old-source/result.json",
+      "selection": [
+        "tests/Unit/ProductionMemberGrants/MemberActivationSelectionJoinTest.php"
+      ],
+      "source": "selection-join/bundles/944e0d38d2f183268cc9ef5469e556f8914c56e00209398734e3738268893b1d.json",
+      "source_unchanged": true,
+      "status": "failed",
+      "workload_overlap": "No other DB test workload authorized by this lane; pure bodies only unless separately scheduled.",
       "xml_problem": null
     }
   },
@@ -521,6 +2309,23 @@
       "runtime": {
         "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
         "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "historical-read/composed-745ccddc/result.json": {
+      "autoload_count": 12,
+      "bundle_sha256": "21d544602610682fb7511585d6d62893269f693fd1d9697a98cf1c8a42a0fff7",
+      "git_matches": 1540,
+      "head": "766569fc65c945b7fd942edcefa983613f80a4fc",
+      "input_count": 1540,
+      "limits": [
+        "Five untracked working source files were later bound to the release commit; this is not execution at that commit.",
+        "Autoload was regenerated inside the command block; before/after metadata differ and do not prove per-test runtime stability."
+      ],
+      "observed_head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "1204187908ebed81dc19f434a92b588f2d45537fdb6f0f7f974f6b60dd62371d",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies"
       }
     },
     "history-core/bundles/4182d94b5054e77c9e52031ebcb60087ba4f5b6d70c1aa8d2fd3b6dd5de56b6d.json": {
@@ -571,6 +2376,57 @@
         "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
       }
     },
+    "operation-ownership/bundles/cfe2233c1e341f42e0fe27f3d3748c2f88d83f51cb363d3249a0b9a49d39884c.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "cfe2233c1e341f42e0fe27f3d3748c2f88d83f51cb363d3249a0b9a49d39884c",
+      "git_matches": 1363,
+      "head": "9af2f8f0e6ce80803bad6b8c250c0073ad50867d",
+      "input_count": 1363,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "1968d44e847f14d462ec89b97a3c53f27123ec49e56bb84cabf8529d13d223b9",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "ordinary-finish/bundles/2de0502c0c145d1047a114d5cf5953fe828e9c5630adeb9c7df6b29a0629c70f.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "2de0502c0c145d1047a114d5cf5953fe828e9c5630adeb9c7df6b29a0629c70f",
+      "git_matches": 1369,
+      "head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "input_count": 1369,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "1c2789703f51eb5f013bdef38db9a9ac5129e050510c4ec11d7f701f0868cacb",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "ordinary-finish/bundles/3804f05a9efa34041499d496a9463329a66251df4e094c36b28c1116d8d0c696.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "3804f05a9efa34041499d496a9463329a66251df4e094c36b28c1116d8d0c696",
+      "git_matches": 1369,
+      "head": "30f7fc533dedc217edbb42e3c473aa6561523b31",
+      "input_count": 1369,
+      "limits": [
+        "Captured working-tree class files are overridden by the explicitly preloaded historical capsules; this is not final-source execution."
+      ],
+      "overlay_source": "ordinary-finish/ordinary-finish-old-contexts/overlay.json",
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "1c2789703f51eb5f013bdef38db9a9ac5129e050510c4ec11d7f701f0868cacb",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "ordinary-finish/ordinary-finish-old-contexts/overlay.json": {
+      "bundle_sha256": "26b903603bd5d55879175ee6333c6dae993d4230209dbb59c6032ecec055e412",
+      "git_matches": 2,
+      "head": "9af2f8f0e6ce80803bad6b8c250c0073ad50867d",
+      "input_count": 2,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "source_kind": "Preloaded historical class capsules"
+    },
     "policy-consume/bundle-3202ad0494e1-32b0aab5a0ae/manifest.json": {
       "autoload_count": 13,
       "bundle_sha256": "c05f40ebbe820b35ef137239029806db1e513a51796c6cbefdfb18a461b8a0c6",
@@ -581,6 +2437,7 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
@@ -598,6 +2455,7 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
@@ -615,6 +2473,7 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
@@ -632,6 +2491,7 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
@@ -649,6 +2509,7 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
@@ -666,11 +2527,117 @@
         "Tracked source scope only; ignored/untracked additions are not inventoried.",
         "Runtime/autoload/runner hashes recorded before execution only; no after metadata receipt."
       ],
+      "non_git_inputs": {},
       "portable_mapping": "reachable root versions; exact named path bytes",
       "runner_sha256": "d762a4fdbdd3805f755c926d32e14ebc4be31b0462dec6ee31c0bed7863c6110",
       "runtime": {
         "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
         "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-corrections/bundle-05e66dfb9793-0cad85a0f435/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "0b9b8148c6cdaf2e89fd18c2a1a9fe7cc090357652d355382ae3490e6dcb445f",
+      "git_matches": 1445,
+      "head": "05e66dfb97931cd4f172bb741ded75da6f95d4ee",
+      "input_count": 1447,
+      "limits": [
+        "Generated bootstrap/cache metadata hashes are observed runtime inputs, not Git-bound source."
+      ],
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "39eda9fecfa916298c7b23c570cd5bf1716227d4301cc001b7bc18086485cde9",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-corrections/bundle-81b71cfc0d7c-c3fd469b8a9c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b21653e0dc7cdc923fa50b8e786926bc7283f86e137977980789ec30bbf0f0e8",
+      "git_matches": 1445,
+      "head": "81b71cfc0d7cc8fec45efb00b2deae54ebe627bb",
+      "input_count": 1447,
+      "limits": [
+        "Generated bootstrap/cache metadata hashes are observed runtime inputs, not Git-bound source."
+      ],
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "39eda9fecfa916298c7b23c570cd5bf1716227d4301cc001b7bc18086485cde9",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "policy-corrections/bundle-ff80d278c424-7fd4b0c12a4b/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "5d45213bb9b26dd61c86f7e10b873329190e0dc5b6bd0273da749d3ddd12fabb",
+      "git_matches": 1445,
+      "head": "ff80d278c424fc19ecef6ed309ff77a0f348ab17",
+      "input_count": 1447,
+      "limits": [
+        "Generated bootstrap/cache metadata hashes are observed runtime inputs, not Git-bound source."
+      ],
+      "non_git_inputs": {
+        "bootstrap/cache/packages.php": "783751092fb889eeb695ec8a7b045ff0ec389f279fbb6f2211ba477b26cd6ba8",
+        "bootstrap/cache/services.php": "48bbdc4ba3ee479db1c801962dea0962cd597031ddd2227cbb829832c508659f"
+      },
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "39eda9fecfa916298c7b23c570cd5bf1716227d4301cc001b7bc18086485cde9",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "read-environment/green/source.json": {
+      "autoload_count": 12,
+      "bundle_sha256": "01b28f495b35cd3934d275e706bd7a3a8afaeabb98daa91b706490e8f88e1706",
+      "git_matches": 1540,
+      "head": "02cefb83cbc8a314f8da00191349f76303f9a693",
+      "input_count": 1540,
+      "limits": [
+        "Source and autoload before/after are recorded; external runner hash is captured before execution only."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "479260be847b82c26176872e89310d3f5384304af1222dcb3630e5c6c38a0de1",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies"
+      }
+    },
+    "read-environment/red-v2/source.json": {
+      "autoload_count": 12,
+      "bundle_sha256": "1270ac5570b140e8a99178a486dd24b7a7dee49ecfabd86864f13ede1384e732",
+      "git_matches": 1540,
+      "head": "207a56712b4d8718db991a80f2fbc90ed2300739",
+      "input_count": 1540,
+      "limits": [
+        "Source and autoload before/after are recorded; external runner hash is captured before execution only."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "479260be847b82c26176872e89310d3f5384304af1222dcb3630e5c6c38a0de1",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies"
+      }
+    },
+    "read-environment/red/source.json": {
+      "autoload_count": 12,
+      "bundle_sha256": "42f268b122cf883b916722a488b6b391523337bf3ed236ab545df79c6668ff77",
+      "git_matches": 1540,
+      "head": "b5e309b4d2da8f7e5a73a5ada79459fae5f226bb",
+      "input_count": 1540,
+      "limits": [
+        "Source and autoload before/after are recorded; external runner hash is captured before execution only."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "479260be847b82c26176872e89310d3f5384304af1222dcb3630e5c6c38a0de1",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies"
       }
     },
     "reader/bundles/3832f0eaa44e20246ff577268108f2d90def7a25cea713845091e54e762aa7ba.json": {
@@ -749,9 +2716,798 @@
         "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies",
         "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
       }
+    },
+    "root-activation-initial/bundle-c2523e9834af-96a12a44aba1fd67/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "67df257b85d70395f378278df6309c9a33a53d85714fd342fac070567480ebd3",
+      "git_matches": 2309,
+      "head": "c2523e9834af29122ddcc51e74ebe21d9b176a3c",
+      "input_count": 2309,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-activation-mysql-initial/bundle-3598015defb2-b44c83d7cd7aceb0/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "9599b9e3667d05ff8067e0b8bd1e677cb1bd5a47bd0dc05f9ed2b7669b5da73e",
+      "git_matches": 2312,
+      "head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "input_count": 2312,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-activation-mysql-private-plan/bundle-61bebdcfaf2f-7537d058f36ad230/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "f765697600b13c045bbc2ce83e59b4b53f506782504b771d19e068819f3689d9",
+      "git_matches": 2312,
+      "head": "61bebdcfaf2fe4ca647dfd503f15e1a63bceadcc",
+      "input_count": 2312,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-activation-sqlite-atomic-capture/bundle-d25f160c0722-4930f6a1cef33f4a/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b874cc3fe1e37f064e813747109444bc6c97fdf8883f4ce077cedf9b3455a83d",
+      "git_matches": 2312,
+      "head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "input_count": 2312,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-activation-sqlite-fixed/bundle-3598015defb2-2dc9023a49ee7a2c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "9599b9e3667d05ff8067e0b8bd1e677cb1bd5a47bd0dc05f9ed2b7669b5da73e",
+      "git_matches": 2312,
+      "head": "3598015defb2179a6a163f29d7f411815a94c892",
+      "input_count": 2312,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-completed-readback-mysql-positive/bundle-a24979ae2ffa-afaee327952d8c8e/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "ee83b1d60b941274cbba5eb9f5a8a67f32b90797a44d6d9e6990ab8b7dca1003",
+      "git_matches": 2318,
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-completed-readback-ownership/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "ee83b1d60b941274cbba5eb9f5a8a67f32b90797a44d6d9e6990ab8b7dca1003",
+      "git_matches": 2318,
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-completed-readback-sqlite-positive/bundle-a24979ae2ffa-88bbff7f0e44343a/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "ee83b1d60b941274cbba5eb9f5a8a67f32b90797a44d6d9e6990ab8b7dca1003",
+      "git_matches": 2318,
+      "head": "a24979ae2ffa2814ee3cdc8ea5558384149230ff",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-durable-recorder-smoke/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-final-sqlite-integration-retention-phase/bundle-3543b71fed3c-f857493febb6cbd9/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-lifecycle-current-balances/bundle-00867c742843-2f82e314ce429ec4/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "90437a8eebc5e39ec7b9380a5be09be3ddb4aca2df5e7fae63fce1097c8a461b",
+      "git_matches": 2317,
+      "head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-consume-release-failure/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "1d472fdb4eba9828effc79ff7c4ab1d309711c551b0e4764797643ba0f7fbe70",
+      "git_matches": 2318,
+      "head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-phase-diagnostic/bundle-d25f160c0722-0dc44b3d39dfcec2/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b874cc3fe1e37f064e813747109444bc6c97fdf8883f4ce077cedf9b3455a83d",
+      "diagnostic_only": true,
+      "git_matches": 2312,
+      "head": "d25f160c0722ee2e07653fad40d2faeaa6c13029",
+      "input_count": 2312,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded.",
+        "Timing overlays add native STDERR writes and try/finally tracing; not unmodified-source acceptance or performance evidence. Original caps and test body unchanged."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "0a0e696315de502d8c6dcd53b7191bc0492e862b4ff830cfa3d5e91fb9187a81",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-postcommit-recovery/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "446ef07667aa795633acf28e30d95b186a867eaf651c65165106df434b76ea17",
+      "git_matches": 2318,
+      "head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-private-batching-readback-error/bundle-00867c742843-23cf2e3db76d2461/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "90437a8eebc5e39ec7b9380a5be09be3ddb4aca2df5e7fae63fce1097c8a461b",
+      "git_matches": 2317,
+      "head": "00867c742843bde196e492a25277c4e9e3d66783",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-race-contention-failure/bundle-8f62c7cb1725-61526bba22caa81e/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "446ef07667aa795633acf28e30d95b186a867eaf651c65165106df434b76ea17",
+      "git_matches": 2318,
+      "head": "8f62c7cb1725e9215f606e19db18fc16213e2c18",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-race-preparation-failure/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "ee83b1d60b941274cbba5eb9f5a8a67f32b90797a44d6d9e6990ab8b7dca1003",
+      "git_matches": 2318,
+      "head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-race-refusal-locations/bundle-72dbd1b45d54-2a65d6bfad55ea0f/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "1d472fdb4eba9828effc79ff7c4ab1d309711c551b0e4764797643ba0f7fbe70",
+      "git_matches": 2318,
+      "head": "72dbd1b45d547d2be608cd77e7f3fe15528dead5",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-rollback-recovery-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded.",
+        "Original process exit and uninterrupted source-after observation are unavailable.",
+        "The fresh comparisons do not recreate the original runner completion or establish its process exit.",
+        "Both original provider testcases have green JUnit/log; this receipt is partial until observed execution/runner closure is available.",
+        "Read mysql-activation-shared-coordination-rollback-recovery/recovery-wording-correction.md alongside the unchanged original recovery wording."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-terminal-interrupted/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded.",
+        "Original process exit and uninterrupted source-after observation are unavailable.",
+        "The fresh comparisons do not recreate the original runner completion or establish its process exit.",
+        "Both original provider testcases have green JUnit/log; this receipt is partial until observed execution/runner closure is available."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-native-write-denial/bundle-4c84b0445fc9-9d5ca7cc0eb49538/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "ee83b1d60b941274cbba5eb9f5a8a67f32b90797a44d6d9e6990ab8b7dca1003",
+      "git_matches": 2318,
+      "head": "4c84b0445fc9ea3e56f4ef184bb9de2507904253",
+      "input_count": 2318,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-ordinary-award/bundle-745ccddc2eb3-5cd5f61e1aceaa25/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "019fd06d053704ac46bb2956625cbc22cf24ca68ee2eeaf159e223427d3481ed",
+      "git_matches": 2301,
+      "head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "input_count": 2301,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-ordinary-reservation/bundle-26b873de4010-f4da21f40459ace8/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "019fd06d053704ac46bb2956625cbc22cf24ca68ee2eeaf159e223427d3481ed",
+      "git_matches": 2301,
+      "head": "26b873de40104fbe8597105f65aa773c69558e86",
+      "input_count": 2301,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-private-batching-ownership-fixed/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "0f53e38426da5932671190371f397b1958290c82fed53ec645fe66d0e695139c",
+      "git_matches": 2317,
+      "head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-private-batching-ownership-fixture-error/bundle-89cf40f01298-26cc0521eebdb32e/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "63c9976142d5266a90934c164a033c21dba3311fe3d545567bc4eee19f0d684f",
+      "git_matches": 2317,
+      "head": "89cf40f0129822df82f44777811c709c704c6c62",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-private-batching-sqlite-lifecycle-expectation-error/bundle-a47e0d69ca59-ff1b50dd73cca93a/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "0f53e38426da5932671190371f397b1958290c82fed53ec645fe66d0e695139c",
+      "git_matches": 2317,
+      "head": "a47e0d69ca593efd0ed945aebff7b4007bebe5f5",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-native-full-race/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-native-parent-codec-error/bundle-4990315a31b2-9771cbed42785838/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "59f4c7b8e838233b7db58ecb7d2f86ebc90c7c7c3ecd45006842e5a22c69262f",
+      "git_matches": 2320,
+      "head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-native-rollback-recovery-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-native-terminal-pass/bundle-3543b71fed3c-9e5e80b53fbac18c/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "b81803b222e25a61b104e05e34372ab38d066a5a3a923925d2d5168bb87953cd",
+      "git_matches": 2320,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": "vaseyaudio_member_activation_root",
+          "version": "8.4.11"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-sqlite-cleanup/bundle-5a5790f16bbc-304be34b9f5bed8f/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "d332816d707091b7dd4826df18b52b1de1a3a6cc69b71336ffccf46afc43201a",
+      "git_matches": 2320,
+      "head": "5a5790f16bbc24939b770935d7c3ad8d15e7b2c8",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-sqlite-initial/bundle-67002abd1143-1218be174edfdf10/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "975292fbbbc671ca5ceef4705dfe3ceda0d5767fe6ff9fe6892cf4af9f79f769",
+      "git_matches": 2319,
+      "head": "67002abd1143413f06cbb4c5fc6dd2d6b280f85c",
+      "input_count": 2319,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-shared-coordination-sqlite-tail/bundle-4990315a31b2-a638010cf33d9b73/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "59f4c7b8e838233b7db58ecb7d2f86ebc90c7c7c3ecd45006842e5a22c69262f",
+      "git_matches": 2320,
+      "head": "4990315a31b2b7b87dd46282559ba9ebb5f75310",
+      "input_count": 2320,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "root-withdrawal-oracles-fixed/bundle-91581edb48ac-c4b7dfe1caba23fe/manifest.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "c96cc5bdeff8d24636669c083c28173b845219181743ea34a4cb3789bc6730ff",
+      "git_matches": 2317,
+      "head": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "input_count": 2317,
+      "limits": [
+        "Tracked source plus actual directory inventory; undeclared files refused unread. bootstrap/cache and Python bytecode excluded."
+      ],
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "d34758df89a01b51ea447d1d236c11388f8f3e6e4ed635715d73119f1ba84124",
+      "runtime": {
+        "database": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+      }
+    },
+    "selection-join/bundles/944e0d38d2f183268cc9ef5469e556f8914c56e00209398734e3738268893b1d.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "944e0d38d2f183268cc9ef5469e556f8914c56e00209398734e3738268893b1d",
+      "git_matches": 1340,
+      "head": "68bd2864c0589e06297d0e69120bb0dc26d3aa1d",
+      "input_count": 1340,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "9c0fc8f5aeca19e11f6e35a3a154452821f676fb97b379f41d04bc1df1078e1c",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
+    },
+    "selection-join/bundles/9ab77113deb7f079d3e3fdab259ed1975dd1892745e91dae8ea5b602e7d593ba.json": {
+      "autoload_count": 13,
+      "bundle_sha256": "9ab77113deb7f079d3e3fdab259ed1975dd1892745e91dae8ea5b602e7d593ba",
+      "git_matches": 1341,
+      "head": "aef13ed47e4d57b17a47a53d2502084d70838291",
+      "input_count": 1341,
+      "portable_mapping": "reachable root versions; exact named path bytes",
+      "runner_sha256": "9c0fc8f5aeca19e11f6e35a3a154452821f676fb97b379f41d04bc1df1078e1c",
+      "runtime": {
+        "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+        "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+      }
     }
   },
   "static": {
+    "acceptance-preparation/static-result.json": {
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0
+      ],
+      "git_verified": true,
+      "head": "014709a35b1454ae87ad50d900eee2c296876e46",
+      "source_count": 2
+    },
+    "historical-read/composed-745ccddc/result.json": {
+      "command_exits": {
+        "autoload": 0,
+        "entry-refusal": 0,
+        "lint-0": 0,
+        "lint-1": 0,
+        "lint-2": 0,
+        "lint-3": 0,
+        "lint-4": 0,
+        "ownership": 0,
+        "pint": 0
+      },
+      "database_execution": false,
+      "observed_head": "745ccddc2eb3aac87521eb6d8443b5b1b7c986d2",
+      "smoke": "Three entry refusals; not PHPUnit tests or successful authority"
+    },
+    "historical-read/static-final.json": {
+      "before_after_equal": true,
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_head": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
+      "source_count": 5
+    },
+    "historical-read/static-initial.json": {
+      "before_after_equal": true,
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "observed_head": "0d5b43eec37d658847cefb24e3d59ea82d4b3f9f",
+      "source_count": 5
+    },
     "integration-preparation/preparation-commit-binding.json": {
       "behavioral_execution": false,
       "git_verified": true,
@@ -782,13 +3538,69 @@
       ],
       "observed_head": "4bc0e54c19d76595868411c7df2562d2bfcea87b",
       "source_count": 3
+    },
+    "read-environment/static-result.json": {
+      "before_after_equal": true,
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "observed_head": "02cefb83cbc8a314f8da00191349f76303f9a693",
+      "source_count": 2
+    },
+    "root-ci-policy/result.json": {
+      "behavioral_execution": false,
+      "git_verified": true,
+      "head": "91581edb48ac430fd9e059c6d1592114d386b821",
+      "local_policy_unittest_counts": [
+        52,
+        50,
+        61,
+        32,
+        14
+      ],
+      "scope": "Local synthetic CI policy self-tests only. No application DB test bodies or hosted dispatch. Complete declared scripts/ci/workflow/dependency/policy inputs captured before and after.",
+      "source_count": 43
+    },
+    "root-final-ci-policy/result.json": {
+      "behavioral_execution": false,
+      "git_verified": true,
+      "head": "75629871a75868b4e67299f0c5017350d302812c",
+      "local_policy_unittest_counts": [
+        52,
+        50,
+        61,
+        32,
+        14
+      ],
+      "scope": "Local synthetic CI policy self-tests only. No application DB test bodies or hosted dispatch. Complete declared scripts/ci/workflow/dependency/policy inputs captured before and after.",
+      "source_count": 43
+    },
+    "root-final-frozen-bindings/member-activation-final-bindings-20261014.json": {
+      "behavioral_execution": false,
+      "git_verified": true,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "source_count": 50
+    },
+    "root-final-quality-discovery/result.json": {
+      "behavioral_execution": false,
+      "exits": [
+        0,
+        0
+      ],
+      "git_verified": true,
+      "head": "3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d",
+      "source_count": 2327
     }
   },
   "storage": {
-    "archive_bytes": 611479,
-    "delta_objects": 9,
-    "original_unique_bytes": 3151616,
-    "release_members": 152,
-    "unique_objects_including_manifests": 123
+    "archive_bytes": 4404705,
+    "delta_objects": 16,
+    "original_unique_bytes": 19279761,
+    "release_members": 758,
+    "unique_objects_including_manifests": 557
   }
 }

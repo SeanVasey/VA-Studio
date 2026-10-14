@@ -66,5 +66,545 @@
       "Cleanup 1/6 selects one added method, not a whole-file rerun.",
       "Source inventory covers tracked paths; runtime and runner are identified before invocation, without retained after metadata checks."
     ]
+  },
+  {
+    "id": "selection-join",
+    "runtime_root": "/workspace/runtime/member-activation-selection-evidence",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "d1ae0a2b5ecd3d8f1a315e8e427b09993418a10d6c096c86110200361971b9a3",
+    "scope": "Pure complete ledger selection-join correction",
+    "limits": [
+      "Old-source intended failure retained; fixed full selected 43/129 pass.",
+      "No actual issuer, database statements, renderer or native concurrency.",
+      "New runner includes TestCase.php and the reflected fixture test; it does not repair earlier capture limits."
+    ]
+  },
+  {
+    "id": "policy-corrections",
+    "runtime_root": "/workspace/runtime/member-consumption-policy-evidence",
+    "manifest": "public-release-v2.json",
+    "manifest_sha256": "a4db8570131c4f6fa8eefd9c29db7c5980c2c49940e6a8836d084d3a36a89a2b",
+    "scope": "Pure policy/display correction and near-capacity complete ledger cleanup",
+    "limits": [
+      "Old control/display failure retained; corrected whole v3 file 32/89.",
+      "Near-capacity 1/17 is pure real codec/ledger work; no database or renderer.",
+      "All three invocations use 1 GiB PHP memory limit; no 512 MiB invocation claim.",
+      "Each bundle captures 1,447 inputs, including two generated bootstrap/cache hashes outside Git source."
+    ]
+  },
+  {
+    "id": "root-ordinary-award",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-ordinary-award-v1.json",
+    "manifest_sha256": "fb70b0c1277a9c459a12c7535fefe00a3ce24958960d2397d08c80c48743a099",
+    "scope": "Actual affected ordinary award commit and replay on SQLite",
+    "limits": [
+      "One ordinary award case only; no activation or native claim.",
+      "Root exclusive DB slot; no performance claim.",
+      "All 2,301 observed declared source inputs match exact root 745ccddc and remain unchanged."
+    ]
+  },
+  {
+    "id": "root-ordinary-reservation",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-ordinary-reservation-v1.json",
+    "manifest_sha256": "2e73804013aaf6e5bfc6f66c6b02f5586788a58b98a52e43ca523d54ddba406f",
+    "scope": "Actual ordinary reservation once, exact retry and award replay on SQLite",
+    "limits": [
+      "One affected ordinary reservation case only; no activation or native claim.",
+      "Root exclusive DB slot; no performance claim.",
+      "All 2,301 observed declared source inputs match exact root 26b873de and remain unchanged."
+    ]
+  },
+  {
+    "id": "historical-read",
+    "runtime_root": "/workspace/runtime/member-activation-read-evidence",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "d221ab51a0490fabbe901323fda5be7a90972fda0eda5703781a100d154d33d0",
+    "scope": "Historical read helper preparation, pure ownership and entry refusals",
+    "limits": [
+      "Observed 745ccddc plus five untracked new classes later bound to 766569fc; no exact 766569fc execution claim.",
+      "Autoload regenerated within command block; no unchanged per-test runtime metadata claim.",
+      "No DB, actual owner/history/renderer authority; three smoke entry refusals are not PHPUnit case counts.",
+      "Initial Pint failure capsules and narrative-only archive-verifier path typo retained."
+    ]
+  },
+  {
+    "id": "acceptance-preparation",
+    "runtime_root": "/workspace/runtime/member-activation-acceptance-preparation",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "43f51b72ff5f4eef9f906315d7dacad8644524b99f56ad9024fe53f1e2bb26c8",
+    "scope": "Static acceptance and native test preparation only",
+    "limits": [
+      "No PHPUnit or database execution, native concurrency or behavior count.",
+      "Author 014709a3 integrated at root c74a9c85; static source binding only."
+    ]
+  },
+  {
+    "id": "root-activation-initial",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-activation-first-failure-v1.json",
+    "manifest_sha256": "cb1c3b5e41e695411cb5bbcffe4ecb34586342eef5fec3889cee60a0355255b6",
+    "scope": "Initial actual SQLite confirmation/conservation/activation/readback selection; failed before activation write",
+    "limits": [
+      "Actual 1/18 setup/runtime error, process exit2; not an intended assertion-red case.",
+      "No successful activation or subsequent phases inferred.",
+      "Captured 2,309 declared source inputs and runtime identities unchanged at exact c2523e98."
+    ]
+  },
+  {
+    "id": "ordinary-finish",
+    "runtime_root": "/workspace/runtime/member-activation-operation-evidence",
+    "manifest": "ordinary-finish-release.json",
+    "manifest_sha256": "b2670910d3c2e8582691043b677531872608db0aaa963ae26f13b73b823f939b",
+    "scope": "Affected ordinary finish closure regression on SQLite",
+    "limits": [
+      "Two separately filtered old Context overlays each fail 1/14; corrected source passes 2/44.",
+      "Overlays preload exact historical class capsules; physical working source inventory remains the fixed source.",
+      "No activation final-tail or six prepared phase-case behavior claim."
+    ]
+  },
+  {
+    "id": "read-environment",
+    "runtime_root": "/workspace/runtime/member-activation-read-evidence/environment-correction",
+    "manifest": "release-manifest.json",
+    "manifest_sha256": "298a35783f38789b7f3b6b91e361a44fa8ad73cc063da43e54f0bff8f98efc63",
+    "scope": "Pure actual Container environment binding correction",
+    "limits": [
+      "Initial setup 4/0 with four errors retained; old-reader 4/7 with three failures; corrected 4/9 passes.",
+      "No database or actual owner/frame admission.",
+      "Source and autoload are observed before/after; external runner digest is recorded before execution only."
+    ]
+  },
+  {
+    "id": "operation-ownership",
+    "runtime_root": "/workspace/runtime/member-activation-operation-evidence",
+    "manifest": "ownership-release.json",
+    "manifest_sha256": "7369b443128128d8ca6d16f6b974a74584fdb859d6242c4dc6d9675f366e23ca",
+    "scope": "Historical pure ownership invocation at author 9af2f8f0",
+    "limits": [
+      "Seven tests / 11 assertions pass; 1,363 declared inputs and runner/autoload unchanged.",
+      "Pre-finish and pre-read-environment source; no final integrated application or six confirmation-case claim."
+    ]
+  },
+  {
+    "id": "root-activation-sqlite-fixed",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-activation-sqlite-fixed-by-evidence.json",
+    "manifest_sha256": "4e3eb5eb03ecf481c098963c90c00a78c23664956a9eeaa557a8a5722a52ab81",
+    "scope": "Actual corrected SQLite confirmation, conserved activation and readback canary at root 3598015d",
+    "limits": [
+      "One selected test / 57 assertions pass; process/verifier exits 0, zero errors/failures/skips.",
+      "All 2,312 captured inputs plus runner/autoload/HEAD/status unchanged.",
+      "The earlier actual canary error remains in a separate immutable release. No native or production claim."
+    ]
+  },
+  {
+    "id": "root-activation-mysql-initial",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-activation-mysql-initial-v1.json",
+    "manifest_sha256": "bee29e1ed2bfa8fc1924308437cc980ea738568280517fda0203a155efdf681e",
+    "scope": "Original unmodified MySQL8.4.11 activation canary; failed in mandatory preinsert proof",
+    "limits": [
+      "Native1/18,error1,process2/verifier1. No native inserts or successful activation inferred.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-activation-mysql-private-plan",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-activation-mysql-private-plan-v1.json",
+    "manifest_sha256": "496c21eb8b9731670a256dbb58d957312e03b424ded826a4b96aa1c29d0dbb25",
+    "scope": "Unmodified MySQL8.4.11 private grant-plan correction; failed during final committing closure",
+    "limits": [
+      "Native1/18,error1,process2/verifier1. Reached inserts and fresh graph audit, refused before physical commit; no durable activation inferred.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-activation-sqlite-atomic-capture",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-activation-sqlite-atomic-capture-v1.json",
+    "manifest_sha256": "191a9f9c2ffa3e48ca26b64d48c934951bd68891230f0d92a8b4b904094d1089",
+    "scope": "Actual SQLite integration3, retention4 and phase6 selection at atomic capture source",
+    "limits": [
+      "13/328 passes with zero errors/failures/skips; separate source from later private batching. No native concurrency claim.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-private-batching-ownership-fixture-error",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-private-batching-ownership-fixture-error-v1.json",
+    "manifest_sha256": "709725f748f7d140d01e8ace7b8d1ca2454252a7730e9b969bf29a6890c652b7",
+    "scope": "Pure ownership selection with invalid manifest fixture before intended refusal",
+    "limits": [
+      "8/9,error1,process2/verifier1; setup fixture error is not intended behavioral red. Later selected case unrun.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-private-batching-ownership-fixed",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-private-batching-ownership-fixed-v1.json",
+    "manifest_sha256": "14d5a1acd08571cfd1c033e62ca5f17740b8352e202c655464b903c0f7080020",
+    "scope": "Corrected pure ownership refusal selection at a47",
+    "limits": [
+      "9/13 passes zero errors/failures/skips. Exact source and fixture correction; no comprehensive real permit replay/materialization proof.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-private-batching-sqlite-lifecycle-expectation-error",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-private-batching-sqlite-lifecycle-expectation-error-v1.json",
+    "manifest_sha256": "04d665adaad6953cd47278aeff3a4253d3fdb96bb5d330f61b8c8909b73dbf3c",
+    "scope": "Actual SQLite private batching selection; lifecycle replay expected stale balances",
+    "limits": [
+      "15/407,failure1,process1/verifier1. Integration3, retention5 and phase6 passed. Lifecycle failed after release; last honor case unrun. No native acceptance.",
+      "Only named public synthetic commands/results/logs/JUnit and source/runtime hashes. No private environment, generated PDFs/audio or database bytes.",
+      "All declared inputs, runner, autoload, HEAD and status remained unchanged; no performance or host/provider claim."
+    ]
+  },
+  {
+    "id": "root-lifecycle-current-balances",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-lifecycle-current-balances-v1.json",
+    "manifest_sha256": "43c07b59e6777d9720bc8124eb483e3aeabb2937d968e0d879540a9263c30675",
+    "scope": "Actual SQLite ordinary lifecycle and genuine no-prior-terminal exact-honor refusal",
+    "limits": [
+      "2/90 pass,zeroall,0/0. Fixes stale replay-balance assertion only; previous15/407failure retained separately.",
+      "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+      "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+    ]
+  },
+  {
+    "id": "root-native-private-batching-readback-error",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-private-batching-readback-error-v1.json",
+    "manifest_sha256": "22a6d8dbee78c154f93f33cd3635e35e67beaa7116a223b658103a814c377113",
+    "scope": "Unmodified MySQL8.4.11 positive activation canary; final post-I/O historical readback Budget refusal",
+    "limits": [
+      "1/18,error1,2/1. Completion distinctcommitted/finish/postfinish returned; first historical inspection and detached byte observe/verify returned; failure is SECOND/final inspect committing raw, not first. No successful native return or post-return durablegraph assertions.",
+      "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+      "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+    ]
+  },
+  {
+    "id": "root-withdrawal-oracles-fixed",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-withdrawal-oracles-fixed-v1.json",
+    "manifest_sha256": "cc9e1df12f6a519869f645a52618edebaaef4ad16562f9b802b7527007c6641b",
+    "scope": "Actual SQLite rendering, normal final committing and origin encryption catalog withdrawal with observations asserted outside catches",
+    "limits": [
+      "3/66 pass,zeroall,0/0. Actual hook/update/transaction observations asserted outside wrapped domain refusal, closing callback false-positive oracle.",
+      "Exact declared inputs, runner, autoload, HEAD and status remained unchanged. Separate source/run; no performance, host/provider or production claim.",
+      "Only explicitly named public synthetic text receipts released; no generated PDF/audio, environment secrets or database bytes."
+    ]
+  },
+  {
+    "id": "root-native-phase-diagnostic",
+    "runtime_root": "/workspace/runtime/member-activation-native-phase-diagnostic-20261014",
+    "manifest": "release-manifest-v1.json",
+    "manifest_sha256": "6100e9b21f91cf1d97c6a92c9867f0bc671ead6282aa361ca288f7ae7b998004",
+    "scope": "Timing-only native failure at d25 with explicitly preloaded instrumented classes",
+    "limits": [
+      "Eight class timing overlays plus native STDERR helper. Diagnostic only; not unmodified acceptance or performance proof.",
+      "Only named public synthetic text released. Source/runner/runtime/overlay hashes are preserved; no environment files, generated PDF/audio, key or database bytes."
+    ]
+  },
+  {
+    "id": "root-ci-policy",
+    "runtime_root": "/workspace/runtime/member-activation-ci-policy-20261014",
+    "manifest": "release-manifest-v1.json",
+    "manifest_sha256": "791ebf91d0384f3b076b1a8e90fc59608f248dc93f15b960c1b6959e6e8cb285",
+    "scope": "Local synthetic CI policy self-tests at915",
+    "limits": [
+      "Five Python unittest selections52/50/61/32/14 pass,209 reportedchecks; not PHP/application or hosted database execution.",
+      "Only named public synthetic text released. Source/runner/runtime/overlay hashes are preserved; no environment files, generated PDF/audio, key or database bytes."
+    ]
+  },
+  {
+    "id": "root-completed-readback-ownership",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-completed-readback-ownership-v1.json",
+    "manifest_sha256": "95b2041dad05601f027a0cc98020498b8b2b367653d3d592763ce5d2c5290322",
+    "scope": "Pure completed-handoff ownership and restoration refusals",
+    "limits": [
+      "11 tests /17 assertions; not real carrier replay.",
+      "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+      "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+    ]
+  },
+  {
+    "id": "root-completed-readback-sqlite-positive",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-completed-readback-sqlite-positive-v1.json",
+    "manifest_sha256": "595e8a21be054ae129d12e17a4c38e1eb08c1753613071ba7fa40fe93a2737eb",
+    "scope": "Actual SQLite completion, atomic graph, conservation, original readback and registry cleanup",
+    "limits": [
+      "1 test /59 assertions; genuine synthetic producers, no native concurrency claim.",
+      "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+      "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+    ]
+  },
+  {
+    "id": "root-completed-readback-mysql-positive",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-completed-readback-mysql-positive-v1.json",
+    "manifest_sha256": "7fd051e85b8e922b3115893994054866ab0ae71696eccf1f1f22d704195fa085",
+    "scope": "Unmodified private MySQL8.4.11 completion, atomic graph, conservation, original readback and registry cleanup",
+    "limits": [
+      "1 test /59 assertions; focused native canary only, not representative performance or host evidence.",
+      "Zero failures/errors/skips, process/verifier0; all2318 declared inputs, runner, loaders, HEAD and status unchanged. Source a24979ae exact; no overlays.",
+      "Only named public synthetic text receipts; no environment secrets, generated PDFs/audio or database bytes. Original failures remain separate releases."
+    ]
+  },
+  {
+    "id": "root-native-write-denial",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-write-denial-v1.json",
+    "manifest_sha256": "e6525babbe0b322d19ee27dcde6c77b50f1456825ebde237f9d3ca9823f4e90e",
+    "scope": "Actual private MySQL8.4.11 INSERT1142 rollback at all four atomic target tables",
+    "limits": [
+      "4/940 pass, zero failures/errors/skips, process/verifier0. Exact target error and complete rollback/idle/account cleanup asserted.",
+      "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+      "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-race-preparation-failure",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-race-preparation-failure-v1.json",
+    "manifest_sha256": "c547a092208157cf7767fa74d54c9e19a265c1186bf76308816be0f8cc90c01e",
+    "scope": "Original outer preparation failure, before contention",
+    "limits": [
+      "1/13 with one failure, process/verifier1. Worker1 readiness expired before worker2 or contention; teardown terminated worker. No race proof.",
+      "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+      "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-race-contention-failure",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-race-contention-failure-v1.json",
+    "manifest_sha256": "6669eb3088f55e85373daff62dcf1d98473c75ab3b4380f4a8256e20071c792e",
+    "scope": "Authentic two-worker contention with failed strict successful-writer requirement",
+    "limits": [
+      "1/33 with one failure, process/verifier1. Two real owner-row waits but neither worker returned receipt. Exact failed frame and persisted effects were not recorded.",
+      "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+      "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-postcommit-recovery",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-postcommit-recovery-v1.json",
+    "manifest_sha256": "4585d4e2c000c707796c9d06d2be94f77a73124a366f1c7a3edbff7183a29078",
+    "scope": "Actual private MySQL8.4.11 postcommit flag withdrawal, receipt refusal and explicit read recovery",
+    "limits": [
+      "1/30 pass, zero failures/errors/skips, process/verifier0. One durable graph retained and recovered; focused synthetic case only.",
+      "All2318 captured inputs, runner, autoload, HEAD and worktree status unchanged at the recorded exact source.",
+      "Only explicitly listed public synthetic text receipts. No generated PDF/audio, credentials, environment secrets or database bytes. Mixed-source selections are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-race-refusal-locations",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-race-refusal-locations-v1.json",
+    "manifest_sha256": "fb3532a1d106fdb738ca176912e2fd3e9f0e69dff0da81686699e5c5f7de9496",
+    "scope": "Native early-race failure with bounded sanitized exception locations and raw postworker effect observation",
+    "limits": [
+      "1/33 with one failure, zero errors/skips, process/verifier1; strict successful-writer requirement remains unmet.",
+      "Diagnostic worker metadata only, no product overlays/cap changes. Both completeActivation refusals occurred in reservation source proof (preinsert/final committing). Effective Budget min-shortened; original300 samples do not locate which minimum by themselves.",
+      "Parent raw observation has zero origins/artifacts/activations and award/reserve events; it is not a complete authenticated graph/conservation audit.",
+      "All2318 source inputs/runner/autoload/HEAD/status unchanged at72db. Explicit public synthetic text only, no secrets/PDF/audio/database bytes."
+    ]
+  },
+  {
+    "id": "root-native-consume-release-failure",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-consume-release-failure-v1.json",
+    "manifest_sha256": "eb98fc7427d04f902cfa5242775f71e64e72bfb6dd25e17fed375cbf3143e3d6",
+    "scope": "Native consume/release actual row contention with refused winner receipt",
+    "limits": [
+      "First consume-wins provider failed1/36 with one failure, zero errors/skips, process/verifier1; release-wins unrun under stop-on-defect.",
+      "Actual owned consume committing hold and independent loser users.PRIMARY wait observed; release loser reservation_terminal; winner final readback workflow_deadline. Strict successful-writer oracle failed before graph/conservation queries.",
+      "All2318 captured inputs/runner/autoload/HEAD/status unchanged at72db. Public bounded metadata only; no product cap/clock changes, no synthetic fixture upgraded to host/provider claim."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-sqlite-initial",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-sqlite-initial-v1.json",
+    "manifest_sha256": "d1504973a1ba2b5f39613d8189abd5354859c960ac7b036558b8eb7798c5650e",
+    "scope": "SQLite ownership, actual activation and ordinary lifecycle at initial native scheduling source",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 166, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "67002 source only, before cleanup and acquisition cap corrections; no native scheduling result.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-sqlite-cleanup",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-sqlite-cleanup-v1.json",
+    "manifest_sha256": "70486fc4189c23787dbcc7b3753b5bb5c5d292315863e2873b2734fc67e4893a",
+    "scope": "SQLite focused regression after cleanup cause and acquisition cap corrections",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 166, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "5a source only, before the final private retained-replay terminal wrapper; no native scheduling result.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-sqlite-tail",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-sqlite-tail-v1.json",
+    "manifest_sha256": "1e1ef19a25d87cc6159c969bde18cace9d43f5b294b1d0626c9f0229a14dd241",
+    "scope": "SQLite focused activation/lifecycle regression and pure final tail classification at reviewed499",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 176, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 17}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "Ownership14 includes pure shaped tail values and causes, not completed graph/file/unlock authority. Actual positive1 and ordinary lifecycle2 are genuine synthetic producers. No native scheduling result yet.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-native-parent-codec-error",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-native-parent-codec-error-v1.json",
+    "manifest_sha256": "ba9334677bde809079ca30d0d3501cc4ba542f396281dc173bee7fc498f812d6",
+    "scope": "Actual native coordination ownership and worker receipts, followed by parent stored-plan codec error",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 60, \"errors\": 1, \"failures\": 0, \"skipped\": 0, \"tests\": 1}, \"process_exit\": 2, \"verifier_exit\": 1}",
+      "1 test /60 assertions /1 error, process2/verifier1; no overall native race pass. First worker actual activated receipt95.029s, second actual bounded source_deadline60.005s, actual users/USER LEVEL LOCK waits.",
+      "Raw one origin/artifact/activation and award/reserve/consume counts were observed and counted. Authenticated winner A/R/D, conservation, bytes and explicit recovery assertions after the invalid parent codec remained unrun.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-native-full-race",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-native-full-race-v1.json",
+    "manifest_sha256": "2ed695253576e8a2278328118c62df83ee8e38c4374bbc68006ec8b432dda0bd",
+    "scope": "Actual native scheduling ownership, two genuine confirmations, winner graph/conservation/bytes/recovery and bounded loser",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 78, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 1}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "Strict full case passed1/78 at3543, zero failures/errors/skips and process/verifier0. One actual successful writer plus bounded loser; not two successful replay receipts or host/performance evidence.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-terminal-interrupted",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-terminal-interrupted-v1.json",
+    "manifest_sha256": "a5370974215fa1e5f8740fa4a2997ed72c62eba63ed1e46b1b4ae20f5aa34ff2",
+    "scope": "Interrupted parent runner after two completed native terminal datasets; explicit null exits and fresh reconciliation",
+    "limits": [
+      "Original terminal JUnit/log2/129 zeroall and completed behavior transcripts, but parent process/runner exits unobserved; Partial, not a full pass.",
+      "Fresh metadata reconciliation confirms2320 captured inputs/head/status/autoload/runner match before and Git; cannot recreate uninterrupted original source-after observation or original exit.",
+      "Actual private MySQL8.4.11 provider bodies only; no representative performance, host/provider or production claim."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-native-terminal-pass",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-native-terminal-pass-v1.json",
+    "manifest_sha256": "1b515487bcf880beaee84b4a6a64042a316ee249f39754d2192082682c45a229",
+    "scope": "Observed complete native runner for both consume/release orders with writer receipts, terminal losers and graph conservation",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 129, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 2}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "2/129 pass zero failures/errors/skips, process/verifier0, all2320 captured inputs/runner/autoload/HEAD/status unchanged at3543. Original interrupted2/129 remains separate Partial, not overwritten.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-native-rollback-recovery-interrupted",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-native-rollback-recovery-interrupted-v1.json",
+    "manifest_sha256": "c11f2aa2fb4b809af4930fe3d9fe3a1e9ac94399e7c760b96c07974d52c0e53c",
+    "scope": "Interrupted recorder after four native INSERT-denial datasets and postcommit recovery; original null exits and additive wording correction",
+    "limits": [
+      "Actual JUnit/log: 5 tests /970 assertions, zero failures/errors/skips. Original process and recorder exits are unobserved and remain null.",
+      "Fresh 2320-input metadata reconciliation does not recreate uninterrupted runner closure.",
+      "Read recovery-wording-correction.md alongside the unchanged original recovery-observation.json: this selection is five testcases, not two.",
+      "No native acceptance or exit-zero claim from this partial receipt; no generated PDF/audio, secret or database bytes released."
+    ]
+  },
+  {
+    "id": "root-durable-recorder-smoke",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-durable-recorder-smoke-v1.json",
+    "manifest_sha256": "e5e9f528a2935dd31a8e095ea53e6e972c5476297214a60ca84a14e54aaa2473",
+    "scope": "Pure ownership smoke after detached launcher return; actual recorder completion and immutable launch provenance",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 27, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "Actual 14 tests /27 assertions, zero failures/errors/skips, process/verifier 0. This is a pure launch-supervision smoke, not native or full-suite acceptance.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-shared-coordination-native-rollback-recovery-pass",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-shared-coordination-native-rollback-recovery-pass-v1.json",
+    "manifest_sha256": "62a048b6a750c941b1c88ca1c22be54d99118cef0edcf2ace863a1f32fb3cfee",
+    "scope": "Current-source native four INSERT1142 rollback datasets and postcommit withdrawal with explicit single-graph recovery, completed under durable recorder",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 970, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 5}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "Actual5/970, zero failures/errors/skips, observed process/verifier0 and2320inputs unchanged. Prior interrupted5/970 remains Partial; no ordinary throwing afterCommit callback claim.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-final-sqlite-integration-retention-phase",
+    "runtime_root": "/workspace/runtime/member-activation-root-evidence",
+    "manifest": "release-root-final-sqlite-integration-retention-phase-v1.json",
+    "manifest_sha256": "72fa00f1e17152fb9638bb6556865de652bf33f1eacaf22dee6474312f3b8152",
+    "scope": "Whole affected actual integration, retention and confirmation-phase files on final coordination product source",
+    "limits": [
+      "{\"actual_junit\": {\"assertions\": 348, \"errors\": 0, \"failures\": 0, \"skipped\": 0, \"tests\": 14}, \"process_exit\": 0, \"verifier_exit\": 0}",
+      "Actual14/348, zero failures/errors/skips, process/verifier0,2320inputs unchanged. Focused three-file selection; not the whole repository or a native concurrency claim.",
+      "Only explicitly named public synthetic text receipts; no generated PDF/audio, environment secrets or database bytes. Exact source/runner/autoload/HEAD/status unchanged. Mixed-source runs are not one suite."
+    ]
+  },
+  {
+    "id": "root-final-quality-discovery",
+    "runtime_root": "/workspace/runtime/member-activation-final-quality-20261014",
+    "manifest": "release-root-final-quality-discovery-v1.json",
+    "manifest_sha256": "b9316c9406d4f62f5ec7488005398a0ac09f6ca3c62bbca3263725fb1d392119",
+    "scope": "Final operative Pint and native list-only partition discovery with exact generated cleanup",
+    "limits": [
+      "Pint94 and 24-shard list-only discovery2200/8715 cases in219/647files; no application database bodies or hosted jobs.",
+      "All50 generated outputs captured and exact-hash cleaned. Complete2327 source/CI inputs plus autoload/runner/helper unchanged.",
+      "61 allowed MySQL skip cases across17 methods is a derived census, not an executed skip count."
+    ]
+  },
+  {
+    "id": "root-final-frozen-bindings",
+    "runtime_root": "/workspace/runtime",
+    "manifest": "release-root-final-frozen-bindings-v1.json",
+    "manifest_sha256": "d76ca72bd30a5f4ff6e876f0867967f9b8c70140ba1c2d8080fe368996b99708",
+    "scope": "Read-only frozen profiles and original contract checks plus exact selected SQLite source carry",
+    "limits": [
+      "Six profiles and44member entries match actual C4b merge bytes; no profile/member edits or re-pins.",
+      "Exact499-to3543 diff contains only two native-parent test corrections; this is source carry, not new execution.",
+      "Initial legacy-manifest helper failure and no-write documentation replacement interruption disclosed separately."
+    ]
+  },
+  {
+    "id": "root-final-ci-policy",
+    "runtime_root": "/workspace/runtime/member-activation-final-ci-policy-20261014",
+    "manifest": "release-root-final-ci-policy-v1.json",
+    "manifest_sha256": "bd881bd0b02af6eb2abb7f1754f3f39b1b80faf4be85d5124e5b7d3cd1e2ce71",
+    "scope": "Local CI policy self-tests after actual census documentation update",
+    "limits": [
+      "Actual52+50+61+32+14 Python unittest checks, allfive command exits0,43inputs/runner/HEAD/status unchanged.",
+      "No application DB bodies, hosted preflight, Foundation CI or GitLab dispatch."
+    ]
   }
 ]
