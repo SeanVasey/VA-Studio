@@ -83,7 +83,9 @@ class MemberGrantOrdinaryLifecycleTest extends TestCase
 
         $afterCleanup = $this->memberOriginalEffects();
         $this->refreshReservationObservation($fixture);
-        $this->assertSame($expired, $operations->expire($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
+        // Replay retains the original expiry identity and reports the now-current balances.
+        $this->assertSame([...$expired, 'balances' => $audit['balances']],
+            $operations->expire($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
         $this->assertSame($released, $operations->release($fixture['invoice']['id'], $second['redemption_id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
         $this->assertSame($award, (new MembershipAwards)->award($fixture['invoice']['id'], $fixture['buyer']['principal'], $fixture['buyer']['user']));
         $this->assertEquals($activation, $this->readMemberActivation($fixture));
