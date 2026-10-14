@@ -8,6 +8,18 @@ a production deployment.
 Sources: Paid252 independent review addenda 9 and 10 (A9-I6, C11 (a)–(e)) and Codex rounds 13, 14 and 16
 (`docs/verification/paid252-composition-20261007/`), plus Codex round 23 (C11 (k)).
 
+## Root registration
+
+`paid-grants.http_mounted` ships as `false`. Only the explicit boolean `true` registers the paid routes in the root web
+route build. Root bootstrap supplies the private intake and generic exception reporting/responses; local tests override
+the mount setting before providers boot and use that real wiring. Neither operative nor rehearsal enablement follows
+from registration. All other pre-mount conditions, authored production policy/account inputs and host verification remain
+required before enabling this switch on a production host.
+
+The switch is evaluated when routes are built, including `route:cache`. Changing it requires rebuilding the route cache
+with the intended configuration; changing configuration alone does not replace an existing route cache. No production
+route-cache rebuild or host mounting is claimed by the synthetic development checks.
+
 ## Why these settings matter
 
 - A paid download streams an exact private snapshot through PHP. If a slow client stops reading, PHP's write blocks.
