@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "php",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "Python 3.12.14\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "php",
+      "vendor/bin/phpunit",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n",
+    "stderr": ""
+  },
+  {
+    "phpunit_proxy_sha256": "1fb9d47c7f192da01d06d1574b85a7e1c02b959cc03a969df1a8c0422abfc574",
+    "pint_proxy_sha256": "6550374367378e01df46d1a6bf0bf994a27c1b28b4e61aab518ca2da52c470fb",
+    "autoload_php_sha256": "4f88d20ebf0e8a55b8b362e50fc16fa49d1f4eb767ab5a893f09c636f19c4f73",
+    "composer_classmap_sha256": "d243d423e9dd8b26162def5fe113feb5a29985345e9a527931cc7e60c189f245",
+    "private_bin_path": "/workspace/VA-Studio-member-originals/vendor/bin",
+    "private_composer_metadata_path": "/workspace/VA-Studio-member-originals/vendor/composer"
+  }
+]

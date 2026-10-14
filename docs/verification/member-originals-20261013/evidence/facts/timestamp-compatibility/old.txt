@@ -1,0 +1,18 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-facts/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.023, Memory: 18.00 MB
+
+There was 1 failure:
+
+1) Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentTimestampTest::test_actual_catalog_timestamp_spelling_is_retained_without_changing_hashes
+Valid catalog timestamp spelling was refused: invalid_document
+
+/workspace/runtime/member-original-facts-evidence/timestamp-compatibility/MemberGrantDocumentTimestampTest.php:29
+
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.

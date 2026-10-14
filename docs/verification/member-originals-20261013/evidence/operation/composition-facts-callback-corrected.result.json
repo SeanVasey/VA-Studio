@@ -1,0 +1,16 @@
+{
+  "exit": 0,
+  "seconds": 18.757,
+  "source_count": 2034,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalCompositionTest",
+    "file": "/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+    "tests": "1",
+    "assertions": "25",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "18.482809"
+  }
+}

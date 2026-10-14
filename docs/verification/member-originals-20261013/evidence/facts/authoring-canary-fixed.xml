@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="3.836665">
+    <testcase name="test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="9" time="3.836665"/>
+  </testsuite>
+</testsuites>

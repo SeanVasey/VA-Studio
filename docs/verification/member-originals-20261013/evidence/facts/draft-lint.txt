@@ -1,0 +1,10 @@
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantPolicy.php
+No syntax errors detected in config/member-grants.php
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantRows.php
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantFactsClosure.php
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantAuthoringObserver.php
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantFactsToken.php
+No syntax errors detected in app/Domain/Grants/Member/MemberGrantDefinitions.php
+No syntax errors detected in app/Domain/Grants/Member/SealedMemberGrantFacts.php
+No syntax errors detected in tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php
+No syntax errors detected in tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php

@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "/workspace/runtime/member-originals-quality-evidence/native-budget-followup/seal-receipts.py"
+  ],
+  "exit": 1,
+  "observed_output": "Traceback (most recent call last):\n  File \"/workspace/runtime/member-originals-quality-evidence/native-budget-followup/seal-receipts.py\", line 31, in <module>\n    assert sorted(changed)==sorted(before['selected_php'])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "output_provenance": "Copied from completed execution tool response, not a separately saved original log.",
+  "runner_sha256": "215f1fb6579a083ef8e07121fd4fdfcd88d92abf12a9ec539d13225bd8a7f838",
+  "meaning": "Receipt-verifier assumption was too narrow: historical source delta includes two census-comment files besides the four PHP paths. Pint and discovery had already passed unchanged and are not rerun."
+}

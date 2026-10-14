@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="9" assertions="39" errors="1" failures="0" skipped="0" time="29.485173">
+    <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" tests="8" assertions="34" errors="0" failures="0" skipped="0" time="25.233279">
+      <testcase name="test_real_enrolled_staff_authors_and_deduplicates_without_customer_gate_or_grant_writes" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="9" time="3.994649"/>
+      <testcase name="test_missing_real_mfa_refuses_before_member_rows_are_written" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="54" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="3" time="2.914550"/>
+      <testcase name="test_authoring_flag_is_independent_and_defaults_off" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="61" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="3" time="2.824119"/>
+      <testcase name="test_exact_authenticated_plan_hash_is_required_before_inserts" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="69" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="3" time="3.072025"/>
+      <testcase name="test_committing_callback_configuration_change_rolls_back_both_immutable_rows" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="78" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="3" time="3.173083"/>
+      <testcase name="test_committed_callback_staff_withdrawal_refuses_receipt_while_retaining_durable_rows" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="88" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="4" time="3.147559"/>
+      <testcase name="test_remaining_config_resolution_hook_refuses_committed_authoring_receipt" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="102" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="5" time="3.267821"/>
+      <testcase name="test_caller_outer_transaction_cannot_receive_provisional_authoring_identity" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php" line="120" class="Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantDefinitionsTest" assertions="4" time="2.839473"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsTest" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php" tests="1" assertions="5" errors="1" failures="0" skipped="0" time="4.251893">
+      <testcase name="test_real_authored_facts_yield_detached_snapshot_and_one_combined_committed_frame" file="/workspace/VA-Studio-member-original-facts/tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php" line="55" class="Tests\Feature\ProductionMemberOriginals\MemberGrantFactsTest" classname="Tests.Feature.ProductionMemberOriginals.MemberGrantFactsTest" assertions="5" time="4.251893">
+        <error type="Illuminate\Database\QueryException">Tests\Feature\ProductionMemberOriginals\MemberGrantFactsTest::test_real_authored_facts_yield_detached_snapshot_and_one_combined_committed_frame
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 cannot VACUUM - SQL statements in progress (Connection: sqlite, Database: :memory:, SQL: vacuum "main")
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Util.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Container.php:803
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:292
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Command/Command.php:341
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:261
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:1094
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:356
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:195
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Application.php:165
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452
+/workspace/VA-Studio-member-original-facts/tests/Support/FinalizationDatabaseMigrations.php:32
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

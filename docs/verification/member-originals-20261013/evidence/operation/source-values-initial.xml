@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MemberOriginalSourceValuesTest" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" tests="5" assertions="15" errors="0" failures="1" skipped="0" time="0.013794">
+    <testcase name="test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="13" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="4" time="0.006762">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\MemberOriginalSourceValuesTest::test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    'track_id' =&gt; 1,
++    'asset_manifest_hash' =&gt; 'f17fda42d701ae6d500bb81f44e3a119bf9a4470bce303294c070117e6962f56',
++    'license_manifest_hash' =&gt; 'fd496ad891a3c32efb74f26c358cb2181746214af693aa746e195eeac6f69e55',
++    'license_version_id' =&gt; 4,
+     'offer_id' =&gt; 2,
+     'offer_revision_id' =&gt; 3,
+-    'license_version_id' =&gt; 4,
++    'original_terms_hash' =&gt; 'cec6a196f4483bd7a540de04f1da42f8d651304fc4f751c33fdd5c7181db3949',
+     'selection_hash' =&gt; '1ece5d1269ebe5fe7d4324b2cbf42cc55248f0d9f07c62c7aa4044d5f2d30550',
+-    'license_manifest_hash' =&gt; 'fd496ad891a3c32efb74f26c358cb2181746214af693aa746e195eeac6f69e55',
+-    'asset_manifest_hash' =&gt; 'f17fda42d701ae6d500bb81f44e3a119bf9a4470bce303294c070117e6962f56',
+-    'original_terms_hash' =&gt; 'cec6a196f4483bd7a540de04f1da42f8d651304fc4f751c33fdd5c7181db3949',
++    'track_id' =&gt; 1,
+ ]
+
+/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php:21
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_nested_caller_references_and_returned_arrays_cannot_mutate_retained_source" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="29" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="2" time="0.001347"/>
+    <testcase name="test_historical_identity_observation_remains_in_the_semantic_source_hash" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="44" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="2" time="0.002013"/>
+    <testcase name="test_fresh_observation_fields_are_not_accepted_as_render_source_members" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="56" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="1" time="0.000559"/>
+    <testcase name="test_changed_definition_profile_selection_and_owner_relations_refuse" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="64" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="6" time="0.003114"/>
+  </testsuite>
+</testsuites>

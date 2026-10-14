@@ -1,0 +1,10 @@
+[
+  "app/Domain/Grants/Member/MemberOriginalInspection.php",
+  "app/Domain/Grants/Member/MemberOriginalObserver.php",
+  "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+  "app/Domain/Memberships/Production/MembershipReservationContext.php",
+  "app/Domain/Memberships/Production/MembershipReservations.php",
+  "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+  "tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php",
+  "tests/Support/MemberOriginalCommittedClock.php"
+]

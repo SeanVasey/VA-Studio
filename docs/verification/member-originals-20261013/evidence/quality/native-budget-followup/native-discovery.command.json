@@ -1,0 +1,30 @@
+{
+  "head": "32f083d28db0609a52cade793849a8767a855ae3",
+  "cwd": "/workspace/VA-Studio-member-originals",
+  "argv": [
+    "python3",
+    "scripts/ci/phpunit-shards.py",
+    "--shards",
+    "24",
+    "--prefix",
+    "phpunit-ci-mysql",
+    "--timings",
+    "scripts/ci/phpunit-timings-mysql.json",
+    "--mysql-native-selection"
+  ],
+  "environment": {
+    "APP_ENV": "testing",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "1",
+    "DB_SOCKET": "",
+    "DB_DATABASE": "vaseyaudio_discovery_only",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "array",
+    "QUEUE_CONNECTION": "sync"
+  },
+  "runner_sha256": "a5ff460ad76f79f53b8c94f6e3a0cd0bcf40e448fe73009fca865fcbfb6bc705",
+  "source_receipt_sha256": "4f27ede39efa93eea3a9fe40050bff6707866b9edb3c8bba2bf87378f0c2e56b",
+  "started_utc": "2026-10-13T09:33:45.480788+00:00"
+}

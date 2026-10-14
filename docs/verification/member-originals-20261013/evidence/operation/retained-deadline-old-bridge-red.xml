@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php" tests="2" assertions="43" errors="0" failures="2" skipped="0" time="41.579428">
+    <testcase name="test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php" line="40" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest" assertions="22" time="18.134738">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work
+Original honor must cap detached work.
+Failed asserting that 62042312542569 is equal to 61983827965135 or is less than 61983827965135.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:72
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php" line="78" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest" assertions="21" time="23.444691">
+      <failure type="PHPUnit\Framework\AssertionFailedError">Tests\Feature\ProductionMemberOriginals\MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket
+Expected original retained authority to expire.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:123
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php:100
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

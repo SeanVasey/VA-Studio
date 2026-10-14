@@ -1,0 +1,12 @@
+{
+    "schema_version": 1,
+    "version": "production-member-original-pdf-v1",
+    "files": {
+        "app/Domain/Grants/Member/MemberOriginalRenderInput.php": "6b470c6d2dfadbb74d24bc7263e347985ce92864c29b236aac50d70bd379e3c7",
+        "app/Domain/Grants/Member/MemberOriginalText.php": "959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da",
+        "app/Domain/Grants/Member/MemberOriginalPdfRenderer.php": "f3acf36fcf4938b14a8efb742ad46a17dc7c3001a478833d36a48d09ce5c7ed2",
+        "app/Domain/Grants/Member/MemberOriginalRendererProcess.php": "f0470e91b122b23588088a7361971b9e009f2098d86e9d1321a3cea47c610085",
+        "scripts/member-original-renderer-autoload.php": "adca75e6c55194265c0395df088cf77b8aab37a30923435e3b5e2704ada7193c",
+        "scripts/render-member-original.php": "880ec7590bba84b24c0944986b9c71e6484cd0b63f25b0e55add1b6a7f4be0c3"
+    }
+}

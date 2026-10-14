@@ -10,7 +10,11 @@ use App\Models\User;
 /** Private materialization/readiness capability; a metadata row or claimed path is never ready. */
 interface MemberOriginalArtifactAuthority
 {
-    public function prepare(MemberGrantIntent $intent, MemberGrantFactsProof $facts, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): MemberOriginalArtifactReceipt;
+    public function prepare(MemberOriginalSource $source, MemberOriginalIoFrame $idle): MemberOriginalMaterialization;
+
+    public function verifyCurrentBytes(MemberOriginalMaterialization $materialized, MemberOriginalIoFrame $idle): void;
+
+    public function admitReady(MemberOriginalMaterialization $materialized, MemberGrantIntent $intent, MemberGrantFactsProof $facts, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): MemberOriginalArtifactReceipt;
 
     public function proveReadyCurrent(MemberOriginalArtifactReceipt $receipt, MemberGrantIntent $intent, MemberGrantFactsProof $facts, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): void;
 }

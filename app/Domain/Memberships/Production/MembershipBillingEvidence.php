@@ -62,13 +62,13 @@ final class MembershipBillingEvidence
     /** Native PDO, captured SQL and native UTC only; no application clocks or callbacks. */
     public static function assertCurrentSnapshot(MembershipRows $rows, array $snapshot): void
     {
-        self::assertSnapshot($rows->identity(), $snapshot);
+        self::assertCapturedSnapshot($rows->identity(), $snapshot);
     }
 
     /** Only native PDO and already-built SQL; the caller finishes its original committed frame. */
     public static function assertCommittedSnapshot(IdentityCommittedFrame $frame, array $snapshot): void
     {
-        self::assertSnapshot($frame->reader()->identityPrimary(), $snapshot);
+        self::assertCapturedSnapshot($frame->reader()->identityPrimary(), $snapshot);
     }
 
     public static function same(MembershipInvoiceBinding $expected, MembershipInvoiceBinding $actual): void
@@ -194,7 +194,7 @@ final class MembershipBillingEvidence
         $binding = new MembershipInvoiceBinding($invoice['source_invoice_hash'], $graph, $invoice['provider_account_hash'], $facts['amount_minor'],
             $facts['currency'], $facts['line_period_start'], $facts['line_period_end'], $document->hash(), $document->termsHash(),
             $approved['original_buyer_binding'], $facts['provenance'], $facts['paid_at'], $approved['plan_version_id'], $locator, $tail['freshness_deadline'], $tail['id'], $tail['seal']);
-        self::assertSnapshot($pdo, $snapshot);
+        self::assertCapturedSnapshot($pdo, $snapshot);
 
         return ['binding' => $binding, 'snapshot' => $snapshot, 'freshness' => $window];
     }
@@ -231,7 +231,8 @@ final class MembershipBillingEvidence
         return array_map(fn (array $row): array => BillingValues::integers($row, self::INTEGER_COLUMNS), $statement->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    private static function assertSnapshot(PDO $pdo, array $snapshot): void
+    /** Raw captured PDO and prebuilt predicates only; a snapshot is not a public authority. */
+    public static function assertCapturedSnapshot(PDO $pdo, array $snapshot): void
     {
         MembershipException::require($snapshot['pdo'] === $pdo, 'changed_primary');
         MembershipAwardConfiguration::plainPrimary($pdo);

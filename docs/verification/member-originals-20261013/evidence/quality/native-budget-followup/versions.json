@@ -1,0 +1,30 @@
+[
+  {
+    "argv": [
+      "php",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "Python 3.12.14\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "php",
+      "vendor/bin/phpunit",
+      "--version"
+    ],
+    "exit": 0,
+    "stdout": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n",
+    "stderr": ""
+  }
+]

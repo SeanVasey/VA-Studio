@@ -1,0 +1,20 @@
+{
+  "MemberOriginalSourceCapture": {
+    "source_path": "app/Domain/Grants/Member/MemberOriginalSourceCapture.php",
+    "original_sha256": "0b769153caed6b5164b2eed2bfaf2eb6c95cfeeae42d77c4b6d079996aa57f2f",
+    "overlay_sha256": "12c8850483e16aab8d1a415dbc24bd631429d3568576fa456763f4a55cac8f90",
+    "scope": "Diagnostic timing/exception output only; original deadline formulas, guards and callback ordering unchanged."
+  },
+  "MemberOriginalInspection": {
+    "source_path": "app/Domain/Grants/Member/MemberOriginalInspection.php",
+    "original_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+    "overlay_sha256": "67ef957f0024bc0b8dfeb0197fddb4a05bef64988d18a4920733d9438025bcba",
+    "scope": "Diagnostic timing/exception output only; original deadline formulas, guards and callback ordering unchanged."
+  },
+  "files": {
+    "Diagnostic.php": "517181ff173b9d2d3eeea176da1c337349572e7790ee46d3d9c7a20390fe8691",
+    "MemberOriginalInspection.php": "67ef957f0024bc0b8dfeb0197fddb4a05bef64988d18a4920733d9438025bcba",
+    "MemberOriginalSourceCapture.php": "12c8850483e16aab8d1a415dbc24bd631429d3568576fa456763f4a55cac8f90",
+    "preload.php": "576a4eb51c2a936d9508662718d5a41da39811bdcbb42d80f2525ba053e2169e"
+  }
+}

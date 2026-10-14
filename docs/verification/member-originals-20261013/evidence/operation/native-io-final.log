@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+MEMBER_IO_NATIVE {"version":"8.4.11","connection_ids":[241,242,243],"all_idle":true}
+...                                                                 3 / 3 (100%)
+
+Time: 00:00.252, Memory: 61.00 MB
+
+[30;42mOK (3 tests, 24 assertions)[0m

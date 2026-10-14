@@ -1,0 +1,37 @@
+{
+  "scope": "Two same-byte tests against one exact old MemberOriginalInspection class preloaded over the supporting current tree, then the fixed current class in the complete 15-case invocation. No whole-old-source, physical-elapsed-time or native-MySQL claim.",
+  "red_source": {
+    "source_commit": "5bbebd776ca6cce2be4fd0d427f3baa926c2676d",
+    "class": "App\\Domain\\Grants\\Member\\MemberOriginalInspection",
+    "path": "/workspace/runtime/member-original-operation-evidence/retained-deadline-old-inspection.php.txt",
+    "sha256": "9e3190d4f4c93e23d2995d4ad58ea4ecfaaffb8c5a2acd991fe9dda1a64ea89f"
+  },
+  "fixed_supporting_commit": "2cfd9a0db46a806c0a0bd0c83839b5b584fc3627",
+  "fixed_inspection_sha256": "976f961bb6ff90d498c42b71da055a4c1ded9fc397994aa752372835936e2627",
+  "identical_test_inputs": {
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php": "daa2e4734d855f8135770ffa79ea2d3bd32b4e2a5331ec8699c66407b0d25d2c",
+    "tests/Support/MemberOriginalCommittedClock.php": "f319b86eee45731fe3fa6c17faa3dc8c6f0550eef1c973a0f4388d23fadf6b8c"
+  },
+  "cases": {
+    "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work": {
+      "old": {
+        "assertions": 22,
+        "outcome": "failure"
+      },
+      "fixed": {
+        "assertions": 29,
+        "outcome": "passed"
+      }
+    },
+    "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket": {
+      "old": {
+        "assertions": 21,
+        "outcome": "failure"
+      },
+      "fixed": {
+        "assertions": 27,
+        "outcome": "passed"
+      }
+    }
+  }
+}

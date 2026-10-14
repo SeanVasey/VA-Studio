@@ -1,0 +1,16 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-facts/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.010, Memory: 14.00 MB
+
+There was 1 failure:
+
+1) Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused@source exceeds member renderer capacity with data ('profile', ['original_terms', 'authored_source'], 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxx')
+Failed asserting that exception of type "App\Domain\Grants\Member\MemberGrantException" is thrown.
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.

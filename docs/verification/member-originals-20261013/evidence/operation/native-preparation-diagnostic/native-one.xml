@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" tests="1" assertions="0" errors="1" failures="0" skipped="0" time="134.208670">
+    <testcase name="test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" line="38" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest" assertions="0" time="134.208670">
+      <error type="Symfony\Component\Process\Exception\ProcessFailedException">Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects
+Symfony\Component\Process\Exception\ProcessFailedException: The command "'/usr/bin/ffmpeg' '-nostdin' '-hide_banner' '-loglevel' 'error' '-f' 'lavfi' '-i' 'sine=frequency=1800:sample_rate=44100:duration=0.2' '-threads' '1' '-c:a' 'pcm_s16le' '-ac' '2' '/tmp/va-studio-member-original-operation-20261013/vasey-test-23707242-a67e-48e9-a87d-8d561b15234c.wav'" failed.
+
+Exit Code: 254(Unknown error)
+
+Working directory: /workspace/VA-Studio-member-original-operation
+
+Output:
+================
+
+
+Error Output:
+================
+[out#0/wav @ 0x5574a0cb07c0] Error opening output /tmp/va-studio-member-original-operation-20261013/vasey-test-23707242-a67e-48e9-a87d-8d561b15234c.wav: No such file or directory
+Error opening output file /tmp/va-studio-member-original-operation-20261013/vasey-test-23707242-a67e-48e9-a87d-8d561b15234c.wav.
+Error opening output files: No such file or directory
+
+
+/workspace/VA-Studio-dependency-adapters/vendor/symfony/process/Process.php:291
+/workspace/VA-Studio-member-original-operation/tests/Support/MediaFixtures.php:41
+/workspace/VA-Studio-member-original-operation/tests/Support/MediaFixtures.php:28
+/workspace/VA-Studio-member-original-operation/tests/Support/MediaFixtures.php:69
+/workspace/VA-Studio-member-original-operation/tests/Support/QuoteFixtures.php:23
+/workspace/VA-Studio-member-original-operation/tests/Support/MembershipReservationFixtures.php:45
+/workspace/VA-Studio-member-original-operation/tests/Support/MemberOriginalFixtures.php:46
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php:40
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+    </testcase>
+  </testsuite>
+</testsuites>

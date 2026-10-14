@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" tests="1" assertions="30" errors="0" failures="0" skipped="0" time="285.984868">
+    <testcase name="test_source_withdrawal_during_real_materialization_refuses_fresh_admission_and_leaves_only_a_candidate" file="/workspace/VA-Studio-member-originals/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php" line="79" class="Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest" classname="Tests.Feature.ProductionMemberOriginals.MemberOriginalPreparationIntegrationTest" assertions="30" time="285.984868"/>
+  </testsuite>
+</testsuites>

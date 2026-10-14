@@ -1,0 +1,119 @@
+{
+  "scope": "Frozen completed correction receipts. Source environment credential fields require established public projection; no .env, keys, databases or raw private rows are included. No production/provider claim. Original164 and diagnostic25 releases remain immutable.",
+  "author_commit": "9399dd998cc3d972b94f6753e576e2c756438657",
+  "equivalent_root_runtime_commit": "32f083d28db0609a52cade793849a8767a855ae3",
+  "artifacts": {
+    "commands.md": {
+      "sha256": "0bf614fc0bcdc1abd534ccc0392c2c3d89652985b9107b61e16d01e151287a67",
+      "bytes": 6350
+    },
+    "correction.patch": {
+      "sha256": "a9ec53a21d117ea9982ce3e784cfbaa4e8cf80eab023d24a6594cef5db0d63c1",
+      "bytes": 11496
+    },
+    "diff-check.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "diff-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "finalize-correction.py": {
+      "sha256": "7fb9a9cb761d0bc260aa37745f8b7da18b9dc8fd82e73af7cde6064d27604ab2",
+      "bytes": 4117
+    },
+    "native-positive-final.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "native-positive-final.log": {
+      "sha256": "10bf75c6377ecc97a6f2567fc8dbd37922c073b10d368414a1520a249d91d555",
+      "bytes": 302
+    },
+    "native-positive-final.result.json": {
+      "sha256": "bebda4dd327ad3cccf7a199bf0efa42c42d4c9707def0a453438cdef62e6a9ff",
+      "bytes": 463
+    },
+    "native-positive-final.source.json": {
+      "sha256": "5d92576d0a389e1f187a13b124fb79927236c5904c110f041608675d0763cd47",
+      "bytes": 170831
+    },
+    "native-positive-final.xml": {
+      "sha256": "fbbd371ff97ca4849c729f25fae67d5709099f8aedfcca49163396aa7e8e139c",
+      "bytes": 876
+    },
+    "native-setup.json": {
+      "sha256": "b2ccfbc95145a3fd0f036748fffb90041820ec7e7a1500f633f6b5d616f2a53e",
+      "bytes": 682
+    },
+    "pint.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "pint.log": {
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "bytes": 33
+    },
+    "run-composed.py": {
+      "sha256": "6faa2fe7650731d4177fed24529a3a4bfeb4f413e9d4e5df753e9a70ba8d4c6c",
+      "bytes": 2478
+    },
+    "run-native-fixed.py": {
+      "sha256": "e6a2e42a5325ad1db206029f37ee67bbaa089fdd0cb6885d444aa801e21d1723",
+      "bytes": 3935
+    },
+    "setup-private-native.py": {
+      "sha256": "79a9a1b1af0a4d43e640d13998c3b9eb15f555031c28430bfa444b23f3c4354a",
+      "bytes": 2516
+    },
+    "source-verification.json": {
+      "sha256": "466ce331a841753326bba943edb70fefa95151667e92f55e085ce45e45cc4465",
+      "bytes": 8139
+    },
+    "sqlite-owned-composition.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "sqlite-owned-composition.log": {
+      "sha256": "c82d54d3f82d2c7942d2da74b54b7b5c8982b4be8d9150bf845ed98d2fadb5a8",
+      "bytes": 306
+    },
+    "sqlite-owned-composition.result.json": {
+      "sha256": "6529e429588f3b9c2a9e3f7a0a007e8d4dcca4626c7fc1210506b254fe51a71a",
+      "bytes": 263
+    },
+    "sqlite-owned-composition.source.json": {
+      "sha256": "fb217c439658b9e5dba2539bce5b4aaed2e17a9c9793a36e3deb4f11a0abd43d",
+      "bytes": 265781
+    },
+    "sqlite-owned-composition.xml": {
+      "sha256": "dec60a9a8ca7d9e471ebd08f0f45430c417cafd299e33b5ff0d50520fc5e7125",
+      "bytes": 11402
+    },
+    "sqlite-public-reservation-proof.exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "sqlite-public-reservation-proof.log": {
+      "sha256": "b849f785d129c7bafe147c2b3fe33622842e3f1c8d45dba1c5b3b7eb62945b9d",
+      "bytes": 302
+    },
+    "sqlite-public-reservation-proof.result.json": {
+      "sha256": "b8deb201ba746dc2f1e77c29f3c9562dffab83ea6f04fc54a103a7f57d3159b6",
+      "bytes": 468
+    },
+    "sqlite-public-reservation-proof.source.json": {
+      "sha256": "6c223cf4869af06b6b6e129ffbb738ab2bfd7db9dd7629957558395df456cc11",
+      "bytes": 265645
+    },
+    "sqlite-public-reservation-proof.xml": {
+      "sha256": "c25ef91214abf6a3f7f1fa2615201adc97f94df654d75d8b8c293dbac3ec480e",
+      "bytes": 858
+    },
+    "static-source.json": {
+      "sha256": "7ced909cce123095bb5f58749f7bfa91e0e590fce566c0c04fa7ffecc7c8cf91",
+      "bytes": 918
+    }
+  }
+}

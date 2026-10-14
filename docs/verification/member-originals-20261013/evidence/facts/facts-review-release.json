@@ -1,0 +1,73 @@
+{
+  "scope": "Completed independent facts owner-input closure correction; SQLite-only actual red/green.",
+  "files": {
+    "facts-review/MemberGrantFactsCallbackClosureTest.php": {
+      "bytes": 5850,
+      "sha256": "2e9679ee2a2857229acae9000b219c07df43307041e57f62a2adc41de9603e61"
+    },
+    "facts-review/README.md": {
+      "bytes": 3980,
+      "sha256": "5273319eb7217538654cda098ceb9a4c0307eee1dfc3f4009393ba17795d79c3"
+    },
+    "facts-review/SealedMemberGrantFacts.proposed.php": {
+      "bytes": 12139,
+      "sha256": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+    },
+    "facts-review/external-to-repository-test-format.diff": {
+      "bytes": 1988,
+      "sha256": "b0019a9687be90368c9f4437d4e93cbb7214a8cae76d8f6bea8894c12166cffd"
+    },
+    "facts-review/fixed-app-source.php": {
+      "bytes": 12139,
+      "sha256": "35a6a07d6117fa92a800b7a4fcc619c3522c56039cf286e89d8574d4ae20e7ed"
+    },
+    "facts-review/fixed-pint.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "facts-review/fixed-pint.txt": {
+      "bytes": 287,
+      "sha256": "c92c19249be294574492337c4f1f3f448abe086c6d3bc9f632e84b56cf4eb6ce"
+    },
+    "facts-review/fixed.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "facts-review/fixed.txt": {
+      "bytes": 300,
+      "sha256": "d276a3247d737530c6c1e5bed266392b946e8d988d2a12e789696d75cc31270c"
+    },
+    "facts-review/fixed.xml": {
+      "bytes": 5493,
+      "sha256": "3af63f79fce3db51d5b9cfa4d8c8f3a712d2b3cbc898d89c00527cdab0785dfc"
+    },
+    "facts-review/old-test-source.json": {
+      "bytes": 546,
+      "sha256": "5b1a1e315751339705127af466d5762ff03d6dbd46991cf0b741bc8309a0c135"
+    },
+    "facts-review/old.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "facts-review/old.txt": {
+      "bytes": 2958,
+      "sha256": "4f43f62a2ac22d18c33785110b632d398cb41642484e1daaaf0af1ee47675339"
+    },
+    "facts-review/old.xml": {
+      "bytes": 6457,
+      "sha256": "419c04f9673bc75e69a3cec94248d49000ce1b718b47ab929fb84a77e26e92f5"
+    },
+    "facts-review/repository-test-source.php": {
+      "bytes": 5742,
+      "sha256": "cfbd4b869aa824dcec0efbbba237c617286bbbc459439984b9d13d91376c531f"
+    },
+    "facts-review/source-relationship.json": {
+      "bytes": 875,
+      "sha256": "4d34f62c69e47fcbb6ee106f1f9bc8066ab11616fc3e7ad131a36fe4f83595e6"
+    },
+    "final-5d6c58da-source.json": {
+      "bytes": 1856793,
+      "sha256": "31d57b3bc7b2d10a7e4abd9df2cf6cf8399fba826f14674d90d16cb2331c89a7"
+    }
+  }
+}

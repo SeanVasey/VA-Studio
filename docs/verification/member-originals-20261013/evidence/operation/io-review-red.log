@@ -1,0 +1,41 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 00:00.271, Memory: 61.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalIoFrameTest::test_direct_handle_transaction_at_framework_zero_is_refused_and_preserved
+The I/O barrier must refuse this state.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:276
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:100
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberOriginalIoFrameTest::test_direct_handle_replacement_and_lazy_slot_are_refused_without_resolution
+The I/O barrier must refuse this state.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:276
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:115
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMemberOriginals\MemberOriginalIoFrameTest::test_database_facade_cannot_point_to_a_foreign_resolved_manager
+The I/O barrier must refuse this state.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:276
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:141
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMemberOriginals\MemberOriginalIoFrameTest::test_facade_application_identity_cannot_change_behind_the_captured_container
+The I/O barrier must refuse this state.
+
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:276
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php:157
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 8, Failures: 4.

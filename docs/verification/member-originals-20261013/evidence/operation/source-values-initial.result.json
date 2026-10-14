@@ -1,0 +1,16 @@
+{
+  "exit": 1,
+  "seconds": 0.262,
+  "source_count": 1975,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Unit\\MemberOriginalSourceValuesTest",
+    "file": "/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php",
+    "tests": "5",
+    "assertions": "15",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "time": "0.013794"
+  }
+}

@@ -7,7 +7,10 @@ follow at `0095e46aefa85463268027d89c829a4886537ad6`. Focused verification is
 complete, including the integrated native reservation check at that source.
 Separate non-author [DECISION](DECISION.md) approves exact candidate
 `c25185136ddf99b6a27b3dcb7c195fe1e6a0e5f8` with no unresolved P0/P1 or new P2.
-Receipt-only review carry and exact-head Development preflight remain merge gates.
+The [merge receipt](merge-receipt.md) records PR #115 at
+`990020c17fa3f5f7b446b1d41b32b1a1bb48249d`, expected head
+`e5f884e72579c4e001ff0087c76f403fd21679c7`, after explicit review carry and
+successful exact-head Development preflight `38365685282`.
 
 ## Changes
 
