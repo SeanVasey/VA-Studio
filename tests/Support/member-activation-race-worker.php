@@ -105,15 +105,29 @@ $errors = [];
 $entered = hrtime(true);
 $progress('activation_entered');
 $ticketDeadlineAtEnter = $ticketBudget?->deadlineNs();
+$traceLocation = static fn (string $file): string => str_starts_with($file, base_path().'/')
+    ? substr($file, strlen(base_path()) + 1) : basename($file);
 try {
     $value = get_object_vars($operation->activate($input['definition_id'], $input['redemption_id'], $ticket, $principal, $actor));
 } catch (Throwable $error) {
     do {
-        $errors[] = ['class' => get_class($error), 'reason' => property_exists($error, 'reason') ? $error->reason : null];
+        // Metadata only. Never serialize trace arguments, objects, messages or application payloads.
+        $trace = array_slice($error->getTrace(), 0, 24);
+        $errors[] = ['class' => get_class($error), 'reason' => property_exists($error, 'reason') ? $error->reason : null,
+            'file' => $traceLocation($error->getFile()), 'line' => $error->getLine(),
+            'trace' => array_map(static function (array $frame) use ($traceLocation): array {
+                $metadata = array_intersect_key($frame, array_flip(['file', 'line', 'class', 'function', 'type']));
+                if (isset($metadata['file'])) {
+                    $metadata['file'] = $traceLocation($metadata['file']);
+                }
+
+                return $metadata;
+            }, $trace)];
         $error = $error->getPrevious();
     } while ($error !== null && count($errors) < 12);
 }
 echo json_encode(['value' => $value, 'errors' => $errors, 'entered_ns' => $entered, 'finished_ns' => hrtime(true),
-    'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'preparation' => $preparation,
+    'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'ticket_deadline_at_finish_ns' => $ticketBudget?->deadlineNs(),
+    'preparation' => $preparation,
     'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel(),
     'pdo_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);

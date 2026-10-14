@@ -119,6 +119,13 @@ class MemberGrantNativeActivationRaceTest extends TestCase
         DB::commit();
         $this->transcript['parent_released_ns'] = hrtime(true);
         $results = [$this->finish($first), $this->finish($second)];
+        // Preserve observed durable effects even when the strict successful-writer oracle fails.
+        // This is diagnostic metadata, not an assertion of a complete or authenticated graph.
+        $observed = $this->memberOriginalEffects();
+        $this->transcript['post_worker_observation'] = ['retained_rows_sha256' => CanonicalJson::hash($observed),
+            'row_counts' => array_map(count(...), $observed),
+            'event_kinds' => DB::table(MembershipPeriodRecords::EVENTS)->orderBy('sequence')->pluck('kind')->all()];
+        $this->writeReceipt();
         $successes = array_values(array_filter($results, static fn (array $result): bool => $result['errors'] === []));
         $this->assertNotEmpty($successes, 'At least one actual worker must return its committed activation receipt.');
         $expected = $successes[0]['value'];

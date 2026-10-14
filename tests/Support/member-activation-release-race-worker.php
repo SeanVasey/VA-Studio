@@ -140,16 +140,30 @@ $errors = [];
 $entered = hrtime(true);
 $progress('operation_entered');
 $ticketDeadlineAtEnter = $ticketBudget?->deadlineNs();
+$traceLocation = static fn (string $file): string => str_starts_with($file, base_path().'/')
+    ? substr($file, strlen(base_path()) + 1) : basename($file);
 try {
     $value = $role === 'activate'
         ? get_object_vars($operation->activate($input['definition_id'], $input['redemption_id'], $ticket, $principal, $actor))
         : (new MembershipReservationOperations)->release($input['invoice_id'], $input['redemption_id'], $principal, $actor);
 } catch (Throwable $error) {
     do {
-        $errors[] = ['class' => get_class($error), 'reason' => property_exists($error, 'reason') ? $error->reason : null];
+        // Metadata only. Never serialize trace arguments, objects, messages or application payloads.
+        $trace = array_slice($error->getTrace(), 0, 24);
+        $errors[] = ['class' => get_class($error), 'reason' => property_exists($error, 'reason') ? $error->reason : null,
+            'file' => $traceLocation($error->getFile()), 'line' => $error->getLine(),
+            'trace' => array_map(static function (array $frame) use ($traceLocation): array {
+                $metadata = array_intersect_key($frame, array_flip(['file', 'line', 'class', 'function', 'type']));
+                if (isset($metadata['file'])) {
+                    $metadata['file'] = $traceLocation($metadata['file']);
+                }
+
+                return $metadata;
+            }, $trace)];
         $error = $error->getPrevious();
     } while ($error !== null && count($errors) < 12);
 }
 echo json_encode(['role' => $role, 'value' => $value, 'errors' => $errors, 'held' => $held,
-    'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'preparation' => $preparation, 'entered_ns' => $entered, 'finished_ns' => hrtime(true), 'connection_id' => $connectionId, 'pid' => getmypid(),
+    'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'ticket_deadline_at_finish_ns' => $ticketBudget?->deadlineNs(),
+    'preparation' => $preparation, 'entered_ns' => $entered, 'finished_ns' => hrtime(true), 'connection_id' => $connectionId, 'pid' => getmypid(),
     'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);
