@@ -184,7 +184,7 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $this->assertSame(1, $hits);
         $this->assertSame($before, $this->snapshot(), 'Historical ownership drift must refuse before retaining new evidence.');
         $this->assertInstanceOf(CheckoutException::class, $refusal);
-        $this->assertSame(503, $refusal->status);
+        $this->assertSame(['write_source_changed', 409], [$refusal->reason, $refusal->status]);
         $this->assertSame($account->owner_key, DB::table('customer_accounts')->where('id', $account->id)->value('owner_key'));
         $this->assertSame(0, $connection->transactionLevel());
         $this->assertFalse($primary->inTransaction());
