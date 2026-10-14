@@ -2,7 +2,7 @@
 
 Development batch on actual C4c merge `ae01c740`, carrying its receipt-only
 `98bb9a91` checkpoint. Operative source is `bd5ec10a1ccbc55d3e65476232733867f96a8130`.
-Final independent packet approval, exact-head preflight and merge are pending.
+Separate non-author [final DECISION](independent-review-DECISION.md) approves with conditions at `f603f1a75bebc52fa04f25ed713d4f4f8ba89138`, with no open A2 P0/P1. Receipt-only carry, exact-head preflight and merge remain pending.
 Paid operative/rehearsal flags and the new root mount switch ship false.
 
 `PaidGrantRequestBudget` captures the monotonic start before identity proof and
@@ -115,8 +115,7 @@ witness or platform-error cause is inferred.
 Separate non-author review approved design `05f9d503`; source `627743d0` received
 REVISE for two P2 windows, repaired and approved at `b682e121`. Bounded root/whole-
 order and required error-handler/source-carry notes approve `09890cdf` and
-`bd5ec10a`. Original notes are copied unchanged. Final coherent-batch DECISION
-must assess the actual frozen candidate and complete native/portable receipts.
+`bd5ec10a`. Original notes are copied unchanged. The final coherent-batch DECISION assesses the actual frozen candidate and complete native/portable receipts; unchanged independent verification is recorded in `independent-packet-verification.json`. Published-head preflight and receipt-only carry still precede merge.
 
 Existing C2/C5-C8 and host portions of C11 remain. C11(k)'s source budget does
 not interrupt SQL or prove proxy/FPM/queue limits, correct per-request SAPI/host
