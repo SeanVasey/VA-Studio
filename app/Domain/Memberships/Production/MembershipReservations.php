@@ -297,6 +297,17 @@ final class MembershipReservations implements MembershipReservationAuthority
         $entry['context']->memberPostFinish($capture);
     }
 
+    /** Pure retained values only; the completion owner separately requires its successful tail. */
+    public function activationRetainedState(MembershipActivationCapture $capture, \PDO $primary): array
+    {
+        $entry = $this->activationCaptures[$capture] ?? null;
+        MembershipException::require(is_array($entry) && $entry['state'] === 'closed'
+            && $entry['pdo'] === $primary && ! $primary->inTransaction()
+            && hrtime(true) < $entry['deadline'], 'foreign_member_capture');
+
+        return $entry['context']->activationRetainedState($capture);
+    }
+
     public function retireActivationCapture(MembershipActivationCapture $capture): void
     {
         $entry = $this->activationCaptures[$capture] ?? null;

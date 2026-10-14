@@ -408,6 +408,18 @@ final class MembershipReservationContext
             'history' => $this->memberHistory->value()];
     }
 
+    /** Actual freshly inserted graph and complete scope, after the owner's finished closure. */
+    public function activationRetainedState(MembershipActivationCapture $capture): array
+    {
+        $this->member($capture);
+        MembershipException::require($this->activationState === 'inserted', 'foreign_activation_transition');
+        $this->finish->assertCurrent();
+        $this->admit();
+
+        return ['history' => $this->memberHistory->value(), 'scope' => $this->memberHistory->scope(),
+            'plan' => MembershipRecords::strings($this->plan)];
+    }
+
     /** Exact private owner plan only: old complete scope plus four fixed rows. */
     public function planActivation(MembershipActivationCapture $capture, MembershipActivationTransition $transition, array $plan): void
     {

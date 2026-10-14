@@ -38,6 +38,8 @@ final class MemberActivationInspection
 
     private bool $committed = false;
 
+    private bool $completedTail = false;
+
     private ?MemberOriginalMaterialization $materialized = null;
 
     private ?MemberLicenseAuthorizationProof $authorizationProof = null;
@@ -348,6 +350,22 @@ final class MemberActivationInspection
             $this->authorizations->postFinish($this->authorizationClosure, $frame);
         }
         $this->admit();
+        $this->completedTail = true;
+    }
+
+    /** Source-owned completion baseline, copied before retirement without a closed Rows proof. */
+    public function completedReadback(MemberOriginalSourceCapture $issuer): array
+    {
+        MemberGrantException::require($issuer === $this->issuer && $this->completedTail && $this->committed
+            && $this->inserted && ! $this->retired && $this->result !== null, 'foreign_completed_readback');
+        $this->finish->assertCurrent();
+        $this->admit();
+        $primary = $this->rows->identity();
+        $retained = $this->reservations->activationRetainedState($this->reservation, $primary);
+
+        return ['primary' => $primary,
+            'original' => $retained['history']->original($this->result->redemptionId),
+            'state' => ['history' => $retained['history']->rows(), 'scope' => $retained['scope'], 'plan' => $retained['plan']]];
     }
 
     private function admit(): void

@@ -37,6 +37,8 @@ final class MemberOriginalSourceCapture
 
     private static ?WeakMap $artifactPlanPermits = null;
 
+    private ?WeakMap $completedReadbacks = null;
+
     private WeakMap $workflows;
 
     private WeakMap $sources;
@@ -126,16 +128,43 @@ final class MemberOriginalSourceCapture
         return $source;
     }
 
-    public function completeActivation(MemberActivationCompletionPermit $entry, MemberOriginalMaterialization $materialized,
+    public function completeActivation(MemberActivationCompletionPermit $entry, MemberActivationReads $reads, MemberOriginalMaterialization $materialized,
         string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal, User $actor,
-        MemberLicenseAuthorizationClaim $claim, MemberOriginalBudget $budget): MemberGrantActivationResult
+        MemberLicenseAuthorizationClaim $claim, MemberOriginalBudget $budget): MemberActivationCompletedReadback
     {
-        MemberGrantActivations::consumeCompletion($entry, $this->activationOwner, $this, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget);
+        MemberGrantActivations::consumeCompletion($entry, $this->activationOwner, $this, $reads, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget);
         $workflow = $this->activationWorkflowEntry($definitionId, $redemptionId, $principal, $actor, $budget);
         $this->artifacts->assertOwned($materialized, $this, $budget);
         $result = $this->inspectActivation($workflow, $definitionId, $redemptionId, $principal, $actor, $budget, $entry, null, $claim, $materialized);
+        // The owned runner returned only after its committed proof and outer idle/config/budget tail.
+        $readback = MemberActivationCompletedReadback::value($result['activation']);
+        $this->completedReadbacks ??= new WeakMap;
+        $this->completedReadbacks[$readback] = [$this, $this->activationOwner, $reads, $result['readback']['primary'],
+            $definitionId, $redemptionId, $principal, $actor, $budget, $readback, $result['activation'],
+            $result['readback']['original'], $result['readback']['state']];
 
-        return $result['activation'];
+        return $readback;
+    }
+
+    /** Both one-use registries are consumed before accepting the exact completed baseline. */
+    public function consumeCompletedReadback(MemberActivationReadPermit $permit, MemberGrantActivations $owner,
+        MemberActivationReads $reads, string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
+        User $actor, MemberOriginalBudget $budget, MemberActivationCompletedReadback $readback): array
+    {
+        $entry = $this->completedReadbacks[$readback] ?? null;
+        if ($this->completedReadbacks !== null) {
+            unset($this->completedReadbacks[$readback]);
+        }
+        MemberGrantActivations::consumeReadPermit($permit, $owner, $reads, $definitionId, $redemptionId,
+            $principal, $actor, $budget, 'verify', $readback);
+        MemberGrantException::require(is_array($entry) && array_slice($entry, 0, 3) === [$this, $owner, $reads]
+            && array_slice($entry, 4, 7) === [$definitionId, $redemptionId, $principal, $actor, $budget, $readback, $readback->result()]
+            && $owner === $this->activationOwner, 'foreign_completed_readback');
+        $idle = MemberOriginalIoFrame::captureIdle();
+        MemberGrantException::require($idle->identityPrimary() === $entry[3], 'changed_primary');
+        $budget->assertCurrent();
+
+        return [$entry[11], $entry[12], $entry[10], $entry[3]];
     }
 
     private function activationWorkflowEntry(string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
@@ -439,6 +468,9 @@ final class MemberOriginalSourceCapture
                 } finally {
                     $frame->close();
                 }
+                if ($materialized !== null) {
+                    $values['readback'] = $inspection->completedReadback($this);
+                }
             } catch (Throwable $error) {
                 throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
             }
@@ -621,6 +653,13 @@ final class MemberOriginalSourceCapture
         foreach ($this->claims as $claim => $entry) {
             if ($entry[1] === $budget) {
                 unset($this->claims[$claim]);
+            }
+        }
+        if ($this->completedReadbacks !== null) {
+            foreach ($this->completedReadbacks as $readback => $entry) {
+                if ($entry[8] === $budget) {
+                    unset($this->completedReadbacks[$readback]);
+                }
             }
         }
     }

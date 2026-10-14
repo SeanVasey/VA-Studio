@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use ReflectionProperty;
 use Throwable;
 use WeakMap;
@@ -20,7 +21,8 @@ final class MemberActivationReads
 
     private static ?WeakMap $inspectionPermits = null;
 
-    public function __construct(private readonly MemberGrantActivations $owner, private readonly MemberRetainedOriginals $originals)
+    public function __construct(private readonly MemberGrantActivations $owner, private readonly MemberRetainedOriginals $originals,
+        private readonly MemberOriginalSourceCapture $sources)
     {
         $this->active = new WeakMap;
     }
@@ -47,12 +49,24 @@ final class MemberActivationReads
 
     public function verify(MemberActivationReadPermit $permit, string $definitionId, string $redemptionId,
         ProductionCustomerPrincipal $principal, User $actor, MemberOriginalBudget $budget,
-        MemberGrantActivationResult $expected): MemberGrantActivationResult
+        MemberActivationCompletedReadback $readback): MemberGrantActivationResult
     {
-        MemberGrantActivations::consumeReadPermit($permit, $this->owner, $this, $definitionId, $redemptionId,
-            $principal, $actor, $budget, 'verify', $expected);
-        $result = $this->execute($definitionId, $redemptionId, $principal, $actor, $budget, null);
+        [$original, $state, $expected, $primary] = $this->sources->consumeCompletedReadback($permit, $this->owner,
+            $this, $definitionId, $redemptionId, $principal, $actor, $budget, $readback);
+        $budget->assertCurrent();
+        $idle = MemberOriginalIoFrame::captureIdle();
+        MemberGrantException::require($idle->identityPrimary() === $primary, 'changed_primary');
+        $configuration = new MemberActivationReadConfiguration($this->owner);
+        $idle->assertStillIdle();
+        $budget->assertCurrent();
+        $observation = $this->originals->observe($original, $idle, $budget);
+        $this->originals->verify($original, $observation, $idle, $budget);
+        $configuration->admit();
+        $idle->assertStillIdle();
+        [, $result] = $this->inspect($configuration, $definitionId, $redemptionId, $principal, $actor,
+            $budget, null, $state, $original, $observation, $primary);
         MemberGrantException::require($result !== null && $result == $expected, 'changed_retained_effect');
+        $this->originals->assertCurrent($original, $observation, $budget);
 
         return $result;
     }
@@ -88,7 +102,8 @@ final class MemberActivationReads
 
     private function inspect(MemberActivationReadConfiguration $configuration, string $definitionId, string $redemptionId,
         ProductionCustomerPrincipal $principal, User $actor, MemberOriginalBudget $budget, ?array $expectedAuthorization,
-        ?array $expectedState, ?MemberActivatedOriginal $original, ?MemberRetainedOriginalObservation $observation): array
+        ?array $expectedState, ?MemberActivatedOriginal $original, ?MemberRetainedOriginalObservation $observation,
+        ?PDO $expectedPrimary = null): array
     {
         $deadline = min($budget->deadlineNs(), \hrtime(true) + 60_000_000_000);
         $idle = MemberOriginalIoFrame::captureIdle();
@@ -96,6 +111,7 @@ final class MemberActivationReads
         $finish = MemberOriginalFinishBoundary::capture();
         $connection = DB::connection();
         $primary = $connection->getRawPdo();
+        MemberGrantException::require($expectedPrimary === null || $primary === $expectedPrimary, 'changed_primary');
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MemberGrantException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');

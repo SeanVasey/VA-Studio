@@ -30,7 +30,7 @@ final class MemberGrantActivations
         MemberOriginalRendererProcess $renderer, MemberOriginalFiles $files)
     {
         [$this->sources, $this->artifacts, $this->authorizations, $this->grants] = MemberOriginalSourceCapture::activationAssembly($this, $facts, $reservations, $renderer, $files);
-        $this->reads = new MemberActivationReads($this, new MemberRetainedOriginals($files));
+        $this->reads = new MemberActivationReads($this, new MemberRetainedOriginals($files), $this->sources);
     }
 
     public function authorizations(): MemberLicenseAuthorizations
@@ -76,12 +76,12 @@ final class MemberGrantActivations
             $this->artifacts->verifyCurrentBytes($materialized, $idle);
             $completion = MemberActivationCompletionPermit::value();
             self::$completions ??= new WeakMap;
-            self::$completions[$completion] = [$this, $this->sources, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget];
-            $result = $this->sources->completeActivation($completion, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget);
+            self::$completions[$completion] = [$this, $this->sources, $this->reads, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget];
+            $readback = $this->sources->completeActivation($completion, $this->reads, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget);
             $effectCommitted = true;
-            $read = $this->readPermit($definitionId, $redemptionId, $principal, $actor, $budget, 'verify', $result);
+            $read = $this->readPermit($definitionId, $redemptionId, $principal, $actor, $budget, 'verify', $readback);
 
-            return $this->reads->verify($read, $definitionId, $redemptionId, $principal, $actor, $budget, $result);
+            return $this->reads->verify($read, $definitionId, $redemptionId, $principal, $actor, $budget, $readback);
         } catch (\Throwable $error) {
             if ($effectCommitted) {
                 throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
@@ -135,19 +135,21 @@ final class MemberGrantActivations
     }
 
     public static function consumeCompletion(MemberActivationCompletionPermit $permit, ?self $owner, MemberOriginalSourceCapture $sources,
-        MemberOriginalMaterialization $materialized, string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
+        MemberActivationReads $reads, MemberOriginalMaterialization $materialized, string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
         User $actor, MemberLicenseAuthorizationClaim $claim, MemberOriginalBudget $budget): void
     {
         $data = self::$completions[$permit] ?? null;
         if (self::$completions !== null) {
             unset(self::$completions[$permit]);
         }
-        MemberGrantException::require($owner !== null && $data === [$owner, $sources, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget], 'foreign_completion');
+        MemberGrantException::require($owner !== null && is_array($data)
+            && $data === [$owner, $sources, $reads, $materialized, $definitionId, $redemptionId, $principal, $actor, $claim, $budget]
+            && $owner->reads === $reads, 'foreign_completion');
         $budget->assertCurrent();
     }
 
     private function readPermit(string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal, User $actor,
-        MemberOriginalBudget $budget, string $kind, array|MemberGrantActivationResult|null $expected): MemberActivationReadPermit
+        MemberOriginalBudget $budget, string $kind, array|MemberGrantActivationResult|MemberActivationCompletedReadback|null $expected): MemberActivationReadPermit
     {
         $permit = MemberActivationReadPermit::value();
         self::$readPermits ??= new WeakMap;
@@ -158,7 +160,7 @@ final class MemberGrantActivations
 
     public static function consumeReadPermit(MemberActivationReadPermit $permit, self $owner, MemberActivationReads $reads,
         string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal, User $actor, MemberOriginalBudget $budget,
-        string $kind, array|MemberGrantActivationResult|null $expected): void
+        string $kind, array|MemberGrantActivationResult|MemberActivationCompletedReadback|null $expected): void
     {
         $data = self::$readPermits[$permit] ?? null;
         if (self::$readPermits !== null) {

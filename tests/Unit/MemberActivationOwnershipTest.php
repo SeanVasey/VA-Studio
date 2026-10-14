@@ -5,10 +5,14 @@ namespace Tests\Unit;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Grants\Member\MemberActivationArtifactPermit;
 use App\Domain\Grants\Member\MemberActivationArtifactPlanToken;
+use App\Domain\Grants\Member\MemberActivationCompletedReadback;
 use App\Domain\Grants\Member\MemberActivationCompletionPermit;
 use App\Domain\Grants\Member\MemberActivationEffectPermit;
 use App\Domain\Grants\Member\MemberActivationEntryPermit;
 use App\Domain\Grants\Member\MemberActivationInspection;
+use App\Domain\Grants\Member\MemberActivationReadPermit;
+use App\Domain\Grants\Member\MemberActivationReads;
+use App\Domain\Grants\Member\MemberGrantActivationResult;
 use App\Domain\Grants\Member\MemberGrantActivations;
 use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberGrantFactsToken;
@@ -66,7 +70,8 @@ final class MemberActivationOwnershipTest extends TestCase
     {
         $this->refuses('foreign_completion', fn () => MemberGrantActivations::consumeCompletion(
             MemberActivationCompletionPermit::value(), $this->uninitialized(MemberGrantActivations::class),
-            $this->uninitialized(MemberOriginalSourceCapture::class), MemberOriginalMaterialization::value(), 'definition', 'redemption',
+            $this->uninitialized(MemberOriginalSourceCapture::class), $this->uninitialized(MemberActivationReads::class),
+            MemberOriginalMaterialization::value(), 'definition', 'redemption',
             $this->uninitialized(ProductionCustomerPrincipal::class), new User, MemberLicenseAuthorizationClaim::value(), MemberOriginalBudget::start()));
     }
 
@@ -118,6 +123,25 @@ final class MemberActivationOwnershipTest extends TestCase
         self::assertSame($native, $error->getPrevious());
         self::assertSame('source_refused', $error->reason);
         self::assertSame('Member original unavailable.', $error->getMessage());
+    }
+
+    public function test_shaped_completed_readback_refuses_before_an_uninitialized_reader_or_source_can_work(): void
+    {
+        $sources = $this->uninitialized(MemberOriginalSourceCapture::class);
+        $readback = MemberActivationCompletedReadback::value($this->uninitialized(MemberGrantActivationResult::class));
+        $this->refuses('foreign_historical_read', fn () => $sources->consumeCompletedReadback(MemberActivationReadPermit::value(),
+            $this->uninitialized(MemberGrantActivations::class), $this->uninitialized(MemberActivationReads::class),
+            'definition', 'redemption', $this->uninitialized(ProductionCustomerPrincipal::class), new User,
+            MemberOriginalBudget::start(), $readback));
+    }
+
+    public function test_completed_readback_carrier_cannot_be_cloned_or_restored(): void
+    {
+        $readback = MemberActivationCompletedReadback::value($this->uninitialized(MemberGrantActivationResult::class));
+        $this->refuses('private_completed_readback', fn () => clone $readback);
+        $this->refuses('private_completed_readback', fn () => serialize($readback));
+        $class = MemberActivationCompletedReadback::class;
+        $this->refuses('private_completed_readback', fn () => unserialize('O:'.strlen($class).':"'.$class.'":0:{}'));
     }
 
     private function uninitialized(string $class): object

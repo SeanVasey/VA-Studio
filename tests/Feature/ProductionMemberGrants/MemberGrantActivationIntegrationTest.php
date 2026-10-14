@@ -8,6 +8,7 @@ use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use ReflectionProperty;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberActivationFixtures;
 use Tests\TestCase;
@@ -40,6 +41,10 @@ class MemberGrantActivationIntegrationTest extends TestCase
 
         $result = $this->activateMemberFixture($fixture, $authorization);
         $this->assertInstanceOf(MemberGrantActivationResult::class, $result);
+        $owner = $fixture['operation'];
+        $sources = (new ReflectionProperty($owner, 'sources'))->getValue($owner);
+        $this->assertCount(0, (new ReflectionProperty($sources, 'completedReadbacks'))->getValue($sources));
+        $this->assertCount(0, (new ReflectionProperty($owner, 'readPermits'))->getValue());
         $expectedKeys = ['originId', 'redemptionId', 'definitionId', 'consumeEventId', 'activationId',
             'artifactManifestHash', 'activationHash', 'status'];
         $actualKeys = array_keys(get_object_vars($result));
