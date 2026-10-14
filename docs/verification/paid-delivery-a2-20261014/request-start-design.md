@@ -16,18 +16,34 @@ A separate private-constructor, nonserializable request-budget object captures
 hrtime at entry, the validated server admission instant and the then-validated
 snapshot bound before identity work. The elapsed server-start age at capture
 shortens the initial 60-second observation bound. The original overall
-first-byte bound is 60 + captured snapshot_seconds + 60 (420 at the default,
-1920 at the validated maximum); it can only shorten. This object is timing
+first-byte deadline is the original initialDeadlineNs + captured snapshot
+nanoseconds + 60 seconds. The server-start age therefore shortens both bounds
+exactly once: 420 seconds at the default before age subtraction, 1920 at the
+validated maximum. It can only shorten, and wall age is never recomputed after
+identity or synthetic wall-clock travel. This object is timing
 state, not identity, policy, payment or download authority. Preserve the
 existing request-instant value/API and its valid-at-arrival semantics.
 
 The controller creates this budget before principal proof, checks the initial
 bound after identity, and passes the exact budget/instant to redeem. The first
 locate/frame budget is capped by the initial request bound, including checks
-before locate and after it. Snapshot keeps its original phase allowance, capped
-by the original request bound. The fresh commit/before-byte frame keeps its
+before locate and after it. Snapshot uses min(captured snapshot_seconds, current validated snapshot_seconds)
+and the original overall request remainder. A callback cannot enlarge the
+original snapshot phase by changing later configuration. The fresh commit/before-byte frame keeps its
 60-second allowance, capped by the same overall bound; check immediately before
 paid_redemptions insert. Keep all current/committed/producer/raw/first-byte proofs.
+Carry the capped phase PaidGrantDeadline through unchanged consumer admission,
+producer/current/committed/raw proof and ProjectionRead. Add checks after the
+controller identity and each callback-heavy access/locate segment in Commands
+before advancing; check after current inspection and attempt-count reads
+immediately before insert. Do not introduce configuration, provider, wall-clock
+or permission refresh after terminal raw proof or restart the first-byte clock.
+All new checks after a prepared stream returns belong inside existing cleanup
+try/catch/finally boundaries; no refused stage leaks its exact descriptor/lease.
+A pre-byte refusal emits no attachment bytes and truthfully retains a committed
+attempt when commit already occurred. PaidGrantDeadline start bounds remain
+unchanged; 420/1920 is separate request timing state only.
+
 No authorization lifetime, render, transfer, observation or retained policy cap
 increases. A direct trusted domain call without an HTTP budget keeps its existing
 entry-time budget; no request-start coverage is claimed for an uncaptured caller.
