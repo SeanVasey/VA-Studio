@@ -6,6 +6,7 @@ use App\Domain\Grants\Member\MemberActivationRecords;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRecords;
 use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -143,7 +144,9 @@ class MemberGrantNativeActivationRaceTest extends TestCase
             $this->assertCount(1, $retained[$table]);
         }
         $this->assertSame(['award', 'reserve', 'consume'], DB::table(MembershipPeriodRecords::EVENTS)->orderBy('sequence')->pluck('kind')->all());
-        $policy = MembershipPolicyVersions::document($fixture['plan'])->binding($fixture['plan']['id']);
+        $storedPlan = DB::table(MembershipRecords::TABLE)->where('id', $fixture['plan']['id'])->first();
+        $this->assertNotNull($storedPlan);
+        $policy = MembershipPolicyVersions::document((array) $storedPlan)->binding($fixture['plan']['id']);
         $origin = MemberActivationRecords::readOrigin($retained['production_member_origins'][0], $policy);
         $activation = MemberActivationRecords::readActivation($retained['production_member_activations'][0]);
         $winnerHash = CanonicalJson::hash($origin['authorization']);

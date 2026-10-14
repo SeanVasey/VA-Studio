@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMemberGrants;
 use App\Domain\Grants\Member\MemberActivationRecords;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRecords;
 use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
 use App\Support\CanonicalJson;
@@ -162,7 +163,9 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
         $this->assertSame(array_sum($beforeAudit['balances']), array_sum($audit['balances']));
         $paths = $this->memberActivationFiles($fixture['reservation']['redemption_id']);
         if ($winner === 'activate') {
-            $policy = MembershipPolicyVersions::document($fixture['plan'])->binding($fixture['plan']['id']);
+            $storedPlan = DB::table(MembershipRecords::TABLE)->where('id', $fixture['plan']['id'])->first();
+            $this->assertNotNull($storedPlan);
+            $policy = MembershipPolicyVersions::document((array) $storedPlan)->binding($fixture['plan']['id']);
             $origin = MemberActivationRecords::readOrigin($after['production_member_origins'][0], $policy);
             $activation = MemberActivationRecords::readActivation($after['production_member_activations'][0]);
             $this->assertSame($activate['authorization']['id'], $origin['authorization']['authorization_id']);
