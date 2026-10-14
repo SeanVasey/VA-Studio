@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\ProductionMemberGrants;
 
-use App\Domain\Grants\Member\MemberGrantSchema;
 use App\Domain\Grants\Member\MemberGrantException;
+use App\Domain\Grants\Member\MemberGrantSchema;
 use App\Domain\Memberships\Production\MembershipAwards;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
