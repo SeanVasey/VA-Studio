@@ -19,6 +19,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTaxCheckoutFixtures;
@@ -137,7 +138,14 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
             $this->admissionLicenseUntil = null;
         }
         // A new independently admitted catalog/order is valid; the expired immutable license is never extended.
-        $valid = $this->fixture($kind);
+        $catalog = $this->taxCatalog();
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $preview = $fixture['checkout']->preview($fixture['buyer']['principal'], $fixture['buyer']['user'], $catalog['candidate']->id, $catalog['items']);
+        $valid = array_replace($fixture, compact('catalog', 'preview'));
+        if ($kind === 'request') {
+            $valid['order'] = $fixture['checkout']->order($fixture['buyer']['principal'], $fixture['buyer']['user'], $catalog['candidate']->id,
+                $catalog['items'], $preview['previewHash'], true, ['legalName' => 'Declared synthetic buyer'], 'tax-deadline-valid-retry-order');
+        }
         $count = DB::table(TaxCheckoutSchema::TABLES[$kind])->count();
         $this->write($valid, $kind);
         $this->assertSame($count + 1, DB::table(TaxCheckoutSchema::TABLES[$kind])->count());
@@ -318,6 +326,85 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $this->assertSame($at->format('Y-m-d\\TH:i:s\\Z'), $row['created_at']);
         $this->assertSame($order['expires_at'], $request['provider_expires_at']);
         $this->assertSame([], $fixture['transport']->calls);
+    }
+
+    #[DataProvider('retainedWrites')]
+    public function test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit(string $kind): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('Synthetic transactional index replacement is SQLite-only; MySQL DDL would implicitly commit.');
+        }
+        $fixture = $this->fixture($kind);
+        $other = $fixture['checkout']->order($fixture['buyer']['principal'], $fixture['buyer']['user'], $fixture['catalog']['candidate']->id,
+            $fixture['catalog']['items'], $fixture['preview']['previewHash'], true, ['legalName' => 'Declared synthetic buyer'], 'tax-family-closure-secondary');
+        self::configureTax();
+        try {
+            $fixture['checkout']->initiate($fixture['buyer']['principal'], $fixture['buyer']['user'], $other['orderId']);
+            $this->fail('Secondary fixture must retain an unbound request.');
+        } catch (CheckoutException $error) {
+            $this->assertSame(['provider_unbound', 503], [$error->reason, $error->status]);
+        }
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $otherOrder = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $other['orderId'])->sole();
+        $otherRequest = DB::table(TaxCheckoutSchema::TABLES['request'])->where('order_id', $otherOrder->id)->sole();
+        $before = $this->snapshot();
+        $table = TaxCheckoutSchema::TABLES[$kind];
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $index = $kind === 'binding' ? 'ptx_b_u1' : 'ptx_s_u3';
+        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($kind, $otherOrder, $otherRequest, $connection, $primary, $table, $before, $index, &$hits): void {
+            if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
+                && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before[$table]['count'] + 1) {
+                $hits++;
+                // Declared damaged-index fixture. Raw conflicting projections are never provider facts.
+                $primary->exec('DROP INDEX '.$index);
+                $target = $primary->query('SELECT * FROM '.$table.' ORDER BY id DESC LIMIT 1')->fetch(\PDO::FETCH_ASSOC);
+                $binding = $kind === 'binding' ? $target
+                    : $primary->query('SELECT * FROM '.TaxCheckoutSchema::TABLES['binding'].' WHERE id = '.(int) $target['binding_id'])->fetch(\PDO::FETCH_ASSOC);
+                unset($binding['id']);
+                $binding['public_id'] = (string) Str::uuid();
+                $binding['request_id'] = $otherRequest->id;
+                if ($kind === 'reviewed') {
+                    $binding['provider_session_id'] = 'cs_test_OTHERRETENTION';
+                    $binding['created_at'] = $target['observed_at'];
+                }
+                $sql = $primary->prepare('INSERT INTO '.TaxCheckoutSchema::TABLES['binding'].' ('.implode(', ', array_keys($binding))
+                    .') VALUES ('.implode(', ', array_fill(0, count($binding), '?')).')');
+                $sql->execute(array_values($binding));
+                if ($kind === 'reviewed') {
+                    unset($target['id']);
+                    $target['public_id'] = (string) Str::uuid();
+                    $target['binding_id'] = (int) $primary->lastInsertId();
+                    $target['request_id'] = $otherRequest->id;
+                    $target['order_id'] = $otherOrder->id;
+                    $target['provider_session_id'] = $binding['provider_session_id'];
+                    $sql = $primary->prepare('INSERT INTO '.$table.' ('.implode(', ', array_keys($target))
+                        .') VALUES ('.implode(', ', array_fill(0, count($target), '?')).')');
+                    $sql->execute(array_values($target));
+                }
+            }
+        });
+        $refusal = null;
+        try {
+            $this->write($fixture, $kind);
+        } catch (CheckoutException $error) {
+            $refusal = $error;
+        } finally {
+            $dispatcher->forget(TransactionCommitting::class);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame('write_source_changed', $refusal->reason);
+        $this->assertSame($before, $this->snapshot());
+        $this->assertSame(1, DB::table('sqlite_master')->where('type', 'index')->where('name', $index)->count(), 'Refusal also restores the transactional index change.');
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $this->write($fixture, $kind);
+        $this->assertSame($before[$table]['count'] + 1, DB::table($table)->count());
+        $this->assertDatabaseCount('license_grants', 0);
     }
 
     #[DataProvider('retainedWrites')]
