@@ -203,7 +203,7 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         } finally {
             CarbonImmutable::setTestNow();
         }
-        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['request'], 1, 'A valid creation-time equality must retain the original request.');
+        $this->assertSame(1, DB::table(TaxCheckoutSchema::TABLES['request'])->count(), 'A valid creation-time equality must retain the original request.');
         $this->assertInstanceOf(CheckoutException::class, $refusal);
         $this->assertSame(['provider_unbound', 503], [$refusal->reason, $refusal->status]);
         $row = (array) DB::table(TaxCheckoutSchema::TABLES['request'])->sole();
