@@ -3,8 +3,10 @@
 namespace Tests\Feature\ProductionMemberGrants;
 
 use App\Domain\Grants\Member\MemberActivationRecords;
+use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Filesystem\Filesystem;
@@ -81,6 +83,7 @@ class MemberGrantNativeActivationRaceTest extends TestCase
 
     public function test_independently_confirmed_same_redemption_workers_retain_the_exact_winner_graph(): void
     {
+        $this->assertNativeCoordinationOwnership();
         $fixture = $this->memberActivationFixture();
         $before = $this->memberOriginalEffects();
         $beforeAudit = $this->ledgerSnapshot($fixture);
@@ -100,21 +103,12 @@ class MemberGrantNativeActivationRaceTest extends TestCase
         $this->await(fn (): bool => $this->waiting($first['connection_id'], $parent, $userId), [$first, $second]);
         $this->transcript['barriers'][] = ['requester' => $first['connection_id'], 'blocker' => $parent,
             'table' => 'users', 'primary_key' => $userId, 'observed_ns' => hrtime(true)];
+        $lockName = MembershipRedemptionWorkflowLock::name(DB::getDatabaseName(), $fixture['reservation']['redemption_id']);
+        $this->assertSame($first['connection_id'], $this->lockOwner($lockName));
         $this->start($second);
-        $secondBlocker = null;
-        $this->await(function () use ($first, $second, $parent, $userId, &$secondBlocker): bool {
-            foreach ([$parent, $first['connection_id']] as $blocker) {
-                if ($this->waiting($second['connection_id'], $blocker, $userId)) {
-                    $secondBlocker = $blocker;
-
-                    return true;
-                }
-            }
-
-            return false;
-        }, [$first, $second]);
-        $this->transcript['barriers'][] = ['requester' => $second['connection_id'], 'blocker' => $secondBlocker,
-            'table' => 'users', 'primary_key' => $userId, 'observed_ns' => hrtime(true)];
+        $this->await(fn (): bool => $this->coordinationWaiting($second['connection_id'], $first['connection_id'], $lockName), [$first, $second]);
+        $this->transcript['barriers'][] = ['requester' => $second['connection_id'], 'blocker' => $first['connection_id'],
+            'lock_type' => 'USER LEVEL LOCK', 'lock_name' => $lockName, 'observed_ns' => hrtime(true)];
         $this->writeReceipt();
         DB::commit();
         $this->transcript['parent_released_ns'] = hrtime(true);
@@ -126,6 +120,7 @@ class MemberGrantNativeActivationRaceTest extends TestCase
             'row_counts' => array_map(count(...), $observed),
             'event_kinds' => DB::table(MembershipPeriodRecords::EVENTS)->orderBy('sequence')->pluck('kind')->all()];
         $this->writeReceipt();
+        $this->assertNull($this->lockOwner($lockName), 'Both real workers must retire their exact scheduling lock.');
         $successes = array_values(array_filter($results, static fn (array $result): bool => $result['errors'] === []));
         $this->assertNotEmpty($successes, 'At least one actual worker must return its committed activation receipt.');
         $expected = $successes[0]['value'];
@@ -256,6 +251,92 @@ SQL);
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         return $row !== false && trim($row['row_key'], "'\"") === (string) $userId;
+    }
+
+    private function lockOwner(string $name): ?int
+    {
+        $statement = DB::connection()->getPdo()->prepare('SELECT IS_USED_LOCK(?)');
+        $statement->execute([$name]);
+        $owner = $statement->fetchColumn();
+
+        return $owner === null ? null : (int) $owner;
+    }
+
+    private function assertNativeCoordinationOwnership(): void
+    {
+        $pdo = DB::connection()->getPdo();
+        $redemptionId = (string) Str::uuid();
+        $name = MembershipRedemptionWorkflowLock::name(DB::getDatabaseName(), $redemptionId);
+        $get = $pdo->prepare('SELECT GET_LOCK(?, 0)');
+        $release = $pdo->prepare('SELECT RELEASE_LOCK(?)');
+        $refusal = static function (callable $operation): ?string {
+            try {
+                $operation();
+            } catch (MembershipException $error) {
+                return $error->reason;
+            }
+
+            return null;
+        };
+        // A pre-existing same-session acquisition must remain the caller's lock.
+        $get->execute([$name]);
+        $this->assertSame(1, (int) $get->fetchColumn());
+        try {
+            $reason = $refusal(fn () => MembershipRedemptionWorkflowLock::acquire($pdo, $redemptionId, hrtime(true) + 60_000_000_000));
+            $this->assertSame('coordination_refused', $reason);
+            $this->assertSame($this->connectionId(), $this->lockOwner($name));
+        } finally {
+            $release->execute([$name]);
+        }
+        $lock = MembershipRedemptionWorkflowLock::acquire($pdo, $redemptionId, hrtime(true) + 60_000_000_000);
+        $this->assertNotNull($lock);
+        $lock->finish(hrtime(true) + 60_000_000_000);
+        $this->assertNull($this->lockOwner($name));
+        $reason = $refusal(fn () => $lock->finish(hrtime(true) + 60_000_000_000));
+        $this->assertSame('coordination_refused', $reason);
+        $lock->closeAfterRefusal();
+        // Native error cleanup releases only scheduling state; it never ends a foreign transaction.
+        $lock = MembershipRedemptionWorkflowLock::acquire($pdo, $redemptionId, hrtime(true) + 60_000_000_000);
+        $pdo->beginTransaction();
+        try {
+            $lock->closeAfterRefusal();
+            $this->assertTrue($pdo->inTransaction());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertNull($this->lockOwner($name));
+        } finally {
+            $pdo->rollBack();
+        }
+        // An injected recursive acquisition cannot be silently decremented twice by cleanup.
+        $lock = MembershipRedemptionWorkflowLock::acquire($pdo, $redemptionId, hrtime(true) + 60_000_000_000);
+        $get->execute([$name]);
+        $this->assertSame(1, (int) $get->fetchColumn());
+        try {
+            $reason = $refusal(fn () => $lock->finish(hrtime(true) + 60_000_000_000));
+            $this->assertSame('coordination_refused', $reason);
+            $this->assertSame($this->connectionId(), $this->lockOwner($name));
+            $reason = $refusal(fn () => $lock->closeAfterRefusal());
+            $this->assertSame('coordination_refused', $reason);
+            $this->assertSame($this->connectionId(), $this->lockOwner($name));
+        } finally {
+            $release->execute([$name]);
+        }
+        $this->assertNull($this->lockOwner($name));
+    }
+
+    private function coordinationWaiting(int $requester, int $blocker, string $name): bool
+    {
+        $statement = DB::connection()->getPdo()->prepare(<<<'SQL'
+SELECT pending.OBJECT_NAME FROM performance_schema.metadata_locks pending
+JOIN performance_schema.threads requester ON requester.THREAD_ID = pending.OWNER_THREAD_ID
+JOIN performance_schema.metadata_locks granted ON granted.OBJECT_TYPE = pending.OBJECT_TYPE AND granted.OBJECT_NAME = pending.OBJECT_NAME
+JOIN performance_schema.threads blocker ON blocker.THREAD_ID = granted.OWNER_THREAD_ID
+WHERE pending.OBJECT_TYPE = 'USER LEVEL LOCK' AND pending.OBJECT_NAME = ? AND pending.OBJECT_SCHEMA IS NULL
+AND pending.LOCK_STATUS = 'PENDING' AND granted.LOCK_STATUS = 'GRANTED'
+AND requester.PROCESSLIST_ID = ? AND blocker.PROCESSLIST_ID = ? LIMIT 1
+SQL);
+        $statement->execute([$name, $requester, $blocker]);
+
+        return $statement->fetchColumn() === $name;
     }
 
     private function await(callable $condition, array $workers, int $seconds = 20): void

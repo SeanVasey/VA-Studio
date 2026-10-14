@@ -155,7 +155,7 @@ final class MemberOriginalSourceCapture
         if ($this->completedReadbacks !== null) {
             unset($this->completedReadbacks[$readback]);
         }
-        MemberGrantActivations::consumeReadPermit($permit, $owner, $reads, $definitionId, $redemptionId,
+        $lock = MemberGrantActivations::consumeReadPermit($permit, $owner, $reads, $definitionId, $redemptionId,
             $principal, $actor, $budget, 'verify', $readback);
         MemberGrantException::require(is_array($entry) && array_slice($entry, 0, 3) === [$this, $owner, $reads]
             && array_slice($entry, 4, 7) === [$definitionId, $redemptionId, $principal, $actor, $budget, $readback, $readback->result()]
@@ -164,7 +164,7 @@ final class MemberOriginalSourceCapture
         MemberGrantException::require($idle->identityPrimary() === $entry[3], 'changed_primary');
         $budget->assertCurrent();
 
-        return [$entry[11], $entry[12], $entry[10], $entry[3]];
+        return [$entry[11], $entry[12], $entry[10], $entry[3], $lock];
     }
 
     private function activationWorkflowEntry(string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,

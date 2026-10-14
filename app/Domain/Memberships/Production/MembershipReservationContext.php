@@ -221,6 +221,13 @@ final class MembershipReservationContext
         $this->admit();
     }
 
+    /** Cached configuration/route and every original cap after native scheduling cleanup. */
+    public function admitAfterCoordination(): void
+    {
+        $this->finish->assertCurrent();
+        $this->admit();
+    }
+
     /** Bind exactly once while the concrete issuer still owns this newly created inspection. */
     public function bindMemberCapture(MembershipMemberCapture|MembershipActivationCapture $capture): void
     {

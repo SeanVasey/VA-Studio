@@ -56,6 +56,17 @@ final class MembershipReservationOperations
         // One original 60-second admission deadline includes callbacks, waits, commit and receipt.
         // Checks refuse elapsed authority; this does not guarantee interruption of a blocking wait.
         $deadline = hrtime(true) + 60_000_000_000;
+        $lock = null;
+        try {
+            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock);
+        } finally {
+            $lock?->closeAfterRefusal();
+        }
+    }
+
+    private function runOwned(string $operation, string $locator, array $arguments,
+        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock): array
+    {
         $connection = DB::connection();
         $primary = $connection->getPdo();
         foreach (DB::getConnections() as $source) {
@@ -79,6 +90,10 @@ final class MembershipReservationOperations
         $policy->proveConfiguration($membershipConfiguration);
         $billingPolicy->proveConfiguration($billingConfiguration);
         MembershipException::require(DB::connection() === $connection && $connection->getRawPdo() === $primary, 'changed_primary');
+        if ($operation === 'release') {
+            // The same original ordinary deadline includes coordination; it is never restarted.
+            $lock = MembershipRedemptionWorkflowLock::acquire($primary, $arguments['redemption_id'], $deadline);
+        }
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MembershipException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
@@ -131,6 +146,10 @@ final class MembershipReservationOperations
             $frame = IdentityCommittedFrame::begin($context->reader(), $deadline);
             try {
                 $context->proveCommitted($frame);
+                if ($lock !== null) {
+                    $lock->finish($deadline);
+                    $context->admitAfterCoordination();
+                }
 
                 return $projection;
             } finally {

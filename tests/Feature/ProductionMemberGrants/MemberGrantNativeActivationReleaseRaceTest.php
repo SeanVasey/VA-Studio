@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMemberGrants;
 use App\Domain\Grants\Member\MemberActivationRecords;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -115,12 +116,16 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
         $this->assertSame(1, $held['transaction_level']);
         $this->assertTrue($held['pdo_transaction']);
         $this->start($loser);
-        $this->await(fn (): bool => $this->waiting($loser['connection_id'], $winner['connection_id'], (int) $fixture['buyer']['user']->id), 18);
+        $lockName = MembershipRedemptionWorkflowLock::name(DB::getDatabaseName(), $fixture['reservation']['redemption_id']);
+        $this->await(fn (): bool => $this->coordinationWaiting($loser['connection_id'], $winner['connection_id'], $lockName), 18);
         $this->transcript['observed_wait'] = ['requester' => $loser['connection_id'], 'blocker' => $winner['connection_id'],
-            'table' => 'users', 'primary_key' => (int) $fixture['buyer']['user']->id, 'observed_ns' => hrtime(true), 'held' => $held];
+            'lock_type' => 'USER LEVEL LOCK', 'lock_name' => $lockName, 'observed_ns' => hrtime(true), 'held' => $held];
         $this->writeReceipt();
         touch($this->directory.'/commit-'.$winnerRole);
         $results = [$winnerRole => $this->finish($winner), $loserRole => $this->finish($loser)];
+        $statement = DB::connection()->getPdo()->prepare('SELECT IS_USED_LOCK(?)');
+        $statement->execute([$lockName]);
+        $this->assertNull($statement->fetchColumn(), 'Both real terminal workers must retire their scheduling lock.');
         $this->assertSame([], $results[$winnerRole]['errors']);
         $this->assertSame($winnerRole === 'activate' ? 'activated' : 'released', $results[$winnerRole]['value']['status']);
         $this->assertNull($results[$loserRole]['value']);
@@ -237,21 +242,20 @@ class MemberGrantNativeActivationReleaseRaceTest extends TestCase
         return $result;
     }
 
-    private function waiting(int $requester, int $blocker, int $userId): bool
+    private function coordinationWaiting(int $requester, int $blocker, string $name): bool
     {
         $statement = DB::connection()->getPdo()->prepare(<<<'SQL'
-SELECT requested.LOCK_DATA AS row_key FROM performance_schema.data_lock_waits waits
-JOIN performance_schema.threads requester ON requester.THREAD_ID = waits.REQUESTING_THREAD_ID
-JOIN performance_schema.threads blocker ON blocker.THREAD_ID = waits.BLOCKING_THREAD_ID
-JOIN performance_schema.data_locks requested ON requested.ENGINE_LOCK_ID = waits.REQUESTING_ENGINE_LOCK_ID AND requested.ENGINE = waits.ENGINE
-WHERE waits.ENGINE = 'INNODB' AND requester.PROCESSLIST_ID = ? AND blocker.PROCESSLIST_ID = ?
-AND requested.OBJECT_SCHEMA = ? AND requested.OBJECT_NAME = 'users' AND requested.INDEX_NAME = 'PRIMARY'
-AND requested.LOCK_TYPE = 'RECORD' AND requested.LOCK_STATUS = 'WAITING' LIMIT 1
+SELECT pending.OBJECT_NAME FROM performance_schema.metadata_locks pending
+JOIN performance_schema.threads requester ON requester.THREAD_ID = pending.OWNER_THREAD_ID
+JOIN performance_schema.metadata_locks granted ON granted.OBJECT_TYPE = pending.OBJECT_TYPE AND granted.OBJECT_NAME = pending.OBJECT_NAME
+JOIN performance_schema.threads blocker ON blocker.THREAD_ID = granted.OWNER_THREAD_ID
+WHERE pending.OBJECT_TYPE = 'USER LEVEL LOCK' AND pending.OBJECT_NAME = ? AND pending.OBJECT_SCHEMA IS NULL
+AND pending.LOCK_STATUS = 'PENDING' AND granted.LOCK_STATUS = 'GRANTED'
+AND requester.PROCESSLIST_ID = ? AND blocker.PROCESSLIST_ID = ? LIMIT 1
 SQL);
-        $statement->execute([$requester, $blocker, DB::getDatabaseName()]);
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        $statement->execute([$name, $requester, $blocker]);
 
-        return $row !== false && trim($row['row_key'], "'\"") === (string) $userId;
+        return $statement->fetchColumn() === $name;
     }
 
     private function await(callable $condition, int $seconds): void

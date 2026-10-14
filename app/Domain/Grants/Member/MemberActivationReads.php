@@ -4,6 +4,7 @@ namespace App\Domain\Grants\Member;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Models\User;
 use Illuminate\Database\Connection;
@@ -30,10 +31,10 @@ final class MemberActivationReads
     public function probe(MemberActivationReadPermit $permit, string $definitionId, string $redemptionId,
         ProductionCustomerPrincipal $principal, User $actor, MemberOriginalBudget $budget, array $expectedAuthorization): ?MemberGrantActivationResult
     {
-        MemberGrantActivations::consumeReadPermit($permit, $this->owner, $this, $definitionId, $redemptionId,
+        $lock = MemberGrantActivations::consumeReadPermit($permit, $this->owner, $this, $definitionId, $redemptionId,
             $principal, $actor, $budget, 'probe', $expectedAuthorization);
 
-        return $this->execute($definitionId, $redemptionId, $principal, $actor, $budget, $expectedAuthorization);
+        return $this->execute($definitionId, $redemptionId, $principal, $actor, $budget, $expectedAuthorization, $lock);
     }
 
     public function read(MemberActivationReadPermit $permit, string $definitionId, string $redemptionId,
@@ -51,7 +52,7 @@ final class MemberActivationReads
         ProductionCustomerPrincipal $principal, User $actor, MemberOriginalBudget $budget,
         MemberActivationCompletedReadback $readback): MemberGrantActivationResult
     {
-        [$original, $state, $expected, $primary] = $this->sources->consumeCompletedReadback($permit, $this->owner,
+        [$original, $state, $expected, $primary, $lock] = $this->sources->consumeCompletedReadback($permit, $this->owner,
             $this, $definitionId, $redemptionId, $principal, $actor, $budget, $readback);
         $budget->assertCurrent();
         $idle = MemberOriginalIoFrame::captureIdle();
@@ -66,13 +67,15 @@ final class MemberActivationReads
         [, $result] = $this->inspect($configuration, $definitionId, $redemptionId, $principal, $actor,
             $budget, null, $state, $original, $observation, $primary);
         MemberGrantException::require($result !== null && $result == $expected, 'changed_retained_effect');
+        $lock?->finish($budget->deadlineNs());
         $this->originals->assertCurrent($original, $observation, $budget);
 
         return $result;
     }
 
     private function execute(string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
-        User $actor, MemberOriginalBudget $budget, ?array $expectedAuthorization): ?MemberGrantActivationResult
+        User $actor, MemberOriginalBudget $budget, ?array $expectedAuthorization,
+        ?MembershipRedemptionWorkflowLock $lock = null): ?MemberGrantActivationResult
     {
         // A current owner already implies a resolved primary. Never resolve lazy secondary handles
         // or adopt callback-created transactions before capturing this operation's baseline.
@@ -94,6 +97,7 @@ final class MemberActivationReads
         [, $final] = $this->inspect($configuration, $definitionId, $redemptionId, $principal,
             $actor, $budget, $expectedAuthorization, $state, $original, $observation);
         MemberGrantException::require($final !== null && $final == $result, 'changed_retained_effect');
+        $lock?->finish($budget->deadlineNs());
         // No filesystem, producer, facade/config getter or permission refresh follows the final closure.
         $this->originals->assertCurrent($original, $observation, $budget);
 
