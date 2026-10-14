@@ -3,12 +3,16 @@
 namespace Tests\Feature;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
+use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantRecords;
+use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +26,7 @@ use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
 use Tests\Support\PaidGrantRootHttpFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\QuoteFixtures;
 use Tests\TestCase;
 
 /** Actual SMTP-enrolled buyer + frozen synthetic paid source. No live payment/legal facts are certified. */
@@ -146,6 +151,89 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $response = $this->postJson('/paid-grants/orders/'.Str::uuid().'/finalize', ['private' => 'PRIVATE-BODY-SENTINEL'])->assertStatus(503)
             ->assertDontSee('PRIVATE-BODY-SENTINEL', false)->assertDontSee('PRIVATE-EXCEPTION-SENTINEL', false);
         $this->assertPrivate($response);
+    }
+
+    public function test_two_line_http_order_retains_its_first_original_across_second_line_failure_and_retry(): void
+    {
+        $f = $this->payable(false);
+        $second = QuoteFixtures::selection(6001);
+        $items = [...$f['catalog']['items'], ...$second['items']];
+        $basis = (new TaxExemptions($f['access']))->qualify($f['buyer']['principal'], $f['buyer']['user'], $f['authority']['public_id'], $items,
+            ['qualified_exemption_confirmed' => true, 'reference' => 'synthetic:two-line-buyer-bound-qualification',
+                'source_sha256' => hash('sha256', 'NONBINDING SYNTHETIC TWO-LINE BUYER EXEMPTION'),
+                'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
+                'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')],
+            'synthetic-two-line-qualified-buyer', $f['catalog']['actor']);
+        $review = $f['checkout']->review($f['buyer']['principal'], $f['buyer']['user'], $f['catalog']['candidate']->id, $items, $basis['public_id'],
+            ['legalName' => 'Declared synthetic two-line buyer'], 'synthetic-two-line-review');
+        $order = $f['checkout']->accept($f['buyer']['principal'], $f['buyer']['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-two-line-accept');
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $order['orderId'])['paymentStatus']);
+        $this->login($f['buyer']);
+        $origin = $this->postJson('/paid-grants/orders/'.$order['orderId'].'/finalize', [])->assertOk()->json('origin');
+        $this->assertCount(2, $origin['lines']);
+        $calls = 0;
+        app()->instance(PaidGrantRendererProcess::class, new PaidGrantRendererProcess(static function ($command, $directory, $environment, $input) use (&$calls): Process {
+            if (++$calls === 2) {
+                throw new ContractIssuanceException('render_failed');
+            }
+
+            return new Process($command, $directory, $environment, $input);
+        }));
+
+        $failure = $this->postJson('/paid-grants/origins/'.$origin['id'].'/document', [])->assertStatus(503);
+
+        $this->assertPrivate($failure);
+        $this->assertSame(2, $calls, 'Line one renders through the real child before line two fails.');
+        $firstOriginal = (array) DB::table('paid_originals')->sole();
+        $firstManifest = PaidGrantRecords::decode($firstOriginal);
+        $firstPdf = file_get_contents(Storage::disk('local')->path($firstManifest['artifact']['storage_path']));
+        $this->assertStringStartsWith('%PDF-', $firstPdf);
+        $this->assertSame($firstManifest['artifact']['sha256'], hash('sha256', $firstPdf));
+        $this->assertSame(['complete', 'failed'], DB::table('paid_document_work')->orderBy('id')->pluck('state')->all());
+        $this->assertDatabaseCount('paid_fulfillments', 0);
+        $this->postJson('/paid-grants/origins/'.$origin['id'].'/lines/'.$origin['lines'][0]['id'].'/authorize',
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $origin['lines'][0]['originHash'], 'kind' => 'master_wav', 'nonce' => bin2hex(random_bytes(32))])->assertStatus(409);
+        $this->assertDatabaseCount('paid_authorizations', 0);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        app()->forgetInstance(PaidGrantRendererProcess::class);
+
+        $retry = $this->postJson('/paid-grants/origins/'.$origin['id'].'/document', [])->assertOk();
+
+        $this->assertPrivate($retry);
+        $this->assertFalse($retry->json('busy'));
+        $this->assertTrue($retry->json('origin.fulfilled'));
+        $this->assertSame($firstOriginal, (array) DB::table('paid_originals')->where('id', $firstOriginal['id'])->sole());
+        $this->assertSame($firstPdf, file_get_contents(Storage::disk('local')->path($firstManifest['artifact']['storage_path'])));
+        $this->assertSame([1, 2], array_map('intval', DB::table('paid_document_work')->orderBy('id')->pluck('attempts')->all()));
+        $this->assertDatabaseCount('paid_originals', 2);
+        $this->assertDatabaseCount('paid_fulfillments', 1);
+        foreach ($origin['lines'] as $position => $line) {
+            $row = DB::table('paid_grant_origins')->where('public_id', $line['id'])->sole();
+            $original = (array) DB::table('paid_originals')->where('origin_id', $row->id)->sole();
+            foreach (['master_wav', 'contract'] as $kind) {
+                $authorization = $this->postJson('/paid-grants/origins/'.$origin['id'].'/lines/'.$line['id'].'/authorize',
+                    ['requestKey' => (string) Str::uuid(), 'originHash' => $line['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))])->assertOk()->json('authorization');
+                $path = $kind === 'contract' ? PaidGrantRecords::decode($original)['artifact']['storage_path']
+                    : ($position === 0 ? $f['catalog'] : $second)['media']['master_wav']->storage_path;
+                $bytes = file_get_contents(Storage::disk('local')->path($path));
+                $raw = http_build_query(['token' => $authorization['token'], '_token' => str_repeat('c', 40)], '', '&', PHP_QUERY_RFC3986);
+                parse_str($raw, $form);
+                $response = $this->call('POST', '/paid-grants/authorizations/'.$authorization['id'].'/redeem', $form, [], [],
+                    ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'], $raw)->assertOk();
+                $this->assertPrivate($response);
+                $response->assertHeader('X-Paid-Grant-Sha256', hash('sha256', $bytes));
+                $this->assertSame($bytes, $response->streamedContent());
+            }
+        }
+        $status = $this->get('/paid-grants/origins/'.$origin['id'].'/downloads')->assertOk();
+        $this->assertSame([2, 2], array_column($status->json('status.lines'), 'attemptCount'));
+        $this->assertSame($firstOriginal, (array) DB::table('paid_originals')->where('id', $firstOriginal['id'])->sole());
+        $this->assertDatabaseCount('paid_redemptions', 4);
+        $this->assertDatabaseCount('paid_order_origins', 1);
+        $this->assertDatabaseCount('paid_grant_origins', 2);
+        $this->assertDatabaseCount('license_grants', 0);
     }
 
     public static function lateBodyWithdrawals(): array
