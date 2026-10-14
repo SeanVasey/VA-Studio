@@ -1,0 +1,323 @@
+{
+  "actual_phpunit_invocations": 4,
+  "all_archived_member_hashes_and_bundle_identities_valid": true,
+  "all_four_original_recorder_os_exits_freshly_observed": true,
+  "all_manifest_files_match_reachable_git": true,
+  "application_database_tests_ci_executed_by_reviewer": false,
+  "archive_bytes": 381258,
+  "archive_members": 54,
+  "archive_sha256": "ef51972fa3af3a5a620070e53f9283006be52b66dc09777e8e8ea5ddf38c542b",
+  "baseline": "cfce548b4f0893a3634422062099d930428856a3",
+  "clean_exact_head_before_after": true,
+  "current_declared_and_actual_inventory_inputs": 2340,
+  "current_loader_hashes": 13,
+  "current_manifest_matches_final_git_and_actual_files": true,
+  "current_passes": 2,
+  "docs_only_delta_since_operative": [
+    "M\tdocs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "M\tdocs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "M\tdocs/verification/tax-255-20261007/README.md",
+    "A\tdocs/verification/tax-v2-integration-20261014/README.md",
+    "A\tdocs/verification/tax-v2-integration-20261014/independent-source-review.md",
+    "A\tdocs/verification/tax-v2-integration-20261014/recorded-evidence-index.json",
+    "A\tdocs/verification/tax-v2-integration-20261014/recorded-evidence.tar.gz"
+  ],
+  "five_changed_php_sha256": {
+    "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2.php": "f43aa15406a892f593d3c75d5494f568ced7a1093174edb6bf0222845907c22b",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php": "5dfb199c41319123ae4a88b852c24f2e62074a42d461b85b5ac240546afb9d77",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php": "b304c2f0a909a5921bfac59791ab923b272d1d0550db6f9f35ebd2170e5dc32c",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidSourceAdmissionTest.php": "186e118a56713b138b411bea42810065d356c823dc09f6d3ed7459bcac3f143d",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php": "8af171d01a631f0fb9489a735aeed798c1687720116e60bf3bf85453685df71a"
+  },
+  "frozen_v1_migrations_contracts_resources_routes_config_locks_workflows_unchanged": true,
+  "index_sha256": "35bfa99e80c3bcb4c0ecda508f6cd8f543e75528c98644e5ae67ee758d47a9a2",
+  "operative_source": "128f423d59316b530996c8d2cec8622d8b216601",
+  "original_failures": 2,
+  "original_setup_and_pint_errors_preserved": true,
+  "owned_native_stop_exit": 0,
+  "packaging_helper_executed": false,
+  "packaging_helper_sha256": "19d9b10684438b715ac359ccee3cd40d354e6b284cc390657a32fca3bfc099a1",
+  "pint_receipts": [
+    {
+      "files": 5,
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "inputs_unchanged_and_current": true,
+      "name": "pint-128f423d.json",
+      "process_exit": 127
+    },
+    {
+      "files": 5,
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "inputs_unchanged_and_current": true,
+      "name": "pint-128f423d-reconciled.json",
+      "process_exit": 0
+    }
+  ],
+  "recorded_utc": "2026-10-14T21:47:57.932062+00:00",
+  "records": [
+    {
+      "all_stability_gates": true,
+      "case_names": [
+        "test_a_source_from_a_closed_transaction_cannot_be_accepted_in_autocommit",
+        "test_a_fresh_transaction_cannot_reuse_a_source_from_the_closed_frame",
+        "test_the_current_source_is_bound_to_the_callers_expected_order",
+        "test_a_current_source_cannot_be_accepted_with_another_primary_reader_or_nested_frame",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent livemode differs from test funds\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent metadata names another request\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent on_behalf_of names another account\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"line currency differs from the USD order\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent is processing while the session is paid\""
+      ],
+      "class_case_counts": {
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutJourneyTest": 5,
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxPaidSourceAdmissionTest": 4
+      },
+      "counts": {
+        "assertions": 47,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 9
+      },
+      "driver": "mysql",
+      "filter": "test_a_source_from_a_closed_transaction|test_a_fresh_transaction|test_the_current_source_is_bound|test_a_current_source_cannot|test_a_paid_session_with_a_mismatched_money_fact.*(livemode|metadata|on_behalf_of|line currency|processing)",
+      "fresh_os_witness": {
+        "decoded_os_exit": 0,
+        "identity_matches": true,
+        "kernel_exit_code": 0,
+        "observed_utc": "2026-10-14T21:47:57.287974+00:00",
+        "pid": 59699,
+        "raw_proc_stat": "59699 (python3) Z 1 59699 59699 0 -1 4227340 6448 1148175 0 0 105 35 3596 1050 20 0 1 0 3363309 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 1 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "start_ticks": "3363309",
+        "state": "Z",
+        "uid": 1000
+      },
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "name": "mysql-tax-v2-admission-and-payment",
+      "php_exit": 0,
+      "recorder_result_exit": 0,
+      "seconds": 1180.251042805001,
+      "selected_files": [
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidSourceAdmissionTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php"
+      ]
+    },
+    {
+      "all_stability_gates": true,
+      "case_names": [
+        "test_a_source_from_a_closed_transaction_cannot_be_accepted_in_autocommit"
+      ],
+      "class_case_counts": {
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxPaidSourceAdmissionTest": 1
+      },
+      "counts": {
+        "assertions": 4,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "filter": "test_a_source_from_a_closed_transaction",
+      "fresh_os_witness": {
+        "decoded_os_exit": 1,
+        "identity_matches": true,
+        "kernel_exit_code": 256,
+        "observed_utc": "2026-10-14T21:47:57.289220+00:00",
+        "pid": 57086,
+        "raw_proc_stat": "57086 (python3) Z 1 57086 57086 0 -1 4227340 6443 207924 0 0 40 8 554 63 20 0 1 0 3330411 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256",
+        "start_ticks": "3330411",
+        "state": "Z",
+        "uid": 1000
+      },
+      "head": "0f8e16b19f68eb55b3d390cb69d174ccd6d0c59f",
+      "name": "sqlite-closed-frame-old-source",
+      "php_exit": 1,
+      "recorder_result_exit": 1,
+      "seconds": 5.677776046999497,
+      "selected_files": [
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidSourceAdmissionTest.php"
+      ]
+    },
+    {
+      "all_stability_gates": true,
+      "case_names": [
+        "test_the_current_source_is_bound_to_the_callers_expected_order"
+      ],
+      "class_case_counts": {
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxPaidSourceAdmissionTest": 1
+      },
+      "counts": {
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "driver": "sqlite",
+      "filter": "test_the_current_source_is_bound",
+      "fresh_os_witness": {
+        "decoded_os_exit": 1,
+        "identity_matches": true,
+        "kernel_exit_code": 256,
+        "observed_utc": "2026-10-14T21:47:57.290505+00:00",
+        "pid": 57254,
+        "raw_proc_stat": "57254 (python3) Z 1 57254 57254 0 -1 4227340 6438 207771 0 0 42 6 561 61 20 0 1 0 3332577 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256",
+        "start_ticks": "3332577",
+        "state": "Z",
+        "uid": 1000
+      },
+      "head": "0f8e16b19f68eb55b3d390cb69d174ccd6d0c59f",
+      "name": "sqlite-expected-order-old-source",
+      "php_exit": 1,
+      "recorder_result_exit": 1,
+      "seconds": 5.732521972000541,
+      "selected_files": [
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidSourceAdmissionTest.php"
+      ]
+    },
+    {
+      "all_stability_gates": true,
+      "case_names": [
+        "test_a_source_from_a_closed_transaction_cannot_be_accepted_in_autocommit",
+        "test_a_fresh_transaction_cannot_reuse_a_source_from_the_closed_frame",
+        "test_the_current_source_is_bound_to_the_callers_expected_order",
+        "test_a_current_source_cannot_be_accepted_with_another_primary_reader_or_nested_frame",
+        "test_source_v2_round_trip_carries_retained_provider_tax_beside_the_order_and_the_v2_adapter_accepts_it",
+        "test_a_resealed_line_moved_to_another_order_with_zero_tax_is_refused_and_the_genuine_line_is_accepted",
+        "test_a_resealed_live_line_is_refused_until_a_reviewed_live_producer_exists",
+        "test_every_retained_tax_record_is_immutable_and_the_source_never_serializes",
+        "test_unpaid_orders_have_no_source_and_the_v1_locator_never_reads_a_v2_order",
+        "test_a_consistent_v2_line_passes_the_self_consistency_checks",
+        "test_v1_shaped_lines_are_refused_and_never_routed_as_v2",
+        "test_the_only_acceptance_path_requires_the_held_source",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tampered without resealing\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"missing key\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"extra key\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive total is not subtotal plus tax\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"inclusive tax exceeds its total\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"string money\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax subtotal differs from pre-tax line\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"incomplete provider calculation\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"non-USD currency\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"live funds under rehearsal\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive license\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"mismatched product hash\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax behavior differs from the retained execution context\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax above the retained approved ceiling\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context names another account\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context funds mode differs\"",
+        "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"foreign origin key\"",
+        "test_unbound_provider_retains_the_exact_automatic_tax_request_and_never_touches_a_transport",
+        "test_service_without_any_transport_retains_the_automatic_tax_request_and_fails_closed",
+        "test_bound_transport_retains_the_buyer_reviewed_provider_tax_exactly_once",
+        "test_inclusive_behavior_retains_provider_tax_inside_the_unchanged_total",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"automatic tax disabled\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"tax total differs from its lines\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"total is not subtotal plus tax\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"subtotal differs from the reviewed order\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"paid without a complete tax calculation\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"line tax behavior differs\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"connected-account liability\"",
+        "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"discount applied\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount_received is short of the session total\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount differs from the session total\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent currency is not usd\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"session currency is not usd\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent livemode differs from test funds\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent metadata names another request\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent on_behalf_of names another account\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"line currency differs from the USD order\"",
+        "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent is processing while the session is paid\"",
+        "test_initiate_refuses_a_retrieved_session_that_is_not_the_created_one_and_binds_nothing",
+        "test_reconcile_refuses_a_retrieved_session_that_is_not_the_bound_one_and_retains_nothing",
+        "test_provider_tax_above_the_approved_ceiling_is_refused_never_adjusted",
+        "test_assent_binds_the_previewed_terms_and_a_replayed_order_is_the_same_order",
+        "test_withdrawn_policy_refuses_new_commands_but_keeps_retained_records"
+      ],
+      "class_case_counts": {
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutJourneyTest": 26,
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxPaidLineAdapterV2Test": 20,
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxPaidSourceAdmissionTest": 4,
+        "Tests.Feature.ProductionTaxCheckout.ProductionTaxSourceV2Test": 5
+      },
+      "counts": {
+        "assertions": 267,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 55
+      },
+      "driver": "sqlite",
+      "filter": null,
+      "fresh_os_witness": {
+        "decoded_os_exit": 0,
+        "identity_matches": true,
+        "kernel_exit_code": 0,
+        "observed_utc": "2026-10-14T21:47:57.291984+00:00",
+        "pid": 57813,
+        "raw_proc_stat": "57813 (python3) Z 1 57813 57813 0 -1 4227340 6447 4206902 0 0 46 12 17307 917 20 0 1 0 3342616 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "start_ticks": "3342616",
+        "state": "Z",
+        "uid": 1000
+      },
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "name": "sqlite-tax-v2-affected",
+      "php_exit": 0,
+      "recorder_result_exit": 0,
+      "seconds": 183.33078984799795,
+      "selected_files": [
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidSourceAdmissionTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxSourceV2Test.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxPaidLineAdapterV2Test.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutJourneyTest.php"
+      ]
+    }
+  ],
+  "reviewed_sha": "59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a",
+  "route_inputs": 16,
+  "source_bundles": [
+    {
+      "all_inputs_bound_to_git": true,
+      "bundle": "bundle-0f8e16b19f68-2d0f80b1fad71c2e",
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "driver": "sqlite",
+      "head": "0f8e16b19f68eb55b3d390cb69d174ccd6d0c59f",
+      "inputs": 2340,
+      "loader_hashes": 13,
+      "routes": 16
+    },
+    {
+      "all_inputs_bound_to_git": true,
+      "bundle": "bundle-128f423d5931-70d8d45c4063bc2d",
+      "database": {
+        "database_name": "vaseyaudio_tax_v2_integration",
+        "version": "8.4.11"
+      },
+      "driver": "mysql",
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "inputs": 2340,
+      "loader_hashes": 13,
+      "routes": 16
+    },
+    {
+      "all_inputs_bound_to_git": true,
+      "bundle": "bundle-128f423d5931-785bee5a2a8888fa",
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "driver": "sqlite",
+      "head": "128f423d59316b530996c8d2cec8622d8b216601",
+      "inputs": 2340,
+      "loader_hashes": 13,
+      "routes": 16
+    }
+  ],
+  "source_review_unchanged_sha256": "ae97e289da205cccb8eb21ec6c0a1ae9ea562040e5a45092a56cd088d5aa926b"
+}

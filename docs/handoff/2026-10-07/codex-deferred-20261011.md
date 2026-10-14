@@ -205,3 +205,8 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Operative `128f423d59316b530996c8d2cec8622d8b216601` requires caller CurrentRows/current held source and expected order before adapter acceptance; five previously reviewer-only money facts now run through the real checkout Journey. Old source genuine closed/wrong-target acceptance regressions fail1/4 and1/2. Current SQLite55/267 and private MySQL8.4.11 nine selected cases9/47 pass, zero errors/failures/skips; original errors/failures retained in [the source-bound packet](../../verification/tax-v2-integration-20261014/README.md).
 - Bounded separate source/test review approves exact128 without P0/P1 or required repair. Final sealed-packet DECISION/preflight/merge remain. Keep A1-1 terminal consumer proof, V2 committed/NEW-write admission, Paid252 wiring and root registration open; no live transport, host/provider acceptance or activation. Preserve the unrelated ordinary membership afterCommit P2 under freeze-and-batch.
+
+### Tax255 V2 prerequisite final independent approval — 2026-10-14
+
+- Separate non-author APPROVE WITH CONDITIONS at exact clean `59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a`, no open P0/P1 or required correction. Unchanged [DECISION/report](../../verification/tax-v2-integration-20261014/independent-review-DECISION.md) bind54members/3Gitbundles/2340actualinputs/16routes/13loaders, four independently observed recorder OS exits and all original/current receipt limits.
+- Receipt-only carry, exact published-head preflight/protections and expected-head merge remain required. Terminal consumer/NEW-write/V2 wiring and all host/provider/activation conditions stay open; ordinary membership afterCommit P2 stays frozen for its related batch.
