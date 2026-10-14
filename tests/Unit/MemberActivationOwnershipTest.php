@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\Member\MemberActivatedOriginal;
 use App\Domain\Grants\Member\MemberActivationArtifactPermit;
 use App\Domain\Grants\Member\MemberActivationArtifactPlanToken;
 use App\Domain\Grants\Member\MemberActivationCompletedReadback;
@@ -28,10 +29,14 @@ use App\Domain\Grants\Member\MemberOriginalMaterialization;
 use App\Domain\Grants\Member\MemberOriginalRendererProcess;
 use App\Domain\Grants\Member\MemberOriginalSourceCapture;
 use App\Domain\Grants\Member\MemberOriginalSourceValues;
+use App\Domain\Grants\Member\MemberRetainedOriginalObservation;
+use App\Domain\Grants\Member\MemberRetainedOriginals;
 use App\Domain\Grants\Member\SealedMemberGrantFacts;
 use App\Domain\Grants\Member\SealedMemberGrants;
 use App\Domain\Memberships\Production\MemberGrantIntent;
+use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipRows;
+use App\Domain\Memberships\Production\MembershipWorkflowCleanupFailure;
 use App\Models\User;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -142,6 +147,57 @@ final class MemberActivationOwnershipTest extends TestCase
         $this->refuses('private_completed_readback', fn () => serialize($readback));
         $class = MemberActivationCompletedReadback::class;
         $this->refuses('private_completed_readback', fn () => unserialize('O:'.strlen($class).':"'.$class.'":0:{}'));
+    }
+
+    public function test_activation_replay_final_observation_expiry_keeps_the_committed_refusal(): void
+    {
+        $error = $this->expiredRetainedTail(true);
+        self::assertSame('committed_activation_receipt_refused', $error->reason);
+        self::assertInstanceOf(MemberGrantException::class, $error->getPrevious());
+        self::assertSame('workflow_deadline', $error->getPrevious()->reason);
+    }
+
+    public function test_public_historical_read_final_observation_expiry_retains_its_existing_reason(): void
+    {
+        $error = $this->expiredRetainedTail(false);
+        self::assertSame('workflow_deadline', $error->reason);
+        self::assertNull($error->getPrevious());
+    }
+
+    public function test_primary_and_cleanup_failures_remain_distinct_under_a_minimized_committed_refusal(): void
+    {
+        $primary = new MemberGrantException('committed_activation_receipt_refused');
+        $cleanup = new MembershipException('coordination_refused');
+        $both = new MembershipWorkflowCleanupFailure($primary, $cleanup);
+        $error = new MembershipException('committed_receipt_refused', $both);
+        self::assertSame($primary, $error->getPrevious()->getPrevious());
+        self::assertSame($cleanup, $both->cleanupFailure());
+        self::assertSame('Production membership preparation unavailable.', $error->getMessage());
+    }
+
+    private function expiredRetainedTail(bool $activationOwned): MemberGrantException
+    {
+        // Pure tail classification only. Shaped values prove no graph, file, SQL or successful unlock.
+        $original = $this->uninitialized(MemberActivatedOriginal::class);
+        $budget = MemberOriginalBudget::start();
+        $budget->shortenTo(hrtime(true) - 1);
+        $observation = new MemberRetainedOriginalObservation('synthetic', str_repeat('a', 64), str_repeat('b', 64),
+            32, str_repeat('c', 64), str_repeat('d', 64), 1, 1, hrtime(true), hrtime(true));
+        $originals = new MemberRetainedOriginals(new MemberOriginalFiles);
+        $registry = (new \ReflectionProperty(MemberRetainedOriginals::class, 'observations'))->getValue($originals);
+        $registry[$observation] = [$original, $budget, $budget->deadlineNs()];
+        $reads = $this->uninitialized(MemberActivationReads::class);
+        (new \ReflectionProperty(MemberActivationReads::class, 'originals'))->setValue($reads, $originals);
+        $error = null;
+        try {
+            (new \ReflectionMethod(MemberActivationReads::class, 'finishRetainedTail'))
+                ->invoke($reads, null, $budget, $original, $observation, $activationOwned);
+        } catch (MemberGrantException $caught) {
+            $error = $caught;
+        }
+        self::assertInstanceOf(MemberGrantException::class, $error);
+
+        return $error;
     }
 
     private function uninitialized(string $class): object

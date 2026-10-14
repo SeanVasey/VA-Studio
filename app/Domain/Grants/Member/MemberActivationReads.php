@@ -34,7 +34,7 @@ final class MemberActivationReads
         $lock = MemberGrantActivations::consumeReadPermit($permit, $this->owner, $this, $definitionId, $redemptionId,
             $principal, $actor, $budget, 'probe', $expectedAuthorization);
 
-        return $this->execute($definitionId, $redemptionId, $principal, $actor, $budget, $expectedAuthorization, $lock);
+        return $this->execute($definitionId, $redemptionId, $principal, $actor, $budget, $expectedAuthorization, $lock, true);
     }
 
     public function read(MemberActivationReadPermit $permit, string $definitionId, string $redemptionId,
@@ -67,15 +67,14 @@ final class MemberActivationReads
         [, $result] = $this->inspect($configuration, $definitionId, $redemptionId, $principal, $actor,
             $budget, null, $state, $original, $observation, $primary);
         MemberGrantException::require($result !== null && $result == $expected, 'changed_retained_effect');
-        $this->finishCoordination($lock, $budget);
-        $this->originals->assertCurrent($original, $observation, $budget);
+        $this->finishRetainedTail($lock, $budget, $original, $observation, true);
 
         return $result;
     }
 
     private function execute(string $definitionId, string $redemptionId, ProductionCustomerPrincipal $principal,
         User $actor, MemberOriginalBudget $budget, ?array $expectedAuthorization,
-        ?MembershipRedemptionWorkflowLock $lock = null): ?MemberGrantActivationResult
+        ?MembershipRedemptionWorkflowLock $lock = null, bool $activationOwned = false): ?MemberGrantActivationResult
     {
         // A current owner already implies a resolved primary. Never resolve lazy secondary handles
         // or adopt callback-created transactions before capturing this operation's baseline.
@@ -97,17 +96,23 @@ final class MemberActivationReads
         [, $final] = $this->inspect($configuration, $definitionId, $redemptionId, $principal,
             $actor, $budget, $expectedAuthorization, $state, $original, $observation);
         MemberGrantException::require($final !== null && $final == $result, 'changed_retained_effect');
-        $this->finishCoordination($lock, $budget);
         // No filesystem, producer, facade/config getter or permission refresh follows the final closure.
-        $this->originals->assertCurrent($original, $observation, $budget);
+        $this->finishRetainedTail($lock, $budget, $original, $observation, $activationOwned);
 
         return $final;
     }
 
-    private function finishCoordination(?MembershipRedemptionWorkflowLock $lock, MemberOriginalBudget $budget): void
+    private function finishRetainedTail(?MembershipRedemptionWorkflowLock $lock, MemberOriginalBudget $budget,
+        MemberActivatedOriginal $original, MemberRetainedOriginalObservation $observation, bool $activationOwned): void
     {
+        if (! $activationOwned) {
+            $this->originals->assertCurrent($original, $observation, $budget);
+
+            return;
+        }
         try {
             $lock?->finish($budget->deadlineNs());
+            $this->originals->assertCurrent($original, $observation, $budget);
         } catch (Throwable $error) {
             // The complete final retained proof already returned, including replay of a prior graph.
             throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
