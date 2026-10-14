@@ -21,6 +21,7 @@ use Closure;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -341,6 +342,59 @@ final class PaidGrantRequestInstantTest extends TestCase
         app()->instance(PaidGrantPrepareStream::class, $prepare);
 
         return $prepare;
+    }
+
+    public function test_a_final_committing_callback_cannot_shorten_the_request_and_commit_an_attempt(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared();
+        $fired = false;
+        Event::listen(TransactionCommitting::class, static function () use ($budget, $prepare, &$fired): void {
+            if (! $fired && $prepare->calls === 1 && DB::transactionLevel() === 1 && DB::table('paid_redemptions')->count() === 1) {
+                $fired = true;
+                $budget->shortenTo(\hrtime(true) - 1);
+            }
+        });
+
+        $this->refusedBudget(fn () => (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget), 410);
+
+        $this->assertTrue($fired, 'The normal final callback must observe the attempt inside its owned commit frame.');
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        $this->assertSame($this->masterBytes($f), $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $this->now()])->assertOk()->streamedContent());
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_the_first_chunk_rechecks_the_request_after_the_transfer_clock_callback(): void
+    {
+        [$f, $auth] = $this->authorized();
+        $budget = PaidGrantRequestBudget::capture($this->now());
+        $prepare = $this->capturePrepared();
+        $ticks = 0;
+        $downloads = new PaidGrantDownloads(static function () use ($budget, &$ticks): int {
+            // Construction, before-write check, then the first physical chunk's check.
+            if (++$ticks === 3) {
+                $budget->shortenTo(\hrtime(true) - 1);
+            }
+
+            return \hrtime(true);
+        });
+        $transfer = $downloads->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget);
+        $bytes = '';
+
+        $this->refusedBudget(function () use ($transfer, &$bytes): void {
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void {
+                $bytes .= $chunk;
+            });
+        }, 410);
+
+        $this->assertSame(3, $ticks);
+        $this->assertSame('', $bytes);
+        $this->assertFalse($prepare->prepared->__debugInfo()['prepared']);
+        $this->assertDatabaseCount('paid_redemptions', 1);
     }
 
     private function refusedBudget(Closure $operation, int $status): void
