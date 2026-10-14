@@ -1,0 +1,31 @@
+# Independent C4c native receipt review — interim 3543b71f
+
+Reviewer: `/root/activation_final_evidence_review`, separate non-author reviewer. Applied repository `AGENTS.md` and the Code Verification skill and verification-matrix reference. Scope is bounded read-only source/runtime review. No application/DB/test workload, hosted action, source/config/test edit, archive-wide verification or new agent was performed. Only this new review note was written.
+
+## Verdict and target
+
+Observed source HEAD `3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d`, clean status. Read the API contract, three accepted batching/readback/coordination addenda, prior independent 67002/5a/499/3543 correction notes, the two native parent test oracles, current fixed scheduling helper, Owner, private retained tail and ordinary release runner. **No new product P0/P1 or required source correction was established in this bounded review. Final C4c acceptance is Partial and not issued by this note.** Fresh terminal runner completion, affected rollback/postcommit reconciliation, portable final packet and exact-candidate preflight remain pending.
+
+## Early native same-redemption receipt: Pass for its named selection
+
+The complete `mysql-activation-same-redemption-stored-plan-oracle` receipt has actual `process.exit` 0 and result verifier 0, JUnit/log 1 test / 78 assertions, zero failures/errors/skips, PHP8.4.26 and MySQL8.4.11. Source before/after and 2320 input digest `12c23058132c8b8979ad1eca4783d1483a21c7934d3c9872ddb19cc58ad902ac`, autoload and runner are recorded unchanged. The explicit release's 11 public member byte counts/hashes independently match; its manifest canonical digest, identity, count and before/after digests reconcile. This reviewer did not independently rerun the selection or recapture every source input during it.
+
+Read the actual parent transcript, 17300 bytes, SHA-256 `d5ebdb030f7e8572d3a7df6432e3943976c2df46514ed4990730d9ab4522bfc3`, and mapped it to the passing test assertions. Parent/session55 really holds the owner row, worker0/session56 waits on users.PRIMARY, and worker1/session57 waits on worker0's exact pending/granted USER LEVEL LOCK. Process/PDO identities are distinct. Both workers exit0, have empty stderr, report native/framework idle and are not stopped by teardown.
+
+Worker0 returns its actual activated receipt, no errors, in95.401405189s. Worker1 returns null with actual `source_deadline -> operation_deadline` at acquisition in60.004907901s. The exact winner authorization UUID/time/hash matches origin and activation; readiness/document/result hashes match; one origin/artifact/activation plus award/reserve/consume is asserted. Conserved balances, actual retained original bytes, separate explicit recovery with unchanged graph/bytes/audit and parent idle are reached, unlike the earlier parent-codec error. The embedded native primitive assertions really run: pre-existing own key is preserved, finish is one-use, raw foreign PDO transaction stays open during cleanup, and injected recursion is decremented only once with explicit test-owned final cleanup.
+
+This proves a successful genuine writer and a bounded loser. It does not prove a successful concurrent retained replay, host support, representative throughput, continuous original integrity or complete C4c acceptance.
+
+## Interrupted terminal receipt: Partial, not a completed runner pass
+
+At inspection `mysql-activation-consume-release-shared-coordination` contains only command, log and JUnit. The command binds clean3543, the same 2320-input bundle, actual MySQL driver and the exact two-provider parent selection. JUnit/log independently show2 tests /129 assertions, zero failures/errors/skips: consume-before-honor70 assertions and release-at-honor59, 784.242027s combined testcase time. The test oracle requires a genuine committing hold, exact pending/granted USER LEVEL LOCK, successful scheduled writer, terminal loser, one terminal/conservation, graph iff consume, historical bytes/readback when activated, and both native/framework idle.
+
+However, actual process exit, source-after/input/autoload/runner gates and final verifier result were not observed. Their absence cannot be filled by PHPUnit's green text, missing running process or another worker summary. Preserve this interrupted attempt and label it Partial. A fresh run of only the same focused provider2 selection under a unique name, observing process exit and final gates, is sufficient direction; no full suite or unrelated dispatch is required. Raw terminal transcripts were requested from the lead and were not available in the named receipt/default source storage directory at this inspection point.
+
+## Source/claim limits retained
+
+The native acquisition captures `min(original deadline, entry+60)` before its idle/route/ownership SQL and checks the same cap after GET_LOCK and final ownership. Ordinary release captures its original60 before waiting and carries it through Context/commit/receipt. Activation still uses its exact claimed confirmation's original300 and all shortened minima. Explicit unlock follows the complete final proof and precedes callback-free admission; retained observation is last. Private retained tail preserves committed classification; public read retains its separate guard-null behavior. One unlock cannot end a foreign transaction or silently decrement recursively again. These static observations support the previously reviewed correction; they are not execution of every owner-level compound cleanup failure.
+
+Historical rollback4/940 at4c84, postcommit1/30 at8f62, corrected SQLite17/176 at499 and other prior outcomes remain attached to their exact sources. Do not sum mixed-source selections into a final suite or relabel historical failures. Preserve C4b's independent acceptance, C4c default-off/unmounted state, frozen renderer/profile bytes and open live/provider/legal/host/production boundaries.
+
+Read-only commands: bounded `cat`, `sed`, `rg`, `git status/rev-parse`, directory metadata and Python JSON/XML parsing/SHA-256 of explicit public receipt members. No check output was invented. The final packet and complete C4c decision will be assessed separately when supplied.

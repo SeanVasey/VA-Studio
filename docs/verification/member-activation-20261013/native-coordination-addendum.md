@@ -6,9 +6,10 @@ failures at `72dbd1b45d547d2be608cd77e7f3fe15528dead5`. Those runs reached real
 contention but did not return the required successful writer receipt. They are
 not passing races or verified complete post-failure graph audits.
 
-The separate reviewer accepted this design subject to exact implementation
-review and focused native evidence. No passing result for this change is yet
-claimed. Everything remains default-off and unmounted.
+The separate reviewer accepted the design and corrected source. At `3543b71f`,
+focused native early activation 1/78, terminal orders 2/129 and rollback/recovery
+5/970 pass with observed process/verifier 0 and unchanged source gates. Final
+whole packet approval remains pending. Everything remains default-off and unmounted.
 
 Activation and ordinary release coordinate on one schema/redemption-derived
 MySQL user lock on their captured native primary PDO. This is scheduling state,
@@ -41,6 +42,13 @@ An existing committed-receipt refusal, a completed writer and proven retained
 replay keep their committed refusal classification when cleanup fails. Both
 the primary exception and cleanup exception remain attached internally, and
 native diagnostics traverse both branches within their existing metadata caps.
+One adjacent pre-existing ordinary-operation limitation remains: an afterCommit
+delegate may throw after physical commit before `commit()` returns and before
+the operation records its committed flag. That unknown outcome retains its
+existing generic refusal mapping. The next related correction requires a genuine
+owned physical-commit witness and actual throwing ordinary callback regression;
+an idle PDO is not commit proof. Member-activation postcommit recovery tests do
+not execute that ordinary branch.
 
 The sole scheduling unlock explicitly follows the complete current and separate
 committed proofs, single finish and post-finish admission. It precedes additional
