@@ -35,7 +35,13 @@ route-cache rebuild or host mounting is claimed by the synthetic development che
 
 Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPolicy` accepts.
 
-| Route | Path before the first byte | Whole request | Defaults | Validated maxima |
+These are application admission/work allowances, not measured host termination guarantees. Only redeem's captured
+request budget includes the validated server-start age and identity work. Document and other-route budgets start after
+the controller's identity proof; their identity, middleware/queue and response I/O overhead are excluded below. Blocking
+SQL or output still requires the host limits and verification described here; an application time check cannot interrupt
+it. Size timeout margins for those excluded costs on the chosen host.
+
+| Route | Timed path before the first byte | Timed application work | Defaults | Validated maxima |
 | --- | --- | --- | --- | --- |
 | `POST /paid-grants/authorizations/{id}/redeem` | locate + frame 1 ≤ 60 s, snapshot ≤ `snapshot_seconds`, frame 2 ≤ 60 s | + `transfer_max_seconds` | first byte ≤ 420 s; whole ≤ 7,620 s | first byte ≤ 1,920 s; whole ≤ 16,320 s |
 | `POST /paid-grants/origins/{batch}/document` | the whole request (JSON answer at the end) | claim loop ≤ 300 s + last claimed line ≤ 300 s + completion (10 × 300 s + 60 s) | ≤ 3,660 s | same (fixed by `LEASE_SECONDS`) |
@@ -45,8 +51,9 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
 
 1. **Dedicated PHP-FPM pool** (or the host's equivalent) for the two long routes above. All other routes stay on the
    normal pool with its normal short timeout. A pool-wide two-hour limit must never apply to the whole application.
-   - `request_terminate_timeout` at least the "Whole request" bound plus a margin. That is 7,800 s at the defaults; raise
-     it with `transfer_max_seconds` or `snapshot_seconds`.
+   - `request_terminate_timeout` sized for the "Timed application work" allowance plus the host's required overhead and
+     margin. The default redeem reference is 7,800 s; raise it with `transfer_max_seconds` or `snapshot_seconds` and verify
+     it on the host. Include the excluded identity/middleware/queue/I/O costs for document and other routes.
    - `php_admin_value[max_execution_time] = 0` in that pool, or a value above the same bound. Hashing is CPU time, so a
      default 30 s limit would cut off the snapshot and completion on large files.
    - `pm.max_children` sized for the three spool slots plus concurrent document requests. Paid preparation runs at most
@@ -54,7 +61,8 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
 2. **Proxy read timeout per route.**
    - `redeem`: `fastcgi_read_timeout` (or equivalent) at least the first-byte bound plus a margin: 480 s at the
      defaults. After the first byte, the per-write timeout applies.
-   - `document`: at least the whole-request bound plus a margin: 3,900 s.
+   - `document`: the timed application allowance plus identity/queue/I/O and a verified margin; 3,900 s is the default
+     application reference, not a measured whole-request guarantee.
    - nginx's 60 s default is too short for both.
    - The controller captures a monotonic request budget before identity proof, deducting the validated server-start
      age once from both the initial 60 s and overall first-byte allowance. Before

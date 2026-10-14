@@ -125,6 +125,12 @@ operation or representative throughput. Missing/implausible server start retains
 stricter token admission fallback but cannot prove proxy elapsed time. A trusted
 domain caller without the HTTP budget retains its existing entry-time allowance.
 
+Runbook figures for document/other routes are post-identity application work
+allowances; excluded identity/middleware/queue/response costs require measured
+host margins. Only redeem's request budget includes its captured start/identity.
+Numeric caps and timeout reference values are unchanged; no whole-request host
+termination guarantee is inferred.
+
 This is synthetic development evidence, not provider/payment/customer/host or
 legal acceptance. No live credentials, payment, active customer import, deployment,
 DNS or cutover. Frozen contract/profile members and the logo remain unchanged.
