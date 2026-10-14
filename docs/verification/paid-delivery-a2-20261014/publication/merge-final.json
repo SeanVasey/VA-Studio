@@ -1,0 +1,15 @@
+{
+  "headRefName": "harness/paid-delivery-a2-20261014",
+  "headRefOid": "b7e99913a16e3eb408a34767f220f46d16b47620",
+  "isDraft": false,
+  "mergeCommit": {
+    "oid": "cfce548b4f0893a3634422062099d930428856a3"
+  },
+  "mergedAt": "2026-10-14T21:06:42Z",
+  "number": 118,
+  "state": "MERGED",
+  "url": "https://github.com/SeanVasey/VA-Studio/pull/118",
+  "approved_head_tree": "e86bf66e27ac679a9fc2ea5e536958504766e9bf",
+  "actual_merge_tree": "e86bf66e27ac679a9fc2ea5e536958504766e9bf",
+  "merge_tree_equals_approved_head": true
+}

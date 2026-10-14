@@ -1,0 +1,19 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "headRefOid": "b7e99913a16e3eb408a34767f220f46d16b47620",
+        "reviewThreads": {
+          "nodes": [],
+          "pageInfo": {
+            "endCursor": null,
+            "hasNextPage": false
+          }
+        },
+        "reviews": {
+          "nodes": []
+        }
+      }
+    }
+  }
+}
