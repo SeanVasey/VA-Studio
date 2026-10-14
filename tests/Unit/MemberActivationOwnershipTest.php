@@ -102,7 +102,10 @@ final class MemberActivationOwnershipTest extends TestCase
     {
         $sources = $this->uninitialized(MemberOriginalSourceCapture::class);
         $artifacts = new MemberOriginalArtifacts($sources, new SealedMemberGrantFacts, new MemberOriginalRendererProcess, new MemberOriginalFiles);
-        $token = MemberActivationArtifactPlanToken::value(new MemberOriginalArtifactManifest('synthetic', str_repeat('a', 64), []));
+        $token = MemberActivationArtifactPlanToken::value(new MemberOriginalArtifactManifest(
+            '00000000-0000-4000-8000-000000000001', str_repeat('a', 64), [
+                ['role' => 'license_pdf', 'sha256' => str_repeat('b', 64), 'bytes' => 1, 'storage_policy_hash' => str_repeat('c', 64)],
+            ]));
         $this->refuses('foreign_readiness', fn () => $artifacts->proveReadyCurrent($token,
             $this->uninitialized(MemberGrantIntent::class), $this->uninitialized(MemberGrantFactsToken::class),
             $this->uninitialized(ProductionCustomerPrincipal::class), new User, $this->uninitialized(MembershipRows::class)));
