@@ -2,6 +2,7 @@
 
 namespace App\Domain\Memberships\Production;
 
+use App\Domain\Grants\Member\MemberActivationRecords;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
@@ -159,6 +160,75 @@ final class MembershipReservationRecords
         $event['after_expired'] += $event['amount'];
 
         return self::finish($event);
+    }
+
+    /** A pure planned terminal record. Only the separately admitted activation writer may insert it. */
+    public static function consumeEvent(array $audit, string $redemptionId, MembershipPolicyBinding $policy,
+        array $readinessValue, array $actorBinding, string $at): array
+    {
+        self::policy($audit, $policy, 'consume');
+        MembershipException::require($policy->consumptionTerms !== null, 'unsupported_policy');
+        $reservation = $audit['reservations'][$redemptionId] ?? null;
+        MembershipException::require(is_array($reservation) && is_array($reservation['reserve'])
+            && $reservation['terminal'] === null, 'reservation_closed');
+        $row = $reservation['record'];
+        $reserve = $reservation['reserve'];
+        $readiness = self::consumeReadiness($audit['period'], $row, $reserve, $readinessValue);
+        MembershipException::require($readiness['policy_hash'] === $policy->policyHash
+            && $readiness['consumption_terms_hash'] === $policy->consumptionTerms->hash()
+            && $readiness['retention_policy_hash'] === $policy->retentionPolicyHash
+            && $readiness['provenance'] === $policy->provenance, 'invalid_consumption');
+        MembershipValues::utc($at);
+        MembershipException::require($at >= $row['created_at'], 'invalid_record_time');
+        MembershipException::require($at < $row['honor_deadline'], 'honor_expired');
+        $amount = MembershipLedgerAudit::integer($row['credit_amount']);
+        MembershipException::require($amount > 0 && $audit['balances']['reserved'] >= $amount, 'invalid_credit_balance');
+        $event = self::event($audit, 'consume', $amount, $actorBinding, $at);
+        $event['redemption_id'] = $row['id'];
+        $event['reservation_event_id'] = $reserve['id'];
+        $event['grant_origin_id'] = $readiness['origin_id'];
+        $event['grant_receipt_hash'] = CanonicalJson::hash($readiness);
+        $event['grant_purpose'] = MemberGrantIntent::PURPOSE;
+        $event['key_hash'] = self::consumeKey($row['id']);
+        $event['request_hash'] = self::consumeRequest($audit['period'], $row, $reserve, $readiness);
+        $event['after_reserved'] -= $amount;
+        $event['after_consumed'] += $amount;
+
+        return self::finish($event);
+    }
+
+    public static function consumeKey(string $redemptionId): string
+    {
+        MembershipValues::id($redemptionId);
+
+        return CanonicalJson::hash(['purpose' => 'membership-credit-consume-event-v1', 'redemption_id' => $redemptionId]);
+    }
+
+    public static function consumeRequest(array $period, array $redemption, array $reserve, array $readinessValue): string
+    {
+        $readiness = self::consumeReadiness($period, $redemption, $reserve, $readinessValue);
+
+        return CanonicalJson::hash(['purpose' => 'membership-credit-consume-v1', 'period_id' => $period['id'],
+            'period_seal' => $period['seal'], 'redemption_id' => $redemption['id'], 'redemption_seal' => $redemption['seal'],
+            'intent_hash' => $redemption['intent_hash'], 'reservation_event_id' => $reserve['id'],
+            'reservation_event_seal' => $reserve['seal'], 'grant_origin_id' => $readiness['origin_id'],
+            'readiness_receipt_hash' => CanonicalJson::hash($readiness),
+            'authorization_intent_hash' => $readiness['authorization_intent_hash'], 'honor_deadline' => $redemption['honor_deadline']]);
+    }
+
+    private static function consumeReadiness(array $period, array $redemption, array $reserve, array $value): array
+    {
+        $readiness = MemberActivationRecords::readiness($value);
+        MembershipException::require($readiness['period_id'] === $period['id'] && $readiness['period_seal'] === $period['seal']
+            && $readiness['redemption_id'] === $redemption['id'] && $readiness['redemption_seal'] === $redemption['seal']
+            && $readiness['reservation_event_id'] === $reserve['id'] && $readiness['reservation_event_seal'] === $reserve['seal']
+            && $readiness['source_invoice_hash'] === $period['source_invoice_hash']
+            && $redemption['period_id'] === $period['id'] && $redemption['owner_binding_hash'] === $period['owner_binding_hash']
+            && $reserve['period_id'] === $period['id'] && $reserve['redemption_id'] === $redemption['id']
+            && $reserve['kind'] === 'reserve'
+            && MembershipLedgerAudit::integer($reserve['amount']) === MembershipLedgerAudit::integer($redemption['credit_amount']), 'invalid_consumption');
+
+        return $readiness;
     }
 
     public static function reserveKey(array $row): string

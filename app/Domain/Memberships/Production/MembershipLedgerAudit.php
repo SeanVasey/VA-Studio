@@ -2,11 +2,13 @@
 
 namespace App\Domain\Memberships\Production;
 
+use App\Domain\Grants\Member\MemberActivationHistory;
+
 /** Complete bounded retained-period audit. It verifies facts; it does not confer writer authority. */
 final class MembershipLedgerAudit
 {
     public static function verify(array $period, array $events, array $redemptions, MembershipInvoiceBinding $invoice,
-        MembershipPolicyBinding $policy, int $originId): array
+        MembershipPolicyBinding $policy, int $originId, MemberActivationHistory $history): array
     {
         MembershipException::require(array_is_list($events) && array_is_list($redemptions) && count($events) >= 1
             && count($events) <= MembershipPolicy::MAX_EVENTS && count($redemptions) < MembershipPolicy::MAX_EVENTS, 'technical_bound');
@@ -28,7 +30,7 @@ final class MembershipLedgerAudit
             $reservations[$row['id']] = ['record' => $row, 'payload' => $payload, 'reserve' => null, 'terminal' => null];
         }
         $balances = ['available' => 0, 'reserved' => 0, 'consumed' => 0, 'expired' => 0];
-        $ids = $keys = [];
+        $ids = $keys = $consumeIds = [];
         $prior = null;
         foreach ($events as $index => $event) {
             MembershipException::require($event['period_id'] === $period['id'] && self::integer($event['sequence'], MembershipPolicy::MAX_EVENTS) === $index + 1
@@ -45,8 +47,10 @@ final class MembershipLedgerAudit
             }
             MembershipException::require($event['prior_seal'] === ($prior['seal'] ?? str_repeat('0', 64))
                 && ($prior === null || $event['created_at'] >= $prior['created_at']), 'invalid_credit_chain');
-            foreach (['grant_origin_id', 'grant_receipt_hash', 'grant_purpose'] as $column) {
-                MembershipException::require($event[$column] === null, 'unsupported_credit_history');
+            if ($event['kind'] !== 'consume') {
+                foreach (['grant_origin_id', 'grant_receipt_hash', 'grant_purpose'] as $column) {
+                    MembershipException::require($event[$column] === null, 'unsupported_credit_history');
+                }
             }
             if ($index === 0) {
                 $balances['available'] = $policy->creditAllowance;
@@ -80,6 +84,23 @@ final class MembershipLedgerAudit
                 $balances['reserved'] -= $amount;
                 $balances[$policy->redemptionTerms->releaseDestination($event['created_at'], $period['credit_expires_at'])] += $amount;
                 $reservations[$id]['terminal'] = $event;
+            } elseif ($event['kind'] === 'consume') {
+                MembershipException::require($policy->supports('consume') && $policy->consumptionTerms !== null, 'unsupported_policy');
+                $id = $event['redemption_id'];
+                MembershipException::require(is_string($id) && isset($reservations[$id])
+                    && $reservations[$id]['reserve'] !== null && $reservations[$id]['terminal'] === null, 'invalid_terminal');
+                $row = $reservations[$id]['record'];
+                $reserve = $reservations[$id]['reserve'];
+                MembershipException::require($event['reservation_event_id'] === $reserve['id']
+                    && $amount === self::integer($row['credit_amount']) && $event['created_at'] >= $row['created_at']
+                    && $event['created_at'] < $row['honor_deadline']
+                    && $event['key_hash'] === MembershipReservationRecords::consumeKey($id), 'invalid_terminal');
+                MembershipException::require($balances['reserved'] >= $amount, 'invalid_credit_balance');
+                $history->verifyConsume($period, $row, $reserve, $event, $invoice, $policy, $originId);
+                $balances['reserved'] -= $amount;
+                $balances['consumed'] += $amount;
+                $reservations[$id]['terminal'] = $event;
+                $consumeIds[] = $event['id'];
             } elseif ($event['kind'] === 'expire') {
                 MembershipException::require($policy->supports('expire') && $policy->redemptionTerms !== null, 'unsupported_policy');
                 MembershipException::require($event['redemption_id'] === null && $event['reservation_event_id'] === null
@@ -90,18 +111,18 @@ final class MembershipLedgerAudit
                 $balances['available'] = 0;
                 $balances['expired'] += $amount;
             } else {
-                // A C4 consume must later have its complete original/activation audit, not just shaped grant columns.
                 throw new MembershipException('unsupported_credit_history');
             }
             foreach ($balances as $balance => $value) {
                 MembershipException::require(self::integer($event['after_'.$balance]) === $value, 'invalid_credit_balance');
             }
-            MembershipException::require(array_sum($balances) === $policy->creditAllowance && $balances['consumed'] === 0, 'invalid_credit_balance');
+            MembershipException::require(array_sum($balances) === $policy->creditAllowance, 'invalid_credit_balance');
             $prior = $event;
         }
         foreach ($reservations as $reservation) {
             MembershipException::require($reservation['reserve'] !== null, 'orphan_redemption');
         }
+        $history->assertComplete($consumeIds);
 
         return ['award' => $award, 'period' => $period, 'policy_hash' => $policy->policyHash,
             'buyer_binding' => $invoice->originalBuyerBinding, 'balances' => $balances, 'tail' => $prior, 'reservations' => $reservations];

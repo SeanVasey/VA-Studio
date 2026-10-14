@@ -28,6 +28,36 @@ trait MembershipPolicyFixtures
                 'late_payment' => ['mode' => 'grace', 'seconds' => 3600]]], ...$overrides];
     }
 
+    /** Pure synthetic v3 inputs only. Real integration replaces every selected catalog identity. */
+    protected function consumptionPolicyInput(array $overrides = []): array
+    {
+        return $this->policyInput([
+            'schema_version' => MembershipPolicyDocument::CONSUMPTION_VERSION, 'scope' => 'paid_period_credit_activation',
+            'redemption_terms' => ['eligibility_rules' => [['rule_id' => 'synthetic-wav', 'track_id' => 1,
+                'offer_id' => 2, 'offer_revision_id' => 3, 'license_version_id' => 4,
+                'license_manifest_hash' => str_repeat('a', 64), 'asset_manifest_hash' => str_repeat('b', 64),
+                'original_terms_hash' => str_repeat('c', 64), 'credit_amount' => 2]],
+                'honor' => ['duration_seconds' => 3600, 'expiry_mode' => 'cap_at_credit_expiry'],
+                'release' => ['before_credit_expiry' => 'available', 'at_or_after_credit_expiry' => 'expired'],
+                'available_expiry' => ['mode' => 'expire_available_at_credit_expiry']],
+            'consumption_terms' => $this->consumptionTermsInput(), ...$overrides,
+        ]);
+    }
+
+    protected function consumptionTermsInput(): array
+    {
+        return ['schema_version' => 'membership-consumption-terms-v1', 'purpose' => 'production-member-license-grant-v1',
+            'reference' => 'synthetic-consumption-only', 'text' => 'NONBINDING synthetic activation terms.',
+            'retention_policy' => ['schema_version' => 'member-original-retention-facts-v1',
+                'reference' => 'synthetic-retention-only', 'text' => 'NONBINDING synthetic retention text.'],
+            'source_rule' => 'current_selected_catalog',
+            'authorization_policy' => ['schema_version' => 'member-license-authorization-policy-v1',
+                'mode' => 'explicit_owner_confirmation_v1', 'action' => 'activate_member_license',
+                'record_claim' => 'owner_requested_activation', 'display_reference' => 'synthetic-confirmation-only',
+                'display_text' => 'NONBINDING fixture: request activation of this selected member license.',
+                'required_sources' => 'selected_license_and_consumption_terms']];
+    }
+
     protected function policyStaff(bool $mfa = true, array $overrides = []): User
     {
         $user = User::factory()->create(['is_admin' => true, 'email_verified_at' => now(), ...$overrides]);

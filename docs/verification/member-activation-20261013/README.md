@@ -1,0 +1,47 @@
+# C4c member consumption and activation
+
+C4b merged as PR #116 at `8c98a5279dade62203c5eb3f6c3e02864532ad65`, after exact-head preflight `38561986182` passed on independently approved `a108aca947ae0d3f661e9feef8a19441d5c3a165`. C4c integrates that actual merge. The former workspace authentication blocker is closed.
+
+C4c is implemented locally, default-off and unmounted. Genuine synthetic owner review/confirmation produces one atomic origin/artifact/consume/activation graph, a conserved ledger and byte-bearing historical readback on SQLite and private MySQL **8.4.11**. Current-source native write-denial rollback, both concurrency families and postcommit recovery have complete passing receipts. Separate non-author [DECISION](independent-review-DECISION.md) approves focused development source `bc708923c03e83ef092286cb437042e855a898e8`, with no open C4c P0/P1. Receipt-only carry and exact-head preflight/merge remain pending. This is focused development evidence.
+
+The original [API contract](api-contract.md), SHA-256 `fda01303672d5a901f48d43f6f3855c0137de3af455ca01eb5bc945cd86a6759`, retains its independently reviewed bytes. The explicit [private batching](private-batching-addendum.md), [completed readback](completed-readback-addendum.md) and [native coordination](native-coordination-addendum.md) addenda record the accepted internal changes. Public original readiness and historical explicit reads/replay remain distinct. All original workflow, source, renderer, physical-observation and honor bounds retain their min-only behavior. Six frozen profiles and 44 member entries match their actual C4b merge bytes and hashes. No frozen profile member or historical migration changed.
+
+## Current focused evidence
+
+| Selection | Exact source | Tests / assertions | Result |
+| --- | --- | --- | --- |
+| Whole affected SQLite integration/retention/confirmation-phase files | `3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d` | 14 / 348 | Pass |
+| Current pure ownership and durable-recorder smoke | same `3543b71f` | 14 / 27 | Pass |
+| Native early same-redemption race | same `3543b71f` | 1 / 78 | Pass: successful writer and bounded loser |
+| Native consume/release, both orders | same `3543b71f` | 2 / 129 | Pass |
+| Native INSERT1142 rollback and postcommit recovery | same `3543b71f` | 5 / 970 | Pass |
+| Final-tail ownership/positive/ordinary lifecycle | `4990315a31b2b7b87dd46282559ba9ebb5f75310` | 17 / 176 | Pass; unchanged application/selected SQLite bytes at `3543b71f` |
+| Completed-handoff ownership | `a24979ae2ffa2814ee3cdc8ea5558384149230ff` | 11 / 17 | Pass |
+| Actual SQLite activation/conservation/readback | same `a24979ae` | 1 / 59 | Pass |
+| Unmodified MySQL 8.4.11 activation/conservation/readback | same `a24979ae` | 1 / 59 | Pass |
+| Strengthened actual withdrawal oracles | `91581edb48ac430fd9e059c6d1592114d386b821` | 3 / 66 | Pass |
+| Ordinary lifecycle and exact-honor refusal | `00867c742843bde196e492a25277c4e9e3d66783` | 2 / 90 | Pass |
+| SQLite integration/retention/phase selection before private batching | `d25f160c0722ee2e07653fad40d2faeaa6c13029` | 13 / 328 | Pass |
+| Local CI policy self-tests | `91581edb` | 52 + 50 + 61 + 32 + 14 | 209 Python checks pass |
+
+Every passing PHPUnit selection above has zero failures, errors and skips, with separate process/verifier exits 0. The a249 invocations each captured 2,318 declared inputs and unchanged source, runner, autoload, HEAD and worktree status; the native positive had no overlays. It asserts the actual complete graph, credit conservation, original bytes/hash/inode, a separate explicit read and emptied completed-handoff/owner-read-permit registries. Selections overlap and span sources; they are not one suite total. Installed dependency identity is the recorded lock and local autoload metadata, rather than a byte inventory of every installed package.
+
+The current runs capture 2,320 declared inputs with the same unchanged gates and no overlays. The full early race asserts the winner's retained A/R/D, graph, conservation, bytes, explicit recovery and actual native scheduling ownership; its second worker refuses at the original acquisition bound, rather than returning a successful replay. Both terminal orders assert their actual native waits, successful writer, terminal loser and graph/absence/conservation/recovery outcomes. Original interrupted terminal 2/129 and rollback/recovery 5/970 JUnit/log remain Partial with null original exits; separate supervised runs supply the observed passing exits. The durable launcher records PID/start provenance and keeps the original recorder bytes and product caps unchanged.
+
+Final local CI policy at `75629871a75868b4e67299f0c5017350d302812c` passes 209 Python checks (52/50/61/32/14), all five command exits 0 and 43 inputs unchanged. [Final source carry](final-source-carry.json) compares all 2,320 actual application/test inputs, autoload metadata and all 43 policy inputs to the integrated packet candidate; this is byte carry, not new execution. Final local Pint passes 94 operative PHP files. Native list-only discovery selects 2,200 cases in 219 files from 8,715 cases in 647 files, with 49 residual files, 56 untimed selected files, and an allowed MySQL skip census of 61 cases in 17 methods. All 50 generated files were captured and removed by exact name/hash. No application database body or hosted CI ran in discovery. A receipt helper initially failed on a legacy manifest shape; its corrected read-only verification passed without changing frozen bytes or rerunning application tests.
+
+All failures remain separate. Initial SQLite provenance admission errored before writing. Unmodified native canaries at `3598015d` and `61bebdcf` errored respectively in preinsert and final committing proof. A timing-only native diagnostic at `d25f160c` errored with eight instrumented classes and a native STDERR helper; it is not unmodified acceptance or a performance result. The private-batching native canary at `00867c74` reached completion and the first historical inspection plus physical byte calls, then errored in the second/final after-I/O inspection. The new a249 pass does not relabel any of them.
+
+The broader private-batching SQLite run at `a47e0d69` recorded 15 tests / 407 assertions / one failure: its new lifecycle test expected stale expiry-replay balances after a real release. Integration 3, retention 5 and phase 6 cases passed; the final honor case remained unrun under fail-fast. The separate corrected lifecycle file passed 2 / 90. A pure ownership setup error at `89cf40f0` used an invalid synthetic manifest, before reaching its intended refusal; the corrected selection at `a47e0d69` passed 9 / 13. These actual sources/counts remain distinct.
+
+## Review and remaining gates
+
+Independent component review found a missing complete reservation-selection join and inconsistent v3 display vocabulary; both were corrected with their original regression failures retained. Separate non-author source review accepted private batching and the completed-only handoff, with no new product P0/P1. The callback-oracle weakness was corrected: real mutation counts and transaction observations are now asserted outside domain catches, so a wrapped PHPUnit assertion cannot supply a false passing refusal. These bounded source reviews are not the final C4c DECISION.
+
+Required focused native selections and final affected SQLite files are complete. Genuine handoff replay and withdrawal specifically during inserted-history authentication have no direct execution claim. The latter phase is source-reviewed; the actual later final-delegate withdrawal is directly tested. Full ordinary owner/cleanup failure injection, native ownership loss/late-admission application branches and representative contention/performance remain untested. Complete evidence verification and independent application/evidence DECISION are satisfied at the recorded candidate. Receipt-only final-head carry and cheap preflight remain merge gates. No Foundation CI or GitLab dispatch occurred.
+
+Separate final application-source review found no C4c P0/P1 and one adjacent pre-existing P2: an ordinary afterCommit delegate can throw after durable commit before the operation records its committed flag, retaining a generic refusal classification. The next related batch needs an exact owned physical-commit witness and genuine throwing ordinary callback regression; an idle PDO cannot establish commit. Current member-activation postcommit evidence does not cover that ordinary callback branch. The finding introduces no successful false receipt, automatic retry or compensation.
+
+The [component receipt packet](evidence/README.md) preserves exact commands, source scopes, original failures and capture limits. It is being extended additively; its historical checkpoint does not imply final integrated approval. The [evidence protocol](evidence-protocol.md) remains the receipt policy. Earlier component captures with omitted base harness or before-only metadata are explicitly partial and are not repaired retrospectively.
+
+Technical confirmation records an authenticated request; it supplies no legal assent or production approval. Commercial, legal, account and host inputs remain unanswered. Representative latency/contention, trigger inventory, physical storage/clock, host/provider and cutover conditions remain open. No production commerce or customer entitlement import is authorized by these synthetic checks.

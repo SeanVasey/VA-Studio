@@ -56,6 +56,28 @@ final class MembershipReservationOperations
         // One original 60-second admission deadline includes callbacks, waits, commit and receipt.
         // Checks refuse elapsed authority; this does not guarantee interruption of a blocking wait.
         $deadline = hrtime(true) + 60_000_000_000;
+        $lock = null;
+        $primaryFailure = null;
+        $committed = false;
+        try {
+            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock, $committed);
+        } catch (Throwable $error) {
+            $primaryFailure = $error;
+            $committed = $committed || ($error instanceof MembershipException && $error->reason === 'committed_receipt_refused');
+            throw $error;
+        } finally {
+            try {
+                $lock?->closeAfterRefusal();
+            } catch (Throwable $cleanup) {
+                $previous = $primaryFailure === null ? $cleanup : new MembershipWorkflowCleanupFailure($primaryFailure, $cleanup);
+                throw new MembershipException($committed ? 'committed_receipt_refused' : 'operation_refused', $previous);
+            }
+        }
+    }
+
+    private function runOwned(string $operation, string $locator, array $arguments,
+        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock, bool &$committed): array
+    {
         $connection = DB::connection();
         $primary = $connection->getPdo();
         foreach (DB::getConnections() as $source) {
@@ -79,6 +101,10 @@ final class MembershipReservationOperations
         $policy->proveConfiguration($membershipConfiguration);
         $billingPolicy->proveConfiguration($billingConfiguration);
         MembershipException::require(DB::connection() === $connection && $connection->getRawPdo() === $primary, 'changed_primary');
+        if ($operation === 'release') {
+            // The same original ordinary deadline includes coordination; it is never restarted.
+            $lock = MembershipRedemptionWorkflowLock::acquire($primary, $arguments['redemption_id'], $deadline);
+        }
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MembershipException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
@@ -103,6 +129,7 @@ final class MembershipReservationOperations
             $observer->prepare($context);
             // PDO commit, scoped afterCommit callbacks and ordinary committed delegates all run.
             $connection->commit();
+            $committed = true;
             $observer->requireProof();
         } catch (Throwable $error) {
             try {
@@ -131,6 +158,10 @@ final class MembershipReservationOperations
             $frame = IdentityCommittedFrame::begin($context->reader(), $deadline);
             try {
                 $context->proveCommitted($frame);
+                if ($lock !== null) {
+                    $lock->finish($deadline);
+                    $context->admitAfterCoordination();
+                }
 
                 return $projection;
             } finally {

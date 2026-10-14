@@ -2,6 +2,7 @@
 
 namespace App\Domain\Memberships\Production;
 
+use App\Domain\Grants\Member\MemberActivationHistory;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Crypt;
@@ -53,28 +54,23 @@ final class MembershipPeriodRecords
     }
 
     /** Preserve the original award projection after auditing every retained ledger effect. */
-    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId, array $redemptions = []): array
+    public static function verify(array $period, array $events, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy,
+        int $originId, array $redemptions, MemberActivationHistory $history): array
     {
-        return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $policy, $originId)['award'];
+        return MembershipLedgerAudit::verify($period, $events, $redemptions, $invoice, $policy, $originId, $history)['award'];
     }
 
     /** The original first-event format. Creation, payload purpose and keyed seal bytes stay unchanged. */
     public static function verifyFirstAward(array $period, array $event, MembershipInvoiceBinding $invoice, MembershipPolicyBinding $policy, int $originId): array
     {
-        MembershipPolicyDocument::keys($period, ['id', 'account_id', 'user_id', 'identity_origin_id', 'plan_version_id',
-            'source_invoice_hash', 'invoice_graph_hash', 'owner_binding_hash', 'allowance', 'period_start', 'period_end',
-            'credit_expires_at', 'payload_ciphertext', 'seal', 'created_at']);
-        self::verifySeal(self::PERIODS, $period);
-        MembershipValues::id($period['id']);
-        MembershipValues::utc($period['created_at']);
-        MembershipException::require(is_string($period['payload_ciphertext']) && strlen($period['payload_ciphertext']) <= 65536, 'tampered');
-        try {
-            $plain = Crypt::decryptString($period['payload_ciphertext']);
-            $payload = json_decode($plain, true, 24, JSON_THROW_ON_ERROR);
-        } catch (Throwable) {
-            throw new MembershipException('tampered');
-        }
-        MembershipException::require(is_array($payload) && strlen($plain) <= 16384 && CanonicalJson::encode($payload) === $plain, 'tampered');
+        $payload = self::periodPayload($period);
+
+        return self::verifiedFirstAward($period, $event, $invoice, $policy, $originId, $payload);
+    }
+
+    private static function verifiedFirstAward(array $period, array $event, MembershipInvoiceBinding $invoice,
+        MembershipPolicyBinding $policy, int $originId, array $payload): array
+    {
         $expected = ['schema_version' => 'membership-paid-period-v1', 'purpose' => 'membership-first-period-award',
             'period_id' => $period['id'], 'invoice' => self::semantic($invoice), 'created_at' => $period['created_at']];
         MembershipException::require(CanonicalJson::encode($payload) === CanonicalJson::encode($expected), 'conflicting_invoice');
@@ -106,6 +102,51 @@ final class MembershipPeriodRecords
         return ['period_id' => $period['id'], 'award_event_id' => $event['id'], 'allowance' => $policy->creditAllowance,
             'period_start' => $period['period_start'], 'period_end' => $period['period_end'],
             'credit_expires_at' => $period['credit_expires_at'], 'provenance' => $invoice->provenance];
+    }
+
+    /** Authenticated retained semantics only. No live invoice, observation or freshness authority. */
+    public static function historicalInvoice(array $period, array $firstAward, MembershipPolicyBinding $policy, int $originId): MembershipInvoiceBinding
+    {
+        $payload = self::periodPayload($period);
+        MembershipException::require(is_array($payload['invoice'] ?? null), 'tampered');
+        $facts = $payload['invoice'];
+        MembershipPolicyDocument::keys($facts, ['source_invoice_hash', 'invoice_graph_hash', 'provider_scope_hash',
+            'amount_minor', 'currency', 'period_start', 'period_end', 'paid_at', 'plan_version_id', 'policy_hash',
+            'original_terms_hash', 'buyer_binding', 'provenance']);
+        MembershipException::require(is_int($facts['amount_minor']) && is_array($facts['buyer_binding']), 'tampered');
+        foreach (array_diff(array_keys($facts), ['amount_minor', 'buyer_binding']) as $key) {
+            MembershipException::require(is_string($facts[$key]), 'tampered');
+        }
+        $invoice = new MembershipInvoiceBinding($facts['source_invoice_hash'], $facts['invoice_graph_hash'],
+            $facts['provider_scope_hash'], $facts['amount_minor'], $facts['currency'], $facts['period_start'], $facts['period_end'],
+            $facts['policy_hash'], $facts['original_terms_hash'], $facts['buyer_binding'], $facts['provenance'], $facts['paid_at'], $facts['plan_version_id']);
+        MembershipException::require($invoice->planVersionId === $policy->planVersionId && $invoice->planPolicyHash === $policy->policyHash
+            && $invoice->originalTermsHash === $policy->originalTermsHash && $invoice->provenance === $policy->provenance
+            && $invoice->amountMinor === $policy->billingPriceMinor && $invoice->currency === $policy->billingCurrency
+            && $policy->awardTerms !== null && $policy->awardTerms->admitsPayment($invoice->periodEnd, $invoice->paidAt), 'conflicting_invoice');
+        self::verifiedFirstAward($period, $firstAward, $invoice, $policy, $originId, $payload);
+
+        return $invoice;
+    }
+
+    private static function periodPayload(array $period): array
+    {
+        MembershipPolicyDocument::keys($period, ['id', 'account_id', 'user_id', 'identity_origin_id', 'plan_version_id',
+            'source_invoice_hash', 'invoice_graph_hash', 'owner_binding_hash', 'allowance', 'period_start', 'period_end',
+            'credit_expires_at', 'payload_ciphertext', 'seal', 'created_at']);
+        self::verifySeal(self::PERIODS, $period);
+        MembershipValues::id($period['id']);
+        MembershipValues::utc($period['created_at']);
+        MembershipException::require(is_string($period['payload_ciphertext']) && strlen($period['payload_ciphertext']) <= 65536, 'tampered');
+        try {
+            $plain = Crypt::decryptString($period['payload_ciphertext']);
+            $payload = json_decode($plain, true, 24, JSON_THROW_ON_ERROR);
+        } catch (Throwable) {
+            throw new MembershipException('tampered');
+        }
+        MembershipException::require(is_array($payload) && strlen($plain) <= 16384 && CanonicalJson::encode($payload) === $plain, 'tampered');
+
+        return $payload;
     }
 
     /** Authenticate the exact event column set before interpreting balances or joins. */

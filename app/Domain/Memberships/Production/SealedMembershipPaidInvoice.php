@@ -79,6 +79,19 @@ final class SealedMembershipPaidInvoice implements MembershipPaidInvoiceAuthorit
         return $this->issued[$proof]['freshness'];
     }
 
+    /** One complete lock proof exports its same original observation; no window is renewed. */
+    public function capture(string $locator, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): array
+    {
+        $proof = $this->lock($locator, $principal, $actor, $rows);
+        $issued = $this->issued[$proof];
+        MembershipException::require($issued['principal'] === $principal && $issued['actor'] === $actor
+            && $issued['rows'] === $rows && $issued['pdo'] === $rows->identity(), 'foreign_invoice_proof');
+        MembershipException::require(hrtime(true) < $issued['deadline_ns'], 'expired_invoice_proof');
+        $issued['freshness']->assertDeadline();
+
+        return [$proof, $issued['freshness']];
+    }
+
     private function sameOwner(array $original, array $current): void
     {
         // Recovery may change the verification observation; the original owner and origin remain fixed.

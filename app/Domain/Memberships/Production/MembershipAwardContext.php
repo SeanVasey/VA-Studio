@@ -6,6 +6,9 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Grants\Member\MemberActivationHistoryReader;
+use App\Domain\Grants\Member\MemberActivationHistorySnapshot;
+use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use App\Domain\Memberships\Billing\BillingFreshnessWindow;
 use App\Domain\Memberships\Billing\BillingPolicy;
 use App\Models\User;
@@ -17,9 +20,15 @@ final class MembershipAwardContext
 {
     private ProductionCustomerAccess $access;
 
+    private MemberOriginalFinishBoundary $finish;
+
     private array $identity;
 
     private array $historical;
+
+    private MemberActivationHistoryReader $memberHistoryReader;
+
+    private MemberActivationHistorySnapshot $memberHistory;
 
     private MembershipPaidInvoiceProof $invoiceProof;
 
@@ -57,7 +66,9 @@ final class MembershipAwardContext
     ) {
         MembershipAwards::consumeContextPermit($rows, $configuration, $policy, $membershipConfiguration,
             $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $locator);
+        $this->finish = MemberOriginalFinishBoundary::capture();
         $this->admit();
+        $this->memberHistoryReader = new MemberActivationHistoryReader;
         $this->access = new ProductionCustomerAccess;
         $this->identity = $this->access->lock($principal, $actor, $rows->current());
         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
@@ -90,8 +101,10 @@ final class MembershipAwardContext
         }
         $this->redemptions = $rows->rows(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
         $this->events = $rows->rows(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1);
+        $this->memberHistory = $this->memberHistoryReader->capturePeriod($this->period['id'], $rows);
+        $this->assertHistoryScope($this->period, $this->events, $this->redemptions);
         $this->projection = MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id'], $this->redemptions);
+            (int) $this->historical['origin']['id'], $this->redemptions, $this->memberHistory->value());
         $this->proveCurrent();
     }
 
@@ -107,14 +120,18 @@ final class MembershipAwardContext
 
     public function proveCurrent(): void
     {
+        $this->memberHistoryReader->currentCallbacks($this->memberHistory, $this->rows);
         $this->proveSources();
         $billing = MembershipBillingEvidence::currentSnapshot($this->rows, $this->invoice, $this->billingConfiguration, $this->invoiceFreshness);
         $plan = $this->rows->one(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId]);
         MembershipPolicyVersions::document($plan);
         MembershipPeriodRecords::verify($this->period, $this->events, $this->invoice, $this->facts,
-            (int) $this->historical['origin']['id'], $this->redemptions);
+            (int) $this->historical['origin']['id'], $this->redemptions, $this->memberHistory->value());
         $this->access->proveCurrent($this->principal, $this->actor, $this->rows->current(), $this->identity);
+        $this->assertHistoryScope($this->period, $this->events, $this->redemptions);
+        $this->finish->assertFrame($this->rows->identity(), false);
         // Nothing below decrypts, resolves a capability or invokes a clock hook.
+        $this->memberHistoryReader->currentRaw($this->memberHistory, $this->rows);
         $this->assertEffects(false);
         MembershipBillingEvidence::assertCurrentSnapshot($this->rows, $billing);
         $this->admit();
@@ -128,6 +145,7 @@ final class MembershipAwardContext
         MembershipException::require($frame->reader()->identityPrimary() === $this->rows->identity(), 'changed_primary');
         $this->admit();
         (new MembershipSchema)->assertOwned($this->rows->identity());
+        $this->memberHistoryReader->committedCallbacks($this->memberHistory, $frame);
         $billing = MembershipBillingEvidence::committed($frame, $this->invoice, $this->billingConfiguration, $this->deadline, $this->invoiceFreshness);
         $plan = $this->read(MembershipRecords::TABLE, 'id = ?', [$this->facts->planVersionId], 2, false);
         MembershipException::require(count($plan) === 1, 'changed_policy_facts');
@@ -136,14 +154,19 @@ final class MembershipAwardContext
         MembershipException::require(count($period) === 1, 'changed_period');
         $events = $this->read(MembershipPeriodRecords::EVENTS, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
         $redemptions = $this->read(MembershipReservationRecords::TABLE, 'period_id = ?', [$this->period['id']], MembershipPolicy::MAX_EVENTS + 1, false);
-        MembershipPeriodRecords::verify($period[0], $events, $this->invoice, $this->facts, (int) $this->historical['origin']['id'], $redemptions);
+        MembershipPeriodRecords::verify($period[0], $events, $this->invoice, $this->facts, (int) $this->historical['origin']['id'], $redemptions, $this->memberHistory->value());
         $this->access->proveHistoricalBindingCommitted($this->invoice->originalBuyerBinding, $frame, $this->historical);
         $this->access->proveCommitted($this->principal, $this->actor, $frame, $this->identity);
+        $this->assertHistoryScope($period[0], $events, $redemptions);
+        $this->finish->assertFrame($this->rows->identity(), true);
         // Finish all callback-capable proof work before the final raw retained-row closure.
+        $this->memberHistoryReader->committedRaw($this->memberHistory, $frame);
         $this->assertEffects(true);
-        MembershipBillingEvidence::assertCommittedSnapshot($frame, $billing);
+        MembershipBillingEvidence::assertCapturedSnapshot($this->rows->identity(), $billing);
         $this->admit();
+        $this->finish->assertFrame($this->rows->identity(), true);
         $frame->finish();
+        $this->finish->assertCurrent();
         $this->admit();
     }
 
@@ -200,6 +223,19 @@ final class MembershipAwardContext
             MembershipException::require(CanonicalJson::encode(array_map(MembershipRecords::strings(...), $actual))
                 === CanonicalJson::encode(array_map(MembershipRecords::strings(...), $expected)), 'changed_retained_effect');
         }
+    }
+
+    /** The complete member graph and ordinary credit audit must use the exact same 257 scope. */
+    private function assertHistoryScope(array $period, array $events, array $redemptions): void
+    {
+        $sort = static function (array $rows): array {
+            usort($rows, static fn (array $a, array $b): int => strcmp($a['id'], $b['id']));
+
+            return array_map(MembershipRecords::strings(...), $rows);
+        };
+        $scope = $this->memberHistory->scope();
+        MembershipException::require(MembershipRecords::strings($period) === MembershipRecords::strings($scope['period'])
+            && $sort($events) === $sort($scope['events']) && $sort($redemptions) === $sort($scope['redemptions']), 'changed_retained_effect');
     }
 
     private function read(string $table, string $where, array $bindings, int $limit, bool $locking): array

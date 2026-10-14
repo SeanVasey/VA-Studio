@@ -989,6 +989,18 @@
     [
       "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalNativeIoFrameTest",
       "test_native_foreign_facade_manager_transaction_is_never_admitted_or_rolled_back"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberGrantNativeWriteRollbackTest",
+      "test_a_native_denial_at_each_owned_write_stage_rolls_back_every_partial_effect"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberGrantNativeActivationRaceTest",
+      "test_independently_confirmed_same_redemption_workers_retain_the_exact_winner_graph"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberGrantNativeActivationReleaseRaceTest",
+      "test_actual_consume_and_release_serialize_at_the_authored_honor_boundary"
     ]
   ]
 }

@@ -71,6 +71,14 @@ final class MemberOriginalIoFrame implements JsonSerializable
         }
     }
 
+    /** Exact resolved primary from the complete idle snapshot; no facade getter or SQL. */
+    public function identityPrimary(): PDO
+    {
+        $this->assertStillIdle();
+
+        return $this->handles[$this->configuration['database']['default']][0];
+    }
+
     private function configuration(): array
     {
         MemberGrantException::require(Container::getInstance() === $this->container, 'io_frame');

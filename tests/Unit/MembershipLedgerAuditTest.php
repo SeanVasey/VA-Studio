@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Grants\Member\MemberActivationHistory;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipInvoiceBinding;
 use App\Domain\Memberships\Production\MembershipLedgerAudit as Audit;
@@ -45,7 +46,7 @@ class MembershipLedgerAuditTest extends TestCase
         $this->assertSame(['period_id' => $f['period']['id'], 'award_event_id' => $f['award']['id'], 'allowance' => 3,
             'period_start' => '2026-10-13 12:00:00', 'period_end' => '2026-10-13 13:00:00',
             'credit_expires_at' => '2026-10-13 13:00:00', 'provenance' => IdentityPolicy::REHEARSAL], $audit['award']);
-        $this->assertSame($audit['award'], Period::verify($f['period'], [$f['award']], $f['invoice'], $f['policy'], 7));
+        $this->assertSame($audit['award'], Period::verify($f['period'], [$f['award']], $f['invoice'], $f['policy'], 7, [], MemberActivationHistory::empty()));
         foreach ([Period::PERIODS => $f['period'], Period::EVENTS => $f['award']] as $table => $row) {
             $seal = $row['seal'];
             unset($row['seal']);
@@ -69,7 +70,7 @@ class MembershipLedgerAuditTest extends TestCase
         $events = [$expire, $release, $reserve, $f['award']];
         $final = $this->audit($f, $events, [$row]);
         $this->assertSame(['available' => 0, 'reserved' => 0, 'consumed' => 0, 'expired' => 3], $final['balances']);
-        $this->assertSame($this->audit($f)['award'], Period::verify($f['period'], $events, $f['invoice'], $f['policy'], 7, [$row]));
+        $this->assertSame($this->audit($f)['award'], Period::verify($f['period'], $events, $f['invoice'], $f['policy'], 7, [$row], MemberActivationHistory::empty()));
         $this->assertSame($release, $final['reservations'][$row['id']]['terminal']);
         $this->refuses(fn () => Reservation::releaseEvent($final, $row['id'], $f['policy'], $f['buyer'], '2026-10-13 13:01:00'), 'reservation_closed');
         $this->refuses(fn () => Reservation::expireEvent($final, $f['policy'], $f['buyer'], '2026-10-13 13:01:00'), 'no_available_credit');
@@ -306,7 +307,7 @@ class MembershipLedgerAuditTest extends TestCase
 
     private function audit(array $fixture, ?array $events = null, array $redemptions = []): array
     {
-        return Audit::verify($fixture['period'], $events ?? [$fixture['award']], $redemptions, $fixture['invoice'], $fixture['policy'], 7);
+        return Audit::verify($fixture['period'], $events ?? [$fixture['award']], $redemptions, $fixture['invoice'], $fixture['policy'], 7, MemberActivationHistory::empty());
     }
 
     private function refuses(callable $operation, ?string $reason = null): void

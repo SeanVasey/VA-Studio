@@ -147,11 +147,11 @@ conditions recorded. Prefer local affected checks; manually request
 `expected_sha`. SQLite runs the complete PHP suite. MySQL runs only the reviewed
 [native selection](docs/verification/mysql-native-selection-20261009/README.md):
 files owning a method in the SQLite skip census, migration test files and a reviewed
-include list (163 of 557 files, 1,765 of 7,642 cases). Other tests no longer run on
-MySQL in Foundation CI, including 47 driver-branching test files pinned in its `residual_files`.
-MySQL may skip only the 58 reviewed SQLite-only cases in `scripts/ci/database-mysql-skips.json`,
+include list (219 of 647 files, 2,200 of 8,715 cases in list-only discovery at `3543b71f`). Other tests no longer run on
+MySQL in Foundation CI, including 49 driver-branching test files pinned in its `residual_files`.
+MySQL may skip only the 61 reviewed SQLite-only cases (17 methods) in `scripts/ci/database-mysql-skips.json`,
 and each of them must have run on SQLite. GitHub and the GitLab workflow both split that selection
-into 24 MySQL shards, weighted by hosted timings from Foundation run 37967128232. GitLab's 175-minute
+into 24 MySQL shards, weighted by hosted timings from Foundation run 38037183233; 56 selected files have no recorded timing. These are discovery counts, not executed tests or skips. GitLab's 175-minute
 job limit stays under its hosted runners' 3-hour cap; whether every shard finishes inside the GitHub
 and GitLab limits is unproven until the next hosted run. Dispatch GitLab only after a hosted GitHub run
 has measured MySQL shard 1 (`BulkReplaceLicenseDraftSourceTest` alone, about 122 minutes on GitHub).
