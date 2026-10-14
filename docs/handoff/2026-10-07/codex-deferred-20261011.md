@@ -170,5 +170,5 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 ### C4c portable packet verified — 2026-10-14
 
-- Integrated packet `6ca6fec9c04dc6371d5a6d9d0a23893af74cdcfe`:51releases/758members/557objects,63sourcebundles/65PHPUnitinvocations,69Gitbindings/35overrides and563digest entries pass. These are archive counts across historical/current selections, not one suite. Original failures and Partial/null-exit receipts remain visible.
+- Integrated packet `6ca6fec9c04dc6371d5a6d9d0a23893af74cdcfe`:51releases/758members/557objects,63sourcebundles/65 recorded invocations (64 PHPUnit and one formatting),69Gitbindings/35overrides and563digest entries pass. These are archive counts across historical/current selections, not one suite. Original failures and Partial/null-exit receipts remain visible.
 - Updated-head local policy at `75629871` passes209checks, allfive exits0. Actual2320application/test inputs, loader metadata and43CIinputs match the integrated packet candidate. Final separate non-author overall DECISION, receipt-only carry and exact-head preflight still precede merge. Keep the adjacent ordinary callback P2 and all listed activation/coverage conditions frozen for the next related batch.
