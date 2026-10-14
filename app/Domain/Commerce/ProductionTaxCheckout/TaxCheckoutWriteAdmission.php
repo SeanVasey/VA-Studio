@@ -138,11 +138,13 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
         foreach ($requests as $request) {
             $intent = TaxCheckoutEvidence::intent($tax, $order, $request);
             $family->plan(TaxCheckoutSchema::TABLES['request'], 'id = ?', [$request['id']], 2, [$request]);
+            $family->plan(TaxCheckoutSchema::TABLES['request'], 'public_id = ?', [$request['public_id']], 2, [$request]);
             $family->plan(TaxCheckoutSchema::TABLES['request'], 'idempotency_key = ?', [$request['idempotency_key']], 2, [$request]);
             $family->plan(TaxCheckoutSchema::TABLES['binding'], 'request_id = ?', [$request['id']], 2, $intent['raw']['binding']);
             $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'request_id = ?', [$request['id']], 2, $intent['raw']['reviewed']);
             $reviewedForOrder = $intent['raw']['reviewed'];
             foreach ($intent['raw']['binding'] as $binding) {
+                $family->plan(TaxCheckoutSchema::TABLES['binding'], 'public_id = ?', [$binding['public_id']], 2, [$binding]);
                 $family->plan(TaxCheckoutSchema::TABLES['binding'], 'account_id = ? AND funds_mode = ? AND provider_session_id = ?',
                     [$binding['account_id'], $binding['funds_mode'], $binding['provider_session_id']], 2, [$binding]);
                 $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'binding_id = ?', [$binding['id']], 2, $intent['raw']['reviewed']);
@@ -150,6 +152,7 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
                     [$binding['account_id'], $binding['funds_mode'], $binding['provider_session_id']], 2, $intent['raw']['reviewed']);
             }
             foreach ($intent['raw']['reviewed'] as $reviewed) {
+                $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'public_id = ?', [$reviewed['public_id']], 2, [$reviewed]);
                 $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'account_id = ? AND funds_mode = ? AND provider_payment_id = ?',
                     [$reviewed['account_id'], $reviewed['funds_mode'], $reviewed['provider_payment_id']], 2, [$reviewed]);
             }

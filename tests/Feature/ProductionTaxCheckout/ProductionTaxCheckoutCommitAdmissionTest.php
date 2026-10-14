@@ -4,6 +4,9 @@ namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;
@@ -19,13 +22,35 @@ use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTaxCheckoutFixtures;
+use Tests\Support\ProductionTrackPreparationFixtures;
 use Tests\TestCase;
 
 /** NEW Tax255 writes must survive the ordinary committing delegates before physical admission. */
 class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
-    use ProductionTaxCheckoutFixtures;
+    use ProductionTaxCheckoutFixtures {
+        taxCatalog as baseTaxCatalog;
+    }
+
+    private ?string $admissionLicenseUntil = null;
+
+    /** Publish the bounded synthetic license through the actual lifecycle; never mutate frozen terms. */
+    protected function taxCatalog(string $behavior = 'exclusive', int $ceiling = 2500): array
+    {
+        if ($this->admissionLicenseUntil === null) {
+            return $this->baseTaxCatalog($behavior, $ceiling);
+        }
+        self::configureTax();
+        $fixture = ProductionTrackPreparationFixtures::prepared(licenseUntil: $this->admissionLicenseUntil);
+        $machine = self::taxMachine($behavior, $ceiling);
+        $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
+            app(PrepareProductionTrackCapabilities::class)->review($fixture['candidate'], $fixture['source'], $machine, $fixture['actor']), $fixture['actor']);
+        app(ReviewProductionTrackCapabilities::class)->applyReviewed(app(ReviewProductionTrackCapabilities::class)->review($candidate, $fixture['reviewer']),
+            ProductionTrackPreparationFixtures::reference('software_choices_reviewed'), $fixture['reviewer']);
+
+        return array_replace($fixture, compact('machine', 'candidate'));
+    }
 
     protected function setUp(): void
     {
@@ -52,6 +77,73 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
     {
         return ['order catalog' => ['order', 'catalog'], 'request catalog' => ['request', 'catalog'],
             'order credential' => ['order', 'credential'], 'request credential' => ['request', 'credential']];
+    }
+
+    public static function currentWrites(): array
+    {
+        return ['order' => ['order'], 'request' => ['request']];
+    }
+
+    #[DataProvider('currentWrites')]
+    public function test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback(string $kind): void
+    {
+        $at = CarbonImmutable::now('UTC')->startOfSecond();
+        $this->admissionLicenseUntil = $at->addSeconds(5)->format('Y-m-d H:i:s');
+        // Wall time is fixed during fixture assembly. Expiry below is real monotonic elapsed time.
+        CarbonImmutable::setTestNow($at);
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $afterCommit = 0;
+        $elapsed = 0;
+        try {
+            $fixture = $this->fixture($kind);
+            $before = $this->snapshot();
+            $table = TaxCheckoutSchema::TABLES[$kind];
+            $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($connection, $primary, $table, $before, &$hits, &$afterCommit, &$elapsed): void {
+                if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
+                    && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before[$table]['count'] + 1) {
+                    $hits++;
+                    $connection->afterCommit(function () use (&$afterCommit): void {
+                        $afterCommit++;
+                    });
+                    $tick = hrtime(true);
+                    usleep(5_100_000);
+                    $elapsed = hrtime(true) - $tick;
+                }
+            });
+            $refusal = null;
+            try {
+                $this->write($fixture, $kind);
+            } catch (CheckoutException $error) {
+                $refusal = $error;
+            } finally {
+                $dispatcher->forget(TransactionCommitting::class);
+            }
+            $this->assertSame(1, $hits);
+            $this->assertGreaterThanOrEqual(5_000_000_000, $elapsed);
+            $this->assertSame($at->format('U.u'), CarbonImmutable::now('UTC')->format('U.u'), 'The test did not advance its wall clock to cause refusal.');
+            $this->assertInstanceOf(CheckoutException::class, $refusal);
+            $this->assertSame('write_frame', $refusal->reason);
+            $this->assertSame($before, $this->snapshot());
+            $this->assertSame(0, $afterCommit);
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertFalse($primary->inTransaction());
+            $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        } finally {
+            $dispatcher->forget(TransactionCommitting::class);
+            CarbonImmutable::setTestNow();
+            $this->admissionLicenseUntil = null;
+        }
+        // A new independently admitted catalog/order is valid; the expired immutable license is never extended.
+        $valid = $this->fixture($kind);
+        $count = DB::table(TaxCheckoutSchema::TABLES[$kind])->count();
+        $this->write($valid, $kind);
+        $this->assertSame($count + 1, DB::table(TaxCheckoutSchema::TABLES[$kind])->count());
+        $this->assertSame(0, $afterCommit);
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
     }
 
     private function fixture(string $kind): array
@@ -384,7 +476,7 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
             $refusal = $error;
         }
         $this->assertInstanceOf(CheckoutException::class, $refusal);
-        $this->assertSame(['permanent_schema', 503], [$refusal->reason, $refusal->status]);
+        $this->assertSame(['permanent_schema', 409], [$refusal->reason, $refusal->status]);
         $this->assertSame($before, $this->snapshot(), 'Damaged storage must refuse before target DML.');
         $this->assertSame($wait, (int) $primary->query('SELECT @@session.lock_wait_timeout')->fetchColumn());
         $this->assertSame(0, DB::connection()->transactionLevel());
