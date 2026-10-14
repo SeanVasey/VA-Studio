@@ -4,6 +4,7 @@ use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\PaidGrantPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
@@ -51,6 +52,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(ServiceProjectPrivacy::class);
         $middleware->prepend(IdentityPrivacy::class);
         $middleware->prepend(FreeGrantPrivacy::class);
+        $middleware->prepend(PaidGrantPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
@@ -61,6 +63,11 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (PaidGrantPrivacy::matches(request())) {
+                PaidGrantPrivacy::report($exception);
+
+                return false;
+            }
             if (SupportAttachmentPrivacy::matches(request())) {
                 try {
                     Log::error('Private attachment request failed.', ['exception_class' => $exception::class]);
@@ -169,6 +176,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (PaidGrantPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
+
+                return $status >= 400 ? PaidGrantPrivacy::error($status) : PaidGrantPrivacy::protect($response);
+            }
             if (SupportAttachmentPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode(), $response->headers->all()) : SupportAttachmentResponse::protect($response);
             }

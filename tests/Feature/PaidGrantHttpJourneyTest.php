@@ -9,21 +9,18 @@ use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantRecords;
-use App\Http\Middleware\PaidGrantPrivacy;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\PaidGrantRootHttpFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\TestCase;
 
@@ -32,6 +29,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
     use PaidGrantDependencyFixtures;
+    use PaidGrantRootHttpFixture;
     use ProductionCheckoutJourneyFixture;
 
     protected function beforeRefreshingDatabase(): void
@@ -43,11 +41,6 @@ final class PaidGrantHttpJourneyTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        $this->app->make(Kernel::class)->prependMiddleware(PaidGrantPrivacy::class);
-        $this->app->make(ExceptionHandler::class)->respondUsing(static function ($response, $error, $request) {
-            return PaidGrantPrivacy::matches($request) ? PaidGrantPrivacy::error($response->getStatusCode()) : $response;
-        });
-        Route::middleware('web')->group(base_path('routes/paid-grants.php'));
         $this->fakePrivateMediaStorage();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('p', 32)),
             'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,

@@ -4,6 +4,8 @@ return [
     // Exact identity/paid-source, approved original terms and an authored delivery policy are prerequisites.
     'rehearsal_enabled' => false,
     'operative_enabled' => false,
+    // Root HTTP registration is a separate explicit mount decision after the documented pre-mount conditions.
+    'http_mounted' => false,
     'delivery_policy' => null,
     // The authorization lifetime only bounds when a redemption may start. An admitted transfer gets its own deadline,
     // counted from the redemption commit: transfer_base_seconds plus the snapshot size at transfer_min_bytes_per_second
