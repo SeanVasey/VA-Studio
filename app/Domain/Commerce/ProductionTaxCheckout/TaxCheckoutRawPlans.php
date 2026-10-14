@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionCheckout\CheckoutCommandFrame;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use LogicException;
 use PDO;
+use PDOException;
 
 /** Fixed Tax255/historical-ownership comparisons; expected arrays confer no authority themselves. */
 final class TaxCheckoutRawPlans
@@ -48,11 +49,32 @@ final class TaxCheckoutRawPlans
     private function read(string $table, string $where, array $bindings, int $limit, array $columns): array
     {
         $this->frame->prove(1);
-        $statement = $this->frame->primary()->prepare('SELECT '.implode(', ', $columns).' FROM '.$this->qualified($table)
-            .' WHERE '.$where.' ORDER BY id LIMIT '.$limit);
-        $statement->execute($bindings);
-        $this->frame->provePdo();
-        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $primary = $this->frame->primary();
+        $mysql = $this->frame->driver() === 'mysql';
+        $wait = null;
+        try {
+            if ($mysql) {
+                $wait = (int) $primary->query('SELECT @@session.innodb_lock_wait_timeout')->fetchColumn();
+                $primary->exec('SET SESSION innodb_lock_wait_timeout = '.min($wait, 5));
+            }
+            $this->frame->prove(1);
+            $statement = $primary->prepare('SELECT '.implode(', ', $columns).' FROM '.$this->qualified($table)
+                .' WHERE '.$where.' ORDER BY id LIMIT '.$limit.($mysql ? ' FOR UPDATE' : ''));
+            $statement->execute($bindings);
+            $this->frame->provePdo();
+            $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $this->frame->prove(1);
+        } catch (PDOException $error) {
+            if ($mysql && in_array((int) ($error->errorInfo[1] ?? 0), [1205, 1213], true)) {
+                throw new CheckoutException('contention', 503);
+            }
+            throw $error;
+        } finally {
+            if ($wait !== null) {
+                // Session restoration uses only this captured PDO, including after automatic deadlock rollback.
+                $primary->exec('SET SESSION innodb_lock_wait_timeout = '.$wait);
+            }
+        }
         $this->frame->prove(1);
 
         return $rows;
