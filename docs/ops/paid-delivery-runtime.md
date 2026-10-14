@@ -8,6 +8,18 @@ a production deployment.
 Sources: Paid252 independent review addenda 9 and 10 (A9-I6, C11 (a)–(e)) and Codex rounds 13, 14 and 16
 (`docs/verification/paid252-composition-20261007/`), plus Codex round 23 (C11 (k)).
 
+## Root registration
+
+`paid-grants.http_mounted` ships as `false`. Only the explicit boolean `true` registers the paid routes in the root web
+route build. Root bootstrap supplies the private intake and generic exception reporting/responses; local tests override
+the mount setting before providers boot and use that real wiring. Neither operative nor rehearsal enablement follows
+from registration. All other pre-mount conditions, authored production policy/account inputs and host verification remain
+required before enabling this switch on a production host.
+
+The switch is evaluated when routes are built, including `route:cache`. Changing it requires rebuilding the route cache
+with the intended configuration; changing configuration alone does not replace an existing route cache. No production
+route-cache rebuild or host mounting is claimed by the synthetic development checks.
+
 ## Why these settings matter
 
 - A paid download streams an exact private snapshot through PHP. If a slow client stops reading, PHP's write blocks.
@@ -23,18 +35,25 @@ Sources: Paid252 independent review addenda 9 and 10 (A9-I6, C11 (a)–(e)) and 
 
 Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPolicy` accepts.
 
-| Route | Path before the first byte | Whole request | Defaults | Validated maxima |
+These are application admission/work allowances, not measured host termination guarantees. Only redeem's captured
+request budget includes the validated server-start age and identity work. Document and other-route budgets start after
+the controller's identity proof; their identity, middleware/queue and response I/O overhead are excluded below. Blocking
+SQL or output still requires the host limits and verification described here; an application time check cannot interrupt
+it. Size timeout margins for those excluded costs on the chosen host.
+
+| Route | Timed path before the first byte | Timed application work | Defaults | Validated maxima |
 | --- | --- | --- | --- | --- |
 | `POST /paid-grants/authorizations/{id}/redeem` | locate + frame 1 ≤ 60 s, snapshot ≤ `snapshot_seconds`, frame 2 ≤ 60 s | + `transfer_max_seconds` | first byte ≤ 420 s; whole ≤ 7,620 s | first byte ≤ 1,920 s; whole ≤ 16,320 s |
-| `POST /paid-grants/origins/{batch}/document` | the whole request (JSON answer at the end) | claim loop ≤ 300 s + last claimed line ≤ 300 s + completion (10 × 300 s + 60 s) | ≤ 3,660 s | same (fixed by `LEASE_SECONDS`) |
+| `POST /paid-grants/origins/{batch}/document` | timed application work (JSON answer at the end) | claim loop ≤ 300 s + last claimed line ≤ 300 s + completion (10 × 300 s + 60 s) | ≤ 3,660 s | same (fixed by `LEASE_SECONDS`) |
 | All other paid routes | — | ≤ 60 s budget + 5 s session-lock wait | ≤ 65 s | same |
 
 ## Requirements
 
 1. **Dedicated PHP-FPM pool** (or the host's equivalent) for the two long routes above. All other routes stay on the
    normal pool with its normal short timeout. A pool-wide two-hour limit must never apply to the whole application.
-   - `request_terminate_timeout` at least the "Whole request" bound plus a margin. That is 7,800 s at the defaults; raise
-     it with `transfer_max_seconds` or `snapshot_seconds`.
+   - `request_terminate_timeout` sized for the "Timed application work" allowance plus the host's required overhead and
+     margin. The default redeem reference is 7,800 s; raise it with `transfer_max_seconds` or `snapshot_seconds` and verify
+     it on the host. Include the excluded identity/middleware/queue/I/O costs for document and other routes.
    - `php_admin_value[max_execution_time] = 0` in that pool, or a value above the same bound. Hashing is CPU time, so a
      default 30 s limit would cut off the snapshot and completion on large files.
    - `pm.max_children` sized for the three spool slots plus concurrent document requests. Paid preparation runs at most
@@ -42,9 +61,11 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
 2. **Proxy read timeout per route.**
    - `redeem`: `fastcgi_read_timeout` (or equivalent) at least the first-byte bound plus a margin: 480 s at the
      defaults. After the first byte, the per-write timeout applies.
-   - `document`: at least the whole-request bound plus a margin: 3,900 s.
+   - `document`: the timed application allowance plus identity/queue/I/O and a verified margin; 3,900 s is the default
+     application reference, not a measured whole-request guarantee.
    - nginx's 60 s default is too short for both.
-   - The `redeem` bound starts when PHP begins the controller, but the proxy's clock starts earlier. Before
+   - The controller captures a monotonic request budget before identity proof, deducting the validated server-start
+     age once from both the initial 60 s and overall first-byte allowance. Before
      `redeem()` runs there is the session-lock wait (up to 5 s) and the customer identity proof. The proof has no
      deadline of its own. On MySQL it issues 4 × (9 + k) `SELECT … FOR UPDATE` reads, where k is the account's
      verification count (1 to 128): 40 to 548 locking reads. Each also runs schema checks whose metadata-lock waits
@@ -52,10 +73,17 @@ Defaults come from `config/paid-grants.php`. Maxima are the values `PaidGrantPol
      Redemption is judged at the request's start, so a slow proof no longer refuses a token that was live on arrival
      (Codex round 23). But if the proof plus the first-byte path outlasts the proxy timeout, the server can record the
      attempt while the customer gets a 504. Lowering `innodb_lock_wait_timeout` alone cannot close this: at its 1 s
-     minimum the worst case is still 548 s. Before mount, add an explicit budget measured from the captured request
-     start and checked before anything is recorded (before `locate()` and again before the commit frame inserts the
-     attempt). If database timeouts are also used, set both `lock_wait_timeout` and `innodb_lock_wait_timeout` on the
-     paid connection, sized for 4 × (9 + 128) statements (condition C11 (k), open for Sean).
+     minimum the worst case is still 548 s. `PaidGrantRequestBudget` caps locating/first frame at the original request's
+     initial allowance, the snapshot at the smaller captured/current snapshot setting and overall remainder, and the
+     commit/first-byte frame at the original overall remainder. Checks run after identity/access/locate, immediately
+     before attempt insertion, in final commit admission and immediately before the first chunk. A later min-only
+     reduction reaches the same admission budget; the later chunks keep their separate transfer allowance.
+     These checks refuse late work after SQL returns; they do not interrupt a blocked SQL statement. Missing or
+     implausible SAPI start values retain stricter token admission fallback but cannot prove elapsed proxy time.
+     Verify valid per-request SAPI values/clock, queue/proxy margins and real blocking behavior before mount. If database
+     timeouts are also used, set both `lock_wait_timeout` and `innodb_lock_wait_timeout` on the paid connection, sized for
+     4 × (9 + 128) statements. The source budget closes the implementation portion of C11 (k); host verification remains
+     open for Sean. A trusted domain call without a captured HTTP budget retains its entry-time allowance.
 3. **Proxy response buffering on** for `redeem`, with a temp-file cap at least the largest deliverable. With nginx that
    means `fastcgi_buffering on` and `fastcgi_max_temp_file_size 1024m` (1 GiB, `DeliveryAssetFiles::MAX_BYTES`). PHP
    then finishes writing at disk speed and releases its spool slot, while the proxy serves slow clients.
@@ -114,7 +142,8 @@ location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
     fastcgi_pass unix:/run/php/paid-delivery.sock;
-    fastcgi_read_timeout 3900s;          # whole request: 300 + 300 + 10 x 300 + 60, plus margin
+    # Application reference: 300 + 300 + 10 x 300 + 60; add measured identity/queue/I/O margin.
+    fastcgi_read_timeout 3900s;
 }
 ```
 

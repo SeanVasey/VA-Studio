@@ -38,8 +38,11 @@ final class PaidGrantCommands
         try {
             app(PaidGrantPolicy::class)->capture();
             app(ProductionCustomerAccess::class)->current($principal, $actor);
+            $deadline->proveCurrent();
             $orderId = $this->locate($batchId, $principal->accountId);
+            $deadline->proveCurrent();
             $locator = ProductionPaidOrderLocatorV1::locate($orderId);
+            $deadline->proveCurrent();
             $result = DB::transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
                 $deadline, $projectionRead, &$heldRows, &$receipt, &$producerRead, &$producerSecond): array {
                 $rows = new PaidGrantRows;
@@ -47,10 +50,12 @@ final class PaidGrantCommands
                 $policy = app(PaidGrantPolicy::class)->capture();
                 $access = app(ProductionCustomerAccess::class);
                 $authority = $access->lock($principal, $actor, $rows->current());
+                $deadline->proveCurrent();
                 $binding = $access->durableBinding($principal);
                 $original = $locator->historicalBuyerBinding();
                 $grants->sameOwner($binding, $original);
                 $historical = $access->verifyHistoricalBinding($original, $rows->current());
+                $deadline->proveCurrent();
                 $reader = $rows->admitSource();
                 $source = ProductionPaidOrderSourceV1::lockedRead($locator, $reader, $historical);
                 $sources = [];
@@ -61,6 +66,7 @@ final class PaidGrantCommands
                 PaidGrantException::require(CanonicalJson::encode($graph['payload']['original_buyer']) === CanonicalJson::encode($original)
                     && CanonicalJson::encode(array_column(array_column($graph['lines'], 'body'), 'source')) === CanonicalJson::encode($sources), 409);
                 PaidGrantPolicy::retained($graph['payload']['delivery_policy'], $policy);
+                $deadline->proveCurrent();
                 $result = $operation($graph, $rows);
                 PaidGrantException::require(is_array($result));
                 $expected = $grants->graph($batchId, $binding['account_id'], $rows);
