@@ -32,7 +32,7 @@ final class PaidGrantRequestBudget
 
     public function initialDeadline(): PaidGrantDeadline
     {
-        $deadline = PaidGrantDeadline::start();
+        $deadline = PaidGrantDeadline::forRequest($this);
         $deadline->shortenTo(min($this->initial, $this->deadline));
         $deadline->proveCurrent();
 
@@ -49,7 +49,7 @@ final class PaidGrantRequestBudget
 
     public function commitDeadline(): PaidGrantDeadline
     {
-        $deadline = PaidGrantDeadline::start();
+        $deadline = PaidGrantDeadline::forRequest($this);
         $deadline->shortenTo($this->deadline);
         $deadline->proveCurrent();
 
@@ -67,9 +67,19 @@ final class PaidGrantRequestBudget
         PaidGrantException::require(hrtime(true) <= $this->deadline, 410);
     }
 
+    public function value(): int
+    {
+        return $this->deadline;
+    }
+
     public function __serialize(): array
     {
         throw new LogicException('Private paid request budgets cannot be serialized.');
+    }
+
+    public function __unserialize(array $data): void
+    {
+        throw new LogicException('Private paid request budgets cannot be deserialized.');
     }
 
     private function __clone() {}

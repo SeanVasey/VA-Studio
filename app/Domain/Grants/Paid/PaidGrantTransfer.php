@@ -32,8 +32,13 @@ final class PaidGrantTransfer
             $this->closedRead->proveBeforeBytes();
             $this->requestBudget?->proveCurrent();
             $this->within();
-            $this->stream->writeTo(function (string $bytes) use ($consumer): void {
+            $first = true;
+            $this->stream->writeTo(function (string $bytes) use ($consumer, &$first): void {
                 $this->within();
+                if ($first) {
+                    $this->requestBudget?->proveCurrent();
+                    $first = false;
+                }
                 $consumer($bytes);
             });
         } finally {
