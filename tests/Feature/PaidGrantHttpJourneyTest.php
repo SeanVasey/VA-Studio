@@ -171,7 +171,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $f['gateway']->paid = true;
         $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $order['orderId'])['paymentStatus']);
         $this->login($f['buyer']);
-        $origin = $this->postJson('/paid-grants/orders/'.$order['orderId'].'/finalize', [])->assertOk()->json('origin');
+        $origin = $this->call('POST', '/paid-grants/orders/'.$order['orderId'].'/finalize', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk()->json('origin');
         $this->assertCount(2, $origin['lines']);
         $calls = 0;
         app()->instance(PaidGrantRendererProcess::class, new PaidGrantRendererProcess(static function ($command, $directory, $environment, $input) use (&$calls): Process {
@@ -182,7 +182,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
             return new Process($command, $directory, $environment, $input);
         }));
 
-        $failure = $this->postJson('/paid-grants/origins/'.$origin['id'].'/document', [])->assertStatus(503);
+        $failure = $this->call('POST', '/paid-grants/origins/'.$origin['id'].'/document', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertStatus(503);
 
         $this->assertPrivate($failure);
         $this->assertSame(2, $calls, 'Line one renders through the real child before line two fails.');
@@ -190,7 +190,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $firstManifest = PaidGrantRecords::decode($firstOriginal);
         $firstPdf = file_get_contents(Storage::disk('local')->path($firstManifest['artifact']['storage_path']));
         $this->assertStringStartsWith('%PDF-', $firstPdf);
-        $this->assertSame($firstManifest['artifact']['sha256'], hash('sha256', $firstPdf));
+        $this->assertSame($firstManifest['artifact']['pdf_hash'], hash('sha256', $firstPdf));
         $this->assertSame(['complete', 'failed'], DB::table('paid_document_work')->orderBy('id')->pluck('state')->all());
         $this->assertDatabaseCount('paid_fulfillments', 0);
         $this->postJson('/paid-grants/origins/'.$origin['id'].'/lines/'.$origin['lines'][0]['id'].'/authorize',
@@ -199,7 +199,7 @@ final class PaidGrantHttpJourneyTest extends TestCase
         $this->assertDatabaseCount('paid_redemptions', 0);
         app()->forgetInstance(PaidGrantRendererProcess::class);
 
-        $retry = $this->postJson('/paid-grants/origins/'.$origin['id'].'/document', [])->assertOk();
+        $retry = $this->call('POST', '/paid-grants/origins/'.$origin['id'].'/document', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertOk();
 
         $this->assertPrivate($retry);
         $this->assertFalse($retry->json('busy'));
