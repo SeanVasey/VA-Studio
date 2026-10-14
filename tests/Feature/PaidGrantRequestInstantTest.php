@@ -209,6 +209,37 @@ final class PaidGrantRequestInstantTest extends TestCase
         return (float) CarbonImmutable::now('UTC')->format('U.u');
     }
 
+    public function test_elapsed_identity_work_cannot_start_a_new_download_budget_or_consume_an_attempt(): void
+    {
+        [, $auth] = $this->authorized();
+        // Wall time only positions the synthetic authorization. The callback spends two real monotonic seconds;
+        // the server instant leaves at most 1.5 s of the original observation budget before identity starts.
+        $this->travelTo(CarbonImmutable::parse($auth['expiresAt'], 'UTC')->subSeconds(20));
+        $received = $this->now() - 58.5;
+        $calls = 0;
+        $elapsed = 0;
+        Event::listen(TransactionCommitted::class, function () use (&$calls, &$elapsed): void {
+            if ($calls !== 0 || DB::transactionLevel() !== 0) {
+                return;
+            }
+            $frames = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            if (array_filter($frames, fn (array $frame): bool => ($frame['class'] ?? null) === ProductionCustomerSessions::class && $frame['function'] === 'principal') === []) {
+                return;
+            }
+            $calls++;
+            $started = \hrtime(true);
+            usleep(2_000_000);
+            $elapsed = \hrtime(true) - $started;
+        });
+
+        $response = $this->redeem($auth, ['REQUEST_TIME_FLOAT' => $received]);
+
+        $this->assertSame(1, $calls, 'The real current-identity callback must run.');
+        $this->assertGreaterThanOrEqual(2_000_000_000, $elapsed, 'Synthetic wall travel is not elapsed-time proof.');
+        $response->assertStatus(410);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+    }
+
     /** The current-identity proof (`ProductionCustomerSessions::principal`) takes `$seconds` of wall time, once. */
     private function slowIdentity(int $seconds): void
     {
