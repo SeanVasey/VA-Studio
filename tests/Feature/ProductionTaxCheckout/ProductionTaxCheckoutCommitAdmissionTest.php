@@ -3,10 +3,13 @@
 namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\Evidence;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -35,6 +38,11 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
     public static function writes(): array
     {
         return ['order' => ['order'], 'request' => ['request'], 'binding' => ['binding'], 'reviewed' => ['reviewed']];
+    }
+
+    public static function retainedWrites(): array
+    {
+        return ['binding' => ['binding'], 'reviewed' => ['reviewed']];
     }
 
     private function fixture(string $kind): array
@@ -133,5 +141,74 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         } elseif ($kind !== 'order') {
             $this->assertSame('unverified', $result['paymentStatus']);
         }
+    }
+
+    #[DataProvider('retainedWrites')]
+    public function test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses(string $kind): void
+    {
+        $fixture = $this->fixture($kind);
+        $table = TaxCheckoutSchema::TABLES[$kind];
+        $before = DB::table($table)->count();
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $password = password_hash('NONBINDING-REHEARSAL-CHANGE', PASSWORD_BCRYPT);
+        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($fixture, $connection, $primary, $table, $before, $password, &$hits): void {
+            if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
+                && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before + 1) {
+                $hits++;
+                $statement = $primary->prepare('UPDATE users SET password = ? WHERE id = ?');
+                $statement->execute([$password, $fixture['buyer']['user']->id]);
+            }
+        });
+        try {
+            $this->write($fixture, $kind);
+        } catch (IdentityException) {
+            // A stale principal may suppress the later status response; it cannot undo verified historical evidence.
+        } finally {
+            $dispatcher->forget(TransactionCommitting::class);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertSame($before + 1, DB::table($table)->count());
+        $this->assertSame($password, DB::table('users')->where('id', $fixture['buyer']['user']->id)->value('password'));
+        if ($kind === 'reviewed') {
+            $reviewed = Evidence::open((array) DB::table($table)->sole(), 'production_tax_checkout_reviewed_session');
+            $this->assertSame('on_time', $reviewed['outcome']);
+            $this->assertSame(5436, $reviewed['amounts']['total_minor']);
+        }
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry(): void
+    {
+        $fixture = $this->fixture('reviewed');
+        $order = Evidence::open((array) DB::table(TaxCheckoutSchema::TABLES['order'])->sole(), 'production_tax_checkout_order');
+        $at = CarbonImmutable::parse($order['expires_at'], 'UTC')->addSecond();
+        $hits = 0;
+        $fixture['transport']->mutateSession = function (array $session) use ($fixture, $at, &$hits): array {
+            $hits++;
+            DB::table('offers')->where('track_id', $fixture['catalog']['items'][0]['trackId'])->update(['is_active' => false]);
+            CarbonImmutable::setTestNow($at);
+
+            return $session;
+        };
+        try {
+            $result = $this->write($fixture, 'reviewed');
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
+        $this->assertSame(1, $hits);
+        $this->assertSame(['verified', 'paid_exception'], [$result['paymentStatus'], $result['fulfillmentStatus']]);
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
+        $reviewed = Evidence::open((array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole(), 'production_tax_checkout_reviewed_session');
+        $this->assertSame([$at->format('Y-m-d\TH:i:s\Z'), 'paid_exception', 5436],
+            [$reviewed['observed_at'], $reviewed['outcome'], $reviewed['amounts']['total_minor']]);
+        $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
     }
 }
