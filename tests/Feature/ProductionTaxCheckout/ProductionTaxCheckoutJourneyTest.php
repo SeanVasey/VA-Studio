@@ -226,6 +226,19 @@ class ProductionTaxCheckoutJourneyTest extends TestCase
             'PaymentIntent amount differs from the session total' => [null, fn (array $p): array => ['amount' => $p['amount'] + 1] + $p],
             'PaymentIntent currency is not usd' => [null, fn (array $p): array => ['currency' => 'eur'] + $p],
             'session currency is not usd' => [fn (array $s): array => ['currency' => 'eur'] + $s, null],
+            'PaymentIntent livemode differs from test funds' => [null, fn (array $p): array => ['livemode' => true] + $p],
+            'PaymentIntent metadata names another request' => [null, function (array $p): array {
+                $p['metadata']['request_id'] = '00000000-0000-4000-8000-000000000099';
+
+                return $p;
+            }],
+            'PaymentIntent on_behalf_of names another account' => [null, fn (array $p): array => ['on_behalf_of' => 'acct_OTHER'] + $p],
+            'line currency differs from the USD order' => [function (array $s): array {
+                $s['line_items']['data'][0]['currency'] = 'eur';
+
+                return $s;
+            }, null],
+            'PaymentIntent is processing while the session is paid' => [null, fn (array $p): array => ['status' => 'processing'] + $p],
         ];
     }
 
