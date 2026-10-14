@@ -136,3 +136,5 @@ DNS or cutover. Frozen contract/profile members and the logo remain unchanged.
 Tax255 V2 consumer wiring and the next dependency-ready plan item remain subsequent.
 
 Portable archive verification completed: 13 actual PHPUnit invocations, 12 source bindings, 160 archived members; SHA-256 `6745b6426fd90de5763ead2e29af206f6a80d1a1c9b472d0137027dce0f2f896`. Two separate Pint receipts are included; they are not PHPUnit invocations. All archived member digests and reachable Git source bindings verified.
+
+Actual PR #118 merge and final preflight/review inventory are recorded in [the merge receipt](merge-receipt.md).

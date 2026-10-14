@@ -194,3 +194,9 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Separate non-author APPROVE WITH CONDITIONS at exact `f603f1a75bebc52fa04f25ed713d4f4f8ba89138`, no open A2 P0/P1. Both A2 P2 timing windows are closed. Unchanged [DECISION](../../verification/paid-delivery-a2-20261014/independent-review-DECISION.md) and verifier report bind all160members/13PHPUnit(9pass4originalfail)/12Gitbindings,2339currentinputs+16routes/13loaderhashes, two15-filePintreceipts and six preserved notes.
 - Exact published-head preflight, receipt-only carry and protections remain merge gates. Keep actual host/commercialC2/C5-C8/C11 conditions and the adjacent ordinary membership afterCommit P2 open; no full-suite, Foundation/GitLab, host/provider or activation claim.
+
+### #118 A2 merge receipt — 2026-10-14
+
+- PR #118 merged at `cfce548b4f0893a3634422062099d930428856a3` from exact approved head `b7e99913a16e3eb408a34767f220f46d16b47620`. Separate APPROVE WITH CONDITIONS and unchanged receipt-only carry; preflight `38636684965` passed. Final inventory empty and fetched merge tree equals the approved head. [Merge receipt](../../verification/paid-delivery-a2-20261014/merge-receipt.md) records actual counts, skips, preserved failures, source carry and stopped private MySQL server.
+- Both A2 P2 windows are closed in this coherent batch. Keep host/commercial C2/C5-C8/C11 and the adjacent ordinary membership afterCommit P2 open under freeze-and-batch. The root route gate is strictly false and build/cache-time; no production configuration or route cache changed. No Foundation/GitLab, provider/host acceptance, real payment, customer import or activation.
+- Next ordered dependency-ready batch: Tax255/Paid252 V2 held-source/order proof and consumer integration, respecting A1-1/A1-2 and V2 commit-admission review conditions. Frozen contract/profile assets remain unchanged.
