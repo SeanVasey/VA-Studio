@@ -144,6 +144,71 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
     }
 
     #[DataProvider('retainedWrites')]
+    public function test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence(string $kind): void
+    {
+        $fixture = $this->fixture($kind);
+        $before = $this->snapshot();
+        $table = TaxCheckoutSchema::TABLES[$kind];
+        $account = DB::table('customer_accounts')->where('user_id', $fixture['buyer']['user']->id)->sole();
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($account, $connection, $primary, $table, $before, &$hits): void {
+            if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
+                && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before[$table]['count'] + 1) {
+                $hits++;
+                $statement = $primary->prepare('UPDATE customer_accounts SET owner_key = ? WHERE id = ?');
+                $statement->execute([hash('sha256', 'NONBINDING-OWNER-WITHDRAWAL'), $account->id]);
+            }
+        });
+        $refusal = null;
+        try {
+            $this->write($fixture, $kind);
+        } catch (CheckoutException|IdentityException $error) {
+            $refusal = $error;
+        } finally {
+            $dispatcher->forget(TransactionCommitting::class);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertSame($before, $this->snapshot(), 'Historical ownership drift must refuse before retaining new evidence.');
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame(503, $refusal->status);
+        $this->assertSame($account->owner_key, DB::table('customer_accounts')->where('id', $account->id)->value('owner_key'));
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $result = $this->write($fixture, $kind);
+        $this->assertSame($before[$table]['count'] + 1, DB::table($table)->count());
+        $this->assertSame($kind === 'reviewed' ? 'verified' : 'unverified', $result['paymentStatus']);
+    }
+
+    public function test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary(): void
+    {
+        $fixture = $this->taxOrder();
+        $order = Evidence::open((array) DB::table(TaxCheckoutSchema::TABLES['order'])->sole(), 'production_tax_checkout_order');
+        $at = CarbonImmutable::parse($order['expires_at'], 'UTC')->subSeconds($fixture['catalog']['machine']['choices']['reservation_and_exclusives']['provider_lifetime_seconds']);
+        self::configureTax();
+        CarbonImmutable::setTestNow($at);
+        $refusal = null;
+        try {
+            $fixture['checkout']->initiate($fixture['buyer']['principal'], $fixture['buyer']['user'], $fixture['order']['orderId']);
+        } catch (CheckoutException $error) {
+            $refusal = $error;
+        } finally {
+            CarbonImmutable::setTestNow();
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['request'], 1, 'A valid creation-time equality must retain the original request.');
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame(['provider_unbound', 503], [$refusal->reason, $refusal->status]);
+        $row = (array) DB::table(TaxCheckoutSchema::TABLES['request'])->sole();
+        $request = Evidence::open($row, 'production_tax_checkout_request');
+        $this->assertSame($at->format('Y-m-d\\TH:i:s\\Z'), $row['created_at']);
+        $this->assertSame($order['expires_at'], $request['provider_expires_at']);
+        $this->assertSame([], $fixture['transport']->calls);
+    }
+
+    #[DataProvider('retainedWrites')]
     public function test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses(string $kind): void
     {
         $fixture = $this->fixture($kind);
