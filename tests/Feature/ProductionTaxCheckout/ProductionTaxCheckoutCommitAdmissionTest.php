@@ -146,25 +146,31 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
     #[DataProvider('retainedWrites')]
     public function test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence(string $kind): void
     {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('Transactional guard replacement fixture is SQLite-only; MySQL DDL would implicitly commit.');
+        }
         $fixture = $this->fixture($kind);
         $before = $this->snapshot();
         $table = TaxCheckoutSchema::TABLES[$kind];
         $account = DB::table('customer_accounts')->where('user_id', $fixture['buyer']['user']->id)->sole();
-        // Damaged-restore fixture only: healthy immutable account guards prevent this mutation.
+        // Synthetic guard replacement only: healthy immutable account guards prevent this mutation.
         $otherOwner = (array) DB::table('quote_owners')->where('owner_key', $account->owner_key)->sole();
         $otherOwner['owner_key'] = hash('sha256', 'NONBINDING-OWNER-WITHDRAWAL');
         DB::table('quote_owners')->insert($otherOwner);
-        DB::unprepared('DROP TRIGGER customer_accounts_update');
+        $guard = DB::table('sqlite_master')->where('name', 'customer_accounts_update')->value('sql');
         $connection = DB::connection();
         $primary = $connection->getPdo();
         $dispatcher = $connection->getEventDispatcher();
         $hits = 0;
-        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($account, $connection, $primary, $table, $before, &$hits): void {
+        $dispatcher->listen(TransactionCommitting::class, function (TransactionCommitting $event) use ($account, $guard, $connection, $primary, $table, $before, &$hits): void {
             if ($hits === 0 && $event->connection === $connection && $connection->transactionLevel() === 1
                 && (int) $primary->query('SELECT COUNT(*) FROM '.$table)->fetchColumn() === $before[$table]['count'] + 1) {
                 $hits++;
+                // SQLite DDL is transactional; restore the identical guard before the final proof.
+                $primary->exec('DROP TRIGGER customer_accounts_update');
                 $statement = $primary->prepare('UPDATE customer_accounts SET owner_key = ? WHERE id = ?');
                 $statement->execute([hash('sha256', 'NONBINDING-OWNER-WITHDRAWAL'), $account->id]);
+                $primary->exec($guard);
             }
         });
         $refusal = null;
