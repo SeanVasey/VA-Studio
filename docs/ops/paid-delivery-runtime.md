@@ -44,7 +44,7 @@ it. Size timeout margins for those excluded costs on the chosen host.
 | Route | Timed path before the first byte | Timed application work | Defaults | Validated maxima |
 | --- | --- | --- | --- | --- |
 | `POST /paid-grants/authorizations/{id}/redeem` | locate + frame 1 ≤ 60 s, snapshot ≤ `snapshot_seconds`, frame 2 ≤ 60 s | + `transfer_max_seconds` | first byte ≤ 420 s; whole ≤ 7,620 s | first byte ≤ 1,920 s; whole ≤ 16,320 s |
-| `POST /paid-grants/origins/{batch}/document` | the whole request (JSON answer at the end) | claim loop ≤ 300 s + last claimed line ≤ 300 s + completion (10 × 300 s + 60 s) | ≤ 3,660 s | same (fixed by `LEASE_SECONDS`) |
+| `POST /paid-grants/origins/{batch}/document` | timed application work (JSON answer at the end) | claim loop ≤ 300 s + last claimed line ≤ 300 s + completion (10 × 300 s + 60 s) | ≤ 3,660 s | same (fixed by `LEASE_SECONDS`) |
 | All other paid routes | — | ≤ 60 s budget + 5 s session-lock wait | ≤ 65 s | same |
 
 ## Requirements
@@ -142,7 +142,8 @@ location ~ "^/paid-grants/origins/[0-9a-f-]{36}/document$" {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
     fastcgi_pass unix:/run/php/paid-delivery.sock;
-    fastcgi_read_timeout 3900s;          # whole request: 300 + 300 + 10 x 300 + 60, plus margin
+    # Application reference: 300 + 300 + 10 x 300 + 60; add measured identity/queue/I/O margin.
+    fastcgi_read_timeout 3900s;
 }
 ```
 
