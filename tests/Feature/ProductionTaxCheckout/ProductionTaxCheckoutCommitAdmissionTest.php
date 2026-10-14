@@ -3,11 +3,15 @@
 namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutEvidence;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutRawPlans;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxExecutionContext;
@@ -16,6 +20,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -569,6 +574,161 @@ class ProductionTaxCheckoutCommitAdmissionTest extends TestCase
         $this->assertSame(0, DB::connection()->transactionLevel());
         $this->assertFalse($primary->inTransaction());
         $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Requires native repeatable-read snapshots and a distinct committed MySQL peer.');
+        }
+        $fixture = $this->fixture('binding');
+        $other = $fixture['checkout']->order($fixture['buyer']['principal'], $fixture['buyer']['user'], $fixture['catalog']['candidate']->id,
+            $fixture['catalog']['items'], $fixture['preview']['previewHash'], true, ['legalName' => 'Declared synthetic buyer'], 'tax-native-peer-secondary');
+        self::configureTax();
+        try {
+            $fixture['checkout']->initiate($fixture['buyer']['principal'], $fixture['buyer']['user'], $other['orderId']);
+            $this->fail('Secondary fixture must retain an unbound request.');
+        } catch (CheckoutException $error) {
+            $this->assertSame(['provider_unbound', 503], [$error->reason, $error->status]);
+        }
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $otherOrder = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $other['orderId'])->sole();
+        $otherRequest = (array) DB::table(TaxCheckoutSchema::TABLES['request'])->where('order_id', $otherOrder->id)->sole();
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $configuration = $connection->getConfig();
+        $configuration['options'][\PDO::ATTR_PERSISTENT] = false;
+        $peer = app('db.factory')->make($configuration)->getPdo();
+        $this->assertNotSame($primary->query('SELECT CONNECTION_ID()')->fetchColumn(), $peer->query('SELECT CONNECTION_ID()')->fetchColumn());
+        $this->assertSame($primary->query('SELECT DATABASE(), @@server_uuid')->fetch(\PDO::FETCH_NUM),
+            $peer->query('SELECT DATABASE(), @@server_uuid')->fetch(\PDO::FETCH_NUM));
+        // Declared damaged-restore condition, before the owned binding frame. No native implicit-DDL rollback claim.
+        $primary->exec('ALTER TABLE '.TaxCheckoutSchema::TABLES['binding'].' DROP INDEX ptx_b_u1');
+        $public = (string) Str::uuid();
+        $created = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
+        $body = TaxCheckoutEvidence::binding(['row' => $otherRequest,
+            'body' => Evidence::open($otherRequest, 'production_tax_checkout_provider_request')], $public, $created, 'cs_test_SYNTHETICTAX');
+        $seed = ['public_id' => $public, 'created_at' => $created, ...Evidence::seal($body), 'request_id' => $otherRequest['id'],
+            'account_id' => $otherRequest['account_id'], 'funds_mode' => $otherRequest['funds_mode'], 'provider_session_id' => 'cs_test_SYNTHETICTAX'];
+        $dispatcher = $connection->getEventDispatcher();
+        $hits = 0;
+        $afterCommit = 0;
+        $peerExpected = null;
+        $isolation = null;
+        $dispatcher->listen(TransactionBeginning::class, function (TransactionBeginning $event) use ($connection, $primary, $peer, $seed, &$hits, &$afterCommit, &$peerExpected, &$isolation): void {
+            if ($hits !== 0 || $event->connection !== $connection) {
+                return;
+            }
+            $bindingFrame = false;
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $call) {
+                $bindingFrame = $bindingFrame || (($call['class'] ?? null) === ProductionTaxCheckout::class && ($call['function'] ?? null) === 'bind');
+            }
+            if (! $bindingFrame) {
+                return;
+            }
+            $hits++;
+            $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM '.TaxCheckoutSchema::TABLES['binding'])->fetchColumn());
+            $isolation = $primary->query("SELECT e.ISOLATION_LEVEL FROM performance_schema.events_transactions_current e JOIN performance_schema.threads t ON t.THREAD_ID = e.THREAD_ID WHERE t.PROCESSLIST_ID = CONNECTION_ID() AND e.STATE = 'ACTIVE'")->fetchColumn();
+            $statement = $peer->prepare('INSERT INTO '.TaxCheckoutSchema::TABLES['binding'].' ('.implode(', ', array_keys($seed))
+                .') VALUES ('.implode(', ', array_fill(0, count($seed), '?')).')');
+            $statement->execute(array_values($seed));
+            $peerExpected = [];
+            foreach (TaxCheckoutSchema::TABLES as $table) {
+                $rows = $peer->query('SELECT * FROM '.$table.' ORDER BY id')->fetchAll(\PDO::FETCH_ASSOC);
+                $peerExpected[$table] = ['count' => count($rows), 'digest' => CanonicalJson::hash($rows)];
+            }
+            $connection->afterCommit(function () use (&$afterCommit): void {
+                $afterCommit++;
+            });
+        });
+        $refusal = null;
+        try {
+            $this->write($fixture, 'binding');
+        } catch (CheckoutException $error) {
+            $refusal = $error;
+        } finally {
+            $dispatcher->forget(TransactionBeginning::class);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertSame('REPEATABLE READ', $isolation, 'This records the actual active transaction, not only its session default.');
+        $this->assertSame(0, DB::table(TaxCheckoutSchema::TABLES['binding'])->where('request_id', DB::table(TaxCheckoutSchema::TABLES['request'])->where('order_id',
+            DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $fixture['order']['orderId'])->value('id'))->value('id'))->count(),
+            'A repeatable-read snapshot must not hide the committed peer from NEW global admission.');
+        $this->assertInstanceOf(CheckoutException::class, $refusal);
+        $this->assertSame('write_source_changed', $refusal->reason);
+        $this->assertSame($peerExpected, $this->snapshot(), 'The independently committed peer is preserved; only the owned target refuses.');
+        $this->assertSame(0, $afterCommit);
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        $this->assertSame($dispatcher, $connection->getEventDispatcher());
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Requires a separately held native InnoDB row lock.');
+        }
+        $fixture = $this->fixture('reviewed');
+        $binding = (array) DB::table(TaxCheckoutSchema::TABLES['binding'])->sole();
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        $configuration = $connection->getConfig();
+        $configuration['options'][\PDO::ATTR_PERSISTENT] = false;
+        $peer = app('db.factory')->make($configuration)->getPdo();
+        $original = (int) $primary->query('SELECT @@session.innodb_lock_wait_timeout')->fetchColumn();
+        $password = DB::table('users')->where('id', $fixture['buyer']['user']->id)->value('password');
+        $afterCommit = 0;
+        $refusal = null;
+        $elapsed = 0;
+        $restored = null;
+        $peerActive = null;
+        $primary->exec('SET SESSION innodb_lock_wait_timeout = 117');
+        $peer->beginTransaction();
+        $statement = $peer->prepare('SELECT id FROM '.TaxCheckoutSchema::TABLES['binding'].' WHERE id = ? FOR UPDATE');
+        $statement->execute([$binding['id']]);
+        try {
+            $tick = hrtime(true);
+            try {
+                CommandTransaction::run(function (Records $rows) use ($fixture, $connection, $primary, $binding, &$afterCommit): void {
+                    $connection->afterCommit(function () use (&$afterCommit): void {
+                        $afterCommit++;
+                    });
+                    $statement = $primary->prepare('UPDATE users SET password = ? WHERE id = ?');
+                    $statement->execute([hash('sha256', 'NONBINDING-ROW-WAIT-WORK'), $fixture['buyer']['user']->id]);
+                    $plans = new TaxCheckoutRawPlans($rows->commandFrame());
+                    $plans->plan(TaxCheckoutSchema::TABLES['binding'], 'id = ?', [$binding['id']], 2, [$binding]);
+                    $plans->proveCurrent();
+                });
+            } catch (CheckoutException $error) {
+                $refusal = $error;
+            }
+            $elapsed = hrtime(true) - $tick;
+            $restored = (int) $primary->query('SELECT @@session.innodb_lock_wait_timeout')->fetchColumn();
+            $peerActive = $peer->inTransaction();
+        } finally {
+            if ($peer->inTransaction()) {
+                $peer->rollBack();
+            }
+            $primary->exec('SET SESSION innodb_lock_wait_timeout = '.$original);
+        }
+        $this->assertInstanceOf(CheckoutException::class, $refusal, 'A current raw proof cannot read through the separately held row lock.');
+        $this->assertSame(['contention', 503], [$refusal->reason, $refusal->status]);
+        $this->assertGreaterThanOrEqual(4_000_000_000, $elapsed);
+        $this->assertLessThan(15_000_000_000, $elapsed, 'The captured row wait is bounded; this is not a general SQL-interruption claim.');
+        $this->assertSame(117, $restored);
+        $this->assertTrue($peerActive, 'Refusal must not roll back an independently owned peer transaction.');
+        $this->assertSame($password, DB::table('users')->where('id', $fixture['buyer']['user']->id)->value('password'));
+        $this->assertSame(0, $afterCommit);
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        CommandTransaction::run(function (Records $rows) use ($binding): void {
+            $plans = new TaxCheckoutRawPlans($rows->commandFrame());
+            $plans->plan(TaxCheckoutSchema::TABLES['binding'], 'id = ?', [$binding['id']], 2, [$binding]);
+            $plans->proveCurrent();
+        });
+        $this->assertSame(0, $afterCommit);
         $this->assertDatabaseCount('license_grants', 0);
     }
 

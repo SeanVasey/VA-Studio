@@ -1005,6 +1005,14 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
       "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
     ]
   ]
 }
