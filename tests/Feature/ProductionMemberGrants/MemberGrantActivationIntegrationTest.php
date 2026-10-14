@@ -127,11 +127,12 @@ class MemberGrantActivationIntegrationTest extends TestCase
         $fixture = $this->memberActivationFixture();
         $before = $this->memberOriginalEffects();
         $calls = 0;
-        $operation = $this->memberActivationOperation(function () use ($fixture, &$calls): void {
+        $observations = [];
+        $operation = $this->memberActivationOperation(function () use ($fixture, &$calls, &$observations): void {
             $calls++;
-            $this->assertSame(0, DB::transactionLevel());
-            $this->assertFalse(DB::connection()->getPdo()->inTransaction());
-            $this->assertSame(1, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']));
+            $observations['transaction_level'] = DB::transactionLevel();
+            $observations['pdo_in_transaction'] = DB::connection()->getPdo()->inTransaction();
+            $observations['track_updates'] = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']);
         });
         $authorization = $this->confirmMemberActivation($fixture, $operation);
         try {
@@ -141,6 +142,7 @@ class MemberGrantActivationIntegrationTest extends TestCase
             $this->assertSame('source_refused', $error->reason);
         }
         $this->assertSame(1, $calls);
+        $this->assertSame(['transaction_level' => 0, 'pdo_in_transaction' => false, 'track_updates' => 1], $observations);
         $this->assertCount(1, $this->memberActivationFiles($fixture['reservation']['redemption_id']));
         $this->assertMemberOriginalEffectsUnchanged($before);
     }

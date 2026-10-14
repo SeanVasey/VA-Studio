@@ -997,6 +997,10 @@
     [
       "Tests\\Feature\\ProductionMemberGrants\\MemberGrantNativeActivationRaceTest",
       "test_independently_confirmed_same_redemption_workers_retain_the_exact_winner_graph"
+    ],
+    [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberGrantNativeActivationReleaseRaceTest",
+      "test_actual_consume_and_release_serialize_at_the_authored_honor_boundary"
     ]
   ]
 }

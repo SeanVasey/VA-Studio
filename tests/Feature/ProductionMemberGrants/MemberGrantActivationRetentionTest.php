@@ -149,14 +149,15 @@ class MemberGrantActivationRetentionTest extends TestCase
         $before = $this->memberOriginalEffects();
         $trackStatus = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status');
         $calls = 0;
-        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($fixture, &$calls): void {
+        $observations = [];
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($fixture, &$calls, &$observations): void {
             if ($calls !== 0 || ! DB::table('production_member_activations')->exists()) {
                 return;
             }
             $calls++;
-            $this->assertSame(1, DB::transactionLevel());
-            $this->assertTrue(DB::connection()->getPdo()->inTransaction());
-            $this->assertSame(1, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']));
+            $observations['transaction_level'] = DB::transactionLevel();
+            $observations['pdo_in_transaction'] = DB::connection()->getPdo()->inTransaction();
+            $observations['track_updates'] = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']);
         });
         try {
             $this->activateMemberFixture($fixture, $authorization);
@@ -165,6 +166,7 @@ class MemberGrantActivationRetentionTest extends TestCase
             $this->assertSame('source_refused', $error->reason);
         }
         $this->assertSame(1, $calls);
+        $this->assertSame(['transaction_level' => 1, 'pdo_in_transaction' => true, 'track_updates' => 1], $observations);
         $this->assertMemberOriginalEffectsUnchanged($before);
         $this->assertSame($trackStatus, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
     }
@@ -176,16 +178,17 @@ class MemberGrantActivationRetentionTest extends TestCase
         $trackStatus = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status');
         $real = Crypt::getFacadeRoot();
         $calls = 0;
+        $observations = [];
         $observed = Mockery::mock();
         $observed->shouldReceive('decryptString')->andReturnUsing($real->decryptString(...));
-        $observed->shouldReceive('encryptString')->andReturnUsing(function ($plain) use ($real, $fixture, &$calls): string {
+        $observed->shouldReceive('encryptString')->andReturnUsing(function ($plain) use ($real, $fixture, &$calls, &$observations): string {
             $document = json_decode($plain, true, 48, JSON_THROW_ON_ERROR);
             if ($calls === 0 && ($document['schema_version'] ?? null) === 'member-origin-record-v1') {
                 $calls++;
-                $this->assertSame(1, DB::transactionLevel());
-                $this->assertTrue(DB::connection()->getPdo()->inTransaction());
-                $this->assertSame(0, DB::table('production_member_origins')->count());
-                $this->assertSame(1, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']));
+                $observations['transaction_level'] = DB::transactionLevel();
+                $observations['pdo_in_transaction'] = DB::connection()->getPdo()->inTransaction();
+                $observations['origin_count'] = DB::table('production_member_origins')->count();
+                $observations['track_updates'] = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']);
             }
 
             // The observation hook never replaces encrypted bytes or a successful source proof.
@@ -201,6 +204,8 @@ class MemberGrantActivationRetentionTest extends TestCase
                 $this->assertSame('source_refused', $error->reason);
             }
             $this->assertSame(1, $calls, 'The actual origin builder must reach the source withdrawal hook.');
+            $this->assertSame(['transaction_level' => 1, 'pdo_in_transaction' => true,
+                'origin_count' => 0, 'track_updates' => 1], $observations);
             $this->assertMemberOriginalEffectsUnchanged($before);
             $this->assertSame($trackStatus, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
         } finally {
