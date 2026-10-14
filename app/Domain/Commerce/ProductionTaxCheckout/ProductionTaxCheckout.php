@@ -177,6 +177,8 @@ final class ProductionTaxCheckout
         $sessionId = $prepared['intent']['binding']['provider_session_id'] ?? null;
         CheckoutException::require($sessionId !== null, 'session_required');
         $transport = TaxCheckoutPolicy::transport($this->transport);
+        $transportIdentity = $transport->boundTo();
+        CheckoutException::require($transportIdentity === config('production-tax-checkout.provider'), 'provider_unbound', 503);
         $context = $prepared['order']['context'];
         $request = $prepared['intent']['body'];
         try {
@@ -190,7 +192,7 @@ final class ProductionTaxCheckout
             throw $error instanceof CheckoutException && in_array($error->reason, ['tax_ceiling', 'session_mismatch'], true) ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($financial['outcome'] === 'confirmed') {
-            $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transport->boundTo(), $orderId);
+            $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transportIdentity, $orderId);
         }
         $status = $this->status($principal, $buyer, $orderId);
 

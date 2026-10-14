@@ -12,6 +12,7 @@ use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use LogicException;
@@ -56,8 +57,8 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
             CheckoutException::require(count($requests) === 1 && $requests[0]['public_id'] === $publicId, 'write_source_changed');
             $intent = TaxCheckoutEvidence::intent($tax, $order, $requests[0]);
             $until[] = $intent['body']['retry_before'];
-            $until[] = CarbonImmutable::parse($order['body']['expires_at'], 'UTC')
-                ->subSeconds($order['context']->providerLifetimeSeconds)->format('Y-m-d\TH:i:s\Z');
+            // Provider lifetime constrains the immutable creation timestamp, not the current commit time.
+            CheckoutException::require($intent['body']['provider_expires_at'] <= $order['body']['expires_at'], 'expired');
         }
         foreach ($selection['graph']['offers'] as $offer) {
             if ((string) $offer['is_active'] !== '1') {
@@ -104,10 +105,15 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
         // Stable original ownership only. Password/access_version/active/current profile are not historical authority.
         $family->plan('users', 'id = ?', [$historical['user_id']], 2, [['id' => $historical['user_id']]], ['id']);
         $account = $historical['account'];
+        $rawAccount = $rows->current->one('customer_accounts', $account['id']);
+        CheckoutException::require(IdentityPolicy::matches('owner', $rawAccount['owner_key'] ?? '', $historical['origin']['owner_digest'])
+            && hash_equals($account['owner_digest'], IdentityPolicy::digest('owner', $rawAccount['owner_key'] ?? '')), 'write_source_changed');
         $family->plan('customer_accounts', 'id = ?', [$account['id']], 2,
-            [['id' => $account['id'], 'public_id' => $account['public_id'], 'user_id' => $account['user_id']]], ['id', 'public_id', 'user_id']);
+            [['id' => $account['id'], 'public_id' => $account['public_id'], 'user_id' => $account['user_id'], 'owner_key' => $rawAccount['owner_key']]],
+            ['id', 'public_id', 'user_id', 'owner_key']);
         $origin = $historical['origin'];
         $family->plan('production_identity_origins', 'id = ?', [$origin['id']], 2, [$origin]);
+        $family->plan('production_identity_origins', 'account_id = ?', [$account['id']], 2, [$origin]);
         $prefix = $historical['verification_prefix'];
         CheckoutException::require($prefix !== [] && count($prefix) <= 128, 'write_source_changed');
         $last = $prefix[array_key_last($prefix)];
@@ -128,22 +134,38 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
         $family->plan(TaxCheckoutSchema::TABLES['order'], 'buyer_origin_id = ? AND request_key = ?',
             [$row['buyer_origin_id'], $row['request_key']], 2, [$row]);
         $family->plan(TaxCheckoutSchema::TABLES['request'], 'order_id = ?', [$row['id']], 2, $requests);
+        $reviewedForOrder = [];
         foreach ($requests as $request) {
             $intent = TaxCheckoutEvidence::intent($tax, $order, $request);
             $family->plan(TaxCheckoutSchema::TABLES['request'], 'id = ?', [$request['id']], 2, [$request]);
+            $family->plan(TaxCheckoutSchema::TABLES['request'], 'idempotency_key = ?', [$request['idempotency_key']], 2, [$request]);
             $family->plan(TaxCheckoutSchema::TABLES['binding'], 'request_id = ?', [$request['id']], 2, $intent['raw']['binding']);
             $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'request_id = ?', [$request['id']], 2, $intent['raw']['reviewed']);
+            $reviewedForOrder = $intent['raw']['reviewed'];
+            foreach ($intent['raw']['binding'] as $binding) {
+                $family->plan(TaxCheckoutSchema::TABLES['binding'], 'account_id = ? AND funds_mode = ? AND provider_session_id = ?',
+                    [$binding['account_id'], $binding['funds_mode'], $binding['provider_session_id']], 2, [$binding]);
+                $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'binding_id = ?', [$binding['id']], 2, $intent['raw']['reviewed']);
+                $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'account_id = ? AND funds_mode = ? AND provider_session_id = ?',
+                    [$binding['account_id'], $binding['funds_mode'], $binding['provider_session_id']], 2, $intent['raw']['reviewed']);
+            }
+            foreach ($intent['raw']['reviewed'] as $reviewed) {
+                $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'account_id = ? AND funds_mode = ? AND provider_payment_id = ?',
+                    [$reviewed['account_id'], $reviewed['funds_mode'], $reviewed['provider_payment_id']], 2, [$reviewed]);
+            }
         }
+        $family->plan(TaxCheckoutSchema::TABLES['reviewed'], 'order_id = ?', [$row['id']], 2, $reviewedForOrder);
 
         return $family;
     }
 
     private static function cap(CheckoutCommandFrame $frame, array $until): void
     {
+        $tick = hrtime(true);
         $expires = min(array_map(fn (string $value): float => (float) CarbonImmutable::parse($value, 'UTC')->format('U.u'), $until));
         $remaining = $expires - (float) CarbonImmutable::now('UTC')->format('U.u');
         CheckoutException::require($remaining > 0, 'expired');
-        $frame->capDeadline(hrtime(true) + (int) floor($remaining * 1_000_000_000));
+        $frame->capDeadline($tick + (int) floor($remaining * 1_000_000_000));
     }
 
     private static function one(array $rows, int $id): array
