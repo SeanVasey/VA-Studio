@@ -88,8 +88,7 @@ final class MemberActivationInspection
             $budget->shortenTo($reservations->activationHonorDeadline($this->reservation));
             $budget->assertCurrent();
             $this->intent = $reservations->activationIntent($this->reservation, $rows);
-            $this->factsProof = $facts->lock($definitionId, $principal, $actor, $rows);
-            $snapshot = $facts->snapshot($this->factsProof, $principal, $actor, $rows);
+            [$this->factsProof, $snapshot] = $facts->capture($definitionId, $principal, $actor, $rows);
             $this->factsClosure = $facts->closure($this->factsProof, $principal, $actor, $rows);
             $parts = $reservations->activationSourceValues($this->reservation, $rows);
             $this->values = MemberOriginalSourceValues::from(['schema_version' => 'member-original-source-v1',

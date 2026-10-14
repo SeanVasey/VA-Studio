@@ -74,4 +74,17 @@ final class CurrentEligibleLicenses implements MembershipEligibleLicenseAuthorit
 
         return $this->issued[$proof]['snapshot'];
     }
+
+    /** The fresh proof and exact snapshot leave the complete lock together, without a caller hook. */
+    public function capture(string $selection, int $expectedRevision, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): array
+    {
+        $proof = $this->lock($selection, $expectedRevision, $principal, $actor, $rows);
+        $issued = $this->issued[$proof];
+        MembershipException::require($issued['principal'] === $principal && $issued['actor'] === $actor
+            && $issued['rows'] === $rows && $issued['pdo'] === $rows->identity(), 'foreign_license_proof');
+        $snapshot = $issued['snapshot'];
+        MembershipException::require(hrtime(true) < $snapshot->deadlineNs, 'expired_license_proof');
+
+        return [$proof, $snapshot];
+    }
 }

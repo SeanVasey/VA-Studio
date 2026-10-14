@@ -129,9 +129,16 @@ final class MembershipReservationContext
         $this->access = new ProductionCustomerAccess;
         $this->identity = $this->access->lock($principal, $actor, $rows->current());
         // The invoice producer acquires its intake fence before policy/subscription/invoice locks.
-        $this->invoiceProof = $configuration->invoices->lock($locator, $principal, $actor, $rows);
+        if ($memberInitialization instanceof MembershipActivationCapture) {
+            MembershipException::require($configuration->invoices instanceof SealedMembershipPaidInvoice, 'unsupported_invoice_authority');
+            [$this->invoiceProof, $this->invoiceFreshness] = $configuration->invoices->capture($locator, $principal, $actor, $rows);
+        } else {
+            $this->invoiceProof = $configuration->invoices->lock($locator, $principal, $actor, $rows);
+        }
         $this->invoice = $this->invoiceProof->binding();
-        $this->invoiceFreshness = $configuration->invoices->freshnessWindow($this->invoiceProof, $principal, $actor, $rows);
+        if (! ($memberInitialization instanceof MembershipActivationCapture)) {
+            $this->invoiceFreshness = $configuration->invoices->freshnessWindow($this->invoiceProof, $principal, $actor, $rows);
+        }
         MembershipException::require($this->invoice->planVersionId !== null && $this->invoice->paidAt !== null
             && $this->invoice->invoiceId !== null && $this->invoice->evidenceDeadline !== null, 'source_facts_absent');
         $this->policyProof = $configuration->policies->lock($this->invoice->planVersionId, $rows);
@@ -146,8 +153,12 @@ final class MembershipReservationContext
             $configuration->admit();
             MembershipException::require($licenses instanceof CurrentEligibleLicenses, 'unsupported_license_authority');
             $this->licenses = $licenses;
-            $this->licenseProof = $licenses->lock($arguments['selection'], $arguments['expected_revision'], $principal, $actor, $rows);
-            $this->catalog = $licenses->snapshot($this->licenseProof, $principal, $actor, $rows);
+            if ($memberInitialization instanceof MembershipActivationCapture) {
+                [$this->licenseProof, $this->catalog] = $licenses->capture($arguments['selection'], $arguments['expected_revision'], $principal, $actor, $rows);
+            } else {
+                $this->licenseProof = $licenses->lock($arguments['selection'], $arguments['expected_revision'], $principal, $actor, $rows);
+                $this->catalog = $licenses->snapshot($this->licenseProof, $principal, $actor, $rows);
+            }
         }
         $database = $rows->driver() === 'mysql' ? $rows->identity()->query('SELECT DATABASE()')->fetchColumn() : 'main';
         MembershipException::require(is_string($database) && preg_match('/\A[a-zA-Z0-9_]+\z/D', $database) === 1, 'changed_schema');

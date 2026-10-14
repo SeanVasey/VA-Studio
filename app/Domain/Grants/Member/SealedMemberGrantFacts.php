@@ -83,6 +83,18 @@ final class SealedMemberGrantFacts implements MemberGrantFactsAuthority
         }
     }
 
+    /** Lock and export in one call; no caller can interpose between the full proof and snapshot. */
+    public function capture(string $definitionId, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): array
+    {
+        $proof = $this->lock($definitionId, $principal, $actor, $rows);
+        $issued = $this->issued[$proof];
+        MemberGrantException::require($issued['principal'] === $principal && $issued['actor'] === $actor
+            && $issued['rows'] === $rows, 'foreign_facts_proof');
+        self::deadline($issued);
+
+        return [$proof, $issued['snapshot']];
+    }
+
     public function snapshot(MemberGrantFactsProof $proof, ProductionCustomerPrincipal $principal, User $actor, MembershipRows $rows): MemberGrantFactsSnapshot
     {
         $this->proveCurrent($proof, $principal, $actor, $rows);
