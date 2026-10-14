@@ -25,6 +25,10 @@ retains its own original bound. Ordinary release starts its single original
 construction, current proof, physical commit and committed receipt; waiting
 never restarts it. Every renderer, source, honor and native physical observation
 minimum remains unchanged and can only shorten admission.
+The acquisition also captures its own original 60-second admission deadline
+before its native route/ownership statements and checks it after GET_LOCK.
+The native integral timeout is at most 60 seconds; a late acquisition is refused
+and cleaned up under the captured session, even if the workflow has time left.
 
 The acquisition rejects a pre-existing same-session lock. Cleanup releases at
 most one proved acquisition on the same captured native session. It never calls
@@ -33,6 +37,10 @@ commits/rolls back another transaction. Continued ownership by the same session
 after the single release refuses; an immediately admitted waiting session is
 allowed. Unknown or failed cleanup is a refusal, never a successful receipt or
 a rollback claim.
+An existing committed-receipt refusal, a completed writer and proven retained
+replay keep their committed refusal classification when cleanup fails. Both
+the primary exception and cleanup exception remain attached internally, and
+native diagnostics traverse both branches within their existing metadata caps.
 
 The sole scheduling unlock explicitly follows the complete current and separate
 committed proofs, single finish and post-finish admission. It precedes additional

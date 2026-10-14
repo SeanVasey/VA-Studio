@@ -67,7 +67,7 @@ final class MemberActivationReads
         [, $result] = $this->inspect($configuration, $definitionId, $redemptionId, $principal, $actor,
             $budget, null, $state, $original, $observation, $primary);
         MemberGrantException::require($result !== null && $result == $expected, 'changed_retained_effect');
-        $lock?->finish($budget->deadlineNs());
+        $this->finishCoordination($lock, $budget);
         $this->originals->assertCurrent($original, $observation, $budget);
 
         return $result;
@@ -97,11 +97,21 @@ final class MemberActivationReads
         [, $final] = $this->inspect($configuration, $definitionId, $redemptionId, $principal,
             $actor, $budget, $expectedAuthorization, $state, $original, $observation);
         MemberGrantException::require($final !== null && $final == $result, 'changed_retained_effect');
-        $lock?->finish($budget->deadlineNs());
+        $this->finishCoordination($lock, $budget);
         // No filesystem, producer, facade/config getter or permission refresh follows the final closure.
         $this->originals->assertCurrent($original, $observation, $budget);
 
         return $final;
+    }
+
+    private function finishCoordination(?MembershipRedemptionWorkflowLock $lock, MemberOriginalBudget $budget): void
+    {
+        try {
+            $lock?->finish($budget->deadlineNs());
+        } catch (Throwable $error) {
+            // The complete final retained proof already returned, including replay of a prior graph.
+            throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
+        }
     }
 
     private function inspect(MemberActivationReadConfiguration $configuration, string $definitionId, string $redemptionId,

@@ -6,6 +6,7 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Domain\Memberships\Production\MembershipReservations;
+use App\Domain\Memberships\Production\MembershipWorkflowCleanupFailure;
 use App\Models\User;
 use WeakMap;
 
@@ -60,6 +61,8 @@ final class MemberGrantActivations
         self::$entries[$entry] = [$this, $this->sources, $this->authorizations, $authorization, $definitionId, $redemptionId, $principal, $actor, null, null];
         $claim = $budget = $completion = null;
         $lock = null;
+        $primaryFailure = null;
+        $knownCommitted = false;
         $effectCommitted = false;
         try {
             $claim = $this->authorizations->claim($authorization, $entry, $principal, $actor);
@@ -81,6 +84,8 @@ final class MemberGrantActivations
             $read = $this->readPermit($definitionId, $redemptionId, $principal, $actor, $budget, 'probe', $a);
             $winner = $this->reads->probe($read, $definitionId, $redemptionId, $principal, $actor, $budget, $a);
             if ($winner !== null) {
+                $knownCommitted = true;
+
                 return $winner;
             }
             $source = $this->sources->captureForActivation($entry, $definitionId, $redemptionId, $principal, $actor, $claim, $budget);
@@ -96,15 +101,19 @@ final class MemberGrantActivations
 
             return $this->reads->verify($read, $definitionId, $redemptionId, $principal, $actor, $budget, $readback);
         } catch (\Throwable $error) {
+            $knownCommitted = $effectCommitted || ($error instanceof MemberGrantException
+                && $error->reason === 'committed_activation_receipt_refused');
+            $primaryFailure = $error;
             if ($effectCommitted) {
-                throw new MemberGrantException('committed_activation_receipt_refused', previous: $error);
+                throw $primaryFailure = new MemberGrantException('committed_activation_receipt_refused', previous: $error);
             }
             throw $error;
         } finally {
             try {
                 $lock?->closeAfterRefusal();
             } catch (\Throwable $error) {
-                throw new MemberGrantException($effectCommitted ? 'committed_activation_receipt_refused' : 'source_refused', previous: $error);
+                $previous = $primaryFailure === null ? $error : new MembershipWorkflowCleanupFailure($primaryFailure, $error);
+                throw new MemberGrantException($effectCommitted || $knownCommitted ? 'committed_activation_receipt_refused' : 'source_refused', previous: $previous);
             } finally {
                 unset(self::$entries[$entry]);
                 if ($completion !== null && self::$completions !== null) {

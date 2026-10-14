@@ -35,6 +35,7 @@ final class MembershipRedemptionWorkflowLock
             return null;
         }
         MembershipException::require($primary->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql', 'changed_primary');
+        $acquisitionDeadline = min($originalDeadline, hrtime(true) + 60_000_000_000);
         $idle = MemberOriginalIoFrame::captureIdle();
         MembershipException::require($idle->identityPrimary() === $primary, 'changed_primary');
         $finish = MemberOriginalFinishBoundary::capture();
@@ -44,23 +45,29 @@ final class MembershipRedemptionWorkflowLock
         $lock = new self($primary, $idle, $finish, $route['schema_name'], (int) $route['session_id'],
             self::name($route['schema_name'], $redemptionId), $originalDeadline);
         try {
-            $lock->assertDeadline($originalDeadline);
+            $lock->assertDeadline($acquisitionDeadline);
             // MySQL locks are recursive. A pre-existing acquisition by this session is foreign.
             MembershipException::require($lock->owner() !== $lock->session, 'coordination_refused');
-            $seconds = min(60, max(0, intdiv($originalDeadline - hrtime(true), 1_000_000_000)));
+            // Native timeout is integral; the separate original admission deadline is checked afterwards.
+            $seconds = min(60, max(0, (int) ceil(($acquisitionDeadline - hrtime(true)) / 1_000_000_000)));
             $statement = $primary->prepare('SELECT GET_LOCK(?, ?)');
             $lock->acquisitionStarted = true;
             $statement->execute([$lock->name, $seconds]);
             $value = $statement->fetchColumn();
             MembershipException::require($value !== null && $value !== false, 'coordination_refused');
             MembershipException::require((int) $value === 1, 'operation_deadline');
-            $lock->assertDeadline($originalDeadline);
+            $lock->assertDeadline($acquisitionDeadline);
             $idle->assertStillIdle();
             MembershipException::require($lock->owner() === $lock->session, 'coordination_refused');
+            $lock->assertDeadline($acquisitionDeadline);
 
             return $lock;
         } catch (Throwable $error) {
-            $lock->closeAfterRefusal();
+            try {
+                $lock->closeAfterRefusal();
+            } catch (Throwable $cleanup) {
+                throw new MembershipException('coordination_refused', new MembershipWorkflowCleanupFailure($error, $cleanup));
+            }
             throw $error;
         }
     }

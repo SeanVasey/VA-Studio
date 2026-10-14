@@ -16,6 +16,7 @@ use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
 use App\Domain\Memberships\Production\MembershipReservations;
+use App\Domain\Memberships\Production\MembershipWorkflowCleanupFailure;
 use App\Domain\Memberships\Production\SealedMembershipPaidInvoice;
 use App\Domain\Memberships\Production\SealedMembershipPolicyFacts;
 use App\Models\User;
@@ -110,7 +111,14 @@ $traceLocation = static fn (string $file): string => str_starts_with($file, base
 try {
     $value = get_object_vars($operation->activate($input['definition_id'], $input['redemption_id'], $ticket, $principal, $actor));
 } catch (Throwable $error) {
-    do {
+    $pending = [$error];
+    $seen = [];
+    while ($pending !== [] && count($errors) < 12) {
+        $error = array_shift($pending);
+        if (isset($seen[spl_object_id($error)])) {
+            continue;
+        }
+        $seen[spl_object_id($error)] = true;
         // Metadata only. Never serialize trace arguments, objects, messages or application payloads.
         $trace = array_slice($error->getTrace(), 0, 24);
         $errors[] = ['class' => get_class($error), 'reason' => property_exists($error, 'reason') ? $error->reason : null,
@@ -123,8 +131,13 @@ try {
 
                 return $metadata;
             }, $trace)];
-        $error = $error->getPrevious();
-    } while ($error !== null && count($errors) < 12);
+        if ($error->getPrevious() !== null) {
+            $pending[] = $error->getPrevious();
+        }
+        if ($error instanceof MembershipWorkflowCleanupFailure) {
+            $pending[] = $error->cleanupFailure();
+        }
+    }
 }
 echo json_encode(['value' => $value, 'errors' => $errors, 'entered_ns' => $entered, 'finished_ns' => hrtime(true),
     'ticket_deadline_at_enter_ns' => $ticketDeadlineAtEnter, 'ticket_deadline_at_finish_ns' => $ticketBudget?->deadlineNs(),

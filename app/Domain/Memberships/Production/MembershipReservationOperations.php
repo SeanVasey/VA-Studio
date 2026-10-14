@@ -57,15 +57,26 @@ final class MembershipReservationOperations
         // Checks refuse elapsed authority; this does not guarantee interruption of a blocking wait.
         $deadline = hrtime(true) + 60_000_000_000;
         $lock = null;
+        $primaryFailure = null;
+        $committed = false;
         try {
-            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock);
+            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock, $committed);
+        } catch (Throwable $error) {
+            $primaryFailure = $error;
+            $committed = $committed || ($error instanceof MembershipException && $error->reason === 'committed_receipt_refused');
+            throw $error;
         } finally {
-            $lock?->closeAfterRefusal();
+            try {
+                $lock?->closeAfterRefusal();
+            } catch (Throwable $cleanup) {
+                $previous = $primaryFailure === null ? $cleanup : new MembershipWorkflowCleanupFailure($primaryFailure, $cleanup);
+                throw new MembershipException($committed ? 'committed_receipt_refused' : 'operation_refused', $previous);
+            }
         }
     }
 
     private function runOwned(string $operation, string $locator, array $arguments,
-        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock): array
+        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock, bool &$committed): array
     {
         $connection = DB::connection();
         $primary = $connection->getPdo();
@@ -118,6 +129,7 @@ final class MembershipReservationOperations
             $observer->prepare($context);
             // PDO commit, scoped afterCommit callbacks and ordinary committed delegates all run.
             $connection->commit();
+            $committed = true;
             $observer->requireProof();
         } catch (Throwable $error) {
             try {
