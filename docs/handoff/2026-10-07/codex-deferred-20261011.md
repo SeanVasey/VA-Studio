@@ -172,3 +172,8 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Integrated packet `6ca6fec9c04dc6371d5a6d9d0a23893af74cdcfe`:51releases/758members/557objects,63sourcebundles/65 recorded invocations (64 PHPUnit and one formatting),69Gitbindings/35overrides and563digest entries pass. These are archive counts across historical/current selections, not one suite. Original failures and Partial/null-exit receipts remain visible.
 - Updated-head local policy at `75629871` passes209checks, allfive exits0. Actual2320application/test inputs, loader metadata and43CIinputs match the integrated packet candidate. Final separate non-author overall DECISION, receipt-only carry and exact-head preflight still precede merge. Keep the adjacent ordinary callback P2 and all listed activation/coverage conditions frozen for the next related batch.
+
+### C4c independent development approval — 2026-10-14
+
+- Separate non-author DECISION APPROVE at exact `bc708923c03e83ef092286cb437042e855a898e8`, no open C4c P0/P1. Recorded unchanged in [the packet](../../verification/member-activation-20261013/independent-review-DECISION.md). All563digests,69Gitbindings, current actual native/SQLite/pure receipts, source carry and209local policy checks independently reconcile. The65record catalog is64PHPUnit plus1formatting; original failures and bothPartial/null-exit runs remain.
+- The adjacent pre-existing ordinary afterCommit P2 remains in the next related correction batch with exact owned commit witness and genuine throwing callback regression. All prior coverage/activation limits remain. Receipt-only final-head carry and cheap exact published-head preflight are still required before merge; no Foundation/GitLab or production activation approval.
