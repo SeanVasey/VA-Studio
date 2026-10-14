@@ -7,8 +7,10 @@ use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use LogicException;
+use Mockery;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberActivationFixtures;
 use Tests\TestCase;
@@ -165,6 +167,45 @@ class MemberGrantActivationRetentionTest extends TestCase
         $this->assertSame(1, $calls);
         $this->assertMemberOriginalEffectsUnchanged($before);
         $this->assertSame($trackStatus, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
+    }
+
+    public function test_catalog_withdrawal_during_actual_origin_encryption_is_refused_before_any_member_insert(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $before = $this->memberOriginalEffects();
+        $trackStatus = DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status');
+        $real = Crypt::getFacadeRoot();
+        $calls = 0;
+        $observed = Mockery::mock();
+        $observed->shouldReceive('decryptString')->andReturnUsing($real->decryptString(...));
+        $observed->shouldReceive('encryptString')->andReturnUsing(function ($plain) use ($real, $fixture, &$calls): string {
+            $document = json_decode($plain, true, 48, JSON_THROW_ON_ERROR);
+            if ($calls === 0 && ($document['schema_version'] ?? null) === 'member-origin-record-v1') {
+                $calls++;
+                $this->assertSame(1, DB::transactionLevel());
+                $this->assertTrue(DB::connection()->getPdo()->inTransaction());
+                $this->assertSame(0, DB::table('production_member_origins')->count());
+                $this->assertSame(1, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->update(['status' => 'draft']));
+            }
+
+            // The observation hook never replaces encrypted bytes or a successful source proof.
+            return $real->encryptString($plain);
+        });
+        Crypt::swap($observed);
+        try {
+            $authorization = $this->confirmMemberActivation($fixture);
+            try {
+                $this->activateMemberFixture($fixture, $authorization);
+                $this->fail('Record encryption cannot make a withdrawn catalog source admissible.');
+            } catch (MemberGrantException $error) {
+                $this->assertSame('source_refused', $error->reason);
+            }
+            $this->assertSame(1, $calls, 'The actual origin builder must reach the source withdrawal hook.');
+            $this->assertMemberOriginalEffectsUnchanged($before);
+            $this->assertSame($trackStatus, DB::table('tracks')->where('id', $fixture['catalog']['track']->id)->value('status'));
+        } finally {
+            Crypt::swap($real);
+        }
     }
 
     private function assertIdle(): void

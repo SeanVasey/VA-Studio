@@ -35,6 +35,8 @@ final class MemberOriginalSourceCapture
 
     private static ?WeakMap $effectPermits = null;
 
+    private static ?WeakMap $artifactPlanPermits = null;
+
     private WeakMap $workflows;
 
     private WeakMap $sources;
@@ -375,7 +377,16 @@ final class MemberOriginalSourceCapture
                     $inspection->authorize($claim);
                 }
                 if ($materialized !== null) {
-                    $inspection->ready($materialized);
+                    [$intent, $factsProof, $sourceValues] = $inspection->artifactPlanSources($this);
+                    $artifactPermit = MemberActivationArtifactPermit::value();
+                    self::$artifactPlanPermits ??= new WeakMap;
+                    self::$artifactPlanPermits[$artifactPermit] = [$this, $this->artifacts, $inspection, $materialized,
+                        $intent, $factsProof, $sourceValues, $principal, $actor, $rows, $rows->identity(), $budget];
+                    try {
+                        $inspection->ready($artifactPermit, $materialized);
+                    } finally {
+                        unset(self::$artifactPlanPermits[$artifactPermit]);
+                    }
                     $effect = MemberActivationEffectPermit::value();
                     self::$effectPermits ??= new WeakMap;
                     self::$effectPermits[$effect] = [$this, $inspection, $this->grants, $rows, 'inspection'];
@@ -567,6 +578,25 @@ final class MemberOriginalSourceCapture
             && $entry['inspection'] instanceof MemberActivationInspection, 'foreign_grant_plan');
 
         return $entry['inspection'];
+    }
+
+    /** Consume completion-only provisional admission; it grants no public readiness or write. */
+    public function consumeArtifactPlanPermit(MemberActivationArtifactPermit $permit, MemberOriginalArtifacts $artifacts,
+        MemberActivationInspection $inspection, MemberOriginalMaterialization $materialized, MemberGrantIntent $intent,
+        MemberGrantFactsProof $facts, MemberOriginalSourceValues $values, ProductionCustomerPrincipal $principal, User $actor,
+        MembershipRows $rows, MemberOriginalBudget $budget): void
+    {
+        $entry = self::$artifactPlanPermits[$permit] ?? null;
+        if (self::$artifactPlanPermits !== null) {
+            unset(self::$artifactPlanPermits[$permit]);
+        }
+        MemberGrantException::require(is_array($entry) && $entry === [$this, $artifacts, $inspection, $materialized,
+            $intent, $facts, $values, $principal, $actor, $rows, $rows->identity(), $budget], 'foreign_artifact_plan');
+        $active = $this->active[$rows] ?? null;
+        MemberGrantException::require($artifacts === $this->artifacts && is_array($active)
+            && $active['inspection'] === $inspection && $active['phase'] === 'current', 'foreign_artifact_plan');
+        MemberGrantException::require($inspection->artifactPlanSources($this) === [$intent, $facts, $values], 'foreign_artifact_plan');
+        $budget->assertCurrent();
     }
 
     private function resolveIdle(): void

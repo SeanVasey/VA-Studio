@@ -100,6 +100,39 @@ final class MemberOriginalArtifacts implements MemberOriginalArtifactAuthority
         MemberGrantException::require($sources === $this->sources && $budget === $entry['budget'], 'foreign_materialization');
     }
 
+    /** Completion-only provisional registration. The distinct public readiness path stays full. */
+    public function admitActivationPlan(MemberActivationArtifactPermit $permit, MemberActivationInspection $inspection,
+        MemberOriginalMaterialization $materialized, MemberGrantIntent $intent, MemberGrantFactsProof $facts,
+        MemberOriginalSourceValues $values, ProductionCustomerPrincipal $principal, User $actor,
+        MembershipRows $rows, MemberOriginalBudget $budget): MemberActivationArtifactPlanToken
+    {
+        $this->sources->consumeArtifactPlanPermit($permit, $this, $inspection, $materialized, $intent, $facts,
+            $values, $principal, $actor, $rows, $budget);
+        $inspection->matches($intent, $facts, $principal, $actor, $rows);
+        $entry = $this->entry($materialized);
+        MemberGrantException::require($inspection->values() === $values && $entry['budget'] === $budget
+            && $values->hash() === $entry['values']->hash()
+            && $values->document() === $entry['values']->document(), 'changed_render_source');
+        $receipt = MemberActivationArtifactPlanToken::value($entry['manifest']);
+        $entry['inspection'] = $inspection;
+        $entry['plan_token'] = $receipt;
+        $this->materializations[$materialized] = $entry;
+        $this->assertActivationPlan($materialized, $this->sources, $inspection, $values, $budget, $receipt);
+
+        return $receipt;
+    }
+
+    /** Terminal registry/value admission only; the token is never public readiness authority. */
+    public function assertActivationPlan(MemberOriginalMaterialization $materialized, MemberOriginalSourceCapture $sources,
+        MemberActivationInspection $inspection, MemberOriginalSourceValues $values, MemberOriginalBudget $budget,
+        ?MemberOriginalArtifactReceipt $receipt): void
+    {
+        $this->assertInspectionCurrent($materialized, $sources, $inspection, $values, $budget);
+        $entry = $this->entry($materialized);
+        MemberGrantException::require($receipt instanceof MemberActivationArtifactPlanToken
+            && ($entry['plan_token'] ?? null) === $receipt && $receipt->binding() === $entry['manifest'], 'foreign_artifact_plan');
+    }
+
     /** Terminal registry/value closure only. Never refreshes a producer or reads a file. */
     public function assertInspectionCurrent(MemberOriginalMaterialization $materialized, MemberOriginalSourceCapture $sources,
         MemberOriginalInspection|MemberActivationInspection $inspection, MemberOriginalSourceValues $values, MemberOriginalBudget $budget): void
@@ -128,6 +161,7 @@ final class MemberOriginalArtifacts implements MemberOriginalArtifactAuthority
         foreach ($this->materializations as $materialized => $entry) {
             if ($entry['inspection'] === $inspection) {
                 $entry['inspection'] = null;
+                unset($entry['plan_token']);
                 $this->materializations[$materialized] = $entry;
             }
         }

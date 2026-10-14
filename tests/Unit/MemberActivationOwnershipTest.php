@@ -3,20 +3,30 @@
 namespace Tests\Unit;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\Member\MemberActivationArtifactPermit;
+use App\Domain\Grants\Member\MemberActivationArtifactPlanToken;
 use App\Domain\Grants\Member\MemberActivationCompletionPermit;
 use App\Domain\Grants\Member\MemberActivationEffectPermit;
 use App\Domain\Grants\Member\MemberActivationEntryPermit;
 use App\Domain\Grants\Member\MemberActivationInspection;
 use App\Domain\Grants\Member\MemberGrantActivations;
 use App\Domain\Grants\Member\MemberGrantException;
+use App\Domain\Grants\Member\MemberGrantFactsToken;
 use App\Domain\Grants\Member\MemberLicenseAuthorization;
 use App\Domain\Grants\Member\MemberLicenseAuthorizationClaim;
 use App\Domain\Grants\Member\MemberLicenseAuthorizations;
 use App\Domain\Grants\Member\MemberLicenseReviewEntryPermit;
+use App\Domain\Grants\Member\MemberOriginalArtifactManifest;
+use App\Domain\Grants\Member\MemberOriginalArtifacts;
 use App\Domain\Grants\Member\MemberOriginalBudget;
+use App\Domain\Grants\Member\MemberOriginalFiles;
 use App\Domain\Grants\Member\MemberOriginalMaterialization;
+use App\Domain\Grants\Member\MemberOriginalRendererProcess;
 use App\Domain\Grants\Member\MemberOriginalSourceCapture;
+use App\Domain\Grants\Member\MemberOriginalSourceValues;
+use App\Domain\Grants\Member\SealedMemberGrantFacts;
 use App\Domain\Grants\Member\SealedMemberGrants;
+use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipRows;
 use App\Models\User;
 use PHPUnit\Framework\TestCase;
@@ -75,6 +85,27 @@ final class MemberActivationOwnershipTest extends TestCase
         $this->refuses('private_activation_evidence', fn () => serialize($ticket));
         $class = MemberLicenseAuthorization::class;
         $this->refuses('private_activation_evidence', fn () => unserialize('O:'.strlen($class).':"'.$class.'":0:{}'));
+    }
+
+    public function test_shaped_artifact_plan_permit_refuses_before_uninitialized_sources_or_rows_are_used(): void
+    {
+        $sources = $this->uninitialized(MemberOriginalSourceCapture::class);
+        $this->refuses('foreign_artifact_plan', fn () => $sources->consumeArtifactPlanPermit(
+            MemberActivationArtifactPermit::value(), $this->uninitialized(MemberOriginalArtifacts::class),
+            $this->uninitialized(MemberActivationInspection::class), MemberOriginalMaterialization::value(),
+            $this->uninitialized(MemberGrantIntent::class), $this->uninitialized(MemberGrantFactsToken::class),
+            $this->uninitialized(MemberOriginalSourceValues::class), $this->uninitialized(ProductionCustomerPrincipal::class),
+            new User, $this->uninitialized(MembershipRows::class), MemberOriginalBudget::start()));
+    }
+
+    public function test_provisional_artifact_plan_token_is_not_public_original_readiness(): void
+    {
+        $sources = $this->uninitialized(MemberOriginalSourceCapture::class);
+        $artifacts = new MemberOriginalArtifacts($sources, new SealedMemberGrantFacts, new MemberOriginalRendererProcess, new MemberOriginalFiles);
+        $token = MemberActivationArtifactPlanToken::value(new MemberOriginalArtifactManifest('synthetic', str_repeat('a', 64), []));
+        $this->refuses('foreign_readiness', fn () => $artifacts->proveReadyCurrent($token,
+            $this->uninitialized(MemberGrantIntent::class), $this->uninitialized(MemberGrantFactsToken::class),
+            $this->uninitialized(ProductionCustomerPrincipal::class), new User, $this->uninitialized(MembershipRows::class)));
     }
 
     public function test_exception_keeps_the_actual_database_failure_as_its_cause(): void

@@ -155,11 +155,23 @@ final class MemberActivationInspection
         return new CurrentRows($this->rows->identity(), $this->rows->driver());
     }
 
-    public function ready(MemberOriginalMaterialization $materialized): void
+    /** Values remain inside this exact completion; they do not authorize readiness or writes. */
+    public function artifactPlanSources(MemberOriginalSourceCapture $issuer): array
+    {
+        MemberGrantException::require($issuer === $this->issuer && $this->entry instanceof MemberActivationCompletionPermit
+            && $this->authorizationProof !== null && $this->claim !== null && $this->materialized === null
+            && ! $this->committed && ! $this->retired, 'foreign_artifact_plan');
+        $this->admit();
+
+        return [$this->intent, $this->factsProof, $this->values];
+    }
+
+    public function ready(MemberActivationArtifactPermit $permit, MemberOriginalMaterialization $materialized): void
     {
         MemberGrantException::require($this->entry instanceof MemberActivationCompletionPermit && $this->authorizationProof !== null
             && $this->materialized === null && ! $this->committed && ! $this->retired, 'foreign_inspection');
-        $this->artifactReceipt = $this->artifacts->admitReady($materialized, $this->intent, $this->factsProof, $this->principal, $this->actor, $this->rows);
+        $this->artifactReceipt = $this->artifacts->admitActivationPlan($permit, $this, $materialized, $this->intent,
+            $this->factsProof, $this->values, $this->principal, $this->actor, $this->rows, $this->budget);
         $this->materialized = $materialized;
     }
 
@@ -270,7 +282,12 @@ final class MemberActivationInspection
         }
         $this->reservations->proveInsertedActivation($this->reservation, $this->transition, $this->rows);
         $this->inserted = true;
-        $this->proveCurrent();
+        // Exact fresh graph/audit precedes this admission. The normal committing observer
+        // closes every source after all remaining delegates, before the physical commit.
+        $this->admit();
+        $this->finish->assertFrame($this->rows->identity(), false);
+        $this->rows->assertCurrent();
+        $this->admit();
     }
 
     public function matches(MemberGrantIntent $intent, MemberGrantFactsProof $facts, ProductionCustomerPrincipal $principal,
@@ -339,7 +356,8 @@ final class MemberActivationInspection
         $this->budget->assertCurrent();
         MemberGrantException::require(\hrtime(true) < $this->deadline, 'source_deadline');
         if ($this->materialized !== null) {
-            $this->artifacts->assertInspectionCurrent($this->materialized, $this->issuer, $this, $this->values, $this->budget);
+            $this->artifacts->assertActivationPlan($this->materialized, $this->issuer, $this, $this->values,
+                $this->budget, $this->artifactReceipt);
         }
     }
 
