@@ -77,7 +77,8 @@ class MemberGrantActivationIntegrationTest extends TestCase
         $this->assertSame($result->artifactManifestHash, $origin['artifact_manifest_hash']);
         $this->assertSame($origin['artifact_manifest_hash'], $activation['artifact_manifest_hash']);
 
-        // This is the real ordinary caller's complete retained-history audit, not a local balance sum.
+        // This helper uses the real history reader and pure full-ledger audit; ordinary writer calls
+        // over consumed history are exercised separately in MemberGrantOrdinaryLifecycleTest.
         $audit = $this->ledgerSnapshot($fixture);
         $amount = $fixture['reservation']['credit_amount'];
         $this->assertSame(['available' => $beforeAudit['balances']['available'],
