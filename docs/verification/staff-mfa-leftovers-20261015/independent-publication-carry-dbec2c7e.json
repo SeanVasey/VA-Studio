@@ -1,0 +1,55 @@
+{
+  "approved_source_evidence_sha": "b7fb1a6c714697322dc70b34bcf81ee2bb4d0838",
+  "archive_index_git_blobs_unchanged": {
+    "focused-evidence-index.json": "e09ca6e2ae33ed1205156cf4ec3bc5387d05a744",
+    "focused-evidence.zip": "402e02c7ecb3ff6fd82887c64555e95fe88a4283"
+  },
+  "archive_sha256_carried": "9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89",
+  "byte_original_import_hashes": {
+    "independent-final-review-b7fb1a6c.json": "1d0bd159c13915f46f9e547ff64d71d297f6196eeeee7887fbb3c1e611e06d85",
+    "independent-final-review-b7fb1a6c.md": "7ba9ab0995cb2589ff48a050b94eb547c315f6c92f7f0b7a25925f2dbee5b31f"
+  },
+  "changed_paths": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/staff-mfa-leftovers-20261015/README.md",
+    "docs/verification/staff-mfa-leftovers-20261015/independent-final-review-b7fb1a6c.json",
+    "docs/verification/staff-mfa-leftovers-20261015/independent-final-review-b7fb1a6c.md"
+  ],
+  "decision": "APPROVE_EXACT_HEAD_DOCUMENTATION_PUBLICATION_CARRY",
+  "open_p0": 0,
+  "open_p1": 0,
+  "remaining_gates": [
+    "Cheap exact-head preflight, complete current review/thread/check/protection inventory and expected-head merge",
+    "Native unenrolled/optional/other writer/full-matrix/concurrency gaps, real host/session/provider/activation and release conditions remain open",
+    "Free/B4/adjacent frozen residual conditions remain open"
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "dbec2c7ef0507c295b206880c77d82d360928585",
+  "reviewed_utc": "2026-10-15T22:20:52.413315+00:00",
+  "scope": "Five-file docs-only carry: original final reviewer MD/JSON, README status and final-approval ledger notes",
+  "source_unchanged_from_tested_sha": true,
+  "status_wording": "Correctly distinguishes completed final review from pending publication; existing native timeout, untested native and host/release limits preserved",
+  "tested_source_sha": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+  "unchanged_scopes": [
+    "app",
+    "bootstrap",
+    "config",
+    "routes",
+    "resources",
+    "tests",
+    "scripts",
+    "composer.json",
+    "composer.lock",
+    "package.json",
+    "package-lock.json",
+    "phpunit.xml",
+    ".github",
+    ".gitlab-ci.yml"
+  ],
+  "verification": "Read-only immutable Git diff/blob and exact original-byte comparisons. No repeated application tests or full packet verification; no shared edits, DB/network/CI action. Only this exclusive report pair created.",
+  "worktree_observation": {
+    "head": "dbec2c7ef0507c295b206880c77d82d360928585",
+    "status": ""
+  }
+}

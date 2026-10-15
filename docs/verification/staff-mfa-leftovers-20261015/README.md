@@ -37,3 +37,5 @@ Separate source review at11ab36d7 records APPROVE SOURCE WITH EXECUTION AND FINA
 No real staff account, challenge/session/host/FPM/browser/provider/scanner/license/rights/payment/commerce/activation/complete Foundation/release acceptance is inferred from synthetic fixtures. No credentials/live money/customer-active import/host/deploy/DNS/cutover action. Free256's remaining mount/input/host/font/source/identity conditions, B4 and adjacent frozen P2s and full final verification remain open. Fixture normalization is the subsequent handoff item.
 
 Sealed originals: 7PHPinvocations/135members/1231822bytes, SHA256 `9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89`. Final independent source/sealed-evidence review is complete; publication remains pending.
+
+Actual publication: **merged PR #130** at `f3b00476218e54f45ad1ee435e0fc5de115d717b` after exact-head review and cheap preflight38816547469 success. [Actual receipt](merge-receipt.md) records complete inventory, cancellation/service interruptions, protections and fetched-tree equality; the earlier pending statements above describe their recorded checkpoints. Next F2.

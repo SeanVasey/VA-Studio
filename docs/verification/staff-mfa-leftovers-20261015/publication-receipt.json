@@ -1,0 +1,184 @@
+{
+  "archive_sha256": "84bee80d12c22e4108f6e8084315b59c0e0f9a2049795aae2930bf976ee1d10d",
+  "archive_bytes": 25371,
+  "members": {
+    "actual-merge-tree-receipt.json": {
+      "bytes": 842,
+      "sha256": "a226a0a9aecfe4130a74324ae8d41d921b2b3badc565d40a27e61e6d52bd4897"
+    },
+    "actual-merged-pr.json": {
+      "bytes": 731,
+      "sha256": "bbe9b46f06acd79fc8537f10240f5805f924a490e123a603019d9e719f32ea22"
+    },
+    "create-draft-pr.json": {
+      "bytes": 630,
+      "sha256": "d904ace420e3188af3e70416db8006affb7053b6517d4ebf7ca266551acc441b"
+    },
+    "exact-head-merge.json": {
+      "bytes": 402,
+      "sha256": "c524e16e3a99d507ecd249e11a46f9abe47dfd4d3e1c1b05c75169a3f95d1f32"
+    },
+    "fetch-actual-main.json": {
+      "bytes": 421,
+      "sha256": "1742b7a21badbb3a7dae9afb70867a5990bee251cf1237b6dadb1f9a260277f8"
+    },
+    "final-inventory.json": {
+      "bytes": 3372,
+      "sha256": "9c9b208d193401e4015ca024dace539fd0ef6b7061ef2712b78fc783ab01dd34"
+    },
+    "final-preflight.json": {
+      "bytes": 7995,
+      "sha256": "5283472fecc6a34568f2de5bb4a66c0d95a6487779e304e3366b788924728bc2"
+    },
+    "final-protection.json": {
+      "bytes": 738,
+      "sha256": "e3e6ed00e604893226fbe5634db9ec755dc4fa88bc568804968b163401141635"
+    },
+    "final-required-checks-corrected.json": {
+      "bytes": 413,
+      "sha256": "aadd0877a7566669ffb16826d3dc92b0d65d86be325e62062f03480d05a559d3"
+    },
+    "final-rules.json": {
+      "bytes": 303,
+      "sha256": "2eb2d28ca88c4f452eff197cb2532c403f1eef85caa75676bcfdb56a1232e99c"
+    },
+    "gate-publication.py": {
+      "bytes": 4324,
+      "sha256": "7ca0731bdc4c1af17693cf66f59debc627e1fdf5531ffc327d74dcb2b22783fd"
+    },
+    "initial-inventory.json": {
+      "bytes": 2457,
+      "sha256": "4d42b7ec9a5faa53445fdfa0c6fd15b4b29c58c505ff3d83a6112f921ab320ae"
+    },
+    "initial-preflight-list.json": {
+      "bytes": 749,
+      "sha256": "1bbf9603d496219b56ca2c0b4a301c60f0d5e53cc17281592da53323b2c057ea"
+    },
+    "inventory-after-service-interruption.json": {
+      "bytes": 3173,
+      "sha256": "85f8f4d5dac4382c6df5d0139d0c5bc48236e1014308c8ef45d27786dd19f5ee"
+    },
+    "inventory-query.graphql": {
+      "bytes": 689,
+      "sha256": "979aeb22c943985d382c4932d26b7d57a9d0f08ad9043f0998a7b6a8cad313db"
+    },
+    "mark-ready.json": {
+      "bytes": 391,
+      "sha256": "a64045f0c66be22fbd90894af0343657ad1fe582746ae162ef90ee21ec174dbb"
+    },
+    "pr-body.md": {
+      "bytes": 1977,
+      "sha256": "50318adddca5d4aab50fb6a2a216871efc8c0663b49303e2e79a57ea4b5b6be5"
+    },
+    "pr-number": {
+      "bytes": 4,
+      "sha256": "f5bde7eb9f6c71611dc5726e8aca3eb4eba3e386da49e0a4ed5c295a90a73a0d"
+    },
+    "pre-merge-gate.json": {
+      "bytes": 777,
+      "sha256": "65bf60ecb57efcb1d265fbe5cf7452edaf361104677bc78167426f1b0bf21025"
+    },
+    "protection-before-publication.json": {
+      "bytes": 738,
+      "sha256": "ae81a1c507cb308405691e510f33d771ed6f3893300bb5a9364bc345791bc0d1"
+    },
+    "push-candidate.json": {
+      "bytes": 820,
+      "sha256": "2a45560e9eecf109926db47431983b9f870045c0dfd82060a40fdf0a6bd696d8"
+    },
+    "readiness-run-snapshot.json": {
+      "bytes": 3334,
+      "sha256": "825445befc5fffdf7321390c40ebaf6d35713baa070ff787daa38b2c97a8abf5"
+    },
+    "ready-cancellation-completed.json": {
+      "bytes": 3334,
+      "sha256": "825445befc5fffdf7321390c40ebaf6d35713baa070ff787daa38b2c97a8abf5"
+    },
+    "record-publication.py": {
+      "bytes": 961,
+      "sha256": "5ec887ce3c55e4ed14293b4f22d84d0f53aa18f43d6e2d1b8683b3d4ef487aca"
+    },
+    "remote-main-before-publication.json": {
+      "bytes": 351,
+      "sha256": "b2faae0364e25ab8cb9baa305feb2492385f0afe12841d131764da3fe3cb31cf"
+    },
+    "replacement-preflight-after-watch-interruption-original.json": {
+      "bytes": 6940,
+      "sha256": "2e3ecabb994b78552c59fa4395d05ad76d15d854e7d6ccdf21ce29f81028a45a"
+    },
+    "replacement-preflight-in-progress-original.json": {
+      "bytes": 6674,
+      "sha256": "017a16a1f03c0f6b1a6c6b8c0aefece200a989101e082e6a92dd959203363b97"
+    },
+    "replacement-preflight-list.json": {
+      "bytes": 1035,
+      "sha256": "fcfe0ad5a511861fef3288c1115695a1037f0feeff3dd5e2f9f0431ed072c5b1"
+    },
+    "replacement-preflight-status-v2.json": {
+      "bytes": 550,
+      "sha256": "085ba86cd95ab0dba2302cdeb09aac3603adf2bc6eefa1566b796749edd5343c"
+    },
+    "replacement-preflight-status-v3.json": {
+      "bytes": 7869,
+      "sha256": "85d89b34f325ca03d276b7099c111cb18d58d9dc4fb904cce93361deae994e54"
+    },
+    "replacement-preflight-watch.json": {
+      "bytes": 9485,
+      "sha256": "36a91be02872ff8637803b97a0f5da4ba4aef9cad17604feb729852d4aaa5541"
+    },
+    "rules-before-publication.json": {
+      "bytes": 303,
+      "sha256": "0e2ad8803c281719dda20b7ce7629e65cc4bdab2823ad38df43c1b830c8d8ea2"
+    },
+    "watch-interruption-reconciliation.json": {
+      "bytes": 441,
+      "sha256": "7bc7fbf3a0dcd374bc26fd78ce9d0726826e0af270b63d67c7fcce3e7a48267b"
+    }
+  },
+  "actual_merge": {
+    "pr": {
+      "base": "2b43b46a3d679c524eacbe34fb4d0595f4cdf1aa",
+      "head": "dbec2c7ef0507c295b206880c77d82d360928585",
+      "html_url": "https://github.com/SeanVasey/VA-Studio/pull/130",
+      "merge_commit_sha": "f3b00476218e54f45ad1ee435e0fc5de115d717b",
+      "merged": true,
+      "merged_at": "2026-10-15T22:26:36Z",
+      "number": 130,
+      "state": "closed"
+    },
+    "approved_head": "dbec2c7ef0507c295b206880c77d82d360928585",
+    "merge": "f3b00476218e54f45ad1ee435e0fc5de115d717b",
+    "merge_tree": "e8892f5ef268288c30cc1fe4d38d9cb60787f394",
+    "parents": [
+      "2b43b46a3d679c524eacbe34fb4d0595f4cdf1aa",
+      "dbec2c7ef0507c295b206880c77d82d360928585"
+    ],
+    "fetched_main": "f3b00476218e54f45ad1ee435e0fc5de115d717b",
+    "tree_equal_to_approved": true,
+    "expected_sha_merge_exit": 0,
+    "observed_utc": "2026-10-15T22:27:10.053279+00:00"
+  },
+  "pre_merge_gate": {
+    "observed_utc": "2026-10-15T22:26:29.035577+00:00",
+    "expected_head": "dbec2c7ef0507c295b206880c77d82d360928585",
+    "pr": 130,
+    "preflight_run": 38816547469,
+    "preflight_jobs": {
+      "scope": "success",
+      "frontend": "success",
+      "backend-quality": "success",
+      "documentation": "skipped",
+      "Development preflight result": "success"
+    },
+    "readiness_cancelled_run": 38816530216,
+    "review_count": 0,
+    "thread_count": 0,
+    "context_count": 10,
+    "pagination_complete": true,
+    "independent_decision": "APPROVE_EXACT_HEAD_DOCUMENTATION_PUBLICATION_CARRY",
+    "rules": [],
+    "branch_protection": null,
+    "scope": "Focused development gate; exact identified readiness-cancellation artifact only, all current/unknown contexts pass. No settings change or bypass."
+  },
+  "scope": "Publication originals only; original source/evidence seal unchanged. Watcher HTTP401 and separate read HTTP503 preserved; follow-up succeeded. No passing check inferred from interruptions."
+}
