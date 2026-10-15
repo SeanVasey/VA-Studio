@@ -1,0 +1,83 @@
+{
+  "DECISION": "APPROVE PUBLICATION-HEAD CARRY WITH CONDITIONS",
+  "actual_current_and_recorded_loaders_equal": 13,
+  "actual_current_input_manifest_equal": 2430,
+  "actual_route_inputs": 17,
+  "application_test_config_policies_profiles_schema_dependency_ops_Git_delta": [],
+  "approval_scope_carried": "Independent bounded defaultfalse/unattested-input development approval only; all prior effects/provenance/source/host/provider/policy/release conditions unchanged.",
+  "approved_candidate_sha": "10e0d86177603f5a0c41f2c1a9011c4eee634592",
+  "archive_and_index_unchanged": {
+    "all_digests_and_safe_exact_member_set": true,
+    "bytes": 7073062,
+    "index_sha256": "e96458f04224ac7bdee00f462767d107d9651f79b644d2f350e630f6fb782e9d",
+    "members": 2460,
+    "sha256": "bd681b5f192e87b7f1f1ec9708682e5a87a91b5797009bbdbd8514aba6bba2fb"
+  },
+  "byte_original_imports": [
+    {
+      "original_bytes_unchanged": true,
+      "path": "independent-final-DECISION.md",
+      "sha256": "d45ee4fa11b700b4ba043aaa57d116463f25ffdb418d0a270a55e08fa88465bc"
+    },
+    {
+      "original_bytes_unchanged": true,
+      "path": "independent-final-report.json",
+      "sha256": "ccb8f073e27b42844bc907a2f183e822b1669b01a8b1cc55af9d84a4bc60169f"
+    },
+    {
+      "original_bytes_unchanged": true,
+      "path": "independent-final-verifier.py",
+      "sha256": "152dc4f9a2b1fbae6bdc87fef2f5539ed858b2fde8ccd6974234c962d3deb137"
+    },
+    {
+      "original_bytes_unchanged": true,
+      "path": "independent-final-verifier-report.json",
+      "sha256": "270495cdb8dd518758f97797fe67fa76ffe3839ed6fd416d2d295c63b08a4b40"
+    }
+  ],
+  "created_utc": "2026-10-15T13:24:57.796097+00:00",
+  "exact_five_documentation_delta": [
+    "docs/verification/paid-financial-observation-20261015/README.md",
+    "docs/verification/paid-financial-observation-20261015/independent-final-DECISION.md",
+    "docs/verification/paid-financial-observation-20261015/independent-final-report.json",
+    "docs/verification/paid-financial-observation-20261015/independent-final-verifier-report.json",
+    "docs/verification/paid-financial-observation-20261015/independent-final-verifier.py"
+  ],
+  "open_P0": false,
+  "open_P1": false,
+  "operative_application_config_test_sha": "ae6d109581bac6b685360a5941d6c7819cd5616f",
+  "original_evidence_scope": {
+    "actual_PHP_invocations": 4,
+    "cheap": "Prior7/196+current3/67=263 narrow coverage; originalfailed52/F1 retained, not fresh full10-command run",
+    "current_new_whole": "13/351,F0E0S0,all0",
+    "legacy69_291": "Prior-source narrow carry, not fresh execution",
+    "passes": 3,
+    "red": 1,
+    "red_counts": "3/7/F1E2S0,PHP2/recorder1/OS1"
+  },
+  "preserved_release_conditions": [
+    "New purpose ships literalfalse; no provider/transport/route/job/command/UI/schema/durable financial observation or business write added.",
+    "No normalized candidate/expectation authenticates provider retrieval, freshness/current finances, positive original commit, dispatch/refund/settlement/payout/access/rights/inventory authority.",
+    "Future authenticated retrieval/original source+commit closure/durable append-only ledger/staff MFA/idempotency need separate design/implementation/review.",
+    "Sean eligibility/window/partial-tax allocation/dispute-download/rights/exclusive rules remain unknown and must not be invented.",
+    "Original source/receipt/schema/profile/SDK21.3.2/API2026-08-26.dahlia bodies and adjacent shared V1/Identity metadata/membership afterCommit P2 remain frozen.",
+    "Official public docs/real account/provider interoperability, merchant/key/host/live activation, existing-request final I/O, global SQL/DDL/isolation/reopen/restore, FPM/distributed/performance/parity/full verification remain open.",
+    "No Foundation/GitLab/live/deployment/DNS/customer import or actual financial/provider operation by reviewer."
+  ],
+  "remaining_publication_merge_gates": [
+    "Green cheap preflight bound to exact f5d0f91addfa947f01b2c9476b5b0a8ac9bfed82; an older-head check is insufficient.",
+    "Complete check/review/thread/protection inventory; mark ready/merge only after required carry and check gates.",
+    "Expected-SHA development merge without bypass/settings change; preserve carry originals with actual post-merge receipt and both ledgers afterward.",
+    "Keep carry originals runtime before merge, avoiding self-referential publication-head movement."
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "f5d0f91addfa947f01b2c9476b5b0a8ac9bfed82",
+  "reviewer_actions": {
+    "app_test_database_network_hosted_CI_operations": 0,
+    "new_runtime_execution_claims": 0,
+    "tracked_edits": 0,
+    "writes": "Only original runtime carry MD/JSON"
+  },
+  "reviewer_preparation_errors": [],
+  "verification_method": "Read-only exact Git delta/README inspection, four original import hashes, unchanged archive/index/ops/operational scopes,2430 actual source-input and13 current loader hashes, frozen clean head before/after."
+}
