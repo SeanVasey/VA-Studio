@@ -54,6 +54,29 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
         app('migrator')->run([database_path('migrations/'.self::MIGRATION.'.php')]);
     }
 
+    public function test_installed_schema_admits_the_standard_uninitialized_schema_grammar_of_a_fresh_application(): void
+    {
+        $this->migrate();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $objects = $this->objects();
+        $prior = $this->prior();
+        // A standard Connection constructor leaves this property null. Migrations warm it;
+        // an independent command/request using the already installed database need not do so.
+        $grammar = new \ReflectionProperty(\Illuminate\Database\Connection::class, 'schemaGrammar');
+        $grammar->setValue($connection, null);
+        $failure = null;
+        try {
+            PaidTaxSchema::assertInstalled();
+        } catch (\Throwable $error) {
+            $failure = $error;
+        }
+        $this->assertNull($failure, 'Installed-schema admission requires a migration-warmed connection.');
+        $this->assertSame($pdo, DB::getPdo());
+        $this->assertSame($objects, $this->objects());
+        $this->assertSame($prior, $this->prior());
+    }
+
     private function plan(): array
     {
         return (new \ReflectionMethod(PaidTaxSchema::class, 'plan'))->invoke(null, DB::getDriverName(), DB::connection()->getTablePrefix())[0];
