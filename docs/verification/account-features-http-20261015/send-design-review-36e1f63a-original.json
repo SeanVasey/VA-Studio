@@ -1,0 +1,48 @@
+{
+  "decision": "REVISE DESIGN: REMOVE SPLIT-EMISSION CALLBACK GAP",
+  "reviewed_sha": "36e1f63ab3c448d70b8bd2cc799eaab21f999879",
+  "observed_utc": "2026-10-15T17:41:37.719815+00:00",
+  "scope": "Narrow completed-root/emission clarification recheck only; planning feasibility, no product approval",
+  "clean_head": true,
+  "changed_paths": [
+    "docs/verification/account-features-http-20261015/design.md",
+    "docs/verification/account-features-http-20261015/send-design-review-d4bb40aa-original.json",
+    "docs/verification/account-features-http-20261015/send-design-review-d4bb40aa-original.md"
+  ],
+  "sha256": {
+    "docs/verification/account-features-http-20261015/design.md": "7cf9db8b6b5b68186daa0ac9202ab14d650bc2c0758f8d41475dbea48bad8a4a",
+    "docs/verification/account-features-http-20261015/send-design-review-d4bb40aa-original.json": "05126ae917df0951d7a4790657ecb6d31aefdd76019e1f096d391f97769e453a",
+    "docs/verification/account-features-http-20261015/send-design-review-d4bb40aa-original.md": "63612f0cc5f31ca914bd7bf62cf0f5e0772350aca3450c95d10ef688bcb424e7"
+  },
+  "original_d4_decision_imports_byte_identical": true,
+  "satisfied": [
+    "Private final kernel epoch completes only after parent handle returns and all RequestHandled listeners finish.",
+    "Original request/response/epoch identity, replacement/incomplete-root refusal, premature/reentrant no-output behavior and no public completion/mint substitute are explicit.",
+    "String conversion always empty; already-sent headers suppress private bytes; native header/cookie preparation precedes the original closing proof."
+  ],
+  "remaining_required_clarification": {
+    "id": "B4-SEND-1-split",
+    "quoted_sentence": "Separate header/content calls may finalize only once after root completion, with private headers preceding content and no duplicate body/header emission on retries.",
+    "issue": "If sendHeaders consumes the sole original closure then returns, caller code can change authority or expire the original deadline before sendContent releases the prepared private body. That contradicts the same section's no-user-callback-after-proof requirement. A completed root epoch does not close this returned-to-caller interval.",
+    "required_resolution": "Standalone split calls must not leave authorized prepared content for later emission. Refuse standalone sendHeaders/sendContent (permitting internal calls only during one synchronous send), or make the first permitted emission entry complete headers and body atomically without returning between proof and private bytes. Preserve one-use/no-repeat behavior.",
+    "meaningful_control": "Direct header call followed by late scope/deadline withdrawal and content call must emit no delayed private payload; ordinary synchronous post-kernel send remains positive."
+  },
+  "open_established_P0_P1": [],
+  "conditions": [
+    "After the split contract is clarified, actual frozen implementation and real root/session/RequestHandled/emission tests still need independent review.",
+    "Metadata14/85 approval/evidence remains its prior separate scope; HTTP/context/cleanup not implemented or accepted here.",
+    "Existing deadline/default-off/non-HTTP semantics and adjacent deferred scopes remain unchanged."
+  ],
+  "reviewer_actions": {
+    "application_tests": false,
+    "database": false,
+    "network_CI": false,
+    "shared_edits": false
+  },
+  "read_commands": [
+    "git rev-parse HEAD; git status --short",
+    "git diff d4bb40aa..36e1f63a design; git diff --name-only; sha256sum original imports",
+    "Offline exact-head/docs hashes and exclusive reviewer artifact creation"
+  ],
+  "preparation_errors": []
+}
