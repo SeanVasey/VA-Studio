@@ -5,6 +5,8 @@ namespace Tests\Feature\ProductionFreeGrants;
 use App\Domain\Delivery\PreparedDeliveryStream;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantTransfer;
+use Closure;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /** Returning-consumer controls only; no blocked SAPI/write or database proof. */
@@ -14,7 +16,7 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
 
     private mixed $input = null;
 
-    private function transfer(string $bytes, int $deadlineSeconds = 200, int $baseSeconds = 30): ProductionFreeGrantTransfer
+    private function transfer(string $bytes, int $deadlineSeconds = 200, int $baseSeconds = 30, ?Closure $clockOverride = null): ProductionFreeGrantTransfer
     {
         $this->input = fopen('php://temp', 'w+b');
         fwrite($this->input, $bytes);
@@ -22,7 +24,7 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
         $snapshot = new PreparedDeliveryStream($this->input, hash('sha256', $bytes), strlen($bytes));
 
         return new ProductionFreeGrantTransfer($snapshot, 'synthetic.bin', 'application/octet-stream',
-            $deadlineSeconds * 1_000_000_000, fn (): int => $this->tick,
+            $deadlineSeconds * 1_000_000_000, $clockOverride ?? fn (): int => $this->tick,
             0, 16384, $baseSeconds);
     }
 
@@ -131,5 +133,21 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
             });
         });
         $this->assertSame(0, $sent);
+    }
+
+    public static function invalidClocks(): iterable
+    {
+        yield 'numeric string' => ['0'];
+        yield 'float' => [0.0];
+        yield 'negative' => [-1];
+        yield 'null' => [null];
+        yield 'boolean' => [true];
+    }
+
+    #[DataProvider('invalidClocks')]
+    public function test_clock_values_must_be_nonnegative_native_integers(mixed $value): void
+    {
+        $transfer = $this->transfer('private synthetic bytes', 200, 30, fn () => $value);
+        $this->expired(fn () => $transfer->writeTo(static function (): void {}));
     }
 }

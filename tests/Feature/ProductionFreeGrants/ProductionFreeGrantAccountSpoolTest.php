@@ -34,10 +34,10 @@ final class ProductionFreeGrantAccountSpoolTest extends TestCase
         parent::tearDown();
     }
 
-    private function prepare(?string $holder, ?callable $beforeFill = null): PreparedDeliveryStream
+    private function prepare(?string $holder, ?callable $beforeFill = null, int $slots = 3): PreparedDeliveryStream
     {
         $bytes = str_repeat('s', 4096);
-        $stream = (new ProductionFreeGrantSpool)->prepare($this->directory, 3, 0, hash('sha256', $bytes),
+        $stream = (new ProductionFreeGrantSpool)->prepare($this->directory, $slots, 0, hash('sha256', $bytes),
             strlen($bytes), hrtime(true) + 10_000_000_000, static function ($output) use ($bytes, $beforeFill): void {
                 if ($beforeFill !== null) {
                     $beforeFill();
@@ -122,5 +122,18 @@ final class ProductionFreeGrantAccountSpoolTest extends TestCase
             $this->prepare(hash('sha256', 'synthetic-account-'.$account));
         }
         $this->refused(fn () => $this->prepare(hash('sha256', 'synthetic-account-d')));
+    }
+
+    public function test_reducing_slot_count_still_detects_a_live_account_in_a_higher_slot(): void
+    {
+        $low = $this->prepare(hash('sha256', 'synthetic-account-b'));
+        $middle = $this->prepare(hash('sha256', 'synthetic-account-c'));
+        $account = hash('sha256', 'synthetic-account-a');
+        $this->prepare($account); // Heldslot2 survives the operator's reduction to one allocatable slot.
+        $low->close();
+        $middle->close();
+        $this->refused(fn () => $this->prepare($account, null, 1));
+        $other = $this->prepare(hash('sha256', 'synthetic-account-d'), null, 1);
+        $this->assertSame(str_repeat('s', 4096), stream_get_contents($other->stream()));
     }
 }
