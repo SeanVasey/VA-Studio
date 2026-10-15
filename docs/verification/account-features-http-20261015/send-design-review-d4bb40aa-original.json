@@ -1,0 +1,51 @@
+{
+  "decision": "REVISE DESIGN BEFORE HTTP IMPLEMENTATION: MAKE COMPLETED-ROOT RELEASE GATE EXPLICIT",
+  "reviewed_sha": "d4bb40aa884ad737bb170ddec14e5566138ff84b",
+  "observed_utc": "2026-10-15T17:35:05.506167+00:00",
+  "clean_head": true,
+  "review_scope": "Bounded deferred-send boundary refinement only; no implementation source re-audit",
+  "sha256": {
+    "docs/verification/account-features-http-20261015/design.md": "9b1a014010d79adbd589e5a89aa0d63bbc84da8d8c25a2e12b703e2716d3c252",
+    "docs/verification/account-features-http-20261015/metadata-review-c978a63a-original.md": "91f3f0d10eafd1390418f0553f5b4a6288be826d0ad277fdd3907cf87547c6d2",
+    "docs/verification/account-features-http-20261015/metadata-review-c978a63a-original.json": "9e30e3c2ad78263257890db1ca636a3ed7e6bb7baff35ffab99a570d56bf9e74"
+  },
+  "operative_delta_from_c978": false,
+  "original_component_approval_imports_byte_identical": true,
+  "positive_assessment": [
+    "Defer the same original postcommit closure until after session save/RequestHandled, preserving its context/identity/reader/metadata admission and original ten-second deadline.",
+    "Mint only after positive original framework commit/proof; no idle-PDO inference, recapture, new lifetime or read-only frame across session writes.",
+    "Keep provisional bytes private, materialize supported headers/cookies before the final proof, preserve non-HTTP immediate closure and original-only frame cleanup.",
+    "Actual sent response status/body must be tested; unsent TestResponse is not release evidence."
+  ],
+  "required_design_clarification": {
+    "id": "B4-SEND-1",
+    "priority": "Required release-contract clarification before implementation",
+    "title": "Calling send is not itself proof that all root callbacks have finished",
+    "evidence": "Installed Kernel.handle dispatches RequestHandled before returning; an ordinary listener can invoke its response.send while later listeners remain. Symfony also exposes sendHeaders/sendContent/__toString independently. The current draft names real send but does not specify a trusted completed-root phase or premature-entry refusal.",
+    "requirement": "Specify a trusted completed-root release phase, or reject emission while the original root/middleware/RequestHandled callback execution remains active. All public emission entry points must share the one-use original boundary; premature/reentrant/second private release must not emit headers or prepared bytes. Refuse private release if headers were already sent. No caller-authored flag, new authority/deadline or arbitrary fallback source may substitute.",
+    "required_controls": [
+      "Real RequestHandled early-send listener followed by a later scope/mount withdrawal: no premature private output; actual final send refuses.",
+      "Direct sendHeaders/sendContent/stringification before authorized final release exposes no prepared bytes/headers.",
+      "Reentrant and second-send/failed-send lifecycle, plus headers-already-sent refusal and unused boundary cleanup.",
+      "Ordinary actual post-kernel send with genuine session save remains positive."
+    ]
+  },
+  "open_established_P0_P1": [],
+  "limits": [
+    "Planning only: no new HTTP implementation/test/native/final acceptance is approved.",
+    "Metadata component approval remains valid and root reports whole14/85 all exits0; no metadata rerun or receipt re-verification here.",
+    "Scope remains default false/unmounted, no activation/host/provider/fullFoundation claim."
+  ],
+  "reviewer_operations": {
+    "application_tests": false,
+    "database": false,
+    "network_or_CI": false,
+    "shared_edits": false
+  },
+  "commands": [
+    "git rev-parse HEAD; git status --short; scoped docs diff/read",
+    "Read installed Symfony Response emission methods and Laravel Kernel/StartSession ordering",
+    "Offline docs/import hashes and empty operative diff check; exclusive runtime artifact creation"
+  ],
+  "preparation_errors": []
+}
