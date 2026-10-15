@@ -5,6 +5,7 @@ namespace App\Domain\Grants\PaidTax;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderCommittedReadReceiptV2;
 use JsonSerializable;
 use LogicException;
+use Throwable;
 
 /** Server-only body closure: original captured receipts, no browser evidence or renewed grant authority. */
 final class PaidTaxProjectionRead implements JsonSerializable
@@ -38,10 +39,21 @@ final class PaidTaxProjectionRead implements JsonSerializable
         PaidTaxException::require(! $this->used && $this->owner !== null && $this->producer !== null && $this->deadline !== null);
         $this->used = true;
         // Any callback-capable consumer work precedes the producer's fixed raw financial/history closure.
-        $this->owner->proveClosed();
-        $this->producer->proveClosed();
-        $this->owner->proveRawClosed();
-        $this->deadline->proveCurrent();
+        try {
+            $this->owner->proveClosed();
+            $this->producer->proveClosed();
+            $this->owner->proveRawClosed();
+            $this->deadline->proveCurrent();
+        } catch (Throwable $error) {
+            try {
+                // Even an owner/budget refusal BEFORE the sibling's proof must release this original
+                // observer. Its exact frame cleanup preserves durable commits, peers and replacements.
+                $this->producer->abortOwnedFrame();
+            } catch (Throwable) {
+                // Preserve the original refusal; never infer replacement physical ownership.
+            }
+            throw $error;
+        }
     }
 
     public function __serialize(): array
