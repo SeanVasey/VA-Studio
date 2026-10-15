@@ -27,7 +27,7 @@ python3 launch-durable.py --name sqlite-affected-existing-tax-family --driver sq
 python3 launch-durable.py --name sqlite-affected-v1-paid-journeys --driver sqlite tests/Feature/PaidGrantSourceJourneyTest.php tests/Feature/PaidGrantDocumentJourneyTest.php tests/Feature/PaidGrantDownloadJourneyTest.php
 ```
 
-The three exact SQLite skips are the native authorization method and two data sets of the native redemption method (enumerated in the index). They genuinely skipped on be6 before their CI skip declaration was added at294; declaration is not backdated. No new-schema case skipped in the native5-case run. Partial earlier stop-on-defect selections did not execute remaining cases.
+The three exact SQLite skips are `Tests\Feature\PaidTaxDownloadNativeTest::test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization` and the two recorded data sets of `Tests\Feature\PaidTaxDownloadNativeTest::test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt` (each case is enumerated in the archived original JUnit and skip receipt). They genuinely skipped on be6 before their CI skip declaration was added at294; declaration is not backdated. No new-schema case skipped in the native5-case run. Partial earlier stop-on-defect selections did not execute remaining cases.
 
 ## Repairs and original failures
 
