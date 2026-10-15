@@ -1,0 +1,60 @@
+{
+  "kind": "Original independent design critique before implementation",
+  "reviewed_commit": "a65bb292e800bfa45ed64a5bbd2f33be242b15f2",
+  "decision": "REVISE DESIGN BEFORE IMPLEMENTATION",
+  "design_sha256": "84a4af086fd3e77d2a80183239d1becc6af1ef8048dc5b851665a68426f960da",
+  "scope": "New internal Tax authorization/history/redemption/private transfer/schema feasibility. No proposed implementation exists or passes inferred.",
+  "required_clarifications": [
+    {
+      "id": "D1",
+      "priority": "Required authority-order clarification",
+      "finding": "An entry-time sibling proof is too early for PreparedDeliveryStream::writeTo, which resolves generic DB/outsideTransactions and calls stream/seek/read before first chunk. Injectable transfer clock may also run after a naive proof.",
+      "required": "Fence inside FIRST NONEMPTY chunk after those callbacks; consumer callback-phase then original source sibling then owner raw closure, only captured pure timing before private chunk handoff.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D2",
+      "priority": "Required original-time clarification",
+      "finding": "Sampling the transfer origin after Commands::run returns lets afterCommit/closed-proof callbacks renew its claimed commit-based lifetime.",
+      "required": "Original monotonic transfer tick no later than physical commit; conservative sample before initiating command acceptable, never post-return restart.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D3",
+      "priority": "Required capture/arithmetic clarification",
+      "finding": "Same numeric timing semantics must preserve the original age debit and exact receivedAt object rather than independent wall-clock/deadline recapture.",
+      "required": "Tick before Carbon/config/identity; initial=start+60-age; overall=initial+capturedSnapshot+60; exact receivedAt identity; min captured/current snapshot and live overall; fresh60 phase capped by same original overall.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D4",
+      "priority": "Required literal key/technical-state closure",
+      "finding": "Token/key/technical settings resolved separately from original receipt could change after token construction or invalidate a returned authorization. Frozen helper calls cannot promise immediate live cancellation.",
+      "required": "Private literal delivery admission inputs incl current app.key separate from retained purchase policy; raw equality in every current/prepared/closed assertion; token uses captured key only; frozen helper pre/post/own-copy checks with no in-helper interruption claim.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D5",
+      "priority": "Required lifecycle cleanup",
+      "finding": "Failure/abandonment before proveBeforeBytes is invoked leaves original SourceV2 sibling observer installed even when descriptor closes. Current ProjectionRead abort exists only in proof catch.",
+      "required": "Idempotent original-handle abandonment plus transfer close/destructor, independent withdrawn policy/spent deadline; preserve refusal/durable attempt/unrelated roots/peers/replacements, no generic rollback/proof renewal.",
+      "disposition": "Explicitly corrected in315 and retained9a3."
+    },
+    {
+      "id": "D6",
+      "priority": "Required snapshot availability clarification",
+      "finding": "An1800-second admitted snapshot may outlive a copied660-second document-heavy availability lease.",
+      "required": "Exact existing key/owner release but snapshot TTL covers admitted phase+cleanup without authority renewal; retain host/blocking/cache limitations.",
+      "disposition": "9a3 states max(660,ceil(remaining snapshot)+60), cap1860; existing document660 untouched."
+    }
+  ],
+  "architecture_assessment": "Separate two-table soft-UUID/hash joins are feasible without incoming old-five dependencies. Exact optional Rows admission and new own Records specs are necessary, not changes to frozen old schema/profile.",
+  "read_commands": [
+    "git rev-parse/status/diff/show at immutable design heads and baseline",
+    "Read/rg exact PaidTaxCommands/Rows/ReadReceipt/ProjectionRead/Policy/Configuration/Records/Schema/Files mechanics",
+    "Read/rg existing PaidGrantDownloads/Transfer/RequestBudget/RequestInstant/PrepareStream/Policy timing and spool semantics",
+    "Read PreparedDeliveryStream/DeliveryAssetFiles/ActivationPolicy; ops C11 and original Addenda15/18 conditions"
+  ],
+  "actual_source_product_delta_since_pr122": [],
+  "actions": "Read-only actual code/design/Git. Original runtime notes only. No source/test/DB/container/network/CI operation."
+}

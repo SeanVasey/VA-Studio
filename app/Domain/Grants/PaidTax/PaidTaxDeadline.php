@@ -9,7 +9,7 @@ final class PaidTaxDeadline
 {
     private int $deadline;
 
-    private ?PaidGrantRequestBudget $requestBudget = null;
+    private PaidGrantRequestBudget|PaidTaxRequestBudget|null $requestBudget = null;
 
     private function __construct(private readonly int $original)
     {
@@ -29,7 +29,7 @@ final class PaidTaxDeadline
     }
 
     /** The same request's live min-only ceiling; the ordinary 60 s allowance is unchanged. */
-    public static function forRequest(PaidGrantRequestBudget $budget): self
+    public static function forRequest(PaidGrantRequestBudget|PaidTaxRequestBudget $budget): self
     {
         $deadline = self::start();
         $deadline->requestBudget = $budget;
