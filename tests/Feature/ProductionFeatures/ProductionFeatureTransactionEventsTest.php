@@ -199,9 +199,10 @@ class ProductionFeatureTransactionEventsTest extends TestCase
                 $this->assertTrue($fired);
                 $this->assertTrue($primary->inTransaction());
                 $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_commit_foreign')->fetchColumn());
-                $this->assertSame(0, $connection->transactionLevel());
+                $this->assertSame(1, $connection->transactionLevel());
                 $this->assertSame(0, $afterCommit);
                 $primary->rollBack();
+                $connection->setPdo($primary); // Explicit cleanup by the foreign frame owner.
                 Event::forget(TransactionBeginning::class);
                 $this->assertSame(1, $library->read($owner)['library']['version']);
                 $this->assertSame(0, $afterCommit, 'The aborted frame must not run its queued callback in a later successful operation.');
@@ -221,7 +222,7 @@ class ProductionFeatureTransactionEventsTest extends TestCase
     }
 
     #[DataProvider('driftingBindings')]
-    public function test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings(string $which): void
+    public function test_committing_manager_or_dispatcher_drift_refuses_and_preserves_callback_owned_bindings(string $which): void
     {
         $owner = $this->featureIdentity();
         $library = new ProductionListeningLibrary;
@@ -231,12 +232,13 @@ class ProductionFeatureTransactionEventsTest extends TestCase
         $manager = $property->getValue($connection);
         $dispatcher = $connection->getEventDispatcher();
         $fired = false;
-        Event::listen(TransactionCommitting::class, function () use ($which, $connection, &$fired): void {
+        $replacement = $which === 'manager' ? new DatabaseTransactionsManager : new Dispatcher;
+        Event::listen(TransactionCommitting::class, function () use ($which, $connection, $replacement, &$fired): void {
             $fired = true;
             if ($which === 'manager') {
-                $connection->setTransactionManager(new DatabaseTransactionsManager);
+                $connection->setTransactionManager($replacement);
             } else {
-                $connection->setEventDispatcher(new Dispatcher);
+                $connection->setEventDispatcher($replacement);
             }
         });
         try {
@@ -246,9 +248,14 @@ class ProductionFeatureTransactionEventsTest extends TestCase
             $this->assertSame(503, $error->status);
             $this->assertTrue($fired);
             $this->assertSame(0, (int) DB::table('production_listening_libraries')->value('version'));
-            $this->assertSame($manager, $property->getValue($connection));
-            $this->assertSame($dispatcher, $connection->getEventDispatcher());
+            $this->assertSame($which === 'manager' ? $replacement : $manager, $property->getValue($connection));
+            $this->assertSame($which === 'dispatcher' ? $replacement : $dispatcher, $connection->getEventDispatcher());
+            $this->assertSame(1, $connection->transactionLevel(), 'Native cleanup cannot reset callback-owned framework state.');
             $this->assertFalse($connection->getRawPdo()->inTransaction());
+        } finally {
+            $connection->setEventDispatcher($dispatcher);
+            $manager === null ? $connection->unsetTransactionManager() : $connection->setTransactionManager($manager);
+            $connection->setPdo($connection->getRawPdo()); // Caller reconciles preserved framework state.
         }
     }
 

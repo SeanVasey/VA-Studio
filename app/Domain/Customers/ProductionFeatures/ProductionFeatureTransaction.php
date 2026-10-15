@@ -52,7 +52,7 @@ final class ProductionFeatureTransaction
         }
     }
 
-    public function protectFailure(): bool
+    public function protectFailure(bool $frameworkOwned = true): bool
     {
         $owned = false;
         if ($this->primary->inTransaction()) {
@@ -65,7 +65,7 @@ final class ProductionFeatureTransaction
         }
         $cached = (new \ReflectionProperty(Connection::class, 'pdo'))->getRawValue($this->connection);
         $depth = (new \ReflectionProperty(Connection::class, 'transactions'))->getRawValue($this->connection);
-        if ($owned && $cached === $this->primary && $depth === 1) {
+        if ($owned && $frameworkOwned && $cached === $this->primary && $depth === 1) {
             return true;
         }
         if ($owned) {

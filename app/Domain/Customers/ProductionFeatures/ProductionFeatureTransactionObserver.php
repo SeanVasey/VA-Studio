@@ -56,7 +56,9 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
     public function abort(): void
     {
         if ($this->frame !== null) {
-            if ($this->frame->protectFailure()) {
+            $owned = (new ReflectionProperty(Connection::class, 'events'))->getRawValue($this->connection) === $this
+                && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getRawValue($this->connection) === $this->manager;
+            if ($this->frame->protectFailure($owned)) {
                 // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
                 $this->connection->rollBack();
             }
