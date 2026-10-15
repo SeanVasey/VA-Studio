@@ -14,7 +14,7 @@ use PDO;
 use ReflectionProperty;
 
 /** Retains one exact original birth before ordinary begun delegates; never a commit observer. */
-final class PaidTaxBeginningDispatcher implements Dispatcher, \JsonSerializable
+final class PaidTaxBeginningDispatcher implements \JsonSerializable, Dispatcher
 {
     private bool $captured = false;
 

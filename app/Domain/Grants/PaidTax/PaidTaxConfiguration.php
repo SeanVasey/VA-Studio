@@ -2,8 +2,8 @@
 
 namespace App\Domain\Grants\PaidTax;
 
-use ReflectionProperty;
 use Illuminate\Config\Repository;
+use ReflectionProperty;
 
 /** Exact core repository storage only; ArrayAccess parents and object leaves are never evaluated. */
 final class PaidTaxConfiguration

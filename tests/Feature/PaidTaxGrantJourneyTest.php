@@ -2,40 +2,35 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
-use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
-use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
-use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\PaidTax\PaidTaxCleanup;
+use App\Domain\Grants\PaidTax\PaidTaxCommands;
+use App\Domain\Grants\PaidTax\PaidTaxDeadline;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxException;
 use App\Domain\Grants\PaidTax\PaidTaxFiles;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
+use App\Domain\Grants\PaidTax\PaidTaxPolicy;
 use App\Domain\Grants\PaidTax\PaidTaxProjectionRead;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
-use App\Domain\Grants\PaidTax\PaidTaxConsumerCommitAdmission;
-use App\Domain\Grants\PaidTax\PaidTaxReadReceipt;
-use App\Domain\Grants\PaidTax\PaidTaxDeadline;
-use App\Domain\Grants\PaidTax\PaidTaxPolicy;
-use App\Domain\Grants\PaidTax\PaidTaxCommands;
+use App\Domain\Grants\PaidTax\PaidTaxRuntime;
+use App\Domain\Grants\PaidTax\PaidTaxTransaction;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Events\TransactionCommitting;
-use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidTaxGrantFixtures;
-use Tests\Support\QuoteFixtures;
-use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
 
 /** Actual local SMTP enrollment and retained synthetic Tax payment; no host/provider acceptance claim. */
@@ -336,7 +331,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         $pdo = $connection->getPdo();
         $pdo->exec('CREATE TABLE paid_tax_reopen_probe (id INTEGER PRIMARY KEY)');
         $calls = 0;
-        app()->afterResolving(\App\Domain\Grants\PaidTax\PaidTaxPolicy::class, static function () use ($pdo, &$calls): void {
+        app()->afterResolving(PaidTaxPolicy::class, static function () use ($pdo, &$calls): void {
             if ($calls === 0) {
                 $calls++;
                 $pdo->commit();
@@ -431,15 +426,19 @@ class PaidTaxGrantJourneyTest extends TestCase
         $connection = DB::connection();
         $pdo = $connection->getPdo();
         $delegate = $connection->getEventDispatcher();
-        $manager = (new \ReflectionProperty(\Illuminate\Database\Connection::class, 'transactionsManager'))->getValue($connection);
+        $manager = (new \ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         $calls = 0;
         $callbacks = 0;
         $delegate->listen(TransactionBeginning::class, static function () use ($behavior, &$calls, &$callbacks): void {
             if ($calls++ !== 0) {
                 return;
             }
-            DB::afterCommit(static function () use (&$callbacks): void { $callbacks++; });
-            DB::afterRollBack(static function () use (&$callbacks): void { $callbacks++; });
+            DB::afterCommit(static function () use (&$callbacks): void {
+                $callbacks++;
+            });
+            DB::afterRollBack(static function () use (&$callbacks): void {
+                $callbacks++;
+            });
             if ($behavior === 'throw') {
                 throw new \RuntimeException('Synthetic ordinary begin failure.');
             }
@@ -485,14 +484,18 @@ class PaidTaxGrantJourneyTest extends TestCase
         $connection = DB::connection();
         $pdo = $connection->getPdo();
         $pdo->exec('CREATE TABLE paid_tax_begin_reopen_probe (id INTEGER PRIMARY KEY)');
-        $manager = (new \ReflectionProperty(\Illuminate\Database\Connection::class, 'transactionsManager'))->getValue($connection);
-        $replacement = new \Illuminate\Events\Dispatcher(app());
+        $manager = (new \ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
+        $replacement = new Dispatcher(app());
         $callbacks = 0;
         $calls = 0;
         $connection->getEventDispatcher()->listen(TransactionBeginning::class, static function () use ($connection, $pdo, $replacement, &$callbacks, &$calls): void {
             $calls++;
-            DB::afterCommit(static function () use (&$callbacks): void { $callbacks++; });
-            DB::afterRollBack(static function () use (&$callbacks): void { $callbacks++; });
+            DB::afterCommit(static function () use (&$callbacks): void {
+                $callbacks++;
+            });
+            DB::afterRollBack(static function () use (&$callbacks): void {
+                $callbacks++;
+            });
             $pdo->commit();
             $pdo->beginTransaction();
             $pdo->exec('INSERT INTO paid_tax_begin_reopen_probe VALUES (456)');
@@ -531,7 +534,7 @@ class PaidTaxGrantJourneyTest extends TestCase
     {
         $f = $this->paid();
         $budget = PaidTaxDeadline::start();
-        $runtime = \App\Domain\Grants\PaidTax\PaidTaxRuntime::capture($budget);
+        $runtime = PaidTaxRuntime::capture($budget);
         $originalEnd = $budget->value();
         $connection = $runtime->connection;
         $delegate = $connection->getEventDispatcher();
@@ -546,14 +549,14 @@ class PaidTaxGrantJourneyTest extends TestCase
         $failure = null;
         try {
             try {
-                \App\Domain\Grants\PaidTax\PaidTaxTransaction::run($runtime, static function () use (&$ran): array {
+                PaidTaxTransaction::run($runtime, static function () use (&$ran): array {
                     $ran = true;
 
                     return [];
                 }, $original);
             } catch (PaidTaxException $error) {
                 $failure = $error;
-                \App\Domain\Grants\PaidTax\PaidTaxCleanup::abort(null, null, $original);
+                PaidTaxCleanup::abort(null, null, $original);
             }
             $this->assertSame(1, $calls);
             $this->assertInstanceOf(PaidTaxException::class, $failure);
@@ -571,6 +574,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $this->assertSame($f['order']['orderId'], $retry['orderId']);
     }
+
     public static function prestartMutations(): array
     {
         return ['dispatcher replacement' => ['dispatcher'], 'appended hook' => ['append'], 'replaced hooks' => ['replace']];
@@ -583,8 +587,8 @@ class PaidTaxGrantJourneyTest extends TestCase
         $connection = DB::connection();
         $pdo = $connection->getPdo();
         $delegate = $connection->getEventDispatcher();
-        $replacement = new \Illuminate\Events\Dispatcher(app());
-        $hooks = new \ReflectionProperty(\Illuminate\Database\Connection::class, 'beforeStartingTransaction');
+        $replacement = new Dispatcher(app());
+        $hooks = new \ReflectionProperty(Connection::class, 'beforeStartingTransaction');
         $before = $hooks->getValue($connection);
         $mutated = null;
         $calls = 0;
@@ -632,7 +636,6 @@ class PaidTaxGrantJourneyTest extends TestCase
             $connection->setEventDispatcher($delegate);
         }
     }
-
 }
 
 final class PaidTaxMetadataOffsetFixture extends \ArrayObject

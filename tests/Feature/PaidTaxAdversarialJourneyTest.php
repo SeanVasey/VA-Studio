@@ -10,10 +10,10 @@ use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Grants\PaidTax\PaidTaxCleanup;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
 use App\Domain\Grants\PaidTax\PaidTaxDeadline;
+use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxException;
 use App\Domain\Grants\PaidTax\PaidTaxFiles;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
-use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxProjectionRead;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
@@ -99,7 +99,7 @@ class PaidTaxAdversarialJourneyTest extends TestCase
     public function test_two_valid_same_buyer_orders_cannot_swap_authenticated_line_or_expected_target(): void
     {
         $a = $this->paidTaxOrder();
-        $b = $this->secondPaidTaxOrder($a, 'cs_test_SECOND_VALID', 'pi_SECOND_VALID');
+        $b = $this->secondPaidTaxOrder($a, 'cs_test_SECONDVALID', 'pi_SECONDVALID');
         $grants = new PaidTaxGrants;
         $first = $grants->finalize($a['buyer']['principal'], $a['buyer']['user'], $a['order']['orderId']);
         $second = $grants->finalize($b['buyer']['principal'], $b['buyer']['user'], $b['order']['orderId']);

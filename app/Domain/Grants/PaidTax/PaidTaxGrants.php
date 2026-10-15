@@ -15,7 +15,6 @@ use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /** New typed paid consumer; current original-session buyer authority precedes immutable historical proof. */
