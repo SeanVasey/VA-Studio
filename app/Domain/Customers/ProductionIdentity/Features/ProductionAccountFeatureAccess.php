@@ -22,6 +22,8 @@ final class ProductionAccountFeatureAccess
     /** Call before module/catalog locks, using that module's captured primary reader. */
     public function lock(ProductionAccountFeatureIdentity $identity, CurrentRows $reader): array
     {
+        IdentityMetadataAdmission::admit($reader->identityPrimary());
+        IdentityMetadataAdmission::actorId($identity->actor());
         $policy = $this->policy($identity);
         $configuration = $policy->current();
         $raw = (new ProductionCustomerAccess)->lock($identity->principal(), $identity->actor(), $reader);
@@ -48,6 +50,8 @@ final class ProductionAccountFeatureAccess
     /** Read-only admission before module validation; deliberately no FOR UPDATE or new identity. */
     public function lockCommitted(ProductionAccountFeatureIdentity $identity, IdentityCommittedFrame $frame, array $expectedRaw): void
     {
+        $frame->assertActive();
+        IdentityMetadataAdmission::actorId($identity->actor());
         if (array_keys($expectedRaw) !== ['configuration', 'identity'] || ! is_array($expectedRaw['identity'])
             || $this->policy($identity)->current() !== $expectedRaw['configuration']) {
             throw new IdentityException;

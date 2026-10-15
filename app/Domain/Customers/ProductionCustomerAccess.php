@@ -64,6 +64,8 @@ final class ProductionCustomerAccess
 
     public function lock(ProductionCustomerPrincipal $principal, User $trustedActor, CurrentRows $reader): array
     {
+        IdentityMetadataAdmission::admit($reader->identityPrimary());
+        IdentityMetadataAdmission::actorId($trustedActor);
         if (DB::transactionLevel() === 0) {
             throw new IdentityException('transaction_required');
         }

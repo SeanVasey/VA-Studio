@@ -105,6 +105,7 @@ final class IdentityMetadataAdmission
                 }
             }
         }
+        self::resolverMetadata($app);
         $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         if ((new ReflectionProperty(Facade::class, 'app'))->getValue() !== $app || ! is_array($resolved)
             || (array_key_exists('db', $resolved) && $resolved['db'] !== $manager)
@@ -158,6 +159,51 @@ final class IdentityMetadataAdmission
         return ['application' => $app, 'repository' => $repository, 'manager' => $manager,
             'environment' => self::environment($app, $instances), 'configuration' => $configuration,
             'default' => $default, 'connections' => $connections, 'primaries' => $primaries];
+    }
+
+    /** Application resolves deferred/contextual branches before its cached-instance return. */
+    private static function resolverMetadata(Application $app): void
+    {
+        $stack = self::array($app, Container::class, 'buildStack');
+        if (! array_is_list($stack) || count($stack) > 128) {
+            throw new IdentityException;
+        }
+        foreach ($stack as $entry) {
+            if (! is_string($entry)) {
+                throw new IdentityException;
+            }
+        }
+        $critical = ['db', 'config', 'env'];
+        $aliases = self::array($app, Container::class, 'abstractAliases');
+        foreach (['db', 'config', 'env'] as $key) {
+            $names = $aliases[$key] ?? [];
+            if (! is_array($names) || ! array_is_list($names)) {
+                throw new IdentityException;
+            }
+            foreach ($names as $name) {
+                if (! is_string($name)) {
+                    throw new IdentityException;
+                }
+                $critical[] = $name;
+            }
+        }
+        $contextual = self::array($app, Container::class, 'contextual');
+        foreach ($contextual as $owner => $bindings) {
+            if (! is_string($owner) || ! is_array($bindings)) {
+                throw new IdentityException;
+            }
+            foreach ($critical as $name) {
+                if (array_key_exists($name, $bindings)) {
+                    throw new IdentityException;
+                }
+            }
+        }
+        $deferred = self::array($app, Application::class, 'deferredServices');
+        foreach (['db', 'config', 'env'] as $name) {
+            if (array_key_exists($name, $deferred)) {
+                throw new IdentityException;
+            }
+        }
     }
 
     private static function environment(Application $app, array $instances): string
