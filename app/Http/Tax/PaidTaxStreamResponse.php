@@ -5,13 +5,14 @@ namespace App\Http\Tax;
 use App\Domain\Grants\PaidTax\PaidTaxException;
 use App\Http\Middleware\PaidTaxPrivacy;
 use Closure;
+use LogicException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
 /** The response owns cleanup even if never sent. Its callback never captures the response. */
 final class PaidTaxStreamResponse extends StreamedResponse
 {
-    public function __construct(private readonly PaidTaxResponseOwner $owner, Closure $callback, array $headers)
+    public function __construct(private ?PaidTaxResponseOwner $owner, Closure $callback, array $headers)
     {
         try {
             parent::__construct($callback, 200, $headers);
@@ -49,7 +50,7 @@ final class PaidTaxStreamResponse extends StreamedResponse
 
     public function close(): void
     {
-        $this->owner->close();
+        $this->owner?->close();
     }
 
     public function __destruct()
@@ -57,5 +58,19 @@ final class PaidTaxStreamResponse extends StreamedResponse
         $this->close();
     }
 
-    private function __clone() {}
+    public function __clone()
+    {
+        $this->owner = null;
+        throw new LogicException('Private Tax responses cannot be cloned.');
+    }
+
+    public function __serialize(): never
+    {
+        throw new LogicException('Private Tax responses cannot be serialized.');
+    }
+
+    public function __unserialize(array $data): never
+    {
+        throw new LogicException('Private Tax responses cannot be deserialized.');
+    }
 }
