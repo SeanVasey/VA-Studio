@@ -1,0 +1,40 @@
+{
+  "actual_merge": {
+    "headRefOid": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+    "mergeCommit": {
+      "oid": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36"
+    },
+    "mergedAt": "2026-10-15T08:06:37Z",
+    "state": "MERGED",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/122"
+  },
+  "head_tree": "4c47c56ae40531d5530a4010b53bd9cf2621c95b",
+  "merge_tree": "4c47c56ae40531d5530a4010b53bd9cf2621c95b",
+  "tree_equal": true,
+  "origin_main": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36",
+  "preflight_run": 38702345205,
+  "tested_source": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+  "publication_files": {
+    "publication-actual-merge-tree-equality.json": "f22012aa744288d58ed721eea9cb3959e93059220a8b2829b1cb07fc24aacb28",
+    "publication-actual-merge.json": "60a85426a478070de6b97824388470b7f97549f48dd42555a5e5610b9409d086",
+    "publication-check-protection-graphql-final.json": "8fb7b88d8ef91cb8b54d93f2a39b68f0ee49b7026ef9ee0d8b25c5b868d1769b",
+    "publication-draft-pr-before-ready.json": "367e59fc0909a4b5c1eb989d6627cc2f3ff05b452bd4a61ab2341f164b0a85bc",
+    "publication-draft-pr-create.json": "0ea55d06e641f6587ef6247a2a06baeec48960c65d38ffdb66f34b7a59a707a8",
+    "publication-exact-head-merge.json": "0d136cd6ff10ab37b58a2edb60d58073ea0e45d32c7c89be5b4eb9c9146a0d80",
+    "publication-fetch-main.json": "8f54063f1301709e33929b35f3b84d6dbc7df3b2593b4a2889b59780c0112d0d",
+    "publication-main-protection-final.json": "4d45a0d6a8e2b42acb782b41dd3eb6e6f59b21432df83b702bc293cd9f3b92e2",
+    "publication-main-rules-final.json": "1023f023c317638cc6c43f20a68fe5b3bb61a8bb039e5ac44207d2fba4a25bb7",
+    "publication-mark-ready.json": "3a6a646f60d0ca18d7614a613c3ccecd7dd7f620aa64aaa91b4696afa03d3b3e",
+    "publication-pr-metadata-query-error-reproduction.json": "01487434ce17fc926eeb747f5933e6f9f5355fa1590c74296b8e24feeb231ef3",
+    "publication-pr-status-supported-fields.json": "79dca0b87a63e8d698c804ddf30ee6421465db2477a1468770443b3928b18ffb",
+    "publication-preflight-after-ready-list.json": "9ef46a157d0cb952cf0676e22c1a8c6f7cfa1662d4563ac4b129a6627b98e344",
+    "publication-preflight-cancelled-final.json": "c0e30fb36f366d7e1c5b007c8d8035542fbf1206d29c7f2dafdcc784a691e683",
+    "publication-preflight-final.json": "c2473daaea1dd9ebbe32da5f338ec1d95f1cb81050d4ff8089cc39346681c8e2",
+    "publication-preflight-initial-list.json": "bd4ee462586f25b8e3cba3af5237f34131884600f066381b3556bae6accf2318",
+    "publication-push.json": "2f8f0e799b50945482dbd345c9eca2b8fd8644d699229bc071bfd806e5ea053b",
+    "publication-required-checks-corrected.json": "650b0d2e4452e0b630ce3ed6b7ab3f3f65d071534b4bcb4ef75d0908ac27c9a1",
+    "publication-required-checks-final.json": "1aef131de5f52c378ce899aaad39a3a98587799c2b47eceb5ca2476b0fe16798",
+    "publication-review-inventory-final.json": "b35e71cc345fa3ffbaf2cac9cb4f8621220dfd68cb8753b70be5f2b0cd463600",
+    "publication-review-inventory-initial.json": "69e18be97a76349b845d02555d4dddbc4d3af1cd5e19a0ee1f39016261a69393"
+  }
+}

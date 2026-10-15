@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "gh",
+    "api",
+    "repos/SeanVasey/VA-Studio/branches/main/protection"
+  ],
+  "observed_at": "2026-10-15T08:05:59.628248+00:00",
+  "process_exit": 1,
+  "stdout": "{\"message\":\"Resource not accessible by integration\",\"documentation_url\":\"https://docs.github.com/rest/branches/branch-protection#get-branch-protection\",\"status\":\"403\"}",
+  "stderr": "gh: Resource not accessible by integration (HTTP 403)\n"
+}

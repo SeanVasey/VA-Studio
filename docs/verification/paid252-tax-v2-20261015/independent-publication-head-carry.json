@@ -1,0 +1,53 @@
+{
+  "actions": "Read-only exact Git diff/blob/source/archive/index/loader/original-hash comparison. Original runtime carry only; no source/test/DB/container/network/CI execution or tracked edit.",
+  "actual_tested_source": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+  "all_actual_source_and_git_input_bytes_unchanged": true,
+  "all_loader_bytes_unchanged": true,
+  "all_product_test_policy_profile_workflow_inputs_equal_tested_26c": true,
+  "approved_commit": "562147dac0b8dea1f9902a5e6b0be8b8bdbdd7ba",
+  "archive_and_index_git_bytes_unchanged": true,
+  "archive_sha256": "8ef68cc4b8ed180541141fa2fb24565474ed8e8a8484455de2dff18c2e5e7b76",
+  "changed_paths": [
+    "docs/verification/paid252-tax-v2-20261015/README.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-DECISION.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-report.json",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-verifier-corrected.py",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-verifier-original-error.json",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-verifier-original.py",
+    "docs/verification/paid252-tax-v2-20261015/independent-final-verifier-working-report.json"
+  ],
+  "current_inputs": 2395,
+  "decision": "APPROVE WITH CONDITIONS \u2014 ORIGINAL FOCUSED DEVELOPMENT APPROVAL CARRIED",
+  "exact_copied_originals_sha256": {
+    "independent-final-DECISION.md": "913469af76b8f8ff5f421a3c44d9766e1d5b709c8b3ca4775689d2ca70232ece",
+    "independent-final-report.json": "ab060412eb44b2b8ccbcdd20c654d2b19ea8190c1508c9c5b98bb50fe609c799",
+    "independent-final-verifier-corrected.py": "2d2fee4408e6944ec59c5fc16457b93664a68ff6325fd52b9c4a2931f3240795",
+    "independent-final-verifier-original-error.json": "7a5e708f5bfa4f023a0603b85c492b1c76eb3acd1927c9a61b7e02a51c307189",
+    "independent-final-verifier-original.py": "fed372bdc6df44bd5825f6e11174c6489bc95387e100c0aa3fdd09aab65f75ef",
+    "independent-final-verifier-working-report.json": "d2816ee606f44a0e0642cd591f82628320f4837548a63508c54973ed974a97b3"
+  },
+  "index_sha256": "9135918b04413704048f594d83b3325ec29a84be8531d9d13d0205ce8c72152d",
+  "kind": "Independent exact receipt-only publication successor carry",
+  "loaders": 13,
+  "observed_clean_head": true,
+  "only_documentation_receipts_changed": true,
+  "open_p0_p1": false,
+  "original_conditions_unchanged": [
+    "Any publication successor must be independently carried from this exact reviewed SHA using unchanged product/test/CI/runtime/evidence bytes; this decision does not approve a moved head automatically.",
+    "Before development merge: required cheap preflight and repository protections on the exact published head, final applicable review/thread inventory and expected-head merge. No bypass or Foundation/GitLab execution required for this focused development approval under AGENTS cost policy.",
+    "Keep all new rehearsal/operative/http flags default false and live producer unsupported; no HTTP authorization/redemption/root mount, active entitlement/import, live payment/provider/host/deploy/DNS or release acceptance authorized by this review.",
+    "Broader general SQL1213/deadlock/interruption, effective isolation/RC gap/excluded overrides, unexpected trigger/DDL/damaged restore/failover/reconnect, invisible direct-PDO reopen, existing-request pre-create READ/final provider-I/O remain unproved.",
+    "Physical validity is bounded observation only; later delivery rechecks retained exact bytes. Cross-host/atomic filesystem/FPM/cache-capacity/latency-throughput/commercial/legal/account/provider/host inputs and final integrated Foundation remain open.",
+    "Historical foreground OS witness gaps and all original product/harness/unresolved/preparation errors remain unchanged. Never infer81e/160 original causes from later04f diagnostics or rewrite94 whole invocation as passed.",
+    "Frozen adjacent sharedV1/generic/identity metadata P2s remain for their next related batch. Ordinary membership ReservationOperations throwing-afterCommit P2 remains frozen, requiring a positively owned physical-commit witness plus real callback regression; idle PDO is not commit proof."
+  ],
+  "pre_merge_conditions": [
+    "Publish this exact reviewed3dc head; cheap exact-head preflight/protections and final applicable review/thread inventory must pass before expected-SHA development merge.",
+    "Record this runtime carry alongside the actual later merge receipt; it need not move this published reviewed head.",
+    "No full-suite/host/provider/activation/HTTP redemption/release acceptance claim; all original limits and frozen adjacent P2s preserved."
+  ],
+  "readme_assessment": "Appends actual APPROVE at562 with exact original/report counts, separately preserved reviewer parser error/correction, pending successor carry/preflight/inventory/expected-head merge. No new test, host or merge claim.",
+  "required_corrections": [],
+  "reviewed_publication_commit": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+  "routes": 16
+}

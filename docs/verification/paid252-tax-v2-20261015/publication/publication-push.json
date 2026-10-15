@@ -1,0 +1,14 @@
+{
+  "recorded_utc": "2026-10-15T07:56:36.766558+00:00",
+  "argv": [
+    "git",
+    "push",
+    "origin",
+    "3dc5a5af043a1e254fab895541d93d25223a8a0e:refs/heads/harness/paid252-tax-v2-20261015"
+  ],
+  "head": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+  "process_exit": 0,
+  "stdout": "",
+  "stderr": "remote: \nremote: Create a pull request for 'harness/paid252-tax-v2-20261015' on GitHub by visiting:        \nremote:      https://github.com/SeanVasey/VA-Studio/pull/new/harness/paid252-tax-v2-20261015        \nremote: \nTo https://github.com/SeanVasey/VA-Studio.git\n * [new branch]        3dc5a5af043a1e254fab895541d93d25223a8a0e -> harness/paid252-tax-v2-20261015\n",
+  "body_sha256": "c9edb78df162173da6f3de1276a28e04281c86382b5656afde5bfd18d0e5b167"
+}

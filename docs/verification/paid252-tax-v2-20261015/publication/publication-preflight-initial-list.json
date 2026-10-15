@@ -1,0 +1,20 @@
+{
+  "recorded_utc": "2026-10-15T07:58:08.971411+00:00",
+  "argv": [
+    "gh",
+    "run",
+    "list",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--workflow",
+    "preflight.yml",
+    "--commit",
+    "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+    "--json",
+    "databaseId,status,conclusion,headSha,event,createdAt,updatedAt,url"
+  ],
+  "head": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+  "process_exit": 0,
+  "stdout": "[{\"conclusion\":\"\",\"createdAt\":\"2026-10-15T07:56:44Z\",\"databaseId\":38702187565,\"event\":\"pull_request\",\"headSha\":\"3dc5a5af043a1e254fab895541d93d25223a8a0e\",\"status\":\"in_progress\",\"updatedAt\":\"2026-10-15T07:56:59Z\",\"url\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38702187565\"}]\n",
+  "stderr": ""
+}
