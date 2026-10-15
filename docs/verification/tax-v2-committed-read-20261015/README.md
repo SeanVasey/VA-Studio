@@ -1,6 +1,6 @@
 # Tax255 V2 original committed-source prerequisite — 2026-10-15
 
-Development source and evidence are complete; final independent sealed-packet DECISION and exact-head preflight/merge remain pending. Operative source `e455c2871ade602653bd0f59b20e151b57afe57d`, based on actual PR120 merge `78efd558b1fafe5ea10a0974ed6e4ba0f9264679` plus its unchanged merge receipt. The separate [source approval](independent-source-APPROVE.md), [report](independent-source-APPROVE.json) and append-only [OS-exit addendum](independent-source-OS-exit-addendum.json) bind that exact source and the explicit earlier-source carry below. Original REVISE notes are retained unchanged.
+Development source and evidence are complete. The separate [final DECISION](independent-review-DECISION.md) APPROVES WITH CONDITIONS exact `789ecf4abf23220059d2b4fd83cd7b5f7a77cfd8`; receipt-only successor carry and exact-head preflight/merge remain pending. Operative source `e455c2871ade602653bd0f59b20e151b57afe57d`, based on actual PR120 merge `78efd558b1fafe5ea10a0974ed6e4ba0f9264679` plus its unchanged merge receipt. The separate [source approval](independent-source-APPROVE.md), [report](independent-source-APPROVE.json) and append-only [OS-exit addendum](independent-source-OS-exit-addendum.json) bind that exact source and the explicit earlier-source carry below. Original REVISE notes are retained unchanged.
 
 ## Behavior and scope
 
@@ -32,6 +32,8 @@ Eleven genuine old-application behavioral oracles remain original one-failure re
 Four separate harness/expectation failures are retained: reused mailbox SMTP timeout; ambiguous trait alias compiler(PHP255/empty JUnit/no executed cases); wrong frozen V1 dispatcher-restoration assertion; stale exact literal-config expected keys (wholeda stopped125/1082/23skips before age/receipt file). Corrected runs do not erase these originals. An additional launcher failed **before PHP** because toolchain PATH was not activated; its original setup log and recorder OS1 are preserved separately, with no test/oracle claim. Every subsequent PHP launcher explicitly activates the existing toolchain. Read/preparation/atomic-patch/UID-witness errors and the incomplete untracked-helper provenance are documented without inventing original overwritten bytes/author.
 
 A transient exec-server transport disconnection recovered the same native recorder PID/startticks without duplicating a workload. This is command transport evidence; no platform-banner/classifier/account-limit diagnosis or fix is claimed. All original launched recorders now have launch-bound OS observations or explicit closed pre-PHP failure classification. PHP markers, JUnit/log hashes, unchanged source/HEAD/status/runner/loaders and actual process UID/startticks are distinct witnesses.
+
+The reviewer independently recomputed the complete sealed packet. Its first read-only report serialization failed with a PosixPath error after the verification assertions; the [original verifier/error and corrected verifier/report](evidence-tools/) are preserved unchanged. Corrected verification exited0, without an app, database or test rerun. This is a reviewer report-preparation error, separate from application outcomes.
 
 | Original invocation | Source | Tests/assertions; F/E/S | PHP/recorder/OS | Classification |
 | --- | --- | --- | --- | --- |
