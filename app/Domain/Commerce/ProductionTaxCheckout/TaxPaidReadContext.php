@@ -10,6 +10,8 @@ use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\SQLiteConnection;
 use LogicException;
 use PDO;
 use PDOStatement;
@@ -60,7 +62,8 @@ final class TaxPaidReadContext implements \JsonSerializable
             && ($this->policy['committed_read_receipt_version'] ?? null) === self::VERSION, 'unsupported');
         $name = $items['database']['default'] ?? null;
         $connection = is_string($name) ? ($manager->getConnections()[$name] ?? null) : null;
-        CheckoutException::require($connection instanceof Connection, 'committed_read_frame');
+        CheckoutException::require($connection instanceof Connection
+            && $connection::class === ($reader->identityDriver() === 'mysql' ? MySqlConnection::class : SQLiteConnection::class), 'committed_read_frame');
         $this->connection = $connection;
         $this->primary = $reader->identityPrimary();
         $this->driver = $reader->identityDriver();
@@ -111,6 +114,7 @@ final class TaxPaidReadContext implements \JsonSerializable
             && hrtime(true) < $this->bornAtNs + 300_000_000_000 && $this->generic !== null, 'committed_read_frame');
         $this->generic->prove($this->reader, $depth);
         $this->fresh?->prove();
+        $this->observer?->proveContextOwner($depth);
         $this->proveNative($depth);
     }
 
@@ -141,7 +145,10 @@ final class TaxPaidReadContext implements \JsonSerializable
                 $this->primary->exec('SET SESSION innodb_lock_wait_timeout = '.min($wait, 5));
             }
 
-            return $operation();
+            $result = $operation();
+            $this->proveHeld();
+
+            return $result;
         } catch (\PDOException $error) {
             if (in_array((int) ($error->errorInfo[1] ?? 0), [1205, 1213], true)) {
                 throw new CheckoutException('contention', 503);

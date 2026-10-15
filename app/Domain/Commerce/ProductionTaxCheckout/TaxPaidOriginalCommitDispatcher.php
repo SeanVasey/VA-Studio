@@ -23,6 +23,8 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
 
     private array $receipts = [];
 
+    private bool $dispatchingCommit = false;
+
     private function __construct(
         private readonly Dispatcher $delegate,
         private readonly ProductionTaxPaidOrderSourceV2 $source,
@@ -132,9 +134,16 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
 
     private function requireCurrent(int $depth): void
     {
-        CheckoutException::require($this->phase !== 'invalid' && hrtime(true) < $this->deadlineNs
-            && $this->context->connection()->getEventDispatcher() === $this, 'committed_read_frame');
+        $this->proveContextOwner($depth);
         $this->context->prove($depth);
+    }
+
+    /** Pure nonrecursive owner admission, also used by the caller's terminal held Source fence. */
+    public function proveContextOwner(int $depth): void
+    {
+        CheckoutException::require(hrtime(true) < $this->deadlineNs
+            && $this->context->connection()->getEventDispatcher() === $this
+            && in_array($this->phase, $depth === 1 ? ['held', 'prepared'] : ['prepared', 'committed'], true), 'committed_read_frame');
     }
 
     public function dispatch($event, $payload = [], $halt = false)
@@ -142,6 +151,10 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
         $owned = is_object($event) && property_exists($event, 'connection') && $event->connection === $this->context->connection();
         $committing = $owned && $event instanceof TransactionCommitting;
         $committed = $owned && $event instanceof TransactionCommitted;
+        if (($committing || $committed) && $this->dispatchingCommit) {
+            $this->poison();
+            throw new CheckoutException('committed_read_frame');
+        }
         if ($owned && ($event instanceof TransactionBeginning || $event instanceof TransactionRolledBack)) {
             $this->poison();
         }
@@ -149,6 +162,7 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
             if ($committing || $committed) {
                 $this->requireCurrent($committing ? 1 : 0);
                 CheckoutException::require($this->phase === ($committing ? 'held' : 'prepared'), 'committed_read_frame');
+                $this->dispatchingCommit = true;
             }
             $response = $this->delegate->dispatch($event, $payload, $halt);
             if ($committing) {
@@ -160,6 +174,9 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
                         $receipt->sealOriginalCommit();
                     }
                 });
+                // The same captured PURE consumer capsule closes NEW eligibility after the last source/
+                // historical decryption callback. The historical read alone deliberately ignores current access.
+                $this->admission?->proveCurrent($this->context->primary());
                 // Last callbacks are above. Only captured native configuration/raw/identity/anchor state follows.
                 $this->requireCurrent(1);
                 $this->source->proveReceiptRows($this->context, 1);
@@ -186,6 +203,10 @@ final class TaxPaidOriginalCommitDispatcher implements \JsonSerializable, Dispat
                 $this->poison();
             }
             throw $error;
+        } finally {
+            if ($committing || $committed) {
+                $this->dispatchingCommit = false;
+            }
         }
     }
 

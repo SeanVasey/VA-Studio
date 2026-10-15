@@ -161,7 +161,7 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
 
             return [$first, $second];
         });
-        $this->assertSame(1, $capsule->calls);
+        $this->assertSame(2, $capsule->calls);
         $first->proveClosed();
         $second->proveClosed();
         $this->assertDatabaseCount('tax_receipt_probe', 1);
@@ -757,6 +757,28 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertSame(1, $newCallbacks, 'Cleanup discarded a separate reopened root callback.');
         $this->assertDatabaseCount('tax_receipt_probe', 1);
         $connection->setEventDispatcher($delegate);
+    }
+
+    public function test_owner_terminal_source_fence_refuses_a_nondelegating_dispatcher_replacement(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $source = null;
+        $replacement = new Dispatcher($this->app);
+        $this->refuses(function () use ($f, $locator, $connection, &$source, $replacement): void {
+            $connection->transaction(function () use ($f, $locator, $connection, &$source, $replacement): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                $connection->getPdo()->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                $connection->setEventDispatcher($replacement);
+                $source->proveRetainedCurrent($reader); // Explicit terminal owner fence before physical commit.
+            });
+        }, 'committed_read_frame');
+        $source->abortOwnedFrame();
+        $this->assertSame($replacement, $connection->getEventDispatcher());
+        $this->assertFalse($connection->getPdo()->inTransaction());
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
     }
 }
 

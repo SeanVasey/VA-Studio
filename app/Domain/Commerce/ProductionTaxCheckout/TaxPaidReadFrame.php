@@ -36,10 +36,12 @@ final class TaxPaidReadFrame implements \JsonSerializable
         $this->manager = $manager;
         $this->name = $connection->getName();
         $current = (new ReflectionProperty(DatabaseTransactionsManager::class, 'currentTransaction'))->getValue($manager);
+        $pending = $manager->getPendingTransactions();
+        CheckoutException::require(is_array($current) && $pending instanceof Collection && $pending::class === Collection::class, 'committed_read_frame');
         $record = $current[$this->name] ?? null;
         CheckoutException::require($record instanceof DatabaseTransactionRecord && $record::class === DatabaseTransactionRecord::class
             && $record->connection === $this->name && $record->level === 1 && $record->parent === null
-            && $manager->getPendingTransactions()->containsStrict($record), 'committed_read_frame');
+            && $pending->containsStrict($record), 'committed_read_frame');
         $this->record = $record;
         $this->abortAnchor = 'tax_abort_'.bin2hex(random_bytes(16));
         $this->terminalAnchor = 'tax_terminal_'.bin2hex(random_bytes(16));
@@ -57,9 +59,12 @@ final class TaxPaidReadFrame implements \JsonSerializable
     public function proveHeld(): void
     {
         $current = (new ReflectionProperty(DatabaseTransactionsManager::class, 'currentTransaction'))->getValue($this->manager);
-        CheckoutException::require(! $this->terminal && ! $this->aborted && ($current[$this->name] ?? null) === $this->record
+        $pending = $this->manager->getPendingTransactions();
+        CheckoutException::require(! $this->terminal && ! $this->aborted && is_array($current)
+            && ($current[$this->name] ?? null) === $this->record && $pending instanceof Collection && $pending::class === Collection::class
+            && $this->record->connection === $this->name && $this->record->level === 1 && $this->record->parent === null
             && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($this->connection) === $this->manager
-            && $this->manager->getPendingTransactions()->containsStrict($this->record), 'committed_read_frame');
+            && $pending->containsStrict($this->record), 'committed_read_frame');
     }
 
     /** Irreversible on both drivers. SQLite also removes the younger generic marker. No held work follows. */
@@ -89,6 +94,7 @@ final class TaxPaidReadFrame implements \JsonSerializable
         }
         $currentProperty = new ReflectionProperty(DatabaseTransactionsManager::class, 'currentTransaction');
         $current = $currentProperty->getValue($this->manager);
+        $current = is_array($current) ? $current : [];
         $ownsCurrent = $this->owns($current[$this->name] ?? null);
         foreach (['pendingTransactions', 'committedTransactions'] as $name) {
             $property = new ReflectionProperty(DatabaseTransactionsManager::class, $name);
@@ -101,6 +107,14 @@ final class TaxPaidReadFrame implements \JsonSerializable
         if ($ownsCurrent) {
             $current[$this->name] = null;
             $currentProperty->setValue($this->manager, $current);
+        } elseif (($current[$this->name] ?? null) instanceof DatabaseTransactionRecord) {
+            $reopened = $current[$this->name];
+            if ($reopened::class === DatabaseTransactionRecord::class && $reopened->connection === $this->name
+                && $reopened->level === 1 && $reopened->parent === $this->record) {
+                // A new root after depth0 can inherit the stale old manager parent. Preserve its callbacks
+                // while detaching only this exact discarded original parent, so its later commit closes cleanly.
+                $reopened->parent = null;
+            }
         }
         if ($rolledBack && $ownsCurrent && $this->connection->getRawPdo() === $this->primary) {
             (new ReflectionProperty(Connection::class, 'transactions'))->setValue($this->connection, 0);
@@ -114,7 +128,14 @@ final class TaxPaidReadFrame implements \JsonSerializable
             if ($record === $this->record) {
                 return true;
             }
-            $record = $record->parent;
+            $parent = $record->parent;
+            if ($record::class !== DatabaseTransactionRecord::class || $record->connection !== $this->name
+                || ! is_int($record->level) || ! $parent instanceof DatabaseTransactionRecord
+                || $parent::class !== DatabaseTransactionRecord::class || ! is_int($parent->level)
+                || $record->level <= $parent->level) {
+                return false;
+            }
+            $record = $parent;
         }
 
         return false;
