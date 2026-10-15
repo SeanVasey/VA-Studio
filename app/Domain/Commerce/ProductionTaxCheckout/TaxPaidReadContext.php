@@ -41,6 +41,8 @@ final class TaxPaidReadContext implements \JsonSerializable
 
     private readonly Container $container;
 
+    private readonly DatabaseManager $manager;
+
     private ?TaxPaidOriginalCommitDispatcher $observer = null;
 
     private ?FreshTaxCheckoutPolicy $fresh = null;
@@ -54,6 +56,7 @@ final class TaxPaidReadContext implements \JsonSerializable
         CheckoutException::require($configuration instanceof Repository && $configuration::class === Repository::class
             && $manager instanceof DatabaseManager && $manager::class === DatabaseManager::class, 'committed_read_frame');
         $this->configuration = $configuration;
+        $this->manager = $manager;
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($configuration);
         CheckoutException::require(is_array($items) && is_array($items['database'] ?? null), 'committed_read_frame');
         $this->policy = $items['production-tax-checkout'];
@@ -69,6 +72,7 @@ final class TaxPaidReadContext implements \JsonSerializable
         $this->driver = $reader->identityDriver();
         $this->database = $connection->getDatabaseName();
         $this->proveNative(1);
+        $this->admitConnections();
         $this->frame = TaxPaidReadFrame::capture($connection, $this->primary);
     }
 
@@ -107,6 +111,7 @@ final class TaxPaidReadContext implements \JsonSerializable
     public function prove(int $depth): void
     {
         $this->proveNative($depth);
+        $this->admitConnections();
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->configuration);
         CheckoutException::require(Container::getInstance() === $this->container && ($instances['config'] ?? null) === $this->configuration
@@ -132,6 +137,26 @@ final class TaxPaidReadContext implements \JsonSerializable
             && $this->connection->transactionLevel() === $depth && $this->primary->inTransaction() === ($depth === 1), 'committed_read_frame');
         if ($depth === 0 && $this->driver === 'mysql') {
             CheckoutException::require((int) $this->primary->query('SELECT @@session.autocommit')->fetchColumn() === 1, 'committed_read_frame');
+        }
+        if ($this->driver === 'sqlite') {
+            CheckoutException::require(in_array(strtolower((string) $this->primary->query('PRAGMA main.journal_mode')->fetchColumn()),
+                ['delete', 'truncate', 'persist', 'memory', 'wal'], true), 'committed_read_frame');
+        }
+    }
+
+    /** Frozen identity context inspects every raw peer. Admit classes before its metadata methods run. */
+    private function admitConnections(): void
+    {
+        $connections = (new ReflectionProperty(DatabaseManager::class, 'connections'))->getValue($this->manager);
+        CheckoutException::require(is_array($connections), 'committed_read_frame');
+        foreach ($connections as $connection) {
+            CheckoutException::require($connection instanceof Connection
+                && in_array($connection::class, [MySqlConnection::class, SQLiteConnection::class], true), 'committed_read_frame');
+            $raw = $connection->getRawPdo(); // Exact standard class admitted above; never resolves a lazy slot.
+            CheckoutException::require($raw instanceof PDO && in_array($raw::class, [PDO::class, 'Pdo\\Mysql', 'Pdo\\Sqlite'], true)
+                && (new ReflectionClass($raw))->isInternal()
+                && $raw->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class]
+                && $raw->getAttribute(PDO::ATTR_DRIVER_NAME) === ($connection::class === MySqlConnection::class ? 'mysql' : 'sqlite'), 'committed_read_frame');
         }
     }
 

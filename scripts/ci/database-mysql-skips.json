@@ -84,11 +84,15 @@
     ],
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_global_payment_alias_in_an_unrelated_request_refuses_original_raw_fence"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
       "test_sqlite_historical_owner_key_drift_refuses_and_owned_abort_restores_original_relation"
     ],
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
-      "test_sqlite_global_payment_alias_in_an_unrelated_request_refuses_original_raw_fence"
+      "test_sqlite_receipt_birth_refuses_disabled_rollback_journaling"
     ]
   ]
 }

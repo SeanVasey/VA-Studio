@@ -60,9 +60,11 @@ final class TaxPaidReadFrame implements \JsonSerializable
     {
         $current = (new ReflectionProperty(DatabaseTransactionsManager::class, 'currentTransaction'))->getValue($this->manager);
         $pending = $this->manager->getPendingTransactions();
+        $attributes = get_object_vars($this->record);
         CheckoutException::require(! $this->terminal && ! $this->aborted && is_array($current)
             && ($current[$this->name] ?? null) === $this->record && $pending instanceof Collection && $pending::class === Collection::class
-            && $this->record->connection === $this->name && $this->record->level === 1 && $this->record->parent === null
+            && ($attributes['connection'] ?? null) === $this->name && ($attributes['level'] ?? null) === 1
+            && array_key_exists('parent', $attributes) && $attributes['parent'] === null
             && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($this->connection) === $this->manager
             && $pending->containsStrict($this->record), 'committed_read_frame');
     }
@@ -109,8 +111,9 @@ final class TaxPaidReadFrame implements \JsonSerializable
             $currentProperty->setValue($this->manager, $current);
         } elseif (($current[$this->name] ?? null) instanceof DatabaseTransactionRecord) {
             $reopened = $current[$this->name];
-            if ($reopened::class === DatabaseTransactionRecord::class && $reopened->connection === $this->name
-                && $reopened->level === 1 && $reopened->parent === $this->record) {
+            $attributes = $reopened::class === DatabaseTransactionRecord::class ? get_object_vars($reopened) : [];
+            if (($attributes['connection'] ?? null) === $this->name
+                && ($attributes['level'] ?? null) === 1 && ($attributes['parent'] ?? null) === $this->record) {
                 // A new root after depth0 can inherit the stale old manager parent. Preserve its callbacks
                 // while detaching only this exact discarded original parent, so its later commit closes cleanly.
                 $reopened->parent = null;
@@ -128,11 +131,17 @@ final class TaxPaidReadFrame implements \JsonSerializable
             if ($record === $this->record) {
                 return true;
             }
-            $parent = $record->parent;
-            if ($record::class !== DatabaseTransactionRecord::class || $record->connection !== $this->name
-                || ! is_int($record->level) || ! $parent instanceof DatabaseTransactionRecord
-                || $parent::class !== DatabaseTransactionRecord::class || ! is_int($parent->level)
-                || $record->level <= $parent->level) {
+            // Reject extension objects BEFORE any metadata dereference, including a magic missing parent.
+            if ($record::class !== DatabaseTransactionRecord::class) {
+                return false;
+            }
+            $attributes = get_object_vars($record);
+            $parent = $attributes['parent'] ?? null;
+            $parentAttributes = $parent instanceof DatabaseTransactionRecord && $parent::class === DatabaseTransactionRecord::class
+                ? get_object_vars($parent) : [];
+            if (($attributes['connection'] ?? null) !== $this->name
+                || ! is_int($attributes['level'] ?? null) || ! is_int($parentAttributes['level'] ?? null)
+                || $attributes['level'] <= $parentAttributes['level']) {
                 return false;
             }
             $record = $parent;

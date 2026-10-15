@@ -986,6 +986,48 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             }
         }
     }
+
+    public function test_standard_idle_native_peer_allows_the_original_receipt(): void
+    {
+        [$f, $locator] = $this->paid();
+        $manager = DB::getFacadeRoot();
+        $property = new \ReflectionProperty(DatabaseManager::class, 'connections');
+        $original = $property->getValue($manager);
+        $peer = new SQLiteConnection(new PDO('sqlite::memory:'), ':memory:', '', ['name' => 'idle-peer', 'driver' => 'sqlite']);
+        $property->setValue($manager, [...$original, 'idle-peer' => $peer]);
+        try {
+            $receipt = DB::transaction(function () use ($f, $locator) {
+                $reader = $this->reader();
+
+                return $this->source($f, $locator, $reader)->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+            });
+            $receipt->proveClosed();
+            $this->assertFalse($peer->getPdo()->inTransaction());
+            $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
+        } finally {
+            $property->setValue($manager, $original);
+        }
+    }
+
+    public function test_sqlite_receipt_birth_refuses_disabled_rollback_journaling(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('SQLite journal_mode OFF has no MySQL session equivalent.');
+        }
+        [$f, $locator] = $this->paid();
+        $pdo = DB::getPdo();
+        $original = $pdo->query('PRAGMA main.journal_mode')->fetchColumn();
+        $pdo->exec('PRAGMA main.journal_mode=OFF');
+        try {
+            $this->refuses(fn () => DB::transaction(fn () => $this->source($f, $locator, $this->reader())), 'committed_read_frame');
+            $this->assertFalse($pdo->inTransaction());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertSame('off', $pdo->query('PRAGMA main.journal_mode')->fetchColumn());
+        } finally {
+            $pdo->exec('PRAGMA main.journal_mode='.$original);
+        }
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
