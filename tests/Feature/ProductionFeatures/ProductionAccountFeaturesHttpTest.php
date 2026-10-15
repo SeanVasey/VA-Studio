@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionFeatures;
 use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningLibrary;
 use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
+use App\Http\AccountFeatures\AccountFeatureController;
 use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -85,7 +86,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
     public function test_actual_session_csrf_read_initialize_change_export_and_preferences_unknown(): void
     {
         $this->signIn();
-        $test = $this->getJson('/customer/features/listening')->assertStatus(200);
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json'])->assertStatus(200);
         $this->assertSame([200, ['initialized' => false]], $this->released($test));
         $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
         [$status, $initial] = $this->released($this->emptyPost('/customer/features/listening/initialize'));
@@ -151,7 +152,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
                 $event->request->session()->forget('_production_customer_identity');
             }
         });
-        $test = $this->getJson('/customer/features/listening');
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
         $this->assertSame('', $early);
         $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($test));
         ob_start();
@@ -162,7 +163,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
     public function test_standalone_headers_then_late_scope_withdrawal_then_content_emit_nothing(): void
     {
         $this->signIn();
-        $response = $this->getJson('/customer/features/listening')->baseResponse;
+        $response = $this->get('/customer/features/listening', ['Accept' => 'application/json'])->baseResponse;
         $this->assertInstanceOf(AccountFeatureResponse::class, $response);
         ob_start();
         $response->sendHeaders();
@@ -192,7 +193,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
                 'deadline' => usleep(10_100_000),
             };
         });
-        $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($this->getJson('/customer/features/listening')));
+        $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($this->get('/customer/features/listening', ['Accept' => 'application/json'])));
         $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
     }
 
@@ -234,8 +235,62 @@ class ProductionAccountFeaturesHttpTest extends TestCase
     {
         foreach ([false, 'true', 1, null, new \ArrayObject] as $value) {
             config(['production-account-features.http_mounted' => $value]);
-            $this->getJson('/customer/features/listening')->assertStatus(503)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
+            $this->get('/customer/features/listening', ['Accept' => 'application/json'])->assertStatus(503)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
             $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
         }
+    }
+
+    public function test_middleware_clone_never_receives_original_private_emission_authority(): void
+    {
+        $this->signIn();
+        Route::getRoutes()->getByAction(AccountFeatureController::class.'@listeningRead')->middleware(FeatureCloneResponseMiddleware::class);
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
+        $test->assertStatus(503)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+    }
+
+    public function test_unused_completed_response_is_not_retained_by_the_kernel_registry(): void
+    {
+        $this->signIn();
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
+        $this->assertInstanceOf(AccountFeatureResponse::class, $test->baseResponse);
+        $weak = \WeakReference::create($test->baseResponse);
+        unset($test);
+        gc_collect_cycles();
+        $this->assertNull($weak->get(), 'Static completion metadata must not retain private response graphs.');
+    }
+
+    public function test_late_stringable_auth_slot_is_refused_without_its_callback(): void
+    {
+        $this->signIn();
+        FeatureAuthSlotString::$calls = 0;
+        Event::listen(RequestHandled::class, function (RequestHandled $event): void {
+            if ($event->response instanceof AccountFeatureResponse) {
+                $name = Auth::guard('customer')->getName();
+                $event->request->session()->put($name, new FeatureAuthSlotString);
+            }
+        });
+        $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($this->get('/customer/features/listening', ['Accept' => 'application/json'])));
+        $this->assertSame(0, FeatureAuthSlotString::$calls);
+    }
+}
+
+final class FeatureCloneResponseMiddleware
+{
+    public function handle(Request $request, \Closure $next): Response
+    {
+        return clone $next($request);
+    }
+}
+
+final class FeatureAuthSlotString implements \Stringable
+{
+    public static int $calls = 0;
+
+    public function __toString(): string
+    {
+        self::$calls++;
+
+        return '1';
     }
 }
