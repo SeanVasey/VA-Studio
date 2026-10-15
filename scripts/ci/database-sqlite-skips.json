@@ -199,6 +199,10 @@
       "test_native_source_wait_rejects_a_review_changed_by_the_committing_source_writer"
     ],
     [
+      "Tests\\Feature\\ProductionFinancialRetrieval\\FinancialReadPlanTest",
+      "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback"
+    ],
+    [
       "Tests\\Feature\\PromotionAdministrationMySqlConcurrencyTest",
       "test_disabling_and_new_commerce_serialize_on_the_same_campaign_without_partial_effects"
     ],

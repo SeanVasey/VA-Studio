@@ -70,6 +70,7 @@
     "tests/Feature/PersistentCatalogDraftImportTest.php",
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
     "tests/Feature/ProductionMemberActivation/MemberRetainedOriginalsTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",

@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\ProductionFinancialRetrieval;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutCommandCommitDispatcher;
 use App\Domain\Commerce\ProductionCheckout\OriginalCommitDispatcher;
+use App\Domain\Commerce\ProductionFinancialInspection\FinancialInspectionException;
 use App\Domain\Commerce\ProductionFinancialInspection\FinancialInspectionPolicy;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxPaidOriginalCommitDispatcher;
@@ -15,7 +16,10 @@ use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Facade;
 use PDO;
+use PDOStatement;
+use ReflectionClass;
 use ReflectionProperty;
 use SensitiveParameter;
 use Stripe\Stripe;
@@ -27,18 +31,32 @@ final readonly class RetrievalPolicy
         'stripe_sdk_version' => '21.3.2', 'stripe_api_version' => '2026-08-26.dahlia', 'maximum_seconds' => 30];
 
     private function __construct(private Application $app, private Repository $config,
-        private FinancialInspectionPolicy $candidatePolicy, #[SensitiveParameter] private array $snapshot) {}
+        private FinancialInspectionPolicy $candidatePolicy, #[SensitiveParameter] private array $snapshot,
+        private DatabaseManager $manager, private array $connectionMap, private array $primaryMap) {}
 
     public static function capture(): self
     {
-        $candidate = FinancialInspectionPolicy::capture();
+        try {
+            $candidate = FinancialInspectionPolicy::capture();
+        } catch (FinancialInspectionException $error) {
+            throw new FinancialRetrievalException($error->reason);
+        }
         $app = Container::getInstance();
         FinancialRetrievalException::require($app::class === Application::class, 'disabled');
         $instances = self::arrayProperty($app, Container::class, 'instances');
         $config = $instances['config'] ?? null;
         FinancialRetrievalException::require($config instanceof Repository && $config::class === Repository::class, 'disabled');
 
-        return new self($app, $config, $candidate, self::read($app, $config));
+        $manager = $instances['db'] ?? null;
+        FinancialRetrievalException::require($manager instanceof DatabaseManager && $manager::class === DatabaseManager::class);
+        $connections = self::arrayProperty($manager, DatabaseManager::class, 'connections');
+        $primaries = [];
+        foreach ($connections as $name => $connection) {
+            $primaries[$name] = self::admitConnection($connection);
+        }
+        self::admitFacade($app, $manager);
+
+        return new self($app, $config, $candidate, self::read($app, $config), $manager, $connections, $primaries);
     }
 
     public function prove(): void
@@ -46,6 +64,7 @@ final readonly class RetrievalPolicy
         $this->candidatePolicy->prove();
         FinancialRetrievalException::require(Container::getInstance() === $this->app
             && self::read($this->app, $this->config) === $this->snapshot, 'disabled');
+        $this->connections();
     }
 
     public function bindAccount(string $account): void
@@ -68,7 +87,7 @@ final readonly class RetrievalPolicy
                 && in_array($connection::class, [SQLiteConnection::class, MySqlConnection::class], true));
             $depth = self::raw($connection, Connection::class, 'transactions');
             $pdo = self::raw($connection, Connection::class, 'pdo');
-            FinancialRetrievalException::require($depth === 0 && $pdo instanceof PDO && ! $pdo->inTransaction());
+            FinancialRetrievalException::require($depth === 0 && ! $pdo->inTransaction());
         }
     }
 
@@ -98,9 +117,43 @@ final readonly class RetrievalPolicy
     {
         $instances = self::arrayProperty($this->app, Container::class, 'instances');
         $manager = $instances['db'] ?? null;
-        FinancialRetrievalException::require($manager instanceof DatabaseManager && $manager::class === DatabaseManager::class);
+        FinancialRetrievalException::require($manager === $this->manager);
+        self::admitFacade($this->app, $manager);
+        $connections = self::arrayProperty($manager, DatabaseManager::class, 'connections');
+        FinancialRetrievalException::require($connections === $this->connectionMap);
+        foreach ($connections as $name => $connection) {
+            FinancialRetrievalException::require(self::admitConnection($connection) === $this->primaryMap[$name]);
+        }
 
-        return self::arrayProperty($manager, DatabaseManager::class, 'connections');
+        return $connections;
+    }
+
+    private static function admitFacade(Application $app, DatabaseManager $manager): void
+    {
+        $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
+        FinancialRetrievalException::require((new ReflectionProperty(Facade::class, 'app'))->getValue() === $app
+            && is_array($resolved) && ($resolved['db'] ?? null) === $manager);
+    }
+
+    private static function admitConnection(mixed $connection): array
+    {
+        FinancialRetrievalException::require(is_object($connection)
+            && in_array($connection::class, [SQLiteConnection::class, MySqlConnection::class], true));
+        $config = self::raw($connection, Connection::class, 'config');
+        $database = self::raw($connection, Connection::class, 'database');
+        $prefix = self::raw($connection, Connection::class, 'tablePrefix');
+        $primary = self::raw($connection, Connection::class, 'pdo');
+        FinancialRetrievalException::require(is_array($config) && is_string($config['driver'] ?? null)
+            && is_string($config['name'] ?? null) && is_string($database) && is_string($prefix)
+            && is_int(self::raw($connection, Connection::class, 'transactions'))
+            && $primary instanceof PDO && in_array($primary::class, [PDO::class, 'Pdo\\Mysql', 'Pdo\\Sqlite'], true)
+            && (new ReflectionClass($primary))->isInternal());
+        // Native methods are reached only after literal class/internal admission.
+        FinancialRetrievalException::require($primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class]
+            && $primary->getAttribute(PDO::ATTR_DRIVER_NAME) === $config['driver']
+            && $primary->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_EXCEPTION);
+
+        return [$primary, $config, $database, $prefix];
     }
 
     private static function read(Application $app, Repository $config): array

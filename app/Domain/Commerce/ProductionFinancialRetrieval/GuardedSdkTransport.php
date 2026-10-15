@@ -65,7 +65,10 @@ final class GuardedSdkTransport implements ClientInterface
     {
         $this->ownership->proveDispatchAllowed();
         $this->policy->requireOutsideTransactions();
-        FinancialRetrievalException::require((new ReflectionProperty(ApiRequestor::class, '_httpClient'))->getRawValue(null) === $this);
+        // The pinned SDK property is static and unhooked. PHP 8.4's getRawValue
+        // requires an object; getValue reads this static slot without a resolver.
+        $slot = new ReflectionProperty(ApiRequestor::class, '_httpClient');
+        FinancialRetrievalException::require($slot->isStatic() && ! $slot->hasHooks() && $slot->getValue() === $this);
     }
 
     private function admitResponse(#[SensitiveParameter] mixed $response): array
@@ -83,6 +86,10 @@ final class GuardedSdkTransport implements ClientInterface
         $body = json_decode($response[0], true, 12, JSON_THROW_ON_ERROR);
         $nodes = 0;
         self::nodes($body, $nodes);
+        if (is_array($body) && ($body['object'] ?? null) === 'list') {
+            FinancialRetrievalException::require(is_array($body['data'] ?? null)
+                && array_is_list($body['data']) && count($body['data']) <= 100);
+        }
 
         return $response;
     }
