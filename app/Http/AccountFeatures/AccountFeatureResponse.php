@@ -30,6 +30,7 @@ final class AccountFeatureResponse extends Response
     public function __construct(private readonly Request $request)
     {
         parent::__construct('', 200, AccountFeaturePrivacy::headers());
+        $this->setProtocolVersion('1.1');
         $failure = AccountFeaturePrivacy::error(503);
         $this->failureHeaders = $failure->headers;
         $this->failureNative = self::materialize($failure);
