@@ -8,6 +8,7 @@ use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Commerce\ProductionTaxCheckout\FreshTaxCheckoutPolicy;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderConsumerCommitAdmissionV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
@@ -16,6 +17,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\DatabaseTransactionRecord;
@@ -1057,6 +1059,57 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             $connection->rollBack();
         }
     }
+
+    public function test_nonarray_environment_descriptor_is_refused_before_pure_offset_callback(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $connection->beginTransaction();
+        $reader = $this->reader();
+        $identity = $f['access']->verifyHistoricalBinding($locator->historicalBuyerBinding(), $reader);
+        $bindings = new \ReflectionProperty(Container::class, 'bindings');
+        $instances = new \ReflectionProperty(Container::class, 'instances');
+        $originalBindings = $bindings->getValue($this->app);
+        $originalInstances = $instances->getValue($this->app);
+        // Generate Laravel's genuine literal value closure, rather than an unrelated closure fixture.
+        $this->app['env'] = 'testing';
+        $currentBindings = $bindings->getValue($this->app);
+        $descriptor = new TaxCallbackEnvironmentDescriptorFixture($currentBindings['env']);
+        $currentBindings['env'] = $descriptor;
+        $bindings->setValue($this->app, $currentBindings);
+        $source = null;
+        $error = null;
+        try {
+            try {
+                $source = ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $identity);
+            } catch (CheckoutException $failure) {
+                $error = $failure;
+            }
+            $this->assertSame(0, $descriptor->pureCalls, 'Final pure policy proof invoked an environment descriptor offset callback.');
+            $this->assertInstanceOf(CheckoutException::class, $error);
+            $this->assertSame('committed_read_frame', $error->reason);
+        } finally {
+            $bindings->setValue($this->app, $originalBindings);
+            $instances->setValue($this->app, $originalInstances);
+            $source?->abortOwnedFrame();
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+    }
+
+    public function test_standard_literal_environment_descriptor_allows_the_original_receipt(): void
+    {
+        [$f, $locator] = $this->paid();
+        $this->app['env'] = 'testing';
+        $reader = $this->reader();
+        $receipt = DB::transaction(function () use ($f, $locator, $reader) {
+            return $this->source($f, $locator, $reader)->committedReadReceipt($reader, hrtime(true) + 30_000_000_000);
+        });
+        $receipt->proveClosed();
+        $this->assertFalse($reader->identityPrimary()->inTransaction());
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
@@ -1136,6 +1189,23 @@ final class TaxCallbackConnectionMapFixture extends \ArrayObject
     public function offsetGet(mixed $key): mixed
     {
         $this->calls++;
+
+        return parent::offsetGet($key);
+    }
+}
+
+final class TaxCallbackEnvironmentDescriptorFixture extends \ArrayObject
+{
+    public int $pureCalls = 0;
+
+    public function offsetGet(mixed $key): mixed
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+            if (($frame['class'] ?? null) === FreshTaxCheckoutPolicy::class && ($frame['function'] ?? null) === 'prove') {
+                $this->pureCalls++;
+                break;
+            }
+        }
 
         return parent::offsetGet($key);
     }

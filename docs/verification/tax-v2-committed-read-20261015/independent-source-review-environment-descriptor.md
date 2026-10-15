@@ -1,0 +1,39 @@
+# Independent Tax255 V2 committed-read map-repair source checkpoint
+
+DECISION: REVISE — NESTED ENVIRONMENT DESCRIPTOR NEEDS PURE ADMISSION
+Reviewed immutable candidate: `b1a5447beb8c07d002f341250a97e396bbb31792`.
+Prior review: `da180b9d0f1942f6c2a1a4dbb50df8fa4f586831`.
+
+The prior constructor connection-map requirement is repaired, and all earlier lifecycle/record/peer/guard fixes remain coherent. One existing Tax helper dependency still admits a callback-bearing nested environment descriptor in purported final PURE proof. That P2 requires correction for this V2 composition. No P0/P1 was identified in this bounded prerequisite inspection. Specification/engineering remain Partial pending that repair and coherent current evidence; no final source/evidence/development merge approval.
+
+## Required remaining purity correction
+
+TaxPaidReadContext::prove now deliberately calls FreshTaxCheckoutPolicy::prove BEFORE the generic binding closure, relying on its pure raw-map admission. Fresh::environment, however, executes `$binding[1]['concrete'] ?? null` when the literal env instance is null without first requiring that descriptor to be an actual array. Exact standard Container and top-level bindings-array checks do not establish that nested value’s shape. An ArrayAccess descriptor wrapping Laravel’s genuine offsetSet value closure can supply the valid closure metadata at capture, be retained as the same object and return the same testing environment, while running offset callbacks during subsequent final Fresh proof. The helper never invokes the closure itself, but it can invoke the descriptor. Ordinary final equality compares retained descriptor object identity and therefore does not eliminate that callback window.
+
+This is an existing Fresh Tax helper branch (it was already present in the preceding Tax write-admission batch), now newly relied upon by this committed-read wrapper’s final purity sequence. It is not an executed finding about default configuration, public client object injection or completed Paid252 V2 wiring. Source confidence is high in the direct offset mechanism; exposure is bounded to unsupported internal binding metadata. Such code can run after final consumer/raw comparison and withdraw current password/policy that historical source checks intentionally ignore, violating this batch’s captured no-callback contract.
+
+Require an actual array descriptor BEFORE its concrete offset when env instance is null, then perform the existing Closure/file/line/static-literal checks. Either repair the owned Tax helper or admit this shape in the V2 wrapper before capture/proof, without frozen V1/shared edits. Keep literal env-instance and standard offsetSet descriptor positives. Add a targeted descriptor sentinel wrapping the original genuine closure, distinguishing permitted app-environment resolution in callback-capable capture from forbidden final PURE offset dispatch. Count/arm the metadata callback and require refusal before it can run in pure proof; retain historical password-change positive without NEW capsule. No provider resolver, new authority/deadline or broader host scope is requested. The author was notified while b1 evidence was still running.
+
+## Repairs and evidence assessment
+
+- Constructor now reflects captured DatabaseManager connections and admits actual array BEFORE primary indexing, then exact native/standard primary and all-peer proof. birth/constructor/prove admit Container instances arrays before own offsets; the normal current proof uses raw policy/fresh guard before the frozen generic closure. The nonarray-map fixture captures reader/connection/prelocked identity before replacing the map, calls genuine SourceV2::lockedRead, expects offsetcallback0 and committed_read_frame, then restores map and rolls back. It isolates the earlier target instead of triggering a facade helper first.
+- Historical owner callback recreates exact original guard before proof, requires unavailable (owner/history) rather than permanent schema refusal, and now asserts exact original SQL after owned abort as well as original relation/probe absence. This resolves the earlier branch-attribution issue.
+- The shipped-config test now expects the actual new literal false receipt flag and exact V2 version alongside EVERY prior disabled/unbound/SDK/API value. Existing no-env/pin checks remain; this corrects a stale expected array without broadening enablement or weakening its oracle.
+- All prior reentry/final pure capsule/observer-owner terminal fence, held postproof/concrete primary, exact record/peer metadata and stale-root preservation, marker order/terminal irreversibility, raw qualified selectors/locking-versus-closed reads, autocommit/journaling, serialization/one-use and conditional restoration changes are otherwise unchanged. The environment descriptor dependency above prevents claiming their complete no-callback composition yet.
+
+Static source contains27 public receipt-test methods and35 provider-expanded cases,34 if only actual >300s source age is excluded; this is discovery, not an executed total. Root reports whole13 Tax SQLite atda stopped125/1082 with23 skips and a stale literal-config assertion failure, so age/new receipt file was not reached. Those results must remain original failed evidence. Root reports old aaaaf39 map oracle1/2 with offsetcallback1, zero errors/skips and PHP/recorder1/1; the new two-case map/literal selection was active when review began. This source-only note has not independently reconciled those receipts. No native execution yet is claimed. Whole13 including actual source age, meaningful native current/closed/metadata/consumer/temporal cases, exact skip identities, original source/runtime/process/OS/formatting witnesses and final portable packet remain pending.
+
+The immutable da review copy remains preserved. Original behavioral failures, metadata sentinels, SMTP/compiler/assertion/policy/command failures must stay separately classified. Missing-method or fixture errors do not become genuine app-gap oracles; unexecuted/stop-on-defect cases are not counted as passing. Overlap is not full-suite acceptance.
+
+This remains default-off/unmounted/unregistered/refusing-transport, with no frozen V1/shared/migration/profile/SDK/root/grant edits and no NEW consumer authority from a read-only receipt. Existing-request pre-create READ/final-I/O, Paid252 forward V2 schema/render/consumer/terminal after-use/root, actual effective isolation/canonical uniqueness/RC/override,1213/general SQL/trigger/DDL/invisible-empty-reopen, all host/provider/live/deploy/import/DNS/activation/release and adjacent ordinary membership afterCommitP2 conditions remain open. Refusal/lost anchor is not compensation. Final independent exact-source/packet review, cheap exact-head preflight/protections and expected-SHA merge remain later requirements.
+
+Read-only source/test/Git/framework inspection under AGENTS and code-verification only. No app/test/DB/CI/hosted execution, tracked edit or delegation. Root owns all fixes. This original runtime artifact is solely authored by the independent reviewer.
+
+## Immutable witnesses
+
+- `app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php`: `ba9d4478f93434d89ea027a0ff835a5a7e8d9daef47e5379029d4b35ac1800ba`
+- `tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php`: `b769ffbac7b083d060a0e886564fcf777d0c1bd2aafe9b065751e8341eee88c8`
+- `tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php`: `6ef35e64ad16f1207aca757810d4fd23b991c13315702770c37ac4b79554569b`
+- Existing helper `app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php`: `8011fe295871eb69bfdbc3f3c8a2dda5b0f31e1f39f9a938cede32f1a15fd141`
+
+Observed worktree at note creation: `b1a5447beb8c07d002f341250a97e396bbb31792`, clean `True`. Verdict binds exactb1 Git bytes, without approval/carry to any successor.
