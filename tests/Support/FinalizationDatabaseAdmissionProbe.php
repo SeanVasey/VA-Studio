@@ -44,7 +44,7 @@ class FinalizationDatabaseAdmissionProbe extends TestCase
             'default' => $database->setDefaultConnection('alternate_fixture'),
             'configuration' => $this->redirectConfiguration(),
             'pdo' => $database->connection()->setPdo(new PDO('sqlite:'.getenv('VASEY_ADMISSION_FILE'))),
-            'none' => null,
+            'none', 'setup-hook' => null,
         };
         RefreshDatabaseState::$migrated = true;
         $this->beforeApplicationDestroyed(function (): void {
