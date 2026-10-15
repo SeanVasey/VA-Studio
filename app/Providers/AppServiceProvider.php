@@ -14,6 +14,7 @@ use App\Domain\Grants\Free\FreeGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
+use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
 use App\Support\PhpCliBinary;
 use App\Support\PhpCliProcess;
@@ -31,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
+            $this->app->register(ProductionTaxCheckoutServiceProvider::class);
+        }
         $this->app->bind(IdentityNoticeTransport::class,
             fn ($app) => IdentitySmtpFactory::make($app, $app['config']));
         $this->app->scoped(MediaWorkflowBudget::class);

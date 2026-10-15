@@ -1,0 +1,73 @@
+{
+  "approved_boundary": "Six typed consumer HTTP endpoints plus conditional default-false Tax producer/root/provider composition using existing typed domains; no UI/index/schema/domain authority/vendor/profile/cap or live merchant expansion.",
+  "commands_read": [
+    "Read-only git target/status/exact docs diff and corrected design; byte-compare originalREVISE imports. Prior bounded related source observations reused; no renewed broad scan."
+  ],
+  "decision": "APPROVE DESIGN WITH CONDITIONS",
+  "design_sha256": "9abb350899aee1e299255f31f5a3bb251c2f63b0c768127a65ddde79b333b86c",
+  "engineering_quality_verdict": "Feasible coherent integration with concrete original context/response lifetime/cache/error contracts; actual source/evidence gates remain.",
+  "exact_documentation_delta": [
+    "docs/verification/paid252-tax-http-20261015/design.md",
+    "docs/verification/paid252-tax-http-20261015/independent-design-original-REVISE.json",
+    "docs/verification/paid252-tax-http-20261015/independent-design-original-REVISE.md"
+  ],
+  "implementation_conditions": [
+    "Callback-free flag/env admission must actually admit captured raw maps/types and standard metadata before offsets; resolving app policy/environment before budget would violate the contract.",
+    "Private exact Request timing context keeps original Budget/receivedAt and nonrenewable one-use claim; budget is timing only, not grant authority.",
+    "Mandatory later mechanics supersede older optional-wrapper phrasing; explicit original cleanup and cycle-free response ownership are required.",
+    "Every positive JSON body has original proof immediately before primitive echo after callback-producing work; late error/attachment refusal truthfulness remains explicit.",
+    "Default false/nonboolean/production/stale-cache requests return private refusal before identity/body/SQL; provider remains absent/unbound as applicable.",
+    "Synthetic fixtures use genuine root before-provider config, actual CSRF comparison/current session and no duplicate/manual privacy/routes layer."
+  ],
+  "limits": [
+    "Design-only; no product code, PHPUnit/database execution or source implementation approval.",
+    "No native rerun solely for root/codec integration; new driver claims/repairs need appropriate owned focused evidence.",
+    "No host/proxy/FPM/distributed cache/I/O interruption/perpetual authorization/provider/live/commercial/activation/release/Foundation/GitLab acceptance.",
+    "Original domain/source/receipt/schema/profile/vendor/numeric caps and frozen shared V1/Identity/membership P2 remain outside this change.",
+    "Existing-request final provider-I/O and wider SQL/isolation/deadlock/DDL/invisible-reopen/damaged-restore boundaries stay open."
+  ],
+  "next_required_gates": [
+    "Implement under root ownership, then freeze actual source and obtain separate independent source/test review.",
+    "Meaningful actual synthetic HTTP/provider/original-byte/adversarial/lifetime/keyed-recorder evidence; no design approval implies tests pass.",
+    "Pint/all10 cheap checks, selection discovery if changed, exact original commands/counts/skips/PHP/recorder/OS provenance.",
+    "Final immutable sealed evidence/exact publication review, new exact-head cheap preflight and expected-SHA development merge."
+  ],
+  "not_performed": [
+    "No implementation/test/source/docs/vendor/Git mutation",
+    "No app/tests/DB/network/CI/Composer/container execution"
+  ],
+  "original_REVISE_hashes": {
+    "json": "6e966805b93588ce6879b1bec415b7ee8a3b13a5b70bc7f1f7ede0636f75f72b",
+    "md": "1c6067418ae0c5325b646a53129292a85b01a84f0a05252f77a3e8a9c3dc806e"
+  },
+  "prior_REVISE_sha": "d8ecca688732d55735309c2a27796c6a2c02abb6",
+  "recorded_utc": "2026-10-15T11:21:18.240275+00:00",
+  "remaining_required_design_corrections": [],
+  "requirement_disposition": [
+    {
+      "evidence": "Earliest globally prepended mounted root capture after callback-free literal flag/environment admission; private exact-Request WeakMap budget/oneclaim; no strong key, attribute replacement, repeat capture or finished-context renewal; off paths avoid capture.",
+      "id": "D1",
+      "status": "Resolved in contract"
+    },
+    {
+      "evidence": "Mandatory plain owner before domain captures/callbacks; immediate original transfer enrollment; owned streamed response explicit close/destructor, callback captures owner not response; late withdrawal cleanup, duplicate/disposal/factory/encoding/reporter coverage.",
+      "id": "D2",
+      "status": "Resolved in contract"
+    },
+    {
+      "evidence": "Both prefixes forced JSON independent of Accept; dontFlash sensitive fields; pre-privacy422/419/500/503 sanitization; bounded allowlisted headers; no fallback framework text logging. Actual CSRF equality/mismatch/rotation with default test bypass defeated.",
+      "id": "D3",
+      "status": "Resolved in contract"
+    },
+    {
+      "evidence": "Exactboolean/local-testing build and runtime gates, cache rebuild/stale route refusal; producer single raw intake/delegation; preserved16KiB/depth8/two-pass duplicate parsing and root-only fixtures/unbound default.",
+      "id": "D4",
+      "status": "Resolved in contract"
+    }
+  ],
+  "reviewed_sha": "9d1a67db975b9061e2e156c4f85ba1969b678c34",
+  "reviewer_role": "Independent non-author, read-only design reviewer",
+  "schema_version": 1,
+  "specification_verdict": "Pass for bounded planning contract; implementation and execution remain unproved.",
+  "verifier_preparation_errors": []
+}

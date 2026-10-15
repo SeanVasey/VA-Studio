@@ -12,6 +12,7 @@ use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/production-customer-identity.php';
@@ -73,4 +74,11 @@ require __DIR__.'/free-grants.php';
 
 if (config('paid-grants.http_mounted') === true) {
     require __DIR__.'/paid-grants.php';
+}
+
+if (TaxHttpMount::admitted('paid-tax-grants.http_mounted')) {
+    require __DIR__.'/paid-tax-grants.php';
+}
+if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
+    require __DIR__.'/production-tax-checkout.php';
 }

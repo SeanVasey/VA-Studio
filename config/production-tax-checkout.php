@@ -8,6 +8,9 @@ return [
     // Refused everywhere unless true AND the application environment is local or testing.
     'enabled' => false,
 
+    // Separate root mount; policy and transport remain off/unbound.
+    'http_mounted' => false,
+
     // Separate literal purpose for original SourceV2 closure; grants/transport/root stay unbound.
     'committed_read_receipts_enabled' => false,
     'committed_read_receipt_version' => 'production-tax-checkout-committed-read-v2',
