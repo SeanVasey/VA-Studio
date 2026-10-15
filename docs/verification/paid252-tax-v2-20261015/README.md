@@ -40,16 +40,31 @@ python3 launch-durable.py --name sqlite-whole-paid-tax-family --driver sqlite te
 python3 launch-durable.py --name sqlite-affected-v1-paid-journeys --driver sqlite tests/Feature/PaidGrantSourceJourneyTest.php tests/Feature/PaidGrantDocumentJourneyTest.php tests/Feature/PaidGrantDownloadJourneyTest.php
 ```
 
+The original native Schema component came from the following command. It ended nonzero after the later race assertion; the component carry does not change that exit:
+
+```sh
+python3 launch-durable.py --name mysql-buyer-serialization-and-native-recovery --driver mysql --filter 'PaidTaxSchemaRecoveryTest|PaidTaxNativeBoundaryTest|test_actual_tax_original_is_private_deterministic_idempotent_and_restore_only' tests/Feature/PaidTaxSchemaRecoveryTest.php tests/Feature/PaidTaxNativeBoundaryTest.php tests/Feature/PaidTaxGrantJourneyTest.php
+```
+
+Current formatting passed for 45 PHP files (`pint-26c0c472.json` contains every selected path/hash/argv). Current partition 52, workflow 14 and scope 27 policy tests passed; the census command validates inventory only:
+
+```sh
+python3 scripts/ci/test-phpunit-shards.py
+python3 scripts/ci/test-workflow-cadence.py
+python3 scripts/ci/test-ci-scope.py
+python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
+```
+
 The launcher refuses reused run names and dirty source. Do not overwrite original receipts to repeat a command. Every recorded selection binds all committed application/bootstrap/config/database/contracts/routes/scripts/tests and dependency/runtime inputs, with exact Git bytes and thirteen Composer loader hashes. Original three foreground selections have no portable launch/PID/startticks OS witness; their missing witness has not been reconstructed or described as observed.
 
 ## Required repairs and failure provenance
 
 - The Fresh Tax environment descriptor, pre-source physical reopen, deserialized budget, delayed claim-clock, begun delegate cleanup, pre-start displacement, before-bytes refusal cleanup and cold schema-grammar regressions each have original failing source-bound executions and later focused corrections. Native generated-ID lookup failed after MySQL resets `lastInsertId` on SET/SELECT; the fix captures it immediately after DML. Byte-distinct provider identifiers use ASCII binary collation in the new schema.
-- The native `04f45bc6` run retained a winning origin and a second worker's status 403 at `PaidTaxReadReceipt.php:54`, after 13.442 s. A separate raw PDO probe on private MySQL 8.4.11 REPEATABLE-READ established the mechanism: information_schema reads create an old view; later FOR UPDATE sees `1` while a plain read sees `0`. SHOW CREATE/no-query/LIMIT0 controls see1. The scratch object was removed. This is a genuine same-owner replay defect, not budget expiry.
+- The native `04f45bc6` run retained a winning origin and a second worker's status 403 at `PaidTaxReadReceipt.php:54`, after 13.442 s. A separate raw PDO probe on private MySQL 8.4.11 REPEATABLE-READ established the mechanism: information_schema reads create an old view; later FOR UPDATE sees `1` while a plain read sees `0`. SHOW CREATE/no-query/LIMIT0 controls see `1`. The scratch object was removed. This is a genuine same-owner replay defect, not budget expiry.
 - The repair captures and retains the exact original frame, then locks the admitted buyer's qualified permanent InnoDB `users.id` before begun delegates or dictionary reads. Both native wait settings are min(original,5) and restored. Full current buyer/schema/source authority still follows before owned DML; the early lock grants no authority. Final comparisons remain plain reads with no new terminal row locks. Isolation and all original numerical caps are unchanged.
 - The revised native test starts both commands behind the exact buyer row after independent authentication, includes an ordinary begun listener reading dictionary metadata, requires at least one saved origin, the same ID from every successful worker and only exact pre-delegate controlled 503 for a refused waiter, and proves a separate real blocked worker refuses with 503, restores settings, closes its transaction, skips delegates and permits fresh exact replay.
 - Earlier `160ff441` and `81e6af2d` native failures omitted diagnostics. Their causes remain unresolved for those original invocations; the later diagnosed snapshot defect is not retroactively assigned. Their selected race/schema assertions were not completed.
-- Original transport/open-URL/invalid synthetic-ID, temporary-table alias, deliberate FK-damage setup, wrong different-buyer/status and users-shadow expectation failures remain explicit. In `a051ac2e`, the new users shadow correctly hit the existing producer 409 before consumer birth; the wrong 503 test expectation stopped later race assertions. `94a2c49b` changes only that precise expectation. The original 94a run also retained a genuine winner and a 5.0267 s controlled 503 waiter; its unconditional two-saved oracle was stronger than the preserved5-second wait cap. It remained failed overall, with the Schema component independently reconciled11/1305/S1 and the later private-original unexecuted. The corrected oracle still rejects 403, 410, unrelated503 and all-refused outcomes and requires fresh exact replay. No failure is deleted or relabelled a pass.
+- Original transport/open-URL/invalid synthetic-ID, temporary-table alias, deliberate FK-damage setup, wrong different-buyer/status and users-shadow expectation failures remain explicit. In `a051ac2e`, the new users shadow correctly hit the existing producer 409 before consumer birth; the wrong 503 test expectation stopped later race assertions. `94a2c49b` changes only that precise expectation. The original 94a run also retained a genuine winner and a 5.0267 s controlled 503 waiter; its unconditional two-saved oracle was stronger than the preserved five-second wait cap. It remained failed overall, with the Schema component independently reconciled 11/1305/S1 and the later private-original unexecuted. The corrected oracle still rejects 403, 410, unrelated 503 and all-refused outcomes and requires fresh exact replay. No failure is deleted or relabelled a pass.
 
 All original outcomes, including failed/errored invocations and exact source heads:
 
