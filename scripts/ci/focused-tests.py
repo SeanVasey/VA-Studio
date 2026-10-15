@@ -437,7 +437,8 @@ def runner_environment(selected: Selection, env: Mapping[str, str]) -> dict[str,
         result.update(APP_ENV="testing", APP_DEBUG="false", DB_CONNECTION=selected.engine, DB_URL="",
                       DB_DATABASE="vaseyaudio_focused" if selected.engine == "mysql" else ":memory:",
                       DB_HOST="127.0.0.1", DB_PORT="3306", DB_SOCKET="", DB_USERNAME="root", DB_PASSWORD="ci-only-password",
-                      VA_CI_DISPOSABLE_MYSQL="1" if selected.engine == "mysql" else "", VA_LOCAL_DISPOSABLE_MYSQL="",
+                      VA_CI_DISPOSABLE_MYSQL="1" if selected.engine == "mysql" else "",
+                      VA_LOCAL_DISPOSABLE_MYSQL="vaseyaudio_focused" if selected.engine == "mysql" and env.get("VA_LOCAL_DISPOSABLE_MYSQL") == "vaseyaudio_focused" else "",
                       CACHE_STORE="array", SESSION_DRIVER="array", QUEUE_CONNECTION="sync", MAIL_MAILER="array")
     elif selected.kind == "browser":
         result["PLAYWRIGHT_JUNIT_OUTPUT_FILE"] = RESULTS
