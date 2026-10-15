@@ -19,6 +19,7 @@ trait PaidTaxDeliveryFixtures
         $catalog = $this->taxCatalog();
         $actor = $catalog['actor'];
         $track = $catalog['track'];
+        $track = app(PublishTrack::class)->unpublish($track, $actor);
         $source = MediaFixtures::source($track, 'master_wav', MediaFixtures::wav(13));
         $run = app(MediaProcessor::class)->handle(app(QueueMediaProcessing::class)->handle($source, $actor)->id);
         $media = $run->outputs()->get()->keyBy('role')->all();

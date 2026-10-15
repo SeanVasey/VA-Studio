@@ -238,7 +238,8 @@ class PaidTaxDownloadJourneyTest extends TestCase
             }
         });
         try {
-            $this->refused(403, fn () => $this->authorize($f));
+            // Producer key-metadata withdrawal is a controlled409 before consumer raw admission.
+            $this->refused(409, fn () => $this->authorize($f));
             config(['app.key' => $key]);
             $mode = 'owner';
             $this->refused(403, fn () => $this->authorize($f));
@@ -248,6 +249,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
         }
         $this->assertGreaterThan(0, $calls);
         fwrite(STDOUT, 'Tax withdrawal mutation timing: '.json_encode($mutations, JSON_THROW_ON_ERROR).PHP_EOL);
+        $this->assertTrue($mutations[0]['pdo_transaction']);
         $this->assertDatabaseCount('paid_tax_authorizations', 0);
         $this->assertSame($user, (array) DB::table('users')->where('id', $user['id'])->sole());
     }
@@ -270,9 +272,11 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $this->assertDatabaseCount('paid_tax_redemptions', 1);
         $bytes = '';
         try {
-            $this->refused(403, fn () => $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
-                $bytes .= $chunk;
-            }));
+            $this->refused(403, function () use ($transfer, &$bytes): void {
+                $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
+                    $bytes .= $chunk;
+                });
+            });
             $this->assertSame('', $bytes);
             $this->assertSame(2, $calls);
         } finally {
@@ -358,7 +362,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
                 parent::copyTarget($target, $destination, $deadline);
             }
         };
-        app()->instance(PaidTaxPrepareStream::class, $stream);
+        app()->bind(PaidTaxPrepareStream::class, static fn () => $stream);
         app()->afterResolving(PaidTaxPrepareStream::class, static function () use ($budget): void {
             $budget->shortenTo(0);
         });
@@ -366,6 +370,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
             (new PaidTaxDownloads)->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user'], requestBudget: $budget);
             $this->fail('Spent snapshot budget yielded transfer.');
         } catch (PaidTaxException|DeliveryException) {
+            $this->assertSame(0, $budget->value(), 'The resolver must actually shorten this original budget.');
             $this->assertSame(0, $copies, 'The adapter copied after its live request budget was spent.');
         }
         $this->assertDatabaseCount('paid_tax_redemptions', 0);
@@ -390,9 +395,11 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $transfer = $d->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user']);
         $this->assertGreaterThan(1048576, $transfer->sizeBytes);
         $bytes = 0;
-        $this->refused(410, fn () => $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
-            $bytes += strlen($chunk);
-        }));
+        $this->refused(410, function () use ($transfer, &$bytes): void {
+            $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
+                $bytes += strlen($chunk);
+            });
+        });
         $this->assertSame(1048576, $bytes, 'The delayed second chunk reached its consumer.');
         $this->assertSame(3, $calls);
         $this->assertDatabaseCount('paid_tax_redemptions', 1);
