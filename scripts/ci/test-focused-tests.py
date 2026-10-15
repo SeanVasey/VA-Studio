@@ -590,6 +590,19 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual((env["APP_ENV"], env["DB_CONNECTION"], env["DB_DATABASE"], env["DB_URL"]), ("testing", "sqlite", ":memory:", ""))
         self.assertEqual((env["MAIL_MAILER"], env["QUEUE_CONNECTION"], env["SESSION_DRIVER"]), ("array", "sync", "array"))
 
+    def test_mysql_runner_declares_its_owned_service_without_inheriting_other_database_authority(self):
+        for engine in ("mysql", "sqlite"):
+            selected = focused.selection({"FOCUSED_SUITE": "media", "FOCUSED_ENGINE": engine})
+            env = focused.runner_environment(selected, {"CI": "true", "DB_SOCKET": "/another/mysql.sock",
+                "VA_LOCAL_DISPOSABLE_MYSQL": "vaseyaudio_other", "VA_CI_DISPOSABLE_MYSQL": "inherited"})
+            self.assertEqual(env["DB_DATABASE"], "vaseyaudio_focused" if engine == "mysql" else ":memory:")
+            self.assertEqual(env["VA_CI_DISPOSABLE_MYSQL"], "1" if engine == "mysql" else "")
+            self.assertEqual(env["VA_LOCAL_DISPOSABLE_MYSQL"], "")
+            self.assertEqual(env["DB_SOCKET"], "")
+            self.assertEqual(env["CI"], "true")
+            without_ci = focused.runner_environment(selected, {})
+            self.assertNotIn("CI", without_ci, "The runner must not invent GitHub CI authority.")
+
     def test_junit_counts_preserve_skip_failure_error_and_assertion_evidence(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -697,6 +710,12 @@ class ExecutionTests(unittest.TestCase):
 
 
 class WorkflowBoundaryTests(unittest.TestCase):
+
+    def test_mysql_service_has_an_explicit_disposable_declaration_in_its_job_environment(self):
+        text = (ROOT / ".github/workflows/focused-feedback.yml").read_text()
+        service_job = text.split("      MYSQL_DATABASE: vaseyaudio_focused", 1)[1].split("    steps:", 1)[0]
+        self.assertIn("      VA_CI_DISPOSABLE_MYSQL: ${{ needs.focused-selection.outputs.engine == 'mysql' && '1' || '' }}", service_job)
+        self.assertIn("      DB_SOCKET: ''", service_job)
     def assert_read_only_workflow(self, text):
         for forbidden in ("secrets.", "pull_request_target", "continue-on-error", "always() &&", "pull_request:"):
             self.assertNotIn(forbidden, text)
