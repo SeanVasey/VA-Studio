@@ -17,6 +17,9 @@ use App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\DatabaseTransactionRecord;
+use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\SQLiteConnection;
@@ -558,12 +561,13 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $delegate = $connection->getEventDispatcher();
         $source = null;
         $taxReceipt = null;
+        $taxObserver = null;
         $replacement = null;
         $frame = null;
         $legacyReceipt = null;
         try {
             $connection->transaction(function () use ($f, $locator, $legacy, $legacyLocator, $kind, $taxFirst, $connection,
-                &$source, &$taxReceipt, &$replacement, &$frame, &$legacyReceipt): void {
+                &$source, &$taxReceipt, &$taxObserver, &$replacement, &$frame, &$legacyReceipt): void {
                 $reader = $this->reader();
                 $deadline = hrtime(true) + 60_000_000_000;
                 $installOther = function () use ($kind, $legacy, $legacyLocator, $reader, $deadline, $connection, &$frame, &$legacyReceipt): void {
@@ -579,6 +583,7 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
                 if ($taxFirst) {
                     $source = $this->source($f, $locator, $reader);
                     $taxReceipt = $source->committedReadReceipt($reader, $deadline);
+                    $taxObserver = $connection->getEventDispatcher();
                     $installOther();
                     $replacement = $connection->getEventDispatcher();
                 } else {
@@ -596,8 +601,11 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             $this->assertTrue($taxFirst);
             $this->assertSame('committed_read_frame', $error->reason);
             $this->assertTrue($connection->getPdo()->inTransaction());
+            $ownerBeforeAbort = $connection->getEventDispatcher();
             $source->abortOwnedFrame();
-            $this->assertSame($replacement, $connection->getEventDispatcher(), 'Tax cleanup replaced a different observer owner.');
+            // Frozen V1 voluntarily restores its delegate on refusal; NEW leaves its replacement installed.
+            $this->assertSame($ownerBeforeAbort === $taxObserver ? $delegate : $ownerBeforeAbort,
+                $connection->getEventDispatcher(), 'Tax cleanup replaced a different current observer owner.');
         } finally {
             $frame?->restore();
             $connection->setEventDispatcher($delegate);
@@ -808,6 +816,7 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         }
         [$f, $locator] = $this->paid();
         $pdo = DB::getPdo();
+        $guard = $pdo->query("SELECT sql FROM sqlite_schema WHERE name='customer_accounts_update'")->fetchColumn();
         $account = (array) DB::table('customer_accounts')->where('user_id', $f['buyer']['user']->id)->sole();
         $otherOwner = (array) DB::table('quote_owners')->where('owner_key', $account['owner_key'])->sole();
         $otherOwner['owner_key'] = hash('sha256', 'NONBINDING TAX RECEIPT OWNER DRIFT');
@@ -815,20 +824,23 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $source = null;
         $hits = 0;
         try {
-            DB::transaction(function () use ($f, $locator, $pdo, $account, $otherOwner, &$source, &$hits): void {
+            DB::transaction(function () use ($f, $locator, $pdo, $account, $otherOwner, $guard, &$source, &$hits): void {
                 $reader = $this->reader();
                 $source = $this->source($f, $locator, $reader);
                 $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
                 $pdo->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
-                DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($pdo, $account, $otherOwner, &$hits): void {
+                DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($pdo, $account, $otherOwner, $guard, &$hits): void {
                     $hits++;
                     $pdo->exec('DROP TRIGGER customer_accounts_update');
                     $statement = $pdo->prepare('UPDATE customer_accounts SET owner_key = ? WHERE id = ?');
                     $statement->execute([$otherOwner['owner_key'], $account['id']]);
+                    $pdo->exec($guard);
+                    $this->assertSame($guard, $pdo->query("SELECT sql FROM sqlite_schema WHERE name='customer_accounts_update'")->fetchColumn());
                 });
             });
             $this->fail('Historical owner drift reached physical commit.');
-        } catch (IdentityException) {
+        } catch (IdentityException $error) {
+            $this->assertSame('unavailable', $error->reason);
             $this->assertSame(1, $hits);
         } finally {
             $source?->abortOwnedFrame();
@@ -922,6 +934,58 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertSame(1, (int) $pdo->query("SELECT COUNT(*) FROM sqlite_schema WHERE name='ptx_s_u3'")->fetchColumn());
         $this->assertDatabaseCount('tax_receipt_probe', 0);
     }
+
+    public function test_cleanup_does_not_dereference_a_foreign_transaction_record_subtype(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $connection->beginTransaction();
+        $source = $this->source($f, $locator, $this->reader());
+        $manager = (new \ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
+        $foreign = new TaxCallbackRecordFixture('foreign-record-peer', 1);
+        unset($foreign->parent);
+        $manager->getPendingTransactions()->push($foreign);
+        try {
+            $source->abortOwnedFrame();
+            $this->assertSame(0, $foreign->calls, 'Cleanup invoked a foreign record metadata callback.');
+            $this->assertTrue($manager->getPendingTransactions()->containsStrict($foreign));
+            $this->assertFalse($connection->getPdo()->inTransaction());
+        } finally {
+            $property = new \ReflectionProperty(DatabaseTransactionsManager::class, 'pendingTransactions');
+            $property->setValue($manager, $manager->getPendingTransactions()->reject(fn ($record): bool => $record === $foreign)->values());
+        }
+    }
+
+    public function test_custom_peer_connection_metadata_is_refused_before_its_callback_can_run(): void
+    {
+        [$f, $locator] = $this->paid();
+        $manager = DB::getFacadeRoot();
+        $property = new \ReflectionProperty(DatabaseManager::class, 'connections');
+        $original = $property->getValue($manager);
+        $peer = new TaxCallbackConnectionFixture(new PDO('sqlite::memory:'), ':memory:', '', ['name' => 'callback-peer', 'driver' => 'sqlite']);
+        $property->setValue($manager, [...$original, 'callback-peer' => $peer]);
+        $source = null;
+        $error = null;
+        DB::connection()->beginTransaction();
+        try {
+            $reader = $this->reader();
+            try {
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+            } catch (CheckoutException $failure) {
+                $error = $failure;
+            }
+            $this->assertSame(0, $peer->calls, 'Original identity witness invoked callback-capable peer metadata.');
+            $this->assertInstanceOf(CheckoutException::class, $error);
+            $this->assertSame('committed_read_frame', $error->reason);
+        } finally {
+            $source?->abortOwnedFrame();
+            $property->setValue($manager, $original);
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+        }
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
@@ -967,5 +1031,29 @@ final readonly class TaxPasswordAdmissionFixture implements ProductionTaxPaidOrd
         $statement = $capturedPrimary->prepare('SELECT password FROM users WHERE id = ?');
         $statement->execute([$this->userId]);
         CheckoutException::require($statement->fetchColumn() === $this->originalPassword, 'consumer_admission');
+    }
+}
+
+final class TaxCallbackRecordFixture extends DatabaseTransactionRecord
+{
+    public int $calls = 0;
+
+    public function __get(string $name): mixed
+    {
+        $this->calls++;
+
+        return null;
+    }
+}
+
+final class TaxCallbackConnectionFixture extends SQLiteConnection
+{
+    public int $calls = 0;
+
+    public function getRawPdo()
+    {
+        $this->calls++;
+
+        return parent::getRawPdo();
     }
 }
