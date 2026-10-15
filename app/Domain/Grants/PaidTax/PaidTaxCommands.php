@@ -50,7 +50,7 @@ final class PaidTaxCommands
             $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
             $deadline->proveCurrent();
             $runtime->prove(0);
-            $result = PaidTaxTransaction::run($runtime, function (PaidTaxOwnedFrame $frame) use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
+            $result = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
                 $deadline, $projectionRead, $runtime, $actorOriginal, &$heldSource, &$heldRows, &$receipt, &$producerRead, &$producerSecond): array {
                 $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;

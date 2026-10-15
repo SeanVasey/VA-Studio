@@ -7,6 +7,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Grants\PaidTax\PaidTaxActor;
 use App\Domain\Grants\PaidTax\PaidTaxCleanup;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
 use App\Domain\Grants\PaidTax\PaidTaxDeadline;
@@ -111,7 +112,7 @@ class PaidTaxAdversarialJourneyTest extends TestCase
         $rows = null;
         $source = null;
         try {
-            PaidTaxTransaction::run($runtime, function ($original) use ($a, $b, $locator, $runtime, $lineB, &$rows, &$source): array {
+            PaidTaxTransaction::run($runtime, PaidTaxActor::capture($a['buyer']['user']), function ($original) use ($a, $b, $locator, $runtime, $lineB, &$rows, &$source): array {
                 $rows = new PaidTaxRows($runtime, $original);
                 $a['access']->lock($a['buyer']['principal'], $a['buyer']['user'], $rows->current());
                 $historical = $a['access']->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current());

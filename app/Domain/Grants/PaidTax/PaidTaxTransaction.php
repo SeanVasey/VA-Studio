@@ -7,12 +7,13 @@ use Closure;
 /** One ordinary begin/commit; the caller retains exact owned cleanup instead of a generic rollback/retry. */
 final class PaidTaxTransaction
 {
-    public static function run(PaidTaxRuntime $runtime, Closure $operation, ?PaidTaxOwnedFrame &$original): array
+    public static function run(PaidTaxRuntime $runtime, PaidTaxActor $actor, Closure $operation, ?PaidTaxOwnedFrame &$original): array
     {
         $runtime->outsideTransactions();
         PaidTaxException::require($original === null);
-        $birth = PaidTaxBeginningDispatcher::install($runtime, static function (PaidTaxOwnedFrame $frame) use (&$original): void {
+        $birth = PaidTaxBeginningDispatcher::install($runtime, static function (PaidTaxOwnedFrame $frame) use ($runtime, $actor, &$original): void {
             $original = $frame;
+            $actor->lockOriginal($runtime, $frame);
         });
         try {
             $runtime->connection->beginTransaction();

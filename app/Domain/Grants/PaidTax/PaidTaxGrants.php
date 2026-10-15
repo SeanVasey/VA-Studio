@@ -47,7 +47,7 @@ final class PaidTaxGrants
         $heldFrame = null;
         $runtime->prove(0);
         try {
-            $projection = PaidTaxTransaction::run($runtime, function (PaidTaxOwnedFrame $frame) use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
+            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
                 &$heldSource, &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;

@@ -2,8 +2,8 @@
 
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
-use App\Domain\Grants\PaidTax\PaidTaxPolicy;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Support\Facades\DB;
 
 require __DIR__.'/../../vendor/autoload.php';
@@ -24,23 +24,16 @@ $pdo = DB::getPdo();
 $connectionId = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
 $directory = getenv('VA_PAID_TAX_RACE_DIRECTORY');
 $phase = 'authenticated';
-app()->afterResolving(PaidTaxPolicy::class, static function () use ($directory, &$phase): void {
-    if ($phase !== 'command-started') {
-        return;
+$begunDictionaryRead = false;
+$connection = DB::connection();
+$connection->getEventDispatcher()->listen(TransactionBeginning::class, static function ($event) use ($connection, $pdo, &$begunDictionaryRead): void {
+    if ($event->connection === $connection && ! $begunDictionaryRead) {
+        $pdo->query('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_COLUMN);
+        $begunDictionaryRead = true;
     }
-    $phase = 'before-owner-lock';
-    touch($directory.'/at-owner-lock');
-    $end = hrtime(true) + 10_000_000_000;
-    while (! is_file($directory.'/lock-start')) {
-        if (hrtime(true) > $end) {
-            throw new RuntimeException('Tax owner-lock coordination timed out.');
-        }
-        usleep(10000);
-        clearstatcache();
-    }
-    $phase = 'owner-lock-released';
 });
-file_put_contents($directory.'/ready.tmp', json_encode(['connection_id' => $connectionId, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
+$waits = static fn (): array => $pdo->query('SELECT @@session.lock_wait_timeout, @@session.innodb_lock_wait_timeout')->fetch(PDO::FETCH_NUM);
+file_put_contents($directory.'/ready.tmp', json_encode(['connection_id' => $connectionId, 'pid' => getmypid(), 'waits' => $waits()], JSON_THROW_ON_ERROR));
 rename($directory.'/ready.tmp', $directory.'/ready');
 $end = hrtime(true) + 15_000_000_000;
 while (! is_file($directory.'/start')) {
@@ -70,5 +63,7 @@ try {
 echo json_encode(['result' => $result, 'id' => $projection['id'] ?? null, 'order_id' => $projection['orderId'] ?? null,
     'error_class' => $errorClass ?? null, 'status' => $status ?? null, 'location' => $location ?? null, 'phase' => $phase,
     'trace' => $trace ?? [], 'command_elapsed_seconds' => (hrtime(true) - $commandStarted) / 1_000_000_000,
+    'waits' => $waits(),
+    'begun_dictionary_read' => $begunDictionaryRead,
     'connection_id' => $connectionId, 'pid' => getmypid(),
     'transaction_level' => DB::transactionLevel(), 'in_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);

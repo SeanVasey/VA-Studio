@@ -56,18 +56,12 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $two = $this->start($input);
         $parent = (int) DB::getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
         $this->assertNotSame($one['connection_id'], $two['connection_id']);
-        foreach ([$one, $two] as $worker) {
-            touch($worker['directory'].'/start');
-        }
-        // Both native schema admissions finish BEFORE the parent takes its row lock. The original
-        // command clocks keep running through this coordination; no application budget is restarted.
-        foreach ([$one, $two] as $worker) {
-            $this->await(fn (): bool => is_file($worker['directory'].'/at-owner-lock'), $worker['process']);
-        }
+        // Authentication is complete. Both ordinary commands must wait on their first original-buyer
+        // lock BEFORE schema metadata or begun delegates can establish a repeatable-read snapshot.
         DB::beginTransaction();
         DB::table('users')->where('id', $first['buyer']['user']->id)->lockForUpdate()->first();
         foreach ([$one, $two] as $worker) {
-            touch($worker['directory'].'/lock-start');
+            touch($worker['directory'].'/start');
             $this->await(fn (): bool => $this->waiting($worker['connection_id'], $parent, $first['buyer']['user']->id), $worker['process']);
         }
         DB::commit();
@@ -79,6 +73,8 @@ class PaidTaxNativeBoundaryTest extends TestCase
             $this->assertSame(0, $result['transaction_level']);
             $this->assertFalse($result['in_transaction']);
             $this->assertSame([$one, $two][$index]['connection_id'], $result['connection_id']);
+            $this->assertSame([$one, $two][$index]['waits'], $result['waits']);
+            $this->assertTrue($result['begun_dictionary_read']);
         }
         $this->assertSame(['saved', 'saved'], array_column($results, 'result'));
         $this->assertSame($results[0]['id'], $results[1]['id']);
@@ -100,6 +96,33 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $this->assertSame(['pi_SYNTHETICTAX', 'pi_synthetictax'], array_map(fn (array $row): string => PaidTaxRecords::decode($row)['source_identity']['provider_payment_id'], $rows));
         $this->assertDatabaseCount('paid_tax_grant_origins', 2);
         $this->assertDatabaseCount('paid_order_origins', 0);
+        $this->assertOwnerWaitIsBoundedAndRestored($input, $first['buyer'], $parent);
+    }
+
+    private function assertOwnerWaitIsBoundedAndRestored(array $input, array $buyer, int $parent): void
+    {
+        $userId = $buyer['user']->id;
+        $worker = $this->start($input);
+        DB::beginTransaction();
+        DB::table('users')->where('id', $userId)->lockForUpdate()->first();
+        try {
+            touch($worker['directory'].'/start');
+            $this->await(fn (): bool => $this->waiting($worker['connection_id'], $parent, $userId), $worker['process']);
+            $result = $this->finish($worker);
+        } finally {
+            DB::commit();
+        }
+        fwrite(STDOUT, 'Native Tax bounded owner wait: '.json_encode($result, JSON_THROW_ON_ERROR).PHP_EOL);
+        $this->assertSame([PaidTaxException::class, 503], [$result['error_class'], $result['status']]);
+        $this->assertSame(0, $result['transaction_level']);
+        $this->assertFalse($result['in_transaction']);
+        $this->assertSame($worker['waits'], $result['waits']);
+        $this->assertSame($worker['connection_id'], $result['connection_id']);
+        $this->assertFalse($result['begun_dictionary_read']);
+        $this->assertLessThan(15, $result['command_elapsed_seconds']);
+        $this->assertDatabaseCount('paid_tax_order_origins', 2);
+        $this->assertDatabaseCount('paid_tax_grant_origins', 2);
+        $this->assertSame($input['order_id'], (new PaidTaxGrants)->finalize($buyer['principal'], $buyer['user'], $input['order_id'])['orderId']);
     }
 
     private function assertNativeObjectsRefuseBeforeOwnedDml(array $f): void
@@ -113,7 +136,7 @@ class PaidTaxNativeBoundaryTest extends TestCase
             return $rows;
         };
         $before = $snapshot();
-        foreach (array_keys(PaidTaxSchema::specs()) as $table) {
+        foreach (['users', ...array_keys(PaidTaxSchema::specs())] as $table) {
             DB::unprepared('CREATE TEMPORARY TABLE `'.$table.'` (id BIGINT UNSIGNED NOT NULL PRIMARY KEY)');
             try {
                 $this->refusesOrigin($f);

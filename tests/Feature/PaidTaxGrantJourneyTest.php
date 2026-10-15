@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\PaidTax\PaidTaxActor;
 use App\Domain\Grants\PaidTax\PaidTaxCleanup;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
 use App\Domain\Grants\PaidTax\PaidTaxDeadline;
@@ -549,7 +550,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         $failure = null;
         try {
             try {
-                PaidTaxTransaction::run($runtime, static function () use (&$ran): array {
+                PaidTaxTransaction::run($runtime, PaidTaxActor::capture($f['buyer']['user']), static function () use (&$ran): array {
                     $ran = true;
 
                     return [];
