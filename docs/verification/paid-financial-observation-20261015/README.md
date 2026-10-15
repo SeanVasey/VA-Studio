@@ -32,3 +32,7 @@ No new SQL/DDL/isolation/reopen/restore/native performance proof is claimed by t
 ## Sealed execution artifact
 
 `tested-ae6d1095-recorded-evidence.tar.gz` SHA256 `bd681b5f192e87b7f1f1ec9708682e5a87a91b5797009bbdbd8514aba6bba2fb`:7,073,062 bytes,2460 members,2377 deduplicated immutable source blobs, three exact source heads (7290 path bindings),13 original matching loader inputs, all four PHP invocations and all original interrupted/continued cheap records. Its companion index binds every member. The original generic sealer scope excludes broader application/native/host acceptance; the exact focused counts above are the execution claims. The host-only ephemeral key is excluded.
+
+## Final independent development decision
+
+Separate exact-head `APPROVE WITH CONDITIONS` at `10e0d86177603f5a0c41f2c1a9011c4eee634592` is recorded byte-identically in [DECISION](independent-final-DECISION.md), its report and original verifier/report. All2460 members/7290 immutable Git bindings/2430 current inputs/13 loaders/four PHP invocations/261 carry bindings/16 protected originals/eight reviewer imports and15 actual cheap commands reconcile; verifier exits0. No open P0/P1 or required source/packet correction. Default-off/unattested/host/provider/policy/frozen-P2/release limits remain. These imports change documentation only; explicit exact publication-head carry and cheap preflight/full inventory/expected-SHA merge remain. Original failed runs are not rewritten.
