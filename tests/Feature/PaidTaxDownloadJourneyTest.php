@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\ProductionTaxCheckout\TaxPaidOriginalCommitDispatcher;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
@@ -217,7 +218,10 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $mode = 'key';
         $calls = 0;
         $mutations = [];
-        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($key, $pdo, $user, $encrypter, &$mode, &$calls, &$mutations): void {
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function ($event) use ($key, $pdo, $user, $encrypter, &$mode, &$calls, &$mutations): void {
+            if ($event->connection->getEventDispatcher()::class !== TaxPaidOriginalCommitDispatcher::class) {
+                return;
+            }
             if ($mode === 'key') {
                 config(['app.key' => $key.'-synthetic-changed']);
             } else {
@@ -324,7 +328,10 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $source['token_hash'] = hash('sha256', 'NONBINDING SYNTHETIC LATE ISSUANCE');
         $pdo = DB::getPdo();
         $calls = 0;
-        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($pdo, $source, &$calls): void {
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function ($event) use ($pdo, $source, &$calls): void {
+            if ($event->connection->getEventDispatcher()::class !== TaxPaidOriginalCommitDispatcher::class) {
+                return;
+            }
             if ($calls++ === 0) {
                 $q = $pdo->prepare('INSERT INTO paid_tax_authorizations ('.implode(', ', array_keys($source)).') VALUES ('.implode(', ', array_fill(0, count($source), '?')).')');
                 $q->execute(array_values($source));

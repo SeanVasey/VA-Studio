@@ -2,14 +2,14 @@
 
 namespace Tests\Support;
 
+use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Media\BindStemsToRecording;
 use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\QueueMediaProcessing;
-use App\Domain\Offers\PublishOffer;
-use App\Domain\Offers\SaveOfferDraft;
 
 /** Authored synthetic multi-role offer on actual processed immutable private media. */
 trait PaidTaxDeliveryFixtures
