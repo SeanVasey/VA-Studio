@@ -98,7 +98,7 @@ class PaidTaxNativeBoundaryTest extends TestCase
         };
         $before = $snapshot();
         foreach (array_keys(PaidTaxSchema::specs()) as $table) {
-            DB::unprepared('CREATE TEMPORARY TABLE `'.$table.'` LIKE `'.$table.'`');
+            DB::unprepared('CREATE TEMPORARY TABLE `'.$table.'` (id BIGINT UNSIGNED NOT NULL PRIMARY KEY)');
             try {
                 $this->refusesOrigin($f);
             } finally {

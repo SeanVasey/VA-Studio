@@ -262,4 +262,25 @@ class PaidTaxAdversarialJourneyTest extends TestCase
             $this->assertSame($status, $error->status);
         }
     }
+
+    public function test_unpaid_and_different_verified_buyer_refuse_without_origin_then_the_original_buyer_replays_once(): void
+    {
+        $f = $this->taxOrder();
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $grants = new PaidTaxGrants;
+        $this->refuses(fn () => $grants->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']), 409);
+        $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $other = $this->enrollThroughLocalSmtp('other-tax-buyer@example.test');
+        $this->refuses(fn () => $grants->finalize($other['principal'], $other['user'], $f['order']['orderId']), 403);
+        $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $original = $grants->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($f['order']['orderId'], $original['orderId']);
+        $this->assertSame($original, $grants->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']));
+        $this->assertDatabaseCount('paid_tax_order_origins', 1);
+    }
 }
