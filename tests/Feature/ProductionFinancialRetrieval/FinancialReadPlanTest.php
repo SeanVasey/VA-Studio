@@ -27,9 +27,13 @@ use Stripe\ApiRequestor;
 use Stripe\HttpClient\ClientInterface;
 use Stripe\Stripe;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FinancialRetrievalClockFixture;
 use Tests\Support\PaidTaxGrantFixtures;
 use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\TestCase;
+
+// Load before any new-module clock call; PHP caches namespace function resolution.
+require_once __DIR__.'/../../Support/FinancialRetrievalClockFixture.php';
 
 /** Genuine retained paid sources and stock SDK; transport replies are nonbinding synthetic arrays. */
 final class FinancialReadPlanTest extends TestCase
@@ -45,6 +49,7 @@ final class FinancialReadPlanTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        FinancialRetrievalClockFixture::$onFirstAttach = null;
         $this->preparePaidTaxFixture();
         $this->app->instance('env', 'testing');
         config(['production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
@@ -61,6 +66,7 @@ final class FinancialReadPlanTest extends TestCase
 
     protected function tearDown(): void
     {
+        FinancialRetrievalClockFixture::$onFirstAttach = null;
         ApiRequestor::setHttpClient($this->previousTransport);
         [Stripe::$accountId, Stripe::$verifySslCerts] = $this->previousGlobals;
         $this->app->instance('env', 'testing');
@@ -667,35 +673,67 @@ final class FinancialReadPlanTest extends TestCase
         $delegate = DB::connection()->getEventDispatcher();
         $first = null;
         $triggered = false;
-        $this->abandonHeld($f, $tax, function ($source, $reader) use ($tax, &$first, &$triggered): void {
+        $probeCalls = 0;
+        $originalObserver = null;
+        $sentinel = new RetrievalHttpFixture([]);
+        ApiRequestor::setHttpClient($sentinel);
+        $this->abandonHeld($f, $tax, function ($source, $reader) use ($tax, &$first, &$triggered, &$probeCalls, &$originalObserver): void {
             $encrypter = Crypt::getFacadeRoot();
-            Crypt::shouldReceive('decryptString')->andReturnUsing(function (#[\SensitiveParameter] string $cipher) use ($encrypter, &$first, &$triggered, $tax): string {
+            $withdraw = function () use (&$first, &$triggered, &$probeCalls, &$originalObserver, $tax): void {
                 $observer = DB::connection()->getEventDispatcher();
                 if (! $triggered && ($observer instanceof OriginalCommitDispatcher || $observer instanceof TaxPaidOriginalCommitDispatcher)) {
                     $receipts = RetrievalPolicy::raw($observer, $observer::class, 'receipts');
                     if (count($receipts) === 1) {
+                        $probeCalls++;
+                        $originalObserver = $observer;
                         $first = $receipts[0];
                         $triggered = true;
                         config([$tax ? 'production-tax-checkout.committed_read_receipts_enabled' : 'production_checkout.committed_read_receipts_enabled' => false]);
                     }
                 }
+            };
+            if ($tax) {
+                // Genuine original Tax source decrypt callback with original forwarding.
+                Crypt::shouldReceive('decryptString')->andReturnUsing(function (#[\SensitiveParameter] string $cipher) use ($encrypter, $withdraw): string {
+                    $withdraw();
 
-                return $encrypter->decryptString($cipher);
-            });
+                    return $encrypter->decryptString($cipher);
+                });
+            } else {
+                // V1's inter-mint reads do not decrypt. This synthetic new-wrapper
+                // attach probe changes a flag and preserves real clock/source bytes.
+                FinancialRetrievalClockFixture::$onFirstAttach = $withdraw;
+            }
             try {
                 $this->refuses(fn () => $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
                     : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000));
             } finally {
+                FinancialRetrievalClockFixture::$onFirstAttach = null;
                 Crypt::swap($encrypter);
             }
-            $this->assertTrue($triggered, 'Genuine decrypt callback did not interrupt the second mint.');
+            $this->assertTrue($triggered, 'The declared partial-mint fault seam did not run.');
+            $this->assertSame(1, $probeCalls);
             $this->assertNotNull($first);
             $this->assertTrue($first->used());
+            $this->assertCount(1, RetrievalPolicy::raw($originalObserver, $originalObserver::class, 'receipts'));
             $this->assertSame(1, DB::transactionLevel());
             $this->assertTrue(DB::getPdo()->inTransaction());
         });
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
         $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertCount(0, $sentinel->calls);
+        $this->assertSame($sentinel, ApiRequestor::httpClient());
+        config([$tax ? 'production-tax-checkout.committed_read_receipts_enabled' : 'production_checkout.committed_read_receipts_enabled' => true]);
+        [$retry, $line] = $this->held($f, $tax, function ($source, $reader) use ($tax): array {
+            $line = $source->line(1);
+
+            return [$tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
+                : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000), $line];
+        });
+        $http = $this->transport($line, $tax);
+        $this->assertFalse($retry->readSynthetic($http)->summary()['providerAuthenticated']);
+        $this->assertCount(6, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
     }
 
     #[DataProvider('kinds')]
