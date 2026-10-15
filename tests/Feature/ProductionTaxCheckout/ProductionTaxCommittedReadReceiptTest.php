@@ -1028,6 +1028,34 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         }
         $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
     }
+
+    public function test_nonarray_connection_map_is_refused_before_primary_offset_callback(): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $connection->beginTransaction();
+        $reader = $this->reader();
+        $identity = $f['access']->verifyHistoricalBinding($locator->historicalBuyerBinding(), $reader);
+        $manager = DB::getFacadeRoot();
+        $property = new \ReflectionProperty(DatabaseManager::class, 'connections');
+        $original = $property->getValue($manager);
+        $map = new TaxCallbackConnectionMapFixture($original);
+        $property->setValue($manager, $map);
+        $error = null;
+        try {
+            try {
+                ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $identity);
+            } catch (CheckoutException $failure) {
+                $error = $failure;
+            }
+            $this->assertSame(0, $map->calls, 'Birth selected a primary through callback-capable offset access.');
+            $this->assertInstanceOf(CheckoutException::class, $error);
+            $this->assertSame('committed_read_frame', $error->reason);
+        } finally {
+            $property->setValue($manager, $original);
+            $connection->rollBack();
+        }
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
@@ -1097,5 +1125,17 @@ final class TaxCallbackConnectionFixture extends SQLiteConnection
         $this->calls++;
 
         return parent::getRawPdo();
+    }
+}
+
+final class TaxCallbackConnectionMapFixture extends \ArrayObject
+{
+    public int $calls = 0;
+
+    public function offsetGet(mixed $key): mixed
+    {
+        $this->calls++;
+
+        return parent::offsetGet($key);
     }
 }
