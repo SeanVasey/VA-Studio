@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\ProductionFeatures;
 
+use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningLibrary;
+use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
@@ -108,17 +110,27 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         $error = null;
         Route::middleware('web')->get('/customer/features/guard-probe', function (Request $request) use (&$error) {
             try {
+                $response = new AccountFeatureResponse($request);
                 $identity = ProductionAccountFeatureIdentity::forRequest($request, 'listening_library');
                 $guard = new AccountFeatureRequestGuard($request, $identity);
                 $guard->requireCurrent();
+                $prepared = new ProductionFeaturePreparation(function () use ($guard, $response): void {
+                    $guard->requireCurrent();
+                    $response->requireUnchanged();
+                }, 3 * 1024 * 1024);
+                (new ProductionListeningLibrary)->read($identity, $prepared);
+                $response->attach($prepared);
+
+                return $response;
             } catch (\Throwable $caught) {
                 $error = $caught;
             }
 
             return new Response('probe-complete');
         });
-        $this->get('/customer/features/guard-probe')->assertOk();
+        $test = $this->get('/customer/features/guard-probe')->assertOk();
         $this->assertNull($error, $error === null ? '' : $error::class.' at '.$error->getFile().':'.$error->getLine());
+        $this->assertSame([200, ['initialized' => false]], $this->released($test));
     }
 
     public function test_premature_handled_send_and_split_withdrawal_never_release_delayed_private_bytes(): void
