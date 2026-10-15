@@ -43,6 +43,10 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
         app('migration.repository')->createRepository();
         app('migration.repository')->log('1999_01_01_000000_retained_original', 1);
         $this->beforeApplicationDestroyed(fn () => Schema::dropAllTables());
+        if (DB::getDriverName() === 'mysql') {
+            DB::unprepared('CREATE PROCEDURE retained_paid_tax_recovery_marker() SELECT 7 AS retained_marker');
+            $this->beforeApplicationDestroyed(fn () => DB::unprepared('DROP PROCEDURE retained_paid_tax_recovery_marker'));
+        }
     }
 
     private function migrate(): void
@@ -96,7 +100,7 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
             foreach ($before as $table => $definition) {
                 if (in_array($table, ['guards', 'routines'], true)) {
                     foreach ($definition as $guard) {
-                        $this->assertContains($guard, $after['guards']);
+                        $this->assertContains($guard, $after[$table]);
                     }
                 }
                 // A newly appended migration row changes only its allocator value in SHOW CREATE.

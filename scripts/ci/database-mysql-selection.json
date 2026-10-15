@@ -61,6 +61,9 @@
     "tests/Feature/CustomerListeningFreshnessTest.php",
     "tests/Feature/FreeGrantSchemaRecoveryTest.php",
     "tests/Feature/LicenseTemplateAuthoringTest.php",
+    "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+    "tests/Feature/PaidTaxFamilyCompatibilityTest.php",
+    "tests/Feature/PaidTaxGrantJourneyTest.php",
     "tests/Feature/PersistentCatalogDraftImportTest.php",
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
@@ -118,10 +121,7 @@
     "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",
     "tests/Feature/SupportAttachmentsTest.php",
-    "tests/Unit/SchemaQualifierDelimiterTest.php",
-    "tests/Feature/PaidTaxGrantJourneyTest.php",
-    "tests/Feature/PaidTaxAdversarialJourneyTest.php",
-    "tests/Feature/PaidTaxFamilyCompatibilityTest.php"
+    "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [
     "tests/Feature/CustomerConsentAdmissionTest.php",
@@ -234,6 +234,7 @@
     "tests/Support/membership-reservation-race-worker.php",
     "tests/Support/order-inquiry-worker.php",
     "tests/Support/order-race-worker.php",
+    "tests/Support/paid-tax-origin-race-worker.php",
     "tests/Support/payment-race-worker.php",
     "tests/Support/pricing-race-worker.php",
     "tests/Support/private-product-draft-worker.php",
@@ -275,7 +276,6 @@
     "tests/browser/reset-login-rate-limit.php",
     "tests/browser/run-due-site-schedule.php",
     "tests/browser/unpaid-release-fixture.php",
-    "tests/browser/verify-public-installation-fixture.php",
-    "tests/Support/paid-tax-origin-race-worker.php"
+    "tests/browser/verify-public-installation-fixture.php"
   ]
 }
