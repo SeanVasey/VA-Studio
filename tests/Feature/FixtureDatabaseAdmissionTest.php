@@ -22,9 +22,8 @@ class FixtureDatabaseAdmissionTest extends TestCase
         $reference = WeakReference::create($connection->getPdo());
         $this->assertSame('delete', $connection->getPdo()->query('PRAGMA journal_mode')->fetchColumn());
         $this->assertSame('DEFERRED', $connection->getConfig('transaction_mode'));
-        $connection->statement('CREATE TABLE retained_fixture (id INTEGER)');
-        $this->artisan('db:wipe', ['--database' => $name, '--force' => true])->assertExitCode(0);
-        $this->assertFalse($connection->getSchemaBuilder()->hasTable('retained_fixture'));
+        $this->artisan('migrate', ['--database' => $name, '--force' => true])->assertSuccessful();
+        $this->assertTrue($connection->getSchemaBuilder()->hasTable('users'));
         $this->releaseOwnedSqliteFixture($name);
         $this->assertNull($reference->get(), 'No registry-held source PDO may satisfy the independent restore.');
         $this->assertFileDoesNotExist($path);
