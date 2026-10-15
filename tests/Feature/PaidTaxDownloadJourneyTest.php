@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidTaxDeliveryFixtures;
 use Tests\Support\PaidTaxGrantFixtures;
@@ -313,7 +314,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $unused = (new PaidTaxDownloads)->redeem($f['batch']['id'], $next['id'], $next['token'], $f['buyer']['principal'], $f['buyer']['user'], requestBudget: $budget);
         $budget->shortenTo(0);
         config(['paid-tax-grants.downloads_enabled' => false]);
-        $unused->close();
+        // Exercise destructor-only abandonment after both policy and original budget withdrawal.
         unset($unused);
         config(['paid-tax-grants.downloads_enabled' => true]);
         $this->assertSame(2, (new PaidTaxDownloads)->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['lines'][0]['attemptCount']);
@@ -454,7 +455,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $this->assertDatabaseCount('paid_tax_authorizations', 1);
     }
 
-    public function test_all_four_targets_stream_exact_retained_private_bytes_and_two_order_lines_keep_separate_counts(): void
+    public function test_purchased_wav_mp3_and_stems_stream_exact_retained_private_bytes(): void
     {
         $f = $this->allRolesTaxOrder();
         $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
@@ -467,7 +468,6 @@ class PaidTaxDownloadJourneyTest extends TestCase
             $paths[$kind] = $f['catalog']['media'][$kind]->storage_path;
         }
         foreach ($paths as $kind => $path) {
-            // Explicit retained limit3, so the fourth target uses a distinct original line below.
             if ($kind === 'contract') {
                 continue;
             }
@@ -482,7 +482,7 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $this->assertSame($original, (array) DB::table('paid_tax_originals')->sole());
         $this->assertDatabaseCount('paid_tax_redemptions', 3);
         $this->assertDatabaseCount('paid_redemptions', 0);
-        // The separately tested contract target has the same actual private-original flow.
+        // Contract PDF is proved by the separate actual-PDF/master journey above.
     }
 
     public function test_second_original_line_is_independently_authorized_and_wrong_current_owner_refuses(): void
@@ -538,5 +538,93 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $transfer = (new PaidTaxDownloads)->redeem($f['batch']['id'], $next['id'], $next['token'], $f['buyer']['principal'], $f['buyer']['user']);
         $transfer->close();
         $this->assertDatabaseCount('paid_tax_redemptions', 2);
+    }
+
+    public static function historySizes(): array
+    {
+        return ['empty history' => [0], 'latest twenty of twenty one' => [20]];
+    }
+
+    #[DataProvider('historySizes')]
+    public function test_latest_history_selector_catches_late_append_even_when_empty_or_full(int $size): void
+    {
+        $f = $this->complete();
+        $line = $f['batch']['lines'][0];
+        if ($size > 0) {
+            $a = $this->authorize($f);
+            $template = (array) DB::table('paid_tax_authorizations')->where('public_id', $a['id'])->sole();
+            unset($template['id']);
+        } else {
+            // A valid SQL boundary row, deliberately not a issued token or paid authority.
+            $template = ['public_id' => (string) Str::uuid(), 'account_id' => $f['buyer']['principal']->accountId, 'actor_id' => $f['buyer']['user']->id,
+                'batch_public_id' => $f['batch']['id'], 'origin_public_id' => $line['id'], 'origin_hash' => $line['originHash'],
+                'request_key' => (string) Str::uuid(), 'request_hash' => str_repeat('a', 64), 'token_hash' => str_repeat('b', 64), 'target' => 'master_wav',
+                'payload' => 'SYNTHETIC-LATE-SQL-HISTORY-ONLY', 'payload_hash' => str_repeat('c', 64), 'created_at' => now()->utc()->format('Y-m-d H:i:s'),
+                'expires_at' => now()->utc()->addSeconds(120)->format('Y-m-d H:i:s')];
+        }
+        for ($index = 0; $index < $size; $index++) {
+            $row = $template;
+            $row['public_id'] = (string) Str::uuid();
+            $row['request_key'] = (string) Str::uuid();
+            $row['token_hash'] = hash('sha256', 'SYNTHETIC-HISTORY-BOUNDARY-'.$index);
+            DB::table('paid_tax_authorizations')->insert($row);
+        }
+        $pdo = DB::getPdo();
+        $appends = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function ($event) use ($pdo, $template, &$appends): void {
+            if ($appends === 0 && $event->connection->getEventDispatcher()::class === TaxPaidOriginalCommitDispatcher::class) {
+                $appends++;
+                $row = $template;
+                $row['public_id'] = (string) Str::uuid();
+                $row['request_key'] = (string) Str::uuid();
+                $row['token_hash'] = hash('sha256', 'SYNTHETIC-LATE-HISTORY-APPEND');
+                $q = $pdo->prepare('INSERT INTO paid_tax_authorizations ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+                $q->execute(array_values($row));
+            }
+        });
+        $this->refused(403, fn () => (new PaidTaxDownloads)->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+        $this->assertSame(1, $appends);
+        $this->assertDatabaseCount('paid_tax_authorizations', $size === 0 ? 0 : 21);
+        $status = (new PaidTaxDownloads)->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertCount($size, $status['lines'][0]['history']);
+        $this->assertSame(0, $status['lines'][0]['attemptCount']);
+    }
+
+    public function test_budget_spent_inside_snapshot_flush_closes_slot_before_fresh_exact_retry(): void
+    {
+        $f = $this->complete();
+        $a = $this->authorize($f);
+        $budget = PaidTaxRequestBudget::capture(null);
+        $flushed = false;
+        $adapter = new class($budget, $flushed) extends PaidTaxPrepareStream
+        {
+            public function __construct(private PaidTaxRequestBudget $budget, private bool &$flushed) {}
+
+            protected function flush($handle): bool
+            {
+                $result = parent::flush($handle);
+                $this->flushed = true;
+                $this->budget->shortenTo(0);
+
+                return $result;
+            }
+        };
+        app()->bind(PaidTaxPrepareStream::class, static fn () => $adapter);
+        try {
+            (new PaidTaxDownloads)->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user'], requestBudget: $budget);
+            $this->fail('Snapshot succeeded after the same live budget was spent in flush.');
+        } catch (DeliveryException $error) {
+            $this->assertSame('target_unavailable', $error->reason);
+        }
+        $this->assertTrue($flushed);
+        $this->assertDatabaseCount('paid_tax_redemptions', 0);
+        app()->bind(PaidTaxPrepareStream::class, PaidTaxPrepareStream::class);
+        $transfer = (new PaidTaxDownloads)->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user']);
+        $bytes = 0;
+        $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
+            $bytes += strlen($chunk);
+        });
+        $this->assertSame($transfer->sizeBytes, $bytes);
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
     }
 }
