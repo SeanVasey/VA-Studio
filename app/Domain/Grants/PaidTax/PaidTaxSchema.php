@@ -221,6 +221,7 @@ final class PaidTaxSchema
     public static function assertInstalled(): void
     {
         $connection = DB::connection();
+        $connection->getSchemaBuilder();
         [$steps, $states, $names] = self::plan($connection->getDriverName(), $connection->getTablePrefix());
         if (self::preflight($connection->getPdo(), $connection->getDriverName(), $connection->getTablePrefix(), $states, $names) !== count($steps)) {
             throw new LogicException('Tax paid schema is not completely installed.');

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Grants\Paid\PaidGrantSchema;
 use App\Domain\Grants\PaidTax\PaidTaxSchema;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
@@ -63,7 +64,7 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
         $prior = $this->prior();
         // A standard Connection constructor leaves this property null. Migrations warm it;
         // an independent command/request using the already installed database need not do so.
-        $grammar = new \ReflectionProperty(\Illuminate\Database\Connection::class, 'schemaGrammar');
+        $grammar = new \ReflectionProperty(Connection::class, 'schemaGrammar');
         $grammar->setValue($connection, null);
         $failure = null;
         try {
