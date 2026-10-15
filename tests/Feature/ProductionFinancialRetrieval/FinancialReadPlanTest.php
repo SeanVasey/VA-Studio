@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionFinancialRetrieval;
 
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
 use App\Domain\Commerce\ProductionCheckout\OriginalCommitDispatcher;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
@@ -16,6 +17,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxPaidOriginalCommitDispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
 use LogicException;
@@ -117,7 +119,10 @@ final class FinancialReadPlanTest extends TestCase
             });
             $this->fail('Original caller cleanup did not execute.');
         } catch (RuntimeException $error) {
-            $this->assertSame('Synthetic original caller cleanup.', $error->getMessage());
+            if ($error::class !== RuntimeException::class || $error->getMessage() !== 'Synthetic original caller cleanup.') {
+                throw $error;
+            }
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -223,12 +228,27 @@ final class FinancialReadPlanTest extends TestCase
     public function test_changed_original_rows_suppress_the_result_and_release_the_original_observer(bool $tax): void
     {
         [$plan, $http, $delegate] = $this->makePlan($tax);
-        $http->after = function (int $position) use ($tax): void {
+        $primary = DB::getPdo();
+        $driver = DB::getDriverName();
+        $table = $tax ? TaxCheckoutSchema::TABLES['order'] : CheckoutSchema::TABLES['order'];
+        $definitions = $tax ? TaxCheckoutSchema::definitions() : CheckoutSchema::definitions();
+        $trigger = $definitions[$table]['prefix'].'_update';
+        $statements = $tax ? TaxCheckoutSchema::statements($driver) : CheckoutSchema::statements($driver);
+        $changed = false;
+        $http->after = function (int $position) use ($primary, $table, $trigger, $statements, &$changed): void {
             if ($position === 0) {
-                DB::table($tax ? TaxCheckoutSchema::TABLES['order'] : CheckoutSchema::TABLES['order'])->update(['payload_hash' => str_repeat('0', 64)]);
+                // Controlled corruption of this isolated fixture only. Restore the exact
+                // declared guard, so the terminal receipt must reject changed retained rows.
+                $primary->exec('DROP TRIGGER '.$trigger);
+                try {
+                    $changed = $primary->exec('UPDATE '.$table." SET payload_hash='".hash('sha256', 'NONBINDING RETRIEVAL ROW DRIFT')."'") === 1;
+                } finally {
+                    $primary->exec($statements[$trigger]['statement']);
+                }
             }
         };
         $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertTrue($changed, 'Fixture row corruption did not occur.');
         $this->assertCount(6, $http->calls, 'The second original receipt must recheck rows after the complete SDK path.');
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
         $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
@@ -256,12 +276,18 @@ final class FinancialReadPlanTest extends TestCase
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
     }
 
-    public function test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport(): void
+    public static function noticeHeaders(): array
+    {
+        return ['upper' => ['Stripe-Notice'], 'lower' => ['stripe-notice'], 'mixed' => ['sTrIpE-nOtIcE']];
+    }
+
+    #[DataProvider('noticeHeaders')]
+    public function test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport(string $header): void
     {
         [$plan, $http, $delegate] = $this->makePlan();
         $displaced = new RetrievalHttpFixture([]);
         $notices = 0;
-        $http->responseHeaders[0] = ['Stripe-Notice' => 'SYNTHETIC NOTICE'];
+        $http->responseHeaders[0] = [$header => 'SYNTHETIC NOTICE'];
         set_error_handler(function () use (&$notices, $displaced): bool {
             $notices++;
             ApiRequestor::setHttpClient($displaced);
@@ -641,25 +667,28 @@ final class FinancialReadPlanTest extends TestCase
         $delegate = DB::connection()->getEventDispatcher();
         $first = null;
         $triggered = false;
-        DB::listen(function () use (&$first, &$triggered, $tax): void {
-            if ($triggered) {
-                return;
-            }
-            $observer = DB::connection()->getEventDispatcher();
-            if ($observer instanceof OriginalCommitDispatcher
-                || $observer instanceof TaxPaidOriginalCommitDispatcher) {
-                $receipts = RetrievalPolicy::raw($observer, $observer::class, 'receipts');
-                if (count($receipts) === 1) {
-                    $first = $receipts[0];
-                    $triggered = true;
-                    config([$tax ? 'production-tax-checkout.committed_read_receipts_enabled' : 'production_checkout.committed_read_receipts_enabled' => false]);
-                }
-            }
-        });
         $this->abandonHeld($f, $tax, function ($source, $reader) use ($tax, &$first, &$triggered): void {
-            $this->refuses(fn () => $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
-                : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000));
-            $this->assertTrue($triggered, 'Original SQL query callback did not interrupt the second mint.');
+            $encrypter = Crypt::getFacadeRoot();
+            Crypt::shouldReceive('decryptString')->andReturnUsing(function (#[\SensitiveParameter] string $cipher) use ($encrypter, &$first, &$triggered, $tax): string {
+                $observer = DB::connection()->getEventDispatcher();
+                if (! $triggered && ($observer instanceof OriginalCommitDispatcher || $observer instanceof TaxPaidOriginalCommitDispatcher)) {
+                    $receipts = RetrievalPolicy::raw($observer, $observer::class, 'receipts');
+                    if (count($receipts) === 1) {
+                        $first = $receipts[0];
+                        $triggered = true;
+                        config([$tax ? 'production-tax-checkout.committed_read_receipts_enabled' : 'production_checkout.committed_read_receipts_enabled' => false]);
+                    }
+                }
+
+                return $encrypter->decryptString($cipher);
+            });
+            try {
+                $this->refuses(fn () => $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
+                    : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000));
+            } finally {
+                Crypt::swap($encrypter);
+            }
+            $this->assertTrue($triggered, 'Genuine decrypt callback did not interrupt the second mint.');
             $this->assertNotNull($first);
             $this->assertTrue($first->used());
             $this->assertSame(1, DB::transactionLevel());
@@ -697,6 +726,65 @@ final class FinancialReadPlanTest extends TestCase
         $http->responses[3]['data'] = array_fill(0, 101, ['object' => 'refund']);
         $this->refuses(fn () => $plan->readSynthetic($http));
         $this->assertCount(4, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    public function test_nested_dense_list_is_refused_before_sdk_conversion_and_following_get(): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan();
+        $http->responses[0]['synthetic_extra'] = ['nested' => array_fill(0, 101, 0)];
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(1, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_original_after_commit_failure_never_admits_sdk_dispatch(bool $tax): void
+    {
+        $f = $this->paid($tax);
+        $delegate = DB::connection()->getEventDispatcher();
+        $plan = $http = null;
+        try {
+            $this->held($f, $tax, function ($source, $reader) use ($tax, &$plan, &$http): void {
+                $plan = $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
+                    : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000);
+                $http = $this->transport($source->line(1), $tax);
+                DB::connection()->afterCommit(static function (): never {
+                    throw new RuntimeException('Synthetic original afterCommit failure.');
+                });
+            });
+            $this->fail('Original afterCommit failure did not execute.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('Synthetic original afterCommit failure.', $error->getMessage());
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(0, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_direct_pdo_commit_cannot_substitute_for_the_original_framework_commit(bool $tax): void
+    {
+        $f = $this->paid($tax);
+        $delegate = DB::connection()->getEventDispatcher();
+        $plan = $http = null;
+        try {
+            $this->held($f, $tax, function ($source, $reader) use ($tax, &$plan, &$http): void {
+                $plan = $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
+                    : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000);
+                $http = $this->transport($source->line(1), $tax);
+                DB::getPdo()->commit();
+            });
+            $this->fail('A direct PDO commit was treated as the original held frame.');
+        } catch (CheckoutException $error) {
+            $this->assertSame('committed_read_frame', $error->reason);
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(0, $http->calls);
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
     }
 

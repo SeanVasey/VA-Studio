@@ -1,0 +1,18 @@
+# Independent repaired source checkpoint
+
+DECISION: **REVISE BEFORE SOURCE APPROVAL**
+
+Reviewed exact immutable `487f24618813b96ca27ef7a3cb1467c23ec8e1b8` against original3b4 source decision and approvedfd061 design. Read-only non-author review of the actual repair/test/policy delta; no app/PHP diagnostics, DB/native/provider/network or hosted CI execution and no shared edits.
+
+The blocking static-slot P1 is repaired by supported hook-free `getValue()` on the admitted unhooked static. Original manager/map/native-PDO custody and reached Facade/standard Connection metadata P2s are also closed by inspection: identities are retained and rechecked, native/internal/default-statement admission precedes methods, and current policy proof admits the reached raw parents. No open P0/P1 identified in this bounded source check.
+
+Two material P2 corrections remain before source approval:
+
+1. R4 is only partly repaired: `admitResponse()` bounds top-level `object=list/data`, while recursive `nodes()` still admits other dense101 arrays. A nested Charge.refunds.data or account extra dense101 field can reach SDK conversion and later GETs before candidate plain() refuses it. Apply the100-item rule at every dense-array node before SDK return, and add a nested/extra list control asserting refusal at that response and no following GET. Keep the explicit top-level list schema check.
+2. The new SQLite skip was inserted into the historical prefix. Previous259 pairs first150 digest is `d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c`; current260 changes it to `001dcd631131b6cfb3e3d9a3cc74c231b06827b83fb44cc6d215f037fab8e7cc`. Unchanged test-focused-tests.py138-140 requires the original digest. Preserve all259 existing pairs in exact order and append the single new reviewed pair. Do not sort SQLite or change its golden assertion. MySQL's sorted new file inclusion and the exact native-only method declaration are appropriate; its two source-kind datasets remain native-only. This was a read-only digest comparison, not a self-test run.
+
+New test mechanisms cover independent policy/slot/TLS/manager/metadata/native subclass/statement drift, raw response bounds, held/rollback/reentry and genuine elapsed native source-cap controls. The latter read authentic immutable source birth and wait to the original five-minute cap, without source/clock mutation. They are not executed evidence yet. The failed-second-mint test uses DB::listen, whereas CurrentRows/IdentityRows source SQL is native PDO and does not itself emit Laravel QueryExecuted; accept it only if actual triggered=true evidence proves the intended second-mint boundary. Otherwise preserve the original fixture failure and use the approved genuine retained Crypt decrypt callback with original forwarding. No cleanup defect is inferred from that potential test issue.
+
+Original3b4 whole22/144/F9/E2/S0 PHP2/recorder1/OS1 remains failed. First487f launcher failed before PHP/PHPUnit because toolchain activation was omitted; original FileNotFoundError/setupOS1 is preparation-only, with no JUnit/application count. Corrected activated run `retrieval-whole-repaired-toolchain`, PID225012/start9593536/UID1000, is pending as last reported; no outcome is invented. Own MySQL8.4.11 is ready but no native app case has executed.
+
+Root should batch these corrections after recorder closure and preserve all originals. Actual repaired whole SQLite and focused native receipt/commit/age/cleanup results, exact source/runtime evidence, immutable sealed-candidate independent review and cheap exact-head publication gates remain required. The current source checkpoint does not approve evidence, provider authentication, durable financial effects or development merge.
