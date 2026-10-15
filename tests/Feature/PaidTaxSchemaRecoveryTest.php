@@ -238,8 +238,11 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
         if (DB::getDriverName() !== 'sqlite') {
             $this->markTestSkipped('SQLite dependency shape refusal.');
         }
-        Schema::drop('users');
-        DB::unprepared('CREATE TABLE users (id INTEGER NOT NULL, tenant INTEGER NOT NULL, PRIMARY KEY(id,tenant))');
+        // Deliberate disposable parent damage; the preserved V1 row's FK prevents a normal drop.
+        Schema::withoutForeignKeyConstraints(static function (): void {
+            Schema::drop('users');
+            DB::unprepared('CREATE TABLE users (id INTEGER NOT NULL, tenant INTEGER NOT NULL, PRIMARY KEY(id,tenant))');
+        });
         $before = $this->objects();
         try {
             $this->migrate();
