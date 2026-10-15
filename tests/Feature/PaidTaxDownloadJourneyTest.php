@@ -453,4 +453,90 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $this->authorize($f);
         $this->assertDatabaseCount('paid_tax_authorizations', 1);
     }
+
+    public function test_all_four_targets_stream_exact_retained_private_bytes_and_two_order_lines_keep_separate_counts(): void
+    {
+        $f = $this->allRolesTaxOrder();
+        $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['batch'] = (new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $d = new PaidTaxDownloads;
+        $original = (array) DB::table('paid_tax_originals')->sole();
+        $artifact = PaidTaxRecords::decode($original)['artifact'];
+        $paths = ['contract' => $artifact['storage_path']];
+        foreach (['master_wav', 'download_mp3', 'stems_zip'] as $kind) {
+            $paths[$kind] = $f['catalog']['media'][$kind]->storage_path;
+        }
+        foreach ($paths as $kind => $path) {
+            // Explicit retained limit3, so the fourth target uses a distinct original line below.
+            if ($kind === 'contract') {
+                continue;
+            }
+            $a = $this->authorize($f, $kind);
+            $bytes = '';
+            $d->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user'])
+                ->writeTo(static function (string $chunk) use (&$bytes): void {
+                    $bytes .= $chunk;
+                });
+            $this->assertSame(file_get_contents(Storage::disk('local')->path($path)), $bytes);
+        }
+        $this->assertSame($original, (array) DB::table('paid_tax_originals')->sole());
+        $this->assertDatabaseCount('paid_tax_redemptions', 3);
+        $this->assertDatabaseCount('paid_redemptions', 0);
+        // The separately tested contract target has the same actual private-original flow.
+    }
+
+    public function test_second_original_line_is_independently_authorized_and_wrong_current_owner_refuses(): void
+    {
+        $f = $this->complete(twoLines: true);
+        $other = $this->enrollThroughLocalSmtp('other@example.test');
+        $d = new PaidTaxDownloads;
+        $this->refused(404, fn () => $d->authorize($f['batch']['id'], $f['batch']['lines'][0]['id'], $this->input($f['batch']['lines'][0], 'master_wav'),
+            $other['principal'], $other['user']));
+        foreach ($f['batch']['lines'] as $line) {
+            $a = $d->authorize($f['batch']['id'], $line['id'], $this->input($line, 'master_wav'), $f['buyer']['principal'], $f['buyer']['user']);
+            $received = '';
+            $transfer = $d->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $transfer->writeTo(static function (string $chunk) use (&$received): void {
+                $received .= $chunk;
+            });
+            $this->assertSame($transfer->sha256, hash('sha256', $received));
+        }
+        $status = $d->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertSame([1, 1], array_column($status['lines'], 'attemptCount'));
+        $this->assertDatabaseCount('paid_tax_originals', 2);
+    }
+
+    public function test_throwing_redemption_after_commit_refuses_transfer_preserves_spent_attempt_and_allows_fresh_command(): void
+    {
+        $f = $this->complete();
+        $a = $this->authorize($f);
+        $pdo = DB::getPdo();
+        $registered = false;
+        $executed = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function ($event) use ($pdo, &$registered, &$executed): void {
+            if (! $registered && $event->connection->getEventDispatcher()::class === TaxPaidOriginalCommitDispatcher::class
+                && (int) $pdo->query('SELECT COUNT(*) FROM paid_tax_redemptions')->fetchColumn() === 1) {
+                $registered = true;
+                DB::afterCommit(static function () use (&$executed): void {
+                    $executed++;
+                    throw new \RuntimeException('Synthetic durable redemption callback failure.');
+                });
+            }
+        });
+        try {
+            (new PaidTaxDownloads)->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('An unobserved managed commit returned a transfer.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Synthetic durable redemption callback failure.', $error->getMessage());
+        }
+        $this->assertSame(1, $executed);
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse($pdo->inTransaction());
+        $this->assertSame(1, (new PaidTaxDownloads)->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['lines'][0]['attemptCount']);
+        $next = $this->authorize($f);
+        $transfer = (new PaidTaxDownloads)->redeem($f['batch']['id'], $next['id'], $next['token'], $f['buyer']['principal'], $f['buyer']['user']);
+        $transfer->close();
+        $this->assertDatabaseCount('paid_tax_redemptions', 2);
+    }
 }
