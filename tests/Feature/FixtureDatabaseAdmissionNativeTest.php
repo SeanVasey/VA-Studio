@@ -109,4 +109,21 @@ class FixtureDatabaseAdmissionNativeTest extends TestCase
         $connection = new MySqlConnection(new PDO('sqlite::memory:'), getenv('DB_DATABASE'), '', ['driver' => 'mysql']);
         $this->refuses(fn () => DisposableTestDatabase::capture()->admit($connection));
     }
+
+    public function test_an_unregistered_memory_alias_cannot_borrow_the_native_selection(): void
+    {
+        $this->native();
+        config(['database.connections.unregistered_memory_fixture' => [
+            'driver' => 'sqlite', 'database' => ':memory:', 'url' => null, 'prefix' => '',
+        ]]);
+        $memory = DB::connection('unregistered_memory_fixture');
+        $memory->statement('CREATE TABLE retained_fixture (id INTEGER)');
+        $memory->statement('INSERT INTO retained_fixture VALUES (47)');
+        try {
+            $this->refuses(fn () => $this->artisan('db:wipe', ['--database' => 'unregistered_memory_fixture', '--force' => true]));
+            $this->assertSame([47], $memory->getPdo()->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+        } finally {
+            DB::purge('unregistered_memory_fixture');
+        }
+    }
 }

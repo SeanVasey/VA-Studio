@@ -1061,6 +1061,10 @@
     [
       "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
       "test_ci_declaration_uses_external_testing_even_in_a_production_boot_fixture"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_an_unregistered_memory_alias_cannot_borrow_the_native_selection"
     ]
   ]
 }

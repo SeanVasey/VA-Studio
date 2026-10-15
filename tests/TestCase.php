@@ -81,7 +81,8 @@ abstract class TestCase extends BaseTestCase
     {
         $this->requireFixtureDatabase();
         $name = 'owned_sqlite_fixture_'.bin2hex(random_bytes(16));
-        if ($this->app['config']->has('database.connections.'.$name)) {
+        if ($this->app['config']->has('database.connections.'.$name)
+            || array_key_exists($name, $this->app['db']->getConnections())) {
             throw new LogicException('Disposable test database admission refused.');
         }
         $this->app['config']->set('database.connections.'.$name, [
