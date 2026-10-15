@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/.va-studio-stripe-docs-tool-20261015/stripe",
+    "--config",
+    "/workspace/.va-studio-stripe-docs-tool-20261015/empty.toml",
+    "docs",
+    "/api/refunds/object"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "time=\"Thu, 15 Oct 2026 12:35:58 UTC\" level=error msg=\"request failed\" error=\"Get \"https://docs.stripe.com/api/refunds/object\": Forbidden\" url=https://docs.stripe.com/api/refunds/object version=1.53.1\nfetching page: docs: request failed: Get \"https://docs.stripe.com/api/refunds/object\": Forbidden\n",
+  "observed_at": "2026-10-15T12:35:58.708154+00:00",
+  "scope": "Public direct docs path; no account/login/provider operation."
+}

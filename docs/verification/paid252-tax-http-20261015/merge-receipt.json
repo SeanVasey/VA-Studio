@@ -1,0 +1,28 @@
+{
+  "actual_merge": "d8817316558b3d5965203b548d75cd635e7cde92",
+  "approved_head": "f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c",
+  "head_tree": "0c6be60065194257aaf5a2b5621c0296301f6984",
+  "merge_tree": "0c6be60065194257aaf5a2b5621c0296301f6984",
+  "observed_at": "2026-10-15T12:17:09.231890+00:00",
+  "parents": [
+    "d95e4a74606ee257a2cda06d0793c1cedf165137",
+    "f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c"
+  ],
+  "pr": {
+    "headRefOid": "f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c",
+    "mergeCommit": {
+      "oid": "d8817316558b3d5965203b548d75cd635e7cde92"
+    },
+    "mergedAt": "2026-10-15T12:15:46Z",
+    "number": 124,
+    "state": "MERGED",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/124"
+  },
+  "preflight_conclusion": "success",
+  "preflight_head": "f32b755c976f3c4f0ab3dc8c038fe6fc26d3273c",
+  "preflight_run": 38732395039,
+  "preflight_url": "https://github.com/SeanVasey/VA-Studio/actions/runs/38732395039",
+  "publication_carry_json_sha256": "82ee2f95c2dba908dfacfd712fd536e2c0024222f14f0d21257226928b3c1daa",
+  "publication_carry_md_sha256": "1f5ca41276f98fae53f292a810c6af047c4e165fe0da9fb4ec4696708ad97b1f",
+  "tree_equal": true
+}

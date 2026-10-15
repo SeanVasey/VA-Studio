@@ -1,0 +1,115 @@
+{
+  "DECISION": "REVISE BEFORE IMPLEMENTATION",
+  "created_utc": "2026-10-15T12:38:08.554409+00:00",
+  "engineering_verdict": "Feasible using unchanged actual SourceV1/V2 APIs; not yet implementation or evidence approval.",
+  "execution_pass_claim": false,
+  "meaningful_evidence_conditions": [
+    "Actual synthetic V1 and Tax V2 held-source factories, complete two-line extraction, differing pre-tax/tax gross, wrong reader/lost frame/late source or new-purpose flag withdrawal; no source reflection forgery.",
+    "Literal defaultfalse/nonboolean/non-rehearsal refusal and callback count0 for map/env/repository object parents, without transport resolution; genuine standard env descriptor positive.",
+    "Unserialization refusal, bounded projection with no raw customer/credential/provider payload; recursively reject object/Stringable/JsonSerializable/ArrayAccess/cyclic/depth/node/size invalid inputs before object code or broad canonicalization.",
+    "Exact money/boolean/numeric-string/overflow/cross-account/mode/currency/payment/Charge/list/id/status checks; stable normalized before/after fields and canonical ordering.",
+    "Separate succeeded/non-succeeded aggregates, full/partial/pending/canceled/failed histories, complete/incomplete lists, active/terminal/prevented dispute reports and contradictions remain nonauthoritative.",
+    "Focused source/pure tests, original failures/exits and static checks on frozen source, independent actual source/sealed evidence review, cheap exact-head preflight/expected-SHA merge. No native rerun for unchanged source SQL primitives."
+  ],
+  "preserved_scope": [
+    "Defaultfalse internal contract only; no provider calls/binding/routes/jobs/UI/schema/durable observation/refund/settlement/payout/access/rights/inventory effects.",
+    "No client array constructs the expectation; a normalized array does not become source/payment/provider-dispatch/commit/entitlement authority.",
+    "Original V1/V2/shared schema/source/receipt/profile/SDK/API bodies remain frozen; adjacent V1/Identity metadata and membership afterCommit P2 are not expanded.",
+    "Sean policy references for eligibility/window/partial allocation/tax/dispute/access/exclusive disposition remain missing and must not be invented.",
+    "Real accounts/keys/provider money/host operations, existing-request I/O, global SQL/DDL/isolation/reopen/restore/FPM/distributed/capacity and parity/release conditions remain open."
+  ],
+  "read_bindings": [
+    {
+      "git_blob": "47a42ddb39f7a8ddde9b830fbb5ae8fdbfe84dc8",
+      "path": "docs/verification/paid-financial-observation-20261015/design.md",
+      "sha256": "8a9cff7df26641176f20c07f847daee5978a7b2c40cc93007e46c526602e048c"
+    },
+    {
+      "git_blob": "fa490dce01f077e5bd356610d44d6835f7062bf8",
+      "path": "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php",
+      "sha256": "ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983"
+    },
+    {
+      "git_blob": "bae844a2bd2fb52bd42b947e442989066a35b35e",
+      "path": "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderSourceV2.php",
+      "sha256": "42ee6d412217a8e72938f4af70a16e0bac38fb7f237b3ef1a95237a132211052"
+    },
+    {
+      "git_blob": "b56d66b6152acc0b1ccf4976051629d03d81584f",
+      "path": "app/Domain/Commerce/Payments/PaymentFinancialEvidence.php",
+      "sha256": "cd3b973903b049cc141e3d0cd6735c05bb5f466a937c7ee89561d1d9c47fd5b2"
+    },
+    {
+      "git_blob": "69e3ad9dbbc5d8880a88a5b4138f07c9e3518013",
+      "path": "app/Domain/Commerce/RefundResolution/RefundResolutionEvidence.php",
+      "sha256": "36902b45c6cd1defa35f7f86284268047564c62b1c12ae2dfa34739aabd0cf98"
+    },
+    {
+      "git_blob": "f05bbb4361fcfc2e64bb574896d6a545908e0804",
+      "path": "app/Domain/Commerce/RefundResolution/RefundResolutionPolicy.php",
+      "sha256": "21109b34d99474859a3d41ebf8c85b4ee44a493706b78178b85d09b6443bd5fe"
+    },
+    {
+      "git_blob": "5d86ab8a174c62e68f922d42ae161d65e54c8ed4",
+      "path": "app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php",
+      "sha256": "adc6723d564dd64bc04a0119d00dc1a281eb03cb68d92d28e43e9db5d8db90e1"
+    },
+    {
+      "git_blob": "94076f2f501881299faaabaabe2530fe8f5fe340",
+      "path": "app/Domain/Commerce/ProductionPolicy/CurrentRows.php",
+      "sha256": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e"
+    }
+  ],
+  "read_commands": [
+    "Read selected design first; AGENTS and clean exact head",
+    "Read actual SourceV1/V2 line/count/prove methods and retained monetary/context fields",
+    "Read legacy PaymentFinancialEvidence/RefundResolutionEvidence/Policy purpose and money/status behavior",
+    "Read CurrentRows and scoped literal configuration mechanics",
+    "Read installed pinned Stripe PaymentIntent/Charge/Refund/Dispute field/status documentation only; no provider/network call"
+  ],
+  "required_design_changes": [
+    {
+      "change": "Name/expose the result as normalized unverified input, or include an explicit immutable provenance/verification marker with equivalent semantics. Describe observed/clear/succeeded as reported field values rather than a trusted provider observation. Future durable financial use must require separately authenticated provider retrieval provenance plus original-source/final commit admission; re-proving original paid source alone does not prove a new refund/dispute. No current transport is requested.",
+      "finding": "FinancialObservation.capture takes an ordinary caller array. Matching account/payment/gross to a source-owned expectation proves internal referential consistency, not a provider GET, own-account credential scope, response authenticity, freshness or current financial state. A fabricated envelope can match these same identities.",
+      "id": "A5-D1",
+      "priority": "required before implementation",
+      "title": "Normalize claimed data; do not authenticate provider observation"
+    },
+    {
+      "change": "Specify exact summary/state fields and supported statuses, USD source/provider currency relation, strictly integer positive original gross and bounded item amounts, overflow-safe sums, and unknown/incomplete/attention taxonomy. Keep succeeded sum and each non-succeeded status count/amount separate from the provider Charge aggregate; no pending/failed/canceled amount is settled by normalization. Define contradiction handling conservatively, including complete terminal lists versus pending/requires_action and separate-GET transitions; retain no atomic/settled-balance claim. Keep exact dispute statuses and observed disputed boolean/history separate without deriving active-access, lost-money or availability consequences. Never reconstruct Tax gross from pre_tax or double-count the repeated order gross per line.",
+      "finding": "The design leaves consistent refund aggregate and observation summary/status unspecified enough to accidentally copy the legacy release proof or treat pending items as settled. Existing normalizer explicitly preserves Charge.amount_refunded separately, while RefundResolution applies an intentionally stricter completed-refund policy for a different purpose.",
+      "id": "A5-D2",
+      "priority": "required before implementation",
+      "title": "Pin monetary, status and output semantics"
+    },
+    {
+      "change": "Apply pure literal/defaultfalse purpose/pins/environment admission to both factories and normalizer; require raw standard maps/repository parents and supported standard literal env descriptor before offsets or resolver callbacks. Recheck the same new policy after the final source proof before issuing the value. Explicitly reject serialization/unserialization reconstruction of internal typed values; public projection is a bounded nonauthoritative summary only. Use lineCount and line1..count under before/after original source proofs with exact common order/payment/account/mode/provider/currency/gross/source identity fields and distinct producer versions. Add no source/frame/clock/receipt/commit authority, transaction begin/rollback/retry or new SQL/DML: existing source APIs remain in caller-owned original held frame and its original lifetime.",
+      "finding": "Only normalizer entry policy is explicitly gated, although factories invoke callback-capable original source proofs. A private readonly constructor alone does not block unserialize reconstruction. The shorthand no SQL boundary would be incorrect if interpreted literally, since proveRetainedCurrent performs existing authenticated reads/locks and marker proofs.",
+      "id": "A5-D3",
+      "priority": "required before implementation",
+      "title": "Explicit source-factory policy and reconstruction boundaries"
+    }
+  ],
+  "review_kind": "Independent non-author bounded planning gate only",
+  "reviewed_sha": "ef74c3cbd4104fbee8449efc36161860ae068b30",
+  "reviewer_actions": {
+    "implementation_test_DB_network_CI_hosted_operations": 0,
+    "shared_or_tracked_edits": 0,
+    "writes": "Own original runtime MD/JSON only"
+  },
+  "reviewer_preparation_limits": [
+    "Several guessed legacy filenames/globs were absent; corrected via rg --files to ExecutionContextV1 and actual nested test paths. These were read-only path-discovery mistakes, not app failures.",
+    "One large read was truncated; the source monetary fields were then read in a bounded exact range. No outcome was inferred from truncation."
+  ],
+  "source_or_test_implementation_review": false,
+  "specification_verdict": "Useful coherent prerequisite, but explicit trust/monetary/factory contract refinements are required before code.",
+  "verified_existing_API_facts": [
+    "Both final source classes expose lineCount(), line(position1-based) and proveRetainedCurrent(CurrentRows). Factories can iterate the actual complete1..10 lines under the same held source frame, without copied caller graph construction.",
+    "V1 line exposes amounts including USD original total; Tax V2 exposes separately typed tax.currency and tax.order_total_minor with buyer-reviewed provider calculated authority, plus separate pre_tax fields. They must stay distinct purposes.",
+    "Source lines identify account/funds mode/provider PaymentIntent but do not export an original Charge ID. Bind Charge IDs to the same supplied PaymentIntent.latest_charge within the observation envelope; do not claim comparison to an unavailable original Charge source field.",
+    "Existing ExecutionContextV1 binding fixes provider stripe/API2026-08-26.dahlia and retains explicit test/live plus provenance. The first-slice rehearsal normalizer must refuse live/unsupported mode without defaulting account/provider facts.",
+    "Legacy PaymentFinancialEvidence keeps provider amount_refunded separate from refund item statuses; RefundResolutionEvidence requires complete succeeded refunds/no disputes solely for test_refunded_exception_release of unfulfilled paid_exception resources. That stricter rule is not a general delivered-grant refund/access policy.",
+    "Installed Stripe21.3.2 Refund statuses are pending/requires_action/succeeded/failed/canceled; Dispute statuses include warning_needs_response/warning_under_review/warning_closed/needs_response/under_review/won/lost/prevented. Unsupported/null states remain attention/unknown.",
+    "CurrentRows and original source prove APIs execute retained authenticated SQL/frame checks. No new SQL/schema/provider/durable effect is needed for this proposed slice."
+  ]
+}

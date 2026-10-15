@@ -1,0 +1,19 @@
+# Independent final A5 first-slice decision
+
+DECISION: APPROVE WITH CONDITIONS
+
+Reviewed exact clean **`10e0d86177603f5a0c41f2c1a9011c4eee634592`**; operative application/config/tests remain `ae6d109581bac6b685360a5941d6c7819cd5616f`. **No open P0/P1 or required source/packet correction found.** The bounded default-off, unattested-input prerequisite is ready for exact-head cheap preflight and expected-SHA development merge after the remaining gates. This is not complete refund/dispute lifecycle or merchant acceptance.
+
+Independent verification recomputed archive SHA `bd681b5f192e87b7f1f1ec9708682e5a87a91b5797009bbdbd8514aba6bba2fb`,7,073,062 bytes and every2,460 exact safe indexed member hash;7,290 reachable Git bindings across3 source/runtime inventories;2,377 exact deduplicated blobs; all2,430 actual current inputs and13 recorded/current loaders;261 narrow carry bindings and16 protected original/local-SDK references. All8 independent design/source originals are byte-preserved. The actual124 base retains original sources/reader/schema/routes/profiles/dependencies/providers/workflows.
+
+All4 actual PHP invocations reconcile original commands/JUnit/log/PHP/recorder/launch-bound OS receipts: **3 pass,1 red**. Current whole new file is **13/351,F0/E0/S0,exits0/0/0**. Red controls remain **3/7,F1/E2/S0,exits2/1/1** against unchanged defective3e module bodies; both async errors reached normalization, and the transfer negative exposed an accepted pointer. Prior10/331 and whole existing69/291 passes remain their original source evidence. No fresh69 execution or invented whole aggregate is reported.
+
+Cheap evidence preserves the original52/1F failure. Seven prior safeguards196 pass carry through exact unchanged dependencies; three current safeguards67 pass yield the bounded263 coverage. Fifteen actual command records retain failed/rerun/continuation provenance. Current strict Composer validate/audit/platform checks and Pint on7 changed PHP files exit0. No fresh full10-command run, native/schema/census/provider/full-suite claim is made.
+
+The source preserves typed original held-frame extraction, V1 versus buyer-reviewed Tax gross, exact supported capture method, transfer refusal, literal raw current policy and reconstruction guards. Explicit candidate provenance is unattested/providerAuthenticated=false; status histories, succeeded sums and Charge aggregates remain separate without settlement, refund/access/rights/inventory effects. Four public documentation lookups remain Forbidden/exit1; declared connector/official documentation/real-provider limitations are not acceptance evidence.
+
+Before merge, require explicit doc-only successor carry if importing these final originals moves the head; green cheap preflight on the exact published40-character SHA; full check/review/thread/protection inventory and expected-SHA merge without bypass/settings changes. Record actual merge/check/carry receipts and both ledgers afterward.
+
+New purpose stays literalfalse and has no provider binding/I/O, route/job/UI/schema/ledger/business effect. Authenticated retrieval, positive original commit/durable ledger/staff-MFA/idempotency and Sean's eligibility/window/partial tax/dispute-access/rights/exclusive policies remain future gates. Preserve all original source/profile/SDK/API/shared-P2 and host/live/provider/SQL/FPM/distributed/performance/parity/full-verification limits. No Foundation/GitLab or actual financial/provider/host operation was run by the reviewer.
+
+Verification was read-only. One guessed runbook cat returned no-such-file exit1, then the README-linked actual runbook was read; that was reviewer preparation, not an application failure. The verifier itself exited0. Only runtime originals were written; no app/test/DB/network/CI/shared edit occurred. Companion JSON binds outcomes, hashes, limits and remaining gates.
