@@ -12,16 +12,19 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderConsumerComm
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use PDO;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -151,6 +154,8 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             $source = $this->source($f, $locator, $reader);
             $first = $source->committedReadReceipt($reader, $deadline, $capsule);
             $observer = DB::connection()->getEventDispatcher();
+            $otherSource = $this->source($f, $locator, $reader);
+            $this->refuses(fn () => $otherSource->committedReadReceipt($reader, $deadline, $capsule), 'committed_read_frame');
             $this->refuses(fn () => $source->committedReadReceipt($this->reader(), $deadline, $capsule), 'committed_read_frame');
             $this->refuses(fn () => $source->committedReadReceipt($reader, $deadline + 1, $capsule), 'committed_read_frame');
             $this->refuses(fn () => $source->committedReadReceipt($reader, $deadline, new TaxReceiptAdmissionFixture), 'committed_read_frame');
@@ -747,6 +752,17 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $connection->afterCommit(function () use (&$newCallbacks): void {
             $newCallbacks++;
         });
+        $manager = (new \ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
+        $peerPdo = new PDO('sqlite::memory:');
+        $peerPdo->exec('CREATE TABLE peer_probe (id INTEGER PRIMARY KEY)');
+        $peer = new SQLiteConnection($peerPdo, ':memory:', '', ['name' => 'tax-receipt-peer', 'driver' => 'sqlite']);
+        $peer->setTransactionManager($manager);
+        $peer->beginTransaction();
+        $peerCallbacks = 0;
+        $peer->afterCommit(function () use (&$peerCallbacks): void {
+            $peerCallbacks++;
+        });
+        $peerPdo->exec('INSERT INTO peer_probe VALUES (23)');
         $pdo->exec('INSERT INTO tax_receipt_probe VALUES (2, 4567)');
         $source->abortOwnedFrame();
         $this->assertTrue($pdo->inTransaction());
@@ -755,6 +771,10 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $connection->commit();
         $this->assertSame(0, $oldCallbacks);
         $this->assertSame(1, $newCallbacks, 'Cleanup discarded a separate reopened root callback.');
+        $this->assertTrue($peerPdo->inTransaction());
+        $peer->commit();
+        $this->assertSame(1, $peerCallbacks);
+        $this->assertSame(23, (int) $peerPdo->query('SELECT id FROM peer_probe')->fetchColumn());
         $this->assertDatabaseCount('tax_receipt_probe', 1);
         $connection->setEventDispatcher($delegate);
     }
@@ -778,6 +798,128 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $source->abortOwnedFrame();
         $this->assertSame($replacement, $connection->getEventDispatcher());
         $this->assertFalse($connection->getPdo()->inTransaction());
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
+    }
+
+    public function test_sqlite_historical_owner_key_drift_refuses_and_owned_abort_restores_original_relation(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('Synthetic transactional historical guard removal is SQLite-only; MySQL DDL would implicitly commit.');
+        }
+        [$f, $locator] = $this->paid();
+        $pdo = DB::getPdo();
+        $account = (array) DB::table('customer_accounts')->where('user_id', $f['buyer']['user']->id)->sole();
+        $otherOwner = (array) DB::table('quote_owners')->where('owner_key', $account['owner_key'])->sole();
+        $otherOwner['owner_key'] = hash('sha256', 'NONBINDING TAX RECEIPT OWNER DRIFT');
+        DB::table('quote_owners')->insert($otherOwner);
+        $source = null;
+        $hits = 0;
+        try {
+            DB::transaction(function () use ($f, $locator, $pdo, $account, $otherOwner, &$source, &$hits): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                $pdo->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($pdo, $account, $otherOwner, &$hits): void {
+                    $hits++;
+                    $pdo->exec('DROP TRIGGER customer_accounts_update');
+                    $statement = $pdo->prepare('UPDATE customer_accounts SET owner_key = ? WHERE id = ?');
+                    $statement->execute([$otherOwner['owner_key'], $account['id']]);
+                });
+            });
+            $this->fail('Historical owner drift reached physical commit.');
+        } catch (IdentityException) {
+            $this->assertSame(1, $hits);
+        } finally {
+            $source?->abortOwnedFrame();
+        }
+        $this->assertSame($account['owner_key'], DB::table('customer_accounts')->where('id', $account['id'])->value('owner_key'));
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
+        $this->assertSame(1, (int) $pdo->query("SELECT COUNT(*) FROM sqlite_schema WHERE name='customer_accounts_update'")->fetchColumn());
+    }
+
+    public function test_original_source_age_cannot_be_renewed_by_a_later_caller_deadline(): void
+    {
+        [$f, $locator] = $this->paid();
+        $source = null;
+        $elapsedNs = 0;
+        $this->refuses(function () use ($f, $locator, &$source, &$elapsedNs): void {
+            DB::transaction(function () use ($f, $locator, &$source, &$elapsedNs): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 600_000_000_000);
+                DB::getPdo()->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                $start = hrtime(true);
+                // Actual monotonic age; no injected clock or rewritten private timestamp.
+                while (hrtime(true) < $start + 300_010_000_000) {
+                    usleep(100_000);
+                }
+                $elapsedNs = hrtime(true) - $start;
+                $this->refuses(fn () => $source->committedReadReceipt($reader, hrtime(true) + 600_000_000_000), 'committed_read_expired');
+                // Catching the expired mint must still leave the original observer to refuse commit.
+            });
+        }, 'committed_read_frame');
+        $this->assertGreaterThanOrEqual(300_000_000_000, $elapsedNs);
+        $source->abortOwnedFrame();
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
+    }
+
+    public function test_sqlite_global_payment_alias_in_an_unrelated_request_refuses_original_raw_fence(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('Synthetic transactional global-index replacement is SQLite-only; MySQL DDL would implicitly commit.');
+        }
+        [$f, $locator] = $this->paid();
+        $other = $f['checkout']->order($f['buyer']['principal'], $f['buyer']['user'], $f['catalog']['candidate']->id,
+            $f['catalog']['items'], $f['preview']['previewHash'], true, ['legalName' => 'Declared synthetic buyer'], 'receipt-global-alias-secondary');
+        self::configureTax();
+        $this->refuses(fn () => $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $other['orderId']), 'provider_unbound');
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $otherOrder = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $other['orderId'])->sole();
+        $otherRequest = DB::table(TaxCheckoutSchema::TABLES['request'])->where('order_id', $otherOrder->id)->sole();
+        $pdo = DB::getPdo();
+        $before = $pdo->query('SELECT * FROM '.TaxCheckoutSchema::TABLES['reviewed'])->fetchAll(PDO::FETCH_ASSOC);
+        $source = null;
+        $hits = 0;
+        $this->refuses(function () use ($f, $locator, $pdo, $otherOrder, $otherRequest, &$source, &$hits): void {
+            DB::transaction(function () use ($f, $locator, $pdo, $otherOrder, $otherRequest, &$source, &$hits): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                $pdo->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($pdo, $otherOrder, $otherRequest, &$hits): void {
+                    $hits++;
+                    $pdo->exec('DROP INDEX ptx_s_u3');
+                    $binding = $pdo->query('SELECT * FROM '.TaxCheckoutSchema::TABLES['binding'])->fetch(PDO::FETCH_ASSOC);
+                    unset($binding['id']);
+                    $binding['public_id'] = (string) Str::uuid();
+                    $binding['request_id'] = $otherRequest->id;
+                    $binding['provider_session_id'] = 'cs_test_RECEIPTOTHER';
+                    $binding['created_at'] = $otherRequest->created_at;
+                    $insert = function (string $table, array $row) use ($pdo): void {
+                        $statement = $pdo->prepare('INSERT INTO '.$table.' ('.implode(', ', array_keys($row)).') VALUES ('
+                            .implode(', ', array_fill(0, count($row), '?')).')');
+                        $statement->execute(array_values($row));
+                    };
+                    $insert(TaxCheckoutSchema::TABLES['binding'], $binding);
+                    $reviewed = $pdo->query('SELECT * FROM '.TaxCheckoutSchema::TABLES['reviewed'])->fetch(PDO::FETCH_ASSOC);
+                    unset($reviewed['id']);
+                    $reviewed['public_id'] = (string) Str::uuid();
+                    $reviewed['binding_id'] = (int) $pdo->lastInsertId();
+                    $reviewed['request_id'] = $otherRequest->id;
+                    $reviewed['order_id'] = $otherOrder->id;
+                    $reviewed['provider_session_id'] = $binding['provider_session_id'];
+                    $reviewed['created_at'] = $reviewed['observed_at'] = $binding['created_at'];
+                    // Deliberately conflicting raw projection, never an authenticated peer provider claim.
+                    $insert(TaxCheckoutSchema::TABLES['reviewed'], $reviewed);
+                });
+            });
+        }, 'committed_read_frame');
+        $source->abortOwnedFrame();
+        $this->assertSame(1, $hits);
+        $this->assertSame($before, $pdo->query('SELECT * FROM '.TaxCheckoutSchema::TABLES['reviewed'])->fetchAll(PDO::FETCH_ASSOC));
+        $this->assertSame(1, (int) $pdo->query("SELECT COUNT(*) FROM sqlite_schema WHERE name='ptx_s_u3'")->fetchColumn());
         $this->assertDatabaseCount('tax_receipt_probe', 0);
     }
 }
