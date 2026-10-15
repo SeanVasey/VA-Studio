@@ -1,0 +1,19 @@
+# Independent final Tax HTTP development decision
+
+DECISION: APPROVE WITH CONDITIONS
+
+Reviewed exact clean candidate **`2a382a505c3145f709cede4110dbcd0b57196a3c`**. Operative application/tests remain `bb3d29983d6d225cfb62d9607beaa54874f3aa03`; the successor changes only documentation/evidence. **No open P0/P1 or required source/packet correction found.** The focused default-off domain batch is ready for cheap exact-head preflight and expected-SHA development merge after the gates below.
+
+Independent verification recomputed the archive SHA `e72a5383d387a23048fc350bbfdc824b426e42380f362050d374956d49327c87`,8,323,164 bytes and all2,546 exact indexed member hashes. The8 source/runtime inventories bind19,384 reachable Git path entries and2,383 deduplicated exact source blobs. All2,423 actual current inputs,17 route files and13 recorded/current loader bodies agree;239 protected original files match actual PR123 base. All12 imported independent MD/JSON originals remain byte-identical. The original verifier completed exit0 with no preparation failure.
+
+All11 actual PHP invocations independently reconcile command/source/JUnit/log/PHP/recorder/launch-bound OS receipts: **5 pass,6 nonzero**. Empty JUnit remains null. Current whole root is45/597 and e3 focused continuation2/40, each F0/E0/S0 and exits0/0/0. The anticipated producer-CSRF control is an actual passing1/17, not a defect oracle. The original ae1 whole48/970/E1 remains failed; producer17/131 and V1 HTTP19/648 are completed prior-source components, and Tax12/191 retains its fixture error. The corrected continuation and narrow unchanged-body carry establish focused coverage without inventing a green whole48 or Tax12 invocation.
+
+The source/test mechanisms preserve the original request clock and one-use private context, mandatory response lifetime ownership, original-only cleanup, private pre-middleware errors and actual CSRF, once-only producer intake, genuine elapsed timing, durable spent attempts and exact PDF/master delivery through retained originals. The cold environment/map/getter/clone corrections remain explicit original source findings; the disproved producer-CSRF mapping assumption is preserved with its correction. No further material repair was identified.
+
+Pint covers20 current PHP files with exit0. The10 original cheap commands passed263 tests at760; exact unchanged script/workflow/lock/configuration scope carries to the final head. No new selection/skip/schema/domain/vendor/profile change or native/census execution is claimed. These focused checks and explicit carries satisfy the authorized development cost policy, not full acceptance.
+
+Before merge, obtain green cheap preflight on the exact published SHA, inspect the complete check/review/thread/protection inventory, and merge with the expected reviewed head. If receipt imports move this candidate, require explicit independent doc-only carry. Record actual merge and check receipts plus both ledgers afterward; do not bypass gates or change settings.
+
+Both mounts/commerce policies remain default-off and the provider Unbound. No Tax UI/index, real merchant/provider/payment/host activation or release claim follows. Existing-request final provider-I/O, global SQL/DDL/isolation/deadlock/trigger/reopen/restore, host cache rebuild, distributed sessions/cache, FPM/I/O/performance/capacity, legal/commercial/provider/account/key/host and complete parity conditions remain open. Historical native evidence retains its original scope. Shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain frozen. No Foundation/GitLab/full-suite/live operation was run.
+
+The reviewer executed only read-only source/archive/receipt verification and wrote originals under `/workspace/runtime`; no app test, DB/network/hosted action or tracked edit occurred. Companion JSON records exact hashes, outcomes, carries and conditions.

@@ -5,6 +5,7 @@ use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\PaidGrantPrivacy;
+use App\Http\Middleware\PaidTaxPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
@@ -12,6 +13,7 @@ use App\Http\Middleware\ServiceProjectPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\SupportAttachmentPrivacy;
+use App\Http\Middleware\TaxRootPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
 use App\Http\Responses\InquiryResponse;
@@ -54,15 +56,21 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(FreeGrantPrivacy::class);
         $middleware->prepend(PaidGrantPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
+        $middleware->prepend(TaxRootPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations']);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (TaxRootPrivacy::matches(request())) {
+                PaidTaxPrivacy::report($exception);
+
+                return false;
+            }
             if (PaidGrantPrivacy::matches(request())) {
                 PaidGrantPrivacy::report($exception);
 
@@ -176,6 +184,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (TaxRootPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? PaidTaxPrivacy::error($status, $response->headers->all()) : PaidTaxPrivacy::protect($response);
+            }
             if (PaidGrantPrivacy::matches($request)) {
                 $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
 

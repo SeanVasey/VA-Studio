@@ -1,0 +1,190 @@
+{
+  "approved_narrow_carry": {
+    "V1_paid_HTTP": {
+      "assertions": 648,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 19
+    },
+    "from": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+    "limits": "Prior-source completed components, not a green whole48 invocation or current full-file rerun; no entire historical/current source manifest equality.",
+    "producer": {
+      "assertions": 131,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 17
+    },
+    "reason": "Only application change bypasses property getters. Standard Request.server has only its set hook, so supported core requests retain identical backing bag and timing factory behavior. Neither producer nor V1 calls the new Tax redemption context capture. Their executed test bodies, fixture, controller/domain/config/vendor/route/CI surfaces are unchanged.",
+    "to": "e3f06b084538dac11665ff9be77c74228bdab64d"
+  },
+  "commands_executed": [
+    "Read-only git head/status and ae1..e3 app/test diff",
+    "Read-only direct root and prior composite result/command/JUnit/launch/OS reconciliation",
+    "Read-only immutable Git equality of executed producer/V1 tests, root fixture, timing factory and controller; full operational path delta enumeration"
+  ],
+  "conditions": [
+    "Reconcile fresh focused two-case outcome without relabeling original48/970/E1.",
+    "Preserve originals including malformed constructor-armed hook fixture44/578/E1 and its recorded source/exits.",
+    "Complete formatting/static gates, immutable source/loader/component carries and sealed-packet independent review on final exact head.",
+    "Cheap exact-published-head preflight, complete review/protection inventory and expected-SHA merge.",
+    "Retain default-off/unbound synthetic development scope, frozen V1/schema/profile/dependency bodies, and all live/provider/host/native/full-suite/release boundaries."
+  ],
+  "corrected_test_only_selector": "Two-line expected artifact now selects actual paid_tax_grant_origins.id by public_id and paid_tax_originals.origin_id, matching the existing schema. The former origin_public_id selector was a fixture error after prior physical retry assertions, not product admission evidence.",
+  "created_utc": "2026-10-15T11:53:28.603631+00:00",
+  "decision": "APPROVE SOURCE WITH CONDITIONS",
+  "execution_boundary": {
+    "reviewer_app_test_DB_network_hosted_operations": 0,
+    "reviewer_tracked_edits": 0
+  },
+  "narrow_application_delta": [
+    "app/Http/Tax/PaidTaxRequestContext.php"
+  ],
+  "new_control_quality": "Backed getter-hook subclass is armed only after actual construction; raw server storage is installed without hooks, capture/claim proves callback count0 and exact original instant. The original construction-armed error is harness preparation, not an application-gap oracle. No old-source hook execution is claimed.",
+  "open_P0": false,
+  "open_P1": false,
+  "pending_not_claimed": "Fresh current two-line exact delivery and real elapsed timing selection was running when requested and is not evaluated in this note; final decision requires its original outcome and launch-bound exits.",
+  "preparation_failures": [],
+  "previous_reviewed_sha": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+  "prior_component_counts": {
+    "Tests\\Feature\\PaidGrantHttpJourneyTest": {
+      "assertions": 648,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 19
+    },
+    "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+      "assertions": 191,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 12
+    },
+    "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+      "assertions": 131,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 17
+    }
+  },
+  "prior_whole_original_preserved": {
+    "PHP_exit": 2,
+    "bindings": [
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/journey-producer-v1-affected/result.json",
+        "sha256": "21b47c60855e43fa86ed327cafb6649e988f95ef201cf8995ca5b8bfcea8a60f"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/journey-producer-v1-affected/command.json",
+        "sha256": "c76996b571df2da35a665ccc6ab371a381f5bf5c85216d7870e36cd2f5fda212"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/journey-producer-v1-affected/junit.xml",
+        "sha256": "23e31a9d2c71696cc083d644e17bd035adb0afa9a28c93ddecb8b36247d7f801"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/journey-producer-v1-affected/os-exit.json",
+        "sha256": "a255023c94bfbc57e288501a8e47e3caac7578c2a47f9eebc504886eab3c0c69"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/launch-journey-producer-v1-affected.json",
+        "sha256": "99cd961b093313900d0ee79a06e614ed44b8cd99bc6586da76626a1e51bcb31a"
+      }
+    ],
+    "counts": {
+      "assertions": 970,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 48
+    },
+    "head_status_runner_autoload_unchanged": true,
+    "input_count": 2423,
+    "launch_identity": {
+      "pid": 211587,
+      "start_ticks": "8545976",
+      "uid": 1000
+    },
+    "observed_recorder_OS_exit": 1,
+    "recorder_exit": 1,
+    "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+    "source_digest": "14089fd04a357cb190975c224e85594dee2bccb1079dbfad6857ba90516a4a58"
+  },
+  "required_source_repairs": [],
+  "reviewed_sha": "e3f06b084538dac11665ff9be77c74228bdab64d",
+  "root_direct_current_evidence": {
+    "PHP_exit": 0,
+    "bindings": [
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-armed-getter-final/result.json",
+        "sha256": "bb59f2c36a24282244a5d06a68018be74fd8021fc024d08c17f3f70d29c7e11b"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-armed-getter-final/command.json",
+        "sha256": "7001c37c7ee0ef3599b26e9509ce41647b9768fc330a6cf54d03656b2d43d0bc"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-armed-getter-final/junit.xml",
+        "sha256": "eb387ba7dfd2044bd7294aa9238324d81da28db043bc5a53863618da628b7551"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-armed-getter-final/os-exit.json",
+        "sha256": "c12bb470459e33564067ed4565d4fabe5d087e3b32a866845e22f96fb682cce4"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/launch-root-armed-getter-final.json",
+        "sha256": "bf7e0f9cf613ad06ae5f9704d9a3f4086c309290c9d20bc184b05a09532d73a1"
+      }
+    ],
+    "counts": {
+      "assertions": 580,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 44
+    },
+    "head_status_runner_autoload_unchanged": true,
+    "input_count": 2423,
+    "launch_identity": {
+      "pid": 213201,
+      "start_ticks": "8592851",
+      "uid": 1000
+    },
+    "observed_recorder_OS_exit": 0,
+    "recorder_exit": 0,
+    "source": "e3f06b084538dac11665ff9be77c74228bdab64d",
+    "source_digest": "d7b0b7b01d1bee0d4d0ecbc5aec970f845b6453bb8ddd52a2d81a496e55ed684"
+  },
+  "scope": "Independent non-author narrow source and component carry gate; no final sealed evidence/merge approval",
+  "source_assessment": "The sole application delta raw-reads declaring Symfony Request.server via getRawValue, bypassing get hooks before budget birth. Exact ServerBag/raw parameters/primitive instant checks and one-use WeakMap tombstone remain. All original review source findings are closed in this scope.",
+  "unchanged_byte_bindings": [
+    {
+      "exact_bytes_equal": true,
+      "path": "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+      "sha256": "5b225a2af2825abe24bcd9d6d0d921af71a0a64d9b52edefe7357705f935d705"
+    },
+    {
+      "exact_bytes_equal": true,
+      "path": "tests/Feature/PaidGrantHttpJourneyTest.php",
+      "sha256": "5741935695e18bb60892effd3030489d7ab59e05a22db5b9b70611f6636ca8ab"
+    },
+    {
+      "exact_bytes_equal": true,
+      "path": "tests/Support/PaidTaxRootHttpFixture.php",
+      "sha256": "5d3030463a2c0f5cde0ff9075f607478daae0a87456401e50545b05d637cd325"
+    },
+    {
+      "exact_bytes_equal": true,
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRequestBudget.php",
+      "sha256": "364273b6c14b46121ed75b9d6b0da7bfd16e9c1ae8d2d409138efdc738151f9f"
+    },
+    {
+      "exact_bytes_equal": true,
+      "path": "app/Http/Controllers/PaidTaxController.php",
+      "sha256": "370fb1fb85bfa82bd24c77ca8f6922edb76ae522c4d200cdb9d3f427624163e8"
+    }
+  ]
+}
