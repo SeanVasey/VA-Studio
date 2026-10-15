@@ -37,7 +37,7 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
     use ProductionTaxCheckoutFixtures {
-        enrollThroughLocalSmtp as private baseReceiptEnrollment;
+        ProductionTaxCheckoutFixtures::enrollThroughLocalSmtp as private baseReceiptEnrollment;
     }
 
     private int $enrollments = 0;
