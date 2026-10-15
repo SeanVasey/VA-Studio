@@ -15,6 +15,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\DB;
@@ -392,6 +393,32 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         $this->assertSame(0, $request->getterCalls);
         $this->assertEqualsWithDelta($start, (float) $budget->receivedAt->at->format('U.u'), 0.001);
         $budget->initialDeadline()->proveCurrent();
+    }
+
+    public function test_real_producer_csrf_equality_and_rotation_return_private_419_without_input_flash(): void
+    {
+        config(['production-tax-checkout.enabled' => true]);
+        $this->app->bind(PreventRequestForgery::class, fn ($app) => new class($app, $app['encrypter']) extends PreventRequestForgery
+        {
+            protected function runningUnitTests(): bool
+            {
+                return false;
+            }
+        });
+        $this->withSession(['_token' => str_repeat('c', 40)]);
+        $path = '/production/tax-checkout/previews';
+        $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'text/html',
+            'HTTP_X_CSRF_TOKEN' => str_repeat('c', 40)], '{}')->assertForbidden();
+        $response = $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'text/html',
+            'HTTP_X_CSRF_TOKEN' => 'PRIVATE-INVALID'], '{}')->assertStatus(419)->assertHeaderMissing('Location')->assertDontSee('PRIVATE-INVALID');
+        $this->privateHeaders($response);
+        session()->regenerateToken();
+        session()->save();
+        $fresh = session()->token();
+        $this->assertNotSame(str_repeat('c', 40), $fresh);
+        $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X_CSRF_TOKEN' => str_repeat('c', 40)], '{}')->assertStatus(419);
+        $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X_CSRF_TOKEN' => $fresh], '{}')->assertForbidden();
+        $this->assertNull(session()->get('_old_input.token'));
     }
 
     private function assertOwnerClosed(PaidTaxResponseOwner $owner): void
