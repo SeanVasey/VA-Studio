@@ -77,6 +77,22 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
       "test_migration_installs_exactly_four_tables_and_twelve_guards_and_a_rerun_is_a_no_op"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_final_raw_order_fence_detects_late_decryption_callback_drift_and_restores_guard"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_global_payment_alias_in_an_unrelated_request_refuses_original_raw_fence"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_historical_owner_key_drift_refuses_and_owned_abort_restores_original_relation"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_sqlite_receipt_birth_refuses_disabled_rollback_journaling"
     ]
   ]
 }

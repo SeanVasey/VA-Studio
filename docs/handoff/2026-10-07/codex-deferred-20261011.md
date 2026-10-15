@@ -226,3 +226,8 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Separate reviewer APPROVE WITH CONDITIONS at `ad4bf751a3302a816eda49dd7951000610fe736c`, no openP0/P1 or required correction. Unchanged DECISION/report verify all source/archive/original-exit/current-selection and narrow carry claims in the packet. Receipt-only final-head carry and exact-head preflight/protections remain.
 - Actual isolation/1213/general SQL/DDL/trigger, existing-request final-I/O, V2 committed-source/terminal consumer/Paid252/root/host/activation and adjacent ordinary membership afterCommitP2 conditions remain unchanged. No full Foundation/GitLab or provider/host claim.
+
+### #120 Tax255 NEW-write admission merge receipt — 2026-10-15
+
+- Merged at `78efd558b1fafe5ea10a0974ed6e4ba0f9264679` from exact reviewed publication head `baf46747cbd5ae3e16d2657a34bf8ab708eb4822`. Separate non-author final decision/carry, exact-head Development preflight38662171292, final review inventory and fetched tree equality are in [the actual merge receipt](../../verification/tax-write-admission-20261014/merge-receipt.md). Original failures/earlier-source carry/23SQLite skips remain explicit.
+- NEW-write admission is addressed within this focused development scope. Existing-request pre-create/final-I/O, V2 committed-source/terminal consumer/Paid252 forward schema wiring/root and actual-isolation/trigger/DDL/deadlock/host/provider/activation conditions remain. Continue V2 prerequisites next; ordinary membership afterCommitP2 remains frozen. No Foundation/GitLab, live funds or host/provider claim.

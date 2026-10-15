@@ -8,6 +8,10 @@ return [
     // Refused everywhere unless true AND the application environment is local or testing.
     'enabled' => false,
 
+    // Separate literal purpose for original SourceV2 closure; grants/transport/root stay unbound.
+    'committed_read_receipts_enabled' => false,
+    'committed_read_receipt_version' => 'production-tax-checkout-committed-read-v2',
+
     // Identifier of the bound provider transport. null = unbound: requests are built and retained,
     // and every provider call fails closed before any I/O.
     'provider' => null,

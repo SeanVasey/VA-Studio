@@ -1,0 +1,17 @@
+{
+  "recorded_utc": "2026-10-15T00:55:41.780671+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "merge",
+    "120",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--merge",
+    "--match-head-commit",
+    "baf46747cbd5ae3e16d2657a34bf8ab708eb4822"
+  ],
+  "process_exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

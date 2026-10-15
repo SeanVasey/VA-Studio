@@ -1,0 +1,9 @@
+{
+  "recorded_utc": "2026-10-15T00:55:25.148139+00:00",
+  "operation": "Read-only pre-merge gh pr view",
+  "observed_python_process_exit": 1,
+  "observed_error": "Unknown JSON field: baseRefOid; gh listed baseRefName as supported.",
+  "original_raw_cli_stream_retained": false,
+  "state": "No PR-before-merge receipt written and no merge attempted. Fetched main comparison had already passed.",
+  "correction": "Use supported baseRefName and freshly fetched origin/main SHA; preserve original failed observation separately."
+}

@@ -1013,6 +1013,14 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
       "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_native_closed_source_reads_ignore_peer_row_lock_but_held_reads_wait_and_restore_budget"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "test_native_autocommit_withdrawal_refuses_before_any_closed_table_read_transaction"
     ]
   ]
 }

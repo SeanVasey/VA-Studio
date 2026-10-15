@@ -1,0 +1,23 @@
+{
+  "recorded_utc": "2026-10-15T00:49:03.324513+00:00",
+  "head": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+  "argv": [
+    "gh",
+    "pr",
+    "create",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--base",
+    "main",
+    "--head",
+    "harness/tax-write-admission-20261014",
+    "--title",
+    "Guard Tax255 new writes at commit and bound native row waits",
+    "--body-file",
+    "/workspace/runtime/tax-write-pr-body-20261015.md"
+  ],
+  "process_exit": 0,
+  "stdout": "https://github.com/SeanVasey/VA-Studio/pull/120\n",
+  "stderr": "",
+  "ready_from_creation": true
+}

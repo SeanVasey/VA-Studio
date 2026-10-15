@@ -1,0 +1,1043 @@
+{
+  "recorded_utc": "2026-10-15T03:56:59.225557+00:00",
+  "reviewed_head": "789ecf4abf23220059d2b4fd83cd7b5f7a77cfd8",
+  "application_source": "e455c2871ade602653bd0f59b20e151b57afe57d",
+  "base": "ebdf56a1a74849133d662dfe19336062b058fb9a",
+  "decision": "PENDING FINAL WRITTEN DISPOSITION",
+  "checks_passed": true,
+  "archive": {
+    "sha256": "07964bc4f96220ce69648d4b8d57c79556545272245dfa4a344f6dc0b6589c80",
+    "bytes": 7886765,
+    "members": 2666,
+    "member_set_and_hashes_match_index": true,
+    "safe_regular_unique_members": true,
+    "index_sha256": "653f210802d0f12f095b2817820b9726f645153e0b580a4ef507a298442c5ee7",
+    "index_packaging_head": "ad78cb489660c7abfbf93390f93e124aa5ffce56",
+    "index_packaging_head_is_ancestor_with_identical_current_inputs": true
+  },
+  "source": {
+    "inventory_count": 15,
+    "path_bindings": 35265,
+    "git_blob_object_count": 2326,
+    "sha256_object_count": 2326,
+    "all_blobs_equal_actual_git_bytes": true,
+    "current_input_count": 2351,
+    "routes": 16,
+    "loaders": 13,
+    "current_local_and_git_source_carry": true,
+    "inventories": [
+      {
+        "head": "0b6ba0cdc47f6fc48216e8d1f4447b3f4763a233",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-0b6ba0cdc47f-37de13d888255a7f"
+      },
+      {
+        "head": "0c9040035b5d1cf898617b6cbd42496b734faf59",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-0c9040035b5d-70d1d3de4bf505be"
+      },
+      {
+        "head": "1ecd7c829ec31a59a5c59956cf2cb9a0473a544a",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-1ecd7c829ec3-0b4ec608c01e72f1"
+      },
+      {
+        "head": "37e525c1b4e78890c2a1b053f272c4cecfe1feeb",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-37e525c1b4e7-1dce3e5b9bc14902"
+      },
+      {
+        "head": "67c97c0088abd7f214a518cff384b563e01f91d9",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-67c97c0088ab-ca17cc53ed66a583"
+      },
+      {
+        "head": "7472ab2f3238c0edaf97a066547c5529a4c345ff",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-7472ab2f3238-78b71b1720f749c5"
+      },
+      {
+        "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-9d602626ddf1-82ff3952265d7b34"
+      },
+      {
+        "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-9d602626ddf1-eb2fb970052d682e"
+      },
+      {
+        "head": "aaaaf39d87bb356b28ad125d6b716c100ee659dd",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-aaaaf39d87bb-d045c97c6811fb5c"
+      },
+      {
+        "head": "b1a5447beb8c07d002f341250a97e396bbb31792",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-b1a5447beb8c-0c3b4a2f804e9698"
+      },
+      {
+        "head": "da180b9d0f1942f6c2a1a4dbb50df8fa4f586831",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-da180b9d0f19-78f35e9f0b42fc26"
+      },
+      {
+        "head": "ddc87705d3fe80f8818a2c9ba72f56fa9da54f6e",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-ddc87705d3fe-a5ec88d4ab66703a"
+      },
+      {
+        "head": "e455c2871ade602653bd0f59b20e151b57afe57d",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-e455c2871ade-de8a96dd5f95d270"
+      },
+      {
+        "head": "eaf906498c2208930259b9ff74baee5ce3cdeb29",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-eaf906498c22-8eeaf3662bb0d383"
+      },
+      {
+        "head": "ee769629a861bbaa8c8cadc5c84d029ca4d6b138",
+        "count": 2351,
+        "routes": 16,
+        "loader_count": 13,
+        "bundle": "bundle-ee769629a861-c83bae96c85b3152"
+      }
+    ],
+    "application_changed_paths": [
+      "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderCommittedReadReceiptV2.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderConsumerCommitAdmissionV2.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderSourceV2.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidOriginalCommitDispatcher.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadFrame.php",
+      "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidSourceRawReads.php",
+      "config/production-tax-checkout.php",
+      "scripts/ci/database-mysql-selection.json",
+      "scripts/ci/database-mysql-skips.json",
+      "scripts/ci/database-sqlite-skips.json",
+      "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php",
+      "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php"
+    ],
+    "line_sha256": "280ece7fb1e002aaeb34b74903552d639bf110fa8829ba77db817950a9a1c427",
+    "line_count_sha256": "0234a4ea17808971f7e322a883a516ebd6c792daed8eff5ee0c5dd602cb52456",
+    "line_bytes_unchanged": true,
+    "forbidden_surfaces_unchanged": true
+  },
+  "invocations": [
+    {
+      "name": "mysql-closed-reader-driver-cases",
+      "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "counts": {
+        "tests": 2,
+        "assertions": 19,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "mysql-source-receipt-current-callbacks",
+      "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "counts": {
+        "tests": 10,
+        "assertions": 71,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-environment-descriptor-gap-activated",
+      "head": "1ecd7c829ec31a59a5c59956cf2cb9a0473a544a",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-facade-cache-terminal-gap",
+      "head": "eaf906498c2208930259b9ff74baee5ce3cdeb29",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-foreign-record-metadata-gap",
+      "head": "0c9040035b5d1cf898617b6cbd42496b734faf59",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-late-consumer-gap",
+      "head": "7472ab2f3238c0edaf97a066547c5529a4c345ff",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-peer-connection-metadata-gap",
+      "head": "0c9040035b5d1cf898617b6cbd42496b734faf59",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-primary-config-terminal-gap",
+      "head": "eaf906498c2208930259b9ff74baee5ce3cdeb29",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-primary-database-coercion-gap",
+      "head": "eaf906498c2208930259b9ff74baee5ce3cdeb29",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-primary-offset-metadata-gap",
+      "head": "aaaaf39d87bb356b28ad125d6b716c100ee659dd",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-primary-prefix-coercion-gap",
+      "head": "eaf906498c2208930259b9ff74baee5ce3cdeb29",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-reentrant-admission-gap-valid-fixture",
+      "head": "7472ab2f3238c0edaf97a066547c5529a4c345ff",
+      "counts": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "old-reentrant-admission-gap",
+      "head": "0b6ba0cdc47f6fc48216e8d1f4447b3f4763a233",
+      "counts": null,
+      "php": 255,
+      "recorder": 1,
+      "os": 1,
+      "classification": "harness/expectation",
+      "skipped_methods": null
+    },
+    {
+      "name": "old-reopened-root-callback-gap",
+      "head": "7472ab2f3238c0edaf97a066547c5529a4c345ff",
+      "counts": {
+        "tests": 1,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "behavioral oracle",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-environment-descriptor-repair",
+      "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "counts": {
+        "tests": 5,
+        "assertions": 26,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-expanded-lifecycle",
+      "head": "67c97c0088abd7f214a518cff384b563e01f91d9",
+      "counts": {
+        "tests": 21,
+        "assertions": 155,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 2
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "harness/expectation",
+      "skipped_methods": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_closed_source_reads_ignore_peer_row_lock_but_held_reads_wait_and_restore_budget"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_autocommit_withdrawal_refuses_before_any_closed_table_read_transaction"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-expanded-repair-validation",
+      "head": "ddc87705d3fe80f8818a2c9ba72f56fa9da54f6e",
+      "counts": {
+        "tests": 21,
+        "assertions": 160,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 2
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "harness/expectation",
+      "skipped_methods": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_closed_source_reads_ignore_peer_row_lock_but_held_reads_wait_and_restore_budget"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_autocommit_withdrawal_refuses_before_any_closed_table_read_transaction"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-facade-and-container-repair",
+      "head": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "counts": {
+        "tests": 11,
+        "assertions": 62,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-final-map-and-literal",
+      "head": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "counts": {
+        "tests": 2,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-first-lifecycle",
+      "head": "37e525c1b4e78890c2a1b053f272c4cecfe1feeb",
+      "counts": {
+        "tests": 9,
+        "assertions": 86,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-first-positive",
+      "head": "37e525c1b4e78890c2a1b053f272c4cecfe1feeb",
+      "counts": {
+        "tests": 1,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-metadata-fixture-repairs",
+      "head": "da180b9d0f1942f6c2a1a4dbb50df8fa4f586831",
+      "counts": {
+        "tests": 11,
+        "assertions": 78,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-repaired-gaps",
+      "head": "ee769629a861bbaa8c8cadc5c84d029ca4d6b138",
+      "counts": {
+        "tests": 4,
+        "assertions": 26,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": []
+    },
+    {
+      "name": "sqlite-whole-tax-final-source",
+      "head": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "counts": {
+        "tests": 211,
+        "assertions": 1523,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 25
+      },
+      "php": 0,
+      "recorder": 0,
+      "os": 0,
+      "classification": "completed selection",
+      "skipped_methods": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_closed_source_reads_ignore_peer_row_lock_but_held_reads_wait_and_restore_budget"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "test_native_autocommit_withdrawal_refuses_before_any_closed_table_read_transaction"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-whole-tax-with-real-source-age",
+      "head": "da180b9d0f1942f6c2a1a4dbb50df8fa4f586831",
+      "counts": {
+        "tests": 125,
+        "assertions": 1082,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 23
+      },
+      "php": 1,
+      "recorder": 1,
+      "os": 1,
+      "classification": "harness/expectation",
+      "skipped_methods": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+        ]
+      ]
+    }
+  ],
+  "counts": {
+    "actual_php_process_launches": 25,
+    "executed_junit_invocations": 24,
+    "behavioral_oracle_failures": 11,
+    "harness_expectation_failures": 4,
+    "completed_passing_selections": 10,
+    "pre_php_setup_failures": 1,
+    "original_recorders_closed": 26,
+    "all_original_skip_instances_reconciled": 52
+  },
+  "pre_php_failure": {
+    "classification": "Recorder preparation failed before PHP/PHPUnit launch; missing activated PHP PATH. No executed test or behavioral oracle.",
+    "correction": "Activate the existing PHP8.4 toolchain before all recorder launches; fresh exclusive run name, originals preserved.",
+    "junit": null,
+    "launch": {
+      "argv": [
+        "python3",
+        "/workspace/runtime/tax-v2-committed-read-evidence-20261015/run-focused.py",
+        "--name",
+        "old-environment-descriptor-gap",
+        "--driver",
+        "sqlite",
+        "--timeout",
+        "1800",
+        "--filter",
+        "test_nonarray_environment_descriptor_is_refused_before_pure_offset_callback",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php"
+      ],
+      "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+      "launched_utc": "2026-10-15T03:03:28.544239+00:00",
+      "launcher_sha256": "e8495e3fc8a1b61bf42ae02ac3b88082a92511249b548a6e84b4e81e9966e098",
+      "pid": 125736,
+      "process_start_ticks": "5429757",
+      "runner_sha256": "afb19e89b8c9ea16c3d37d52e6280c8bcd780b617e13291eb43244d29ac940ff",
+      "scope": "Detached local recorder and its test process; one root-owned workload. No original missing exit is inferred.",
+      "source": {
+        "head": "1ecd7c829ec31a59a5c59956cf2cb9a0473a544a",
+        "status": ""
+      },
+      "supervisor_log": "/workspace/runtime/tax-v2-committed-read-evidence-20261015/launch-old-environment-descriptor-gap.log",
+      "uid": 1000
+    },
+    "name": "old-environment-descriptor-gap",
+    "observed_recorder_os_exit": 1,
+    "original_log_sha256": "135d8fa766d9562844cbfa2c1b76116748d62f39d8c28aee328dc25cde0c5a77",
+    "recorded_utc": "2026-10-15T03:04:17.959226+00:00",
+    "state": "Z"
+  },
+  "whole_b1": {
+    "cases": 211,
+    "assertions": 1523,
+    "skipped": 25,
+    "non_skipped": 186,
+    "age_case": {
+      "name": "test_original_source_age_cannot_be_renewed_by_a_later_caller_deadline",
+      "file": "/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
+      "line": "854",
+      "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+      "classname": "Tests.Feature.ProductionTaxCheckout.ProductionTaxCommittedReadReceiptTest",
+      "assertions": "7",
+      "time": "305.844272"
+    }
+  },
+  "narrow_carry": [
+    {
+      "invocation": "sqlite-whole-tax-final-source",
+      "from": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "to": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "identical": 2349,
+      "different_paths": [
+        "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php"
+      ],
+      "exact_patch_sha256": "f58a331c63eb18812fe4c393d77b4e4348895188c13eb5bf5e4f24a8ec90e7bd"
+    },
+    {
+      "invocation": "mysql-closed-reader-driver-cases",
+      "from": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "to": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "identical": 2349,
+      "different_paths": [
+        "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php"
+      ],
+      "exact_patch_sha256": "85d4df72d3e3c12d447e8d3a0543b1f76f128a73c7a25df4cad177eef5df2d8a"
+    },
+    {
+      "invocation": "mysql-source-receipt-current-callbacks",
+      "from": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "to": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "identical": 2349,
+      "different_paths": [
+        "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php"
+      ],
+      "exact_patch_sha256": "85d4df72d3e3c12d447e8d3a0543b1f76f128a73c7a25df4cad177eef5df2d8a"
+    }
+  ],
+  "quality": [
+    {
+      "receipt": "pint-e455c287.json",
+      "exit": 0,
+      "head": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "source_hash_count": 10,
+      "sha256": "a28c871feb2483a13e2ce3e411db26ac43169a35f9ed2562b4c09ee16e0748b7"
+    },
+    {
+      "receipt": "policy-shards-e455c287.json",
+      "exit": 0,
+      "head": "e455c2871ade602653bd0f59b20e151b57afe57d",
+      "source_hash_count": 10,
+      "sha256": "2952755c5316b72c30c0d0ac566aded458cc7cfeffa12214522109e3cbc36b80"
+    }
+  ],
+  "native_ready": {
+    "recorded_utc": "2026-10-15T01:42:14.739154+00:00",
+    "attempts": 1,
+    "container": "va-studio-private-mysql-tax-v2-committed-read-20261015",
+    "private_datadir_volume": "va-studio-private-mysql-tax-v2-committed-read-data-20261015",
+    "host_port": 33517,
+    "host_socket": "/workspace/runtime/mysql-tax-v2-committed-read-run/mysql.sock",
+    "schema": "vaseyaudio_tax_v2_committed_read",
+    "scope": "New owned synthetic local server; prior datadirs untouched. No provider/host acceptance.",
+    "socket_accessible": true
+  },
+  "native_version": {
+    "recorded_utc": "2026-10-15T01:42:14.738805+00:00",
+    "argv": [
+      "docker",
+      "exec",
+      "va-studio-private-mysql-tax-v2-committed-read-20261015",
+      "mysql",
+      "--socket=/var/run/tax-v2-committed-read/mysql.sock",
+      "-uroot",
+      "--batch",
+      "--database",
+      "vaseyaudio_tax_v2_committed_read",
+      "--execute",
+      "SELECT VERSION() AS version, DATABASE() AS database_name, @@session.time_zone AS time_zone, @@session.sql_mode AS sql_mode;"
+    ],
+    "process_exit": 0,
+    "stdout": "version\tdatabase_name\ttime_zone\tsql_mode\n8.4.11\tvaseyaudio_tax_v2_committed_read\t+00:00\tONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION\n",
+    "stderr": ""
+  },
+  "native_stop": {
+    "recorded_utc": "2026-10-15T03:46:22.215207+00:00",
+    "argv": [
+      "docker",
+      "stop",
+      "va-studio-private-mysql-tax-v2-committed-read-20261015"
+    ],
+    "process_exit": 0,
+    "stdout": "va-studio-private-mysql-tax-v2-committed-read-20261015\n",
+    "stderr": "",
+    "owned_container_id": "572a9efab1588ef47f5c291ecf3488698db01259ddfe44fee52c40b21e3351d6",
+    "scope": "Stop only this owned idle private native server after both original native selections closed. Datadir volume/evidence retained; prior daemons untouched."
+  },
+  "original_review_copies": {
+    "independent-design-review-initial.md": {
+      "sha256": "004f82d6cd9b719ec36e0eee51b9f4be25e15af1bdd906e25bdc31e4c3fb0d63",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-design-review-2adaec76-20261015.md"
+      ]
+    },
+    "independent-design-DECISION.md": {
+      "sha256": "a951891e46d7333aebcd946e016212d3ef4032d3d6ad781c4be57f05478c4789",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-design-DECISION-be71f779-20261015.md"
+      ]
+    },
+    "independent-source-review-initial.md": {
+      "sha256": "73ac2da6e65193cd733f40ad58d87c6e58b5caa389652d8cdd879317ecdfe1f9",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-67c97c00-20261015.md"
+      ]
+    },
+    "independent-source-review-repairs.md": {
+      "sha256": "510f1aa3c4652010473a0ff41a9023724e5c20152efdc272f11ef10c646bcdb8",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-ddc87705-20261015.md"
+      ]
+    },
+    "independent-source-review-environment-descriptor.md": {
+      "sha256": "49533b529373b34ba76a4fff7b996392916e683129a67468154f5b3c51fdcf67",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-b1a5447b-20261015.md"
+      ]
+    },
+    "independent-source-review-final-metadata-batch.json": {
+      "sha256": "d37738609ff56ed177fbbd70c0900c771a8731745370aafd584977b591dcbd94",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-9d602626-20261015.json"
+      ]
+    },
+    "independent-source-review-final-metadata-batch.md": {
+      "sha256": "bf188105ceb99f598da1d89d883eb91d0017d1bba636e47fba79b37122c95421",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-9d602626-20261015.md"
+      ]
+    },
+    "independent-source-review-map-placement.md": {
+      "sha256": "3462cedc9f52807e6b8d4abe11bfd13c517c6b8541e504c1de00d56e7f897ef9",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-da180b9d-20261015.md"
+      ]
+    },
+    "independent-source-APPROVE.json": {
+      "sha256": "b814e6448afc71d36caed08b58716a7c5bb118c9bada9f92dcd32a81b015150f",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-e455c287-20261015.json"
+      ]
+    },
+    "independent-source-OS-exit-addendum.json": {
+      "sha256": "4bc27b1f175f6cae6419f5bbaf73e02a02055d974a09346a1f65c3fd21b71858",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-e455c287-20261015-os-exit-addendum.json"
+      ]
+    },
+    "independent-source-APPROVE.md": {
+      "sha256": "034a7ee777be79266cd07b01a204e1fd8125aa06d8c92d7e338f0f504406f8b8",
+      "matching_original_members": [
+        "independent-originals/tax-v2-committed-read-independent-source-review-e455c287-20261015.md"
+      ]
+    }
+  },
+  "failure_details": {
+    "mysql-closed-reader-driver-cases": [],
+    "mysql-source-receipt-current-callbacks": [],
+    "old-environment-descriptor-gap-activated": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_nonarray_environment_descriptor_is_refused_before_pure_offset_callback\nFinal pure policy proof invoked an environment descriptor offset callback.\nFailed asserting that 92 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1088"
+    ],
+    "old-facade-cache-terminal-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_nonarray_facade_cache_is_refused_before_terminal_witness_offset_callback\nTerminal identity witness preparation dispatched metadata offset code.\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1163\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1118"
+    ],
+    "old-foreign-record-metadata-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_cleanup_does_not_dereference_a_foreign_transaction_record_subtype\nCleanup invoked a foreign record metadata callback.\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:950"
+    ],
+    "old-late-consumer-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_consumer_withdrawal_in_later_actual_decryption_refuses_before_physical_commit\nThe operation unexpectedly admitted the original receipt.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:95\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:690"
+    ],
+    "old-peer-connection-metadata-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_custom_peer_connection_metadata_is_refused_before_its_callback_can_run\nOriginal identity witness invoked callback-capable peer metadata.\nFailed asserting that 32 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:978"
+    ],
+    "old-primary-config-terminal-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_nonarray_primary_config_is_refused_before_terminal_witness_offset_callback\nTerminal identity witness preparation dispatched metadata offset code.\nFailed asserting that 2 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1163\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1123"
+    ],
+    "old-primary-database-coercion-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_birth_refuses_stringable_primary_metadata_before_coercion with data set \"database\"\nLiteral source birth coerced connection metadata through a callback.\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1207"
+    ],
+    "old-primary-offset-metadata-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_nonarray_connection_map_is_refused_before_primary_offset_callback\nBirth selected a primary through callback-capable offset access.\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1051"
+    ],
+    "old-primary-prefix-coercion-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_birth_refuses_stringable_primary_metadata_before_coercion with data set \"tablePrefix\"\nLiteral source birth coerced connection metadata through a callback.\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:1207"
+    ],
+    "old-reentrant-admission-gap-valid-fixture": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_reentrant_committing_delegate_cannot_physically_commit_the_original_probe\nReentrant callback already committed the original probe.\nFailed asserting that false is true.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:673"
+    ],
+    "old-reopened-root-callback-gap": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_abort_preserves_reopened_root_callbacks_even_with_stale_original_framework_parent\nCleanup discarded a separate reopened root callback.\nFailed asserting that 0 is identical to 1.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:757"
+    ],
+    "sqlite-environment-descriptor-repair": [],
+    "sqlite-expanded-lifecycle": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_observer_install_orders_cannot_create_a_stacked_tax_positive_receipt with data set \"Tax-to-V1\"\nTraceback (most recent call last):\n  File \"/workspace/VA-Studio-tax-v2-committed-read/tests/Support/production_identity_smtp_sink.py\", line 6, in <module>\n    connection, _ = server.accept(); connection.settimeout(8)\n                    ^^^^^^^^^^^^^^^\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py\", line 295, in accept\n    fd, addr = self._accept()\n               ^^^^^^^^^^^^^^\nTimeoutError: timed out\n\nFailed asserting that 1 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Support/ProductionIdentityFixture.php:99\n/workspace/VA-Studio-tax-v2-committed-read/tests/Support/ProductionIdentityFixture.php:51\n/workspace/VA-Studio-tax-v2-committed-read/tests/Support/ProductionCheckoutJourneyFixture.php:21\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:535"
+    ],
+    "sqlite-expanded-repair-validation": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest::test_observer_install_orders_cannot_create_a_stacked_tax_positive_receipt with data set \"Tax-to-V1\"\nTax cleanup replaced a different observer owner.\nFailed asserting that two variables reference the same object.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php:600"
+    ],
+    "sqlite-facade-and-container-repair": [],
+    "sqlite-final-map-and-literal": [],
+    "sqlite-first-lifecycle": [],
+    "sqlite-first-positive": [],
+    "sqlite-metadata-fixture-repairs": [],
+    "sqlite-repaired-gaps": [],
+    "sqlite-whole-tax-final-source": [],
+    "sqlite-whole-tax-with-real-source-age": [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest::test_shipped_configuration_is_off_unbound_literal_and_pinned\nFailed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n Array &0 [\n     'enabled' => false,\n+    'committed_read_receipts_enabled' => false,\n+    'committed_read_receipt_version' => 'production-tax-checkout-committed-read-v2',\n     'provider' => null,\n     'funds_mode' => null,\n     'account_id' => null,\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php:54"
+    ]
+  },
+  "commands_performed": "Read-only Git tree/blob/diff inspection and Python tar/hash/JSON/XML receipt reconciliation only. No app/test/database/CI/host/network operation or tracked edit."
+}
