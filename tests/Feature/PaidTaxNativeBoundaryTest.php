@@ -56,10 +56,18 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $two = $this->start($input);
         $parent = (int) DB::getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
         $this->assertNotSame($one['connection_id'], $two['connection_id']);
+        foreach ([$one, $two] as $worker) {
+            touch($worker['directory'].'/start');
+        }
+        // Both native schema admissions finish BEFORE the parent takes its row lock. The original
+        // command clocks keep running through this coordination; no application budget is restarted.
+        foreach ([$one, $two] as $worker) {
+            $this->await(fn (): bool => is_file($worker['directory'].'/at-owner-lock'), $worker['process']);
+        }
         DB::beginTransaction();
         DB::table('users')->where('id', $first['buyer']['user']->id)->lockForUpdate()->first();
         foreach ([$one, $two] as $worker) {
-            touch($worker['directory'].'/start');
+            touch($worker['directory'].'/lock-start');
             $this->await(fn (): bool => $this->waiting($worker['connection_id'], $parent, $first['buyer']['user']->id), $worker['process']);
         }
         DB::commit();
@@ -190,7 +198,11 @@ SQL, [$requester, $blocker, DB::getDatabaseName()]);
             if ($condition()) {
                 return;
             }
-            $this->assertTrue($process->isRunning(), 'Native worker ended before its authenticated barrier.');
+            if (! $process->isRunning()) {
+                $result = json_decode($process->getOutput(), true);
+                $public = is_array($result) ? array_intersect_key($result, array_flip(['result', 'error_class', 'status', 'location', 'phase', 'transaction_level', 'in_transaction'])) : ['result' => 'no JSON result'];
+                $this->fail('Native worker ended before the expected barrier: '.json_encode($public, JSON_THROW_ON_ERROR));
+            }
             $process->checkTimeout();
             usleep(10000);
         } while (hrtime(true) < $deadline);

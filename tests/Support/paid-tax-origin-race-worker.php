@@ -2,6 +2,7 @@
 
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
+use App\Domain\Grants\PaidTax\PaidTaxPolicy;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +23,23 @@ if ($buyer === null) {
 $pdo = DB::getPdo();
 $connectionId = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
 $directory = getenv('VA_PAID_TAX_RACE_DIRECTORY');
+$phase = 'authenticated';
+app()->afterResolving(PaidTaxPolicy::class, static function () use ($directory, &$phase): void {
+    if ($phase !== 'command-started') {
+        return;
+    }
+    $phase = 'before-owner-lock';
+    touch($directory.'/at-owner-lock');
+    $end = hrtime(true) + 10_000_000_000;
+    while (! is_file($directory.'/lock-start')) {
+        if (hrtime(true) > $end) {
+            throw new RuntimeException('Tax owner-lock coordination timed out.');
+        }
+        usleep(10000);
+        clearstatcache();
+    }
+    $phase = 'owner-lock-released';
+});
 file_put_contents($directory.'/ready.tmp', json_encode(['connection_id' => $connectionId, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
 rename($directory.'/ready.tmp', $directory.'/ready');
 $end = hrtime(true) + 15_000_000_000;
@@ -34,12 +52,16 @@ while (! is_file($directory.'/start')) {
 }
 try {
     // Authentication precedes the barrier; the ordinary command budget starts exactly once inside finalize.
+    $phase = 'command-started';
     $projection = (new PaidTaxGrants)->finalize($buyer['principal'], $buyer['user'], $input['order_id']);
     $result = 'saved';
 } catch (Throwable $error) {
     $result = 'unexpected';
     $errorClass = $error::class;
+    $status = property_exists($error, 'status') ? $error->status : null;
+    $location = basename($error->getFile()).':'.$error->getLine();
 }
 echo json_encode(['result' => $result, 'id' => $projection['id'] ?? null, 'order_id' => $projection['orderId'] ?? null,
-    'error_class' => $errorClass ?? null, 'connection_id' => $connectionId, 'pid' => getmypid(),
+    'error_class' => $errorClass ?? null, 'status' => $status ?? null, 'location' => $location ?? null, 'phase' => $phase,
+    'connection_id' => $connectionId, 'pid' => getmypid(),
     'transaction_level' => DB::transactionLevel(), 'in_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);
