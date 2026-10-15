@@ -1,0 +1,722 @@
+{
+  "archive_bytes": 14095635,
+  "archive_sha256": "0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60",
+  "bundles": 22,
+  "completed_runs": [
+    {
+      "head": "47a470fc30cf016f204e3d2a4f806b7755e8d47c",
+      "junit": {
+        "assertions": 76,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 4
+      },
+      "name": "http-epoch-regressions-old-preserved",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "952fb9e3a2d0d96f28ee80aa33ddc6078a3335c5",
+      "junit": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "http-first-root-bootstrap-fixed",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "952fb9e3a2d0d96f28ee80aa33ddc6078a3335c5",
+      "junit": {
+        "assertions": 5,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "name": "http-first-root-controls",
+      "php_recorder_os": [
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "4854649a28f0ed8541d1b9eac1c0d7f04229b1e8",
+      "junit": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "http-first-root-protocol-fixed",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "378471ee52a186b856e04ff7fd75ec3b63332d89",
+      "junit": {
+        "assertions": 20,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 2
+      },
+      "name": "http-preparation-api-path-diagnostic",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "9acca01b715e54f23e37460076218444ac7a1bf3",
+      "junit": {
+        "assertions": 20,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 2
+      },
+      "name": "http-preparation-guard-positive",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "b90347006ab2a7cb675d9bf3aad995465899de83",
+      "junit": {
+        "assertions": 7,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "http-request-guard-positive",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "junit": {
+        "assertions": 406,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 29
+      },
+      "name": "http-root-complete-fixed",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "028dc8e776f3ec1cf0671bf80a3a40c8417b5f75",
+      "junit": {
+        "assertions": 316,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 24
+      },
+      "name": "http-root-complete-initial",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "1d8f60ded4d87f0583a11dc8634f116097ad0138",
+      "junit": {
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "metadata-committed-control-old-corrected",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "e9eb60f7bd9540abd821720eab34e2971f11c0a3",
+      "junit": {
+        "assertions": 24,
+        "errors": 0,
+        "failures": 6,
+        "skipped": 0,
+        "tests": 7
+      },
+      "name": "metadata-followup-regressions-old",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "58f93c83bff044e1ce2db23bf1f6ae579ef0807b",
+      "junit": {
+        "assertions": 67,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 11
+      },
+      "name": "metadata-regressions-fixed-complete",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "c978a63a7babcc41d23c6360800a83aad72969fe",
+      "junit": {
+        "assertions": 85,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "name": "metadata-regressions-fixed-final",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "cbe111eccc9ecbdfe5967b832eb155df2fc9af9d",
+      "junit": {
+        "assertions": 25,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "name": "metadata-regressions-fixed-initial",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "24f6fd14c75ec7d89ff60d363203f5a05aa55599",
+      "junit": {
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "metadata-regressions-old",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "24f6fd14c75ec7d89ff60d363203f5a05aa55599",
+      "junit": {
+        "assertions": 14,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 3
+      },
+      "name": "metadata-regressions-old-remainder",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "b88c4134f510b7b2082f5c5fb28fdb7e9d582876",
+      "junit": {
+        "assertions": 12,
+        "errors": 0,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 3
+      },
+      "name": "metadata-resolver-writes-old",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "junit": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "mysql-current-credential-visibility",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "junit": {
+        "assertions": 98,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 6
+      },
+      "name": "mysql-root-release-and-ownership",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "857d92b1f38d420af63e9615c9be0ed7b5723d1a",
+      "junit": {
+        "assertions": 166,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 18
+      },
+      "name": "release-component-cleanup-fixed",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "2496036387ab8301e9687723f43bd18e73ba8b0b",
+      "junit": {
+        "assertions": 191,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 21
+      },
+      "name": "release-component-custody-fixed",
+      "php_recorder_os": [
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "9187362e9d4fb9a988b02620203f1b1eb31eef8d",
+      "junit": {
+        "assertions": 212,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 23
+      },
+      "name": "release-component-final",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "head": "cf7011d6955d3d5bfa12aaeb8b783412014ac7ec",
+      "junit": {
+        "assertions": 158,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 18
+      },
+      "name": "release-component-initial",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "5b8a451f20b0f13f5910e56996d1d93b78ff9e3a",
+      "junit": {
+        "assertions": 21,
+        "errors": 0,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 3
+      },
+      "name": "release-custody-regressions-old",
+      "php_recorder_os": [
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "junit": {
+        "assertions": 491,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1,
+        "tests": 65
+      },
+      "name": "sqlite-direct-shared-composition",
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "current_input_carry_count": 2455,
+  "docs_only_changed_paths": [
+    "docs/verification/account-features-http-20261015/README.md",
+    "docs/verification/account-features-http-20261015/account-features-http-source-review-4854649a-20261015-original.json",
+    "docs/verification/account-features-http-20261015/account-features-http-source-review-4854649a-20261015-original.md",
+    "docs/verification/account-features-http-20261015/account-features-http-source-review-68d22b7e-20261015-original.json",
+    "docs/verification/account-features-http-20261015/account-features-http-source-review-68d22b7e-20261015-original.md",
+    "docs/verification/account-features-http-20261015/focused-evidence.zip",
+    "docs/verification/account-features-http-20261015/focused-receipt.json",
+    "docs/verification/account-features-http-20261015/scripts/assemble-evidence.py",
+    "docs/verification/account-features-http-20261015/scripts/close-supervisor.py",
+    "docs/verification/account-features-http-20261015/scripts/launch-durable-http.py",
+    "docs/verification/account-features-http-20261015/scripts/launch-durable-native.py",
+    "docs/verification/account-features-http-20261015/scripts/launch-durable.py",
+    "docs/verification/account-features-http-20261015/scripts/prepare-account-features-mysql-20261015.py",
+    "docs/verification/account-features-http-20261015/scripts/run-focused-http.py",
+    "docs/verification/account-features-http-20261015/scripts/run-focused-native.py",
+    "docs/verification/account-features-http-20261015/scripts/run-focused.py",
+    "docs/verification/account-features-http-20261015/scripts/run-quality.py"
+  ],
+  "final_cases": {
+    "http-root-complete-fixed": [
+      "test_actual_session_csrf_read_initialize_change_export_and_preferences_unknown",
+      "test_original_resolved_request_guard_is_positive_through_the_actual_web_stack",
+      "test_premature_handled_send_and_split_withdrawal_never_release_delayed_private_bytes",
+      "test_standalone_headers_then_late_scope_withdrawal_then_content_emit_nothing",
+      "test_real_handled_late_changes_refuse_original_release with data set #0",
+      "test_real_handled_late_changes_refuse_original_release with data set #1",
+      "test_real_handled_late_changes_refuse_original_release with data set #2",
+      "test_real_handled_late_changes_refuse_original_release with data set #3",
+      "test_real_handled_late_changes_refuse_original_release with data set #4",
+      "test_rotated_old_csrf_refuses_and_current_token_remains_valid_without_one_use_claim",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #0",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #1",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #2",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #3",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #4",
+      "test_bounded_duplicate_escaped_and_scalar_requests_refuse_before_feature_dml with data set #5",
+      "test_disabled_and_nonboolean_mount_refuse_stale_registered_routes",
+      "test_middleware_clone_never_receives_original_private_emission_authority",
+      "test_unused_completed_response_is_not_retained_by_the_kernel_registry",
+      "test_late_stringable_auth_slot_is_refused_without_its_callback",
+      "test_exact_body_bounds_preserve_feature_change_and_original_identity_limit",
+      "test_controls_page_has_opaque_render_scope_and_no_private_projection",
+      "test_private_debug_framework_exits_never_redirect_or_flash_inputs",
+      "test_reentry_cannot_complete_original_epoch_before_later_withdrawal",
+      "test_stale_compiled_route_collection_still_refuses_disabled_mount_before_identity_queries",
+      "test_real_session_save_withdrawal_occurs_before_final_original_release",
+      "test_foreign_framework_frame_after_handling_remains_owned_by_its_callback",
+      "test_native_session_cookie_crossing_a_wall_second_keeps_healthy_original_release",
+      "test_shipped_default_has_no_registered_feature_routes_or_identity_queries"
+    ],
+    "mysql-current-credential-visibility": [
+      "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot"
+    ],
+    "mysql-root-release-and-ownership": [
+      "test_actual_session_csrf_read_initialize_change_export_and_preferences_unknown",
+      "test_foreign_framework_frame_after_handling_remains_owned_by_its_callback",
+      "test_late_guard_withdrawal_refuses_but_durable_mutation_is_reconciled_by_fresh_read",
+      "test_before_start_metadata_withdrawal_refuses_before_original_physical_begin",
+      "test_preparation_start_cannot_move_feature_writes_into_a_foreign_frame",
+      "test_standard_actor_native_primary_and_idle_standard_peer_keep_original_positive_proofs"
+    ],
+    "sqlite-direct-shared-composition": [
+      "test_prepared_projection_has_no_open_frame_and_closes_original_authority_once with data set #0",
+      "test_prepared_projection_has_no_open_frame_and_closes_original_authority_once with data set #1",
+      "test_late_guard_withdrawal_refuses_but_durable_mutation_is_reconciled_by_fresh_read",
+      "test_unused_preparation_never_opens_a_closing_transaction",
+      "test_unproduced_preparation_cannot_claim_a_closing_proof",
+      "test_saved_replacement_dispatcher_and_manager_are_preserved",
+      "test_before_start_metadata_withdrawal_refuses_before_original_physical_begin",
+      "test_owned_framework_rollback_keeps_normal_afterrollback_callback_once",
+      "test_original_birth_guard_is_inert_for_completed_nested_delegate_work_and_after_exit",
+      "test_callback_free_discard_preserves_unset_foreign_record_without_error_handler",
+      "test_prestart_replacement_associative_hooks_preserve_original_keys_and_closures",
+      "test_preparation_start_cannot_move_feature_writes_into_a_foreign_frame",
+      "test_explicit_library_initializer_and_monotonic_clear_do_not_adopt_or_rewrite_v1",
+      "test_unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer",
+      "test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #0",
+      "test_saved_callback_commit_reopen_cannot_make_cleanup_rollback_a_foreign_transaction with data set #1",
+      "test_beginning_listener_cannot_make_the_feature_adopt_or_commit_a_foreign_transaction",
+      "test_committing_listener_purpose_withdrawal_prevents_a_durable_grant",
+      "test_regular_begin_commit_and_aftercommit_callback_order_is_preserved",
+      "test_pre_start_foreign_transaction_is_refused_without_rollback_or_source_adoption",
+      "test_committing_replacement_preserves_foreign_transaction_and_discards_its_unacknowledged_callbacks",
+      "test_committing_manager_or_dispatcher_drift_refuses_and_preserves_callback_owned_bindings with data set #0",
+      "test_committing_manager_or_dispatcher_drift_refuses_and_preserves_callback_owned_bindings with data set #1",
+      "test_original_managers_other_pending_callbacks_are_preserved_byte_for_byte_and_still_execute_once",
+      "test_custom_actor_id_cast_is_refused_before_eloquent_executes_it",
+      "test_nonarray_facade_cache_is_refused_before_offset_callbacks",
+      "test_peer_connection_subclass_is_refused_before_its_raw_pdo_method",
+      "test_standard_actor_native_primary_and_idle_standard_peer_keep_original_positive_proofs",
+      "test_reached_resolver_maps_are_refused_before_application_offsets with data set #0",
+      "test_reached_resolver_maps_are_refused_before_application_offsets with data set #1",
+      "test_reached_resolver_maps_are_refused_before_application_offsets with data set #2",
+      "test_reached_resolver_maps_are_refused_before_application_offsets with data set #3",
+      "test_resolver_write_maps_are_refused_before_supported_literal_environment_setters with data set #0",
+      "test_resolver_write_maps_are_refused_before_supported_literal_environment_setters with data set #1",
+      "test_standard_literal_environment_descriptor_keeps_the_original_positive_source",
+      "test_early_feature_lock_metadata_is_admitted_before_facade_or_policy with data set #0",
+      "test_early_feature_lock_metadata_is_admitted_before_facade_or_policy with data set #1",
+      "test_early_feature_lock_metadata_is_admitted_before_facade_or_policy with data set #2",
+      "test_received_mailbox_identity_and_marker_bind_new_features_without_credential_or_owner_projection",
+      "test_recovery_preserves_original_feature_act_but_an_old_session_cannot_remint_current_authority",
+      "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #0",
+      "test_module_callbacks_cannot_commit_after_current_identity_or_feature_withdrawal with data set #1",
+      "test_unbound_old_data_cross_feature_owner_and_provenance_bindings_are_refused",
+      "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #0",
+      "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #1",
+      "test_ordinary_terminal_connection_admission_precedes_policy_and_preserves_normal_rollback with data set #2",
+      "test_default_off_missing_marker_unknown_feature_and_serialization_are_refused",
+      "test_committed_read_frame_is_read_only_one_use_and_fires_no_new_framework_commit_event",
+      "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"credential\"",
+      "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"actor\"",
+      "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"feature config\"",
+      "test_normal_commit_callback_withdrawal_retains_durable_write_but_releases_no_private_response with data set \"identity config\"",
+      "test_direct_commit_reopen_loses_physical_anchor_and_is_not_rolled_back_as_owned_work",
+      "test_foreign_reader_existing_or_nested_transaction_and_expired_original_deadline_are_refused",
+      "test_close_preserves_replacement_transaction_read_only_state",
+      "test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close with data set \"rollback then statement\"",
+      "test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close with data set \"rollback then transaction\"",
+      "test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close with data set \"commit then statement\"",
+      "test_single_close_restores_idle_default_after_caller_ends_replacement_without_another_close with data set \"commit then transaction\"",
+      "test_expiring_original_deadline_cannot_be_renewed_by_starting_final_proof",
+      "test_active_secondary_transaction_refuses_a_new_committed_frame",
+      "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot",
+      "test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy with data set \"primary resolver\"",
+      "test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy with data set \"secondary resolver\"",
+      "test_late_unresolved_connection_is_refused_without_running_a_callback_after_feature_policy with data set \"secondary null\""
+    ]
+  },
+  "git_blobs": 2447,
+  "members": 2782,
+  "mysql_version": "8.4.11",
+  "native_stopped_exit": 0,
+  "physical_loaders": 13,
+  "preparation_errors": [],
+  "private_nonzero_log_xml_members_verified": 30,
+  "quality": [
+    {
+      "argv": [
+        "composer",
+        "audit",
+        "--locked"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-audit-68-original.json"
+    },
+    {
+      "argv": [
+        "composer",
+        "check-platform-reqs"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-platform-68-original.json"
+    },
+    {
+      "argv": [
+        "composer",
+        "validate",
+        "--strict"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-validate-68-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "test",
+        "--",
+        "tests/frontend/production-account-features.test.tsx",
+        "tests/frontend/production-customer-identity.test.tsx",
+        "tests/frontend/production-identity-registration.test.tsx"
+      ],
+      "exit": 0,
+      "head": "028dc8e776f3ec1cf0671bf80a3a40c8417b5f75",
+      "name": "quality/frontend-028-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "test",
+        "--",
+        "tests/frontend/production-account-features.test.tsx",
+        "tests/frontend/production-customer-identity.test.tsx",
+        "tests/frontend/production-identity-registration.test.tsx"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/frontend-68-original.json"
+    },
+    {
+      "argv": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "--outDir",
+        "/workspace/runtime/b4-http-staging/vite-build-68",
+        "--emptyOutDir"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/frontend-build-68-original.json"
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Customers/ProductionCustomerAccess.php",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+        "app/Http/AccountFeatures/AccountFeatureBody.php",
+        "app/Http/AccountFeatures/AccountFeatureController.php",
+        "app/Http/AccountFeatures/AccountFeatureHttpKernel.php",
+        "app/Http/AccountFeatures/AccountFeatureMount.php",
+        "app/Http/AccountFeatures/AccountFeaturePrivacy.php",
+        "app/Http/AccountFeatures/AccountFeatureRequestGuard.php",
+        "app/Http/AccountFeatures/AccountFeatureResponse.php",
+        "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+        "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+        "bootstrap/app.php",
+        "config/production-account-features.php",
+        "routes/production-account-features.php",
+        "routes/web.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesDefaultMountTest.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+        "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php"
+      ],
+      "exit": 127,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/pint-68-original.json"
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Customers/ProductionCustomerAccess.php",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+        "app/Http/AccountFeatures/AccountFeatureBody.php",
+        "app/Http/AccountFeatures/AccountFeatureController.php",
+        "app/Http/AccountFeatures/AccountFeatureHttpKernel.php",
+        "app/Http/AccountFeatures/AccountFeatureMount.php",
+        "app/Http/AccountFeatures/AccountFeaturePrivacy.php",
+        "app/Http/AccountFeatures/AccountFeatureRequestGuard.php",
+        "app/Http/AccountFeatures/AccountFeatureResponse.php",
+        "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+        "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+        "bootstrap/app.php",
+        "config/production-account-features.php",
+        "routes/production-account-features.php",
+        "routes/web.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesDefaultMountTest.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+        "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/pint-68-toolchain-fixed-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit": 0,
+      "head": "028dc8e776f3ec1cf0671bf80a3a40c8417b5f75",
+      "name": "quality/typecheck-028-original.json"
+    }
+  ],
+  "skips": [
+    {
+      "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+      "message": null,
+      "name": "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot",
+      "run": "sqlite-direct-shared-composition"
+    }
+  ],
+  "source_bindings": 48928,
+  "target_head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+  "tested_head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+  "tracked_heads": 20,
+  "verified_utc": "2026-10-15T20:04:50.837162+00:00"
+}

@@ -1,0 +1,405 @@
+{
+  "actions_performed": [
+    "Read-only exactGit/source/test and original decision inspection",
+    "Read-only Python archive/member/Git/physical-loader/JUnit/private-original/source-carry/native/quality reconciliation",
+    "Exclusive runtime reviewer MD/JSON and verification record creation"
+  ],
+  "application_tests_executed_by_reviewer": false,
+  "baseline_merge": "9cfe3a618e19557b95828d35c52a0e4d3622b44a",
+  "db_network_ci_operations_executed_by_reviewer": false,
+  "decision": "APPROVE FOCUSED DEVELOPMENT SOURCE AND SEALED EVIDENCE",
+  "engineering_quality_verdict": "PASS within the documented reached root/domain/UI scope",
+  "evidence_verification": {
+    "archive_bytes": 14095635,
+    "archive_sha256": "0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60",
+    "completed_original_invocations": 25,
+    "current_inputs_unchanged": 2455,
+    "docs_only_delta": [
+      "docs/verification/account-features-http-20261015/README.md",
+      "docs/verification/account-features-http-20261015/account-features-http-source-review-4854649a-20261015-original.json",
+      "docs/verification/account-features-http-20261015/account-features-http-source-review-4854649a-20261015-original.md",
+      "docs/verification/account-features-http-20261015/account-features-http-source-review-68d22b7e-20261015-original.json",
+      "docs/verification/account-features-http-20261015/account-features-http-source-review-68d22b7e-20261015-original.md",
+      "docs/verification/account-features-http-20261015/focused-evidence.zip",
+      "docs/verification/account-features-http-20261015/focused-receipt.json",
+      "docs/verification/account-features-http-20261015/scripts/assemble-evidence.py",
+      "docs/verification/account-features-http-20261015/scripts/close-supervisor.py",
+      "docs/verification/account-features-http-20261015/scripts/launch-durable-http.py",
+      "docs/verification/account-features-http-20261015/scripts/launch-durable-native.py",
+      "docs/verification/account-features-http-20261015/scripts/launch-durable.py",
+      "docs/verification/account-features-http-20261015/scripts/prepare-account-features-mysql-20261015.py",
+      "docs/verification/account-features-http-20261015/scripts/run-focused-http.py",
+      "docs/verification/account-features-http-20261015/scripts/run-focused-native.py",
+      "docs/verification/account-features-http-20261015/scripts/run-focused.py",
+      "docs/verification/account-features-http-20261015/scripts/run-quality.py"
+    ],
+    "git_blobs": 2447,
+    "members": 2782,
+    "nonzero_original_invocations": 15,
+    "path": "/workspace/runtime/account-features-http-final-review-6fdabe77-20261015-verification.json",
+    "physical_loaders": 13,
+    "private_nonzero_log_xml_originals_authenticated": 30,
+    "sha256": "dbd32c9af51ef585e4a68aafa06e665b1715516277affea27a5940965b9785a9",
+    "source_bindings": 48928,
+    "successful_original_invocations": 10,
+    "tracked_heads": 20
+  },
+  "findings": [],
+  "focused_current_outcomes": {
+    "http-root-complete-fixed": {
+      "junit": {
+        "assertions": 406,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 29
+      },
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    "mysql-current-credential-visibility": {
+      "junit": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    "mysql-root-release-and-ownership": {
+      "junit": {
+        "assertions": 98,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 6
+      },
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    },
+    "sqlite-direct-shared-composition": {
+      "junit": {
+        "assertions": 491,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1,
+        "tests": 65
+      },
+      "php_recorder_os": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "independent_source_author": false,
+  "native_environment": {
+    "datadir_retained": true,
+    "other_containers_touched": false,
+    "own_stopped_exit": 0,
+    "port": 33521,
+    "schema": "vaseyaudio_account_features",
+    "socket": "/workspace/runtime/mysql-account-features-run/mysql.sock",
+    "version": "MySQL 8.4.11"
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "preparation_errors": [],
+  "quality_originals": [
+    {
+      "argv": [
+        "composer",
+        "audit",
+        "--locked"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-audit-68-original.json"
+    },
+    {
+      "argv": [
+        "composer",
+        "check-platform-reqs"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-platform-68-original.json"
+    },
+    {
+      "argv": [
+        "composer",
+        "validate",
+        "--strict"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/composer-validate-68-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "test",
+        "--",
+        "tests/frontend/production-account-features.test.tsx",
+        "tests/frontend/production-customer-identity.test.tsx",
+        "tests/frontend/production-identity-registration.test.tsx"
+      ],
+      "exit": 0,
+      "head": "028dc8e776f3ec1cf0671bf80a3a40c8417b5f75",
+      "name": "quality/frontend-028-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "test",
+        "--",
+        "tests/frontend/production-account-features.test.tsx",
+        "tests/frontend/production-customer-identity.test.tsx",
+        "tests/frontend/production-identity-registration.test.tsx"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/frontend-68-original.json"
+    },
+    {
+      "argv": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "--outDir",
+        "/workspace/runtime/b4-http-staging/vite-build-68",
+        "--emptyOutDir"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/frontend-build-68-original.json"
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Customers/ProductionCustomerAccess.php",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+        "app/Http/AccountFeatures/AccountFeatureBody.php",
+        "app/Http/AccountFeatures/AccountFeatureController.php",
+        "app/Http/AccountFeatures/AccountFeatureHttpKernel.php",
+        "app/Http/AccountFeatures/AccountFeatureMount.php",
+        "app/Http/AccountFeatures/AccountFeaturePrivacy.php",
+        "app/Http/AccountFeatures/AccountFeatureRequestGuard.php",
+        "app/Http/AccountFeatures/AccountFeatureResponse.php",
+        "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+        "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+        "bootstrap/app.php",
+        "config/production-account-features.php",
+        "routes/production-account-features.php",
+        "routes/web.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesDefaultMountTest.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+        "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php"
+      ],
+      "exit": 127,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/pint-68-original.json"
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Customers/ProductionCustomerAccess.php",
+        "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php",
+        "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php",
+        "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+        "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php",
+        "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+        "app/Http/AccountFeatures/AccountFeatureBody.php",
+        "app/Http/AccountFeatures/AccountFeatureController.php",
+        "app/Http/AccountFeatures/AccountFeatureHttpKernel.php",
+        "app/Http/AccountFeatures/AccountFeatureMount.php",
+        "app/Http/AccountFeatures/AccountFeaturePrivacy.php",
+        "app/Http/AccountFeatures/AccountFeatureRequestGuard.php",
+        "app/Http/AccountFeatures/AccountFeatureResponse.php",
+        "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php",
+        "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php",
+        "bootstrap/app.php",
+        "config/production-account-features.php",
+        "routes/production-account-features.php",
+        "routes/web.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesDefaultMountTest.php",
+        "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php",
+        "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php",
+        "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php"
+      ],
+      "exit": 0,
+      "head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+      "name": "quality/pint-68-toolchain-fixed-original.json"
+    },
+    {
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit": 0,
+      "head": "028dc8e776f3ec1cf0671bf80a3a40c8417b5f75",
+      "name": "quality/typecheck-028-original.json"
+    }
+  ],
+  "read_original_decisions_sha256": {
+    "account-features-http-source-review-4854649a-20261015-original.md": "971afcf74fc9f1850006de715172487d2c9b720b0fbee28f0a15bc5f21d36d10",
+    "account-features-http-source-review-68d22b7e-20261015-original.md": "688c8ec26cae84e42a30363f2fdb67e7f404a5fcef9ff3e781732488ea393157",
+    "design-draft-original.md": "e1ed807f5ade1e6572b03c818fb9a606847e1f06284acc3b938c3a6a746c57e9",
+    "design-review-draft-original.md": "4ab415de55dcd30db56048e6cdd7506e8dd1d46015cb63cab51cb6a207e15f9e",
+    "design-review-f7b5b185-original.md": "f2def5642a5faf30bce36bcacd6495a6eb63abd4f636bde2f38f80c228ef0187",
+    "metadata-review-58f93c83-original.md": "16572dac8af4a44e0f8a8b37425ae872bec7744407ea61dd98c4167ba586fe58",
+    "metadata-review-c978a63a-original.md": "91f3f0d10eafd1390418f0553f5b4a6288be826d0ad277fdd3907cf87547c6d2",
+    "metadata-review-cbe111ec-original.md": "4a002c09f11b14a0538d0b691e65e7de1d854d4b065334f3e90fcb394dd28a7f",
+    "release-review-1631ed60-original.md": "6847d3bc7d7692521e5664833dc74b02c78a36758088fa9d44a84c093e34000e",
+    "release-review-857d92b1-original.md": "0ce596e50111c96391b2e467be3bb33e4583b773e5688275239c765cc3fa3bf0",
+    "release-review-9187362e-original.md": "8cc758f1c64e9b522cfb5c73d7273cf74bc8bdd21f52513370452197785fe675",
+    "send-design-review-36e1f63a-original.md": "ffaa501b85c8a55a47b1cea0b0e826c2146e62649094ffb74e0bdcbacbc1a201",
+    "send-design-review-d4bb40aa-original.md": "63612f0cc5f31ca914bd7bf62cf0f5e0772350aca3450c95d10ef688bcb424e7",
+    "send-design-review-e78e25fa-original.md": "e1c229ad543c07d0939509fa276e9ff1afc8ec605c0b0ecb82af9c035e9bfcdc"
+  },
+  "recorded_utc": "2026-10-15T20:06:40.081630+00:00",
+  "remaining_publication_gates": [
+    "Import byte-original final decision and reconcile current ledger/packet status",
+    "Independent explicit carry for final documentation-only publication head",
+    "Green cheap preflight on exact publication head; readiness cancellation is not accepted as pass",
+    "Complete current reviews/threads/checks inventory with no openP0/P1; preserve protections",
+    "Expected-head-SHA development merge and actual receipt/both ledgers"
+  ],
+  "required_source_corrections": [],
+  "reviewed_head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified_by_reviewer": false,
+  "skip": [
+    {
+      "class": "Tests\\Feature\\ProductionIdentityAdapters\\ProductionIdentityCommittedFrameTest",
+      "message": null,
+      "name": "test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot",
+      "run": "sqlite-direct-shared-composition"
+    }
+  ],
+  "source_sha256": {
+    "app/Domain/Customers/ProductionCustomerAccess.php": "ce24d7d2fcf77b89b728a54e681fcdd5137748f576bfa21836584299c0a559f7",
+    "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php": "7cc909f22ed1c71696e0f40b49a5858729b2aa1fe61988d8c427faa5cf316378",
+    "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php": "8565aea18093dd8ede2f727f2208b5414a9a5f94c2f985625141c969bfcd8a7c",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php": "8fd8be1604e0583d602eada48a9edad2c9e4818b112f48e7231019b06a44c107",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "11dc94281a5417295baa72a6e6c541f2fed8bed6b9503f65ef9860d06d88249e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "116d84d8e99d32129e3145a97d367bceb8acda4a4419cdc51292b267e72fa11e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php": "06598d8698b4635cb742ccd019bfadbac214e811997b10a0462a8494f8d98c77",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php": "40942d2808abd9d16cf13266f6c63d69f19d043dc8fe0ae460bc301a3209c9b4",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "9e4a75e45eaedf26087bfba495467aa28866206c8872ff26d75bf2e4f7f241f8",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "895d46a26dc1cf1bee82d03a02d2324df726e1fd09c1b7b2b98e0cc414211c3b",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "89123f7a5f905ad88e7ebe70745b733fad1c7fad9ca028aeb55f9ef6a8373b1d",
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "57ee1e61f2c7eb525356f57cc1e4bdec85ea3dacb10ff460b5ffa397c4f61c8d",
+    "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php": "b35909bd5ba3d287d3bf38d695f7e62bdc7f45cd95f8c51bf5e67d568dcca518",
+    "app/Http/AccountFeatures/AccountFeatureBody.php": "f3e9189ad521b100faaea7ab1b456e03975787fd423799fa06dd4fbe8e4b1397",
+    "app/Http/AccountFeatures/AccountFeatureController.php": "1756316ed020e904349f176c8de1c13f8e70a026a57083f1d384dbd4fee865f1",
+    "app/Http/AccountFeatures/AccountFeatureHttpKernel.php": "036bc6247daa62b1ecab2b1112c99a709d2ae3b20fdcbfe72ca18e2c1218aeba",
+    "app/Http/AccountFeatures/AccountFeatureMount.php": "95d76ce7445eca456692136cc130be069fae25cd69a21e350fae72ce145a8b22",
+    "app/Http/AccountFeatures/AccountFeaturePrivacy.php": "9619a3e56e9bec353b0fe2bd516a2213563a7958d605d0b91c17a8707696904d",
+    "app/Http/AccountFeatures/AccountFeatureRequestGuard.php": "780056ecc9b521165660931ea88f893ea37e9a860a2eeb64d09b670fd75c89a2",
+    "app/Http/AccountFeatures/AccountFeatureResponse.php": "9596d948568a1d7e69a447c62412ab25ea47d33c765e22b32445e87a6c70acb0",
+    "app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php": "53e4de45c5b389dd65f451896d33b3a95a25db9f6402684f78c3242764b56d7c",
+    "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php": "34bd1ff03fa08aa3d54a6c5a0e2d4b25c5efb7385c81547c0964c361ecea1c91",
+    "bootstrap/app.php": "36adabf5e7aa11e05d9e010e441cb3740cfe431faa3c1cabd03e8f78ae39a6fb",
+    "config/production-account-features.php": "e7b7669ed02e5773b5145ef6420c3ac76a5eaf66d5c3bb20f653be46b1e50e4b",
+    "resources/css/production-customer-features.css": "94cf8b314920d3b1721a4c307c1fc2c860f42a5d9ad295ae0e57145c749d94f4",
+    "resources/js/Pages/ProductionCustomerFeatures.tsx": "6dd0bef458e62c8ecc9ba60838b245aa447ef9d3cc1b210191b9bef479c8db5c",
+    "resources/js/Pages/ProductionCustomerIdentity.tsx": "dac8b0c066ed2ecd0e19c3f8c0445029af9fe20314e84c2ac846842a6700ff2a",
+    "resources/js/lib/production-account-features.ts": "617a0ef32a8d72a53659b60a738ecec84f8cc8f59d78b6d529c1af56d5359f29",
+    "routes/production-account-features.php": "89ca04175e3a0bb7747bdcb72eaa6aeb04ddbd43cb67e877c095af75a6b74f0e",
+    "routes/web.php": "9e497b98cf182d3fd6fb95eb1d70a01620d6157868da7ccb3a88231107a8f7ac",
+    "tests/Feature/ProductionFeatures/ProductionAccountFeaturesDefaultMountTest.php": "b2e988a8bb932e519a4a00661bcc8f8443cf7ac0a30f5956989f4b6857351425",
+    "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php": "8ddf2ad861d602f9bcbc0d120b557e53ea0bdf2a448305e725207d8b79a88570",
+    "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php": "b01af65f1af4d74af5f2259323d5b146acd699b93bf60dc5089ab26d5506c6d5",
+    "tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php": "4c68f09113173282746b8452e8f724799404f31a4b14866035451a66a777486f",
+    "tests/Feature/ProductionFeatures/ProductionFeatureTransactionOwnershipTest.php": "99c000fd31d8cd992228f5cc76ec2c6c3856de8235c7e8b7071113e27ecdb17a",
+    "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php": "2e610c1f3ad5e75f9c0980705c2050211ad73ae55f54661758ed70b6e44769a7",
+    "tests/frontend/production-account-features.test.tsx": "a1850f72e3d8950166be44a850ac1bfc32d303346632de32a84907dd49d33eaa"
+  },
+  "specification_verdict": "PASS within the documented focused development scope",
+  "tested_application_test_head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+  "typecheck_scope": "The archived successful typecheck is exact028; frontend source later changed. It is not a final68 typecheck claim. Exact publication preflight must enforce its applicable frontend/typecheck jobs. Current68 three-file frontend25/25 and external-directory Vite0 independently reconciled.",
+  "untested_or_unapproved": [
+    "Full Foundation/application/browser matrices",
+    "Physical SAPI/FPM/output handler/host verification and deployment",
+    "Wider native concurrency/performance or whole HTTP latency",
+    "Provider delivery/commercial/legal/launch acceptance, live accounts/payments/import/activation",
+    "Frozen adjacent unwrappedV1/generic/IdentityOriginalCommitWitness metadata and ordinary membership throwing-afterCommitP2"
+  ],
+  "verification_matrix": [
+    {
+      "evidence": "Actual booting fixture registration, shipped-default zero-query control, actual CompiledRouteCollection stale-mount control in currentHTTP29; raw mount source verified",
+      "requirement": "Default-off/literal mount and stale cache before identity/data work",
+      "result": "PASS focused"
+    },
+    {
+      "evidence": "Root real enrollment/sign-in, forced enabled forgery check and rotated/current token controls; current journey and exact4KiB/16KiB plus duplicate/escaped controls; parser/privacy/route source",
+      "requirement": "Real session/CSRF, bounded duplicate-free parsing, explicit initialize and no-write GET",
+      "result": "PASS focused"
+    },
+    {
+      "evidence": "Actual native send in isolated PHP child, RequestHandled/split/reentry/scope/body/actor/deadline/session-save/cookie positive controls; private epoch and one-use release source; native sixfocus includes real journey",
+      "requirement": "One original authority/deadline closing proof after real root callbacks",
+      "result": "PASS focused"
+    },
+    {
+      "evidence": "Final shared65 includes metadata negative/positive controls; authenticated old24/e9/1d8/b88 originals with genuine failures; original metadata admission in context/observer/frame source",
+      "requirement": "Reached raw metadata before offset/cast/delegate behavior",
+      "result": "PASS focused"
+    },
+    {
+      "evidence": "Final shared composition and native sixfocus; actual custody regressions red on5b and repaired closure/associative-hook controls; bookkeeping/transaction cleanup source",
+      "requirement": "Preserve owned versus foreign transaction/manager/dispatcher/hook state",
+      "result": "PASS focused"
+    },
+    {
+      "evidence": "SQLite exact named skip remainsS1; separate privateMySQL samecondition1/6/S0 actual0/0/0",
+      "requirement": "Native current committed credential visibility",
+      "result": "PASS native selection; SQLite condition SKIP"
+    },
+    {
+      "evidence": "Current68 frontend25/25 acrossthreefiles, current production UI/helper read; strict bounded UTF8/envelopes, explicit init, late search/logout/page exit, ownversion export, canGrant/notice and pending suppression",
+      "requirement": "UI scope/cancellation/uncertainty/export/unknown consent",
+      "result": "PASS focused"
+    }
+  ]
+}

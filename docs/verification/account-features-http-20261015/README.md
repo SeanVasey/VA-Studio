@@ -1,6 +1,6 @@
 # B4 account-feature HTTP development evidence
 
-Current executable candidate: `68d22b7e0db7bf60a5f8e46f3878c205f7289129`. Independent source review approves with evidence conditions. All application checks below are closed; final independent sealed-evidence review and publication remain pending.
+Current executable candidate: `68d22b7e0db7bf60a5f8e46f3878c205f7289129`. Fresh separate final review at `6fdabe77b839eb821fa418f53057707898f5eb3c` records **APPROVE FOCUSED DEVELOPMENT SOURCE AND SEALED EVIDENCE**, with no material finding or open P0/P1. All application checks below are closed. Exact publication-head carry, cheap preflight, complete remote inventory and expected-SHA merge remain pending.
 
 The default-off root composes the existing production253 services with session/CSRF routes, one bounded JSON capture, private errors, one atomic post-kernel release and a separate production UI. GET never initializes. The original successful ordinary commit, retained domain authority and original ten-second deadline govern a one-use read-only closing frame after session saving and every RequestHandled listener. Existing non-HTTP callers close immediately. Native emission is tested in isolated PHP CLI children; physical SAPI/host, complete browser and full Foundation acceptance are unverified.
 
@@ -60,4 +60,20 @@ The owned native server used a separate datadir volume,127.0.0.1:33521 and socke
 
 Direct shared SQLite composition passed65/491/F0/E0/S1. Its exact skip is `ProductionIdentityCommittedFrameTest::test_native_validation_reads_current_committed_credential_instead_of_an_old_repeatable_read_snapshot`, because READ COMMITTED visibility requires native MySQL; the later1/6 run executes that condition. The SQLite skip remains a skip. The seven selected whole files and exact argv are preserved in the archive; this is no whole application matrix or wider concurrency claim.
 
-The sealed archive contains25 completed original invocations,20 captured Git heads,2,447 deduplicated tracked Git blobs,13 actual physical Composer loader files and2,782 members;14,095,635 bytes, SHA256 `0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60`. Each tracked input is verified against its original head/blob and SHA256; all actual loader bodies match retained original hashes. Every completed original has authenticated recorder/observed-OS/source binding. Full nonzero logs/XML remain privately retained and hash-bound; no whole-object private runtime dump is copied into Git. Independent final packet review and exact-head development publication are the remaining gates.
+The sealed archive contains25 completed original invocations,20 captured Git heads,2,447 deduplicated tracked Git blobs,13 actual physical Composer loader files and2,782 members;14,095,635 bytes, SHA256 `0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60`. Each tracked input is verified against its original head/blob and SHA256; all actual loader bodies match retained original hashes. Every completed original has authenticated recorder/observed-OS/source binding. Full nonzero logs/XML remain privately retained and hash-bound; no whole-object private runtime dump is copied into Git. The final separate sealed-packet review is complete and approved; exact-head development publication remains gated as above.
+
+## Final decision and publication appendix
+
+The original final decision, structured report and mechanical-verification receipt are imported byte-identically alongside the unchanged sealed archive. The independent reviewer authenticated all25 originals (10passing/15nonzero), all30 private failure log/XML originals, all tracked and physical input bindings and native stop receipts. Original failures remain failures.
+
+`npm run typecheck` passed with process exit0 at clean6fd, with before/after source unchanged and application/UI bytes identical to tested68. Its original JSON and log are the versioned publication appendix; the old archive and receipt were not rewritten. The archived028 typecheck remains its earlier scope. Hosted preflight is still required.
+
+Reviewer startup initially returned an aborted spawn, then an existing-path response on one retry. Resuming that existing reviewer session succeeded; its completed decision above replaces no failed application check. No application process or source mutation occurred during that coordination anomaly.
+
+Original appendix SHA256 bindings:
+
+- `account-features-http-final-review-6fdabe77-20261015-original.md`: `ac1e97934062b5109e57e0f3c51215563d2f1c75e5db4b46d950fc8de7c721de`
+- `account-features-http-final-review-6fdabe77-20261015-original.json`: `068cd998ff8f3e9dd0cf356cc5903c8ee3f52838f7785f9df0ab26b7e8b152e4`
+- `account-features-http-final-review-6fdabe77-20261015-verification-original.json`: `dbd32c9af51ef585e4a68aafa06e665b1715516277affea27a5940965b9785a9`
+- `typecheck-6fd-final-original.json`: `288137c1a72d2068fd4014ccfa4cf5788cf078a19713bba581072b571c0d8f56`
+- `typecheck-6fd-final-original.log`: `8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f`
