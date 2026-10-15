@@ -1,0 +1,11 @@
+{
+  "reviewer_preparation": true,
+  "original_verifier": "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py",
+  "original_exit": 1,
+  "phase": "initial exact-head/clean worktree guard before archive verification",
+  "error": "AssertionError: candidate not clean",
+  "application_tests_executed": false,
+  "artifact_changed_by_reviewer": false,
+  "original_error_text_sha256": "32833e3d28413fe8b6fe096347b61b3750b980019b73dd0670e33e5b6136c0b6",
+  "next_step": "Wait for root corrected docs-only clean frozen candidate; preserve original verifier/error and run same bounded checks on corrected successor."
+}

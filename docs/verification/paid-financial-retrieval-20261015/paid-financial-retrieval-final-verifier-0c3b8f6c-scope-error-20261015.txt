@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py", line 132, in <module>
+    for old in [carry['prior_candidate_tested_head'],carry['prior_sdk_tested_head'],tested]:require(sha(git('show',old+':'+p))==wanted,'immutable carry '+p)
+                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py", line 11, in require
+    if not v:raise AssertionError(message)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: immutable carry app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php
