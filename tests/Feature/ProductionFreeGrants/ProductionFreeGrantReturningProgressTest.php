@@ -150,4 +150,42 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
         $transfer = $this->transfer('private synthetic bytes', 200, 30, fn () => $value);
         $this->expired(fn () => $transfer->writeTo(static function (): void {}));
     }
+
+    public function test_a_clock_reversal_after_a_returning_chunk_refuses_and_closes(): void
+    {
+        $transfer = $this->transfer('small');
+        $this->tick = 1;
+        $this->expired(fn () => $transfer->writeTo(function (): void {
+            $this->tick = 0;
+        }));
+    }
+
+    public function test_zero_base_startup_cannot_be_borrowed_after_the_first_acceptance(): void
+    {
+        $transfer = $this->transfer(str_repeat('p', 2097152), 200, 0);
+        $sent = 0;
+        $this->expired(function () use ($transfer, &$sent): void {
+            $transfer->writeTo(function (string $chunk) use (&$sent): void {
+                $sent += strlen($chunk);
+                $this->tick = $sent === 1048576 ? 64_000_000_000 : 129_000_000_000;
+            });
+        });
+        $this->assertSame(2097152, $sent, 'Final acceptance exceeds its original 128s quota even though each callback returned.');
+    }
+
+    public function test_partial_progress_policy_is_rejected_without_minting_a_transfer(): void
+    {
+        $this->input = fopen('php://temp', 'w+b');
+        $prepared = new PreparedDeliveryStream($this->input, hash('sha256', 'x'), 1);
+        try {
+            new ProductionFreeGrantTransfer($prepared, 'synthetic.bin', 'application/octet-stream', 200_000_000_000,
+                fn (): int => 0, 0, 16384);
+            $this->fail('A partial captured progress policy must refuse.');
+        } catch (\LogicException $error) {
+            $this->assertSame('Invalid transfer progress policy.', $error->getMessage());
+        } finally {
+            $prepared->close();
+        }
+        $this->assertFalse(is_resource($this->input));
+    }
 }

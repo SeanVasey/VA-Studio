@@ -139,7 +139,7 @@ class ProductionFreeGrantSpool
             $reservation = null;
             try {
                 if ($holder !== null) {
-                    $this->accountAvailable($directory, $slots, $number, $holder);
+                    $this->accountAvailable($directory, $number, $holder);
                 }
                 $space = $this->freeBytes($directory);
                 $pending = $this->pending($directory, $number);
@@ -223,13 +223,15 @@ class ProductionFreeGrantSpool
     }
 
     /** Global admission and own slot are held. Unknown held marks never establish an available account. */
-    private function accountAvailable(string $directory, int $slots, int $own, string $holder): void
+    private function accountAvailable(string $directory, int $own, string $holder): void
     {
-        for ($slot = 0; $slot < $slots; $slot++) {
-            if ($slot === $own) {
+        $locks = glob($directory.'/slot-*.lock');
+        ProductionFreeGrantException::require(is_array($locks), 'spool_busy');
+        foreach ($locks as $lock) {
+            if (preg_match('~/slot-(0|[1-9][0-9]*)\.lock\z~D', $lock, $match) !== 1 || $match[1] === (string) $own) {
                 continue;
             }
-            $probe = $this->lease($directory.'/slot-'.$slot.'.lock');
+            $probe = $this->lease($lock);
             try {
                 if (@flock($probe, LOCK_EX | LOCK_NB)) {
                     @flock($probe, LOCK_UN);
@@ -239,7 +241,7 @@ class ProductionFreeGrantSpool
             } finally {
                 fclose($probe);
             }
-            $path = $directory.'/slot-'.$slot.'.holder';
+            $path = $directory.'/slot-'.$match[1].'.holder';
             try {
                 clearstatcache(true, $path);
                 $before = @lstat($path);

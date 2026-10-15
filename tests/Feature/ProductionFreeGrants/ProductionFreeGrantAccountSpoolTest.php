@@ -136,4 +136,32 @@ final class ProductionFreeGrantAccountSpoolTest extends TestCase
         $other = $this->prepare(hash('sha256', 'synthetic-account-d'), null, 1);
         $this->assertSame(str_repeat('s', 4096), stream_get_contents($other->stream()));
     }
+
+    public function test_an_unknown_holder_in_a_high_live_slot_refuses_after_slot_count_shrinks(): void
+    {
+        $low = $this->prepare(hash('sha256', 'synthetic-account-b'));
+        $middle = $this->prepare(hash('sha256', 'synthetic-account-c'));
+        $this->prepare(hash('sha256', 'synthetic-account-a'));
+        $low->close();
+        $middle->close();
+        unlink($this->directory.'/slot-2.holder');
+        $filled = false;
+        $this->refused(function () use (&$filled): void {
+            $this->prepare(hash('sha256', 'synthetic-account-d'), function () use (&$filled): void {
+                $filled = true;
+            }, 1);
+        });
+        $this->assertFalse($filled);
+        $this->assertFileDoesNotExist($this->directory.'/slot-2.holder');
+    }
+
+    public function test_a_failed_fill_releases_the_account_and_its_owned_slot(): void
+    {
+        $account = hash('sha256', 'synthetic-account-a');
+        $this->refused(fn () => $this->prepare($account, static function (): never {
+            throw new \RuntimeException('synthetic fill failure');
+        }), 'artifact_unavailable');
+        $this->assertSame([], glob($this->directory.'/*.snapshot'));
+        $this->assertSame(str_repeat('s', 4096), stream_get_contents($this->prepare($account)->stream()));
+    }
 }

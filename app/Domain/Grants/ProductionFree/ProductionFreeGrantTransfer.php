@@ -64,6 +64,7 @@ final class ProductionFreeGrantTransfer
     private function within(int $acceptedBytes): void
     {
         $now = $this->clock === null ? hrtime(true) : ($this->clock)();
+        ProductionFreeGrantException::require(is_int($now) && $now >= 0, 'expired');
         ProductionFreeGrantException::require($now < $this->deadline, 'expired');
         if ($this->startedNs === null) {
             return;
