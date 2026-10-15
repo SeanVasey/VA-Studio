@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -128,6 +129,7 @@ final class ProductionAccountFeatureAccess
     private function resolvedConnections(CurrentRows $reader): void
     {
         $primary = $reader->identityPrimary();
+        IdentityMetadataAdmission::admit($primary);
         $connection = DB::connection();
         if ($connection->getRawPdo() !== $primary || $connection->getDriverName() !== $reader->identityDriver()
             || $connection->transactionLevel() !== 1 || ! $primary->inTransaction()) {

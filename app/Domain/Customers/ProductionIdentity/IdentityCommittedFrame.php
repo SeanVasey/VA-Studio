@@ -11,6 +11,8 @@ use Throwable;
 /** One-use read-only physical frame after normal Laravel commit/events. No identity or source writer. */
 final class IdentityCommittedFrame
 {
+    private IdentityMetadataAdmission $admission;
+
     private Connection $connection;
 
     private PDO $primary;
@@ -31,7 +33,8 @@ final class IdentityCommittedFrame
 
     private function __construct(private readonly CurrentRows $reader, private readonly int $originalDeadlineNs)
     {
-        $this->connection = DB::connection();
+        $this->admission = IdentityMetadataAdmission::capture();
+        $this->connection = $this->admission->connection();
         $this->primary = $reader->identityPrimary();
         $this->driver = $reader->identityDriver();
         $this->schema = $this->driver === 'sqlite' ? 'main' : $this->connection->getDatabaseName();
@@ -169,6 +172,7 @@ final class IdentityCommittedFrame
 
     private function connectionCurrent(): void
     {
+        $this->admission->requireCurrent($this->primary);
         if (! in_array($this->driver, ['sqlite', 'mysql'], true) || $this->primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $this->driver
             || DB::connection() !== $this->connection || $this->connection->getRawPdo() !== $this->primary
             || $this->connection->getDriverName() !== $this->driver || $this->connection->transactionLevel() !== 0

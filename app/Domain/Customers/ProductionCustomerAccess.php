@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityEvidence;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityHistoricalPlainRows;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityRows;
 use App\Models\User;
@@ -24,6 +25,8 @@ final class ProductionCustomerAccess
     /** Standalone captured-primary proof used to mint and before/after provider I/O. */
     public function source(User $trustedActor): array
     {
+        $admission = IdentityMetadataAdmission::capture();
+        $actorId = IdentityMetadataAdmission::actorId($trustedActor);
         $policy = new IdentityPolicy;
         $policy->outsideTransactions();
         $connection = DB::connection();
@@ -32,11 +35,11 @@ final class ProductionCustomerAccess
             throw new IdentityException;
         }
 
-        $actorId = $trustedActor->id;
         $reader = new CurrentRows($primary, $connection->getDriverName());
         $proof = $connection->transaction(fn (): array => $this->read($trustedActor, $reader));
         // TransactionCommitted callbacks are still application callbacks: close them before minting.
-        if ($trustedActor->id !== $actorId || DB::connection() !== $connection || $connection->getPdo() !== $primary || $primary->inTransaction()) {
+        $admission->requireCurrent();
+        if (IdentityMetadataAdmission::actorId($trustedActor) !== $actorId || DB::connection() !== $connection || $connection->getPdo() !== $primary || $primary->inTransaction()) {
             throw new IdentityException;
         }
         $policy->outsideTransactions();
@@ -46,6 +49,7 @@ final class ProductionCustomerAccess
         }
         $policy->outsideTransactions();
         $policy->requireEnabled();
+        $admission->requireCurrent();
 
         return $terminal;
     }
@@ -213,14 +217,13 @@ final class ProductionCustomerAccess
 
     private function read(User $actor, CurrentRows $sourceReader, ?IdentityRows $committedReader = null): array
     {
+        IdentityMetadataAdmission::admit($sourceReader->identityPrimary());
+        $actorId = IdentityMetadataAdmission::actorId($actor);
         $reader = $committedReader ?? IdentityRows::from($sourceReader);
         $policy = new IdentityPolicy;
         $policy->requireEnabled();
-        if ($actor::class !== User::class || ! $actor->exists || ! is_int($actor->getKey()) || $actor->id < 1) {
-            throw new IdentityException;
-        }
-        $user = $reader->one('users', $actor->id);
-        $accounts = $reader->rows('customer_accounts', 'user_id = ?', [$actor->id], 2);
+        $user = $reader->one('users', $actorId);
+        $accounts = $reader->rows('customer_accounts', 'user_id = ?', [$actorId], 2);
         $account = count($accounts) === 1 ? $accounts[0] : [];
         if ($user === [] || (string) $user['is_admin'] !== '0' || $user['email_verified_at'] === null
             || $account === [] || (string) $account['active'] !== '1' || (int) $account['access_version'] < 1
@@ -288,7 +291,7 @@ final class ProductionCustomerAccess
 
     private function match(ProductionCustomerPrincipal $principal, User $actor, array $proof): void
     {
-        if ($actor->id !== $principal->userId || (int) $proof['user']['id'] !== $principal->userId
+        if (IdentityMetadataAdmission::actorId($actor) !== $principal->userId || (int) $proof['user']['id'] !== $principal->userId
             || (int) $proof['account']['id'] !== $principal->accountId || (int) $proof['account']['access_version'] !== $principal->accessVersion
             || ! $principal->matchesPrivate($proof['owner_digest'], $proof['credential_binding'])
             || CanonicalJson::encode($principal->durableBinding()) !== CanonicalJson::encode($proof['durable_binding'])) {
