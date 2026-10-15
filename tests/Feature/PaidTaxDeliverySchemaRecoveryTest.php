@@ -258,4 +258,32 @@ final class PaidTaxDeliverySchemaRecoveryTest extends TestCase
         $this->assertSame($before, $this->objects());
         $this->assertSame($rows, $this->prior());
     }
+
+    public function test_each_selected_empty_committed_prefix_recovers_without_changing_old_families(): void
+    {
+        $steps = $this->plan();
+        $cuts = DB::getDriverName() === 'sqlite' ? range(0, count($steps)) : array_values(array_unique([
+            0, 1, array_key_first(array_filter($steps, fn ($sql) => str_contains($sql, 'foreign key'))) + 1,
+            array_key_first(array_filter($steps, fn ($sql) => str_contains($sql, 'add unique'))) + 1,
+            array_key_first(array_filter($steps, fn ($sql) => str_starts_with($sql, 'CREATE TRIGGER'))) + 1, count($steps),
+        ]));
+        $prior = $this->prior();
+        foreach ($cuts as $cut) {
+            $this->dropOwned();
+            DB::table('migrations')->where('migration', self::MIGRATION)->delete();
+            foreach (array_slice($steps, 0, $cut) as $sql) {
+                DB::unprepared($sql);
+            }
+            $this->assertFalse(DB::getPdo()->inTransaction(), 'The prefix must actually be physically committed.');
+            $this->assertSame($prior, $this->prior());
+            $survivors = $this->objects();
+            $this->migrate();
+            $this->assertSurvivors($survivors, $this->objects());
+            PaidTaxDeliverySchema::assertInstalled();
+            PaidTaxSchema::assertInstalled();
+            $this->assertSame($prior, $this->prior());
+            $this->assertDatabaseCount('paid_tax_authorizations', 0);
+            $this->assertDatabaseCount('paid_tax_redemptions', 0);
+        }
+    }
 }
