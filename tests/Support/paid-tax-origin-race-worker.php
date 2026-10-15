@@ -53,6 +53,7 @@ while (! is_file($directory.'/start')) {
 try {
     // Authentication precedes the barrier; the ordinary command budget starts exactly once inside finalize.
     $phase = 'command-started';
+    $commandStarted = hrtime(true);
     $projection = (new PaidTaxGrants)->finalize($buyer['principal'], $buyer['user'], $input['order_id']);
     $result = 'saved';
 } catch (Throwable $error) {
@@ -60,8 +61,14 @@ try {
     $errorClass = $error::class;
     $status = property_exists($error, 'status') ? $error->status : null;
     $location = basename($error->getFile()).':'.$error->getLine();
+    // Call sites only: never include arguments, SQL bindings, configuration or credentials.
+    $trace = array_map(static fn (array $frame): array => [
+        'call' => ($frame['class'] ?? '').($frame['type'] ?? '').($frame['function'] ?? ''),
+        'site' => isset($frame['file']) ? basename($frame['file']).':'.($frame['line'] ?? 0) : null,
+    ], array_slice($error->getTrace(), 0, 12));
 }
 echo json_encode(['result' => $result, 'id' => $projection['id'] ?? null, 'order_id' => $projection['orderId'] ?? null,
     'error_class' => $errorClass ?? null, 'status' => $status ?? null, 'location' => $location ?? null, 'phase' => $phase,
+    'trace' => $trace ?? [], 'command_elapsed_seconds' => (hrtime(true) - $commandStarted) / 1_000_000_000,
     'connection_id' => $connectionId, 'pid' => getmypid(),
     'transaction_level' => DB::transactionLevel(), 'in_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);

@@ -72,6 +72,14 @@ class PaidTaxNativeBoundaryTest extends TestCase
         }
         DB::commit();
         $results = [$this->finish($one), $this->finish($two)];
+        // Retain both isolated outcomes in the test receipt before any assertion can stop it.
+        fwrite(STDOUT, 'Native Tax worker outcomes: '.json_encode($results, JSON_THROW_ON_ERROR).PHP_EOL);
+        foreach ($results as $index => $result) {
+            $this->assertNull($result['error_class'], 'Native Tax worker refusal: '.json_encode($result, JSON_THROW_ON_ERROR));
+            $this->assertSame(0, $result['transaction_level']);
+            $this->assertFalse($result['in_transaction']);
+            $this->assertSame([$one, $two][$index]['connection_id'], $result['connection_id']);
+        }
         $this->assertSame(['saved', 'saved'], array_column($results, 'result'));
         $this->assertSame($results[0]['id'], $results[1]['id']);
         $this->assertSame([$second['order']['orderId'], $second['order']['orderId']], array_column($results, 'order_id'));
@@ -166,13 +174,8 @@ class PaidTaxNativeBoundaryTest extends TestCase
     {
         $worker['process']->wait();
         $this->assertSame(0, $worker['process']->getExitCode(), 'The isolated native worker did not complete.');
-        $result = json_decode($worker['process']->getOutput(), true, 8, JSON_THROW_ON_ERROR);
-        $this->assertNull($result['error_class']);
-        $this->assertSame(0, $result['transaction_level']);
-        $this->assertFalse($result['in_transaction']);
-        $this->assertSame($worker['connection_id'], $result['connection_id']);
 
-        return $result;
+        return json_decode($worker['process']->getOutput(), true, 16, JSON_THROW_ON_ERROR);
     }
 
     private function waiting(int $requester, int $blocker, int $userId): bool
