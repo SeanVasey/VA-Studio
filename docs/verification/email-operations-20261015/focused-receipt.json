@@ -1,0 +1,216 @@
+{
+  "tested_source": "4635d182f6c6113b2c496ff45a924db91d47a503",
+  "invocation_count": 1,
+  "tests": 30,
+  "process_exit": 0,
+  "source_unchanged": true,
+  "command": [
+    "python3",
+    "scripts/ops/test-email-operations-preflight.py"
+  ],
+  "archive_sha256": "a3d9cf51a16b1a48553af9f2c26df0cd7648670b1a847105e36d9ba9047570f3",
+  "archive_bytes": 29156,
+  "member_count": 19,
+  "members": [
+    {
+      "member": "source/scripts/ops/email-operations-preflight.py",
+      "bytes": 11165,
+      "sha256": "c4be1f03cf1d451328cf2d5f18a27b9403ed28f6c94ff67d48c417b7e294cc1c"
+    },
+    {
+      "member": "source/scripts/ops/test-email-operations-preflight.py",
+      "bytes": 13714,
+      "sha256": "cf97d22a914fd05de927e056dc6416a1ba9c36926e570f1a4549897ff3c4f0d8"
+    },
+    {
+      "member": "source/ops/email-operations/facts.example.json",
+      "bytes": 1384,
+      "sha256": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9"
+    },
+    {
+      "member": "source/docs/ops/email-operations-runtime.md",
+      "bytes": 5864,
+      "sha256": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4"
+    },
+    {
+      "member": "source/app/Jobs/DeliverProductionIdentityNotice.php",
+      "bytes": 526,
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "member": "source/app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "bytes": 2408,
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "member": "source/app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "bytes": 5114,
+      "sha256": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775"
+    },
+    {
+      "member": "source/app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "bytes": 10653,
+      "sha256": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc"
+    },
+    {
+      "member": "source/app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "bytes": 13251,
+      "sha256": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e"
+    },
+    {
+      "member": "source/app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "bytes": 7188,
+      "sha256": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f"
+    },
+    {
+      "member": "source/app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php",
+      "bytes": 1063,
+      "sha256": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd"
+    },
+    {
+      "member": "source/config/production-customer-identity.php",
+      "bytes": 261,
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "member": "source/config/production-identity-smtp.php",
+      "bytes": 220,
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "member": "source/config/production-suppression.php",
+      "bytes": 256,
+      "sha256": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49"
+    },
+    {
+      "member": "source/config/mail.php",
+      "bytes": 3631,
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "member": "source/routes/console.php",
+      "bytes": 572,
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    },
+    {
+      "member": "originals/cli-focused-4635-original.json",
+      "bytes": 580,
+      "sha256": "006d5e6dfee3c71df4755d12d27be91837ca8d2ad24cedd10b34c573f98a8e1b"
+    },
+    {
+      "member": "originals/cli-focused-4635-original.log",
+      "bytes": 129,
+      "sha256": "4a617620bcaa62b11198745d75b6575aedfd95edc6892ce34d33910c4cd839f4"
+    },
+    {
+      "member": "originals/run-quality.py",
+      "bytes": 1253,
+      "sha256": "1daa5c8c4dfc0b62f3cf53ec652c3ee3e73a3878bed64eded5b4b8953857fb29"
+    }
+  ],
+  "captured_source": [
+    {
+      "path": "scripts/ops/email-operations-preflight.py",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "6d37157cae6699e8e6f89980e566452dbc10db19",
+      "sha256": "c4be1f03cf1d451328cf2d5f18a27b9403ed28f6c94ff67d48c417b7e294cc1c"
+    },
+    {
+      "path": "scripts/ops/test-email-operations-preflight.py",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "6ce7e85ed883c200b2950b1090a9740154322445",
+      "sha256": "cf97d22a914fd05de927e056dc6416a1ba9c36926e570f1a4549897ff3c4f0d8"
+    },
+    {
+      "path": "ops/email-operations/facts.example.json",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "019632254e3e6115fe86a703579b46beaf7e5951",
+      "sha256": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9"
+    },
+    {
+      "path": "docs/ops/email-operations-runtime.md",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "290c413e7ea9069a5992bcc1961c84b2be9e3c80",
+      "sha256": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4"
+    },
+    {
+      "path": "app/Jobs/DeliverProductionIdentityNotice.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "b57f6eb902104974b858fc4f044988163ca8ef02",
+      "sha256": "061de336297e398ded168dad925457b69dbf4c05242bde6f9591e7837280e539"
+    },
+    {
+      "path": "app/Console/Commands/ProcessProductionIdentityNotices.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "a1edbed5480e85674ba96a1484aa25f36d0fb0ef",
+      "sha256": "1d7cdcd3cd5facc769df0f69e0c87997cb7753f06cbe92837648e164da6dcdb7"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityPolicy.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "95228799b3ac9b79336da991fdb7722bf727d38b",
+      "sha256": "8825d44b84067699e69236ee823748eba70967a2b1e5c90fb604265f59656775"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRequests.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "df22135d2b81c53738c9129221089c5378dbd7a4",
+      "sha256": "186f76459a29f999dcd2cf59c408b5230fd1d3b5f0005f256f75b91fe7f5efdc"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/WorkIdentityNotice.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "ba5a110d474dc6a071c7b51bab5f653f5818801a",
+      "sha256": "37462eb8e71546483d61047b67db49ea5b091a529a82c3cd10e1760642775c8e"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "cbbf9ef252a293a0a0dea23f335caacf52925b6b",
+      "sha256": "f3cdee9241b59020beb6f5b2d73f02a7e42f55b10e6b05f12064d8a3cf89f51f"
+    },
+    {
+      "path": "app/Domain/Customers/ProductionFeatures/Suppression/ProductionSuppressionProvider.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "735ef824544d7ce0fc85ab1339f22307db28124c",
+      "sha256": "71791e0b0d9f07c2373cfe871064dc2d12452dc5d8ef3a20bc96423ebb2303bd"
+    },
+    {
+      "path": "config/production-customer-identity.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "5832ea430ca56a532abb5d1bae15a7c9df9078c4",
+      "sha256": "5e4bf0c3b2505a735c833a195e441d67913e71a62438f083a30c353f73c34188"
+    },
+    {
+      "path": "config/production-identity-smtp.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "dc5838b87a3127d998ac8b972b666e723c9c991f",
+      "sha256": "75413404f81d57f54eb4c4d838c795c50a18a0b44cbb50e0d3363961df75b3f9"
+    },
+    {
+      "path": "config/production-suppression.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "1243ecabc67573207be8b8f066ea5c586f681c53",
+      "sha256": "84a6654f8917351ff5bcf2c28cf1e7041a272e655030c594f0825a6528fe9e49"
+    },
+    {
+      "path": "config/mail.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "e32e88da2cc82d4139c032c28b03005afc6008c6",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "path": "routes/console.php",
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "git_blob": "dac0e48095333f6da2d6d39843904c1de7ed957e",
+      "sha256": "a8f59fe29174f0ea5714cdc1ac1731af09e0d413825eb877a159d96bb157c2a3"
+    }
+  ],
+  "untested": [
+    "real sender/provider/retention inputs",
+    "host/SAPI/effectivecache/queue/scheduler installation",
+    "real DNS/TLS/authentication/accountscope/submission/delivery/reconciliation",
+    "native/performance/activation/fullrelease"
+  ],
+  "native_sql": "Inapplicable: no SQL or application/domain changes; no native DB test executed"
+}
