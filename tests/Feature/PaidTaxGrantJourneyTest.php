@@ -25,6 +25,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -416,6 +417,159 @@ class PaidTaxGrantJourneyTest extends TestCase
         $this->assertIsInt($publicationBudget);
         $this->assertLessThanOrEqual($entryBound, $publicationBudget, 'Publication restarted time spent in the original claim clock.');
         $this->assertTrue($complete['fulfilled']);
+    }
+
+    public static function begunFailures(): array
+    {
+        return ['ordinary throw' => ['throw'], 'purpose withdrawal' => ['withdraw']];
+    }
+
+    #[DataProvider('begunFailures')]
+    public function test_begin_delegate_refusal_closes_only_the_original_frame_and_discards_its_callbacks(string $behavior): void
+    {
+        $f = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $delegate = $connection->getEventDispatcher();
+        $manager = (new \ReflectionProperty(\Illuminate\Database\Connection::class, 'transactionsManager'))->getValue($connection);
+        $calls = 0;
+        $callbacks = 0;
+        $delegate->listen(TransactionBeginning::class, static function () use ($behavior, &$calls, &$callbacks): void {
+            if ($calls++ !== 0) {
+                return;
+            }
+            DB::afterCommit(static function () use (&$callbacks): void { $callbacks++; });
+            DB::afterRollBack(static function () use (&$callbacks): void { $callbacks++; });
+            if ($behavior === 'throw') {
+                throw new \RuntimeException('Synthetic ordinary begin failure.');
+            }
+            config(['paid-tax-grants.rehearsal_enabled' => false]);
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (\Throwable $error) {
+                $failure = $error;
+            }
+            $this->assertSame(1, $calls);
+            $this->assertInstanceOf($behavior === 'throw' ? \RuntimeException::class : PaidTaxException::class, $failure);
+            if ($behavior === 'throw') {
+                $this->assertSame('Synthetic ordinary begin failure.', $failure->getMessage());
+            } else {
+                $this->assertSame(503, $failure->status);
+            }
+            $this->assertFalse($pdo->inTransaction(), 'An original transaction leaked after an ordinary begun delegate refused.');
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertCount(0, $manager->getPendingTransactions());
+            $this->assertCount(0, $manager->getCommittedTransactions());
+            $this->assertSame(0, $callbacks, 'Owned deferred callbacks ran during refusal cleanup.');
+            $this->assertSame($delegate, $connection->getEventDispatcher());
+            $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        } finally {
+            config(['paid-tax-grants.rehearsal_enabled' => true]);
+            // Baseline reproduction can leak; only the fixture closes its own leftover transaction.
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($f['order']['orderId'], $retry['orderId']);
+        $this->assertSame(0, $callbacks);
+        $this->assertDatabaseCount('paid_tax_order_origins', 1);
+    }
+
+    public function test_begin_delegate_direct_reopen_and_throw_preserves_unrelated_work_and_replacement_dispatcher(): void
+    {
+        $f = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $pdo->exec('CREATE TABLE paid_tax_begin_reopen_probe (id INTEGER PRIMARY KEY)');
+        $manager = (new \ReflectionProperty(\Illuminate\Database\Connection::class, 'transactionsManager'))->getValue($connection);
+        $replacement = new \Illuminate\Events\Dispatcher(app());
+        $callbacks = 0;
+        $calls = 0;
+        $connection->getEventDispatcher()->listen(TransactionBeginning::class, static function () use ($connection, $pdo, $replacement, &$callbacks, &$calls): void {
+            $calls++;
+            DB::afterCommit(static function () use (&$callbacks): void { $callbacks++; });
+            DB::afterRollBack(static function () use (&$callbacks): void { $callbacks++; });
+            $pdo->commit();
+            $pdo->beginTransaction();
+            $pdo->exec('INSERT INTO paid_tax_begin_reopen_probe VALUES (456)');
+            $connection->setEventDispatcher($replacement);
+            throw new \RuntimeException('Synthetic begun reopen failure.');
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (\Throwable $error) {
+                $failure = $error;
+            }
+            $this->assertSame(1, $calls);
+            $this->assertInstanceOf(\RuntimeException::class, $failure);
+            $this->assertSame('Synthetic begun reopen failure.', $failure->getMessage());
+            $this->assertTrue($pdo->inTransaction(), 'Cleanup rolled back unrelated reopened physical work.');
+            $this->assertSame([456], $pdo->query('SELECT id FROM paid_tax_begin_reopen_probe')->fetchAll(\PDO::FETCH_COLUMN));
+            $this->assertSame($replacement, $connection->getEventDispatcher());
+            $this->assertCount(0, $manager->getPendingTransactions());
+            $this->assertCount(0, $manager->getCommittedTransactions());
+            $this->assertSame(0, $callbacks);
+            $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM paid_tax_order_origins')->fetchColumn());
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+        $this->assertSame(0, $callbacks);
+    }
+
+    public function test_live_budget_shortened_in_begin_delegate_closes_original_without_renewal(): void
+    {
+        $f = $this->paid();
+        $budget = PaidTaxDeadline::start();
+        $runtime = \App\Domain\Grants\PaidTax\PaidTaxRuntime::capture($budget);
+        $originalEnd = $budget->value();
+        $connection = $runtime->connection;
+        $delegate = $connection->getEventDispatcher();
+        $calls = 0;
+        $ran = false;
+        $delegate->listen(TransactionBeginning::class, static function () use ($budget, &$calls): void {
+            if ($calls++ === 0) {
+                $budget->shortenTo(hrtime(true) - 1);
+            }
+        });
+        $original = null;
+        $failure = null;
+        try {
+            try {
+                \App\Domain\Grants\PaidTax\PaidTaxTransaction::run($runtime, static function () use (&$ran): array {
+                    $ran = true;
+
+                    return [];
+                }, $original);
+            } catch (PaidTaxException $error) {
+                $failure = $error;
+                \App\Domain\Grants\PaidTax\PaidTaxCleanup::abort(null, null, $original);
+            }
+            $this->assertSame(1, $calls);
+            $this->assertInstanceOf(PaidTaxException::class, $failure);
+            $this->assertSame(410, $failure->status);
+            $this->assertFalse($ran);
+            $this->assertLessThan($originalEnd, $budget->value());
+            $this->assertFalse($runtime->primary->inTransaction());
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame($delegate, $connection->getEventDispatcher());
+        } finally {
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($f['order']['orderId'], $retry['orderId']);
     }
 }
 
