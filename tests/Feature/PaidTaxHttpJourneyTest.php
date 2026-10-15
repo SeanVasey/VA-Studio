@@ -299,7 +299,8 @@ final class PaidTaxHttpJourneyTest extends TestCase
         $this->assertSame($first, (array) DB::table('paid_tax_originals')->where('id', $first['id'])->sole());
         $this->assertDatabaseCount('paid_tax_originals', 2);
         foreach ($complete['lines'] as $index => $line) {
-            $original = (array) DB::table('paid_tax_originals')->where('origin_public_id', $line['id'])->sole();
+            $originId = DB::table('paid_tax_grant_origins')->where('public_id', $line['id'])->soleValue('id');
+            $original = (array) DB::table('paid_tax_originals')->where('origin_id', $originId)->sole();
             $artifact = PaidTaxRecords::decode($original)['artifact'];
             foreach (['contract', 'master_wav'] as $kind) {
                 $a = $this->postTax('/paid-tax-grants/origins/'.$batch['id'].'/lines/'.$line['id'].'/authorize',

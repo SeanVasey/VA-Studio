@@ -1,0 +1,152 @@
+{
+  "changed_path_bindings": [
+    {
+      "git_blob": "bf47ec7daeef5b15925b2e6db05e8bbb8c615c1e",
+      "path": "app/Http/Tax/PaidTaxRequestContext.php",
+      "sha256": "d790bc0caaab8009265ba008041587160d412d7d821949829627a66a534a3886"
+    },
+    {
+      "git_blob": "ca4de303409cc80c8befe9fe5c4defb029427132",
+      "path": "app/Http/Tax/PaidTaxStreamResponse.php",
+      "sha256": "a34ab4830ac0d1a3d71c960e8cb26e9417a6242f236bc77d4d8521198052a920"
+    },
+    {
+      "git_blob": "1ea013130136f21f411c49616988dcd64ce87536",
+      "path": "app/Http/Tax/TaxHttpMount.php",
+      "sha256": "16e4a509accea8ebf03500b468209e4fecdfff09460906f5651ff8cdd632006c"
+    },
+    {
+      "git_blob": "d0b51f17632b4faa4d0cb08ad3b2961fd3c40382",
+      "path": "docs/verification/paid252-tax-http-20261015/independent-source-original-REVISE.json",
+      "sha256": "c59eece664c070848b13991048bb7761435e086d2dc6e03f0e258d32bc7bfc66"
+    },
+    {
+      "git_blob": "de22d33e5fd31d030c8b420e9c1a60d8e8af187c",
+      "path": "docs/verification/paid252-tax-http-20261015/independent-source-original-REVISE.md",
+      "sha256": "c4f0dd6a21aecdf4dc60ac31d56a6e28f908d97e8c58dd89e431b0ad79e0afd5"
+    },
+    {
+      "git_blob": "7c662a3fdaeb4b73407e7db568afee50b07f40ce",
+      "path": "tests/Feature/PaidTaxHttpJourneyTest.php",
+      "sha256": "d907777a700c1c19d17882737d083b00dfdac8833d4664e822f8c887814bd8b9"
+    },
+    {
+      "git_blob": "3a7cc1041836b91fad3f1b214852e0ba865f1217",
+      "path": "tests/Feature/PaidTaxRootHttpBoundaryTest.php",
+      "sha256": "8a84b871d8105a878856508b44854fdf25a0867aaea5b5dc65a780964f99c505"
+    },
+    {
+      "git_blob": "1d114b8d298e374dba874524ccab5b9c6ca62497",
+      "path": "tests/Support/PaidTaxRootHttpFixture.php",
+      "sha256": "5d3030463a2c0f5cde0ff9075f607478daae0a87456401e50545b05d637cd325"
+    }
+  ],
+  "commands_executed": [
+    "Read-only git status/head, a565..ae1 diff/stat for source/test/fixture, immutable changed-path blob hashes",
+    "Read-only result/command/launch/OS/JUnit parsing for root-final-serverbag",
+    "Read-only installed Symfony Request server-property declaration; no app/compiler/test execution"
+  ],
+  "completed_root_evidence": {
+    "counts": {
+      "assertions": 578,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 43
+    },
+    "input_count": 2423,
+    "launcher_pid": 211500,
+    "observed_recorder_os_exit": 0,
+    "os_identity_matched": true,
+    "php_exit": 0,
+    "scope": "Whole PaidTaxRootHttpBoundaryTest file only; no running journey/V1 result included.",
+    "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+    "source_digest": "14089fd04a357cb190975c224e85594dee2bccb1079dbfad6857ba90516a4a58",
+    "source_head_status_runner_autoload_unchanged": true,
+    "start_ticks": "8542348",
+    "synthetic_key_descriptor_only": true,
+    "uid": 1000,
+    "verifier_exit": 0
+  },
+  "conditions": [
+    "Finish residual property raw read and focused control on frozen repaired source.",
+    "Reconcile actual completed journey/producer/V1 source/counts/exits; never relabel originals or sum overlapping selections.",
+    "Preserve default-off/unbound/live/host/provider/full-suite/native boundaries and frozen V1/schema/profile/dependency scope.",
+    "Independent actual final source/evidence review, cheap exact-head preflight and expected-SHA merge remain required."
+  ],
+  "created_utc": "2026-10-15T11:45:13.986253+00:00",
+  "decision": "REVISE",
+  "execution_limits": {
+    "final_sealed_packet": "not provided/not approved",
+    "journey_producer_V1_run": "running when review was requested; no pass/count inferred",
+    "reviewer_test_or_db_or_hosted_operations": 0,
+    "reviewer_tracked_edits": 0
+  },
+  "new_test_quality": [
+    "Actual captured PaidTaxReads observer, invalid UTF8 encoding and throwing Stringable header construction; original exception identity and observer restoration plus fresh read asserted.",
+    "Refused clone asserts the original observer is still retained, then the original response remains readable and closes that observer.",
+    "Original server instant aged59.7s plus genuine500ms identity-resolution delay, server/attribute mutation,410 and zero attempt. This repairs the prior shortened-budget-only coverage gap.",
+    "Actual committing listener adds throwing afterCommit when the staged redemption count is1; durable attempt1, callback1, idle framework/native, spent replay409 and new authorization succeeds.",
+    "Two-line failed render retry retains first immutable original and now retrieves exact PDF/master bytes plus hashes for both lines and4 durable attempts.",
+    "Late transfer withdrawal emits no attachment error bytes, retains spent attempt and allows only fresh authorized retry.",
+    "Genuine early TokenMismatch419 plus bounded header allowlist and additional body/query/form alias controls; producer raw resource once with cached body normalization and decoded duplicate refusal.",
+    "Raw mount ArrayAccess and env closure sentinels count forbidden callbacks; exact ServerBag subclass virtual-get sentinel and failed tombstone covered, but Request property getter-hook sentinel is still absent."
+  ],
+  "open_P0": false,
+  "open_P1": false,
+  "preparation_failures": [],
+  "prior_reviewed_sha": "a565e54a47fd46a3cf62eeab40826674f8c84988",
+  "receipt_bindings": [
+    {
+      "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-final-serverbag/result.json",
+      "sha256": "86cf1eab8479f61208d26e69bbe7e88b00a01bb12a26977e03521aec0d575a91"
+    },
+    {
+      "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-final-serverbag/command.json",
+      "sha256": "6b5cec03eec2a3c9dff6aca0de66f1459dc0c73d39463ff0ac08eb5a8d767875"
+    },
+    {
+      "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-final-serverbag/junit.xml",
+      "sha256": "bf06fe47f0cecb5746d0c530dd1990dd7456d7f55d50ca2b1942918957ab0b82"
+    },
+    {
+      "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/root-final-serverbag/os-exit.json",
+      "sha256": "d7f6b5c295d088f06f0cce18bd3b74a11146b1f4807c6d767afba34b54370e02"
+    },
+    {
+      "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/launch-root-final-serverbag.json",
+      "sha256": "825ca0ec1679d87e83596881cffde6a912f29b85c4316865cc141ff5150564af"
+    }
+  ],
+  "remaining_required_source_corrections": [
+    {
+      "confidence": "high",
+      "direction": "Use ReflectionProperty on Symfony Request server with getRawValue($request), then retain exact ServerBag/raw parameters/primitive start-field guards and one-use tombstone. Add a getter-hook sentinel with callback count0/refusal and a supported standard-bag positive.",
+      "finding": "The bag getter is removed, but `$request->server` remains ordinary property access before the factory samples monotonic time. The Request API accepts subclasses and Symfony8.1 has a hooked server property. A get hook can execute before the subsequent exact ServerBag check.",
+      "id": "HTTP-03-residual",
+      "path": "app/Http/Tax/PaidTaxRequestContext.php",
+      "relation": "Completes original a565 requirement to raw-read the server property without property hooks; no new adjacent scope.",
+      "severity": "P2"
+    }
+  ],
+  "resolved_source_findings": [
+    {
+      "assessment": "Exact Application, actual raw instances map, genuine standard offsetSet env binding literal recovered through reflection without resolver/factory invocation; new fixture uses normal binding rather than manually instantiating env.",
+      "id": "HTTP-01"
+    },
+    {
+      "assessment": "instances and bindings map guards and env descriptor array checks precede every own offset. Parent config map goes through existing raw PaidTaxConfiguration checks.",
+      "id": "HTTP-02"
+    },
+    {
+      "assessment": "Public clone signature fixes historical visibility fatal; clone holder is detached before throwing. Serialization/deserialization refuse.",
+      "id": "HTTP-04"
+    },
+    {
+      "assessment": "Constructor accepts mandatory non-null holder, stores it in separate nullable private slot before callbacks, preserving clone-only detachment.",
+      "id": "HTTP-05"
+    }
+  ],
+  "review_kind": "independent bounded corrected-source gate; not final packet/merge approval",
+  "reviewed_sha": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97"
+}

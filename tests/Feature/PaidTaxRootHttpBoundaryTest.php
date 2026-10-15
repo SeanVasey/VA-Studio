@@ -360,6 +360,32 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
     }
 
+    public function test_original_start_capture_reads_backing_storage_without_a_request_property_getter_hook(): void
+    {
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $request = new class extends Request
+        {
+            public int $getterCalls = 0;
+
+            public ServerBag $server {
+                get {
+                    $this->getterCalls++;
+                    throw new \RuntimeException('A server getter cannot precede the original clock.');
+                }
+                set {
+                    $this->server = $value;
+                }
+            }
+        };
+        $start = microtime(true);
+        (new \ReflectionProperty(\Symfony\Component\HttpFoundation\Request::class, 'server'))->setRawValue($request, new ServerBag(['REQUEST_TIME_FLOAT' => $start]));
+        PaidTaxRequestContext::capture($request);
+        $budget = PaidTaxRequestContext::claim($request);
+        $this->assertSame(0, $request->getterCalls);
+        $this->assertEqualsWithDelta($start, (float) $budget->receivedAt->at->format('U.u'), 0.001);
+        $budget->initialDeadline()->proveCurrent();
+    }
+
     private function assertOwnerClosed(PaidTaxResponseOwner $owner): void
     {
         try {
