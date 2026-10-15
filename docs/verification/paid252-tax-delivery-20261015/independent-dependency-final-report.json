@@ -1,0 +1,260 @@
+{
+  "acceptance_scope": {
+    "continuation": {
+      "assertions": 227,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 14
+    },
+    "missing_key_error_classification": "Missing synthetic testing configuration, no app/library repair. Original Storefront error remains; completed six components and separate keyed two-file completion accepted under cost policy.",
+    "no_aggregated_85_case_single_invocation_claim": true,
+    "no_whole_eight_file_green_claim": true,
+    "original_failed_invocation_preserved": true,
+    "six_completed_component_totals": {
+      "assertions": 3261,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 3,
+      "tests": 71
+    }
+  },
+  "actual_tested_dependency_sha": "bb86ceec1f1106890f4ab605009fb67091ca35f3",
+  "archive": {
+    "Git_path_bindings_verified": 4818,
+    "all_unique_regular_safe_members_verified": true,
+    "bytes": 6481088,
+    "current_source_inputs": 2409,
+    "index_sha256": "ce0f94e611383b4eeab1369f2f4aee7791ef0da699d7f01c6a2efd2149620ce8",
+    "loaders": 13,
+    "members": 2406,
+    "original_files_compared": 45,
+    "routes": 16,
+    "same_actual_source_and_loaders_as_tested": true,
+    "sealed_candidate_head": "a737056f015f0483c06986ef36c3f631f84bde9c",
+    "sha256": "ba852919ae3c5a8f7fe62cf89751adb33493801402624a18f48713f5d4133dee",
+    "source_inventories": 2,
+    "source_objects": 2353
+  },
+  "blocked_previous_publication_sha": "089fba7b8e66a85de8393755e9e416725a3154dd",
+  "commands": [
+    "Read-only Git exact-head/diff/ls-tree/cat-file, Python tar/JSON/XML/SHA/Base64/zip/original-file checks; no app execution."
+  ],
+  "decision": "APPROVE WITH CONDITIONS",
+  "dependency": {
+    "Foundation_installed_and_pristine_zip_files": 120,
+    "PHP_requirement": "^8.4.1",
+    "actual_toolchain": "Recorded localPHP8.4.26",
+    "all_other_locked_entries_unchanged": true,
+    "audit_validation_platform": [
+      {
+        "exit": 0,
+        "member": "preflight-and-dependency-originals/composer-supported-update.json",
+        "sha256": "eb9fbd32cc938867e14a758ed5039adba5316dfa472463442da2f960ad86c563"
+      },
+      {
+        "exit": 0,
+        "member": "preflight-and-dependency-originals/composer-audit-supported.json",
+        "sha256": "c958a3eb621a1c5c5d84d04c20a700aa30bbb383928b4bb0ce41ff05ff72027d"
+      },
+      {
+        "exit": 0,
+        "member": "preflight-and-dependency-originals/composer-validate-supported.json",
+        "sha256": "43928050df4d88a7308e3bc69682d82ae88163a4bac2f8ee1ac21b9209358ef4"
+      },
+      {
+        "exit": 0,
+        "member": "preflight-and-dependency-originals/composer-platform-supported.json",
+        "sha256": "748fcaff036cab797b372b95f8090cb0ab01c9399900815f73355971b15eb472"
+      }
+    ],
+    "current_critical_immutable_ref_bodies_verified": 6,
+    "current_vendor_file_hashes_checked": 2231,
+    "new_version": "v8.1.9",
+    "no_historical_vendor_snapshots_claimed": true,
+    "old_version": "v8.0.15",
+    "only_changed_package": "symfony/http-foundation",
+    "platform": "8.4.1",
+    "reference": "7850897fb8659f98491b03be79ac48600bdaf9ab",
+    "source_decision_sha256": "77bdd3d526bca23b3cbb5f20c7d7e99e88035982afc57b908a2032a45060166f"
+  },
+  "engineering_quality_verdict": "Pass within reviewed minimal dependency update and honest focused component/continuation evidence.",
+  "environment_and_tools": {
+    "actual_key_excluded_from_public_receipts": true,
+    "audit_job_log_excerpt_bound_to_original_full_log": true,
+    "distinct_keyed_runner_and_public_environment_preserved": true,
+    "original_preparation_syntax_error_preserved": {
+      "error": "SyntaxError: unterminated triple-quoted string literal (detected at line 4)",
+      "new_php_invocations": 0,
+      "overall_tool_command_exit": 2,
+      "scope": "Root preparation syntax error before any new runner/launcher file or PHP invocation. Original tool command ended2 after Python SyntaxError and missing launcher; no application outcome. Source/tests/vendor/loaders unchanged. Corrected with structured JSON and fail-fast shell."
+    },
+    "redacted_log_access": {
+      "derivative_sha256": "2cba94691d5dafec66479af25e8774909d8bbd41bd691d952a020fcfe064da0d",
+      "omitted_original_not_archived": true,
+      "original_hash_independently_matched": true,
+      "original_host_only_sha256": "0e58b91a217c88f0e27050f5018bf2f47dd4272cda935666964d54bfad5447d5"
+    },
+    "temporary_key_is_ephemeral_random32byte_testing_only": true
+  },
+  "invocations": [
+    {
+      "PHP_exit": 2,
+      "actual_key_in_public_receipt": false,
+      "class_components": {
+        "Tests\\Feature\\CustomerSessionHttpTest": {
+          "assertions": 118,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 9
+        },
+        "Tests\\Feature\\PaidGrantHttpJourneyTest": {
+          "assertions": 648,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 19
+        },
+        "Tests\\Feature\\PaidTaxDeliverySchemaRecoveryTest": {
+          "assertions": 2179,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 5
+        },
+        "Tests\\Feature\\PaidTaxDownloadJourneyTest": {
+          "assertions": 185,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 18
+        },
+        "Tests\\Feature\\PaidTaxDownloadNativeTest": {
+          "assertions": 0,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 3,
+          "tests": 3
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 131,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 17
+        },
+        "Tests\\Feature\\StorefrontMetadataTest": {
+          "assertions": 0,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      "counts": {
+        "assertions": 3261,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 3,
+        "tests": 72
+      },
+      "executed_head": "bb86ceec1f1106890f4ab605009fb67091ca35f3",
+      "launch_bound_observed_OS_exit": 1,
+      "launcher_sha256": "5e3164570e416c656023526183d7e1eccb9c5bb4cb38d96dd60a3ac767a791ee",
+      "manifest_sha256": "cbbf7a3b93c7ad364a42bc1a5fa8864eafe04aaddff6d9d049cd20f53b295908",
+      "name": "sqlite-current-runtime-tax-and-http",
+      "pid": 200241,
+      "process_start_ticks": "8064334",
+      "recorder_exit": 1,
+      "runner_sha256": "69e7a7e0ba124e86afdc5e4797c6c7ff982803789ac7234473ab452e979187e0",
+      "selected_files": [
+        "tests/Feature/PaidTaxDownloadJourneyTest.php",
+        "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+        "tests/Feature/PaidTaxDownloadNativeTest.php",
+        "tests/Feature/PaidGrantHttpJourneyTest.php",
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+        "tests/Feature/CustomerSessionHttpTest.php",
+        "tests/Feature/StorefrontMetadataTest.php",
+        "tests/Feature/PaidGrantRootRegistrationTest.php"
+      ],
+      "testing_key_descriptor_present": false,
+      "wall_seconds": 510.72312315300223
+    },
+    {
+      "PHP_exit": 0,
+      "actual_key_in_public_receipt": false,
+      "class_components": {
+        "Tests\\Feature\\PaidGrantRootRegistrationTest": {
+          "assertions": 77,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 7
+        },
+        "Tests\\Feature\\StorefrontMetadataTest": {
+          "assertions": 150,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 7
+        }
+      },
+      "counts": {
+        "assertions": 227,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "executed_head": "bb86ceec1f1106890f4ab605009fb67091ca35f3",
+      "launch_bound_observed_OS_exit": 0,
+      "launcher_sha256": "74d4f574d7cd16c3c55094ccb42789ff5dd2516adc62303d95b713f6ee692e01",
+      "manifest_sha256": "cbbf7a3b93c7ad364a42bc1a5fa8864eafe04aaddff6d9d049cd20f53b295908",
+      "name": "sqlite-unfinished-storefront-and-root-with-testing-key",
+      "pid": 201980,
+      "process_start_ticks": "8128141",
+      "recorder_exit": 0,
+      "runner_sha256": "b19345d0105e7d37ecaaeb7bc042bcc8d944cc2ae1cf218cda813390ed121a65",
+      "selected_files": [
+        "tests/Feature/StorefrontMetadataTest.php",
+        "tests/Feature/PaidGrantRootRegistrationTest.php"
+      ],
+      "testing_key_descriptor_present": true,
+      "wall_seconds": 11.863867324005696
+    }
+  ],
+  "limits": [
+    "No current native execution or whole dependency/vendor/loader equality with prior run is claimed. Old native schema5/2893 and races3/76 remain historical observations with accepted narrow unchanged primitives and current affected evidence.",
+    "The earlier source/full evidence approvals remain exact old-runtime history; neither failed preflight nor new failed invocation is relabeled green.",
+    "Fresh exact published-head preflight and expected-SHA merge remain required; inaccessible protections are not inferred or bypassed.",
+    "Default-off/unmounted Tax domain, HTTP/root/auth/redemption next; no live provider/commercial/account/host/activation/release acceptance.",
+    "No Foundation/GitLab/full-matrix claim; broader SQL/isolation/deadlock/DDL/physical/distributed cache/uninterruptible I/O/FPM/performance boundaries remain open.",
+    "Frozen shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain outside this batch.",
+    "Elapsed times include test/fixture lifecycle and are not performance benchmarks."
+  ],
+  "native_carry": {
+    "accepted_scope": "Historical schema5/2893 and race3/76 observations on old runtime, with unchanged application/test/helpers and current critical SQL/PDO/container/event/process bodies matched to identical locked Gitrefs; combine with fresh current-runtime affected evidence before final approval.",
+    "fresh_native_rerun_required_solely_for_this_delta": false,
+    "not_claimed": [
+      "Current native execution",
+      "Whole-runtime or regenerated-loader equality",
+      "Historic vendor before/after snapshots",
+      "Broad SQL/isolation/deadlock/host acceptance"
+    ]
+  },
+  "not_performed": [
+    "No app/test/DB/network/Composer/container/CI execution",
+    "No source/test/vendor/config/autoload/Git/tracked mutation"
+  ],
+  "open_P0_P1": [],
+  "prior_original_archive_unchanged": true,
+  "ready_for": "New cheap exact-publication-head preflight and expected-SHA development merge, after receipt-only carry for any imported-review successor.",
+  "recorded_utc": "2026-10-15T10:39:49.813908+00:00",
+  "required_corrections": [],
+  "reviewed_sha": "c80972717cf8323e794245fa45e150539d4b2792",
+  "reviewer_role": "Independent non-author",
+  "schema_version": 1,
+  "specification_verdict": "Pass within bounded domain/dependency remediation scope; external/complete-release acceptance remains Partial.",
+  "verifier_preparation_errors": []
+}
