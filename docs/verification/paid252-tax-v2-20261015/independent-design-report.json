@@ -1,0 +1,113 @@
+{
+  "recorded_utc": "2026-10-15T04:42:28.083221+00:00",
+  "reviewed_head": "1e6e103101865eff0dfe6cfd7ac8a3fa1d9ace7e",
+  "original_design_head": "208a4a90acc2631c31a055815d17c671ff6ae8c2",
+  "decision": "APPROVE DESIGN WITH IMPLEMENTATION/EVIDENCE CONDITIONS",
+  "design_sha256": "9b2ec39bedbe9ef936ba0562a7238fb1c71b193f176aa918f58701d96179e391",
+  "required_design_corrections_remaining": [],
+  "original_requirements_resolved": [
+    {
+      "id": "D1",
+      "requirement": "Separate claim, physical work, publication and fulfillment transaction authority. New Source/receipts only inside each fresh independently authorized command; never carry prior Source or extend its claim lease."
+    },
+    {
+      "id": "D2",
+      "requirement": "Specify owned current five-table identities/unique/FK map and runtime pre-DML permanent InnoDB/shadow refusal. Keep Tax/V1 producer and immutable identity evidence references outside the family; validate allowed user/account parents through real inspectors."
+    },
+    {
+      "id": "D3",
+      "requirement": "Preserve60s command,300s call/claim/per-line physical allowances,5 attempts and660s account lock. Derive original truncated lease end; retain live min-only caps and honestly expired claims. Share V1 account lock discipline across versions."
+    },
+    {
+      "id": "D4",
+      "requirement": "Physical observation binds exact retained artifact/master/assets and origin/claim/profile/input/text/PDF/manifest facts; fresh publication closes same-order/current-owner state. Pure PDO closure performs no physicalI/O; no filesystem atomic/permanent validity claim."
+    },
+    {
+      "id": "D5",
+      "requirement": "Pure actor closure compares raw admitted original/attributes/id and boolean exists without Eloquent getters/casts. Callback-capable closed work precedes Source sibling closure; serialized projection is trusted primitive typed data."
+    },
+    {
+      "id": "D6",
+      "requirement": "Meaningful two-valid-orders target-swap, late current/metadata withdrawal, cross-family replay, V1 pending/completed compatibility, real Tax two-line physical failure/retry, native duplicate origin and pre-DML refusal coverage. No missing-API old oracle or fixture-derived host acceptance."
+    }
+  ],
+  "original_note_sha256": "bf44fbc4d80b92118dd303ab74990a1fb9317e88384ed64e857adc12bb58c846",
+  "original_report_sha256": "c3d9cce60ddbc6486f1823257df329a8db1efd1e643b4be4993961157560eda1",
+  "actual_diff_from_original": [
+    "app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php",
+    "docs/verification/paid252-tax-v2-20261015/design.md",
+    "tests/Feature/ProductionTaxCheckout/FreshTaxCheckoutPolicyMetadataTest.php"
+  ],
+  "implementation_status": "No new PaidTax family/schema/render/profile implementation exists at this head; one owned Fresh helper admission line and its tests now exist. Design approval is not source/final approval.",
+  "helper_review": "The actual-array guard is correctly before concrete offsets in the env-null branch; supported genuine Laravel value closure and literal instance remain admitted. Narrow direct helper evidence only.",
+  "helper_evidence": [
+    {
+      "name": "sqlite-fresh-environment-old-source",
+      "head": "c2c1d16a9660820153dc11f6e3a7c489aa6e8130",
+      "junit": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "verifier_exit": 1,
+      "root_reported_os_exit": 1,
+      "independent_portable_os_witness_present": false,
+      "counts_classification": "Direct existing Fresh capture/prove metadata-helper oracle, not a staged NEW-write commit test.",
+      "case_names": [
+        "test_nonarray_environment_descriptor_is_refused_before_pure_offset_code"
+      ],
+      "failures": [
+        "Tests\\Feature\\ProductionTaxCheckout\\FreshTaxCheckoutPolicyMetadataTest::test_nonarray_environment_descriptor_is_refused_before_pure_offset_code\nPure original-policy admission executed environment offset code.\nFailed asserting that 2 is identical to 0.\n\n/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/FreshTaxCheckoutPolicyMetadataTest.php:36"
+      ],
+      "result_sha256": "7ca6aa09343b0d591d0b8ed243252342ae34e7c9ed54be4bd520e9c83992fcc3",
+      "junit_sha256": "18e0610c1b96cbb8f9b744a48e1845b3321727b794627818fa5e8cd75ba0bfd6"
+    },
+    {
+      "name": "sqlite-fresh-environment-fixed",
+      "head": "1e6e103101865eff0dfe6cfd7ac8a3fa1d9ace7e",
+      "junit": {
+        "tests": 3,
+        "assertions": 5,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "verifier_exit": 0,
+      "root_reported_os_exit": 0,
+      "independent_portable_os_witness_present": false,
+      "counts_classification": "Direct existing Fresh capture/prove metadata-helper oracle, not a staged NEW-write commit test.",
+      "case_names": [
+        "test_nonarray_environment_descriptor_is_refused_before_pure_offset_code",
+        "test_genuine_laravel_value_closure_remains_admitted",
+        "test_literal_environment_instance_remains_admitted"
+      ],
+      "failures": [],
+      "result_sha256": "e452a60466e91f3c7c8f498d97d45c0ddda01f30e699d7a71b6b088fc16469b8",
+      "junit_sha256": "9de7eb3c7cd2f4bc517294ecea25e7f9b4abcca427e477f629d29dba84013327"
+    }
+  ],
+  "frozen_v1_profile_hashes": {
+    "resources/contracts/paid-v1/profile-assets.json": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+    "app/Domain/Grants/Paid/PaidGrantText.php": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+    "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+    "app/Domain/Grants/Paid/PaidGrantRendererProcess.php": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+    "app/Domain/Grants/Paid/PaidGrantRenderInput.php": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+    "app/Domain/Grants/Paid/PaidGrantFiles.php": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+    "scripts/render-paid-grant.php": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc"
+  },
+  "conditions": [
+    "Keep exact transaction/marker/record ownership and live min-only original budgets, no renewed authority within a frame/claim.",
+    "Enumerated five-table current scope; exact ownership/recovery/guards and runtime pre-DML engine/shadow refusal require real SQLite/native evidence.",
+    "Retain unchanged nested authenticated Tax facts and integer inclusive/exclusive/zero-tax behavior; prevent wrong-order and V1 relabel/replay acceptance.",
+    "No final Eloquent getter/cast/ArrayAccess/magic/coercion callback. Actor id is captured raw scalar identity; exists is actual boolean.",
+    "Versioned profile/entrypoint only; unchanged pinned V1/font/base/package/logo and retained originals, real renderer/private physical observation and partial failure/retry evidence.",
+    "Shared660s per-account lock only availability; claims/unique keys/current ownership are authority. No host/cache capacity or permanent filesystem validity inference.",
+    "Future HTTP/download/root/concrete terminal delivery, shared metadata and ordinary membershipP2, host/provider/live/release/isolation/SQL/DDL/deadlock gates remain open.",
+    "Actual immutable source/test review and final portable packet/OS reconciliation plus cheap exact-head preflight/expected-SHA merge remain required."
+  ],
+  "actions": "Read-only immutable Git/design/source and existing helper JSON/XML/log/marker inspection only. No app/test/database/CI/hosted/network execution, tracked edit or delegation."
+}

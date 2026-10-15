@@ -12,6 +12,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTranspor
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Grants\Free\FreeGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Models\User;
 use App\Support\PhpCliBinary;
@@ -41,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
         // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
         // Family 256 (production free grants) is deliberately absent: nothing ships binding it, and the step that
         // composes and mounts it adds its renderer here after review.
-        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class] as $renderer) {
+        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class, PaidTaxRendererProcess::class] as $renderer) {
             $this->app->bind($renderer, function ($app) use ($renderer) {
                 $binary = $app->make(PhpCliBinary::class);
 
