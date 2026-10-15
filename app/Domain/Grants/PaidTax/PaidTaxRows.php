@@ -38,6 +38,8 @@ final class PaidTaxRows
 
     private ?array $deliveryInputs = null;
 
+    private bool $deliveryAdmitted = false;
+
     public function __construct(private readonly PaidTaxRuntime $runtime, private readonly PaidTaxOwnedFrame $frame)
     {
         $runtime->prove(1);
@@ -163,10 +165,11 @@ final class PaidTaxRows
         return $this->qualifiedTable($logical);
     }
 
-    private function qualifiedTable(string $logical): string
+    private function qualifiedTable(string $logical, bool $enrollment = false): string
     {
         PaidTaxException::require(preg_match('/\A[a-z][a-z0-9_]*\z/D', $logical) === 1);
-        PaidTaxException::require(! isset(PaidTaxDeliverySchema::specs()[$logical]) || $this->deliveryInputs !== null);
+        PaidTaxException::require(! isset(PaidTaxDeliverySchema::specs()[$logical])
+            || $this->deliveryAdmitted || ($enrollment && $this->deliveryInputs !== null));
         if ($this->driver === 'sqlite') {
             $statement = $this->primary->prepare('SELECT 1 FROM temp.sqlite_schema WHERE name = ? COLLATE NOCASE OR tbl_name = ? COLLATE NOCASE LIMIT 1');
             $statement->execute([$logical, $logical]);
@@ -192,7 +195,7 @@ final class PaidTaxRows
         $result = [];
         foreach (array_keys(PaidTaxSchema::specs() + ($this->deliveryInputs === null ? [] : PaidTaxDeliverySchema::specs())) as $logical) {
             $this->runtime->prove($depth); // Guard autocommit before EVERY closed table/catalog observation.
-            $table = $this->qualifiedTable($logical);
+            $table = $this->qualifiedTable($logical, enrollment: true);
             if ($this->driver === 'sqlite') {
                 $statement = $this->primary->prepare('SELECT type, name, tbl_name, sql FROM main.sqlite_schema WHERE tbl_name = ? ORDER BY type, name');
                 $statement->execute([$logical]);
@@ -220,20 +223,21 @@ final class PaidTaxRows
         $this->deliveryInputs = PaidTaxDeliveryPolicy::capture($this->configuration, $this->environment);
         $this->held(function (): void {
             foreach (array_keys(PaidTaxDeliverySchema::specs()) as $table) {
-                $this->primary->query('SELECT 1 FROM '.$this->qualifiedTable($table).' LIMIT 0')->fetchAll();
+                $this->primary->query('SELECT 1 FROM '.$this->qualifiedTable($table, enrollment: true).' LIMIT 0')->fetchAll();
             }
             PaidTaxDeliverySchema::assertInstalled();
         }, metadata: true);
         $definitions = $this->schemaDefinitions(1);
         PaidTaxException::require(array_intersect_key($definitions, $original) === $original);
         $this->definitions = $definitions;
+        $this->deliveryAdmitted = true;
         $this->assertCurrent();
     }
 
     public function deliveryInputs(): array
     {
         $this->assertCurrent();
-        PaidTaxException::require($this->deliveryInputs !== null);
+        PaidTaxException::require($this->deliveryInputs !== null && $this->deliveryAdmitted);
 
         return $this->deliveryInputs;
     }

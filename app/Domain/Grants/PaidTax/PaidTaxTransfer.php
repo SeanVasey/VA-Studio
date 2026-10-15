@@ -40,9 +40,9 @@ final class PaidTaxTransfer
                     $this->closedRead->proveBeforeBytes();
                     // Original timing values only after the sibling's final source/owner closure.
                     $this->requestBudget?->proveCurrent();
-                    PaidTaxException::require($tick + (hrtime(true) - $system) <= $this->deadline, 410);
                     $first = false;
                 }
+                PaidTaxException::require($tick + (hrtime(true) - $system) <= $this->deadline, 410);
                 $consumer($bytes);
             });
             PaidTaxException::require(! $first, 503);

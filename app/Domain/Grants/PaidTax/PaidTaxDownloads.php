@@ -61,8 +61,7 @@ final class PaidTaxDownloads
                 $auths = $query->fetchAll(PDO::FETCH_ASSOC);
                 $redemptions = $this->attempts($line['origin']['public_id'], $rows);
                 $minimum = $auths === [] ? 0 : min(array_column($auths, 'id'));
-                $maximum = $auths === [] ? 0 : max(array_column($auths, 'id'));
-                $snapshots[] = ['paid_tax_authorizations', 'origin_public_id = ? AND id BETWEEN ? AND ?', [$line['origin']['public_id'], $minimum, $maximum], 21, array_reverse($auths)];
+                $snapshots[] = ['paid_tax_authorizations', 'origin_public_id = ? AND id >= ?', [$line['origin']['public_id'], $minimum], 21, array_reverse($auths)];
                 $snapshots[] = $this->attemptSnapshot($line['origin']['public_id'], $rows, $redemptions);
                 $history = [];
                 foreach ($auths as $auth) {
@@ -94,9 +93,10 @@ final class PaidTaxDownloads
         PaidTaxException::require(in_array($input['kind'], self::KINDS, true), 422);
         $requestHash = CanonicalJson::hash($input);
         $auth = null;
+        $recentSnapshot = [];
         $deadline = PaidTaxDeadline::start(self::AUTHORIZE_BUDGET_SECONDS);
 
-        return (new PaidTaxCommands)->run($batchId, $principal, $actor, function (array $graph, PaidTaxRows $rows) use ($lineId, $input, $requestHash, &$auth, &$deadline): array {
+        return (new PaidTaxCommands)->run($batchId, $principal, $actor, function (array $graph, PaidTaxRows $rows) use ($lineId, $input, $requestHash, &$auth, &$deadline, &$recentSnapshot): array {
             $rows->admitDelivery();
             $inputs = $rows->deliveryInputs();
             $line = $this->line($graph, $lineId);
@@ -121,6 +121,10 @@ final class PaidTaxDownloads
                     'request_key' => $input['requestKey'], 'request_hash' => $requestHash, 'token_hash' => hash('sha256', $token), 'target' => $input['kind'],
                     ...PaidTaxRecords::encode($payload), 'created_at' => $at->format('Y-m-d H:i:s'),
                     'expires_at' => $at->addSeconds($graph['payload']['delivery_policy']['authorization_seconds'] + self::AUTHORIZE_BUDGET_SECONDS)->format('Y-m-d H:i:s')], $rows);
+                $bindings = [$line['origin']['public_id'], $at->subSeconds(60)->format('Y-m-d H:i:s')];
+                $issued = $rows->rows('paid_tax_authorizations', 'origin_public_id = ? AND created_at > ?', $bindings, 4);
+                PaidTaxException::require(count($issued) <= 3, 429);
+                $recentSnapshot = [['paid_tax_authorizations', 'origin_public_id = ? AND created_at > ?', $bindings, 4, $issued]];
             }
             $deadline->shortenTo($this->deadline($auth));
             $token = $this->token($auth['public_id'], $input['nonce'], $inputs['app.key']);
@@ -128,8 +132,8 @@ final class PaidTaxDownloads
 
             return ['id' => $auth['public_id'], 'token' => $token, 'expiresAt' => $auth['expires_at'], 'kind' => $auth['target'],
                 'filename' => $this->filename($lineId, $auth['target']), 'mimeType' => $this->mime($auth['target'])];
-        }, $deadline, additionalSnapshots: function (array $graph, PaidTaxRows $rows) use (&$auth): array {
-            return $this->authSnapshots($auth, $rows);
+        }, $deadline, additionalSnapshots: function (array $graph, PaidTaxRows $rows) use (&$auth, &$recentSnapshot): array {
+            return [...$this->authSnapshots($auth, $rows), ...$recentSnapshot];
         }, projectionRead: $projectionRead);
     }
 
@@ -179,7 +183,7 @@ final class PaidTaxDownloads
         try {
             $requestBudget->proveCurrent();
             $prepared = app(PaidTaxPrepareStream::class)->handle($before['payload']['target'], $snapshotDeadline,
-                hash('sha256', 'paid-tax-spool-holder-v2:'.$principal->accountId));
+                hash('sha256', 'paid-tax-spool-holder-v2:'.$principal->accountId), $requestBudget);
         } finally {
             $lock->release();
         }

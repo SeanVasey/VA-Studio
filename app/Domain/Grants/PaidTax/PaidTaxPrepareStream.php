@@ -36,7 +36,7 @@ class PaidTaxPrepareStream
      *                               slot at a time, so a buyer's own slow transfers cannot take every slot from other
      *                               customers; null (tests and non-account callers) records no holder.
      */
-    public function handle(array $target, ?int $snapshotDeadline = null, ?string $holder = null): PreparedDeliveryStream
+    public function handle(array $target, ?int $snapshotDeadline = null, ?string $holder = null, ?PaidTaxRequestBudget $requestBudget = null): PreparedDeliveryStream
     {
         ActivationPolicy::outsideTransactions();
         $policy = (new PaidTaxPolicy)->capture();
@@ -51,6 +51,8 @@ class PaidTaxPrepareStream
             $now = hrtime(true);
             $deadline = $snapshotDeadline === null ? $now + self::MAX_SECONDS * 1000000000
                 : min($snapshotDeadline, $now + self::MAX_DEADLINE_SECONDS * 1000000000);
+            $deadline = new PaidTaxSnapshotDeadline($deadline, $requestBudget);
+            $this->within($deadline);
             $files = app(DeliveryAssetFiles::class);
             $root = $files->privateRoot();
             $directories = $this->directories($root, true);
@@ -70,6 +72,7 @@ class PaidTaxPrepareStream
             }
             $owned = fstat($output);
             $this->sameFile($path, $owned, 0600, 0);
+            $this->within($deadline);
             $this->copyTarget($target, $output, $deadline);
             $this->within($deadline);
             if (! $this->flush($output)) {
@@ -153,10 +156,12 @@ class PaidTaxPrepareStream
         }
     }
 
-    protected function copyTarget(array $target, $destination, int $deadline): void
+    protected function copyTarget(array $target, $destination, PaidTaxSnapshotDeadline $deadline): void
     {
+        $this->within($deadline);
         if ($target['kind'] !== 'contract') {
-            app(DeliveryAssetFiles::class)->copyVerified($target, $destination, $deadline);
+            app(DeliveryAssetFiles::class)->copyVerified($target, $destination, $deadline->value());
+            $this->within($deadline);
 
             return;
         }
@@ -190,7 +195,7 @@ class PaidTaxPrepareStream
         return @unlink($path);
     }
 
-    private function readBack($input, array $target, int $deadline): void
+    private function readBack($input, array $target, PaidTaxSnapshotDeadline $deadline): void
     {
         $hash = hash_init('sha256');
         $bytes = 0;
@@ -578,9 +583,9 @@ class PaidTaxPrepareStream
         return is_array($stat) ? array_intersect_key($stat, array_flip(['dev', 'ino', 'size', 'mode', 'nlink', 'uid', 'gid', 'mtime', 'ctime'])) : [];
     }
 
-    private function within(int $deadline): void
+    private function within(PaidTaxSnapshotDeadline $deadline): void
     {
-        if (hrtime(true) > $deadline) {
+        if (hrtime(true) > $deadline->value()) {
             throw new \UnexpectedValueException;
         }
     }
