@@ -36,7 +36,18 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
-    use ProductionTaxCheckoutFixtures;
+    use ProductionTaxCheckoutFixtures {
+        enrollThroughLocalSmtp as private baseReceiptEnrollment;
+    }
+
+    private int $enrollments = 0;
+
+    protected function enrollThroughLocalSmtp(string $email = 'buyer@example.test', string $password = 'MailboxPassword123'): array
+    {
+        $this->enrollments++;
+
+        return $this->baseReceiptEnrollment($this->enrollments === 1 ? $email : 'receipt-'.$this->enrollments.'@example.test', $password);
+    }
 
     protected function setUp(): void
     {
@@ -637,6 +648,116 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertSame($guard, $pdo->query("SELECT sql FROM sqlite_schema WHERE name='ptx_o_update'")->fetchColumn());
         $this->assertDatabaseCount('tax_receipt_probe', 0);
     }
+
+    public function test_reentrant_committing_delegate_cannot_physically_commit_the_original_probe(): void
+    {
+        [$f, $locator] = $this->paid();
+        $source = null;
+        $hits = 0;
+        $connection = DB::connection();
+        $this->refuses(function () use ($f, $locator, $connection, &$source, &$hits): void {
+            $connection->transaction(function () use ($f, $locator, $connection, &$source, &$hits): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                $connection->getPdo()->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                $connection->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($connection, &$hits): void {
+                    if ($hits === 0) {
+                        $hits++;
+                        $connection->commit();
+                    }
+                });
+            });
+        }, 'committed_read_frame');
+        $this->assertSame(1, $hits);
+        $this->assertTrue($connection->getPdo()->inTransaction(), 'Reentrant callback already committed the original probe.');
+        $source->abortOwnedFrame();
+        $this->assertFalse($connection->getPdo()->inTransaction());
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
+    }
+
+    public function test_consumer_withdrawal_in_later_actual_decryption_refuses_before_physical_commit(): void
+    {
+        [$f, $locator] = $this->paid();
+        $pdo = DB::getPdo();
+        $userId = (int) $f['buyer']['user']->id;
+        $original = $pdo->query('SELECT password FROM users WHERE id='.$userId)->fetchColumn();
+        $capsule = new TaxPasswordAdmissionFixture($pdo, $userId, $original);
+        $encrypter = Crypt::getFacadeRoot();
+        $source = null;
+        $hits = 0;
+        try {
+            $this->refuses(function () use ($f, $locator, $pdo, $userId, $capsule, $encrypter, &$source, &$hits): void {
+                DB::transaction(function () use ($f, $locator, $pdo, $userId, $capsule, $encrypter, &$source, &$hits): void {
+                    $reader = $this->reader();
+                    $source = $this->source($f, $locator, $reader);
+                    $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000, $capsule);
+                    $pdo->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                    DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($pdo, $userId, $encrypter, &$hits): void {
+                        Crypt::shouldReceive('decryptString')->andReturnUsing(function (string $cipher) use ($pdo, $userId, $encrypter, &$hits): string {
+                            if ($hits === 0) {
+                                $hits++;
+                                $pdo->exec("UPDATE users SET password='withdrawn-after-initial-consumer-proof' WHERE id=".$userId);
+                            }
+
+                            return $encrypter->decryptString($cipher);
+                        });
+                    });
+                });
+            }, 'consumer_admission');
+        } finally {
+            Crypt::swap($encrypter);
+            $source?->abortOwnedFrame();
+        }
+        $this->assertSame(1, $hits);
+        $this->assertSame($original, $pdo->query('SELECT password FROM users WHERE id='.$userId)->fetchColumn());
+        $this->assertDatabaseCount('tax_receipt_probe', 0);
+    }
+
+    public function test_abort_preserves_reopened_root_callbacks_even_with_stale_original_framework_parent(): void
+    {
+        [$f, $locator] = $this->paid();
+        $source = null;
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $delegate = $connection->getEventDispatcher();
+        $oldCallbacks = 0;
+        try {
+            $connection->transaction(function () use ($f, $locator, $connection, &$source, &$oldCallbacks): void {
+                $reader = $this->reader();
+                $source = $this->source($f, $locator, $reader);
+                $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                $connection->afterCommit(function () use (&$oldCallbacks): void {
+                    $oldCallbacks++;
+                });
+                $connection->getEventDispatcher()->listen(TransactionCommitting::class,
+                    fn () => throw new RuntimeException('Synthetic root callback failure'));
+            });
+            $this->fail('The original committing error did not run.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('Synthetic root callback failure', $error->getMessage());
+        }
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertTrue($pdo->inTransaction());
+        $pdo->rollBack(); // Foreign owner closes old physical frame, leaving original framework record deliberately pending.
+        $replacement = new Dispatcher($this->app);
+        $connection->setEventDispatcher($replacement);
+        $connection->beginTransaction();
+        $newCallbacks = 0;
+        $connection->afterCommit(function () use (&$newCallbacks): void {
+            $newCallbacks++;
+        });
+        $pdo->exec('INSERT INTO tax_receipt_probe VALUES (2, 4567)');
+        $source->abortOwnedFrame();
+        $this->assertTrue($pdo->inTransaction());
+        $this->assertSame(1, $connection->transactionLevel());
+        $this->assertSame($replacement, $connection->getEventDispatcher());
+        $connection->commit();
+        $this->assertSame(0, $oldCallbacks);
+        $this->assertSame(1, $newCallbacks, 'Cleanup discarded a separate reopened root callback.');
+        $this->assertDatabaseCount('tax_receipt_probe', 1);
+        $connection->setEventDispatcher($delegate);
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
@@ -669,5 +790,18 @@ final readonly class TaxOtherObserverAdmissionFixture implements CheckoutCommitA
     public function proveFresh(): void
     {
         $this->frame->prove(1);
+    }
+}
+
+final readonly class TaxPasswordAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
+{
+    public function __construct(private PDO $primary, private int $userId, private string $originalPassword) {}
+
+    public function proveCurrent(PDO $capturedPrimary): void
+    {
+        CheckoutException::require($capturedPrimary === $this->primary && $capturedPrimary->inTransaction(), 'consumer_admission');
+        $statement = $capturedPrimary->prepare('SELECT password FROM users WHERE id = ?');
+        $statement->execute([$this->userId]);
+        CheckoutException::require($statement->fetchColumn() === $this->originalPassword, 'consumer_admission');
     }
 }
