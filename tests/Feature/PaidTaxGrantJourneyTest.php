@@ -571,6 +571,63 @@ class PaidTaxGrantJourneyTest extends TestCase
         $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $this->assertSame($f['order']['orderId'], $retry['orderId']);
     }
+    public static function prestartMutations(): array
+    {
+        return ['dispatcher replacement' => ['dispatcher'], 'appended hook' => ['append'], 'replaced hooks' => ['replace']];
+    }
+
+    #[DataProvider('prestartMutations')]
+    public function test_prestart_displacement_refuses_before_physical_begin_and_preserves_replacement(string $kind): void
+    {
+        $f = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $delegate = $connection->getEventDispatcher();
+        $replacement = new \Illuminate\Events\Dispatcher(app());
+        $hooks = new \ReflectionProperty(\Illuminate\Database\Connection::class, 'beforeStartingTransaction');
+        $before = $hooks->getValue($connection);
+        $mutated = null;
+        $calls = 0;
+        $connection->beforeStartingTransaction(static function () use ($kind, $connection, $replacement, $hooks, &$calls, &$mutated): void {
+            $calls++;
+            if ($kind === 'dispatcher') {
+                $connection->setEventDispatcher($replacement);
+            } elseif ($kind === 'append') {
+                $connection->beforeStartingTransaction(static function (): void {});
+                $mutated = $hooks->getValue($connection);
+            } else {
+                $hooks->setValue($connection, []);
+                $mutated = [];
+            }
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (\Throwable $error) {
+                $failure = $error;
+            }
+            $this->assertSame(1, $calls);
+            $this->assertInstanceOf(PaidTaxException::class, $failure);
+            $this->assertSame(503, $failure->status);
+            $this->assertFalse($pdo->inTransaction(), 'A displaced pre-start witness was refused only after opening an unowned transaction.');
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame($kind === 'dispatcher' ? $replacement : $delegate, $connection->getEventDispatcher());
+            if ($kind !== 'dispatcher') {
+                $this->assertSame($mutated, $hooks->getValue($connection), 'Conditional restoration overwrote a delegate-owned hook replacement.');
+            }
+            $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        } finally {
+            $hooks->setValue($connection, $before);
+            $connection->setEventDispatcher($delegate);
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($f['order']['orderId'], $retry['orderId']);
+    }
+
 }
 
 final class PaidTaxMetadataOffsetFixture extends \ArrayObject
