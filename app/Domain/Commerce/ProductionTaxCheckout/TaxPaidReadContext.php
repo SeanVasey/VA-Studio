@@ -12,6 +12,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Support\Facades\Facade;
 use LogicException;
 use PDO;
 use PDOStatement;
@@ -70,6 +71,7 @@ final class TaxPaidReadContext implements \JsonSerializable
         CheckoutException::require($connection instanceof Connection
             && $connection::class === ($reader->identityDriver() === 'mysql' ? MySqlConnection::class : SQLiteConnection::class), 'committed_read_frame');
         $this->connection = $connection;
+        $this->admitPrimaryMetadata();
         $this->primary = $reader->identityPrimary();
         $this->driver = $reader->identityDriver();
         $this->database = $connection->getDatabaseName();
@@ -114,6 +116,7 @@ final class TaxPaidReadContext implements \JsonSerializable
 
     public function prove(int $depth): void
     {
+        $this->admitPrimaryMetadata();
         $this->proveNative($depth);
         $this->admitConnections();
         $instances = $this->admitContainerMaps();
@@ -171,12 +174,24 @@ final class TaxPaidReadContext implements \JsonSerializable
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
         $bindings = (new ReflectionProperty(Container::class, 'bindings'))->getValue($this->container);
         $aliases = (new ReflectionProperty(Container::class, 'aliases'))->getValue($this->container);
-        CheckoutException::require(is_array($instances) && is_array($bindings) && is_array($aliases), 'committed_read_frame');
+        $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
+        CheckoutException::require(is_array($instances) && is_array($bindings) && is_array($aliases)
+            && is_array($resolved), 'committed_read_frame');
         if (($instances['env'] ?? null) === null) {
             CheckoutException::require(is_array($bindings['env'] ?? null), 'committed_read_frame');
         }
 
         return $instances;
+    }
+
+    /** Standard connection getters can still dispatch offsets or string coercion through raw metadata. */
+    private function admitPrimaryMetadata(): void
+    {
+        $configuration = (new ReflectionProperty(Connection::class, 'config'))->getValue($this->connection);
+        CheckoutException::require(is_array($configuration) && is_string($configuration['driver'] ?? null)
+            && is_string($configuration['name'] ?? null)
+            && is_string((new ReflectionProperty(Connection::class, 'database'))->getValue($this->connection))
+            && is_string((new ReflectionProperty(Connection::class, 'tablePrefix'))->getValue($this->connection)), 'committed_read_frame');
     }
 
     public function held(callable $operation): mixed
