@@ -367,16 +367,24 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         {
             public int $getterCalls = 0;
 
+            public bool $armed = false;
+
             public ServerBag $server {
                 get {
                     $this->getterCalls++;
-                    throw new \RuntimeException('A server getter cannot precede the original clock.');
+                    if ($this->armed) {
+                        throw new \RuntimeException('A server getter cannot precede the original clock.');
+                    }
+
+                    return $this->server;
                 }
                 set {
                     $this->server = $value;
                 }
             }
         };
+        $request->getterCalls = 0;
+        $request->armed = true;
         $start = microtime(true);
         (new \ReflectionProperty(\Symfony\Component\HttpFoundation\Request::class, 'server'))->setRawValue($request, new ServerBag(['REQUEST_TIME_FLOAT' => $start]));
         PaidTaxRequestContext::capture($request);
