@@ -40,7 +40,7 @@ class PaidTaxNativeBoundaryTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_native_case_distinct_provider_payments_retain_two_valid_same_buyer_orders_and_exact_replays(): void
+    public function test_native_provider_replays_serialize_one_origin_and_refuse_temporary_or_nontransactional_owned_objects(): void
     {
         if (DB::getDriverName() !== 'mysql') {
             $this->markTestSkipped('Native MySQL collation can conflate byte-distinct provider identities.');

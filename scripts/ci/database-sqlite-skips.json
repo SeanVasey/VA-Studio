@@ -1021,6 +1021,14 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
       "test_native_autocommit_withdrawal_refuses_before_any_closed_table_read_transaction"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxNativeBoundaryTest",
+      "test_native_provider_replays_serialize_one_origin_and_refuse_temporary_or_nontransactional_owned_objects"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
+      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
     ]
   ]
 }

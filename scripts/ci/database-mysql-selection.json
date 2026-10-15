@@ -118,7 +118,10 @@
     "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",
     "tests/Feature/SupportAttachmentsTest.php",
-    "tests/Unit/SchemaQualifierDelimiterTest.php"
+    "tests/Unit/SchemaQualifierDelimiterTest.php",
+    "tests/Feature/PaidTaxGrantJourneyTest.php",
+    "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+    "tests/Feature/PaidTaxFamilyCompatibilityTest.php"
   ],
   "residual_files": [
     "tests/Feature/CustomerConsentAdmissionTest.php",
@@ -272,6 +275,7 @@
     "tests/browser/reset-login-rate-limit.php",
     "tests/browser/run-due-site-schedule.php",
     "tests/browser/unpaid-release-fixture.php",
-    "tests/browser/verify-public-installation-fixture.php"
+    "tests/browser/verify-public-installation-fixture.php",
+    "tests/Support/paid-tax-origin-race-worker.php"
   ]
 }

@@ -275,7 +275,8 @@ class PaidTaxAdversarialJourneyTest extends TestCase
         $f['transport']->paid = true;
         $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
         $other = $this->enrollThroughLocalSmtp('other-tax-buyer@example.test');
-        $this->refuses(fn () => $grants->finalize($other['principal'], $other['user'], $f['order']['orderId']), 403);
+        // Preserve the existing hidden-target contract for a different verified account.
+        $this->refuses(fn () => $grants->finalize($other['principal'], $other['user'], $f['order']['orderId']), 404);
         $this->assertDatabaseCount('paid_tax_order_origins', 0);
         $this->assertFalse(DB::getPdo()->inTransaction());
         $original = $grants->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
