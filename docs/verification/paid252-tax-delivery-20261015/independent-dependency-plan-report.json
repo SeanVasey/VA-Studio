@@ -1,0 +1,68 @@
+{
+  "actions_not_performed": [
+    "No app/test/DB/network/Composer command/CI execution or tracked/source/vendor write"
+  ],
+  "approved_scope": [
+    "Only symfony/http-foundation8.0.15 to supported nonaffected8.1.9, subject to actual exact lock/installed bytes review.",
+    "Root PHP requirement^8.4.1 and Composer platform8.4.1, with truthful README minimum; local actualPHP8.4.26 remains unchanged.",
+    "No other package updates, advisory exceptions, cap increases, frozen asset/profile repin or Stripe update."
+  ],
+  "before_final_approval": [
+    "Freeze exact new commit and independently inspect complete composer.json/lock/README diff, all other locked package records and frozen surfaces.",
+    "Bind actual installed HttpFoundation version/dist reference/package bytes and regenerated loaders to new lock; review relevant minor-version Request/Response/HeaderUtils/ParameterBag behavior.",
+    "Fresh locked audit, strict Composer validation and platform check must pass without ignore flags, on recorded actual toolchain.",
+    "Meaningful affected current-runtime tests and recorded source/head/status/runner/new-loader stability must pass.",
+    "Preserve prior failed preflight/audit/resolution outcomes and old sealed archive/approvals without rewriting.",
+    "New exact-head independent approval, successor carry if needed and cheap same-head preflight/expected-SHA merge."
+  ],
+  "decision": "APPROVE MINIMAL UPDATE PLAN WITH CONDITIONS",
+  "limits": [
+    "Plan approval does not renew approval of the blocked old publication SHA or establish a patched final candidate.",
+    "No actual source/package/test or new audit outcome is asserted until exact current receipts are reviewed.",
+    "No Foundation/GitLab/host/provider/live/activation/release claim."
+  ],
+  "native_carry_scope": [
+    "Original5-schema and3-race native evidence remains on its original dependency/loader runtime.",
+    "Compare actual unchanged database/schema/raw-PDO/events/wait/selector/runtime bodies and exact executed test/helper code; combine with current-runtime new Tax fixture/bootstrap/physical-transfer evidence.",
+    "No fresh native rerun is necessary solely for HttpFoundation when direct native SQL/authenticate/string-only and primitive PDO paths plus database/process/Laravel dependencies remain unchanged.",
+    "Do not claim whole runtime/loader equality or current native execution; rerun a focused native case only if exact package diff or new check reveals a relevant native boundary risk."
+  ],
+  "original_resolution_failure": {
+    "cause": "Requested8.1.9 requiresPHP>=8.4.1 while original config.platform.php8.4.0; no ignored platform requirements approved.",
+    "exit": 2,
+    "receipt_sha256": "ec8167c16710e88f6c2fe12bfb1d41ab3296dccd323d45d91ba2c2fca577c416"
+  },
+  "read_commands": [
+    "Read-only git show of old Composer manifests; existing original audit/resolution receipts; current code paths and selected test/worker source; no mutation/execution."
+  ],
+  "reason": {
+    "advisoryId": "PKSA-xmwy-rmx5-m7h4",
+    "affectedVersions": ">=5.4.1,<5.4.54|>=6.0.1,<6.1.0|>=6.1.0,<6.2.0|>=6.2.0,<6.3.0|>=6.3.0,<6.4.0|>=6.4.0,<6.4.46|>=7.0.0,<7.1.0|>=7.1.0,<7.2.0|>=7.2.0,<7.3.0|>=7.3.0,<7.4.0|>=7.4.0,<7.4.19|>=8.0.0,<8.1.0|>=8.1.0,<8.1.7",
+    "cve": "CVE-2026-108082",
+    "link": "https://symfony.com/cve-2026-108082",
+    "packageName": "symfony/http-foundation",
+    "reportedAt": "2026-09-15T08:00:00+00:00",
+    "severity": null,
+    "sources": [
+      {
+        "name": "FriendsOfPHP/security-advisories",
+        "remoteId": "symfony/http-foundation/CVE-2026-108082.yaml"
+      }
+    ],
+    "title": "CVE-2026-108082: ReDoS in HeaderUtils::split() Reachable Through the Cache-Control Request Header"
+  },
+  "recorded_utc": "2026-10-15T10:22:38.079047+00:00",
+  "required_current_affected_files": [
+    "tests/Feature/PaidTaxDownloadJourneyTest.php",
+    "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+    "tests/Feature/PaidTaxDownloadNativeTest.php",
+    "tests/Feature/PaidGrantHttpJourneyTest.php",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+    "tests/Feature/CustomerSessionHttpTest.php",
+    "tests/Feature/StorefrontMetadataTest.php",
+    "tests/Feature/PaidGrantRootRegistrationTest.php"
+  ],
+  "reviewed_baseline_sha": "089fba7b8e66a85de8393755e9e416725a3154dd",
+  "reviewer": "Independent non-author; plan only, not new-head approval",
+  "selection_note": "The exact CustomerSessionHttp/StorefrontMetadata file names must be resolved by root; seven proposed affected files plus inexpensive root-registration default/private-handler evidence. Counts derive from actual JUnit, not this plan."
+}

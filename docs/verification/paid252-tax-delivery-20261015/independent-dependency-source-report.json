@@ -1,0 +1,253 @@
+{
+  "audit_validation_platform_receipts": [
+    {
+      "argv": [
+        "composer",
+        "update",
+        "symfony/http-foundation:8.1.9",
+        "--minimal-changes",
+        "--no-interaction",
+        "--prefer-dist",
+        "--no-scripts"
+      ],
+      "exit": 0,
+      "receipt": "/workspace/runtime/paid252-tax-delivery-publication-20261015/composer-supported-update.json",
+      "sha256": "eb9fbd32cc938867e14a758ed5039adba5316dfa472463442da2f960ad86c563"
+    },
+    {
+      "argv": [
+        "composer",
+        "audit",
+        "--locked",
+        "--format=json",
+        "--no-interaction"
+      ],
+      "exit": 0,
+      "receipt": "/workspace/runtime/paid252-tax-delivery-publication-20261015/composer-audit-supported.json",
+      "sha256": "c958a3eb621a1c5c5d84d04c20a700aa30bbb383928b4bb0ce41ff05ff72027d"
+    },
+    {
+      "argv": [
+        "composer",
+        "validate",
+        "--strict",
+        "--no-check-publish"
+      ],
+      "exit": 0,
+      "receipt": "/workspace/runtime/paid252-tax-delivery-publication-20261015/composer-validate-supported.json",
+      "sha256": "43928050df4d88a7308e3bc69682d82ae88163a4bac2f8ee1ac21b9209358ef4"
+    },
+    {
+      "argv": [
+        "composer",
+        "check-platform-reqs",
+        "--lock"
+      ],
+      "exit": 0,
+      "receipt": "/workspace/runtime/paid252-tax-delivery-publication-20261015/composer-platform-supported.json",
+      "sha256": "748fcaff036cab797b372b95f8090cb0ab01c9399900815f73355971b15eb472"
+    }
+  ],
+  "baseline_sha": "089fba7b8e66a85de8393755e9e416725a3154dd",
+  "critical_primitives": {
+    "current_Gitref_checks": [
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "laravel/framework",
+        "path": "src/Illuminate/Database/Connection.php",
+        "recorded_fetch_exit": 0,
+        "reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "sha256": "7ac2392c7236486fd92040bdb55760cd195f7cbc2b8f753fffcda70a5edaf39c"
+      },
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "laravel/framework",
+        "path": "src/Illuminate/Database/Connectors/MySqlConnector.php",
+        "recorded_fetch_exit": 0,
+        "reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "sha256": "a0bde340ecc11a0f4137f955ba2e596d2aed1437f46a4350c95769c043df5183"
+      },
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "laravel/framework",
+        "path": "src/Illuminate/Container/Container.php",
+        "recorded_fetch_exit": 0,
+        "reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "sha256": "8bbfbc5955205f817106077355a493952e685bc376653236a7188f20ff634ea8"
+      },
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "laravel/framework",
+        "path": "src/Illuminate/Events/Dispatcher.php",
+        "recorded_fetch_exit": 0,
+        "reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "sha256": "4e6cfda694257cd70621ceb3bca7895b0e071fbdc1362437dc6b52ce8aeb5d60"
+      },
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "symfony/event-dispatcher",
+        "path": "EventDispatcher.php",
+        "recorded_fetch_exit": 0,
+        "reference": "4ad08142e63219fdcb75ea1a0ac1c9e5c0fc7686",
+        "sha256": "212bc21d00210a52c56901aec7dd6ec4b9544bde241890e93470211a18aa2e45"
+      },
+      {
+        "current_matches_unchanged_lock_Gitref": true,
+        "package": "symfony/process",
+        "path": "Process.php",
+        "recorded_fetch_exit": 0,
+        "reference": "4f23d9c7637ead9ed19f697fe93cb87fd9b379d4",
+        "sha256": "73c4e31230f9602768b73cda3451ed7ec0dddc20ddef6cc0d6795ea879600c39"
+      }
+    ],
+    "not_historical_vendor_snapshots": true,
+    "receipt_sha256": "a0e97214fc3320bb288f3a6e04d11af165a387ccdf8c93d94e8913c637ccd363"
+  },
+  "decision": "APPROVE MINIMAL DEPENDENCY SOURCE WITH CONDITIONS",
+  "dependency_scope": {
+    "actual_local_toolchain": "PHP8.4.26 as recorded platform check; not a host runtime claim",
+    "all_other_locked_entries_unchanged": true,
+    "changed_package_names": [
+      "symfony/http-foundation"
+    ],
+    "new": "v8.1.9",
+    "new_reference": "7850897fb8659f98491b03be79ac48600bdaf9ab",
+    "old": "v8.0.15",
+    "package_entry_count": 158,
+    "php_requirement": "^8.4.1",
+    "platform": "8.4.1"
+  },
+  "exact_diff": [
+    "README.md",
+    "composer.json",
+    "composer.lock",
+    "docs/verification/paid252-tax-delivery-20261015/README.md",
+    "docs/verification/paid252-tax-delivery-20261015/dependency-repair.md"
+  ],
+  "final_evidence_status": "Partial: eight-file affected run was active for this bounded source checkpoint; no result or OS exit claimed.",
+  "native_carry": {
+    "accepted_scope": "Historical schema5/2893 and race3/76 observations on old runtime, with unchanged application/test/helpers and current critical SQL/PDO/container/event/process bodies matched to identical locked Gitrefs; combine with fresh current-runtime affected evidence before final approval.",
+    "fresh_native_rerun_required_solely_for_this_delta": false,
+    "not_claimed": [
+      "Current native execution",
+      "Whole-runtime or regenerated-loader equality",
+      "Historic vendor before/after snapshots",
+      "Broad SQL/isolation/deadlock/host acceptance"
+    ]
+  },
+  "not_performed": [
+    "No app/test/DB/Composer/network/CI execution",
+    "No tracked/source/vendor/autoload/Git mutation"
+  ],
+  "open_P0_P1_source_findings": [],
+  "read_commands": [
+    "Read-only Git diff/show and existing Composer/API receipts; Python hashes, JSON/Base64/Git-blob identity and zip matching; relevant library/application source reads."
+  ],
+  "recorded_utc": "2026-10-15T10:27:01.064665+00:00",
+  "remaining_gates": [
+    "Complete/reconcile actual current affected run, source/HEAD/status/runner/loaders and launch-bound OS exit.",
+    "Final sealed supplemental evidence and exact final source/claim review.",
+    "New publication-head carry and cheap exact-head preflight/expected-SHA merge.",
+    "All previous default-off/unmounted/host/provider/live/activation/Foundation and frozen adjacent P2 conditions remain."
+  ],
+  "required_current_affected_selection": [
+    "tests/Feature/PaidTaxDownloadJourneyTest.php",
+    "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
+    "tests/Feature/PaidTaxDownloadNativeTest.php",
+    "tests/Feature/PaidGrantHttpJourneyTest.php",
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutHttpBoundaryTest.php",
+    "tests/Feature/CustomerSessionHttpTest.php",
+    "tests/Feature/StorefrontMetadataTest.php",
+    "tests/Feature/PaidGrantRootRegistrationTest.php"
+  ],
+  "required_source_repairs": [],
+  "reviewed_sha": "bb86ceec1f1106890f4ab605009fb67091ca35f3",
+  "reviewer_role": "Independent non-author, read-only",
+  "schema_version": 1,
+  "source_and_loader_delta": {
+    "changed_loader_paths": [
+      "vendor/composer/autoload_classmap.php",
+      "vendor/composer/autoload_static.php",
+      "vendor/composer/installed.json",
+      "vendor/composer/installed.php",
+      "vendor/composer/platform_check.php"
+    ],
+    "inputs": 2409,
+    "loaders": 13,
+    "original_to_current_manifest_changed_paths": [
+      "composer.json",
+      "composer.lock"
+    ],
+    "routes": 16,
+    "whole_runtime_equal": false
+  },
+  "upstream_diff": {
+    "changed_paths": 55,
+    "receipt_sha256": "193c918defd5655c2459a32e7593a7aa18ec2f22153d59fd16022beab2bb47fb",
+    "reviewed_relevant_changes": [
+      "Possessive HeaderUtils token/whitespace parsing closes recorded ReDoS advisory.",
+      "Request/Response raw initialization bypasses new public-field deprecation hooks; retained Laravel version already handles compatible constructor/header path and bag replacement.",
+      "InputBag/ParameterBag int/boolean invalid conversions now throw; no direct reached application getInt/getBoolean caller was found.",
+      "Trusted-host/proxy and BinaryFileResponse/sendfile/session-helper behavior changes are bounded by selected HTTP evidence and retained host/offload boundaries.",
+      "StreamedResponse is not modified in this package diff."
+    ],
+    "status": "ahead",
+    "total_commits": 139
+  },
+  "vendor_provenance": {
+    "foundation_pristine_zip": [
+      {
+        "all_bytes_match": true,
+        "members": 120,
+        "sha256": "bec9891f4de44755f0239ccce590f3091a8ebcef577ddd3ba925d3432f17a64d"
+      }
+    ],
+    "historical_snapshot_claim": false,
+    "package_summaries": [
+      {
+        "entry_unchanged_from_original": true,
+        "installed_files_checked": 1899,
+        "package": "laravel/framework",
+        "reference": "a413a9da94884e5e9d58f4e6612884f712827804",
+        "version": "v13.35.0"
+      },
+      {
+        "entry_unchanged_from_original": true,
+        "installed_files_checked": 14,
+        "package": "symfony/event-dispatcher",
+        "reference": "4ad08142e63219fdcb75ea1a0ac1c9e5c0fc7686",
+        "version": "v8.0.15"
+      },
+      {
+        "entry_unchanged_from_original": false,
+        "installed_files_checked": 120,
+        "package": "symfony/http-foundation",
+        "reference": "7850897fb8659f98491b03be79ac48600bdaf9ab",
+        "version": "v8.1.9"
+      },
+      {
+        "entry_unchanged_from_original": true,
+        "installed_files_checked": 171,
+        "package": "symfony/http-kernel",
+        "reference": "6dbe7c51a77cb32cafd330593c8ebdff63d7b8bc",
+        "version": "v8.0.15"
+      },
+      {
+        "entry_unchanged_from_original": true,
+        "installed_files_checked": 27,
+        "package": "symfony/process",
+        "reference": "4f23d9c7637ead9ed19f697fe93cb87fd9b379d4",
+        "version": "v8.0.13"
+      }
+    ],
+    "receipt_sha256": "b83f7781b9e9aa06127d66d1b5ce8bdb7229183d25c78766851899a2de46688d",
+    "total_current_vendor_file_hashes_checked": 2231
+  },
+  "verifier_preparation_errors": [
+    {
+      "kind": "FileNotFoundError",
+      "path": "/workspace/runtime/paid252-tax-delivery-publication-20261015/critical-vendor-provenance.json",
+      "scope": "Reader guessed publication directory; actual source is dependency evidence directory. No app execution or mutation. Corrected inspection passed."
+    }
+  ]
+}
