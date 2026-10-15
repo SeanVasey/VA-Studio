@@ -1,0 +1,34 @@
+# A5 first financial-input prerequisite
+
+Actual base is PR124 merge `d8817316558b3d5965203b548d75cd635e7cde92`. Its actual receipt, unchanged final tree/approved head, complete publication archive and both ledger updates are carried in d6ae73ce. This packet adds a default-off internal, unattested candidate contract, not complete refund/dispute lifecycle or merchant activation. See [design](design.md) and [runtime boundary](../../ops/paid-financial-candidate-runtime.md).
+
+Root owns new module/config/tests/docs. The separate `/root/c4c_final_packet_review` session owns independent runtime decisions; their originals are copied byte-identically. Existing source/receipt/reader/schema/route/transport/Stripe/profile bodies remain unchanged. No Foundation/GitLab dispatch, native rerun, provider/account/login/sandbox, real credential/payment/customer import or host/deploy action occurred.
+
+## Exact recorded checks
+
+All PHP invocations use PHP8.4.26, SQLite `:memory:`, the pinned vendor and a host-only ephemeral test key excluded from public receipts. Every completed invocation binds all2430 actual tracked source inputs to its exact Git head and records stable HEAD/status/runner/13 loader inputs, reconciled JUnit, PHP exit, recorder exit and independently observed original supervisor PID/UID/start-ticks/zombie OS exit. The complete public argv/cwd/environment/source records and original logs/JUnit are retained in the evidence archive.
+
+| Original invocation | Exact tested source | Tests/assertions | Failures/errors/skips | PHP/recorder/OS exit |
+| --- | --- | --- | --- | --- |
+| `candidate-whole-3e6f8922`: whole new file | `3e6f89222c0832c08bf0205ee79077935b0c4e28` | 10/331 | 0/0/0 | 0/0/0 |
+| `affected-financial-3e6f8922`: whole existing SDK inspection and financial observation files | same3e6 | 69/291 | 0/0/0 | 0/0/0 |
+| `reviewer-regressions-red`: filter `automatic_async\|transfer_pointer` against unchanged defective module bodies | `f9fda036ad483cafbe524437fcf0c56435a96376` | 3/7 | 1/2/0 | 2/1/1 |
+| `candidate-whole-repaired`: whole new file including the three regressions | `ae6d109581bac6b685360a5941d6c7819cd5616f` | 13/351 | 0/0/0 | 0/0/0 |
+
+The red async cases are genuine reviewed catalog/local-SMTP/paid V1 and Tax V2 journeys reaching the normalizer, which incorrectly required `automatic`; the transfer case admits a non-null Charge.transfer and fails its negative assertion. Repair retains the original capture method in the expectation and requires the exact supported method; rejects `transfer`; keeps every actual succeeded/paid/captured/gross condition. The final whole file proves both async cases and before/after transfer refusal, complete two-line V1/Tax gross, each supported status, separate attempt sums/Charge aggregates/history, bounded malformed/object/list/money inputs, policy withdrawal during source decryption, original frame/reader/row refusal and both reconstruction directions. No reflected fabricated paid source is used.
+
+Initial cheap recorder completed seven commands at3e6 (196 passing Python tests), then `test-phpunit-shards.py` failed:52 tests/1 failure, exit1. Its broad discovery regex classified the new file solely from a Tax fixture's `DB::getDriverName`; there was no driver conditional. The corrected fixture creates a different reader using the original captured reader's primary/driver instead of resolving global metadata. Its meaningful identity mismatch stays intact; scripts/selection/skips/weights are unchanged. The failed original remains failed; the remaining six commands were unexecuted in that first recorder.
+
+The ae6 continuation reran the failed shard safeguard52/0F and completed bootstrap13/publish2 plus `composer validate --strict`, `composer audit --format=json`, `composer check-platform-reqs` and Pint `--test` on all seven changed PHP files: all exit0. Together with seven unchanged earlier safeguards the ten cheap commands provide263 passing Python tests. This is a narrow evidence carry, not a fresh full ten-command run on ae6. The two whole existing financial files remain earlier3e6 evidence69/291; no fresh legacy execution is claimed at ae6. Exact unchanged protected bindings/delta support those carries, subject to final independent evidence approval.
+
+## Review sequence and unresolved conditions
+
+Design ef74: original `REVISE BEFORE IMPLEMENTATION` for caller provenance, exact money/status summary and policy/lifecycle boundaries. Design b6a8: `APPROVE DESIGN WITH CONDITIONS`; implementation/review/execution still required. Source3e6: original `REVISE`, two P2 findings (transfer omission/original capture method loss); no other required source finding reported. Repaired ae6 source: `APPROVE SOURCE WITH CONDITIONS`, both P2 repairs closed, no open P0/P1 or further required source correction. The reviewer independently reconciled current13/351/zero exits and all261 narrow carry bindings. The sealed candidate evidence and exact publication-head preflight/merge still require their own final gates. A passing prior source or proposed merge is never substituted for that gate.
+
+Public documentation preparation installed verified latest StripeCLI1.53.1. Three `docs api` locator reads and one direct documentation path exited1/Forbidden; original records are in `documentation-preparation/`. The documentation connector required an unavailable link_id and was not retried with guessed account identifiers. No login/account/API operation followed. Pinned SDK21.3.2 local source definitions and synthetic SDK-envelope tests are the field/status evidence; current official documentation and real-provider compatibility remain unverified.
+
+No new SQL/DDL/isolation/reopen/restore/native performance proof is claimed by this pure wrapper slice. Unchanged retained SQL/source primitives retain their prior evidence and limitations. Caller arrays prove consistency only, never authenticity, freshness, positive original commit or durable current finances. Original-source-bound authenticated retrieval, commit closure, staff/MFA ledger/idempotency and Sean's reviewed eligibility/partial tax/dispute-access/rights/exclusive rules remain next A5 gates. Tax UI/history-index, existing-request final provider I/O and all host/legal/provider/activation/parity/full-verification boundaries remain open.
+
+## Sealed execution artifact
+
+`tested-ae6d1095-recorded-evidence.tar.gz` SHA256 `bd681b5f192e87b7f1f1ec9708682e5a87a91b5797009bbdbd8514aba6bba2fb`:7,073,062 bytes,2460 members,2377 deduplicated immutable source blobs, three exact source heads (7290 path bindings),13 original matching loader inputs, all four PHP invocations and all original interrupted/continued cheap records. Its companion index binds every member. The original generic sealer scope excludes broader application/native/host acceptance; the exact focused counts above are the execution claims. The host-only ephemeral key is excluded.

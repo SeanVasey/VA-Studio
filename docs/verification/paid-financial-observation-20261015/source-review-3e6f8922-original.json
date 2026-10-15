@@ -1,0 +1,155 @@
+{
+  "DECISION": "REVISE",
+  "additional_material_findings": [],
+  "approved_design_sha": "b6a8b72cac8af133e003f8daa48a04b97c99d09c",
+  "created_utc": "2026-10-15T13:04:56.079382+00:00",
+  "engineering_verdict": "REVISE for two owned P2s; no frozen-source/SQL/schema/provider/authority scope expansion required.",
+  "open_P0": false,
+  "open_P1": false,
+  "positive_source_assessment": [
+    "Actual V1/Tax final sources and retained readers are required; source proof surrounds complete1..10 line extraction, with captured new policy rechecks after callback-capable proof/extraction. Tax gross stays buyer-reviewed and repeated order gross is not summed by line.",
+    "Exact loaded Application/repository/raw maps/standard env closure are admitted without service resolution; defaultfalse pins and64-bit runtime, same captured policy and current summary gates are checked. No new SQL/provider/frame/cleanup/clock/commit witness is introduced.",
+    "Candidate output is fixed consistent_candidate/providerAuthenticated=false/unattested_input, excludes provider/customer IDs and raw payload. Monetary/status maps preserve non-succeeded histories and comparison boolean without settlement/rights/access/availability consequences.",
+    "Recursive primitive/tree/byte/node/depth checks precede canonical encoding; monetary fields are exact ints, dense lists bounded100, IDs/statuses/currency/subject checked, original gross and status sums bounded on64-bit. Unknown object/callback/coercion leaves are rejected.",
+    "Expectation/candidate deny clone/serialize/unserialize/JSON; explicit summary/identity access requires current purpose. Actual held-source decryption withdrawal tests retain caller-owned native/framework frame and original error/refusal."
+  ],
+  "preserved_conditions": [
+    "All values remain unattested input consistency, never provider retrieval/current financial/commit/refund/payment/access/rights/inventory authority.",
+    "Business refund/dispute/tax allocation/exclusive policies stay unknown.",
+    "No new provider/account/binding/routes/job/UI/SQL/DML/schema/cleanup/host/live effect; defaultfalse and frozen original/shared-P2/SDK/API/profile limits remain."
+  ],
+  "read_commands": [
+    "Read-only frozen source delta and all five new classes/config/test file",
+    "Read-only original execution/paid-evidence capture-method supported enums and pinned Charge.transfer definition",
+    "No app/test/DB/network/CI/shared mutation"
+  ],
+  "reported_original_outcomes": {
+    "affected_old_whole_files": {
+      "assertions": 291,
+      "errors": 0,
+      "exits": [
+        0,
+        0,
+        0
+      ],
+      "failures": 0,
+      "skips": 0,
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "tests": 69
+    },
+    "cheap_original_failure": {
+      "failures": 1,
+      "scope": "native-policy source driver regex classification; original remains failed",
+      "tests": 52
+    },
+    "limit": "These source-note outcome summaries are root-reported; direct full portable receipt reconciliation belongs to final evidence review. Reviewer did not execute them.",
+    "new_file": {
+      "assertions": 331,
+      "errors": 0,
+      "exits": [
+        0,
+        0,
+        0
+      ],
+      "failures": 0,
+      "skips": 0,
+      "source": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "tests": 10
+    },
+    "test_only_f9_gap_controls": {
+      "app_bytes_same_as": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+      "assertions": 7,
+      "errors": 2,
+      "exits": [
+        2,
+        1,
+        1
+      ],
+      "failures": 1,
+      "skips": 0,
+      "source": "f9fda036ad483cafbe524437fcf0c56435a96376",
+      "tests": 3
+    }
+  },
+  "required_next_evidence": [
+    "Preserve original gaps/CI failure and source/test-only identities.",
+    "Repair exactly the two owned source gaps, retain original profile/schema/SDK/source/receipt/consumer behavior.",
+    "Meaningful repaired transfer/async controls and ordinary supported matching; fresh frozen-source review and required focused/cheap evidence.",
+    "Later independent final sealed-packet decision, cheap exact-head preflight and expected-SHA development merge. No new native proof required solely for these pure value/normalization corrections."
+  ],
+  "required_source_repairs": [
+    {
+      "basis": "Installed pinned Stripe Charge declares transfer; new helper currently checks transfer_data/group/reversals but not transfer.",
+      "confidence": "high",
+      "direction": "Reject non-null transfer in the owned ambiguity check and test both before/after Charge paths. Preserve original legacy normalizer untouched.",
+      "finding": "The ambiguity denylist omits the real Charge.transfer field. A non-null destination-transfer pointer is ignored as an unknown field and candidate normalization succeeds, violating the intended own-account/no-transfer envelope contract.",
+      "id": "A5-S1",
+      "method": "ownAccount",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialObservation.php",
+      "severity": "P2"
+    },
+    {
+      "basis": "ExecutionContextV1::make and TaxExecutionContext admit both methods; original HostedEvidence and TaxCheckoutEvidence bind provider capture_method to retained context.",
+      "confidence": "high",
+      "direction": "Retain original context capture_method in the common typed tuple; admit only automatic or automatic_async and require exact raw PI matching. Exercise genuine V1 and Tax async preparation/review/payment/source flows without rebranding retained rows or reflected source classes.",
+      "finding": "Expectation drops the authenticated original execution_context.capture_method, while normalize hardcodes automatic. Both unchanged V1 and Tax execution contexts support automatic_async, so actual fully captured successful async sources can produce expectations whose matching envelope is then incorrectly rejected. A raw automatic envelope can also pass without proving it equals an async original.",
+      "id": "A5-S2",
+      "method": "extract/normalize",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php and FinancialObservation.php",
+      "severity": "P2"
+    }
+  ],
+  "review_kind": "Independent non-author bounded actual source checkpoint; no final evidence/merge approval",
+  "reviewed_sha": "3e6f89222c0832c08bf0205ee79077935b0c4e28",
+  "reviewer_actions": {
+    "application_test_DB_network_CI_hosted_operations": 0,
+    "tracked_edits": 0,
+    "writes": "Only runtime original MD/JSON"
+  },
+  "reviewer_preparation_errors": [],
+  "source_bindings": [
+    {
+      "git_blob": "fadf70edb0b2f60c5b0396e3cc4cdf88d588f785",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialCandidate.php",
+      "sha256": "fa5599557597ee4fdd7a35322745a72b172299a72332f6eaf76c598f5f18278f"
+    },
+    {
+      "git_blob": "98b1362747bb2b0896aeb64f57701140047ae1ea",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php",
+      "sha256": "b1dfc4fe13804635a82187669dc9dc4ef94306180b0787dfeedcce14fdfeb62f"
+    },
+    {
+      "git_blob": "7ff32eb4a40d61b06d803c538428a95a2a6ed0e8",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionException.php",
+      "sha256": "a1ee75117e030a2af3b6963bb2a1144ed8a8e12045124dd265c1317af7f79564"
+    },
+    {
+      "git_blob": "f4513a107e0b5d757ea5a0d0eeb4709d1a151279",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php",
+      "sha256": "ec9070b73b9b8c7ad91625d0977faa3b942965b0a6ffd2f1badbe64286706cf0"
+    },
+    {
+      "git_blob": "8e62312886b6bdbc4b0100d5b1619d9abd22fe93",
+      "path": "app/Domain/Commerce/ProductionFinancialInspection/FinancialObservation.php",
+      "sha256": "c988c9ece0d0bc4fa0668f3b95774948ee30e3175d02f6f0212a8b78a0d8884d"
+    },
+    {
+      "git_blob": "bc1917c020e7fe5e2cce1f572274e39a8743c9d7",
+      "path": "config/production-financial-inspection.php",
+      "sha256": "b5728c8018379fad76470e2033ab11fc24a59bb70f4a375688e392b71cf4241c"
+    },
+    {
+      "git_blob": "336697f299e824fc0d8210b325d5ec0b385afe51",
+      "path": "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php",
+      "sha256": "e100afd8b605609d5f21b210d7f16dce045d321702b68fabd5838b89228b0cf4"
+    }
+  ],
+  "specification_verdict": "Partial/fail: coherent unattested first slice is implemented, but transfer refusal and original supported capture semantics need repair.",
+  "test_assessment": [
+    "Real SMTP/synthetic paid V1/Tax two-line factories are used, no reflected source construction. Actual source and identity readers are proved before/after extraction.",
+    "Refund/dispute histories and stable normalized Charge ordering are exercised with explicit aggregates, status maps and comparison mismatch without atomic/provider claims.",
+    "Adversarial primitive/money/status/list/subject/bounds/recursion/object/serialization cases and genuine standard env plus nonliteral policy/leaf callbacks are meaningful.",
+    "Current tests lacked non-null Charge.transfer and genuine automatic_async source compatibility; green executions therefore do not establish those requirements.",
+    "Test-only different Tax reader uses a global DB driver getter, triggering real52-case shard-policy failure despite no driver branch. Construct it from captured reader primary/driver metadata to preserve the actual identity mismatch without weakening CI parsing or skip policy."
+  ]
+}
