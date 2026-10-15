@@ -13,6 +13,7 @@ use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -32,6 +33,7 @@ final class ActivateExclusiveOffer
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             $policy = app(ExclusiveSelectionPolicy::class)->current();
             $track = Track::whereKey($offer->track_id)->lockForUpdate()->firstOrFail();
             $locked = Offer::whereKey($offer->id)->lockForUpdate()->firstOrFail();

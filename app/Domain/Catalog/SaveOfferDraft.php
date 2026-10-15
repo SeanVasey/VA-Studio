@@ -4,6 +4,7 @@ namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,6 +26,7 @@ class SaveOfferDraft
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             if (array_diff(array_keys($data), self::FIELDS)) {
                 throw ValidationException::withMessages(['offer' => 'Only draft fields may be saved. Publish a revision to change the active offer.']);
             }

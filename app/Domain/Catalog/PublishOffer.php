@@ -5,6 +5,7 @@ namespace App\Domain\Catalog;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -25,6 +26,7 @@ class PublishOffer
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             $trackId = Offer::query()->findOrFail($offer->id)->track_id;
             $track = Track::query()->lockForUpdate()->findOrFail($trackId);
             $locked = Offer::query()->lockForUpdate()->findOrFail($offer->id);

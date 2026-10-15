@@ -9,6 +9,7 @@ use App\Domain\Commerce\Inventory\InventoryPolicy;
 use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -29,6 +30,7 @@ final class PrepareExclusiveOffer
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             InventoryPolicy::requireTestEnvironment();
             if (! preg_match('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]{0,191}\z/D', $reference)) {
                 throw ValidationException::withMessages(['inventory' => 'An explicit private scope-link evidence reference is required.']);

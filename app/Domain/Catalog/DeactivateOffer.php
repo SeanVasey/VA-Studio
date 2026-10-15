@@ -4,6 +4,7 @@ namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -21,6 +22,7 @@ class DeactivateOffer
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             $trackId = Offer::findOrFail($offer->id)->track_id;
             Track::query()->lockForUpdate()->findOrFail($trackId);
             $locked = Offer::query()->lockForUpdate()->findOrFail($offer->id);

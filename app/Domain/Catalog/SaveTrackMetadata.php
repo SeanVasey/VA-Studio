@@ -3,6 +3,7 @@
 namespace App\Domain\Catalog;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -28,6 +29,7 @@ class SaveTrackMetadata
                     throw new AuthorizationException;
                 }
                 Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+                StaffWriteAuthority::require($currentActor);
                 if (array_diff(array_keys($data), [...self::FIELDS, 'metadata_version'])) {
                     throw ValidationException::withMessages(['title' => 'Only track metadata may be saved here. Use the publication and media actions for other changes.']);
                 }

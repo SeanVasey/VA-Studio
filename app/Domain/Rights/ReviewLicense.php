@@ -5,6 +5,7 @@ namespace App\Domain\Rights;
 use App\Domain\Rights\Models\LicenseReviewEvidence;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -25,6 +26,7 @@ class ReviewLicense
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             // Template identity is part of the review and must not race a template edit.
             LicenseTemplate::query()->lockForUpdate()->findOrFail($version->license_template_id);
             $locked = LicenseVersion::query()->lockForUpdate()->findOrFail($version->id);
@@ -54,6 +56,7 @@ class ReviewLicense
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             $evidence = Validator::make($evidence, [
                 'approval_reference' => ['required', 'string', 'max:255', 'regex:/\S/'],
                 'review_hash' => ['required', 'regex:/^[a-f0-9]{64}$/'],
