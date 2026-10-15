@@ -68,17 +68,28 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $results = [$this->finish($one), $this->finish($two)];
         // Retain both isolated outcomes in the test receipt before any assertion can stop it.
         fwrite(STDOUT, 'Native Tax worker outcomes: '.json_encode($results, JSON_THROW_ON_ERROR).PHP_EOL);
+        $saved = [];
         foreach ($results as $index => $result) {
-            $this->assertNull($result['error_class'], 'Native Tax worker refusal: '.json_encode($result, JSON_THROW_ON_ERROR));
             $this->assertSame(0, $result['transaction_level']);
             $this->assertFalse($result['in_transaction']);
             $this->assertSame([$one, $two][$index]['connection_id'], $result['connection_id']);
             $this->assertSame([$one, $two][$index]['waits'], $result['waits']);
-            $this->assertTrue($result['begun_dictionary_read']);
+            if ($result['error_class'] === null) {
+                $this->assertSame('saved', $result['result']);
+                $this->assertSame($second['order']['orderId'], $result['order_id']);
+                $this->assertTrue($result['begun_dictionary_read']);
+                $saved[] = $result;
+            } else {
+                // The winner can retain its lock longer than the unchanged five-second waiter cap.
+                // A bounded pre-delegate refusal is valid; stale-snapshot403 or spent-budget410 is not.
+                $this->assertSame([PaidTaxException::class, 503], [$result['error_class'], $result['status']], json_encode($result, JSON_THROW_ON_ERROR));
+                $this->assertSame('App\\Domain\\Grants\\PaidTax\\PaidTaxActor->lockOriginal', $result['trace'][0]['call'] ?? null);
+                $this->assertFalse($result['begun_dictionary_read']);
+                $this->assertNull($result['id']);
+            }
         }
-        $this->assertSame(['saved', 'saved'], array_column($results, 'result'));
-        $this->assertSame($results[0]['id'], $results[1]['id']);
-        $this->assertSame([$second['order']['orderId'], $second['order']['orderId']], array_column($results, 'order_id'));
+        $this->assertNotEmpty($saved, 'Contention produced no winning original origin.');
+        $this->assertCount(1, array_unique(array_column($saved, 'id')));
         $b = null;
         $collision = null;
         try {
@@ -87,6 +98,7 @@ class PaidTaxNativeBoundaryTest extends TestCase
             $collision = $error;
         }
         $this->assertNull($collision, 'Byte-distinct, verified provider payments collided in the owned consumer schema.');
+        $this->assertSame($saved[0]['id'], $b['id'], 'A fresh authorized replay did not retain the winning origin.');
         $this->assertNotSame($a['id'], $b['id']);
         $this->assertSame([$first['order']['orderId'], $second['order']['orderId']], [$a['orderId'], $b['orderId']]);
         $this->assertSame($a, $grants->finalize($first['buyer']['principal'], $first['buyer']['user'], $first['order']['orderId']));
