@@ -1,0 +1,449 @@
+{
+  "archive_bytes": 1231822,
+  "archive_member_count": 135,
+  "archive_sha256": "9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89",
+  "bundles": [
+    "bundle-11ab36d7ed08-3bc5bc140aedb546",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626",
+    "bundle-8b2cd56c2c44-636f0767927aacf9",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3"
+  ],
+  "candidate_head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+  "current_input_count": 2461,
+  "git_bindings": [
+    {
+      "blob": "afc940522ac09c7e5e5478df41e6dbbb44f25165",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/ActivateExclusiveOffer.php",
+      "path": "app/Domain/Catalog/ActivateExclusiveOffer.php",
+      "sha256": "c46d7382299942541be47484d77d304c3f5dab00b1525aa8132072ebcb0d53a6"
+    },
+    {
+      "blob": "74b0a5c5404783143543b4eb55dee2ed2f74457a",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/DeactivateOffer.php",
+      "path": "app/Domain/Catalog/DeactivateOffer.php",
+      "sha256": "80afb2fe1eb8e930ade3697305fd27537d8070f01a39f3da44d0be25dc8403f9"
+    },
+    {
+      "blob": "d92cc433d82a29ba554a368d698a863881a07ae2",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/PrepareExclusiveOffer.php",
+      "path": "app/Domain/Catalog/PrepareExclusiveOffer.php",
+      "sha256": "3c392893f4ede182ff101921dd1d991b9eaa9632fa5413e592af65de456ef01a"
+    },
+    {
+      "blob": "6752f993d354551caceedda31a24ab7800fe0a7d",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/PublishOffer.php",
+      "path": "app/Domain/Catalog/PublishOffer.php",
+      "sha256": "76a65e2ccdae027f94aeb9b4af82ffd342249e93c32f07c5f38642577af5f5bd"
+    },
+    {
+      "blob": "e268148476c7262ff71f4b72d183995d2ed28c8b",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/SaveOfferDraft.php",
+      "path": "app/Domain/Catalog/SaveOfferDraft.php",
+      "sha256": "7fbb80ee85589d5e16b9acc9a39288a07348f4d2acd7280f0687df04924bd7ec"
+    },
+    {
+      "blob": "47b7dfef4376ed5c6c2719af452b3170e2163f1f",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/SaveTrackMetadata.php",
+      "path": "app/Domain/Catalog/SaveTrackMetadata.php",
+      "sha256": "3036e09271e7e35af1fc70406dd1345533e17e558d7fa4d6af8d82d3c117bb92"
+    },
+    {
+      "blob": "838fbf9846fb18248ac364df28a7f33594a07b53",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/CreateLicenseDraft.php",
+      "path": "app/Domain/Rights/CreateLicenseDraft.php",
+      "sha256": "999516e8adee094e7490d14bf96303fe4697da4c6739d531226245fd58ac4331"
+    },
+    {
+      "blob": "1bda0433ecfad1fd2c54a88ed8fe445a654a5fab",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/PublishLicense.php",
+      "path": "app/Domain/Rights/PublishLicense.php",
+      "sha256": "0883c86206eaf650d5bc3f2272366bebc804bf669e32697f8a17cbf742e6acd2"
+    },
+    {
+      "blob": "0ee0544db6a836f7308568fbdb7e1befbc041592",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/ReviewLicense.php",
+      "path": "app/Domain/Rights/ReviewLicense.php",
+      "sha256": "34a04baa65ea92f90248a1c9e5551082de8b349736721c1485f0a850a4cae081"
+    },
+    {
+      "blob": "5b25521a206d1a32592694e3709832afff1821ca",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/UpdateLicenseDraft.php",
+      "path": "app/Domain/Rights/UpdateLicenseDraft.php",
+      "sha256": "7c4a1127122b07e752cf59d45a826a76081fe93a17788a6874d55d9ac3f235a9"
+    },
+    {
+      "blob": "9f917ec5124564d488a454640a8fb41643f9f6e4",
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "member": "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/tests/Feature/CatalogLicenseStaffMfaTest.php",
+      "path": "tests/Feature/CatalogLicenseStaffMfaTest.php",
+      "sha256": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9"
+    },
+    {
+      "blob": "19068788717bccb5d8debab09df0a77420b3bb22",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/ActivateExclusiveOffer.php",
+      "path": "app/Domain/Catalog/ActivateExclusiveOffer.php",
+      "sha256": "f7b1f6ddd5fd459f562a01d2195ce02df9c46093bb4f5fa6c3e76e0052e3dacd"
+    },
+    {
+      "blob": "11e384a7de0c1ec57110af25b3550b9631d7c158",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/DeactivateOffer.php",
+      "path": "app/Domain/Catalog/DeactivateOffer.php",
+      "sha256": "7de74aec0009fc4e99b0398b40aac4345595674f21039180f51ac93592d7c2dd"
+    },
+    {
+      "blob": "1c355e00bba146e61afe88ba4362bd4cd30f9a75",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/PrepareExclusiveOffer.php",
+      "path": "app/Domain/Catalog/PrepareExclusiveOffer.php",
+      "sha256": "20bfd0825d2db0c9196e1b832fc3a6d4c7d299a73d531ad60ac9b3f720a93e89"
+    },
+    {
+      "blob": "688d9577e29bf22ec36838f498c89452f971c0e1",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/PublishOffer.php",
+      "path": "app/Domain/Catalog/PublishOffer.php",
+      "sha256": "be703b09f95cbc083d5a160baf2f349cf5f97b27dc00a2450570b3e22fe95690"
+    },
+    {
+      "blob": "e8069526f5912649b26c80d6c08d907c35bd47e5",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/SaveOfferDraft.php",
+      "path": "app/Domain/Catalog/SaveOfferDraft.php",
+      "sha256": "b517d22a69e296aef209068fb4cd7eff14101cdabe19b347e36da13a6bc31234"
+    },
+    {
+      "blob": "da008fbad65b854b73d1e1914db917ccb2df196f",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/SaveTrackMetadata.php",
+      "path": "app/Domain/Catalog/SaveTrackMetadata.php",
+      "sha256": "e9c9c6ada177059d2f28ddace34cc4d7bff6275afb837499eb53d19c926c3981"
+    },
+    {
+      "blob": "bc98f8cc764ec74d050ef4ad797eb5631fe9752e",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/CreateLicenseDraft.php",
+      "path": "app/Domain/Rights/CreateLicenseDraft.php",
+      "sha256": "69c6ccdee3c8e7793fd9dc889c84c57214be50a6b246d30b113002200b9533ab"
+    },
+    {
+      "blob": "091556d47166279dba7873d9a5c623816e908084",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/PublishLicense.php",
+      "path": "app/Domain/Rights/PublishLicense.php",
+      "sha256": "39ab31f7690c6fe06e1f02aa39a58d89e7479b0e93b4440789998490ca720b18"
+    },
+    {
+      "blob": "f3aa881b0ca48b4f0c23aa3d591085d0c16186e3",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/ReviewLicense.php",
+      "path": "app/Domain/Rights/ReviewLicense.php",
+      "sha256": "30f08ae356dc0e4a3bfd46b85bf4e1837d75d2572a949712c6b93a15922529cc"
+    },
+    {
+      "blob": "83b07ee93b20f043b4f0bd41d3a4f746cc271ea7",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/UpdateLicenseDraft.php",
+      "path": "app/Domain/Rights/UpdateLicenseDraft.php",
+      "sha256": "8732120d28114e30ea661b1c430c67f1d1fe7ea2e1e59507ece90f589ff60e2d"
+    },
+    {
+      "blob": "9f917ec5124564d488a454640a8fb41643f9f6e4",
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "member": "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/tests/Feature/CatalogLicenseStaffMfaTest.php",
+      "path": "tests/Feature/CatalogLicenseStaffMfaTest.php",
+      "sha256": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9"
+    }
+  ],
+  "invocations": [
+    {
+      "bundle": "bundle-8b2cd56c2c44-636f0767927aacf9",
+      "command": "catalog-license-mfa-old-original/command.json",
+      "counts": {
+        "assertions": 50,
+        "errors": 32,
+        "failures": 20,
+        "skipped": 0,
+        "tests": 52
+      },
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "name": "catalog-license-mfa-old-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-8b2cd56c2c44-66121446ae7b57e3",
+      "command": "catalog-license-mfa-old-storage-v2-original/command.json",
+      "counts": {
+        "assertions": 156,
+        "errors": 0,
+        "failures": 26,
+        "skipped": 0,
+        "tests": 52
+      },
+      "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+      "name": "catalog-license-mfa-old-storage-v2-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-11ab36d7ed08-ab835dc5dbf05626",
+      "command": "catalog-license-mfa-fixed-original/command.json",
+      "counts": {
+        "assertions": 208,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 52
+      },
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "name": "catalog-license-mfa-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-11ab36d7ed08-ab835dc5dbf05626",
+      "command": "legacy-writer-authority-sqlite-original/command.json",
+      "counts": {
+        "assertions": 272,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 90
+      },
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "name": "legacy-writer-authority-sqlite-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+      "command": "exclusive-prepare-mfa-native-original/command.json",
+      "counts": null,
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "name": "exclusive-prepare-mfa-native-original",
+      "process_exit": 124,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+      "command": "exclusive-prepare-withdrawal-native-original/command.json",
+      "counts": {
+        "assertions": 5,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "name": "exclusive-prepare-withdrawal-native-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+      "command": "exclusive-prepare-enrolled-native-original/command.json",
+      "counts": {
+        "assertions": 4,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+      "name": "exclusive-prepare-enrolled-native-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    }
+  ],
+  "limits": "Focused selections are not summed. Original filesystem-errored52case scope and corrected genuine old-source26failure scope preserved. Failed log/XML privately retained and hash-bound, derivedcaseoutcomes labeled. Initial four-dataset native attempt timed out420 with no usable JUnit/counts, preserved as incomplete; current selected withdrawal and enrolled counterparts only, not four-dataset/fullnative/concurrency/host/session challenge/release proof. No Foundation/GitLab/live/provider/frozen/activation claim.",
+  "loader_hash_count": 13,
+  "members": {
+    "bundle-11ab36d7ed08-3bc5bc140aedb546/identity.json": "34230ca17315de452b75f406fee9dac0b717690fbcc990c1e42bca67da3b1089",
+    "bundle-11ab36d7ed08-3bc5bc140aedb546/manifest.json": "08c5ed2d1ab14939ace01ff7a7182daca81664baf8859426a575efd2619f0e6d",
+    "bundle-11ab36d7ed08-3bc5bc140aedb546/public-environment.json": "6851e2f100a59b0f878cfd79fcd0d52a2fb6879f0a539b7f9d5dd149cfdd3fbb",
+    "bundle-11ab36d7ed08-3bc5bc140aedb546/runner.py": "85db264b648b1708b4483eecfc80922d2997b265a715de73cde431a381120e2d",
+    "bundle-11ab36d7ed08-3bc5bc140aedb546/runtime.json": "a5c937cdb9338fc5cb0b8163626c23b80da1a4fc11983069c6a0b7d71a1bf147",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626/identity.json": "e66aa8192dab12d0494274edb791485a10c9c41b36448fdd2042ef749f9df812",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626/manifest.json": "08c5ed2d1ab14939ace01ff7a7182daca81664baf8859426a575efd2619f0e6d",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626/public-environment.json": "6224d53b2d3630cfa50aaf1c28d66962f06e057d03cf1cf2e65513b59dbc498a",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626/runner.py": "a8039c9f1fddaca057ce0dcbe25fe9d268f3efc4c5a437cc0cb464d8a16ec418",
+    "bundle-11ab36d7ed08-ab835dc5dbf05626/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-8b2cd56c2c44-636f0767927aacf9/identity.json": "10694079993fbcd22da32e92e16cbaffad17b05d3bb7482ff207f877a09942d8",
+    "bundle-8b2cd56c2c44-636f0767927aacf9/manifest.json": "7e6beb26e5f6058a037f64469a3d2059a86652050ca61d11c4a1fe86ce44382d",
+    "bundle-8b2cd56c2c44-636f0767927aacf9/public-environment.json": "d751e4c3d5341c7a3662b9b526ee1f159e73fb1954e994f222bb13d04de14236",
+    "bundle-8b2cd56c2c44-636f0767927aacf9/runner.py": "36b18bed494bb58a46fbc16c4ce1ce3ae8badcca23bbe44e0bb3fda0e18c03b9",
+    "bundle-8b2cd56c2c44-636f0767927aacf9/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3/identity.json": "00b0e820c46b56a17ef3ee207fb04118d7fe8525408562d72fadce36da20c94a",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3/manifest.json": "7e6beb26e5f6058a037f64469a3d2059a86652050ca61d11c4a1fe86ce44382d",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3/public-environment.json": "6224d53b2d3630cfa50aaf1c28d66962f06e057d03cf1cf2e65513b59dbc498a",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3/runner.py": "a8039c9f1fddaca057ce0dcbe25fe9d268f3efc4c5a437cc0cb464d8a16ec418",
+    "bundle-8b2cd56c2c44-66121446ae7b57e3/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "catalog-license-mfa-fixed-original/command.json": "2941a61b399ef24ac08b4fa8ff545b610fd52ecae6da1d84656b9fcf20d75bae",
+    "catalog-license-mfa-fixed-original/junit.xml": "f2736342b623f69fb86fe43b95de1fb37923be24d5fc2870ae30906c020ed4d8",
+    "catalog-license-mfa-fixed-original/log.txt": "a2751b40286b022f420b436af4f45d4d5a219a1b7214ff63aee0d581d9ab14a4",
+    "catalog-license-mfa-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "catalog-license-mfa-fixed-original/result.json": "cbb2145d5864f8d694716db6b2fbcc49e6df2a63112fc5e62f66572e48faa8e1",
+    "catalog-license-mfa-old-original/command.json": "e31cab75feb8b8e4eafc0e232651cf3575d1f935cceb79c219361bcce0fff06a",
+    "catalog-license-mfa-old-original/derived-case-outcomes.json": "0e12d699b12ae8717a3e5c2ab55f23edc03b9da6c7f7a05eb840ad4de666b85e",
+    "catalog-license-mfa-old-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "catalog-license-mfa-old-original/result.json": "4127061d9ff285e1c184d7f47135e933ca0af1e1b71c60e9ea4c0eb1655bd21c",
+    "catalog-license-mfa-old-storage-v2-original/command.json": "1ba70825f705ef8c8202ba1e7aef028928d1532d5794c82bd310cf56fff34194",
+    "catalog-license-mfa-old-storage-v2-original/derived-case-outcomes.json": "f8fd9055cc2724dfed1254da077c07d73aa3ce559e63efde5b91d23f2c97d851",
+    "catalog-license-mfa-old-storage-v2-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "catalog-license-mfa-old-storage-v2-original/result.json": "72eb2f0d71b92185ccc61e7534c7cafe89b310c9bdbfd686b8b2c1e14e0452d8",
+    "composer-cli-parser-metadata-path-restored.json": "3cb03bcf13cf03463277fdcc218e8760dbfa0a2699673c5ea8d200e05a7314ed",
+    "corrected-old-tool-exit-original.json": "c870990c159c702a89f37b826098750fe144cc287c37f7eca66a1b0f0dbfcc8a",
+    "evidence-tools/package-recorded-evidence.py": "c2a5060d264bcf7d6f11af8693d412d00266f6e578b4e30987e6e181034885c2",
+    "exclusive-prepare-enrolled-native-original/command.json": "bc1e9867261640ec491d380534b6f7db695b907257b5c9a8d08dcb664b6f57c2",
+    "exclusive-prepare-enrolled-native-original/junit.xml": "8d28af00e287bd55ff73e97a8b0f72c79b1f4d58bffd13fbb296acff58bb8362",
+    "exclusive-prepare-enrolled-native-original/log.txt": "c78a961708c905a4c25001ba0af52a78cfc602c30d9cd34e4ae02fb754c849b2",
+    "exclusive-prepare-enrolled-native-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "exclusive-prepare-enrolled-native-original/result.json": "36b64d0e98ca3e73f64b5cca96ffff34ecf100d70bb02bba595fba1ded404d24",
+    "exclusive-prepare-mfa-native-original/command.json": "84034c538512fa939dc95074e483539cc4f477c6152a725b96050e7c86977c59",
+    "exclusive-prepare-mfa-native-original/derived-case-outcomes.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "exclusive-prepare-mfa-native-original/process.exit": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+    "exclusive-prepare-mfa-native-original/result.json": "efd2db1e02e06d3800ccfb650ef3a8694885163acc152924b70777993b242486",
+    "exclusive-prepare-withdrawal-native-original/command.json": "a9485e49047d785b5c9cb7732f14c1c04135e0f2c0de7667385bbb545903639f",
+    "exclusive-prepare-withdrawal-native-original/junit.xml": "2dfea50fc9c5aaa46bf2b799078daf5e60eddbd6a8eeb64e8d11310142da68e5",
+    "exclusive-prepare-withdrawal-native-original/log.txt": "b2d41818fa26dc696a71d5d73be6b5b3884f162fdf6014d75f390b6a4be3f022",
+    "exclusive-prepare-withdrawal-native-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "exclusive-prepare-withdrawal-native-original/result.json": "4710975454d165de764faa19ef9162dfeea604a638442f38307f0a366cdc710c",
+    "fixed-matrix-tool-exit-original.json": "b922e39509659c5ac9435a5cfeeaf4fcfeeb823578253ef4dbeee1a97ba76752",
+    "focused-pint-original.json": "1e2a3af781b6eeb7a19f5dd4862bab3854450645539c7805d82439d8f58310c1",
+    "focused-pint-original.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "generated-cli-proxies-isolated.json": "c5b871bb2f5c8271cdeebbde9c86541ed7015c77ed3884338a5be3cce06320fd",
+    "independent/staff-mfa-leftovers-source-review-11ab36d7-20261015.json": "e42c41b2514e15d4aea3987f60aecb861ecab1a46aab262774bccc37e2e7301e",
+    "independent/staff-mfa-leftovers-source-review-11ab36d7-20261015.md": "eca68b7c5b8757a9c9ffff613a089cddfe24cb63bbe258b16002384d9bfb8b52",
+    "isolated-checkout-source-proof.json": "fa2ac47790be95e6f7784ab4ca9556770c138484e87f3a35c15d68e5242ef8c0",
+    "legacy-authority-tool-exit-original.json": "6da08a6769220e5acf5e813e5d5006ea4c22f45826f2373a022867046ccb07ff",
+    "legacy-writer-authority-sqlite-original/command.json": "3d7fd664c59e1d1cb5cfecd5e9495f853a9a38ee61bde8ecdd45b12dae9235d4",
+    "legacy-writer-authority-sqlite-original/junit.xml": "a5e7ef997e1938a44b0c3b88b8aea987691a6e3a302a1201b5336c775a3b421e",
+    "legacy-writer-authority-sqlite-original/log.txt": "4c6df1e5309e681562499bde36f16645d7a58624f138fe09ab4d30d824e59d39",
+    "legacy-writer-authority-sqlite-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "legacy-writer-authority-sqlite-original/result.json": "a2ce2942fad61738f0b040761aea7aa2bf904027b4faedd0fcb38b4856457d41",
+    "mysql-private-retry1/mysql-schema-create.json": "fa491c632d5bda967ec19ff4f599dae56b7bc531d1ebe2dc0745622e72664b82",
+    "mysql-private-retry1/mysql-server-launch.json": "d39ab9fdbda0c684e1893df52523bb50e3edf1ffdace88e4faf7bdee911e18a0",
+    "mysql-private-retry1/mysql-server-ready.json": "7cf86d37eb606a748ac52670d58029ff508be4c061fd07fd87b2ce686010fa35",
+    "mysql-private-retry1/mysql-server-stop.json": "9fdf8002299735d559ce83248b75cb25e032624a575a5f24598295b2c7592322",
+    "mysql-private-retry1/mysql-server-version.json": "0332037f1ba6eccfa50939b1ef25ba14dbe3bfc13cb3b3294c479f2c27cffd70",
+    "mysql-private-retry1/mysql-socket-mode.json": "2cfebda418525159867a42339f5fae15b163a1612bf4be29107d4f20b9cd0909",
+    "mysql-private-retry1/mysql-stopped-state.json": "f4e5346436b31da9e1e10e694f05a2db34a6c55a77939308e28314ce1b64aa10",
+    "mysql-private/mysql-server-launch.json": "e8e5042eff140a7de3491d4b5ad07d0563e1de01513aff322cdd05ef40e5eb59",
+    "native-discovery-corrected-original.json": "cb5d732032655fdd3a10749b25f88e2d65a7c100a5136ab21b820e5a4fcb24d9",
+    "native-discovery-corrected-original.log": "da4a9dd6eea7589fbd93fd4621707e380ad7a221065bd5acd8cc05259c7cc161",
+    "native-discovery-generated/phpunit-ci-mysql-1-tests.xml": "99e678e6b1eb7553b770cff46c18b29e8f675fc33ea633764c11d27835ee39f6",
+    "native-discovery-generated/phpunit-ci-mysql-1.xml": "e5853e6a0e1dd98da7bdac185982a49c8a008567b132163e9a3f769303621838",
+    "native-discovery-generated/phpunit-ci-mysql-2-tests.xml": "102b03d4dbac3d55cc21ee1770904f8c6c1555c55694a29da5696e6afb9f6c68",
+    "native-discovery-generated/phpunit-ci-mysql-2.xml": "060cacc8c6cefbae63dc8156667c09652ae9f79d22b7fa37a381093d0de82a0c",
+    "native-discovery-generated/phpunit-ci-mysql-3-tests.xml": "c36da8245a5e4553775a0b9ee2ad4df84b0b32590929a604751b7a54cf56ffce",
+    "native-discovery-generated/phpunit-ci-mysql-3.xml": "a8717b3015420ad44dec933fa2b27844f909d8ae3d6e76a93a884b9dc0c73f02",
+    "native-discovery-generated/phpunit-ci-mysql-4-tests.xml": "4e65efdaaedeee6f57f3dd5af015bfdd29af5dc77be5d0e43b6a971934d65053",
+    "native-discovery-generated/phpunit-ci-mysql-4.xml": "d1c313567a3ee240b0cfc0a0ded2dfdbbd1d7d838436c1d5310213282ee82c8c",
+    "native-discovery-generated/phpunit-ci-mysql-5-tests.xml": "bac37e2cb58c39a40de6d056a0177aa63c1129fa25bb615e50bd9b0d92db347e",
+    "native-discovery-generated/phpunit-ci-mysql-5.xml": "aee85ba05d749e36bd72ba6291123c512f2dea61a297e7065dc5aea9d71f633c",
+    "native-discovery-generated/phpunit-ci-mysql-6-tests.xml": "6a72785b9638fad0b8fe925e1e4eb36f055826be020d50bc31a34b57c0e563ff",
+    "native-discovery-generated/phpunit-ci-mysql-6.xml": "3f66b3ad23ced75aa7d8a276aa1beaf157d09e735b8f268ce031008fe3ed8cbc",
+    "native-discovery-generated/phpunit-ci-mysql-7-tests.xml": "ebb81219e2da8500d2da90c124c20eb19f47b5a22a93b77a0c79b0cc641e9105",
+    "native-discovery-generated/phpunit-ci-mysql-7.xml": "4156937f834f03727ad5aa9aa9e813dcae54193fe575208376be98f46d6353c5",
+    "native-discovery-generated/phpunit-ci-mysql-8-tests.xml": "8272c3c80975ed92f30800fdd0f0599818e106b5a4ace225780b3318c391e818",
+    "native-discovery-generated/phpunit-ci-mysql-8.xml": "6d54646d0ddbb88655d9e3dd1db34b1ba8ce619ab96cfd1b8ea800bd3e139335",
+    "native-discovery-generated/phpunit-ci-mysql-manifest.json": "1752970f639a37888c519840c4f5a5b0257030efce143442d9151ec809894b1e",
+    "native-discovery-generated/phpunit-ci-mysql-source-tests.xml": "04e54849109bd58a7d1a471bf9b5d4249de67bc6555c38733d8f33e9b8166680",
+    "native-discovery-original.json": "ba56411709b594e83d0d3aec189c5dd13388e5697633b19b7b5f5fb06ba9e22f",
+    "native-discovery-original.log": "d7ad8af2e7d8c89336483e9fbf5e2395bee322c02436c79e721e44a866002a2d",
+    "native-enrolled-tool-exit-original.json": "6de55872951cb9b00b0d7acf04661cdfddf189123ceb90c66f81a98b46f9db03",
+    "native-execution-status.json": "2e95555e9b94ed5e93c3267b2688f184f92ae88629dd64eecf16418b93709cb0",
+    "native-generated-copy-cleanup.json": "9c189602a46c2f7f7d3f6d2b552deb0aba5142414f918cace243718750d979e1",
+    "native-selection-plan.json": "9e63cbf9223bf990c976a6b15da7cdd1bc9c57fd86ad2e1ca08d04b6afc915e6",
+    "native-timeout-tool-exit-original.json": "61f67a8fc7c71b58d4531c3e8c1cb0ac6091690c89e1ffb80d28b14965721e30",
+    "native-withdrawal-tool-exit-original.json": "70e72e26785e407ecc8b10a09af9ecbcf7db3ba63ce0c1052b32d69fa514b18a",
+    "npm-cache-byte-preserving-relocation.json": "f40d8b8d934bb47b4f012fdd687c6166de7460754ab8e098b0a1827c24a65b40",
+    "prepare-private-mysql-v2.py": "98a28269b065e606139b0e687227a271f651275bc8c48f28675f4e17e08b90ed",
+    "prepare-private-mysql.py": "0186f2f7af65c8ac8cfe867456fae1e5bd53b3fa80d195641f757b697fcd4289",
+    "run-focused-native-storage-v3.py": "85db264b648b1708b4483eecfc80922d2997b265a715de73cde431a381120e2d",
+    "run-focused-native-v2.py": "0e950048473170cf54db351d5154d939ec09d3e1ade3a879ce737e9008365770",
+    "run-focused-native.py": "af2418e3af21e6e0f5820adfc8ccdd13527ed0822e9e56aa6f3c3580ea161fb1",
+    "run-focused-storage-v2.py": "a8039c9f1fddaca057ce0dcbe25fe9d268f3efc4c5a437cc0cb464d8a16ec418",
+    "run-focused.py": "36b18bed494bb58a46fbc16c4ce1ce3ae8badcca23bbe44e0bb3fda0e18c03b9",
+    "run-quality.py": "4309be1f823fd2d06c05e821dc3eb6a010734ccccafbf196bf1adbbd8be07f81",
+    "scope.json": "c72699bf45374d0ca9eaefb2221923f509c91db72c0967dd27005ac267ea263b",
+    "shard-policy-original.json": "e0f95a6a0c8eace7abc7f6bb42dcea412919ae355303b30a644e6a4dac057cef",
+    "shard-policy-original.log": "e10868e2daed8d72c23223d7f2d7212d68b06cb0b63597c471f15b393ea39c40",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/ActivateExclusiveOffer.php": "c46d7382299942541be47484d77d304c3f5dab00b1525aa8132072ebcb0d53a6",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/DeactivateOffer.php": "80afb2fe1eb8e930ade3697305fd27537d8070f01a39f3da44d0be25dc8403f9",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/PrepareExclusiveOffer.php": "3c392893f4ede182ff101921dd1d991b9eaa9632fa5413e592af65de456ef01a",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/PublishOffer.php": "76a65e2ccdae027f94aeb9b4af82ffd342249e93c32f07c5f38642577af5f5bd",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/SaveOfferDraft.php": "7fbb80ee85589d5e16b9acc9a39288a07348f4d2acd7280f0687df04924bd7ec",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Catalog/SaveTrackMetadata.php": "3036e09271e7e35af1fc70406dd1345533e17e558d7fa4d6af8d82d3c117bb92",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/CreateLicenseDraft.php": "999516e8adee094e7490d14bf96303fe4697da4c6739d531226245fd58ac4331",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/PublishLicense.php": "0883c86206eaf650d5bc3f2272366bebc804bf669e32697f8a17cbf742e6acd2",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/ReviewLicense.php": "34a04baa65ea92f90248a1c9e5551082de8b349736721c1485f0a850a4cae081",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/app/Domain/Rights/UpdateLicenseDraft.php": "7c4a1127122b07e752cf59d45a826a76081fe93a17788a6874d55d9ac3f235a9",
+    "source/11ab36d7ed0896b9bfe811f9530b7c27508a4117/tests/Feature/CatalogLicenseStaffMfaTest.php": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/ActivateExclusiveOffer.php": "f7b1f6ddd5fd459f562a01d2195ce02df9c46093bb4f5fa6c3e76e0052e3dacd",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/DeactivateOffer.php": "7de74aec0009fc4e99b0398b40aac4345595674f21039180f51ac93592d7c2dd",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/PrepareExclusiveOffer.php": "20bfd0825d2db0c9196e1b832fc3a6d4c7d299a73d531ad60ac9b3f720a93e89",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/PublishOffer.php": "be703b09f95cbc083d5a160baf2f349cf5f97b27dc00a2450570b3e22fe95690",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/SaveOfferDraft.php": "b517d22a69e296aef209068fb4cd7eff14101cdabe19b347e36da13a6bc31234",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Catalog/SaveTrackMetadata.php": "e9c9c6ada177059d2f28ddace34cc4d7bff6275afb837499eb53d19c926c3981",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/CreateLicenseDraft.php": "69c6ccdee3c8e7793fd9dc889c84c57214be50a6b246d30b113002200b9533ab",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/PublishLicense.php": "39ab31f7690c6fe06e1f02aa39a58d89e7479b0e93b4440789998490ca720b18",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/ReviewLicense.php": "30f08ae356dc0e4a3bfd46b85bf4e1837d75d2572a949712c6b93a15922529cc",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/app/Domain/Rights/UpdateLicenseDraft.php": "8732120d28114e30ea661b1c430c67f1d1fe7ea2e1e59507ece90f589ff60e2d",
+    "source/8b2cd56c2c4434a01bd1fd699f38a6649433adbb/tests/Feature/CatalogLicenseStaffMfaTest.php": "84aae810bce124ee71f6264f39e7e4ac77a49cf67a03016988f7ff5905ed6df9",
+    "storage-and-setup-tool-outcomes-original.json": "7c308e3cda9feb162dd5963fcf8fd23af357d797fe76dcfde5dd82afa6155fc9",
+    "storage-checkpoint-reconciliation.json": "1787ef957fb533d3b3b25555995858120aff33142b5010ab3cc7ea6a9ef2ea6d"
+  },
+  "original_phpunit_invocations": 7,
+  "private_originals": [
+    {
+      "bytes": 72991,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "e407dddb91071eaf1d389e9be28a1966ab1a8eaa7c39511bdb1c32ae6ec3ffcc"
+    },
+    {
+      "bytes": 48661,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "47045967aa578d3ed62ef3984d5e4f63f0c40bb61052b8c07e84d8ecd6d88e8f"
+    },
+    {
+      "bytes": 32976,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-storage-v2-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "3e8efa8054541e82b6ed5b74194b2191b9a6a27e568221f53020320012437829"
+    },
+    {
+      "bytes": 10356,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/catalog-license-mfa-old-storage-v2-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "d118473dcb782da65cdf00bb82a9f1775c1bac1e82a7b9e22fcb52f8f11929ae"
+    },
+    {
+      "bytes": 0,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/exclusive-prepare-mfa-native-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 202,
+      "path": "/tmp/staff-mfa-leftovers-evidence-20261015/exclusive-prepare-mfa-native-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "4d835db0f16905400fd4a74a3062129d87275b62e6939a0e9581e806e22659cc"
+    }
+  ],
+  "recorded_utc": "2026-10-15T22:16:10.852170+00:00"
+}
