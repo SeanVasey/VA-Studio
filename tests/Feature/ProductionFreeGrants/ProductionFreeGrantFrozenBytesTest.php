@@ -25,7 +25,7 @@ final class ProductionFreeGrantFrozenBytesTest extends TestCase
         'app/Domain/Delivery/PreparedDeliveryStream.php' => 'e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13',
         'app/Domain/Delivery/ActivationPolicy.php' => '38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95', // B2: account()'s environment gate only; outsideTransactions() unchanged
         'app/Domain/Delivery/DeliveryException.php' => 'a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc',
-        'app/Domain/Customers/ProductionCustomerAccess.php' => 'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7',
+        'app/Domain/Customers/ProductionCustomerAccess.php' => 'ce24d7d2fcf77b89b728a54e681fcdd5137748f576bfa21836584299c0a559f7', // B4 metadata admission, independently reassessed for Free256 on 2026-10-15.
         'app/Domain/Customers/ProductionCustomerPrincipal.php' => 'd49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b',
         'app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php' => '73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6',
         'app/Domain/Customers/ProductionIdentity/IdentityException.php' => '91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563',

@@ -1,0 +1,73 @@
+{
+  "additional_controls": [
+    "Healthy zero-base first-chunk boundary and startup delay beyond fixed allowance",
+    "Post-first-chunk zero-base cumulative budget and no borrowed second startup allowance",
+    "Explicit integer rounding/type/bounds/overflow controls for original tuple and extreme supported size/rate, with no fresh grace",
+    "Held zero/missing/unreadable holder scoped refusal even though paid pattern admits zero and skips absent holder; idle stale recovery and actual account derivation controls"
+  ],
+  "closed_findings": [
+    "D1-D1: supported zero-base first-chunk semantics explicitly defined"
+  ],
+  "current_observed_sha": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+  "decision": "APPROVE BOUNDED D1 DESIGN WITH IMPLEMENTATION CONDITIONS",
+  "design_path": "/workspace/runtime/free-delivery-progress-design-v2-20261015.md",
+  "design_sha256": "0c301ab30c316fab4b8ca581b537c087ef8ce929d12a789642df0b9fba4700cd",
+  "frozen_profile_hashes": {
+    "resources/contracts/free-v1/profile-assets.json": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+    "resources/contracts/paid-tax-v2/profile-assets.json": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "resources/contracts/paid-v1/profile-assets.json": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+    "resources/contracts/production-free-v1/profile-assets.json": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+    "resources/contracts/production-member-v1/profile-assets.json": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac"
+  },
+  "immutable_three_file_bindings": {
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": {
+      "baseline_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+      "git_blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    }
+  },
+  "implementation_conditions": [
+    "Treat progress as full-chunk consumer acceptance, not network/client receipt. Check original absolute deadline before read/write and after every returning consumer, including final callback; update accepted-byte count only after complete successful acceptance. Refusal/throw closes only owned snapshot/lease and never undoes or retries consumed redemption.",
+    "Capture one original monotonic start with original captured policy before returning domain Transfer; do not recapture/renew at firstwrite/chunk/retry. Validate complete optional timing tuple, numeric rate/grace bounds, clock type/reversal and overflow before arithmetic. Document old trusted direct-constructor compatibility separately from domain-issued full-policy path.",
+    "Holder is a native SHA256 domain-labelled account digest from original retained server-proved auth/binding, independent of origin/role and never supplied by client. Account check and mark publication under global gate plus owned slot precede fill/reservation/redemption. Scan held slots even if configuration shrinks.",
+    "Held all-zero sentinel, missing, malformed or unreadable holder is unknown and refuses scoped admission. Paid holder scan alone accepts all64hex includingzeros, so explicitFree refusal is required. Null trusted callers retain old global behavior, with no account-cap claim.",
+    "Preserve private atomic exact64byte holder sidecars and exact ownership/regular/singlelink/mode/inode checks; never overwrite foreign/symlink/hardlink/nonregular records. Free stale owned wrongsize records may be reclaimed only while native lease proves idle. Preserve existing reservation/free-space accounting and all handles cleanup.",
+    "The held native flock must remain in PreparedDeliveryStream until owned close/destruction/kernel exit. Require real independent-process same-account contention and close/destruction/crash recovery, no pretending SQLite/MySQL establishes POSIX filesystem coordination. ActualDownloads integration verifies original account derivation and no redemption on cap refusal.",
+    "Transfer publicstream/shared PreparedDeliveryStream currently expose direct raw paths; this prerequisite applies to Transfer.writeTo contract only. Mount/first-byte authority/all-entry emission, blocking callback termination/sendtimeout/proxy/per-host/coherentflock/sourceadapter/fonts/identity/native/activation/legal/release conditions remain open, never claim A6-2fullyclosed.",
+    "Do not touch frozen profile members/manifests, shared PreparedDeliveryStream, paid source, schemas/config/provider/HTTP mounts or adjacent B4/V1/generic/OriginalCommitWitness/membership findings. Appropriate focused old/fixed/current evidence, independent final source/evidence review and cheap exacthead publication gates remain required."
+  ],
+  "implementation_or_test_acceptance": false,
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_design_sha256": "c90c1a9df4e00908a492a5e04d630f5a664cc730687e9ede0e34f7c11d7573bc",
+  "original_revise_json_sha256": "ff195434bf84052fad4f2423e676d5e1747accda7a4920f0136590990beb6cc6",
+  "original_revise_md_sha256": "3197a1a37f2daf95f77baaa65a7835558455a11e5849ba73f7a3fc497cee6151",
+  "parent_reported_old_controls": "Parent reports original6/8/F4 with nonzero exits and initial1/1/F1 retained; no application execution or receipt verification performed by this planning review. Those counts are not reviewer acceptance.",
+  "preparation_errors": [],
+  "recorded_utc": "2026-10-15T20:58:26.765756+00:00",
+  "required_design_corrections": [],
+  "reviewed_source_base_sha": "d54522aa1f719780615a90362a2ff57a04395513",
+  "reviewer_app_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "scope": "Planning approval of three unfrozen Free files only; no full A6-2/all-entry emission/blocking-write/mount/host/sourceadapter/renderer/identity/activation/release closure",
+  "shared_files_modified": false,
+  "startup_contract": {
+    "absolute_deadline": "Original absolute deadline and monotonic reversal admission still govern before/read/write and after every returning consumer including final",
+    "accepted_bytes": "Count complete chunks only after successful returning acceptance; not client receipt proof",
+    "after_first_acceptance": "Exactly original baseNs + acceptedBytes/rate; no repeated startup credit, recapture or renewed grace",
+    "positive_base": "Original positive base grace governs before first accepted chunk",
+    "zero_base": "One fixed first bounded min(asset_size,1MiB) chunk/rate allowance from original start, computed once"
+  }
+}

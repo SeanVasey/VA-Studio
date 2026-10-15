@@ -1,0 +1,9 @@
+DECISION: APPROVE FINAL DOCUMENTATION-ONLY PUBLICATION CARRY
+
+Reviewed exact clean `9c01dffbd08dc50ac24d2098f15dfa59db73cc4e`. All seven changed paths from approved `f1ea7991a0d7fe36ce141e1220b6281113000410` are documentation only: byte-original initial/final decisions and current status text. All 16 captured source paths remain identical to tested `f782a79a8cd16c996e9cf65ea89a64a630261bfd`. Existing domain/config/routes/schema/jobs/providers and all implementation/test files are unchanged.
+
+Both source-review decision/report imports match their reviewer runtime originals. The initial 19-member/29,156-byte archive and final 57-member/91,295-byte archive, with their receipt files, remain byte-identical and retain approved hashes. Final archive SHA256 is `6f7ec89f2d02511ffae09f1355e853fd1711de5724033ea263f452396673c570`. Genuine old one-method/three-subtest failures remain nonzero; initial 30 and final 31 passing scopes are not summed or relabeled.
+
+README and both ledgers accurately record completed independent source/evidence approval, closed B5-S1 and pending final carry/preflight/inventory/expected-SHA merge. No material finding, open P0/P1 or required correction is established. The prior bounded development approval explicitly carries to this exact head without another checker/application run.
+
+Green cheap exact-head preflight, complete current inventory/no open P0/P1, repository protections/required reviews and expected-SHA merge still govern publication. Record the actual receipt and both ledgers afterward. Real sender/provider/account/retention inputs and all effective-runtime/host/DNS/TLS/delivery/queue/scheduler/restore/provider-compensation/full/native/Foundation/GitLab/activation/release acceptance remain unapproved. Only read-only verification and exclusive runtime artifacts occurred; no checker/app/DB/network/CI execution, shared edit or preparation error.

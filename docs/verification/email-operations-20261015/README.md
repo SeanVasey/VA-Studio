@@ -19,3 +19,7 @@ The versioned focused-fixed-evidence.zip/receipt preserve all3 original invocati
 Final independent review atf1ea records **APPROVE BOUNDED DEVELOPMENT SOURCE AND FINAL SEALED EVIDENCE**, no openP0/P1 or required correction. B5-S1 canonical origin is closed; publication carry/preflight/inventory/expectedSHAmerge and actual host/provider/activation limits remain. No real sender/provider/retention inputs arrived; blank operator inputs remain blocked.
 
 Original source-review artifact preparation was delayed by a pre-process exec transport failure and a broad current-HEAD assertion after root advanced documentation. These are recorded in the reviewer report, not application test failures or passing checks; immutable4635 source and the corrected source/evidence lineage are independently reconciled. Both original decisions are imported unchanged.
+
+## Actual publication
+
+PR #128 merged at83901a60 from exact approved9c01; cheap preflight38804022106 and full inventory/protection/expectedSHA/fetchedtree gates passed. [Actual merge receipt](merge-receipt.md) and publication originals preserve both the current pass and readiness-cancellation/preparation failures. Source and publication are complete for this bounded reader; all real-input/host/provider/delivery/activation limits remain. Earlier pending checkpoints above are original chronology.

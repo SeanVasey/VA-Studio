@@ -1,0 +1,884 @@
+{
+  "archive_bytes": 1848673,
+  "archive_member_count": 206,
+  "archive_sha256": "e3bd46d4ce9431ca642d7a7508264ac4ff4d572017365ed55972e26c8af488b6",
+  "bundles": [
+    "bundle-2e071ef9b478-73e741dcd1410212",
+    "bundle-2e071ef9b478-c86563a5e6ca18da",
+    "bundle-409e979df823-7f9a0199c5bf07f7",
+    "bundle-70bbee3563ef-5b44148625733631",
+    "bundle-80c174caa551-295bea0121f46540",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c"
+  ],
+  "candidate_head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+  "current_input_count": 2460,
+  "git_bindings": [
+    {
+      "blob": "41cff52120b4486c66da3d7ad2ea89ed9814a3cc",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0"
+    },
+    {
+      "blob": "809c42e58a89281e47a50399d75fc8f6e8c60112",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "ac3c0fb0055374f9d2ede945d9dc525f84b1ecb68e1073fce65615f86c4e0dc9"
+    },
+    {
+      "blob": "83834399ee64162252a7139787666554288256d3",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "95615cd3cf07a2337da13e85adcc2c221c8eda24b696b1478bf1b294d84b8ff9"
+    },
+    {
+      "blob": "f2707ab8dede84f8809faa281ea92c8a2437e130",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php",
+      "sha256": "31784dbc28fa3436ed4edf1aa17450a90b7bbb0a0814ac03b3a856e5bb2b6bbe"
+    },
+    {
+      "blob": "e7e30d176360c0188223acde1ff2ee32a65f72ef",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "sha256": "9fa08250277dcd21608e41be818d5d97754b495aba68e6c262e632d5b6538875"
+    },
+    {
+      "blob": "66a92ab4c8d24ed1c7fcbb975200f3f4f1553a3d",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "642ecc9300b6eb63a39a5764d348a83b324ab7a89cc972abbab7eab39b221133"
+    },
+    {
+      "blob": "7a24374574b2851634083dd015b8158676b7991c",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "d23058018be83c2e34c465c2d2eafdb8baf92cea7c51bcde1c5a97925946b294"
+    },
+    {
+      "blob": "30094b5bf5f84b2b58e738acc2466f4c6da8b135",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "871b9ad5bf865978a7296da7aaab20d5eae8439fdba2985382a37142c660a818"
+    },
+    {
+      "blob": "69cab9c96088a9ee963d9e45da1be2adfe982f22",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "1e401ef5d72d693fe53a07ceb409f8dc14fcdc2470cdd4325fd2151fac277faa"
+    },
+    {
+      "blob": "b224fabc943d623485045174a4d832f5ce2aa060",
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "member": "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "e53c70e61945fe2ed47fead27b7ced8ac7008219d699fa136596c3cae380442f"
+    },
+    {
+      "blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    {
+      "blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    {
+      "blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "a4271f588517ffb9a4ccf5af78578fd4e79226a5",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "19122c08b46bbcbcf67a605f4150bbd21fababff134f9e15312afcd7fe74d042"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "member": "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    },
+    {
+      "blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    {
+      "blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    {
+      "blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "bbbd1299bb1b6e644a86e8356f9d6efeef697424",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "1ac4a34c11a8c91e5be063e68f830b60477b2e341993e89516733e0015c01982"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "member": "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    },
+    {
+      "blob": "41cff52120b4486c66da3d7ad2ea89ed9814a3cc",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0"
+    },
+    {
+      "blob": "c2419412dc336927e5887e4b5becd619eaefc900",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54"
+    },
+    {
+      "blob": "6fdac7b5c68895b2f3baebe094e696b6bce41a43",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050"
+    },
+    {
+      "blob": "40df95caf361a8021be5334db62612d84d6af2a3",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "sha256": "a322be805672d1cd6840e9c38aae39cd78c3ee614934473f0215cbb23bf1b4c4"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "9a95f9707155531510651fdcfd4f01da70a7fadd",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "3ba0c8965964097707ac61bc798389f8940f2add961c813befdf144eb1492b3f"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "member": "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    },
+    {
+      "blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    {
+      "blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    {
+      "blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "2f9a0274f796138c4e634f57267fd257bd2006ab",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "member": "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    },
+    {
+      "blob": "c35ef57508f8feea1a6494ee90d7e39d1c60bb00",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e"
+    },
+    {
+      "blob": "e204bf3455607389b57d255243373d957768a9d0",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66"
+    },
+    {
+      "blob": "552425736cbfb408eb968743abab4c159a938fda",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e"
+    },
+    {
+      "blob": "50796d24c4758baf315afe8518b57c0818a66ee3",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "sha256": "957e37ebf58ce57bbb6706df75c9b3b8bf54fc3407284be74d2fb0e185b6fedb"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "2f9a0274f796138c4e634f57267fd257bd2006ab",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "member": "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    },
+    {
+      "blob": "41cff52120b4486c66da3d7ad2ea89ed9814a3cc",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php",
+      "sha256": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0"
+    },
+    {
+      "blob": "c2419412dc336927e5887e4b5becd619eaefc900",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php",
+      "sha256": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54"
+    },
+    {
+      "blob": "6fdac7b5c68895b2f3baebe094e696b6bce41a43",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php",
+      "sha256": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050"
+    },
+    {
+      "blob": "50796d24c4758baf315afe8518b57c0818a66ee3",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php",
+      "sha256": "957e37ebf58ce57bbb6706df75c9b3b8bf54fc3407284be74d2fb0e185b6fedb"
+    },
+    {
+      "blob": "cc67cff5fa72df8bde62e4d17b4ee17791457497",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+      "sha256": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e"
+    },
+    {
+      "blob": "2f9a0274f796138c4e634f57267fd257bd2006ab",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php",
+      "sha256": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4"
+    },
+    {
+      "blob": "4aac9f8effb66760cf9ee0f17915af1f417df7a8",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "sha256": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6"
+    },
+    {
+      "blob": "c1d54e3c48f4e3afc65f0fef5e9bccdbb6c608eb",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "sha256": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d"
+    },
+    {
+      "blob": "321c2e9e258b3a5900d80945283d37999a542acb",
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "member": "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "sha256": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db"
+    }
+  ],
+  "invocations": [
+    {
+      "bundle": "bundle-70bbee3563ef-5b44148625733631",
+      "command": "returning-progress-old-original/command.json",
+      "counts": {
+        "assertions": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "head": "70bbee3563ef584f8dcbebc34c75135612228217",
+      "name": "returning-progress-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-409e979df823-7f9a0199c5bf07f7",
+      "command": "returning-progress-old-complete-original/command.json",
+      "counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "tests": 6
+      },
+      "head": "409e979df82327fb7b719436170f472f8b294867",
+      "name": "returning-progress-old-complete-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-c7e92bc2a627-d5f25a9e267664e6",
+      "command": "zero-base-old-original/command.json",
+      "counts": {
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 2
+      },
+      "head": "c7e92bc2a62709c477047f7dcdb8b82cced8eeb6",
+      "name": "zero-base-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-ca20e35103c8-b5ef6fa223c16c24",
+      "command": "account-spool-old-original/command.json",
+      "counts": {
+        "assertions": 6,
+        "errors": 0,
+        "failures": 5,
+        "skipped": 0,
+        "tests": 6
+      },
+      "head": "ca20e35103c85fd0259b2677848f7cceb0a753f5",
+      "name": "account-spool-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c",
+      "command": "returning-progress-account-fixed-original/command.json",
+      "counts": {
+        "assertions": 33,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "name": "returning-progress-account-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c",
+      "command": "affected-free-sqlite-initial-original/command.json",
+      "counts": {
+        "assertions": 276,
+        "errors": 4,
+        "failures": 2,
+        "skipped": 0,
+        "tests": 33
+      },
+      "head": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+      "name": "affected-free-sqlite-initial-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-80c174caa551-295bea0121f46540",
+      "command": "shrink-clock-old-original/command.json",
+      "counts": {
+        "assertions": 7,
+        "errors": 1,
+        "failures": 3,
+        "skipped": 0,
+        "tests": 6
+      },
+      "head": "80c174caa551ff18d619181e38415a80c8597901",
+      "name": "shrink-clock-old-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-c86563a5e6ca18da",
+      "command": "progress-account-process-fixed-original/command.json",
+      "counts": {
+        "assertions": 85,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 27
+      },
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "progress-account-process-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-c86563a5e6ca18da",
+      "command": "affected-free-sqlite-fixed-original/command.json",
+      "counts": {
+        "assertions": 313,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 34
+      },
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "affected-free-sqlite-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-2e071ef9b478-73e741dcd1410212",
+      "command": "account-domain-native-fixed-original/command.json",
+      "counts": {
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "head": "2e071ef9b4783beb99336968a8b73cd76f7c9cf5",
+      "name": "account-domain-native-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    }
+  ],
+  "limits": "Focused overlapping selections are not summed. Raw failed logs/XML hash-bound privately; every failure retained. POSIX process proof is local filesystem only; native selected domain case only. No full CI/host/provider/HTTP mount/blocked-write/activation/release claim.",
+  "loader_hash_count": 13,
+  "members": {
+    "account-domain-native-fixed-original/command.json": "a4191f342c9dd5d4ccba18b74a2be9ebf572159d824b835323741f04bb93ba3e",
+    "account-domain-native-fixed-original/junit.xml": "1afeff1ab65e75e9690f1160ef125cd309a1903dc9a7242619415c34efaae62f",
+    "account-domain-native-fixed-original/log.txt": "eebae98974cfdd8e654af27331bff11ee25d5f816121e4e14e0c0f860a4d389c",
+    "account-domain-native-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "account-domain-native-fixed-original/result.json": "56f6d6a488795c60cbdac0dcea1963e165228f00c13f3c07974a47707a7f1d91",
+    "account-spool-old-original/command.json": "4a82a2cae408c88be28fd6d4778c6618e2131cbfea8f881d49ab856b8c1f8db5",
+    "account-spool-old-original/derived-case-outcomes.json": "62205c6ff1aa626013c15613e5acee66423815a9ca36625daf854a582c328d7e",
+    "account-spool-old-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "account-spool-old-original/result.json": "bb462f4deb48ea9d7f546556ef344576b4b9396649643cffae2a6ed48bec780f",
+    "affected-free-sqlite-fixed-original/command.json": "337fe28dfb73f2e5967875245f0f8cf8148f5089fff0bdfcb67540241f6afc6d",
+    "affected-free-sqlite-fixed-original/junit.xml": "2e08112f3be9bd8810c98188c7757327dca088ad7a59f10781938594804b03e4",
+    "affected-free-sqlite-fixed-original/log.txt": "b359ffa53c1b4386b669bca0772d9ca2da13a9e9b5bb461cdf8cea178414079a",
+    "affected-free-sqlite-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "affected-free-sqlite-fixed-original/result.json": "c013a09fce98d925e2c66b16ce16fdd83f3062d91ecf48f51ffe1e19fcd54610",
+    "affected-free-sqlite-initial-original/command.json": "2d51d48538e3404202de70080cc0fb0021c2cefc58d077996b22cf4aab8bf719",
+    "affected-free-sqlite-initial-original/derived-case-outcomes.json": "4e43770135c443152461e9941da18d1c0baee1846e20159091c1daceff9bcbb0",
+    "affected-free-sqlite-initial-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "affected-free-sqlite-initial-original/result.json": "25b07ee22d7ae5ab71363b7c38643f5fb7bf5c181b0b2f74580353cc1010d734",
+    "bundle-2e071ef9b478-73e741dcd1410212/identity.json": "373778b764a77748dbf4e2259ac3d7683342c11ef8b144a0ea3ee49cdedbd1dd",
+    "bundle-2e071ef9b478-73e741dcd1410212/manifest.json": "0d2f28cd1cca4a29df2ee0061a1b5455070fbe0b12609fe83bcf127539a4d97b",
+    "bundle-2e071ef9b478-73e741dcd1410212/public-environment.json": "3628ef3ee5982f790747120878b3860b010b0981418db960e703f01e3cb0dd07",
+    "bundle-2e071ef9b478-73e741dcd1410212/runner.py": "50f1aa4dbadaae947ae2e944c9a5dfeec1c1b69766f7600d613a8fab14132942",
+    "bundle-2e071ef9b478-73e741dcd1410212/runtime.json": "831fc26042ec63c4e7a441a5fa47b5fc7bfdd9209fc422b675540bc33cd811c3",
+    "bundle-2e071ef9b478-c86563a5e6ca18da/identity.json": "9bb3cf5bdb83bcc37a3d17738dc8c79d526b6d697e8bb1d0a2b540128feccdeb",
+    "bundle-2e071ef9b478-c86563a5e6ca18da/manifest.json": "0d2f28cd1cca4a29df2ee0061a1b5455070fbe0b12609fe83bcf127539a4d97b",
+    "bundle-2e071ef9b478-c86563a5e6ca18da/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-2e071ef9b478-c86563a5e6ca18da/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-2e071ef9b478-c86563a5e6ca18da/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-409e979df823-7f9a0199c5bf07f7/identity.json": "1f18748eb018d9920593d5be535cb6ada51735de8d53f117cb32f4c0dc421ae4",
+    "bundle-409e979df823-7f9a0199c5bf07f7/manifest.json": "5087f900efe03004f3db3acb74fac6e6492db1ad364e5cc5f0652f4f329a36b2",
+    "bundle-409e979df823-7f9a0199c5bf07f7/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-409e979df823-7f9a0199c5bf07f7/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-409e979df823-7f9a0199c5bf07f7/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-70bbee3563ef-5b44148625733631/identity.json": "e9246b60d8fcc4ad3d324d133ac5618b709e38a17b3f0bbc25599a6a37e4ba97",
+    "bundle-70bbee3563ef-5b44148625733631/manifest.json": "e0e775f1f1d79af011f9d55a113f65f6832f1904872cc2812d14a67b7b5da1a9",
+    "bundle-70bbee3563ef-5b44148625733631/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-70bbee3563ef-5b44148625733631/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-70bbee3563ef-5b44148625733631/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-80c174caa551-295bea0121f46540/identity.json": "c4944fa1b1d7f9c2e904363b309af20a98d3478cfb9d7f5a3be513ea411915a6",
+    "bundle-80c174caa551-295bea0121f46540/manifest.json": "b19e80dda36a990ffe91580ce8ee5955be3f8062821e3b5d2665f13ad01d5655",
+    "bundle-80c174caa551-295bea0121f46540/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-80c174caa551-295bea0121f46540/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-80c174caa551-295bea0121f46540/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6/identity.json": "ed25e2ab5bd64f313c43829974e78d6414f1b0f104d0ec64f2e0dce0184f13fa",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6/manifest.json": "82039870a96ce02952e5ea848c8ad23caa91c92a95ff378463cbcff812495428",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-c7e92bc2a627-d5f25a9e267664e6/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24/identity.json": "6ecd9facdcec45c98feaf15a1ad0e8532617cb1de5d2df05e26edd7ce359ded2",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24/manifest.json": "6180a7f3eebaacacd23563b5dc09fe836797eb67905ac68afcd9b0dec8123464",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-ca20e35103c8-b5ef6fa223c16c24/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c/identity.json": "ab43e8c5cb1afba34ef4c222a4c312c858f7abd5d555759fbf552a0279641844",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c/manifest.json": "c54bec47174bccd152ca04d42d7d5dbecb7804439ec185dcefe458566eb0cf4e",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c/public-environment.json": "d01abf081d747e5446db634529277946881e2a6fdc704eb033842e7fba4536d8",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c/runner.py": "d743d55f75bbf0373f19af9beea29bc834b1e98622abc8161c52798b6a45ed41",
+    "bundle-f1d5fb1f2559-7ecf848ed5ba9f8c/runtime.json": "388c33660c00fc4101cfbfdaa490803ce61fbde5be4090c3406257f3ef804fd7",
+    "evidence-tools/package-recorded-evidence.py": "b53a451e9a0e23a4fb4a38b2340a7f0206d2a1582b2016aeaba7b2d72f11c5bd",
+    "evidence-tools/prepare-free-delivery-progress-mysql-20261015.py": "14b6cb1848dc97aedc9997f45dcf7f8a20edd7491348efbe21b0c2f2418bc418",
+    "evidence-tools/prepare-free-delivery-progress-mysql-tmp-20261015.py": "20f206ed60454b9610f91c97966a7716ffde8ba46ded0017538b40c4ffec6688",
+    "focused-pint-original.json": "78eda5bcd98dd7fa405f70fdea63c1fe3d0fd680577c9538133a15e9568ea28c",
+    "focused-pint-original.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "independent/free-delivery-identity-dependency-review-20261015.json": "b364a7fbff00535a90f45ecacea579f8ef58e28b62cc637c0bd989282c406997",
+    "independent/free-delivery-identity-dependency-review-20261015.md": "f6b9c0552a03aac07ee97ce26cf07d0ddf1226607a575ed89fdbbb88c51076aa",
+    "independent/free-delivery-progress-design-20261015.md": "c90c1a9df4e00908a492a5e04d630f5a664cc730687e9ede0e34f7c11d7573bc",
+    "independent/free-delivery-progress-design-review-20261015.json": "ff195434bf84052fad4f2423e676d5e1747accda7a4920f0136590990beb6cc6",
+    "independent/free-delivery-progress-design-review-20261015.md": "3197a1a37f2daf95f77baaa65a7835558455a11e5849ba73f7a3fc497cee6151",
+    "independent/free-delivery-progress-design-review-v2-20261015.json": "348d16a5c672a7e5b86ca5f7a0ea9316be899751b16b38f821cd0f6739e5f393",
+    "independent/free-delivery-progress-design-review-v2-20261015.md": "116eca9febc7b015c2f6ac0f2aeea208b03ec05bc56d18e006802aecfe84df79",
+    "independent/free-delivery-progress-design-v2-20261015.md": "0c301ab30c316fab4b8ca581b537c087ef8ce929d12a789642df0b9fba4700cd",
+    "independent/free-delivery-progress-source-review-2e071ef9-20261015.json": "bcb0efe166ec88562156e7483c862fa26f76261c4dc0d0bb64cc0e67c17597b6",
+    "independent/free-delivery-progress-source-review-2e071ef9-20261015.md": "32c7489481453cafffb2390597d9ce5eece626f4497aa3448860df13a24d1d9f",
+    "independent/free-delivery-progress-source-review-f1d5fb1f-20261015.json": "857e4875fd6ed923a38ca914472a39cec01931758c3f2638aa14a46efdb605e6",
+    "independent/free-delivery-progress-source-review-f1d5fb1f-20261015.md": "90163b1fe8bcd78c39943f404ca2ccfe746ca49217098b29e9052f56b096c972",
+    "mysql-failed-container-remove-original.json": "8421c5d0515629317fbb29efc91dabeb2113c19a2326fef3d7c77583b7d61943",
+    "mysql-failed-empty-initialization-volume-remove-original.json": "c88d36b4a3313a685a02aa74081d270745a988410d7d356912bc8d0048df0f0a",
+    "mysql-server-launch.json": "5c3b92b9f4cbe91fc78998e095e680e6792d8496010db35adc77896488438fc0",
+    "mysql-start-failure-log-original.json": "3319293811541a2276d13624f5ca9c416917550ae4bdda4dd3ae7afefe11d1c8",
+    "mysql-start-failure-state-original.json": "e74977ceeed042483da917e61d841a2fb8641d8229c9c543e1788dcf72bc1bee",
+    "mysql-tmp-retry/mysql-schema-create.json": "5480736aa53f289c05923fddeda44c6aa097e1e0ec49b4b51c6c02e271e65adf",
+    "mysql-tmp-retry/mysql-server-launch.json": "d26c7f49e5013e47e6b2ff8866f8b0ea0f94f166f867f0ade47fe03daa8a3c8f",
+    "mysql-tmp-retry/mysql-server-ready.json": "c6b5db7dfb2953adbb40809309d782d478622fa2858a3f478b324d44e5c4d106",
+    "mysql-tmp-retry/mysql-server-stop.json": "1b576f198abb65a6dddd6f9ae198064d092c0a15758539ec78c0d8f8a07d9497",
+    "mysql-tmp-retry/mysql-server-version.json": "0230ee2b3b36a18f6c5c4724aa0692f98f28efad5f9543762efa308551cb8148",
+    "mysql-tmp-retry/mysql-socket-mode.json": "8a4e45b241efc779197f82668a55931c9e2a84232a103f6f22b9a204bb287495",
+    "mysql-tmp-retry/mysql-stopped-state.json": "39bcd45b067448bea4ad60f3a68013fcad66b3fe896ceecca141ed881df24b1b",
+    "native-discovery-generated-copy-and-cleanup.json": "e025f5c4b691074f0546f30a0f2dab2e8875c779e648753376f7e1e555584b55",
+    "native-discovery-generated/phpunit-ci-mysql-1-tests.xml": "4c7b0a99c9b5998e36ff2d14428f181bffa8fd367cfc584dd59959545737e874",
+    "native-discovery-generated/phpunit-ci-mysql-1.xml": "ff495d4b5b6f2016b93b98f0131b48ea987d1ed94a2990c49910e00a0cbbf794",
+    "native-discovery-generated/phpunit-ci-mysql-2-tests.xml": "fe950f4be695e0467c254b928d925e9fed8fc80b9bf3a7df06a8e23823b51284",
+    "native-discovery-generated/phpunit-ci-mysql-2.xml": "e9b376f7646211b389f34a0a69a5e948dd8bb8ea0f3b124e73725c3604ec62b3",
+    "native-discovery-generated/phpunit-ci-mysql-3-tests.xml": "c41fb0c86bee2b9c30ef88f4816a0fb99f79e319fcf3eadfe0f50977d77b3a39",
+    "native-discovery-generated/phpunit-ci-mysql-3.xml": "7a99f2f77c1aaaeeea4044e245279c4ec8c4855fa380983159289da21b436145",
+    "native-discovery-generated/phpunit-ci-mysql-4-tests.xml": "c451d8ab1d14f2bf4891793485d444a536a088a308c3ad84e72c0abcd9fb98d2",
+    "native-discovery-generated/phpunit-ci-mysql-4.xml": "dfaeb8f5aa6f84abccb5c423e910d510153112d21ebc61b220f0caf78f6aa56e",
+    "native-discovery-generated/phpunit-ci-mysql-5-tests.xml": "0194617df7017017b194302b08f958284a509753125a74351a85aae8e0e4876f",
+    "native-discovery-generated/phpunit-ci-mysql-5.xml": "4e1e87381d7fcfcf1f083aa2ce7af71beab472ae7809451f678d8585666a0906",
+    "native-discovery-generated/phpunit-ci-mysql-6-tests.xml": "af98fbe73bf90aa0a2e3257793c38fb934bb97b4cf1d4db8b460db4f1a68336f",
+    "native-discovery-generated/phpunit-ci-mysql-6.xml": "95b5c7991d6d668b61e5a5f14b9a060a302f77a60947db4dfeb0e1916e663d71",
+    "native-discovery-generated/phpunit-ci-mysql-7-tests.xml": "90576bacc99c3eb1727e959fe99f25c34577afcb4b6bcc1d44deb62d11c77f64",
+    "native-discovery-generated/phpunit-ci-mysql-7.xml": "78f84baa18f4a1869b2449ceeb276744da98654a83a5f971b028a6e1ed9c8212",
+    "native-discovery-generated/phpunit-ci-mysql-8-tests.xml": "b77a6b01798049626f6c9258b05dc70513e6f12f22bc75ef209680138b5bfea2",
+    "native-discovery-generated/phpunit-ci-mysql-8.xml": "0cfb00f9e65664ed07c351f15a8f8ab142b491789ed480fe9aadd980cb868a91",
+    "native-discovery-generated/phpunit-ci-mysql-manifest.json": "aa12066dbd6f044197491165b1a47970f9350d7a9b1efaffa36b7e1ee22c62db",
+    "native-discovery-generated/phpunit-ci-mysql-source-tests.xml": "017bd09325ce64f78d1a2c7ef3c97a2721315e296577935353b0a3624c4c7c6c",
+    "native-selection-census-corrected-original.json": "a2f588414ccc1e493738342a78ad85f7562cd3ece11725f3b7e62fb6e2f91d78",
+    "native-selection-census-corrected-original.log": "810f4b1f6057d7e654f933044409eaf8292be593317a2aa69cff20bca33edbfb",
+    "native-selection-census-original.json": "5bce17bec2e9657bd5ddca5492ab60f6648e64fbf90844a6f08d2c4838528b7b",
+    "native-selection-census-original.log": "d64f7d91594664922db7038466e57f6f24102ac2bf69a47f3ef165c3f5f263ef",
+    "observed-affected-sqlite-fixed-tool-exit-original.json": "87a9ed7b71b64ff16417170f93c6667dd4c489693fcbc9b3c13fd8d717d21e9a",
+    "observed-native-and-census-tool-exits-original.json": "ffa3aa2223b931a00ccd2e933736065da9e81cc69b9743d9dd9d5c61cdd46284",
+    "observed-tool-exit-addendum-original.json": "57a60c242fe8c17240262365982fc76ecf744d65576717efe3b035da4f250e26",
+    "observed-tool-exit-originals.json": "f69ae0fd7ade30c6c06cf84ef7acf95848cf6e18c3cb63ad5a9a1218781508b2",
+    "preexisting-main-dependency-hash-drift-original.json": "9dc8e85e0c1ba01f16eef2815e25231dca7b65f5184721f4127b1647b37a1404",
+    "progress-account-process-fixed-original/command.json": "b16442f4924ec6cfc07549b10ba71bd881fa9549f6933dac5c8bedfeb7f5525f",
+    "progress-account-process-fixed-original/junit.xml": "d251f90d9aee74d8f5d12dc4459fec300b6b474f8aa7a405bcfdf4ea1c92bdda",
+    "progress-account-process-fixed-original/log.txt": "2885453ed086138d0c2e8b3efb8fdb739190bd9d8f33a4a4e4a0bb58b7bef52b",
+    "progress-account-process-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "progress-account-process-fixed-original/result.json": "783161f711768d6fbc4beb345ea5a30db3f380019ec44bef5fdcdaea293858cf",
+    "returning-progress-account-fixed-original/command.json": "a3a3fcfea89d1a38c9cda8277b5fb9cae27ef80d09ae511fc645b262a9f2a618",
+    "returning-progress-account-fixed-original/junit.xml": "6cde4e4dbee319b3040cdb230a71c919c511c5f3580fb14bd7a57fa832f34c65",
+    "returning-progress-account-fixed-original/log.txt": "13b50174116e9c4b90efeb045df266ff18bf58b726559d4e6a3ddca9f0544867",
+    "returning-progress-account-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "returning-progress-account-fixed-original/result.json": "d001ace4c0a50908dda47c1115863369f7fb1446019101193c6bc9a76fb7175a",
+    "returning-progress-old-complete-original/command.json": "e6d17cd0fe2788f0bc7beb6f70a22f8d220657f42de3e76cbe3f96792ce7eee5",
+    "returning-progress-old-complete-original/derived-case-outcomes.json": "d6f7cf9a9a21d609a9aeb734916c9cd1ea306c8d5256251d4de960bcd1d3546c",
+    "returning-progress-old-complete-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "returning-progress-old-complete-original/result.json": "55f5282aff1957fa3df5a302633ff50c68629039beb4d30e62a3a971cd0e827e",
+    "returning-progress-old-original/command.json": "db3e06815870c4ea5d65f0924003e224c80aea4b8f934fccb314ac5a82f1360e",
+    "returning-progress-old-original/derived-case-outcomes.json": "9f631cee2e3a06b5034dc28af2866f283c2a81ea0d4c15b700f5f08022bff174",
+    "returning-progress-old-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "returning-progress-old-original/result.json": "4cc9d5929d0cad85a77a9bd0f6f62023cf17a917fb6c132c7da1a1811e28e60b",
+    "run-focused-native-tmp.py": "50f1aa4dbadaae947ae2e944c9a5dfeec1c1b69766f7600d613a8fab14132942",
+    "run-quality.py": "6b51617cb2027bb8b16ec0af82d0064e9758a6bdcdcbc1374f3fc62362b5b622",
+    "shard-policy-original.json": "c7284227a57bb05df7e778ed0952cf80265a5d5ff63de5d2de2631228bcb6b4c",
+    "shard-policy-original.log": "426249c7bc86b2607a2f783a14e97e7b535d8c3130f4214638e099722c96b5b5",
+    "shrink-clock-old-original/command.json": "9ebe87e57c7c4b567e76535ee485c4b966d9494fcbc9a2f1ff57850a93c31b60",
+    "shrink-clock-old-original/derived-case-outcomes.json": "d3bb0c6da5ce4fb256f466cdee821c48740b7ce5b193e0c641272a9915946e01",
+    "shrink-clock-old-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "shrink-clock-old-original/result.json": "ea5c674260cd768feb960f7bb67c8d05334ffbbcfcdb3e9839ebeb89946141ae",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "ac3c0fb0055374f9d2ede945d9dc525f84b1ecb68e1073fce65615f86c4e0dc9",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "95615cd3cf07a2337da13e85adcc2c221c8eda24b696b1478bf1b294d84b8ff9",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolProcessTest.php": "31784dbc28fa3436ed4edf1aa17450a90b7bbb0a0814ac03b3a856e5bb2b6bbe",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "9fa08250277dcd21608e41be818d5d97754b495aba68e6c262e632d5b6538875",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "642ecc9300b6eb63a39a5764d348a83b324ab7a89cc972abbab7eab39b221133",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "d23058018be83c2e34c465c2d2eafdb8baf92cea7c51bcde1c5a97925946b294",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "871b9ad5bf865978a7296da7aaab20d5eae8439fdba2985382a37142c660a818",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "1e401ef5d72d693fe53a07ceb409f8dc14fcdc2470cdd4325fd2151fac277faa",
+    "source/2e071ef9b4783beb99336968a8b73cd76f7c9cf5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "e53c70e61945fe2ed47fead27b7ced8ac7008219d699fa136596c3cae380442f",
+    "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e",
+    "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66",
+    "source/409e979df82327fb7b719436170f472f8b294867/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e",
+    "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "19122c08b46bbcbcf67a605f4150bbd21fababff134f9e15312afcd7fe74d042",
+    "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/409e979df82327fb7b719436170f472f8b294867/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "1ac4a34c11a8c91e5be063e68f830b60477b2e341993e89516733e0015c01982",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/70bbee3563ef584f8dcbebc34c75135612228217/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+    "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54",
+    "source/80c174caa551ff18d619181e38415a80c8597901/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "a322be805672d1cd6840e9c38aae39cd78c3ee614934473f0215cbb23bf1b4c4",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "3ba0c8965964097707ac61bc798389f8940f2add961c813befdf144eb1492b3f",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/80c174caa551ff18d619181e38415a80c8597901/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/c7e92bc2a62709c477047f7dcdb8b82cced8eeb6/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "57f2a9c8bc3d19938932a5d6356277aa6db3adedecbff75299caf077b90d899e",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "c2a7e7f6e00f9bca865b530fe671685a2c1589d931b78db6d85c017fd2bf0c66",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "a5aa57fc619c5b13d1af937215129b7a18175422c82910683f72499179ad824e",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "957e37ebf58ce57bbb6706df75c9b3b8bf54fc3407284be74d2fb0e185b6fedb",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/ca20e35103c85fd0259b2677848f7cceb0a753f5/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": "957e37ebf58ce57bbb6706df75c9b3b8bf54fc3407284be74d2fb0e185b6fedb",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php": "5c1fc003b01c9176b3672ac074368bbb929339b2864f6b3060d30b59f0a1dd8e",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php": "a2119d7482ecd145d7333737cd887d21195fefcd9cc71dc0db3d83a5fde597e6",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php": "29058eb706533788d1ae5bb3a7367725e9e6b201ae4bf8f7679a6debd626097d",
+    "source/f1d5fb1f25598ceac17b9808d8d96d5c9065d04a/tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php": "eccd4b79a2456ef844859715e5a3fa109cfba6fe4b9c0e3d6faa8899cacf91db",
+    "zero-base-old-original/command.json": "273f1851a3dd00350db49a399a67063f84d0f33c54e970b6740610cca9f9990f",
+    "zero-base-old-original/derived-case-outcomes.json": "bc4d6261bdd69d91762e3f84f35a0057aafd0635bca5397c42ba6092d6881d50",
+    "zero-base-old-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "zero-base-old-original/result.json": "0e05e6783f00e348f98951c7ac5a995ccf273a5d5c27255d9bd66921359d6161"
+  },
+  "original_phpunit_invocations": 10,
+  "private_originals": [
+    {
+      "bytes": 1349,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "c363fb1d8ed5edac6e9e92a09a17ab12191bf61082fa7f0a80bdee6118b68005"
+    },
+    {
+      "bytes": 721,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "20bcce763740aa6c088e7711622bb399829012751551bc9ba6cbf9b932eb3a35"
+    },
+    {
+      "bytes": 5135,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-complete-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "7766f252f7fe1dfae259be1b8465b3d9dd12965c4b380d8e41f894df3f72b7e7"
+    },
+    {
+      "bytes": 2202,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/returning-progress-old-complete-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "983a6438e6f6e713372059fa957cf2a83268dcdb272d720e86250b2cdf6f99cb"
+    },
+    {
+      "bytes": 1804,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/zero-base-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "1e52ebc7ecab5196466a5c4a2c57a9b29a6562026cf590494ba076916bf586ce"
+    },
+    {
+      "bytes": 816,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/zero-base-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "c5c0dbabe679513ba33e3c686a30ad6446e0c8b06be4ad5f7a8231f5a062b601"
+    },
+    {
+      "bytes": 5452,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/account-spool-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "fc5b742a92f5fc727409e308a3dc5ecfe22b981b22d417d0438155dadd21f241"
+    },
+    {
+      "bytes": 2536,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/account-spool-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "f9cd48d88a6264d7a17f64103929074392d31abf70b38632686ce6c79357e04b"
+    },
+    {
+      "bytes": 21547,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-initial-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "c50c1fefe4e9b004b6452745e45db3223ef1d23602520dfa0710894e4c651eb9"
+    },
+    {
+      "bytes": 5141,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/affected-free-sqlite-initial-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "d0b73a868f41a03eee78e451e4e850ce974ee2796dfb68bf01377bd3c63949f8"
+    },
+    {
+      "bytes": 6427,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/shrink-clock-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "d18257fd2363417338c1191798253218cb851b3cecc5c5a450564dfd3c94e028"
+    },
+    {
+      "bytes": 2677,
+      "path": "/workspace/runtime/free-delivery-progress-evidence-20261015/shrink-clock-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "567c75b844fbae4d148cdf7c1d44ee80e7f7010af56aa977d0a4b76d2616e62f"
+    }
+  ],
+  "recorded_utc": "2026-10-15T21:22:03.937523+00:00"
+}

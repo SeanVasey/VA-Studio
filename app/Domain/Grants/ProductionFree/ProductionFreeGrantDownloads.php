@@ -110,7 +110,11 @@ final class ProductionFreeGrantDownloads
             $policy = $before['policy'];
             $seconds = min($policy['transfer_max_seconds'], $policy['transfer_base_seconds'] + intdiv($before['target']['bytes'] + $policy['transfer_min_bytes_per_second'] - 1, $policy['transfer_min_bytes_per_second']));
 
-            return new ProductionFreeGrantTransfer($prepared, $before['target']['filename'], $before['target']['mime_type'], $this->tick() + $seconds * 1000000000, $this->clock);
+            $started = $this->tick();
+
+            return new ProductionFreeGrantTransfer($prepared, $before['target']['filename'], $before['target']['mime_type'],
+                $started + $seconds * 1000000000, $this->clock, $started,
+                $policy['transfer_min_bytes_per_second'], $policy['transfer_base_seconds']);
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;
@@ -218,7 +222,7 @@ final class ProductionFreeGrantDownloads
                             fclose($input);
                         }
                     }
-                });
+                }, hash('sha256', 'production-free-spool-account-v1:'.$before['auth']['account_id']));
         } catch (ProductionFreeGrantException $error) {
             throw $error;
         } catch (Throwable) {
