@@ -9,19 +9,26 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
+use App\Domain\Grants\PaidTax\PaidTaxException;
 use App\Domain\Grants\PaidTax\PaidTaxFiles;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
 use App\Domain\Grants\PaidTax\PaidTaxProjectionRead;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
+use App\Domain\Grants\PaidTax\PaidTaxConsumerCommitAdmission;
+use App\Domain\Grants\PaidTax\PaidTaxReadReceipt;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
-use Tests\Support\ProductionTaxCheckoutFixtures;
+use Tests\Support\PaidTaxGrantFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
@@ -30,50 +37,17 @@ use Tests\TestCase;
 class PaidTaxGrantJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
-    use ProductionTaxCheckoutFixtures;
+    use PaidTaxGrantFixtures;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fakePrivateMediaStorage();
-        config(['app.key' => 'base64:'.base64_encode(str_repeat('t', 32)),
-            'production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
-            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
-            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY,
-            'production-customer-identity.historical_receipts_enabled' => true,
-            'production-customer-identity.historical_receipts_version' => 'identity-historical-committed-receipt-v1',
-            'production-tax-checkout.committed_read_receipts_enabled' => true,
-            'paid-tax-grants.rehearsal_enabled' => true,
-            'paid-tax-grants.delivery_policy' => ['schema_version' => 2, 'version' => 'explicit-synthetic-tax-delivery-v2',
-                'purpose' => 'paid-tax-original-delivery', 'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60]]);
-        Queue::fake();
+        $this->preparePaidTaxFixture();
     }
 
     protected function paid(string $behavior = 'exclusive', int $tax = 437, bool $twoLines = false): array
     {
-        if ($twoLines) {
-            $catalog = $this->taxCatalog($behavior);
-            $second = QuoteFixtures::selection(3499);
-            $items = [...$catalog['items'], ...$second['items']];
-            $buyer = $this->enrollThroughLocalSmtp();
-            $access = new ProductionCustomerAccess;
-            $transport = new RecordingTaxCheckoutTransport;
-            $checkout = new ProductionTaxCheckout($access, $transport);
-            $preview = $checkout->preview($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $items);
-            $order = $checkout->order($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $items, $preview['previewHash'], true,
-                ['legalName' => 'Declared synthetic buyer'], 'synthetic-tax-two-lines');
-            $f = compact('catalog', 'second', 'buyer', 'access', 'transport', 'checkout', 'preview', 'order');
-        } else {
-            $f = $this->taxOrder($behavior);
-        }
-        self::configureTax(self::SYNTHETIC_PROVIDER);
-        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
-        $f['transport']->lineTax = $tax;
-        $f['transport']->paid = true;
-        $paid = $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
-        $this->assertSame('verified', $paid['paymentStatus']);
-
-        return $f;
+        return $this->paidTaxOrder($behavior, $tax, $twoLines);
     }
 
     public static function amounts(): array
@@ -201,5 +175,164 @@ class PaidTaxGrantJourneyTest extends TestCase
         $this->assertDatabaseCount('paid_tax_originals', 2);
         $this->assertDatabaseCount('paid_tax_fulfillments', 1);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public static function actorMetadata(): array
+    {
+        return ['raw original' => ['original'], 'raw attributes' => ['attributes']];
+    }
+
+    #[DataProvider('actorMetadata')]
+    public function test_late_nonarray_actor_storage_refuses_without_pure_offset_code_or_retained_origin(string $property): void
+    {
+        $f = $this->paid();
+        $actor = $f['buyer']['user'];
+        $metadata = new \ReflectionProperty(Model::class, $property);
+        $original = $metadata->getValue($actor);
+        $changed = new PaidTaxMetadataOffsetFixture($original);
+        $calls = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($metadata, $actor, $changed, &$calls): void {
+            if ($calls++ === 0) {
+                $metadata->setValue($actor, $changed);
+            }
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $actor, $f['order']['orderId']);
+            } catch (PaidTaxException $error) {
+                $failure = $error;
+            }
+        } finally {
+            $metadata->setValue($actor, $original);
+        }
+        $this->assertSame(1, $calls);
+        $this->assertSame(0, $changed->calls, 'Pure actor admission dispatched raw model offset code.');
+        $this->assertInstanceOf(PaidTaxException::class, $failure);
+        $this->assertSame(403, $failure->status);
+        $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertSame(0, DB::transactionLevel());
+    }
+
+    public function test_late_current_owner_withdrawal_rolls_back_origin_and_allows_a_fresh_authorized_retry(): void
+    {
+        $f = $this->paid();
+        $pdo = DB::getPdo();
+        $id = $f['buyer']['principal']->accountId;
+        $before = (array) DB::table('customer_accounts')->where('id', $id)->sole();
+        $calls = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($pdo, $id, &$calls): void {
+            if ($calls++ === 0) {
+                $statement = $pdo->prepare('UPDATE customer_accounts SET active = 0, access_version = access_version + 1 WHERE id = ?');
+                $statement->execute([$id]);
+            }
+        });
+        $failure = null;
+        try {
+            (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        } catch (PaidTaxException $error) {
+            $failure = $error;
+        }
+        $this->assertSame(1, $calls);
+        $this->assertInstanceOf(PaidTaxException::class, $failure);
+        $this->assertSame(403, $failure->status);
+        $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        $this->assertSame($before, (array) DB::table('customer_accounts')->where('id', $id)->sole());
+        $this->assertFalse($pdo->inTransaction());
+        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($f['order']['orderId'], $retry['orderId']);
+        $this->assertDatabaseCount('paid_tax_order_origins', 1);
+    }
+
+    public function test_late_tax_purpose_withdrawal_rolls_back_without_adopting_new_authority(): void
+    {
+        $f = $this->paid();
+        $calls = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use (&$calls): void {
+            $calls++;
+            config(['production-tax-checkout.enabled' => false]);
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (PaidTaxException $error) {
+                $failure = $error;
+            }
+        } finally {
+            config(['production-tax-checkout.enabled' => true]);
+        }
+        $this->assertSame(1, $calls);
+        $this->assertInstanceOf(PaidTaxException::class, $failure);
+        $this->assertSame(503, $failure->status);
+        $this->assertDatabaseCount('paid_tax_order_origins', 0);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+    }
+
+    public function test_throwing_managed_after_commit_refuses_observation_and_exact_replay_preserves_durable_origin(): void
+    {
+        $f = $this->paid();
+        $registered = 0;
+        $executed = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use (&$registered, &$executed): void {
+            if ($registered++ === 0) {
+                DB::afterCommit(static function () use (&$executed): void {
+                    $executed++;
+                    throw new \RuntimeException('Synthetic ordinary afterCommit failure.');
+                });
+            }
+        });
+        $failure = null;
+        try {
+            (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        } catch (\RuntimeException $error) {
+            $failure = $error;
+        }
+        $this->assertSame(1, $executed);
+        $this->assertSame(1, $registered);
+        $this->assertInstanceOf(\RuntimeException::class, $failure);
+        $this->assertSame('Synthetic ordinary afterCommit failure.', $failure->getMessage());
+        $this->assertDatabaseCount('paid_tax_order_origins', 1);
+        $this->assertDatabaseCount('paid_tax_grant_origins', 1);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $before = (array) DB::table('paid_tax_order_origins')->sole();
+        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertSame($before['public_id'], $retry['id']);
+        $this->assertSame($before, (array) DB::table('paid_tax_order_origins')->sole());
+        $this->assertSame(1, $executed);
+    }
+
+    public function test_original_shared_account_heavy_lock_yields_without_spending_any_tax_claim(): void
+    {
+        $f = $this->paid();
+        $retained = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $lock = Cache::lock('paid-grant-heavy:'.hash('sha256', 'paid-heavy-v1:'.$f['buyer']['principal']->accountId), 660);
+        $this->assertTrue($lock->get());
+        try {
+            $read = PaidTaxProjectionRead::begin();
+            $busy = null;
+            $yield = (new PaidTaxDocuments)->prepare($retained['id'], $f['buyer']['principal'], $f['buyer']['user'], $read, $busy);
+            $read->proveBeforeBytes();
+            $this->assertTrue($busy);
+            $this->assertSame($retained, $yield);
+            $this->assertSame(0, (int) DB::table('paid_tax_document_work')->sole()->attempts);
+            $this->assertDatabaseCount('paid_tax_originals', 0);
+            $this->assertDatabaseCount('paid_tax_fulfillments', 0);
+        } finally {
+            $lock->release();
+        }
+    }
+}
+
+final class PaidTaxMetadataOffsetFixture extends \ArrayObject
+{
+    public int $calls = 0;
+
+    public function offsetGet(mixed $key): mixed
+    {
+        $this->calls++;
+
+        return parent::offsetGet($key);
     }
 }
