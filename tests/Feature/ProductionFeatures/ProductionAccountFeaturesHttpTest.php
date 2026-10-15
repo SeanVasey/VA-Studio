@@ -9,6 +9,7 @@ use App\Http\AccountFeatures\AccountFeatureController;
 use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
 use App\Http\Middleware\HandleInertiaRequests;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
@@ -257,7 +258,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         $weak = \WeakReference::create($test->baseResponse);
         unset($test);
         gc_collect_cycles();
-        $this->assertNull($weak->get(), 'Static completion metadata must not retain private response graphs.');
+        $this->assertTrue($weak->get() === null, 'Static completion metadata must not retain private response graphs.');
     }
 
     public function test_late_stringable_auth_slot_is_refused_without_its_callback(): void
@@ -272,6 +273,65 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         });
         $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($this->get('/customer/features/listening', ['Accept' => 'application/json'])));
         $this->assertSame(0, FeatureAuthSlotString::$calls);
+    }
+
+    public function test_exact_body_bounds_preserve_feature_change_and_original_identity_limit(): void
+    {
+        $this->signIn();
+        $initial = str_repeat(' ', 4094).'{}';
+        $send = fn ($path, $body) => $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json', 'HTTP_X_CSRF_TOKEN' => session()->token()], $body);
+        $this->assertSame(200, $this->released($send('/customer/features/listening/initialize', $initial))[0]);
+        $command = json_encode(['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC exact feature bound'], JSON_THROW_ON_ERROR);
+        $bounded = str_repeat(' ', 16384 - strlen($command)).$command;
+        [$status, $value] = $this->released($send('/customer/features/listening/change', $bounded));
+        $this->assertSame(200, $status);
+        $this->assertSame(1, $value['library']['version']);
+        $send('/customer/sign-in', str_repeat(' ', 4095).'{}')->assertStatus(413);
+        $this->assertSame(1, DB::table('production_listening_libraries')->value('version'));
+    }
+
+    public function test_controls_page_has_opaque_render_scope_and_no_private_projection(): void
+    {
+        $this->signIn();
+        $first = $this->get('/customer/features', ['X-Inertia' => 'true', 'Accept' => 'text/html']);
+        $first->assertOk()->assertJsonPath('component', 'ProductionCustomerFeatures');
+        $scope = $first->json('props.scope');
+        $this->assertMatchesRegularExpression('/\A[a-f0-9]{48}\z/', $scope);
+        $this->assertArrayNotHasKey('library', $first->json('props'));
+        $this->assertArrayNotHasKey('preferences', $first->json('props'));
+        $first->assertDontSee('http-feature@example.test', false);
+        $second = $this->get('/customer/features', ['X-Inertia' => 'true', 'Accept' => 'text/html']);
+        $this->assertNotSame($scope, $second->json('props.scope'));
+        $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
+    }
+
+    public function test_private_debug_framework_exits_never_redirect_or_flash_inputs(): void
+    {
+        config(['app.debug' => true]);
+        Route::middleware('web')->get('/customer/features/throw-probe', function (): void {
+            throw new \RuntimeException('SYNTHETIC private exception text');
+        });
+        $failed = $this->get('/customer/features/throw-probe', ['Accept' => 'text/html']);
+        $failed->assertStatus(503)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE'])->assertDontSee('SYNTHETIC private exception text', false);
+        $this->assertFalse($failed->headers->has('Location'));
+        $this->assertFalse(session()->has('_old_input'));
+        $this->call('PUT', '/customer/features/listening')->assertStatus(405)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
+        $this->get('/customer/features/missing?name=synthetic-private')->assertStatus(422)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
+    }
+
+    public function test_reentry_cannot_complete_original_epoch_before_later_withdrawal(): void
+    {
+        $this->signIn();
+        $nested = null;
+        Event::listen(RequestHandled::class, function (RequestHandled $event) use (&$nested): void {
+            if ($event->response instanceof AccountFeatureResponse) {
+                $nested = app(Kernel::class)->handle($event->request);
+                $event->request->session()->forget('_production_customer_identity');
+            }
+        });
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
+        $this->assertSame(503, $nested->getStatusCode());
+        $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($test));
     }
 }
 
