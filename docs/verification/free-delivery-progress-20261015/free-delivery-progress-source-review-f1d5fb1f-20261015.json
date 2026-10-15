@@ -1,0 +1,96 @@
+{
+  "approved_design_v2_sha256": "0c301ab30c316fab4b8ca581b537c087ef8ce929d12a789642df0b9fba4700cd",
+  "current_focused_receipt": {
+    "autoload_stable": true,
+    "command_sha256": "a3a3fcfea89d1a38c9cda8277b5fb9cae27ef80d09ae511fc645b262a9f2a618",
+    "junit": {
+      "assertions": 33,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 14
+    },
+    "junit_sha256": "6cde4e4dbee319b3040cdb230a71c919c511c5f3580fb14bd7a57fa832f34c65",
+    "log_sha256": "13b50174116e9c4b90efeb045df266ff18bf58b726559d4e6a3ddca9f0544867",
+    "observed_tool_exit": "Parent reports0; no independent tool/OS receipt inspected in this component review",
+    "php_exit": 0,
+    "recorder_exit": 0,
+    "result_sha256": "d001ace4c0a50908dda47c1115863369f7fb1446019101193c6bc9a76fb7175a",
+    "runner_stable": true,
+    "source_stable": true
+  },
+  "current_observed_sha": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+  "decision": "REVISE TWO BOUNDED SOURCE GROUPS; FINAL APPROVAL PENDING",
+  "existing_evidence_limits": [
+    "14/33 focused component scope is real and remains its original source; does not cover shrink/invalid tick/race/domain counterpart",
+    "Seven existing affected whole SQLite files running when task issued; no completion/pass/count inferred here",
+    "Independent-process POSIX race, close/destruction/kernel-exit and actual domain account derivation/native counterpart pending",
+    "No final source/evidence/sealed packet/publication approval; all mount/blocked-write/host/first-byte/sourceadapter/font/identity/native/activation/release conditions remain open"
+  ],
+  "immutable_bindings": {
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": {
+      "git_blob": "41cff52120b4486c66da3d7ad2ea89ed9814a3cc",
+      "sha256": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantSpool.php": {
+      "git_blob": "c2419412dc336927e5887e4b5becd619eaefc900",
+      "sha256": "a58603ad7c43496f081cc52b09a3ffd53bf2544bff55b77567cf17ba0ee15b54"
+    },
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransfer.php": {
+      "git_blob": "6fdac7b5c68895b2f3baebe094e696b6bce41a43",
+      "sha256": "6b0e9aab507010e3afb86b38f97582bada4b3d8563c8d57e86b2e20f4843d050"
+    },
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantAccountSpoolTest.php": {
+      "git_blob": "50796d24c4758baf315afe8518b57c0818a66ee3",
+      "sha256": "957e37ebf58ce57bbb6706df75c9b3b8bf54fc3407284be74d2fb0e185b6fedb"
+    },
+    "tests/Feature/ProductionFreeGrants/ProductionFreeGrantReturningProgressTest.php": {
+      "git_blob": "2f9a0274f796138c4e634f57267fd257bd2006ab",
+      "sha256": "3b42d4ad1a6d1a6427c926d04ac05ddeac563209fb3aff40b7cb74148b2659e4"
+    }
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "positive_source_assessment": [
+    "Downloads derives native domain-prefixed digest from original re-proved retained auth.account_id, independent of origin/role; no client holder",
+    "Mark scanning/creation under global admission plus owned slot precedes fill/reservation, and stream retains original lease; null/zero/missing/malformed marks treated conservatively",
+    "Progress tuple admission and one original start, fixed zero-base startup, post-return accepted-byte accounting and final deadline checks match approved contract apart from tick-type omission",
+    "Only own snapshot/lease is closed, no reversal of consumed redemption; shared PreparedDeliveryStream/paid files/frozen manifests unchanged"
+  ],
+  "preparation_errors": [],
+  "recorded_utc": "2026-10-15T21:06:52.165977+00:00",
+  "required_corrections": [
+    {
+      "confidence": "confirmed by immutable source and retained lease lifecycle; not independently executed",
+      "controls_needed": [
+        "Old-source high-held-slot/current-count-shrink same-holder refusal before fill",
+        "Different-holder positive after shrink with active high-slot reservation preserved",
+        "Held high-slot zero/missing/malformed mark still refuses scoped admission"
+      ],
+      "effect": "High held lease/holder is omitted from the account scan, so a new lower slot may be admitted for the same account. Violates the explicit held-slot scan-after-shrink design condition. It does not establish false entitlement/private release or P0/P1.",
+      "id": "D1-S1",
+      "location": "ProductionFreeGrantSpool::accountAvailable for(slot=0;slot<slots;slot++)",
+      "remediation": "Scan existing canonical held slot locks across the spool namespace, separately from current allocation range; preserve reservation accounting, unknown-held refusal and foreign-file rules.",
+      "severity": "P2",
+      "trigger": "Same account retains a live snapshot in a high old slot; new admission uses a reduced current slot count"
+    },
+    {
+      "confidence": "confirmed source omission; no independent runtime reproduction",
+      "controls_needed": [
+        "Genuine prior-source float/numeric-string rejection controls and normal integer positive",
+        "Invalid/null/nonfinite/object values refuse before consumer output and close owned snapshot",
+        "Reversal/original tuple bounds/no renewed startup coverage"
+      ],
+      "effect": "PHP numeric comparisons/coercion can admit it instead of the planned canonical integer tick; other bad values may produce non-fixed errors. This is a bounded clock-contract/refusal gap, not new authority or host proof.",
+      "id": "D1-S2",
+      "location": "ProductionFreeGrantTransfer::within before now<deadline/now>=lastTick and typed assignment",
+      "remediation": "Require is_int(now) and now>=0 before comparisons/coercion, using the fixed expired refusal; retain original reversal/deadline rules and finally cleanup.",
+      "severity": "P2",
+      "trigger": "Injected trusted clock returns numeric string/fractional scalar rather than admitted integer nanoseconds"
+    }
+  ],
+  "reviewed_sha": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+  "reviewer_app_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified": false
+}

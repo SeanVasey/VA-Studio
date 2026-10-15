@@ -1,0 +1,237 @@
+{
+  "approved_current_sha256": "ce24d7d2fcf77b89b728a54e681fcdd5137748f576bfa21836584299c0a559f7",
+  "composition_assessment": [
+    "Free customerCommand uses original locked CurrentRows inside standard nativePDO/framework transaction, identity lock first, original raw proof comparison last, then Free policy/rows proof",
+    "IdentityMetadataAdmission supports exact standardSQLite/MySQL/defaultprimary active only when originalreaderPDO supplied, peers idle; primitive exactUser/raworiginal-ID guard replaces callback-capable getter/cast",
+    "Standalone source adds original application/repository/manager/cohort/current native rechecks after commitcallbacks and beforereturn; Free principal mint remains unchangedtyped evidence",
+    "No change to identity SQL/lock shape, historical origin/verification prefix, owner/credentialbinding, durablebinding/provenance, Free origin/assent/entitlement/revocation/render/auth/redemption records or frozenrenderer output",
+    "Unsupported actor/metadata failsclosed; no widened principal or renewal, no legacy adoption/legalname/provider/money claim"
+  ],
+  "current_git_blob": "3da6bc38056fb8dff6aaf1b487ecf30ee2945a3c",
+  "decision": "APPROVE CURRENT IDENTITY DEPENDENCY FOR BOUNDED FREE256 COMPOSITION; MAIN TEST REFERENCE MAY UPDATE",
+  "dependency_path": "app/Domain/Customers/ProductionCustomerAccess.php",
+  "drift_original_sha256": "9dc8e85e0c1ba01f16eef2815e25231dca7b65f5184721f4127b1647b37a1404",
+  "existing_failed_whole_scope": {
+    "autoload_stable": true,
+    "command_sha256": "2d51d48538e3404202de70080cc0fb0021c2cefc58d077996b22cf4aab8bf719",
+    "completed_passes": [
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolTest",
+        "name": "test_the_slot_count_comes_from_configuration"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolTest",
+        "name": "test_low_free_space_is_refused_before_any_byte_is_written"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolTest",
+        "name": "test_bytes_that_change_after_the_write_fail_the_read_back_and_release_the_slot"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolTest",
+        "name": "test_a_prepared_snapshot_is_read_only_unlinked_and_closes_its_lease"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolReservationTest",
+        "name": "test_two_reservations_that_fit_alone_but_not_together_are_refused_and_admitted_after_release"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolReservationTest",
+        "name": "test_reservations_that_fit_together_are_admitted_and_a_failed_fill_releases_its_reservation"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolResidualTest",
+        "name": "test_only_a_regular_single_link_file_at_the_exact_slot_path_is_removed"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolResidualTest",
+        "name": "test_a_reservation_sidecar_that_is_not_an_own_regular_file_is_never_reclaimed"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSpoolResidualTest",
+        "name": "test_an_unreclaimable_sidecar_skips_its_slot_instead_of_blocking_admission"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantTransferDeadlineTest",
+        "name": "test_the_derived_deadline_is_capped_by_the_configured_maximum"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantTransferDeadlineTest",
+        "name": "test_redeeming_after_the_authorization_expired_is_still_refused"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantTransferDeadlineTest",
+        "name": "test_a_redemption_started_before_expiry_is_recorded_when_its_snapshot_finishes_after_expiry"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantTransferDeadlineTest",
+        "name": "test_the_redemption_guard_still_refuses_a_start_time_at_or_after_expiry"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantTransferDeadlineTest",
+        "name": "test_shipped_defaults_and_policy_bounds"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_authorization_retains_only_the_token_hash_and_redemption_is_one_use"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_original_must_exist_before_any_artifact_is_authorized"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_unapproved_role_stale_seal_and_loose_input_are_refused"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_foreign_owner_wrong_token_and_expired_authorization_are_refused"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_revocation_stops_new_and_outstanding_authorizations_but_keeps_history"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_drifted_private_bytes_are_refused_before_the_first_byte_and_record_no_attempt"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_disabled_policy_and_burst_rate_are_refused"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantDeliveryTest",
+        "name": "test_the_original_authorization_deadline_bounds_the_stream"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFilesTest",
+        "name": "test_a_dangling_symlink_at_the_original_path_creates_nothing_outside_the_root"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFilesTest",
+        "name": "test_a_live_symlink_to_an_existing_outside_file_leaves_it_untouched"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFilesTest",
+        "name": "test_the_original_is_written_once_sealed_and_leaves_no_temporary_name"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFrozenBytesTest",
+        "name": "test_sealed_profile_manifest_binds_every_renderer_implementation_file"
+      },
+      {
+        "class": "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFrozenBytesTest",
+        "name": "test_no_paid_lane_or_old_free_family_file_is_copied_or_imported"
+      }
+    ],
+    "junit": {
+      "assertions": 276,
+      "errors": 4,
+      "failures": 2,
+      "skipped": 0,
+      "tests": 33
+    },
+    "junit_sha256": "c50c1fefe4e9b004b6452745e45db3223ef1d23602520dfa0710894e4c651eb9",
+    "limits": "27 passing cases are components of failed33/F2/E4 original, not a new whole pass or native evidence",
+    "log_sha256": "d0b73a868f41a03eee78e451e4e850ce974ee2796dfb68bf01377bd3c63949f8",
+    "pass_count": 27,
+    "php_exit": 2,
+    "recorder_exit": 1,
+    "result_sha256": "25b07ee22d7ae5ab71363b7c38643f5fb7bf5c181b0b2f74580353cc1010d734",
+    "runner_stable": true,
+    "selected_files": [
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolReservationTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantSpoolResidualTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantTransferDeadlineTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantDeliveryTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFilesTest.php",
+      "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php"
+    ],
+    "source_stable": true,
+    "whole_pass": false
+  },
+  "frozen_renderer": {
+    "all5hashesmatch": true,
+    "files": {
+      "app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+      "app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+      "app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+      "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+      "scripts/render-production-free-grant.php": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199"
+    },
+    "manifest_path": "resources/contracts/production-free-v1/profile-assets.json",
+    "manifest_sha256": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+    "manifest_unchanged_from_d545": true,
+    "no_edit_or_repin_authorized": true
+  },
+  "main_pins": {
+    "mismatches": [
+      "app/Domain/Customers/ProductionCustomerAccess.php"
+    ],
+    "other19unchanged": {
+      "app/Domain/Commerce/ProductionPolicy/CurrentRows.php": "a7e682df609b29225c088b24a817169146066f8ff74e3fbafebd361c22ad350e",
+      "app/Domain/Contracts/ContractFiles.php": "3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c",
+      "app/Domain/Contracts/ContractIo.php": "245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8",
+      "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
+      "app/Domain/Contracts/ContractRenderProfile.php": "8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40",
+      "app/Domain/Contracts/ContractRenderProfileRegistry.php": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7",
+      "app/Domain/Contracts/ContractRenderWorkspace.php": "61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad",
+      "app/Domain/Contracts/ContractRenderer.php": "4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a",
+      "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
+      "app/Domain/Customers/ProductionCustomerPrincipal.php": "d49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b",
+      "app/Domain/Customers/ProductionIdentity/IdentityException.php": "91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563",
+      "app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php": "73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6",
+      "app/Domain/Delivery/ActivationPolicy.php": "38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95",
+      "app/Domain/Delivery/DeliveryAssetFiles.php": "3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c",
+      "app/Domain/Delivery/DeliveryException.php": "a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc",
+      "app/Domain/Delivery/PreparedDeliveryStream.php": "e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13",
+      "app/Support/Access/AdminMultiFactor.php": "dc83e64ae86754c6ac2a6b64cb420e687d5ecaf4f5d87225060d021597681710",
+      "app/Support/CanonicalJson.php": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+      "scripts/contract-renderer-autoload.php": "09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01"
+    },
+    "total": 20
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_b4_delta_sha256": "6b3cc5b43c844366f4c0215bb85374666c0108a62d6af284f456a96b204dac96",
+  "original_b4_merge": "81eb44b0f97e17bb39bccd7a1ba871a344773409",
+  "original_main_pin_sha256": "f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7",
+  "permitted_update": {
+    "path": "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+    "quote": "Any change to these exact bytes must be re-reviewed against256 before this test is updated.",
+    "scope": "Only MAIN entry for ProductionCustomerAccess oldf0fc\u2192ce24 after this independent Free256 reassessment; no source/member/profile repin"
+  },
+  "preparation_errors": [
+    {
+      "failure": "Initial lookup guessed nonexistent ProductionFreeGrantIdentity.php",
+      "reconciliation": "ActualFree composition is ProductionFreeGrants::customerCommand using ProductionCustomerAccess directly; inspected actual callers/Rows/Transactions. Source-read only."
+    }
+  ],
+  "recorded_utc": "2026-10-15T21:12:34.491117+00:00",
+  "related_source_sha256": {
+    "app/Domain/Customers/ProductionCustomerPrincipal.php": "d49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b",
+    "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php": "b35909bd5ba3d287d3bf38d695f7e62bdc7f45cd95f8c51bf5e67d568dcca518",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantDownloads.php": "427bea80c5f6b7aa4c531bf36e537105252b372a73a656e25083d8290b1516b0",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantLibrary.php": "e3962dd8e8a6b15368194bcf9ac05db71ecec2d0d38f3c9f3ae357961f1ec998",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php": "160a225332d233c32e55c846fb609dac8962243148069147ef837a9483f6fba6",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantTransactions.php": "5982ee4cfd2b724337391f48cd5a458c618c1be4867ec2ed21e246fc1a4c0186",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrants.php": "1e95902835b6dbedf7743a078a2f8b0f347abbe26f45aa957765db11bc7a17b0"
+  },
+  "remaining_gates": [
+    "Execute meaningful corrected whole affected selections including updated MAIN-reference assertion at actual finalsource",
+    "Repair D1-S1 highslot shrink and D1-S2 clockadmission with old/fixed controls; retain failed whole and startup originals",
+    "NativePOSIX race and actualDownloads account counterpart/final sealedsource/evidence/publication gates"
+  ],
+  "required_dependency_corrections": [],
+  "reviewed_source_sha": "f1d5fb1f25598ceac17b9808d8d96d5c9065d04a",
+  "reviewer_app_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified": false,
+  "unapproved": [
+    "Overall D1 source/evidence approval: f1d S1/S2 remain open",
+    "Wider/native/concurrency/whole Free acceptance, current MySQL counterpart not yet executed",
+    "Resourceprofile member/manifest repins, source edits or restoration of old Access bytes",
+    "Mount/blockedwrite/sendtimeout/firstbyte/sourceadapter/fonts/identity/host/provider/legal/activation/release conditions"
+  ]
+}
