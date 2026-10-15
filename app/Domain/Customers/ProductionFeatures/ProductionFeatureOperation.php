@@ -136,7 +136,10 @@ final class ProductionFeatureOperation
             // Remove only our tail; a callback may have replaced or extended the list.
             $currentHooks = $hooksProperty->getRawValue($connection);
             if (is_array($currentHooks)) {
-                $hooksProperty->setValue($connection, array_values(array_filter($currentHooks, fn ($hook) => $hook !== $tail)));
+                $remainingHooks = array_filter($currentHooks, fn ($hook) => $hook !== $tail);
+                if ($remainingHooks !== $currentHooks) {
+                    $hooksProperty->setValue($connection, $remainingHooks);
+                }
             }
             if ($connection->getEventDispatcher() === $observer) {
                 if ($events === null) {

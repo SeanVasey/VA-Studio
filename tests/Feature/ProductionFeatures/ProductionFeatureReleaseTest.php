@@ -295,6 +295,27 @@ class ProductionFeatureReleaseTest extends TestCase
         }
     }
 
+    public function test_prestart_replacement_associative_hooks_preserve_original_keys_and_closures(): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $property = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $foreign = ['foreign' => static function (): void {}];
+        $connection->beforeStartingTransaction(function () use ($connection, $property, $foreign): void {
+            $property->setValue($connection, $foreign);
+        });
+        try {
+            (new ProductionListeningLibrary)->initialize($owner);
+            $this->fail('Original birth hooks were replaced.');
+        } catch (ProductionFeatureException) {
+            $this->assertSame($foreign, $property->getValue($connection));
+            $this->assertFalse($connection->getRawPdo()->inTransaction());
+            $this->assertSame(0, $connection->transactionLevel());
+        } finally {
+            $property->setValue($connection, []);
+        }
+    }
+
     public function test_preparation_start_cannot_move_feature_writes_into_a_foreign_frame(): void
     {
         $owner = $this->featureIdentity();
