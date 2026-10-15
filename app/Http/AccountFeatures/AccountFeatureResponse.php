@@ -29,7 +29,7 @@ final class AccountFeatureResponse extends Response
 
     private array $nativeHeaders = [];
 
-    private ?array $candidateHeaders = null;
+    private ?array $candidateState = null;
 
     private readonly ResponseHeaderBag $failureHeaders;
 
@@ -89,11 +89,16 @@ final class AccountFeatureResponse extends Response
         return '';
     }
 
+    public function getContent(): string|false
+    {
+        return $this->attempted ? parent::getContent() : '';
+    }
+
     public function requireUnchanged(): void
     {
         if ($this->content !== '' || $this->statusCode !== 200 || $this->version !== '1.1'
             || $this->headers::class !== ResponseHeaderBag::class
-            || ($this->candidateHeaders !== null && self::materialize($this) !== $this->candidateHeaders)) {
+            || ($this->candidateState !== null && self::stableState($this) !== $this->candidateState)) {
             throw new ProductionFeatureException;
         }
     }
@@ -120,7 +125,7 @@ final class AccountFeatureResponse extends Response
             }
             $body = $this->preparation->bytes();
             $native = self::materialize($this);
-            $this->candidateHeaders = $native;
+            $this->candidateState = self::stableState($this);
             // Every callback-producing preparation finishes before the original final proof.
             $this->preparation->finish();
             $this->nativeHeaders = $native;
@@ -207,5 +212,27 @@ final class AccountFeatureResponse extends Response
         }
 
         return $result;
+    }
+
+    /** Stable admitted facts; never recompute a cookie's time-dependent Max-Age during proof. */
+    private static function stableState(Response $response): array
+    {
+        if ($response->headers::class !== ResponseHeaderBag::class) {
+            throw new ProductionFeatureException;
+        }
+        $cookies = $response->headers->getCookies();
+        if (count($cookies) > 8) {
+            throw new ProductionFeatureException;
+        }
+        $state = [];
+        foreach ($cookies as $cookie) {
+            if ($cookie::class !== Cookie::class) {
+                throw new ProductionFeatureException;
+            }
+            $state[] = [$cookie, $cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(),
+                $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(), $cookie->isRaw(), $cookie->getSameSite(), $cookie->isPartitioned()];
+        }
+
+        return [$response->headers, $response->headers->allPreserveCaseWithoutCookies(), $state];
     }
 }

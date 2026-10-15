@@ -7,4 +7,4 @@
 .production-customer-features form { display: grid; gap: 16px; max-width: 640px; }
 .production-customer-features .button { justify-self: start; max-width: 100%; white-space: normal; }
 .production-customer-features [role="status"] { overflow-wrap: anywhere; }
-.production-customer-features :focus-visible { outline: 3px solid var(--va-accent); outline-offset: 3px; }
+.production-customer-features :focus-visible { outline: 3px solid var(--va-focus); outline-offset: 3px; }

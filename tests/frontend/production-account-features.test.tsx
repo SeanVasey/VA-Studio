@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import ProductionCustomerFeatures from '../../resources/js/Pages/ProductionCustomerFeatures';
 import { boundedFeatureJson, libraryEnvelope, preferencesEnvelope, exportEnvelope } from '../../resources/js/lib/production-account-features';
@@ -8,6 +8,37 @@ const library = { listeningSchema: 1, version: 0, favorites: [], playlists: [], 
 const unknown = { schema: 1, purposes: [{ purpose: 'email_marketing', version: 0, status: 'unknown', notice: null, canGrant: false, suppression: { status: 'not_requested' } }] };
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); });
+
+it('sign-out aborts a pending feature request and clears private state immediately', async () => {
+  const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ initialized: true, library }))
+    .mockImplementationOnce(() => new Promise(() => {})).mockResolvedValueOnce(response({ code: 'unavailable' }, 503));
+  render(<ProductionCustomerFeatures scope="opaque-sign-out" />);
+  fireEvent.click(screen.getByRole('button', { name: 'Reload listening library' }));
+  await screen.findByRole('heading', { name: 'Saved tracks' });
+  fireEvent.click(screen.getByRole('button', { name: 'Reload listening library' }));
+  expect(screen.getByRole('button', { name: 'Sign out' })).toBeEnabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+  expect(fetch.mock.calls[1][1]!.signal!.aborted).toBe(true);
+  expect(screen.queryByRole('heading', { name: 'Saved tracks' })).not.toBeInTheDocument();
+  expect(fetch.mock.calls[2][0]).toBe('/customer/sign-out');
+});
+
+it('locally ends an abort-ignoring public search and rejects its late choices', async () => {
+  let finish!: (response: Response) => void;
+  const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ initialized: true, library }))
+    .mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+  render(<ProductionCustomerFeatures scope="opaque-search" />);
+  fireEvent.click(screen.getByRole('button', { name: 'Reload listening library' }));
+  await screen.findByRole('heading', { name: 'Saved tracks' });
+  vi.useFakeTimers();
+  fireEvent.change(screen.getByLabelText('Find public tracks'), { target: { value: 'Synthetic track' } });
+  fireEvent.submit(screen.getByRole('button', { name: 'Search public tracks' }).closest('form')!);
+  await act(async () => { vi.advanceTimersByTime(20000); });
+  expect(fetch.mock.calls[1][1]!.signal!.aborted).toBe(true);
+  expect(screen.getByRole('button', { name: 'Reload listening library' })).toBeEnabled();
+  await act(async () => finish(response({ tracks: [{ id: '1', title: 'Synthetic late choice', artist: 'Synthetic', slug: 'synthetic-track' }] })));
+  expect(screen.queryByRole('option', { name: 'Synthetic late choice — Synthetic' })).not.toBeInTheDocument();
+});
 
 it('uses explicit uninitialized envelopes and a dedicated closed-empty initialization without automatic writes', async () => {
   const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ initialized: false })).mockResolvedValueOnce(response({ initialized: true, library }));

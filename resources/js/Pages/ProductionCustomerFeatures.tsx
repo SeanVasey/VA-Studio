@@ -82,17 +82,21 @@ function ProductionFeatureJourney({ scope }: { scope: string }) {
   async function search() {
     if (!active.current || closed || pending.current) return;
     const token = ++generation.current, originalScope = scope, abort = new AbortController(); pending.current = abort; setBusy(true); setChoices([]);
-    const timeout = window.setTimeout(() => abort.abort(), 20000); timer.current = timeout;
     const owns = () => active.current && currentScope.current === originalScope && token === generation.current && pending.current === abort;
+    const timeout = window.setTimeout(() => {
+      if (!owns()) return; abort.abort(); ++generation.current; pending.current = null; timer.current = null; setBusy(false); setMessage('Public track search is unavailable.');
+    }, 20000); timer.current = timeout;
     try { const values = await publicFeatureChoices(query, abort.signal); if (owns() && !abort.signal.aborted) setChoices(values); }
     catch { if (owns()) setMessage('Public track search is unavailable.'); }
     finally { window.clearTimeout(timeout); if (owns()) { pending.current = null; timer.current = null; setBusy(false); } }
   }
   async function signOut() {
-    if (pending.current) return;
+    if (!active.current || closed) return;
     erase(true);
+    const token = generation.current, originalScope = scope;
     const abort = new AbortController(), timeout = window.setTimeout(() => abort.abort(), 20000);
-    try { if (await productionIdentityRequest('sign-out', '{}', abort.signal) === 'saved') window.location.assign('/customer/sign-in'); }
+    try { if (await productionIdentityRequest('sign-out', '{}', abort.signal) === 'saved'
+      && generation.current === token && currentScope.current === originalScope && !abort.signal.aborted) window.location.assign('/customer/sign-in'); }
     finally { window.clearTimeout(timeout); }
   }
   return <><Head title="Your listening and preferences"><meta name="robots" content="noindex, nofollow" /><meta name="referrer" content="no-referrer" /></Head>
@@ -126,6 +130,6 @@ function ProductionFeatureJourney({ scope }: { scope: string }) {
             <button className="button" disabled={!affirmative || busy || closed || uncertain.preferences} onClick={() => void request('preferences', 'change', { action: 'grant-consent', version: purpose.version, purpose: 'email_marketing', noticeVersion: purpose.notice!.version, noticeHash: purpose.notice!.hash, affirmative: true })}>Save marketing choice</button></> : <p>Marketing opt-in is currently unavailable.</p>}
           <button className="button" disabled={busy || closed || uncertain.preferences} onClick={() => void request('preferences', 'change', { action: 'withdraw-consent', version: purpose.version, purpose: 'email_marketing' })}>Withdraw marketing consent</button>
           {purpose.suppression.status === 'pending' && <p>Suppression is pending. Provider completion has not been confirmed.</p>}</>}
-      </section><button className="button" disabled={busy || closed} onClick={() => void signOut()}>Sign out</button>
+      </section><button className="button" disabled={closed} onClick={() => void signOut()}>Sign out</button>
     </main></>;
 }

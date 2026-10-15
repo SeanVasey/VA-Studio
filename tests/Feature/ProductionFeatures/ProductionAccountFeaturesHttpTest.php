@@ -10,9 +10,13 @@ use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
+use Illuminate\Routing\CompiledRouteCollection;
+use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -21,6 +25,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\ProductionFeatureFixtures;
 use Tests\TestCase;
@@ -31,14 +36,23 @@ class ProductionAccountFeaturesHttpTest extends TestCase
 {
     use ProductionFeatureFixtures;
 
+    public function createApplication()
+    {
+        $application = require dirname(__DIR__, 3).'/bootstrap/app.php';
+        $this->traitsUsedByTest = class_uses_recursive(static::class);
+        $application->booting(fn () => $application['config']->set('production-account-features.http_mounted', true));
+        $application->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+        return $application;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->featureSetup();
         $this->withoutVite();
         config(['production-account-features.http_mounted' => true]);
-        // Execute the actual conditional registration after this isolated fixture config.
-        Route::middleware('web')->group(base_path('routes/production-account-features.php'));
+        $this->assertNotNull(Route::getRoutes()->getByAction(AccountFeatureController::class.'@listeningRead'));
         $this->app->bind(PreventRequestForgery::class, fn ($app) => new class($app, $app['encrypter']) extends PreventRequestForgery
         {
             protected function runningUnitTests(): bool
@@ -333,6 +347,81 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         $this->assertSame(503, $nested->getStatusCode());
         $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($test));
     }
+
+    public function test_stale_compiled_route_collection_still_refuses_disabled_mount_before_identity_queries(): void
+    {
+        $routes = Route::getRoutes();
+        $routes->refreshNameLookups();
+        $routes->refreshActionLookups();
+        app('router')->setCompiledRoutes($routes->compile());
+        $this->assertInstanceOf(CompiledRouteCollection::class, Route::getRoutes());
+        $queries = 0;
+        Event::listen(QueryExecuted::class, function () use (&$queries): void {
+            $queries++;
+        });
+        config(['production-account-features.http_mounted' => false]);
+        $this->get('/customer/features/listening', ['Accept' => 'application/json'])->assertStatus(503)->assertExactJson(['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']);
+        $this->assertSame(0, $queries);
+    }
+
+    public function test_real_session_save_withdrawal_occurs_before_final_original_release(): void
+    {
+        $this->signIn();
+        $store = app('session.store');
+        $handler = new FeatureWithdrawingSessionHandler(120);
+        (new \ReflectionProperty(Store::class, 'handler'))->setValue($store, $handler);
+        $test = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
+        $this->assertSame(1, $handler->writes);
+        $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($test));
+        $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+    }
+
+    public function test_foreign_framework_frame_after_handling_remains_owned_by_its_callback(): void
+    {
+        $this->signIn();
+        $connection = DB::connection();
+        $primary = $connection->getRawPdo();
+        Event::listen(RequestHandled::class, function (RequestHandled $event) use ($connection): void {
+            if ($event->response instanceof AccountFeatureResponse) {
+                $connection->beginTransaction();
+            }
+        });
+        try {
+            $this->assertSame([503, ['code' => 'ACCOUNT_FEATURE_UNAVAILABLE']], $this->released($this->get('/customer/features/listening', ['Accept' => 'application/json'])));
+            $this->assertTrue($primary->inTransaction());
+            $this->assertSame(1, $connection->transactionLevel());
+        } finally {
+            $connection->rollBack();
+        }
+        $this->assertFalse($primary->inTransaction());
+    }
+
+    public function test_native_session_cookie_crossing_a_wall_second_keeps_healthy_original_release(): void
+    {
+        $this->signIn();
+        $crossed = false;
+        Route::middleware('web')->withoutMiddleware(HandleInertiaRequests::class)->get('/customer/features/cookie-crossing', function (Request $request) use (&$crossed) {
+            $response = new AccountFeatureResponse($request);
+            $identity = ProductionAccountFeatureIdentity::forRequest($request, 'listening_library');
+            $guard = new AccountFeatureRequestGuard($request, $identity);
+            $prepared = new ProductionFeaturePreparation(function (bool $committed = false) use ($guard, $response, &$crossed): void {
+                if ($committed) {
+                    $before = time();
+                    usleep(1_100_000);
+                    $crossed = time() > $before;
+                }
+                $guard->requireCurrent();
+                $response->requireUnchanged();
+            }, 3 * 1024 * 1024);
+            (new ProductionListeningLibrary)->read($identity, $prepared);
+            $response->attach($prepared);
+            $response->headers->setCookie(new Cookie('synthetic-cookie', 'bounded-value', time() + 60));
+
+            return $response;
+        });
+        $this->assertSame([200, ['initialized' => false]], $this->released($this->get('/customer/features/cookie-crossing', ['Accept' => 'application/json'])));
+        $this->assertTrue($crossed);
+    }
 }
 
 final class FeatureCloneResponseMiddleware
@@ -352,5 +441,18 @@ final class FeatureAuthSlotString implements \Stringable
         self::$calls++;
 
         return '1';
+    }
+}
+
+final class FeatureWithdrawingSessionHandler extends ArraySessionHandler
+{
+    public int $writes = 0;
+
+    public function write($sessionId, $data): bool
+    {
+        $this->writes++;
+        config(['production-account-features.http_mounted' => false]);
+
+        return parent::write($sessionId, $data);
     }
 }
