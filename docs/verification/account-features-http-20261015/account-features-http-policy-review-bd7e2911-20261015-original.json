@@ -1,0 +1,162 @@
+{
+  "added_whole_files": [
+    "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
+    "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php"
+  ],
+  "app_db_network_ci_execution": false,
+  "correction_check_count": 159,
+  "correction_checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "json_sha256": "dca5b3e7dd34238e3b1f9e1fd6b24e837c8adc34479b4db807b601668d058151",
+      "log_sha256": "663dc2be2a2bca05529060a55bff67958d9fc8f49025e3189a516622849d3ad4",
+      "name": "test-phpunit-shards",
+      "process_exit": 0,
+      "tests": 52
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "json_sha256": "cab51095c7251a6145acb4ea0fa66a34b7ab18df4a8b98089fb98d0237a2ace0",
+      "log_sha256": "9a47840fd7685b6ea4c9494ed4747e5b7d3cdd2ff5468252435bcb9400c2ea5a",
+      "name": "test-database-receipts",
+      "process_exit": 0,
+      "tests": 61
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-gitlab-database-receipts.py"
+      ],
+      "json_sha256": "4a70d0658563f7b5a370ac1a8b88d1ebe8c8554a955085abb8d9fbe25e80b9cf",
+      "log_sha256": "e08811a11ff0b5d3c5c525c46355f0a57adaa7321fcd723cafff8cd13adb50ce",
+      "name": "test-gitlab-database-receipts",
+      "process_exit": 0,
+      "tests": 32
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "json_sha256": "45a2844fe9c9d545895b179e0e2dc40391aa1124e28eaec79c197c7b3bb80549",
+      "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "name": "test-workflow-cadence",
+      "process_exit": 0,
+      "tests": 14
+    }
+  ],
+  "decision": "APPROVE NARROW NATIVE SELECTION POLICY CORRECTION AND SOURCE CARRY",
+  "findings": [],
+  "immutable_delta_sha256": {
+    ".github/workflows/final-verification.yml": "baf2b3ad43a4b07e035e14d64a25311ff73596ec8a1b6e16960f48e9818d6f3d",
+    ".gitlab-ci.yml": "2e2a0224a25789933dc84b6fa4f390cd066e061f22e637d5365dfd11819fd80a",
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "f88f7e1ee4e803a4ee2cb29702bd2f5a54e49961d3ebbeb473dbb95f47848567",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "b6a7b838ed452e63cd050fa6e0fd01381531ca59480a99a90a9aeb6f0f81d792",
+    "docs/verification/account-features-http-20261015/README.md": "639c1379798cf7ba195f258c6d775253adc7708ea4329deedc667dbd52226707",
+    "docs/verification/account-features-http-20261015/mysql-selection-corrected-toolchain-original.log": "92a1dd30a64d1e24c956a1972bc9dc2b493cc92dda94afa7d45d311f58e91c05",
+    "docs/verification/account-features-http-20261015/shard-0902-preflight-failure-original.json": "cc9a827ef61c86001dc5b347e5c2b5c2c9af93b37576d769ba7affd48edd58d6",
+    "docs/verification/account-features-http-20261015/shard-0902-preflight-failure-original.log": "aa966d06a79d2904c2c0ad4d719ee1740b1c92d4af1699abca18611ffeebdee5",
+    "scripts/ci/database-mysql-selection.json": "8efcc8fd5a66ef8a936347a1282211297c70a52957d65a0adea8cdd980d4cd4f"
+  },
+  "observed_worktree_status": " M docs/verification/account-features-http-20261015/README.md\n?? docs/verification/account-features-http-20261015/test-database-receipts-bd7-corrected-original.json\n?? docs/verification/account-features-http-20261015/test-gitlab-database-receipts-bd7-corrected-original.json\n?? docs/verification/account-features-http-20261015/test-phpunit-shards-bd7-corrected-original.json\n?? docs/verification/account-features-http-20261015/test-workflow-cadence-bd7-corrected-original.json\n",
+  "open_p0": 0,
+  "open_p1": 0,
+  "policy_change": "Exactly two whole branching files added to sorted native include list; no residual/skip/helper/pattern policy removal or gate/code change",
+  "preparation_errors": [],
+  "prior_publication_carry_head": "0902be9ed5c3202444521d697f79ce8641f1fa89",
+  "recorded_utc": "2026-10-15T20:16:41.641400+00:00",
+  "remaining_gates": [
+    "Byte-original policy decision and four closed correction-check imports on final docs-only head",
+    "Independent exact final documentation-only carry",
+    "Green cheap exact-head preflight and complete current inventory/protections/no openP0/P1",
+    "Expected-head-SHA merge with actual receipt/both ledgers"
+  ],
+  "required_corrections": [],
+  "retained_failed_reproduction": {
+    "failures": 1,
+    "json_sha256": "cc9a827ef61c86001dc5b347e5c2b5c2c9af93b37576d769ba7affd48edd58d6",
+    "log_sha256": "aa966d06a79d2904c2c0ad4d719ee1740b1c92d4af1699abca18611ffeebdee5",
+    "process_exit": 1,
+    "tests": 52
+  },
+  "review_scope": "Immutablebd7 policy/comment/status delta; announced root-owned subsequent docs imports are outside this head. No clean-current-worktree assertion.",
+  "reviewed_head": "bd7e29119e718ace3a714fbee580c6e8992eeea7",
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified": false,
+  "source_carry": {
+    "application_ui_tests_source_files_unchanged": 37,
+    "archive_sha256": "0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60",
+    "captured_inputs_total": 2455,
+    "changed_inputs": [
+      "scripts/ci/database-mysql-selection.json"
+    ],
+    "physical_loaders_unchanged": 13,
+    "unchanged_inputs": 2454
+  },
+  "status_assessment": "Immutable README/both ledger checkpoint accurately preserve real0902 preflight failure and pending corrected-head review/preflight/inventory/merge, with no full-native execution claim",
+  "tested_application_test_head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+  "untested_or_unapproved": [
+    "Full Foundation/application/browser matrices",
+    "Physical SAPI/FPM/output handler/host verification and deployment",
+    "Wider native concurrency/performance or whole HTTP latency",
+    "Provider delivery/commercial/legal/launch acceptance, live accounts/payments/import/activation",
+    "Frozen adjacent unwrappedV1/generic/IdentityOriginalCommitWitness metadata and ordinary membership throwing-afterCommitP2"
+  ],
+  "verified_census": {
+    "generated_shards": [
+      {
+        "cases": 287,
+        "files": 28,
+        "index": 1
+      },
+      {
+        "cases": 288,
+        "files": 28,
+        "index": 2
+      },
+      {
+        "cases": 296,
+        "files": 28,
+        "index": 3
+      },
+      {
+        "cases": 305,
+        "files": 28,
+        "index": 4
+      },
+      {
+        "cases": 296,
+        "files": 33,
+        "index": 5
+      },
+      {
+        "cases": 313,
+        "files": 28,
+        "index": 6
+      },
+      {
+        "cases": 354,
+        "files": 31,
+        "index": 7
+      },
+      {
+        "cases": 284,
+        "files": 28,
+        "index": 8
+      }
+    ],
+    "limits": "Discovery/partition proof only, not executed native cases or timings. Eight local discovery shards do not change manual24-shardFoundation policy.",
+    "manifest_sha256": "75ef40b15a0b4b345025b5a9123ea5e54a8e28a6b1000eaea98bf23ee6bac54f",
+    "selected_cases": 2423,
+    "selected_files": 232,
+    "source_cases": 9069,
+    "source_files": 670,
+    "untimed_estimated_files": 69
+  }
+}

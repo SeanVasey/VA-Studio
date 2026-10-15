@@ -1,0 +1,78 @@
+{
+  "actions_performed": [
+    "Read-only Git/source/hash/appendix/typecheck/status verification",
+    "Exclusive reviewer runtime MD/JSON creation"
+  ],
+  "app_db_network_ci_execution": false,
+  "approved_final_review_head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+  "archive_bytes": 14095635,
+  "archive_sha256": "0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60",
+  "byte_original_import_sha256": {
+    "account-features-http-final-review-6fdabe77-20261015-original.json": "068cd998ff8f3e9dd0cf356cc5903c8ee3f52838f7785f9df0ab26b7e8b152e4",
+    "account-features-http-final-review-6fdabe77-20261015-original.md": "ac1e97934062b5109e57e0f3c51215563d2f1c75e5db4b46d950fc8de7c721de",
+    "account-features-http-final-review-6fdabe77-20261015-verification-original.json": "dbd32c9af51ef585e4a68aafa06e665b1715516277affea27a5940965b9785a9",
+    "typecheck-6fd-final-original.json": "288137c1a72d2068fd4014ccfa4cf5788cf078a19713bba581072b571c0d8f56",
+    "typecheck-6fd-final-original.log": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+  },
+  "decision": "APPROVE DOCUMENTATION-ONLY PUBLICATION CARRY",
+  "documentation_delta": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "docs/verification/account-features-http-20261015/README.md",
+    "docs/verification/account-features-http-20261015/account-features-http-final-review-6fdabe77-20261015-original.json",
+    "docs/verification/account-features-http-20261015/account-features-http-final-review-6fdabe77-20261015-original.md",
+    "docs/verification/account-features-http-20261015/account-features-http-final-review-6fdabe77-20261015-verification-original.json",
+    "docs/verification/account-features-http-20261015/typecheck-6fd-final-original.json",
+    "docs/verification/account-features-http-20261015/typecheck-6fd-final-original.log"
+  ],
+  "findings": [],
+  "independent_reviewer": "/root/account_features_final_review",
+  "limits": [
+    "Full Foundation/application/browser matrices",
+    "Physical SAPI/FPM/output handler/host verification and deployment",
+    "Wider native concurrency/performance or whole HTTP latency",
+    "Provider delivery/commercial/legal/launch acceptance, live accounts/payments/import/activation",
+    "Frozen adjacent unwrappedV1/generic/IdentityOriginalCommitWitness metadata and ordinary membership throwing-afterCommitP2"
+  ],
+  "new_typecheck_original": {
+    "argv": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+    "finished_utc": "2026-10-15T20:07:02.273176+00:00",
+    "log_sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+    "process_exit": 0,
+    "source_after": {
+      "head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+      "status": ""
+    },
+    "source_before": {
+      "head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+      "status": ""
+    },
+    "source_unchanged": true,
+    "started_utc": "2026-10-15T20:07:00.511128+00:00"
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "preparation_errors": [],
+  "recorded_utc": "2026-10-15T20:08:48.402449+00:00",
+  "remaining_gates": [
+    "Import this original carry if desired and explicitly carry any subsequent documentation-only head",
+    "Green cheap preflight on exact final head; applicable frontend/typecheck jobs required",
+    "Complete current review/thread/check inventory and protections; no openP0/P1",
+    "Expected-head-SHA development merge and actual receipt/both ledgers"
+  ],
+  "required_corrections": [],
+  "reviewed_head": "0902be9ed5c3202444521d697f79ce8641f1fa89",
+  "shared_files_modified": false,
+  "source_equality": "No application/bootstrap/config/routes/resources/tests/scripts/package/lock/tsconfig/phpunit delta from tested68 to publication0902",
+  "status_review": "README and both ledgers accurately record completed independent final source/evidence review versus pending publication carry/preflight/inventory/expected-SHA merge. No actual merge or activation claimed.",
+  "tested_application_test_head": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+  "typecheck_scope": "New original npm run typecheck process0 at clean6fd/source unchanged carries unchanged currentUI bytes; prior028 original remains unchanged. package.json build includes tsc but recorded external Vite invocation alone is not a tsc execution claim.",
+  "unchanged_changed_source_files": 37,
+  "unchanged_current_captured_inputs": 2455,
+  "unchanged_physical_loaders": 13
+}

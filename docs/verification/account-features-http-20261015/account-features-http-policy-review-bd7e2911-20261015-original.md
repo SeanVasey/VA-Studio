@@ -1,0 +1,13 @@
+DECISION: APPROVE NARROW NATIVE SELECTION POLICY CORRECTION AND SOURCE CARRY
+
+Reviewed immutable `bd7e29119e718ace3a714fbee580c6e8992eeea7` against0902. The policy change adds exactly the two newly reached driver-branching release/metadata whole files to the sorted MySQL include list. No residual, skip, helper or migration policy is removed; selection/check implementation and gates are unchanged. GitHub/GitLab workflow changes are comments only. No material finding/openP0/P1 or required correction is established.
+
+Actual tested68 application/UI/test source remains byte-identical, as do all37 reviewed changed source files,13 physical loaders and the sealed archive. Of2,455 originally captured inputs,2,454 remain unchanged; the sole changed input is the reviewed native selectionJSON. The original focused application receipts are not relabeled as runs of this new policy.
+
+Fresh read-only reconciliation verifies generated source9069cases/670files and selected2423cases/232files, whole-file inclusion of both additions, disjoint eight local partition inventories and69 untimed fallback files. The policy hash matchesbd7 and comments match the census. This is discovery/partition proof, not native execution or measured current timings; the eight local discovery shards do not change Foundation's manual24-shard policy.
+
+Four closed originalbd7 safeguards reconcile clean before/after source, hashes and process0: shard52, database receipts61, GitLab receipts32, cadence14 (159 selected Python safeguard cases). Original0902 reproduction remains52/1failure/process1, with both offending file messages retained. README/both ledgers preserve the genuine preflight failure and pending corrected publication gates, without a whole-native or host claim.
+
+Root's subsequent documentation imports are intentionally outside this immutable review. Import this original decision and closed check receipts, obtain explicit independent carry on the final docs-only head, then satisfy green cheap exact-head preflight/current complete inventory/protections/no openP0/P1 and expected-SHA merge; record actual receipt and both ledgers. No additional PHP/application rerun is required solely for this reviewed policy/comment/status delta. Full Foundation/GitLab/native-concurrency/browser/SAPI/host/provider/commercial/activation and adjacent frozen scopes remain unapproved.
+
+Only read-only exactGit/hash/source/census/original-check reconciliation and exclusive reviewer runtime artifacts occurred; no application/DB/network/CI execution, shared edit or preparation error. Current worktree documentation dirt belongs to root's announced imports and is not described as immutablebd7 clean status.
