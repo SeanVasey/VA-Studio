@@ -1,0 +1,2816 @@
+{
+  "reviewed_head": "ad4bf751a3302a816eda49dd7951000610fe736c",
+  "tested_operative_head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+  "verification_utc": "2026-10-15T00:29:05.048798+00:00",
+  "archive_sha256": "b35525aebbd244c18ba91bfba0a1f648808bacf8850510dbb4b8a52cb35e27f0",
+  "archive_bytes": 9040998,
+  "members_verified": 2646,
+  "regular_unique_safe_member_names": true,
+  "checks": {
+    "all_18_inventories_actual_reachable_Git_blob_bytes_verified": true,
+    "current_2344_actual_inputs_16_routes_13_loaders_equal_tested_and_final_Git": true,
+    "fresh_native_11_exact_prior_case_identity_selection_verified": true,
+    "23_skip_full_identities_exact_reviewed_expanded_selection": true,
+    "engine_target_only_carry_original_supplement_binding": true,
+    "Pint6_policy52_ci14_27_receipts_and_comment_only_workflows_verified": true,
+    "whole_12_SQLite_files_all_176_expanded_identities_match_discovery": true
+  },
+  "invocations": [
+    {
+      "name": "mysql-tax-write-commit-and-history-current-raw-proof",
+      "head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+      "counts": {
+        "tests": 11,
+        "assertions": 130,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "f5b864f8557e5f1fcd1ab1752df95bdb4dcdcb54668d2c0551bb646d702f1ea6",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry"
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-commit-and-history-final",
+      "head": "9b2f2e2e5074d5849942e9a7d46c3789afa28e46",
+      "counts": {
+        "tests": 11,
+        "assertions": 130,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "e10c177d62ecf1d61e471335fd64fa03826a38e7e79c3d17944abb4372747b51",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry"
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-current-raw-proof-fixed",
+      "head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+      "counts": {
+        "tests": 2,
+        "assertions": 31,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "23ae63f8e4713b6766420baf96199c04a90b78a8d6a5428461734b7790fdb8ae",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-damaged-engine-correct-status",
+      "head": "38dea3961d10712aa9e6b0617241cafcfc2ec21e",
+      "counts": {
+        "tests": 4,
+        "assertions": 45,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "e25159a4370dd5d26ce5952a1d810ad4102d3cad443ee66363b36455ea5a7d94",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-damaged-engine",
+      "head": "868b1a34c99cd5734333732b0e58790b9f396eb6",
+      "counts": {
+        "tests": 1,
+        "assertions": 5,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Expected 503 instead of structured-schema conflict 409; later assertions were not executed.",
+      "log_sha256": "6bc75b1053dde8fa85338e4daec115fff0d60cedcd7a59081bc9ab0f1f7750ee",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"order\""
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-global-snapshot-old-raw-source",
+      "head": "fea23deaaf2cba4fb31718a5e1042bc307e9ee7c",
+      "counts": {
+        "tests": 1,
+        "assertions": 9,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "e42fc765906d372ce3e6abf59f6401fb5681dc8e8168a81f1ff6c51940d8f768",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+        ]
+      ]
+    },
+    {
+      "name": "mysql-tax-write-row-wait-old-raw-source",
+      "head": "fea23deaaf2cba4fb31718a5e1042bc307e9ee7c",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "668888a8321465e3486cb8f4d391160372aef0134422a9b6743a9e8af96476b4",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-binding-owner-before-review-repair-transactional-guard",
+      "head": "52d637ed170eb7657848b716aa3b11399130ef3f",
+      "counts": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "f3e01627a58ad071c76e71085dd27b7cd66f01cc639e7de51b5ea25aa493d49d",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-boundary-before-review-repair-corrected",
+      "head": "88649ca2de3de38e08344b71092e203eeed35f08",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "dcf1a6108234bf3c12c4e455ff54a4ae950965aa755b19a108a90834161d7984",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-boundary-before-review-repair",
+      "head": "3d85b23daae0c0cb845d820f0d98d553446d5857",
+      "counts": {
+        "tests": 1,
+        "assertions": 1,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "recorded_scope": "Wrong assertion signature treated the message as a database connection.",
+      "log_sha256": "ea49e8c25ed0cfcc967fd98fa5b6d4f87fa2c07ed18b88b6a343082388c8c835",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-four-new-write-config-first-fix",
+      "head": "c2652593027d2d8159cc0b5e8018fffeb5c7700a",
+      "counts": {
+        "tests": 4,
+        "assertions": 60,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "6b4bb7796b362b03dc35b67fda5f2d32f67dacb8f57e28d460d566ef6c7039a8",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-new-binding-config-old-source",
+      "head": "e1968cedababf574cb74c22a22a28fd12458cf51",
+      "counts": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "16d79e4bbdc2f9e26be5897130614cd74180b0120aa218e92ce09a38f93be985",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-new-order-config-first-fix",
+      "head": "c2652593027d2d8159cc0b5e8018fffeb5c7700a",
+      "counts": {
+        "tests": 1,
+        "assertions": 14,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "301ddcaef491c8923ba23d426cbc09631ed7ed4a1fba59ffb9f399a12355e8d2",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-new-order-config-old-source",
+      "head": "e1968cedababf574cb74c22a22a28fd12458cf51",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "e4271ff30c5d40bf99b357587f2a9ced504e9382b17db715d8e054e1a39fb36d",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-new-request-config-old-source",
+      "head": "e1968cedababf574cb74c22a22a28fd12458cf51",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "5fdb5558c7772ded4126e632d8c4a9d939410186f35df7f90a3d6f68aa77c739",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-new-reviewed-config-old-source",
+      "head": "e1968cedababf574cb74c22a22a28fd12458cf51",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "420ff13503bf8c141c95f1949664295127be79c65e1f5c15f9f0093645d6b142",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-owner-and-boundary-after-review-repair-correct-status",
+      "head": "335c1d46a114f12853d2b2ed58ff9b45ce05b18a",
+      "counts": {
+        "tests": 3,
+        "assertions": 30,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "9505a8b2075f30cfc72b9d47ff2ce3105235ca8a32463855505d3c5091ec53d1",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-owner-and-boundary-after-review-repair",
+      "head": "454314b48fb6aa89d0687c87dfec05bd0e50c13a",
+      "counts": {
+        "tests": 1,
+        "assertions": 6,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Expected 503 instead of established raw-source conflict 409.",
+      "log_sha256": "9b871e06af3f51791cb7a6bc406c5f26348cae6718461d790d0be6ce6468cb0f",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-owner-and-boundary-before-review-repair",
+      "head": "b9b367456c89357c582d51f25ff691510cf976b1",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "recorded_scope": "Intact owner guard rejected the mutation with PDO error.",
+      "log_sha256": "ca9be9c91e9c846b7b901f0a9ca5dcf7cb94115c5f52166a4a9d6264a1e3879f",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-owner-before-review-repair-restored-fixture",
+      "head": "3d85b23daae0c0cb845d820f0d98d553446d5857",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Removed guard refused at identity admission before the callback; not an application-gap oracle.",
+      "log_sha256": "a34b39ba7b770e39e0b5e02c1dc0e9a4b040842a71563f201404016229755477",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-reviewed-owner-before-review-repair-transactional-guard",
+      "head": "52d637ed170eb7657848b716aa3b11399130ef3f",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Original application-gap oracle; assertions after the first failure were not executed.",
+      "log_sha256": "329961285f7bda912a63713aa3142966836decc306d2906f3120ec1fb31fd303",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-reviewed-owner-before-review-repair",
+      "head": "88649ca2de3de38e08344b71092e203eeed35f08",
+      "counts": {
+        "tests": 1,
+        "assertions": 2,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Removed guard refused at identity admission before the callback; not an application-gap oracle.",
+      "log_sha256": "6364bf61e69e223f658a35adde7e4b2cd838a0e3efb91b7d6d89cca33cbdd34d",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-affected-current-raw-proof",
+      "head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+      "counts": {
+        "tests": 176,
+        "assertions": 1273,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 23
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "ad0e5d568ebc6d30248ac2972dcc15bba66722f57331111abf239c041ec19024",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutFrozenV1Test",
+          "test_frozen_v1_purpose_and_line_source_bytes_are_unchanged"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutFrozenV1Test",
+          "test_the_frozen_list_matches_the_independent_composition_record"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_order_guard_refuses_every_malformed_field_and_accepts_the_valid_row"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_request_guard_refuses_malformed_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_binding_guard_refuses_malformed_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_reviewed_guard_refuses_inconsistent_provider_amounts_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_provider_identifiers_with_a_trailing_line_terminator_are_refused"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_inclusive_reviewed_rows_keep_tax_inside_the_unchanged_total"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_every_table_refuses_update_and_delete"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_nothing_is_registered_or_mounted_by_default"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_default_off_never_queries_private_data_and_never_resolves_identity"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #0"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #1"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #2"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #3"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #4"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #5"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #6"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #7"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #8"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #9"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #10"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #11"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #12"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #13"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_unbound_provider_retains_the_exact_automatic_tax_request_and_never_touches_a_transport"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_service_without_any_transport_retains_the_automatic_tax_request_and_fails_closed"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_bound_transport_retains_the_buyer_reviewed_provider_tax_exactly_once"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inclusive_behavior_retains_provider_tax_inside_the_unchanged_total"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"automatic tax disabled\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"tax total differs from its lines\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"total is not subtotal plus tax\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"subtotal differs from the reviewed order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"paid without a complete tax calculation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"line tax behavior differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"connected-account liability\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"discount applied\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount_received is short of the session total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount differs from the session total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent currency is not usd\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"session currency is not usd\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent livemode differs from test funds\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent metadata names another request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent on_behalf_of names another account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"line currency differs from the USD order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent is processing while the session is paid\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_initiate_refuses_a_retrieved_session_that_is_not_the_created_one_and_binds_nothing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_reconcile_refuses_a_retrieved_session_that_is_not_the_bound_one_and_retains_nothing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_provider_tax_above_the_approved_ceiling_is_refused_never_adjusted"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_assent_binds_the_previewed_terms_and_a_replayed_order_is_the_same_order"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_withdrawn_policy_refuses_new_commands_but_keeps_retained_records"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_migration_installs_exactly_four_tables_and_twelve_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_both_drivers_guard_text_is_generated_and_never_names_a_v1_checkout_table"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"drifted guard\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"interior gap\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"populated incomplete installation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"temporary shadow\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"foreign view\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"foreign trigger\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"additional owned index\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_rollback_is_refused_before_any_query"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"drifted guard body\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"guard recreated under another definer\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"guard recreated under another SQL mode\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"interior gap\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"populated incomplete installation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"temporary shadow\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign view\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign trigger\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign routine\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign key consumer\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"additional owned index\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"additional owned guard\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"column collation drift\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_shipped_configuration_is_off_unbound_literal_and_pinned"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_pin_drift_refuses_even_when_enabled"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"no provider configured\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"empty provider\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"no transport bound\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"refusing default named\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"identity mismatch\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"non-string provider\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"matching identity\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_unbound_transport_refuses_every_operation"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"declared exemption strategy\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"manual capture\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"guest buyers\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"other currency\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"other api version\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"provider lifetime below Stripe minimum plus retry\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"provider payment time basis\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"live funds\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"missing funds mode\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"configured account differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"missing account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"configured return origin differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_test_funds_outside_local_or_testing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_a_consistent_v2_line_passes_the_self_consistency_checks"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_v1_shaped_lines_are_refused_and_never_routed_as_v2"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_the_only_acceptance_path_requires_the_held_source"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tampered without resealing\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"missing key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"extra key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive total is not subtotal plus tax\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"inclusive tax exceeds its total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"string money\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax subtotal differs from pre-tax line\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"incomplete provider calculation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"non-USD currency\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"live funds under rehearsal\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive license\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"mismatched product hash\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax behavior differs from the retained execution context\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax above the retained approved ceiling\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context names another account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context funds mode differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"foreign origin key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_source_from_a_closed_transaction_cannot_be_accepted_in_autocommit"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_fresh_transaction_cannot_reuse_a_source_from_the_closed_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_the_current_source_is_bound_to_the_callers_expected_order"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_current_source_cannot_be_accepted_with_another_primary_reader_or_nested_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_source_v2_round_trip_carries_retained_provider_tax_beside_the_order_and_the_v2_adapter_accepts_it"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_a_resealed_line_moved_to_another_order_with_zero_tax_is_refused_and_the_genuine_line_is_accepted"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_a_resealed_live_line_is_refused_until_a_reviewed_live_producer_exists"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_every_retained_tax_record_is_immutable_and_the_source_never_serializes"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_unpaid_orders_have_no_source_and_the_v1_locator_never_reads_a_v2_order"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-affected-final",
+      "head": "9b2f2e2e5074d5849942e9a7d46c3789afa28e46",
+      "counts": {
+        "tests": 174,
+        "assertions": 1273,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 21
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "4588c2ac47f2076cc5e2ca8ba80298edaf965954b477d792049742edd77398b8",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutFrozenV1Test",
+          "test_frozen_v1_purpose_and_line_source_bytes_are_unchanged"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutFrozenV1Test",
+          "test_the_frozen_list_matches_the_independent_composition_record"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_order_guard_refuses_every_malformed_field_and_accepts_the_valid_row"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_request_guard_refuses_malformed_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_binding_guard_refuses_malformed_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_reviewed_guard_refuses_inconsistent_provider_amounts_and_out_of_order_rows"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_provider_identifiers_with_a_trailing_line_terminator_are_refused"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_inclusive_reviewed_rows_keep_tax_inside_the_unchanged_total"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutGuardTest",
+          "test_every_table_refuses_update_and_delete"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_nothing_is_registered_or_mounted_by_default"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_default_off_never_queries_private_data_and_never_resolves_identity"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #0"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #1"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #2"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #3"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #4"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #5"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #6"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #7"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #8"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #9"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #10"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #11"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #12"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_private_transport_refusals_are_bounded_and_sanitized with data set #13"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest",
+          "test_session_floor_principal_is_required_and_no_request_field_can_carry_an_amount"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_unbound_provider_retains_the_exact_automatic_tax_request_and_never_touches_a_transport"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_service_without_any_transport_retains_the_automatic_tax_request_and_fails_closed"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_bound_transport_retains_the_buyer_reviewed_provider_tax_exactly_once"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inclusive_behavior_retains_provider_tax_inside_the_unchanged_total"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"automatic tax disabled\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"tax total differs from its lines\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"total is not subtotal plus tax\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"subtotal differs from the reviewed order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"paid without a complete tax calculation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"line tax behavior differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"connected-account liability\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_inconsistent_provider_sessions_are_refused_and_nothing_is_retained with data set \"discount applied\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount_received is short of the session total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent amount differs from the session total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent currency is not usd\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"session currency is not usd\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent livemode differs from test funds\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent metadata names another request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent on_behalf_of names another account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"line currency differs from the USD order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_a_paid_session_with_a_mismatched_money_fact_is_refused_and_nothing_is_retained with data set \"PaymentIntent is processing while the session is paid\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_initiate_refuses_a_retrieved_session_that_is_not_the_created_one_and_binds_nothing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_reconcile_refuses_a_retrieved_session_that_is_not_the_bound_one_and_retains_nothing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_provider_tax_above_the_approved_ceiling_is_refused_never_adjusted"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_assent_binds_the_previewed_terms_and_a_replayed_order_is_the_same_order"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutJourneyTest",
+          "test_withdrawn_policy_refuses_new_commands_but_keeps_retained_records"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_migration_installs_exactly_four_tables_and_twelve_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_both_drivers_guard_text_is_generated_and_never_names_a_v1_checkout_table"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"drifted guard\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"interior gap\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"populated incomplete installation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"temporary shadow\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"foreign view\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"foreign trigger\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references with data set \"additional owned index\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
+          "test_rollback_is_refused_before_any_query"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"drifted guard body\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"guard recreated under another definer\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"guard recreated under another SQL mode\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"interior gap\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"populated incomplete installation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"temporary shadow\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign view\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign trigger\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign routine\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"foreign key consumer\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"additional owned index\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"additional owned guard\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_installer_refuses_before_ddl with data set \"column collation drift\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeInstallerTest",
+          "test_native_frozen_v1_installer_reruns_with_tax255_present_and_tables_are_inert"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_timestamp_and_uuid_guards_refuse_malformed_text"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutNativeSchemaTest",
+          "test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"production / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"staging / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"local / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / true\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / false\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / null\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / string\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_policy_is_enabled_only_by_literal_true_in_local_or_testing with data set \"testing / one\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_shipped_configuration_is_off_unbound_literal_and_pinned"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_pin_drift_refuses_even_when_enabled"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"no provider configured\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"empty provider\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"no transport bound\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"refusing default named\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"identity mismatch\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"non-string provider\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_transport_admission_fails_closed_before_any_call with data set \"matching identity\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_unbound_transport_refuses_every_operation"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"declared exemption strategy\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"manual capture\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"guest buyers\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"other currency\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"other api version\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"provider lifetime below Stripe minimum plus retry\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"provider payment time basis\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"live funds\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"missing funds mode\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"configured account differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"missing account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_every_unsupported_choice with data set \"configured return origin differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutPolicyTest",
+          "test_execution_context_refuses_test_funds_outside_local_or_testing"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_a_consistent_v2_line_passes_the_self_consistency_checks"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_v1_shaped_lines_are_refused_and_never_routed_as_v2"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_the_only_acceptance_path_requires_the_held_source"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tampered without resealing\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"missing key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"extra key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive total is not subtotal plus tax\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"inclusive tax exceeds its total\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"string money\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax subtotal differs from pre-tax line\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"incomplete provider calculation\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"non-USD currency\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"live funds under rehearsal\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"exclusive license\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"mismatched product hash\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax behavior differs from the retained execution context\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"tax above the retained approved ceiling\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context names another account\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"execution context funds mode differs\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidLineAdapterV2Test",
+          "test_tampered_or_inconsistent_v2_lines_are_refused with data set \"foreign origin key\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_source_from_a_closed_transaction_cannot_be_accepted_in_autocommit"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_fresh_transaction_cannot_reuse_a_source_from_the_closed_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_the_current_source_is_bound_to_the_callers_expected_order"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxPaidSourceAdmissionTest",
+          "test_a_current_source_cannot_be_accepted_with_another_primary_reader_or_nested_frame"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_source_v2_round_trip_carries_retained_provider_tax_beside_the_order_and_the_v2_adapter_accepts_it"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_a_resealed_line_moved_to_another_order_with_zero_tax_is_refused_and_the_genuine_line_is_accepted"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_a_resealed_live_line_is_refused_until_a_reviewed_live_producer_exists"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_every_retained_tax_record_is_immutable_and_the_source_never_serializes"
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxSourceV2Test",
+          "test_unpaid_orders_have_no_source_and_the_v1_locator_never_reads_a_v2_order"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-global-and-live-cap-final",
+      "head": "9b2f2e2e5074d5849942e9a7d46c3789afa28e46",
+      "counts": {
+        "tests": 4,
+        "assertions": 57,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "36df76ca4678c5b34fac7bc9e8e36ef114c072127409f86f6a0220e9ca0cbaa4",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"request\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set \"reviewed\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-historical-first-source",
+      "head": "1262a7179a3d2e44d3d1065eeb0a2563cb3fe69e",
+      "counts": {
+        "tests": 3,
+        "assertions": 28,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "a680b016794b71e1da54bfdb33863a7758ae1b574f35a41d44d120c08fa6180a",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"binding\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set \"reviewed\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry"
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-live-license-cap",
+      "head": "38dea3961d10712aa9e6b0617241cafcfc2ec21e",
+      "counts": {
+        "tests": 1,
+        "assertions": 13,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "php_exit": 1,
+      "recorder_exit": 1,
+      "recorded_scope": "Expiry/rollback checks reached; retry fixture tried to enroll the same email again and SMTP received no notice.",
+      "log_sha256": "c16d1e11de5205c09214e6ca8c07fcd353c8aacd3c963217f3f650d5a4d84800",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\""
+        ]
+      ]
+    },
+    {
+      "name": "sqlite-tax-write-withdrawal-and-transport",
+      "head": "868b1a34c99cd5734333732b0e58790b9f396eb6",
+      "counts": {
+        "tests": 5,
+        "assertions": 53,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "recorded_scope": "Completed focused selection; skips and selected conditions remain explicit.",
+      "log_sha256": "ab38c89b2755927e99313d3260242d6260e4003900d1ba7c03a56fafc23360f5",
+      "case_identities": [
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request catalog\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"order credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set \"request credential\""
+        ],
+        [
+          "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+          "test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads"
+        ]
+      ]
+    }
+  ],
+  "source_bindings": [
+    {
+      "inventory": "bundle-1262a7179a3d-6ce1b40f946dffbe",
+      "head": "1262a7179a3d2e44d3d1065eeb0a2563cb3fe69e",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-335c1d46a114-45819283cbf2dc9c",
+      "head": "335c1d46a114f12853d2b2ed58ff9b45ce05b18a",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-38dea3961d10-2f293b153ab8505d",
+      "head": "38dea3961d10712aa9e6b0617241cafcfc2ec21e",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-38dea3961d10-fe1c6c10726ea614",
+      "head": "38dea3961d10712aa9e6b0617241cafcfc2ec21e",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-3d85b23daae0-f88a9a4a43ebcef5",
+      "head": "3d85b23daae0c0cb845d820f0d98d553446d5857",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-454314b48fb6-b9fc1b4b2b88b484",
+      "head": "454314b48fb6aa89d0687c87dfec05bd0e50c13a",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-52d637ed170e-f134f176eb5526fb",
+      "head": "52d637ed170eb7657848b716aa3b11399130ef3f",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-868b1a34c99c-3bb86ef846a8fed9",
+      "head": "868b1a34c99cd5734333732b0e58790b9f396eb6",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-868b1a34c99c-f09ffeab899eb369",
+      "head": "868b1a34c99cd5734333732b0e58790b9f396eb6",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-88649ca2de3d-5c7152cc8e5cf097",
+      "head": "88649ca2de3de38e08344b71092e203eeed35f08",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-9b2f2e2e5074-4f4e754c2720fe0c",
+      "head": "9b2f2e2e5074d5849942e9a7d46c3789afa28e46",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-9b2f2e2e5074-8f46b7529e5d0cb9",
+      "head": "9b2f2e2e5074d5849942e9a7d46c3789afa28e46",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-b9b367456c89-e3e43b00af720bb8",
+      "head": "b9b367456c89357c582d51f25ff691510cf976b1",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-c2652593027d-aab4bb8462ba09af",
+      "head": "c2652593027d2d8159cc0b5e8018fffeb5c7700a",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-d4b331039336-0617ce833847a47e",
+      "head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-d4b331039336-e23c05d7fdc5b06d",
+      "head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-e1968cedabab-3ecc51caf7d71bb1",
+      "head": "e1968cedababf574cb74c22a22a28fd12458cf51",
+      "inputs": 2341,
+      "routes": 16,
+      "loader_hashes": 13
+    },
+    {
+      "inventory": "bundle-fea23deaaf2c-fcc5835bc81a3c5d",
+      "head": "fea23deaaf2cba4fb31718a5e1042bc307e9ee7c",
+      "inputs": 2344,
+      "routes": 16,
+      "loader_hashes": 13
+    }
+  ],
+  "fresh_os_witnesses": [
+    {
+      "name": "mysql-tax-write-commit-and-history-current-raw-proof",
+      "pid": 99325,
+      "start_ticks": "4327749",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "99325 (python3) Z 1 99325 99325 0 -1 4227340 6455 1499308 0 0 108 37 4468 1355 20 0 1 0 4327749 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 1 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "mysql-tax-write-commit-and-history-final",
+      "pid": 80086,
+      "start_ticks": "3976677",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "80086 (python3) Z 1 80086 80086 0 -1 4227340 6457 1498899 0 0 114 34 4373 1393 20 0 1 0 3976677 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "mysql-tax-write-current-raw-proof-fixed",
+      "pid": 94870,
+      "start_ticks": "4268830",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "94870 (python3) Z 1 94870 94870 0 -1 4227340 6455 325311 0 0 51 15 836 299 20 0 1 0 4268830 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "mysql-tax-write-damaged-engine-correct-status",
+      "pid": 75467,
+      "start_ticks": "3907468",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "75467 (python3) Z 1 75467 75467 0 -1 4227340 6459 560662 0 0 69 20 1483 448 20 0 1 0 3907468 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "mysql-tax-write-damaged-engine",
+      "pid": 73780,
+      "start_ticks": "3882321",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "73780 (python3) Z 1 73780 73780 0 -1 4227340 6456 206205 0 0 49 15 402 138 20 0 1 0 3882321 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "mysql-tax-write-global-snapshot-old-raw-source",
+      "pid": 92786,
+      "start_ticks": "4200879",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "92786 (python3) Z 1 92786 92786 0 -1 4227340 6455 206678 0 0 43 15 487 175 20 0 1 0 4200879 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 2 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "mysql-tax-write-row-wait-old-raw-source",
+      "pid": 93781,
+      "start_ticks": "4225784",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "93781 (python3) Z 1 93781 93781 0 -1 4227340 6451 206426 0 0 45 11 435 162 20 0 1 0 4225784 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-binding-owner-before-review-repair-transactional-guard",
+      "pid": 72702,
+      "start_ticks": "3865587",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "72702 (python3) Z 1 72702 72702 0 -1 4227340 6449 208189 0 0 36 11 553 61 20 0 1 0 3865587 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-boundary-before-review-repair-corrected",
+      "pid": 72335,
+      "start_ticks": "3860663",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "72335 (python3) Z 1 72335 72335 0 -1 4227340 6447 208091 0 0 38 10 535 65 20 0 1 0 3860663 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-boundary-before-review-repair",
+      "pid": 72016,
+      "start_ticks": "3858821",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "72016 (python3) Z 1 72016 72016 0 -1 4227340 6443 208054 0 0 38 9 526 63 20 0 1 0 3858821 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-four-new-write-config-first-fix",
+      "pid": 70434,
+      "start_ticks": "3801713",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "70434 (python3) Z 1 70434 70434 0 -1 4227340 6447 563396 0 0 37 11 2120 144 20 0 1 0 3801713 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-new-binding-config-old-source",
+      "pid": 69476,
+      "start_ticks": "3629576",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "69476 (python3) Z 1 69476 69476 0 -1 4227340 6444 207977 0 0 38 8 518 66 20 0 1 0 3629576 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 1 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-new-order-config-first-fix",
+      "pid": 70287,
+      "start_ticks": "3799293",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "70287 (python3) Z 1 70287 70287 0 -1 4227340 6449 208249 0 0 44 7 551 68 20 0 1 0 3799293 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-new-order-config-old-source",
+      "pid": 69186,
+      "start_ticks": "3619709",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "69186 (python3) Z 1 69186 69186 0 -1 4227340 6449 207924 0 0 37 10 514 61 20 0 1 0 3619709 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-new-request-config-old-source",
+      "pid": 69335,
+      "start_ticks": "3628868",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "69335 (python3) Z 1 69335 69335 0 -1 4227340 6443 207967 0 0 38 8 506 56 20 0 1 0 3628868 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-new-reviewed-config-old-source",
+      "pid": 69617,
+      "start_ticks": "3630284",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "69617 (python3) Z 1 69617 69617 0 -1 4227340 6444 208100 0 0 38 6 537 56 20 0 1 0 3630284 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-owner-and-boundary-after-review-repair-correct-status",
+      "pid": 73417,
+      "start_ticks": "3876717",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "73417 (python3) Z 1 73417 73417 0 -1 4227340 6450 444506 0 0 40 8 1575 107 20 0 1 0 3876717 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-owner-and-boundary-after-review-repair",
+      "pid": 73156,
+      "start_ticks": "3873310",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "73156 (python3) Z 1 73156 73156 0 -1 4227340 6479 208067 0 0 35 14 549 69 20 0 1 0 3873310 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-owner-and-boundary-before-review-repair",
+      "pid": 71678,
+      "start_ticks": "3853974",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "71678 (python3) Z 1 71678 71678 0 -1 4227340 6479 208068 0 0 37 11 558 77 20 0 1 0 3853974 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-owner-before-review-repair-restored-fixture",
+      "pid": 71971,
+      "start_ticks": "3858814",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "71971 (python3) Z 1 71971 71971 0 -1 4227340 6448 207991 0 0 36 11 526 67 20 0 1 0 3858814 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-reviewed-owner-before-review-repair-transactional-guard",
+      "pid": 72748,
+      "start_ticks": "3865596",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "72748 (python3) Z 1 72748 72748 0 -1 4227340 6476 208220 0 0 40 7 564 74 20 0 1 0 3865596 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-reviewed-owner-before-review-repair",
+      "pid": 72381,
+      "start_ticks": "3860671",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "72381 (python3) Z 1 72381 72381 0 -1 4227340 6474 208157 0 0 38 11 544 66 20 0 1 0 3860671 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-tax-write-affected-current-raw-proof",
+      "pid": 94924,
+      "start_ticks": "4268839",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "94924 (python3) Z 1 94924 94924 0 -1 4227340 6464 6803891 0 0 59 20 44113 1538 20 0 1 0 4268839 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 1 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-tax-write-affected-final",
+      "pid": 80041,
+      "start_ticks": "3976669",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "80041 (python3) Z 1 80041 80041 0 -1 4227340 6462 6803393 0 0 57 20 43205 1554 20 0 1 0 3976669 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-tax-write-global-and-live-cap-final",
+      "pid": 79652,
+      "start_ticks": "3969585",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "79652 (python3) Z 1 79652 79652 0 -1 4227340 6454 793112 0 0 40 8 2438 171 20 0 1 0 3969585 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-tax-write-historical-first-source",
+      "pid": 71142,
+      "start_ticks": "3820923",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "71142 (python3) Z 1 71142 71142 0 -1 4227340 6475 444316 0 0 37 11 1601 123 20 0 1 0 3820923 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 4 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    },
+    {
+      "name": "sqlite-tax-write-live-license-cap",
+      "pid": 75422,
+      "start_ticks": "3907459",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 256,
+      "observed_exit": 1,
+      "raw_stat": "75422 (python3) Z 1 75422 75422 0 -1 4227340 6453 327120 0 0 38 13 638 99 20 0 1 0 3907459 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 256"
+    },
+    {
+      "name": "sqlite-tax-write-withdrawal-and-transport",
+      "pid": 73734,
+      "start_ticks": "3882313",
+      "uid": 1000,
+      "state": "Z",
+      "kernel_exit_code": 0,
+      "observed_exit": 0,
+      "raw_stat": "73734 (python3) Z 1 73734 73734 0 -1 4227340 6480 679691 0 0 37 12 2631 172 20 0 1 0 3882313 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 1 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    }
+  ],
+  "git_unique_objects_verified": 2307,
+  "path_bindings_verified": 42189,
+  "immutable_review_artifacts_verified": 10,
+  "original_failure_classification": {
+    "application_gap_names": [
+      "mysql-tax-write-global-snapshot-old-raw-source",
+      "mysql-tax-write-row-wait-old-raw-source",
+      "sqlite-binding-owner-before-review-repair-transactional-guard",
+      "sqlite-boundary-before-review-repair-corrected",
+      "sqlite-new-binding-config-old-source",
+      "sqlite-new-order-config-old-source",
+      "sqlite-new-request-config-old-source",
+      "sqlite-new-reviewed-config-old-source",
+      "sqlite-reviewed-owner-before-review-repair-transactional-guard"
+    ],
+    "fixture_assertion_names": [
+      "mysql-tax-write-damaged-engine",
+      "sqlite-boundary-before-review-repair",
+      "sqlite-owner-and-boundary-after-review-repair",
+      "sqlite-owner-and-boundary-before-review-repair",
+      "sqlite-owner-before-review-repair-restored-fixture",
+      "sqlite-reviewed-owner-before-review-repair",
+      "sqlite-tax-write-live-license-cap"
+    ],
+    "passed_invocations": 12,
+    "scope_labels_agree_with_direct_JUnit_exit_fields": true
+  },
+  "census_generations": [
+    {
+      "receipt": "database-census-own-autoload-list-only.json",
+      "source_cases": 8763,
+      "source_files": 650,
+      "selected_cases": 2223,
+      "selected_files": 220,
+      "six_artifact_hashes_verified": true,
+      "exact_hash_cleanup_receipt_and_current_absence_verified": true,
+      "expanded_case_union_groups_manifest_hashes_verified": true,
+      "scope": "discovery only"
+    },
+    {
+      "receipt": "database-census-normal-proxy-repaired.json",
+      "source_cases": 8765,
+      "source_files": 650,
+      "selected_cases": 2225,
+      "selected_files": 220,
+      "six_artifact_hashes_verified": true,
+      "exact_hash_cleanup_receipt_and_current_absence_verified": true,
+      "expanded_case_union_groups_manifest_hashes_verified": true,
+      "scope": "discovery only"
+    }
+  ],
+  "original_failure_summaries": {
+    "mysql-tax-write-global-snapshot-old-raw-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot\nA repeatable-read snapshot must not hide the committed peer from NEW global admission.\nFailed asserting that 1 is identical to 0."
+      }
+    ],
+    "mysql-tax-write-row-wait-old-raw-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame\nA current raw proof cannot read through the separately held row lock.\nFailed asserting that null is an instance of class App\\Domain\\Commerce\\ProductionCheckout\\CheckoutException."
+      }
+    ],
+    "sqlite-binding-owner-before-review-repair-transactional-guard": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\"\nHistorical ownership drift must refuse before retaining new evidence.\nFailed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n         'digest' => 'cfdb2b3a67899b3d275ba2f02ea11bbca93bca67f69e15f30d60760d88f94365',\n     ],\n     'production_tax_checkout_bindings' => Array &3 [\n-        'count' => 0,\n-        'digest' => '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945',\n+        'count' => 1,\n+        'digest' => '1a964716e96583bad31fc7d9f8a2611c26269211e80c3bb"
+      }
+    ],
+    "sqlite-boundary-before-review-repair-corrected": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary\nA valid creation-time equality must retain the original request.\nFailed asserting that 0 is identical to 1."
+      }
+    ],
+    "sqlite-new-binding-config-old-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"binding\"\nA withdrawn NEW write reached the physical database.\nFailed asserting that 1 is identical to 0."
+      }
+    ],
+    "sqlite-new-order-config-old-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"order\"\nA withdrawn NEW write reached the physical database.\nFailed asserting that 2 is identical to 1."
+      }
+    ],
+    "sqlite-new-request-config-old-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"request\"\nA withdrawn NEW write reached the physical database.\nFailed asserting that 1 is identical to 0."
+      }
+    ],
+    "sqlite-new-reviewed-config-old-source": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set \"reviewed\"\nA withdrawn NEW write reached the physical database.\nFailed asserting that 1 is identical to 0."
+      }
+    ],
+    "sqlite-reviewed-owner-before-review-repair-transactional-guard": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\"\nHistorical ownership drift must refuse before retaining new evidence.\nFailed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n         'digest' => '5a40169f5aab5956a614d7dbd9c3fabf4e0a44022adc4885e7f12c53aab8187a',\n     ],\n     'production_tax_checkout_reviewed_sessions' => Array &4 [\n-        'count' => 0,\n-        'digest' => '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945',\n+        'count' => 1,\n+        'digest' => '1cd87a25ad7ff7388dcb9c326005281217efb"
+      }
+    ],
+    "mysql-tax-write-damaged-engine": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set \"order\"\nFailed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n Array &0 [\n     0 => 'permanent_schema',\n-    1 => 503,\n+    1 => 409,\n ]"
+      }
+    ],
+    "sqlite-boundary-before-review-repair": [
+      {
+        "type": "InvalidArgumentException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary\nInvalidArgumentException: Database connection [A valid creation-time equality must retain the original request.] not configured."
+      }
+    ],
+    "sqlite-owner-and-boundary-after-review-repair": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\"\nFailed asserting that 409 is identical to 503."
+      }
+    ],
+    "sqlite-owner-and-boundary-before-review-repair": [
+      {
+        "type": "PDOException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\"\nPDOException: SQLSTATE[23000]: Integrity constraint violation: 19 Customer identity is retained"
+      }
+    ],
+    "sqlite-owner-before-review-repair-restored-fixture": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"binding\"\nFailed asserting that 0 is identical to 1."
+      }
+    ],
+    "sqlite-reviewed-owner-before-review-repair": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set \"reviewed\"\nFailed asserting that 0 is identical to 1."
+      }
+    ],
+    "sqlite-tax-write-live-license-cap": [
+      {
+        "type": "PHPUnit\\Framework\\ExpectationFailedException",
+        "summary": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest::test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set \"order\"\nTraceback (most recent call last):\n  File \"/workspace/VA-Studio-tax-write-admission/tests/Support/production_identity_smtp_sink.py\", line 6, in <module>\n    connection, _ = server.accept(); connection.settimeout(8)\n                    ^^^^^^^^^^^^^^^\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py\", line 295, in accept\n    fd, addr = self._accept()\n               ^^^^^^^^^^^^^^\nTimeoutError: timed out"
+      }
+    ]
+  },
+  "support_checks": {
+    "pint_changed_PHP_files": 6,
+    "pint_exit": 0,
+    "current_policy52_exit": 0,
+    "top_level_cadence_routing_exits": [
+      0,
+      0
+    ],
+    "server_stop": {
+      "recorded_utc": "2026-10-15T00:21:34.767327+00:00",
+      "argv": [
+        "docker",
+        "stop",
+        "--timeout",
+        "10",
+        "va-studio-private-mysql-tax-write-20261014"
+      ],
+      "process_exit": 0,
+      "stdout": "va-studio-private-mysql-tax-write-20261014\n",
+      "stderr": "",
+      "scope": "Only this task\u2019s private server stopped after all native checks; named datadir retained; older private servers untouched."
+    },
+    "transport_original": {
+      "recorded_utc": "2026-10-14T22:58:13.161427+00:00",
+      "observations": [
+        "Two independent read-only exec process creations were rejected with exec-server transport disconnected. Neither shell was created.",
+        "Cloud runtime status reported connected/running, failure null, desired/observed spec revision29. This does not diagnose the transport failure.",
+        "A later read-only exec succeeded and found the original native recorder active with its same launch and frozen source; no replacement native workload was started."
+      ],
+      "limits": "No account/session-limit, platform classification cause, or repaired banner claim."
+    },
+    "preparation_original": [
+      {
+        "observed_utc": "2026-10-15T00:00:46.230520+00:00",
+        "operation": "Runtime-only current SQLite skip reconciliation",
+        "original_process_exit": 1,
+        "original_error": "AssertionError: JUnit classname uses dotted namespace; first comparison used it directly against the PHP namespace skip registry.",
+        "affected_state": "Failed before writing any receipt; no source, tests or recorder changed.",
+        "correction": "Normalize JUnit dots to PHP namespace separators before exact pair comparison. Corrected176/153/23 reconciliation completed with exit0."
+      }
+    ]
+  },
+  "initial_full_verification_head": "7cf72a402de3f6e85d7fc4f10cf19be639a642ae",
+  "final_document_only_carry": {
+    "head": "ad4bf751a3302a816eda49dd7951000610fe736c",
+    "from": "7cf72a402de3f6e85d7fc4f10cf19be639a642ae",
+    "paths": [
+      "docs/verification/tax-write-admission-20261014/README.md"
+    ],
+    "transport_count_clarified_without_rewriting_original_receipt": true,
+    "all_other_tracked_bytes_unchanged": true,
+    "archive_index_hashes_unchanged": true,
+    "current_inputs_worktree_and_Git_unchanged_from_verified_source": true,
+    "checked_utc": "2026-10-15T00:33:09.948062+00:00"
+  },
+  "decision": "APPROVE WITH CONDITIONS",
+  "approval_scope": "Exact candidate development merge",
+  "open_P0_P1": [],
+  "required_product_or_packet_repairs": [],
+  "closed_source_P2": [
+    "Historical owner-key projection",
+    "Inclusive request-created/provider-expiry boundary",
+    "Native stale global snapshot currentness"
+  ],
+  "engine_carry": {
+    "six_file_seven_method_comparisons_verified_in_unchanged_archived_checkpoint": true,
+    "target_only_pre_DML_scope": true,
+    "whole_fixture_not_reexecuted_at_d4": true
+  },
+  "adjacent_preexisting_open_P2": "Ordinary membership/ReservationOperations afterCommit throw after physical commit can leave generic refusal; retained for its related physical-commit-witness/throwing-callback regression batch.",
+  "conditions": [
+    "Exact published-head cheap preflight/protections and expected-head merge; independent source-preserving carry for receipt-only successor.",
+    "Existing-request pre-create READ/final-provider-I/O, V2 committed-source/terminal consumer/Paid252 wiring and root registration remain open.",
+    "Actual RR/Serializable next-key behavior without one-transaction isolation overrides or verified canonical uniqueness is needed for gap exclusion; helper does not enforce active isolation, no RC phantom acceptance.",
+    "Earlier engine4/45 carries only damaged target pre-DML refusal, not whole engine fixture or canonical restored-schema/trigger acceptance.",
+    "1205 executed;1213 restoration source-reviewed only; row/metadata waits do not interrupt arbitrary SQL or prove whole-operation wall budget.",
+    "No undo of implicit/direct physical commit, arbitrary external-trigger/blind-writer or overlapping-DDL acceptance.",
+    "Tax255 remains default-off/unmounted/unregistered/test-funds; no host/provider/merchant/tax/live/deploy/import/DNS/cutover/activation or full Foundation/GitLab acceptance.",
+    "Adjacent ordinary membership afterCommit P2 stays frozen for related batch."
+  ],
+  "Pint_native_agent_output_provenance": {
+    "locked_version": "v1.32.1",
+    "dist_reference": "006bd7825eb01daf92959d060b89cd9514fe4253",
+    "installed_PHAR_sha256": "4b88d36765c0d8fa0f9683b29ebee5f6d5a76dffcdecc0e143b8455af2d2e095",
+    "readonly_copy_equals_installed": true,
+    "member_sha256": {
+      "app/Actions/ElaborateSummary.php": "129b0c8e49f84e8819352422aab54fd3d222ac161d709b56171531809bf74c72",
+      "app/Factories/ConfigurationResolverFactory.php": "d66ff9cbc1320056bb960eda9b1165376fb55f0a9d81a87afb0bba05b8ca6f95",
+      "app/Output/AgentReporter.php": "6ceeba621f3d38ed01eb8e77662d3bb09260d418a2b11761e5f1f808ff811aa6"
+    },
+    "JSON_stdout_is_native_agent_format": true,
+    "inspection": "Passive built-in PHAR getContent; no Pint/app/test command run"
+  },
+  "independent_verifier_script_hashes": {
+    "tax-write-independent-final-verify-7cf72a40-20261015.py": "00eca74698c711acc3fca8c79e9b4a3180e414d422bcbab34b1b2818f2cf7e56",
+    "tax-write-independent-final-supplement-20261015.py": "b18e7e5a5ad0a6a4777f41da702ed0f8db7e31381acfde0921831be24638a681"
+  },
+  "reviewer_checker_adjustments": [
+    "Identity uses canonical JSON digest, not serialized indentation hash; archive raw member hashes independently verified.",
+    "Original application-gap scope exact prefix excludes fixture labels explicitly saying not an oracle.",
+    "Numeric PHPUnit dataset labels normalized alongside named labels for full176 identity comparison."
+  ],
+  "final_decision_utc": "2026-10-15T00:43:00.227500+00:00",
+  "reviewer_executed_application_DB_tests_CI": false,
+  "reviewer_tracked_edits": false
+}
