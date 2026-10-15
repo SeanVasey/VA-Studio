@@ -589,7 +589,9 @@ class PaidTaxGrantJourneyTest extends TestCase
         $mutated = null;
         $calls = 0;
         $connection->beforeStartingTransaction(static function () use ($kind, $connection, $replacement, $hooks, &$calls, &$mutated): void {
-            $calls++;
+            if ($calls++ !== 0) {
+                return;
+            }
             if ($kind === 'dispatcher') {
                 $connection->setEventDispatcher($replacement);
             } elseif ($kind === 'append') {
@@ -618,14 +620,17 @@ class PaidTaxGrantJourneyTest extends TestCase
             }
             $this->assertDatabaseCount('paid_tax_order_origins', 0);
         } finally {
-            $hooks->setValue($connection, $before);
-            $connection->setEventDispatcher($delegate);
             if ($connection->transactionLevel() > 0) {
                 $connection->rollBack();
             }
         }
-        $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
-        $this->assertSame($f['order']['orderId'], $retry['orderId']);
+        try {
+            $retry = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->assertSame($f['order']['orderId'], $retry['orderId']);
+        } finally {
+            $hooks->setValue($connection, $before);
+            $connection->setEventDispatcher($delegate);
+        }
     }
 
 }
