@@ -42,9 +42,11 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
         $transfer = $this->transfer(str_repeat('p', 1048576));
         $this->tick = 31_000_000_000;
         $sent = 0;
-        $this->expired(fn () => $transfer->writeTo(function (string $chunk) use (&$sent): void {
-            $sent += strlen($chunk);
-        }));
+        $this->expired(function () use ($transfer, &$sent): void {
+            $transfer->writeTo(function (string $chunk) use (&$sent): void {
+                $sent += strlen($chunk);
+            });
+        });
         $this->assertSame(0, $sent);
     }
 
@@ -52,10 +54,12 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
     {
         $transfer = $this->transfer(str_repeat('p', 2097152));
         $sent = 0;
-        $this->expired(fn () => $transfer->writeTo(function (string $chunk) use (&$sent): void {
-            $sent += strlen($chunk);
-            $this->tick = 100_000_000_000; // 1MiB needs <=30+64 seconds at16KiB/s.
-        }));
+        $this->expired(function () use ($transfer, &$sent): void {
+            $transfer->writeTo(function (string $chunk) use (&$sent): void {
+                $sent += strlen($chunk);
+                $this->tick = 100_000_000_000; // 1MiB needs <=30+64 seconds at16KiB/s.
+            });
+        });
         $this->assertSame(1048576, $sent, 'No second chunk leaves after the returning consumer misses progress.');
     }
 
