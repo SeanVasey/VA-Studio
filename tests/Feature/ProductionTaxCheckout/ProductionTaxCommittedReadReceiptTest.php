@@ -15,6 +15,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityHistoricalCommittedReceipt;
+use App\Domain\Customers\ProductionIdentity\IdentityOriginalCommitWitness;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use Illuminate\Container\Container;
@@ -28,6 +29,7 @@ use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use PDO;
@@ -1110,6 +1112,112 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertFalse($reader->identityPrimary()->inTransaction());
         $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
     }
+
+    public function test_nonarray_facade_cache_is_refused_before_terminal_witness_offset_callback(): void
+    {
+        $this->assertTerminalMetadataRefused('facade');
+    }
+
+    public function test_nonarray_primary_config_is_refused_before_terminal_witness_offset_callback(): void
+    {
+        $this->assertTerminalMetadataRefused('connection');
+    }
+
+    private function assertTerminalMetadataRefused(string $slot): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $delegate = $connection->getEventDispatcher();
+        $property = new \ReflectionProperty($slot === 'facade' ? Facade::class : Connection::class,
+            $slot === 'facade' ? 'resolvedInstance' : 'config');
+        $owner = $slot === 'facade' ? null : $connection;
+        $original = null;
+        $cache = null;
+        $source = null;
+        $receipt = null;
+        $callbacks = 0;
+        $error = null;
+        $delegate->listen(TransactionCommitting::class, function ($event) use ($connection, $property, $owner, &$original, &$cache): void {
+            if ($event->connection === $connection && $cache === null) {
+                $original = $property->getValue($owner);
+                $cache = new TaxCallbackTerminalMetadataFixture($original);
+                $property->setValue($owner, $cache);
+            }
+        });
+        try {
+            try {
+                $connection->transaction(function () use ($f, $locator, $connection, $pdo, &$source, &$receipt, &$callbacks): void {
+                    $reader = $this->reader();
+                    $source = $this->source($f, $locator, $reader);
+                    $receipt = $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
+                    $pdo->exec('INSERT INTO tax_receipt_probe VALUES (1, 9123)');
+                    $connection->afterCommit(function () use (&$callbacks): void {
+                        $callbacks++;
+                    });
+                });
+            } catch (CheckoutException $failure) {
+                $error = $failure;
+            }
+            $this->assertInstanceOf(TaxCallbackTerminalMetadataFixture::class, $cache);
+            $this->assertSame(0, $cache->terminalCalls, 'Terminal identity witness preparation dispatched metadata offset code.');
+            $this->assertInstanceOf(CheckoutException::class, $error);
+            $this->assertSame('committed_read_frame', $error->reason);
+        } finally {
+            if ($original !== null) {
+                $property->setValue($owner, $original);
+            }
+            $source?->abortOwnedFrame();
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
+        }
+        $this->assertFalse($pdo->inTransaction());
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertSame(0, $callbacks);
+        $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM tax_receipt_probe')->fetchColumn());
+        $connection->transaction(function () use ($connection, &$callbacks): void {
+            $connection->afterCommit(function () use (&$callbacks): void {
+                $callbacks++;
+            });
+        });
+        $this->assertSame(1, $callbacks, 'Owned cleanup leaked an old callback or removed the new owner callback.');
+        $this->assertSame($delegate, $connection->getEventDispatcher());
+    }
+
+    #[DataProvider('stringableConnectionFields')]
+    public function test_birth_refuses_stringable_primary_metadata_before_coercion(string $field): void
+    {
+        [$f, $locator] = $this->paid();
+        $connection = DB::connection();
+        $connection->beginTransaction();
+        $reader = $this->reader();
+        $identity = $f['access']->verifyHistoricalBinding($locator->historicalBuyerBinding(), $reader);
+        $property = new \ReflectionProperty(Connection::class, $field);
+        $original = $property->getValue($connection);
+        $value = new TaxStringableConnectionMetadataFixture($original);
+        $property->setValue($connection, $value);
+        $error = null;
+        try {
+            try {
+                ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $identity);
+            } catch (CheckoutException $failure) {
+                $error = $failure;
+            }
+            $this->assertSame(0, $value->calls, 'Literal source birth coerced connection metadata through a callback.');
+            $this->assertInstanceOf(CheckoutException::class, $error);
+            $this->assertSame('committed_read_frame', $error->reason);
+        } finally {
+            $property->setValue($connection, $original);
+            $connection->rollBack();
+        }
+    }
+
+    public static function stringableConnectionFields(): iterable
+    {
+        yield 'database' => ['database'];
+        yield 'tablePrefix' => ['tablePrefix'];
+    }
 }
 
 final class TaxReceiptAdmissionFixture implements ProductionTaxPaidOrderConsumerCommitAdmissionV2
@@ -1208,5 +1316,36 @@ final class TaxCallbackEnvironmentDescriptorFixture extends \ArrayObject
         }
 
         return parent::offsetGet($key);
+    }
+}
+
+final class TaxCallbackTerminalMetadataFixture extends \ArrayObject
+{
+    public int $terminalCalls = 0;
+
+    public function offsetGet(mixed $key): mixed
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+            if (($frame['class'] ?? null) === IdentityOriginalCommitWitness::class && ($frame['function'] ?? null) === 'prepareOriginalCommit') {
+                $this->terminalCalls++;
+                break;
+            }
+        }
+
+        return parent::offsetGet($key);
+    }
+}
+
+final class TaxStringableConnectionMetadataFixture implements \Stringable
+{
+    public int $calls = 0;
+
+    public function __construct(private readonly string $value) {}
+
+    public function __toString(): string
+    {
+        $this->calls++;
+
+        return $this->value;
     }
 }
