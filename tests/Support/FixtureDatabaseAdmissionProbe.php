@@ -15,10 +15,10 @@ class FixtureDatabaseAdmissionProbe extends TestCase
     use DatabaseTransactions;
     use DatabaseTruncation;
     use RefreshDatabase {
-        refreshTestDatabase insteadof DatabaseMigrations;
-        beforeRefreshingDatabase insteadof DatabaseMigrations;
-        afterRefreshingDatabase insteadof DatabaseMigrations;
-        connectionsToTransact insteadof DatabaseTransactions;
+        RefreshDatabase::refreshTestDatabase insteadof DatabaseMigrations;
+        RefreshDatabase::beforeRefreshingDatabase insteadof DatabaseMigrations;
+        RefreshDatabase::afterRefreshingDatabase insteadof DatabaseMigrations;
+        RefreshDatabase::connectionsToTransact insteadof DatabaseTransactions;
     }
 
     public function createApplication()
