@@ -52,10 +52,14 @@ abstract class TestCase extends BaseTestCase
     protected function requireFixtureDatabase(?string $name = null): Connection
     {
         $connection = $this->app['db']->connection($name);
-        $keys = array_flip(['driver', 'database', 'host', 'port', 'unix_socket', 'url']);
         $configured = $this->app['config']->get('database.connections.'.$connection->getName());
-        if (! is_array($configured) || array_intersect_key($configured, $keys) !== array_intersect_key($connection->getConfig(), $keys)) {
+        if (! is_array($configured) || ! in_array($configured['url'] ?? null, [null, ''], true)) {
             throw new LogicException('Disposable test database admission refused.');
+        }
+        foreach (['driver', 'database', 'host', 'port', 'unix_socket'] as $key) {
+            if (($configured[$key] ?? null) !== $connection->getConfig($key)) {
+                throw new LogicException('Disposable test database admission refused.');
+            }
         }
 
         return $this->testDatabaseSelection->admit($connection);
