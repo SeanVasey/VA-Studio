@@ -72,4 +72,17 @@ final class PaidTaxProjectionRead implements JsonSerializable
     }
 
     private function __clone() {}
+
+    /** Abandon only the original body sibling; withdrawal/expiry must never prevent cleanup. */
+    public function abandon(): void
+    {
+        $this->used = true;
+        $producer = $this->producer;
+        $this->producer = null;
+        try {
+            $producer?->abortOwnedFrame();
+        } catch (Throwable) {
+            // Preserve durable commits, peer/reopened frames and replacement dispatchers.
+        }
+    }
 }

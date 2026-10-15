@@ -1,0 +1,100 @@
+{
+  "additional_preparation_failure": {
+    "error": "SyntaxError: unterminated triple-quoted string literal (detected at line 4)",
+    "new_php_invocations": 0,
+    "overall_tool_command_exit": 2,
+    "scope": "Root preparation syntax error before any new runner/launcher file or PHP invocation. Original tool command ended2 after Python SyntaxError and missing launcher; no application outcome. Source/tests/vendor/loaders unchanged. Corrected with structured JSON and fail-fast shell."
+  },
+  "classification": "One actual MissingAppKeyException in first Storefront request,0assertions; root-registration file unexecuted. Missing synthetic local key environment, not a product/library repair or regression oracle.",
+  "component_carry": "Accept exact six completed source/runtime components of failed original; do not repeat71 solely to obtain a green whole exit. Final two files need direct current outcome/stability/OS. Never claim whole8-file pass or aggregate85-case single green invocation.",
+  "component_groups": {
+    "Tests\\Feature\\CustomerSessionHttpTest": {
+      "assertions": 118,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 9
+    },
+    "Tests\\Feature\\PaidGrantHttpJourneyTest": {
+      "assertions": 648,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 19
+    },
+    "Tests\\Feature\\PaidTaxDeliverySchemaRecoveryTest": {
+      "assertions": 2179,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 5
+    },
+    "Tests\\Feature\\PaidTaxDownloadJourneyTest": {
+      "assertions": 185,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 18
+    },
+    "Tests\\Feature\\PaidTaxDownloadNativeTest": {
+      "assertions": 0,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 3,
+      "tests": 3
+    },
+    "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+      "assertions": 131,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 17
+    },
+    "Tests\\Feature\\StorefrontMetadataTest": {
+      "assertions": 0,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1
+    }
+  },
+  "continuation": {
+    "manifest_unchanged": true,
+    "new_runner_sha256": "b19345d0105e7d37ecaaeb7bc042bcc8d944cc2ae1cf218cda813390ed121a65",
+    "original_runner_sha256": "69e7a7e0ba124e86afdc5e4797c6c7ff982803789ac7234473ab452e979187e0",
+    "outcome": "Pending; no expected14-case outcome or OS exit asserted.",
+    "runner_diff_only": "Generate ephemeral random32-byte APP_KEY; exclude rawkey from public environment and record configured descriptor.",
+    "selected_files": [
+      "tests/Feature/StorefrontMetadataTest.php",
+      "tests/Feature/PaidGrantRootRegistrationTest.php"
+    ],
+    "source_sha_unchanged": true
+  },
+  "decision": "ACCEPT SIX COMPLETED COMPONENTS AND TWO-FILE CONTINUATION PLAN",
+  "not_performed": [
+    "No tests/DB/Composer/network/CI execution or shared mutation"
+  ],
+  "original_invocation_status": "FAIL:72/3261/F0E1S3; PHP2/recorder1/launch-bound OS1",
+  "original_receipts": {
+    "launch-sqlite-current-runtime-tax-and-http.json": "1f9ba603fa90496782103d148c5b5c2a4227c2056a2f426fd0873e370de8ece0",
+    "observed-os-exit-sqlite-current-runtime-tax-and-http.json": "4eeeaf37e861f070ead6858b14a4705cb0a7cae00cbc84ab107cfb1c25e4dac2",
+    "sqlite-current-runtime-tax-and-http/command.json": "54ce30d51cee3b813187350dab640b92695b9366ec9828a04d3987e56a229b63",
+    "sqlite-current-runtime-tax-and-http/junit.xml": "9a5753279ed55714a19fb80ab62e92f612495621cf66b288653cb1a4757452ac",
+    "sqlite-current-runtime-tax-and-http/log.txt": "189be10cf914a4c8d36cc6b80c0b05f1fd64f841ef6dba6ac2643bb40cae5ab9",
+    "sqlite-current-runtime-tax-and-http/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "sqlite-current-runtime-tax-and-http/result.json": "cf09b77ab71e7d9e5433c410e29755630e9e7502cb21e6935c983b27003ed6ef"
+  },
+  "recorded_utc": "2026-10-15T10:35:12.711868+00:00",
+  "remaining_gates": [
+    "Complete continuation and final sealed supplemental evidence/exact-head review.",
+    "Cheap exact-head preflight and expected-SHA merge; no settings bypass or activation."
+  ],
+  "reviewed_sha": "bb86ceec1f1106890f4ab605009fb67091ca35f3",
+  "six_complete_component_totals": {
+    "assertions": 3261,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 3,
+    "tests": 71
+  }
+}

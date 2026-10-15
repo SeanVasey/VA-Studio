@@ -1,0 +1,67 @@
+{
+  "all_cases_and_groups_exactly_once": true,
+  "discovery_only": true,
+  "nonempty_shards": [
+    {
+      "cases": 317,
+      "files": 27,
+      "index": 1
+    },
+    {
+      "cases": 282,
+      "files": 27,
+      "index": 2
+    },
+    {
+      "cases": 266,
+      "files": 27,
+      "index": 3
+    },
+    {
+      "cases": 356,
+      "files": 39,
+      "index": 4
+    },
+    {
+      "cases": 259,
+      "files": 27,
+      "index": 5
+    },
+    {
+      "cases": 289,
+      "files": 27,
+      "index": 6
+    },
+    {
+      "cases": 290,
+      "files": 28,
+      "index": 7
+    },
+    {
+      "cases": 274,
+      "files": 27,
+      "index": 8
+    }
+  ],
+  "not_executed_tests": true,
+  "original_output_SHA256": {
+    "census-final-phpunit-ci-mysql-1-tests.xml": "b5346ae849baa2811d1ff877ddcf2de5316478fae66a4e9dbe87613d12aad7be",
+    "census-final-phpunit-ci-mysql-2-tests.xml": "c0830d1f4efa71c7f39603af79597a4cca09acbcfc4e09992a858f92b368f497",
+    "census-final-phpunit-ci-mysql-3-tests.xml": "14697eff087d770151872534e7a26302a6ac417834dba782f77145510e00f8f5",
+    "census-final-phpunit-ci-mysql-4-tests.xml": "e6544e97aba6c5728ff238f98a0f520f913cc72cc13588cb0f887ad384cb5d53",
+    "census-final-phpunit-ci-mysql-5-tests.xml": "6c5ed0d4f9372a7ec3427918f3839eac8ce816e43208d4cd9d9c0a4eb001fd6c",
+    "census-final-phpunit-ci-mysql-6-tests.xml": "360e07c398c941974af140c1cc921257c3c7d665b2257ab0a1459d0114836af4",
+    "census-final-phpunit-ci-mysql-7-tests.xml": "7c0c92980698a98a986ebbe906051c0c85ed7fd42018f70af994bc26bd9280e3",
+    "census-final-phpunit-ci-mysql-8-tests.xml": "e5071388fd7751bef2e6f0bc675e12a41025cfde432f820859bedbe22200f3d6",
+    "census-final-phpunit-ci-mysql-source-tests.xml": "06d7ef4050d7c89a1dde349c3a474d9664ff12915d14eb70160ab72dbf791423"
+  },
+  "reviewed_policy_selected_cases": 2333,
+  "reviewed_policy_selected_files": 229,
+  "reviewed_sha": "4ca23ebbf51c9b819eec5135402601bcbfca1e85",
+  "selected_case_identity_hash_matches": true,
+  "source_XML_cases": 8880,
+  "source_XML_files": 662,
+  "source_case_and_group_identity_hashes_match": true,
+  "source_phpunit_configuration_hash_matches": true,
+  "timing_fallback_files": 66
+}

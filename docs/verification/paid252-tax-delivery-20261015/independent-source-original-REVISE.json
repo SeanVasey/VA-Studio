@@ -1,0 +1,211 @@
+{
+  "kind": "Independent bounded first implementation/source checkpoint, not evidence approval",
+  "decision": "REVISE SOURCE \u2014 FOUR MATERIAL P2 CORRECTIONS REQUIRED",
+  "reviewed_commit": "f2cefff70473349c4273ff4dd1e1aab9880d48ff",
+  "approved_design": "9a3eb4eab955c9dee8bb73677dc01259792d54fc",
+  "observed_head_at_artifact": "92f15d155886c9c2387877a804ccf2be360f4b0c",
+  "changed_paths": [
+    "app/Domain/Grants/PaidTax/PaidTaxDeadline.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliveryRecords.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliverySchema.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDownloads.php",
+    "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php",
+    "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRequestBudget.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+    "app/Domain/Grants/PaidTax/PaidTaxTransfer.php",
+    "config/paid-tax-grants.php",
+    "database/migrations/2026_10_15_252200_paid_tax_delivery.php",
+    "docs/verification/paid252-tax-delivery-20261015/independent-design-DECISION.json",
+    "docs/verification/paid252-tax-delivery-20261015/independent-design-DECISION.md",
+    "docs/verification/paid252-tax-delivery-20261015/independent-design-original-REVISE.json",
+    "docs/verification/paid252-tax-delivery-20261015/independent-design-original-REVISE.md",
+    "tests/Feature/PaidTaxDownloadJourneyTest.php"
+  ],
+  "product_paths": [
+    "app/Domain/Grants/PaidTax/PaidTaxDeadline.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliveryRecords.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDeliverySchema.php",
+    "app/Domain/Grants/PaidTax/PaidTaxDownloads.php",
+    "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php",
+    "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRequestBudget.php",
+    "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+    "app/Domain/Grants/PaidTax/PaidTaxTransfer.php",
+    "config/paid-tax-grants.php",
+    "database/migrations/2026_10_15_252200_paid_tax_delivery.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDeadline.php",
+      "git_blob": "2b9e383496f31aae42b4f1f9e7b7ef2b3e9e38bf",
+      "sha256": "586e81d10e33816c523849b587944563784f2f7e4cedc1af0442480c343bc65f"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php",
+      "git_blob": "55e9ba263efd4b10f213c6939a56d0f2c54a259b",
+      "sha256": "589e41624f14f1f44ab2df01a1b896c1d15cc99a01680dcb11f16a70f8744d4e"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDeliveryRecords.php",
+      "git_blob": "76991c248b910652e026e9ebdb4d57efd5099432",
+      "sha256": "22b93e3b94662a72bdf1e9113c0d757be2913344968868e709e6dc0fb60342fb"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDeliverySchema.php",
+      "git_blob": "01966a9528c805cbf78670458819cb6013d70cfa",
+      "sha256": "f161ba769e20caeb39bbec7d750470234173c6395bec9ab645e070cae1da5c0e"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxDownloads.php",
+      "git_blob": "a4602cb848a91fbbb5f22b51b791db42319cfc9a",
+      "sha256": "41016236a57ad8141192ed527bb05ee67c8d9a4d2247fe68439b75e793169992"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php",
+      "git_blob": "f9b2b27780c73e48f58799a223189e82445ece14",
+      "sha256": "89d7e57ef9e96f95a7c9c63e4bf93e5291f5dd92af458aa0911435b911f6bf4e"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxProjectionRead.php",
+      "git_blob": "bb2e4d613d3f84c5eac54cb543723e0257045a49",
+      "sha256": "337417d9917c8d131f5f099dffacf1faf9adff7b7576182875bf0ee29d6d5750"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRequestBudget.php",
+      "git_blob": "cad9ca2c593cb736fa343d2a9142c50ebf60d336",
+      "sha256": "364273b6c14b46121ed75b9d6b0da7bfd16e9c1ae8d2d409138efdc738151f9f"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxRows.php",
+      "git_blob": "020da9616d88ef595813b9f44742cf9b7a82f1c5",
+      "sha256": "c54c61ad15f9ff64e689717485d21962a76b9538facc6d287bc0a6fd61682d19"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxTransfer.php",
+      "git_blob": "942f186fd9e04ff35b83e6b6edb0798396de73b4",
+      "sha256": "67ec25b7f4853d3f606cba2f774870c26247399b2dd7f5bf6244c6fba69ecfc0"
+    },
+    {
+      "path": "config/paid-tax-grants.php",
+      "git_blob": "a83c6f2943705b4dc3e5b5c9fa6e84e422a646c3",
+      "sha256": "4f36ecfefc1f4a44d87da0f3b95ac72b1d14f885a5b97e123b7e3b92f67a1f32"
+    },
+    {
+      "path": "database/migrations/2026_10_15_252200_paid_tax_delivery.php",
+      "git_blob": "328c7e68afa0a4aa7f30e689e060506c0d414ed5",
+      "sha256": "7d78bb5813a63f476823400a0c9514a92a1e9ebe1abce9892a0670fc907d48d4"
+    },
+    {
+      "path": "tests/Feature/PaidTaxDownloadJourneyTest.php",
+      "git_blob": "f576d79c70050db03991df639fe7f79ae3acfab3",
+      "sha256": "9ee45c3c12032b120eb71ce9fe4b932a93d56da8f3f9b8b45937cf2524cb4ff0"
+    }
+  ],
+  "protected_v1_old_schema_and_profile_delta": [],
+  "findings": [
+    {
+      "id": "PTD-R1",
+      "severity": "P2",
+      "confidence": "High: exact source selector coverage",
+      "paths": [
+        "app/Domain/Grants/PaidTax/PaidTaxDownloads.php:112",
+        "app/Domain/Grants/PaidTax/PaidTaxDownloads.php:131",
+        "app/Domain/Grants/PaidTax/PaidTaxDownloads.php:235",
+        "app/Domain/Grants/PaidTax/PaidTaxDownloads.php:65"
+      ],
+      "finding": "Recent issuance and the actual latest-history selector are absent from terminal snapshots. authorize checks the origin recent-window count<3, but captures only chosen authorization and origin redemptions. status snapshots history with id BETWEEN minimum and maximum, excluding a newer append above captured maximum.",
+      "consequence": "A permitted late TransactionCommitting append can produce a fourth recent authorization without changing selected auth/attempts, or leave current status missing the latest auth. Healthy uniqueness does not constrain three-per60 issuance or forbid an unrelated new request key.",
+      "required_repair": "Capture exact bounded post-insert origin/recent-window set (four sentinel) through current/prepared/closed/body proofs. For latest history capture a bounded selector that notices appended higher IDs, e.g.origin andid>=minimum with21 sentinel and exact expected selected rows; preserve selected ordering/bounds.",
+      "meaningful_regression": "Real current synthetic producer/original; create existing recent auths, append a fresh schema-valid auth in ordinary committing listener after operation, require original issuance rollback/refusal, unchanged legitimate prior rows and fresh retry. Separate late latest-history append refusal."
+    },
+    {
+      "id": "PTD-R2",
+      "severity": "P2",
+      "confidence": "High: scalar-only adapter checks",
+      "paths": [
+        "app/Domain/Grants/PaidTax/PaidTaxDownloads.php:181",
+        "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php:24",
+        "app/Domain/Grants/PaidTax/PaidTaxPrepareStream.php:582"
+      ],
+      "finding": "The new snapshot adapter receives only the scalar snapshotDeadline. Its own within checks do not retain the original PaidTaxRequestBudget and cannot observe min-only shortening inside a permitted resolver/file/flush callback until redeem checks afterhandle returns.",
+      "consequence": "Own copying/readback may continue beyond the live request allowance even though eventual post-return refusal prevents an attempt. This violates the promised live ceiling at the adapter check points; it is not a claimed frozen-helper interruption defect.",
+      "required_repair": "Pass/retain the exact typed budget for this owned snapshot operation and check min(captured phase deadline,current live budget.value) at helper pre/post and all own copy/readback checkpoints. Never recapture source/time or extend a deadline. Maintain explicit no immediate interruption inside frozenhelpers/blocking I/O.",
+      "meaningful_regression": "Shorten the genuine original Budget in a permitted callback immediately before own copy/flush/readback; require timelycheck refusal/no committed redemption and exact owned cleanup; preserve original artifact/asset bytes."
+    },
+    {
+      "id": "PTD-R3",
+      "severity": "P2",
+      "confidence": "High: first-only elapsed check",
+      "paths": [
+        "app/Domain/Grants/PaidTax/PaidTaxTransfer.php:37",
+        "app/Domain/Grants/PaidTax/PaidTaxTransfer.php:46",
+        "app/Domain/Grants/PaidTax/PaidTaxTransfer.php:49"
+      ],
+      "finding": "Tick+(hrtime-system) adjusts callback/proof elapsed time only for the first chunk. Later chunks check the injected clock returned tick then handoff without a pure elapsed check.",
+      "consequence": "A later clock callback may sample an admissible tick, delay past the original transfer deadline, then return that stale tick; the next private chunk is handed off after its bound.",
+      "required_repair": "Apply the captured tick plus real elapsed check immediately before every consumer handoff. Keep the original authority sibling/request-first-byte ceiling first-only; no perpetual reauthorization or cap changes.",
+      "meaningful_regression": "Real multi-chunk prepared descriptor, initial chunk succeeds; later clock samplesvalidtick then truly delays beyond original deadline and returns it. Require no laterchunk delivery, one honest committed attempt and descriptor/observer cleanup."
+    },
+    {
+      "id": "PTD-R4",
+      "severity": "P2",
+      "confidence": "High: pending state equals public admission flag",
+      "paths": [
+        "app/Domain/Grants/PaidTax/PaidTaxRows.php:218",
+        "app/Domain/Grants/PaidTax/PaidTaxRows.php:167",
+        "app/Domain/Grants/PaidTax/PaidTaxRows.php:235"
+      ],
+      "finding": "admitDelivery sets deliveryInputs nonnull before new-table open/fullassertInstalled/captured definitions complete. qualifiedTable and deliveryInputs treat that nonnull captured state as completed admission.",
+      "consequence": "Permitted reentrant grammar/schema callbacks can access new tables or DeliveryRecords before complete exact own-schema admission. New records require onlydeliveryInputs getter, so pending capture is insufficient accessguard.",
+      "required_repair": "Separate captured/pending technical inputs from explicit completed-delivery admission. Permit only private enrollment opens/definition reads while pending; public table/rows/records/deliveryInputs require completed flag. Set flag only after exact whole inspection, original definition equality and live frame/config checks.",
+      "meaningful_regression": "Genuine admitted reader/native frame with a permitted schema grammar callback attempting public new-table read/insert while plan/assertInstalled on stack; require refusal before DML, original frame/callback cleanup, then genuine standard admission positive."
+    }
+  ],
+  "open_p0_p1_identified": false,
+  "required_material_repairs": [
+    "PTD-R1",
+    "PTD-R2",
+    "PTD-R3",
+    "PTD-R4"
+  ],
+  "sound_mechanics": [
+    "Separate newtwo-table own schema/forward migration uses ordinary users/accounts plus own authorization FK, no old-five incoming references. Own DeliveryRecords specs reuse only typed encode/decode.",
+    "Tax domain HMAC uses captured raw literal key and technical inputs separated from retained purchase policy. Every current/prepared/closed Rows proof compares those original literals.",
+    "Request capture precedes Carbon/config work, age debitedonce, original overall initial+snapshot+60, min-only ceiling and exactBudget-owned receivedAt. Direct suppliedInstant withoutmatchingBudget is currently refused; no standalone Tax legacy compatibility claim.",
+    "Two fresh authenticated command frames enclose physical snapshot; immutable inspection matches and current originattemptset/max is rechecked before one unique redemption, then captured postwrite for pure source/consumer/closed/body proofs.",
+    "Transfer birth conservatively precedes commit command; first NONEMPTY chunk occurs after generic stream/seek/read+clock callbacks, then consumer callback-phase/source sibling/rawowner proof before pure timing/handoff.",
+    "Explicit projection abandonment and transfer close/destructor use original sibling abort, preserve durable attempts/reopened peers/replacements and never genericrollback or proof renewal. Stream replay/serialize/unserialize/clone refused.",
+    "Shared key/own ownerrelease snapshotTTL max660 or phase+60 capped1860; document660 untouched. Private separately named spool retains copied boundedlease/reservation/readback/unlink hygiene; original artifact is never overwritten."
+  ],
+  "evidence_status": {
+    "first_f2_real_sqlite_journey": "Was active at source-review request; no completed pass inspected or claimed.",
+    "later_test_only_50dd22d7": "Author reported6/89F1 in later test-only selection, unknown mutation persistence cause; not independently reconciled here, not attributed to production/fixture by this source review.",
+    "native_schema_races_adversarial_evidence": "Pending; source reading alone cannot approve final development or merge."
+  },
+  "required_remaining_evidence": [
+    "Meaningful original-source behavioral oracles for all four findings, then repaired-source focused checks.",
+    "All target kinds/two lines/idempotency/caps/status/expiry/wrong batch-origin-owner-token-producer/partial-damaged originals, late key/source/policy/actor/budget callbacks and exact frame/observer cleanup.",
+    "Throwing commit/afterCommit, pre-callback failure and never-started disposal, honest spentattempt + fresh authorization retry.",
+    "Populated oldnew schemas/all selectedprefixes/drift no-mutation/temporary-engine refusal and independent MySQL duplicate authorization/redemption/final-limit races with captured process/runtime/source provenance.",
+    "Affected oldTax/V1/profile byte comparisons, Pint/CI policy, independent coherent tested-source/final packet review and exact-head publication gates."
+  ],
+  "limits": [
+    "No app/test/DB/container/network/CI execution, no tracked edits; own runtime notes only.",
+    "No implementation/full evidence/development merge approval; no HTTP/root/host/provider/activation/commercial/release acceptance.",
+    "Uninterruptible helper/SQL/output behavior, native general isolation/deadlock/DDL/trigger/reconnect/invisible-reopen/distributed cache/all-familycapacity/physicalsystem conditions remain open.",
+    "Frozen V1/identity/shared metadata and ordinary-membership throwing-afterCommit P2s remain outside this owned family batch."
+  ],
+  "read_commands": [
+    "git rev-parse/status/diff/stat at exactf2 versusapproved9a3",
+    "Read/numbered source of DeliveryPolicy/Records/RequestBudget/Transfer/Downloads and Rows/Deadline/ProjectionRead diffs",
+    "Read newDeliverySchema plus exact diffagainstoldPaidTaxSchema; read newPrepareStream + current shared frozen helper/stream composition",
+    "Read initial genuine journey source, no test execution"
+  ],
+  "verdict_axes": {
+    "specification": "Four exact contract/callback/time/admission gaps require owned-source repair.",
+    "engineering_quality": "Feasible core separation and ownership, but no source approval while material selector/time/admission gaps remain."
+  }
+}

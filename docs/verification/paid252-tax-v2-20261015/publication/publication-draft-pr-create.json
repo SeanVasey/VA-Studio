@@ -1,0 +1,24 @@
+{
+  "recorded_utc": "2026-10-15T07:56:42.582267+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "create",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--base",
+    "main",
+    "--head",
+    "harness/paid252-tax-v2-20261015",
+    "--draft",
+    "--title",
+    "Retain Tax V2 paid origins and private first originals",
+    "--body-file",
+    "/workspace/runtime/paid252-tax-v2-pr-body.md"
+  ],
+  "head": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+  "process_exit": 0,
+  "stdout": "https://github.com/SeanVasey/VA-Studio/pull/122\n",
+  "stderr": "",
+  "body_sha256": "c9edb78df162173da6f3de1276a28e04281c86382b5656afde5bfd18d0e5b167"
+}

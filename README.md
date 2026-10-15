@@ -98,13 +98,13 @@ The separate **Test order preparation** action requires explicit local/testing o
 
 ## Stack
 
-Laravel 13 / PHP 8.4+, Inertia 3 / React / TypeScript, Filament 5. MySQL 8.4 is the production database target; SQLite is supported for local development. Redis jobs and private S3-compatible storage are staged behind later work packages. Keep the stack modular within one application and one transactional database.
+Laravel 13 / PHP 8.4.1+, Inertia 3 / React / TypeScript, Filament 5. MySQL 8.4 is the production database target; SQLite is supported for local development. Redis jobs and private S3-compatible storage are staged behind later work packages. Keep the stack modular within one application and one transactional database.
 
 No LLM is required by the storefront runtime. Astra is the requested development lead, not a dependency exposed to customers.
 
 ## Run locally
 
-Prerequisites: a currently patched PHP 8.4 or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24.15+ (within Node 24); npm. Use your platform's supported installers.
+Prerequisites: a currently patched PHP 8.4.1+ or 8.5 with `pdo_sqlite`, `pdo_mysql`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, and `curl`; Composer 2; Node 24.15+ (within Node 24); npm. Use your platform's supported installers.
 
 ```sh
 composer install

@@ -1029,6 +1029,14 @@
     [
       "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
       "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxDownloadNativeTest",
+      "test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxDownloadNativeTest",
+      "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt"
     ]
   ]
 }

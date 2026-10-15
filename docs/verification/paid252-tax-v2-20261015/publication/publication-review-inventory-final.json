@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "gh",
+    "api",
+    "graphql",
+    "-f",
+    "query=query { repository(owner:\"SeanVasey\",name:\"VA-Studio\") { pullRequest(number:122) { number url headRefOid baseRefOid isDraft mergeable mergeStateStatus reviewDecision reviews(first:100) { pageInfo { hasNextPage endCursor } nodes { id state body submittedAt commit { oid } author { login } } } reviewThreads(first:100) { pageInfo { hasNextPage endCursor } nodes { id isResolved isOutdated comments(first:100) { pageInfo { hasNextPage endCursor } nodes { id body path url commit { oid } originalCommit { oid } author { login } } } } } } } }"
+  ],
+  "observed_at": "2026-10-15T08:05:58.609596+00:00",
+  "process_exit": 0,
+  "stdout": "{\"data\":{\"repository\":{\"pullRequest\":{\"number\":122,\"url\":\"https://github.com/SeanVasey/VA-Studio/pull/122\",\"headRefOid\":\"3dc5a5af043a1e254fab895541d93d25223a8a0e\",\"baseRefOid\":\"7567c52a3246ab2625196952a448c8cd7a890dcb\",\"isDraft\":false,\"mergeable\":\"MERGEABLE\",\"mergeStateStatus\":\"CLEAN\",\"reviewDecision\":null,\"reviews\":{\"pageInfo\":{\"hasNextPage\":false,\"endCursor\":null},\"nodes\":[]},\"reviewThreads\":{\"pageInfo\":{\"hasNextPage\":false,\"endCursor\":null},\"nodes\":[]}}}}}",
+  "stderr": ""
+}
