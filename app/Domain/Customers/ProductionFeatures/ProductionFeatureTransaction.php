@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers\ProductionFeatures;
 
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -20,8 +21,12 @@ final class ProductionFeatureTransaction
 
     private readonly string $anchor;
 
+    private readonly IdentityMetadataAdmission $metadata;
+
     public function __construct(private readonly Connection $connection)
     {
+        $raw = (new \ReflectionProperty(Connection::class, 'pdo'))->getRawValue($connection);
+        $this->metadata = IdentityMetadataAdmission::capture($raw instanceof PDO ? $raw : null);
         $primary = $connection->getRawPdo();
         if (! $primary instanceof PDO || $connection->transactionLevel() !== 1 || ! $primary->inTransaction()) {
             throw new ProductionFeatureException;
@@ -58,21 +63,23 @@ final class ProductionFeatureTransaction
                 // A commit/reopen has lost the original marker; its transaction is foreign.
             }
         }
-        $cached = $this->connection->getRawPdo();
-        if ($owned && $cached === $this->primary && $this->connection->transactionLevel() === 1) {
+        $cached = (new \ReflectionProperty(Connection::class, 'pdo'))->getRawValue($this->connection);
+        $depth = (new \ReflectionProperty(Connection::class, 'transactions'))->getRawValue($this->connection);
+        if ($owned && $cached === $this->primary && $depth === 1) {
             return true;
         }
         if ($owned) {
             $this->primary->rollBack();
         }
-        // Stop Laravel's catch from resolving/rolling back a foreign source. Preserve its PDO.
-        $this->connection->setPdo($cached);
 
+        // Operation owns its catch: a lost marker gives no authority to reset a foreign
+        // source's framework depth. Its owner must reconcile/close that physical frame.
         return false;
     }
 
     private function source(): void
     {
+        $this->metadata->requireCurrent($this->primary);
         ProductionFeatureConfiguration::plainPrimary($this->primary);
         if (! in_array($this->driver, ['sqlite', 'mysql'], true) || ! $this->primary->inTransaction()
             || DB::getDefaultConnection() !== $this->name || (DB::getConnections()[$this->name] ?? null) !== $this->connection

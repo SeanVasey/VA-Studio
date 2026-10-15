@@ -61,8 +61,9 @@ class ProductionFeatureTransactionEventsTest extends TestCase
             $this->assertSame(503, $refusal->status);
             $this->assertTrue($primary->inTransaction());
             $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
-            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame(1, $connection->transactionLevel());
             $primary->rollBack();
+            $connection->setPdo($primary); // Foreign frame owner reconciles its stale depth.
             $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
             $this->assertSame(0, (int) DB::table('production_listening_libraries')->value('version'));
         } finally {

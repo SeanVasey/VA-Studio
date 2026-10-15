@@ -55,8 +55,9 @@ class ProductionFeatureTransactionOwnershipTest extends TestCase
             $this->assertSame(503, $refusal->status);
             $this->assertTrue($primary->inTransaction(), 'Failure cleanup must leave the replacement transaction active.');
             $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_foreign_transaction')->fetchColumn());
-            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame(1, $connection->transactionLevel(), "Cleanup cannot reset a foreign physical frame's framework depth.");
             $primary->rollBack();
+            $connection->setPdo($primary); // Explicit reconciliation by the foreign frame owner.
             $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM feature_foreign_transaction')->fetchColumn());
             $model::flushEventListeners();
             $fresh = $service->read($owner);

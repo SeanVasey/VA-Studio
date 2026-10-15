@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers\ProductionFeatures;
 
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
@@ -21,7 +22,7 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     public function __construct(private readonly Connection $connection, private readonly PDO $primary,
         private readonly ProductionFeatureConfiguration $configuration, private readonly ?Dispatcher $delegate,
-        private readonly DatabaseTransactionsManager $manager) {}
+        private readonly DatabaseTransactionsManager $manager, private readonly IdentityMetadataAdmission $metadata) {}
 
     public function frame(): ProductionFeatureTransaction
     {
@@ -59,14 +60,12 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
                 // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
                 $this->connection->rollBack();
             }
-        } else {
-            // No marker existed: a pre-start callback may own this active PDO. Never roll it back.
-            $this->connection->setPdo($this->connection->getRawPdo());
         }
     }
 
     public function dispatch($event, $payload = [], $halt = false)
     {
+        $this->metadata->requireCurrent($this->primary);
         $outerBeginning = ! $this->proved && $event instanceof TransactionBeginning && $event->connection === $this->connection
             && $this->connection->transactionLevel() === 1;
         $outerCommitting = ! $this->proved && $event instanceof TransactionCommitting && $event->connection === $this->connection
@@ -106,6 +105,7 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     private function admitBinding(): void
     {
+        $this->metadata->requireCurrent($this->primary);
         $this->configuration->admit();
         ProductionFeatureConfiguration::plainPrimary($this->primary);
         if ($this->connection->getRawPdo() !== $this->primary || $this->connection->getEventDispatcher() !== $this
