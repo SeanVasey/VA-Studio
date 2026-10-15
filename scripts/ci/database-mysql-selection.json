@@ -202,6 +202,7 @@
     "tests/Fixtures/paid-development/2ec1854-e8f7441/database/migrations/2026_10_07_247000_production_customer_identity.php",
     "tests/Fixtures/paid-development/2ec1854-e8f7441/tests/Support/ProductionIdentityFixture.php",
     "tests/Support/DeliveryRace.php",
+    "tests/Support/DisposableTestDatabase.php",
     "tests/Support/FinalizationLifecycleFixture.php",
     "tests/Support/PaidGrantCommitFrameProbe.php",
     "tests/Support/PaidGrantDependencyFixtures.php",
