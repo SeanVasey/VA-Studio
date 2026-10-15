@@ -120,6 +120,13 @@ class EmailOperationsTests(unittest.TestCase):
         value = configured(); value["public_origin"] = "https://store.example.com:8443"
         result, _ = self.run_check(value=value); self.assertEqual(0, result.returncode)
 
+    def test_origin_rejects_empty_and_noncanonical_explicit_ports(self):
+        for origin in ("https://store.example.com:", "https://store.example.com:000443",
+                       "https://store.example.com:0443"):
+            with self.subTest(origin=origin):
+                value = configured(); value["public_origin"] = origin
+                self.blocked(value=value)
+
     def test_candidate_requires_exact_lowercase_40_character_shape(self):
         for candidate in (None, "a" * 39, "a" * 41, "A" * 40, True):
             value = configured(); value["candidate_sha"] = candidate
