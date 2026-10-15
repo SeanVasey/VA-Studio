@@ -1,0 +1,26 @@
+{
+  "observed_utc": "2026-10-15T16:42:47.909428+00:00",
+  "pull_request": {
+    "baseRefName": "main",
+    "headRefOid": "127c79a7dade4b4570927cdc752a4b5fc34c722a",
+    "isDraft": false,
+    "mergeCommit": {
+      "oid": "9cfe3a618e19557b95828d35c52a0e4d3622b44a"
+    },
+    "mergedAt": "2026-10-15T16:42:28Z",
+    "number": 126,
+    "state": "MERGED",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/126"
+  },
+  "expected_head_merge_exit": 0,
+  "fetched_main_commit": "9cfe3a618e19557b95828d35c52a0e4d3622b44a",
+  "expected_head_tree": "3822415b14b441ed7515e59fde761ca39959969e",
+  "fetched_main_tree": "3822415b14b441ed7515e59fde761ca39959969e",
+  "tree_equals_approved_head": true,
+  "parents": [
+    "0d7a7da24db2ef6dca76cd1f14ce1294bc1c7bb5",
+    "127c79a7dade4b4570927cdc752a4b5fc34c722a"
+  ],
+  "preflight_run": 38770563763,
+  "scope": "Actual focused development merge; no whole/native/host/provider/activation acceptance."
+}

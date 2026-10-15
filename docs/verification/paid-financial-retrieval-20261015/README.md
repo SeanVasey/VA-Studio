@@ -1,5 +1,7 @@
 # Controlled original-source financial retrieval development packet
 
+Actual PR126 merged at9cfe3a618e19557b95828d35c52a0e4d3622b44a from approved127c79a7, preflight38770563763 green; see [actual merge receipt](merge-receipt.md). Candidate-era gates below retain their original source boundaries.
+
 Operational app/config/policy bodies are reviewed at a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3. Final test-control source is f77f5c12e590b2d9295ebff582b142b4091ff8c2. Actual base PR125 is 0d7a7da24db2ef6dca76cd1f14ce1294bc1c7bb5; its actual receipt and both ledger updates are included here from107ab400. Root owns this new module/config/test/support and related selection entries. The separate reviewer owns original decisions, imported byte-identically.
 
 This isolated default-off module captures a genuine paid V1 or Tax V2 expectation and two actual original committed-read receipts under the caller's held framework frame. The first positive original closure precedes six controlled SDK test GETs; the second proves original frozen source/identity/closure after the SDK result. No recapture or lifetime renewal. The wrapper retains the actual earlier source-clamped deadline and the30-second plan cap, the original loaded manager/connections/native primaries and admitted reached metadata. Policy/credential/account/mode/TLS/SDK-slot/native-frame changes stop the path. The caller retains physical cleanup; the wrapper settles only its own receipts, including failures/abandonment.
