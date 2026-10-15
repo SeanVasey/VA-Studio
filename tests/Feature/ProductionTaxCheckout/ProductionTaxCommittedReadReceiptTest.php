@@ -848,6 +848,7 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertSame($account['owner_key'], DB::table('customer_accounts')->where('id', $account['id'])->value('owner_key'));
         $this->assertDatabaseCount('tax_receipt_probe', 0);
         $this->assertSame(1, (int) $pdo->query("SELECT COUNT(*) FROM sqlite_schema WHERE name='customer_accounts_update'")->fetchColumn());
+        $this->assertSame($guard, $pdo->query("SELECT sql FROM sqlite_schema WHERE name='customer_accounts_update'")->fetchColumn());
     }
 
     public function test_original_source_age_cannot_be_renewed_by_a_later_caller_deadline(): void

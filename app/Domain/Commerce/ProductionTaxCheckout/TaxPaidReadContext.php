@@ -51,6 +51,7 @@ final class TaxPaidReadContext implements \JsonSerializable
     {
         $this->container = Container::getInstance();
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
+        CheckoutException::require(is_array($instances), 'committed_read_frame');
         $configuration = $instances['config'] ?? null;
         $manager = $instances['db'] ?? null;
         CheckoutException::require($configuration instanceof Repository && $configuration::class === Repository::class
@@ -64,7 +65,9 @@ final class TaxPaidReadContext implements \JsonSerializable
         CheckoutException::require(($this->policy['committed_read_receipts_enabled'] ?? null) === true
             && ($this->policy['committed_read_receipt_version'] ?? null) === self::VERSION, 'unsupported');
         $name = $items['database']['default'] ?? null;
-        $connection = is_string($name) ? ($manager->getConnections()[$name] ?? null) : null;
+        $connections = (new ReflectionProperty(DatabaseManager::class, 'connections'))->getValue($manager);
+        CheckoutException::require(is_array($connections), 'committed_read_frame');
+        $connection = is_string($name) ? ($connections[$name] ?? null) : null;
         CheckoutException::require($connection instanceof Connection
             && $connection::class === ($reader->identityDriver() === 'mysql' ? MySqlConnection::class : SQLiteConnection::class), 'committed_read_frame');
         $this->connection = $connection;
@@ -81,6 +84,7 @@ final class TaxPaidReadContext implements \JsonSerializable
     {
         $container = Container::getInstance();
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($container);
+        CheckoutException::require(is_array($instances), 'committed_read_frame');
         $configuration = $instances['config'] ?? null;
         CheckoutException::require($configuration instanceof Repository && $configuration::class === Repository::class, 'committed_read_frame');
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($configuration);
@@ -113,12 +117,14 @@ final class TaxPaidReadContext implements \JsonSerializable
         $this->proveNative($depth);
         $this->admitConnections();
         $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
+        CheckoutException::require(is_array($instances), 'committed_read_frame');
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->configuration);
         CheckoutException::require(Container::getInstance() === $this->container && ($instances['config'] ?? null) === $this->configuration
             && is_array($items) && ($items['production-tax-checkout'] ?? null) === $this->policy
             && hrtime(true) < $this->bornAtNs + 300_000_000_000 && $this->generic !== null, 'committed_read_frame');
-        $this->generic->prove($this->reader, $depth);
         $this->fresh?->prove();
+        // Fresh proof admits raw container maps before the frozen generic binding closure indexes them.
+        $this->generic->prove($this->reader, $depth);
         $this->observer?->proveContextOwner($depth);
         $this->proveNative($depth);
     }
