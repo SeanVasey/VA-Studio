@@ -215,6 +215,8 @@ final readonly class ProductionTaxPaidOrderSourceV2 implements \JsonSerializable
         throw new LogicException('Production tax paid sources cannot be serialized.');
     }
 
+    private function __clone() {}
+
     public function jsonSerialize(): never
     {
         throw new LogicException('Production tax paid sources are internal server objects.');

@@ -13,7 +13,7 @@ use ReflectionProperty;
 use Throwable;
 
 /** Original framework ownership and two private markers, established before the younger held source. */
-final class TaxPaidReadFrame
+final class TaxPaidReadFrame implements \JsonSerializable
 {
     private bool $terminal = false;
 
@@ -139,6 +139,11 @@ final class TaxPaidReadFrame
     public function __unserialize(array $data): never
     {
         throw new LogicException('Tax paid read frames cannot be deserialized.');
+    }
+
+    public function jsonSerialize(): never
+    {
+        throw new LogicException('Tax paid read frames are internal server objects.');
     }
 
     public function __debugInfo(): array

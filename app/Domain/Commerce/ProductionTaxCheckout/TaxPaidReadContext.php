@@ -17,7 +17,7 @@ use ReflectionClass;
 use ReflectionProperty;
 
 /** Tax-specific literal birth purpose. The original generic context is attached once, never recaptured. */
-final class TaxPaidReadContext
+final class TaxPaidReadContext implements \JsonSerializable
 {
     public const VERSION = 'production-tax-checkout-committed-read-v2';
 
@@ -234,6 +234,11 @@ final class TaxPaidReadContext
     public function __unserialize(array $data): never
     {
         throw new LogicException('Tax paid read contexts cannot be deserialized.');
+    }
+
+    public function jsonSerialize(): never
+    {
+        throw new LogicException('Tax paid read contexts are internal server objects.');
     }
 
     public function __debugInfo(): array

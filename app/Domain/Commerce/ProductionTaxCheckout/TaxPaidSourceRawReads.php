@@ -11,7 +11,7 @@ use PDOStatement;
 use ReflectionClass;
 
 /** Fixed SQL infrastructure. Expected facts stay private in authenticated SourceV2; this grants no authority. */
-final readonly class TaxPaidSourceRawReads
+final readonly class TaxPaidSourceRawReads implements \JsonSerializable
 {
     private function __construct(private TaxPaidReadContext $context) {}
 
@@ -136,6 +136,13 @@ final readonly class TaxPaidSourceRawReads
     public function __serialize(): never
     {
         throw new LogicException('Tax raw reads cannot be serialized.');
+    }
+
+    private function __clone() {}
+
+    public function jsonSerialize(): never
+    {
+        throw new LogicException('Tax raw readers are internal server objects.');
     }
 
     public function __unserialize(array $data): never
