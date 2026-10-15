@@ -40,3 +40,7 @@ Original design REVISE clarified the zero-base startup; v2 received bounded desi
 HTTP mount, committed-frame/first-byte/ff0 composition, real host-local source adapter bounding `open()`, renderer r2/hash-checked fonts, A1-1/A1-7, contention mapping, blocked-consumer termination/send timeout/proxy behavior, actual host sizing/flock/performance, identity/activation, real rights/terms/source exports and complete release acceptance remain open. Nothing is mounted or activated. No Foundation/GitLab dispatch, real provider call, credentials, payments, customer-active import, host verification, deployment, DNS or cutover occurred. Existing B4 and adjacent frozen metadata/membership P2s remain outside this delivery scope.
 
 Sealed originals: 10PHP invocations, 206archive members, 1848673bytes, SHA256 `e3bd46d4ce9431ca642d7a7508264ac4ff4d572017365ed55972e26c8af488b6`. Final independent packet review is complete: **APPROVE BOUNDED DEVELOPMENT SOURCE AND FINAL SEALED EVIDENCE**, no open P0/P1 or required source/evidence correction. Exact-head publication carry, cheap preflight, complete inventory and expected-SHA merge remain pending.
+
+## Actual publication
+
+PR #129 merged at2b43b46a from exact approved01e429b9 after cheap38810003721 success and full inventory/protection/expectedSHA/fetchedtree gates. [Actual receipt](merge-receipt.md) preserves completed source/publication approval and every cancellation/preparation failure. Earlier pending text is checkpoint chronology; all activation/host/mount/release limits remain.
