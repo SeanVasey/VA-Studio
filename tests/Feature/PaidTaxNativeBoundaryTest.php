@@ -139,7 +139,8 @@ class PaidTaxNativeBoundaryTest extends TestCase
         foreach (['users', ...array_keys(PaidTaxSchema::specs())] as $table) {
             DB::unprepared('CREATE TEMPORARY TABLE `'.$table.'` (id BIGINT UNSIGNED NOT NULL PRIMARY KEY)');
             try {
-                $this->refusesOrigin($f);
+                // The shared producer boundary already rejects a users shadow before consumer birth.
+                $this->refusesOrigin($f, $table === 'users' ? 409 : 503);
             } finally {
                 DB::unprepared('DROP TEMPORARY TABLE `'.$table.'`');
             }
@@ -159,13 +160,13 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $this->assertSame(0, DB::transactionLevel());
     }
 
-    private function refusesOrigin(array $f): void
+    private function refusesOrigin(array $f, int $status = 503): void
     {
         try {
             (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
             $this->fail('An unadmitted owned object reached consumer DML.');
         } catch (PaidTaxException $error) {
-            $this->assertSame(503, $error->status);
+            $this->assertSame($status, $error->status);
         }
         $this->assertFalse(DB::getPdo()->inTransaction());
         $this->assertSame(0, DB::transactionLevel());
