@@ -14,7 +14,7 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
 
     private mixed $input = null;
 
-    private function transfer(string $bytes, int $deadlineSeconds = 200): ProductionFreeGrantTransfer
+    private function transfer(string $bytes, int $deadlineSeconds = 200, int $baseSeconds = 30): ProductionFreeGrantTransfer
     {
         $this->input = fopen('php://temp', 'w+b');
         fwrite($this->input, $bytes);
@@ -23,7 +23,7 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
 
         return new ProductionFreeGrantTransfer($snapshot, 'synthetic.bin', 'application/octet-stream',
             $deadlineSeconds * 1_000_000_000, fn (): int => $this->tick,
-            0, 16384, 30);
+            0, 16384, $baseSeconds);
     }
 
     private function expired(callable $run): void
@@ -104,5 +104,32 @@ final class ProductionFreeGrantReturningProgressTest extends TestCase
             $this->assertSame('Synthetic returning consumer failure.', $error->getMessage());
         }
         $this->assertFalse(is_resource($this->input));
+    }
+
+    public function test_zero_base_first_chunk_has_one_fixed_rate_allowance(): void
+    {
+        $bytes = str_repeat('p', 1048576);
+        $transfer = $this->transfer($bytes, 200, 0);
+        $this->tick = 32_000_000_000;
+        $sent = '';
+        $transfer->writeTo(function (string $chunk) use (&$sent): void {
+            $sent .= $chunk;
+            $this->tick = 64_000_000_000; // Exact1MiB/16KiB/s boundary from originalstart0.
+        });
+        $this->assertSame($bytes, $sent);
+        $this->assertFalse(is_resource($this->input));
+    }
+
+    public function test_zero_base_delay_beyond_first_chunk_allowance_refuses_before_output(): void
+    {
+        $transfer = $this->transfer(str_repeat('p', 1048576), 200, 0);
+        $this->tick = 65_000_000_000;
+        $sent = 0;
+        $this->expired(function () use ($transfer, &$sent): void {
+            $transfer->writeTo(function (string $chunk) use (&$sent): void {
+                $sent += strlen($chunk);
+            });
+        });
+        $this->assertSame(0, $sent);
     }
 }
