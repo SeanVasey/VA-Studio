@@ -265,7 +265,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         }
         $this->assertSame(1, $calls);
         $this->assertInstanceOf(PaidTaxException::class, $failure);
-        $this->assertSame(503, $failure->status);
+        $this->assertSame(409, $failure->status);
         $this->assertDatabaseCount('paid_tax_order_origins', 0);
         $this->assertFalse(DB::getPdo()->inTransaction());
     }
@@ -321,6 +321,45 @@ class PaidTaxGrantJourneyTest extends TestCase
             $this->assertDatabaseCount('paid_tax_fulfillments', 0);
         } finally {
             $lock->release();
+        }
+    }
+
+    public function test_pre_source_direct_commit_reopen_refuses_original_frame_and_preserves_the_unrelated_transaction(): void
+    {
+        $f = $this->paid();
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $pdo->exec('CREATE TABLE paid_tax_reopen_probe (id INTEGER PRIMARY KEY)');
+        $calls = 0;
+        app()->afterResolving(\App\Domain\Grants\PaidTax\PaidTaxPolicy::class, static function () use ($pdo, &$calls): void {
+            if ($calls === 0) {
+                $calls++;
+                $pdo->commit();
+                $pdo->beginTransaction();
+                $pdo->exec('INSERT INTO paid_tax_reopen_probe VALUES (123)');
+            }
+        });
+        $failure = null;
+        try {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            } catch (PaidTaxException $error) {
+                $failure = $error;
+            }
+            $this->assertSame(1, $calls);
+            $this->assertInstanceOf(PaidTaxException::class, $failure, 'A replaced pre-source physical frame produced a positive grant.');
+            $this->assertSame(503, $failure->status);
+            $this->assertTrue($pdo->inTransaction(), 'The command committed or rolled back a different reopened transaction.');
+            $this->assertSame([123], $pdo->query('SELECT id FROM paid_tax_reopen_probe')->fetchAll(\PDO::FETCH_COLUMN));
+            $this->assertSame(0, (int) $pdo->query('SELECT COUNT(*) FROM paid_tax_order_origins')->fetchColumn());
+        } finally {
+            // Only the fixture owns this reopened direct-PDO transaction and its deliberate framework mismatch.
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            if ($connection->transactionLevel() > 0) {
+                $connection->rollBack();
+            }
         }
     }
 }
