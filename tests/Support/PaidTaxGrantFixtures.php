@@ -29,6 +29,23 @@ trait PaidTaxGrantFixtures
 {
     use ProductionTaxCheckoutFixtures;
 
+    protected function secondPaidTaxOrder(array $first, string $session, string $payment): array
+    {
+        $catalog = $first['catalog'];
+        $buyer = $first['buyer'];
+        $access = new ProductionCustomerAccess;
+        $transport = new PaidTaxDistinctTransportFixture($session, $payment);
+        $checkout = new ProductionTaxCheckout($access, $transport);
+        $preview = $checkout->preview($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items']);
+        $order = $checkout->order($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $preview['previewHash'], true,
+            ['legalName' => 'Declared synthetic buyer'], 'synthetic-tax-second-order');
+        $checkout->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
+        $transport->paid = true;
+        $this->assertSame('verified', $checkout->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+
+        return compact('catalog', 'buyer', 'access', 'transport', 'checkout', 'preview', 'order');
+    }
+
     protected function preparePaidTaxFixture(): void
     {
         $this->fakePrivateMediaStorage();
