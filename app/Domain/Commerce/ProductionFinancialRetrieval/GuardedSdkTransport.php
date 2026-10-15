@@ -98,6 +98,7 @@ final class GuardedSdkTransport implements ClientInterface
     {
         FinancialRetrievalException::require(++$count <= 4096);
         if (is_array($value)) {
+            FinancialRetrievalException::require(! array_is_list($value) || count($value) <= 100);
             foreach ($value as $child) {
                 self::nodes($child, $count);
             }

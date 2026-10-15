@@ -233,7 +233,7 @@ final class FinancialReadPlanTest extends TestCase
         $table = $tax ? TaxCheckoutSchema::TABLES['order'] : CheckoutSchema::TABLES['order'];
         $definitions = $tax ? TaxCheckoutSchema::definitions() : CheckoutSchema::definitions();
         $trigger = $definitions[$table]['prefix'].'_update';
-        $statements = $tax ? TaxCheckoutSchema::statements($driver) : CheckoutSchema::statements($driver);
+        $statements = $tax ? TaxCheckoutSchema::statements($driver) : CheckoutSchema::statements();
         $changed = false;
         $http->after = function (int $position) use ($primary, $table, $trigger, $statements, &$changed): void {
             if ($position === 0) {
