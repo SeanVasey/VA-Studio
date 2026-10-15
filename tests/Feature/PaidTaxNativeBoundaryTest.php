@@ -29,7 +29,14 @@ class PaidTaxNativeBoundaryTest extends TestCase
         $second = $this->secondPaidTaxOrder($first, 'cs_test_synthetictax', 'pi_synthetictax');
         $grants = new PaidTaxGrants;
         $a = $grants->finalize($first['buyer']['principal'], $first['buyer']['user'], $first['order']['orderId']);
-        $b = $grants->finalize($second['buyer']['principal'], $second['buyer']['user'], $second['order']['orderId']);
+        $b = null;
+        $collision = null;
+        try {
+            $b = $grants->finalize($second['buyer']['principal'], $second['buyer']['user'], $second['order']['orderId']);
+        } catch (\PDOException $error) {
+            $collision = $error;
+        }
+        $this->assertNull($collision, 'Byte-distinct, verified provider payments collided in the owned consumer schema.');
         $this->assertNotSame($a['id'], $b['id']);
         $this->assertSame([$first['order']['orderId'], $second['order']['orderId']], [$a['orderId'], $b['orderId']]);
         $this->assertSame($a, $grants->finalize($first['buyer']['principal'], $first['buyer']['user'], $first['order']['orderId']));

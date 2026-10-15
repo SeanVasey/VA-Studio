@@ -36,7 +36,8 @@ final class PaidTaxDistinctTransportFixture implements TaxCheckoutTransport
         $this->inner->paid = $this->paid;
         $session = $this->inner->retrieve($context, RecordingTaxCheckoutTransport::SESSION);
 
-        return [...$session, 'id' => $this->session, 'payment_intent' => $this->paid ? $this->payment : null];
+        return [...$session, 'id' => $this->session, 'payment_intent' => $this->paid ? $this->payment : null,
+            'url' => $this->paid ? null : 'https://checkout.stripe.com/c/pay/'.$this->session];
     }
 
     public function paymentIntent(TaxExecutionContext $context, string $paymentId): array
