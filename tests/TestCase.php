@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
+use LogicException;
 use Tests\Support\DisposableTestDatabase;
 
 abstract class TestCase extends BaseTestCase
@@ -50,7 +51,14 @@ abstract class TestCase extends BaseTestCase
 
     protected function requireFixtureDatabase(?string $name = null): Connection
     {
-        return $this->testDatabaseSelection->admit($this->app['db']->connection($name));
+        $connection = $this->app['db']->connection($name);
+        $keys = array_flip(['driver', 'database', 'host', 'port', 'unix_socket', 'url']);
+        $configured = $this->app['config']->get('database.connections.'.$connection->getName());
+        if (! is_array($configured) || array_intersect_key($configured, $keys) !== array_intersect_key($connection->getConfig(), $keys)) {
+            throw new LogicException('Disposable test database admission refused.');
+        }
+
+        return $this->testDatabaseSelection->admit($connection);
     }
 
     public function artisan($command, $parameters = [])
