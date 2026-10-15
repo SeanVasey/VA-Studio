@@ -9,6 +9,7 @@ use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAcc
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,20 @@ final class ProductionFeatureOperation
     /** Contexts whose minting run callback is executing now. Only run() writes it; there is no setter. */
     private static array $live = [];
 
+    private static array $issuers = [];
+
+    public static function issuing(ProductionFeatureContext $context): array
+    {
+        $key = spl_object_id($context);
+        $issued = self::$issuers[$key] ?? null;
+        if ($issued === null || $issued[0] !== $context) {
+            throw new ProductionFeatureException;
+        }
+        unset(self::$issuers[$key]);
+
+        return array_slice($issued, 1);
+    }
+
     /** Sealed consumers accept only a context minted by run() whose callback is still executing. */
     public static function assertLive(ProductionFeatureContext $context): void
     {
@@ -29,12 +44,15 @@ final class ProductionFeatureOperation
         }
     }
 
-    public function run(ProductionAccountFeatureIdentity $identity, callable $operation): array
+    public function run(ProductionAccountFeatureIdentity $identity, callable $operation, ?ProductionFeaturePreparation $preparation = null): array
     {
         // One operation budget includes source callbacks, commit events and validation; never renewed.
         $deadline = hrtime(true) + 10_000_000_000;
+        $metadata = IdentityMetadataAdmission::capture();
+        IdentityMetadataAdmission::actorId($identity->actor());
         $configuration = new ProductionFeatureConfiguration;
-        $connection = DB::connection();
+        $metadata->requireCurrent();
+        $connection = $metadata->connection();
         $primary = $connection->getPdo();
         foreach (DB::getConnections() as $sourceConnection) {
             $sourcePrimary = $sourceConnection->getPdo();
@@ -57,17 +75,44 @@ final class ProductionFeatureOperation
         // Standard Laravel bookkeeping scoped to this operation: aborted frames cannot leak
         // queued callbacks into a later transaction, and other connections are untouched.
         $manager = new DatabaseTransactionsManager;
-        $observer = new ProductionFeatureTransactionObserver($connection, $primary, $configuration, $events, $manager);
+        $observer = new ProductionFeatureTransactionObserver($connection, $primary, $configuration, $events, $manager, $metadata);
+        $hooksProperty = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $hooks = $hooksProperty->getRawValue($connection);
+        if (! is_array($hooks) || ! array_is_list($hooks)) {
+            throw new ProductionFeatureException;
+        }
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
+        $tailActive = true;
+        $tail = function () use ($metadata, $configuration, $connection, $primary, $observer, $manager, $managerProperty, $hooksProperty, &$installed, &$tailActive): void {
+            if (! $tailActive || $observer->hasOriginalFrame()) {
+                return;
+            }
+            try {
+                $metadata->requireCurrent();
+                $configuration->admit();
+                if ($connection->getRawPdo() !== $primary || $connection->transactionLevel() !== 0 || $primary->inTransaction()
+                    || $connection->getEventDispatcher() !== $observer || $managerProperty->getRawValue($connection) !== $manager
+                    || $hooksProperty->getRawValue($connection) !== $installed) {
+                    throw new ProductionFeatureException;
+                }
+            } catch (Throwable) {
+                throw new ProductionFeatureException;
+            }
+        };
+        $installed = [...$hooks, $tail];
+        $hooksProperty->setValue($connection, $installed);
         try {
             $connection->beginTransaction();
             $frame = $observer->frame();
             $reader = new CurrentRows($primary, $connection->getDriverName());
-            $context = ProductionFeatureContext::locked($identity, $access, $reader, $frame, $deadline, $configuration);
+            $context = ProductionFeatureContext::locked($identity, $access, $reader, $frame, $deadline, $configuration, $metadata);
             self::$live[spl_object_id($context)] = $context;
             try {
+                $preparation?->start($context);
+                $context->admitOuter();
                 $projection = $operation($context);
+                $preparation?->prepare($context, $projection);
             } finally {
                 unset(self::$live[spl_object_id($context)]);
             }
@@ -87,18 +132,44 @@ final class ProductionFeatureOperation
             }
             throw new ProductionFeatureException;
         } finally {
-            if ($events === null) {
-                $connection->unsetEventDispatcher();
-            } else {
-                $connection->setEventDispatcher($events);
+            $tailActive = false;
+            // Remove only our tail; a callback may have replaced or extended the list.
+            $currentHooks = $hooksProperty->getRawValue($connection);
+            if (is_array($currentHooks)) {
+                $remainingHooks = array_filter($currentHooks, fn ($hook) => $hook !== $tail);
+                if ($remainingHooks !== $currentHooks) {
+                    $hooksProperty->setValue($connection, $remainingHooks);
+                }
             }
-            if ($originalManager === null) {
-                $connection->unsetTransactionManager();
-            } else {
-                $connection->setTransactionManager($originalManager);
+            if ($connection->getEventDispatcher() === $observer) {
+                if ($events === null) {
+                    $connection->unsetEventDispatcher();
+                } else {
+                    $connection->setEventDispatcher($events);
+                }
+            }
+            if ($managerProperty->getValue($connection) === $manager) {
+                if ($originalManager === null) {
+                    $connection->unsetTransactionManager();
+                } else {
+                    $connection->setTransactionManager($originalManager);
+                }
             }
         }
+        if ($preparation !== null) {
+            // Only run writes this window, after the original framework commit returned normally.
+            $key = spl_object_id($context);
+            self::$issuers[$key] = [$context, $identity, $access, $deadline, $metadata];
+            try {
+                $preparation->seal($context);
+            } finally {
+                unset(self::$issuers[$key]);
+            }
+
+            return $projection;
+        }
         try {
+            $metadata->requireCurrent();
             $context->admitConfiguration();
             ProductionFeatureConfiguration::plainPrimary($context->reader()->identityPrimary());
             $frame = IdentityCommittedFrame::begin($context->reader(), $deadline);

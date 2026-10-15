@@ -1,0 +1,60 @@
+{
+  "decision": "APPROVE REPAIRED COMPONENT SOURCE WITH ONE NARROW CLEANUP CONDITION",
+  "reviewed_sha": "9187362e9d4fb9a988b02620203f1b1eb31eef8d",
+  "observed_utc": "2026-10-15T18:07:57.056751+00:00",
+  "scope": "Bounded original-release/preparation custody repairs and their new mechanisms; not integrated HTTP/UI or development merge approval",
+  "clean_at_review_observation": true,
+  "source_sha256": {
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "160c6cd0195df66c86e14c961d42efe33c6531e2369c1bbfeb4604f8dde1adc3",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureBookkeeping.php": "8fd8be1604e0583d602eada48a9edad2c9e4818b112f48e7231019b06a44c107",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "895d46a26dc1cf1bee82d03a02d2324df726e1fd09c1b7b2b98e0cc414211c3b",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "9e4a75e45eaedf26087bfba495467aa28866206c8872ff26d75bf2e4f7f241f8",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "11dc94281a5417295baa72a6e6c541f2fed8bed6b9503f65ef9860d06d88249e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php": "06598d8698b4635cb742ccd019bfadbac214e811997b10a0462a8494f8d98c77",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php": "40942d2808abd9d16cf13266f6c63d69f19d043dc8fe0ae460bc301a3209c9b4",
+    "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php": "e5365b2233de1bc93e57ddaf4cafda2c8fe971eb3f4c222d38334ebfbb2a7631"
+  },
+  "closed_findings": {
+    "B4-R1": "Pure tail checks original metadata/config/slot/hook/idle state after prestart callbacks before actual PDO begin; inert after original frame exists and on every exit.",
+    "B4-R2": "Exact original standard root captured before beginning delegates; callback-free raw record pruning removes root/strict descendants, clears owned callbacks, preserves unrelated same-name root/stale-parent and foreign manager records. Native-only rollback never delegates into replacement runtime; normal owned rollback retains afterRollback.",
+    "B4-R3": "Original context.admitOuter follows preparation.start before domain work, refusing commit/reopen before feature DML.",
+    "new_mechanism_followups": "Tail is inert for completed nested beginning/commit work and retained use after exit; Bookkeeping uses exact-class raw public metadata with key/type admission so unset foreign records remain untouched."
+  },
+  "remaining_required_correction_before_integrated_final_approval": {
+    "severity": "P2",
+    "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+    "method": "run finally hook cleanup",
+    "issue": "array_values(array_filter(currentHooks, hook !== tail)) normalizes callback-replaced associative storage even when no owned tail exists. A prestart replacement [foreign => closure] becomes [0 => closure] on refusal.",
+    "correction": "Do not write callback-owned array storage if the owned tail is absent; when removing the owned tail preserve unrelated keys/order. Reindex only the genuinely owned original list if necessary.",
+    "scope": "Metadata-only correction in the same original-only hook cleanup mechanism; does not reopen or invalidate completed918 application receipts.",
+    "control_guidance": "Exact raw hook-array preservation on a prestart callback replacement/refusal; this small fix alone does not justify repeating the full component selection."
+  },
+  "open_P0_P1": [],
+  "test_mechanism_assessment": [
+    "Old three custody controls target actual prestart mutation, native foreign-frame writes and retained framework manager state.",
+    "Current controls explicitly distinguish native-only afterRollback suppression from ordinary afterRollback once, preserve replacement manager/listener and stale-parent same-name root callbacks, and test normal nested work plus inactive retained tail and unset raw foreign record."
+  ],
+  "execution_status": {
+    "parent_reported_original_857_controls": "3/21/F3/E0/S0 with original exits1 retained.",
+    "parent_reported_249_selection": "21/191/E1; original exception-type expectation mismatch retained, not passing evidence.",
+    "parent_reported_current_918_selection": "Completed23/212/F0/E0/S0, PHP/recorder/observedOS0, source unchanged. Reviewed control bodies and source; no reviewer app rerun or sealed-receipt reconciliation in this checkpoint."
+  },
+  "conditions": [
+    "Apply the narrow foreign hook-array preservation correction before integrated final approval.",
+    "HTTP kernel epoch/response/session/privacy/routes/UI implementation and real send-path evidence remain separate pending gates.",
+    "Independent integrated tested-source and final sealed evidence review, native component evidence as scoped, exact-head cheap preflight/inventory/expected-SHA merge remain required.",
+    "Default-off/original deadline/non-HTTP compatibility and frozen adjacent scopes stay unchanged."
+  ],
+  "reviewer_operations": {
+    "application_tests": false,
+    "database": false,
+    "network_CI": false,
+    "shared_edits": false
+  },
+  "read_commands": [
+    "Scoped immutable app/test diffs857..249 and249..918",
+    "Read standard installed DatabaseTransactionRecord definition only as needed for raw metadata admission",
+    "Exact918 immutable Git-byte hashes and exclusive runtime artifact creation"
+  ],
+  "preparation_errors": []
+}

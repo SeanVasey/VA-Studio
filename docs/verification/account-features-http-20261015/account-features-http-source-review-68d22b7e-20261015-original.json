@@ -1,0 +1,72 @@
+{
+  "decision": "APPROVE INTEGRATED SOURCE WITH EVIDENCE CONDITIONS",
+  "reviewed_sha": "68d22b7e0db7bf60a5f8e46f3878c205f7289129",
+  "prior_reviewed_sha": "4854649a28f0ed8541d1b9eac1c0d7f04229b1e8",
+  "observed_utc": "2026-10-15T19:33:19.879085+00:00",
+  "clean_at_source_review_observation": true,
+  "scope": "Bounded repaired B4 seven-class HTTP/root/privacy/routes/UI composition and meaningful controls; no broader/frozen-family audit",
+  "source_sha256": {
+    "app/Http/AccountFeatures/AccountFeatureHttpKernel.php": "036bc6247daa62b1ecab2b1112c99a709d2ae3b20fdcbfe72ca18e2c1218aeba",
+    "app/Http/AccountFeatures/AccountFeatureRequestGuard.php": "780056ecc9b521165660931ea88f893ea37e9a860a2eeb64d09b670fd75c89a2",
+    "app/Http/AccountFeatures/AccountFeatureResponse.php": "9596d948568a1d7e69a447c62412ab25ea47d33c765e22b32445e87a6c70acb0",
+    "app/Http/AccountFeatures/AccountFeatureController.php": "1756316ed020e904349f176c8de1c13f8e70a026a57083f1d384dbd4fee865f1",
+    "app/Http/AccountFeatures/AccountFeatureMount.php": "95d76ce7445eca456692136cc130be069fae25cd69a21e350fae72ce145a8b22",
+    "app/Http/AccountFeatures/AccountFeaturePrivacy.php": "9619a3e56e9bec353b0fe2bd516a2213563a7958d605d0b91c17a8707696904d",
+    "app/Http/AccountFeatures/AccountFeatureBody.php": "f3e9189ad521b100faaea7ab1b456e03975787fd423799fa06dd4fbe8e4b1397",
+    "resources/js/Pages/ProductionCustomerFeatures.tsx": "6dd0bef458e62c8ecc9ba60838b245aa447ef9d3cc1b210191b9bef479c8db5c",
+    "resources/js/lib/production-account-features.ts": "617a0ef32a8d72a53659b60a738ecec84f8cc8f59d78b6d529c1af56d5359f29",
+    "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php": "8ddf2ad861d602f9bcbc0d120b557e53ea0bdf2a448305e725207d8b79a88570",
+    "tests/frontend/production-account-features.test.tsx": "a1850f72e3d8950166be44a850ac1bfc32d303346632de32a84907dd49d33eaa",
+    "bootstrap/app.php": "36adabf5e7aa11e05d9e010e441cb3740cfe431faa3c1cabd03e8f78ae39a6fb",
+    "routes/production-account-features.php": "89ca04175e3a0bb7747bdcb72eaa6aeb04ddbd43cb67e877c095af75a6b74f0e",
+    "config/production-account-features.php": "e7b7669ed02e5773b5145ef6420c3ac76a5eaf66d5c3bb20f653be46b1e50e4b"
+  },
+  "closed_485_groups": {
+    "B4-H1": "Constructor-only epoch capture retains original object/epoch; clone/serialization refused, kernel value is a WeakReference, consume requires actual attempted send and removes the registry entry. No strong response/request value cycle or middleware clone authority.",
+    "B4-H2": "Raw login session slot is primitive/canonical integer-string admitted before casting; no Stringable callback. Exact original resolved guard/store/request/user/marker remain retained.",
+    "B4-H3": "Emission strings materialized once before finish; terminal comparison uses stable supported native cookie facts/header identity/content, avoiding time-dependent Max-Age recomputation.",
+    "B4-H4": "Signout available during pending work clears/aborts; redirect bound to original scope/generation; keyed child remount isolates render lifetimes. Public-search timeout settles local ownership/busy state without waiting for transport."
+  },
+  "required_source_corrections": [],
+  "open_P0_P1": [],
+  "remaining_material_B4_source_P2_in_reviewed_groups": [],
+  "control_assessment": [
+    "Initial application booting flag is applied before providers boot/actual conditional route loading, replacing manual route-file registration. This proves the real root registration path; it is not a claim about pre-provider-registration config.",
+    "Compiled route collection with withdrawn mount and counted request queries, shipped default-route absence, actual ArraySessionHandler.write withdrawal and foreign framework frame ownership are relevant acceptance mechanisms.",
+    "Native Cookie real1.1s crossing in the actual closing guard tests healthy original deadline/output with native/session middleware cookies.",
+    "Actual request/send, early/reentrant/split/root-substitution/clone, invalid bodies/exact accepted caps, debug fixed errors and no-inferred consent/export semantics are now covered by authored controls.",
+    "Frontend cancellation/scope/search/consent controls use real component/helper surfaces rather than fabricated internal authority."
+  ],
+  "execution_scopes": {
+    "metadata_component": "Original14/85 and prior component approval remain scoped; no fresh implication.",
+    "release_component": "Original23/212 at918 plus163 narrow cleanup/control conditions remain their recorded scopes.",
+    "earlier_HTTP": "952 first1/6/F1 and runner2/5/E1, old47 clone/retention/Stringable4/76/F3, and028 whole24/316/F2 remain preserved original outcomes. No retroactive green labels.",
+    "current_HTTP68": "Parent-reconciled completed29/406/F0/E0/S0 with PHP/recorder/observedOS0 and unchanged source. Source/control bodies inspected; this checkpoint does not replace final independent sealed-receipt verification.",
+    "current_frontend": "Parent reports25/25 across three files, source stable, plus Composer strictvalidate/platform/audit0. Original commands/receipts still require final packet reconciliation.",
+    "native68": "Owned private8.4.11 focused six-case selection running/pending when notified; no completed count/pass or full/concurrency/host inference."
+  },
+  "conditions": [
+    "Reconcile completed current HTTP/frontend/quality originals and directly affected shared SQLite composition with exact source/runtime/loader/OS scopes.",
+    "Complete proportionate owned native original-commit/read-only closure/late durable withdrawal/foreign frame/metadata evidence; do not infer a whole matrix, wider concurrency, host/FPM/output-handler or commercial activation.",
+    "Independent final exact tested-source and coherent sealed-evidence review, publication carry, exact-head cheap preflight, complete inventory and expected-SHA development merge remain required.",
+    "Default-off/unmounted, original10-second post-identity budget, immediate non-HTTP closure and frozen V1/generic/OriginalCommitWitness/membership conditions unchanged."
+  ],
+  "limits": [
+    "Review covers reached standard native/header/cookie/request/session composition, not arbitrary reflection-corrupted native-library internals or SAPI-wide output handling.",
+    "No live/provider/funds/SQL/schema/profile/vendor/SDK policy expansion or activation approval."
+  ],
+  "ownership": "Reviewer made no shared edits or authored the unattributed three-file patch. This decision assesses actual immutable68 integrated source independently, not its unknown earlier draft authorship.",
+  "reviewer_operations": {
+    "application_tests": false,
+    "frontend_tests": false,
+    "database": false,
+    "network_CI": false,
+    "shared_edits": false
+  },
+  "commands": [
+    "git head/status observation at68; exact485..68 scoped app/UI/test diff",
+    "Read installed typed ResponseHeaderBag/Cookie definitions only for reached stable native facts",
+    "Immutable68 source hash binding and exclusive runtime artifacts"
+  ],
+  "preparation_errors": []
+}

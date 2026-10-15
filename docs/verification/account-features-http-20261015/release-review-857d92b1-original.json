@@ -1,0 +1,76 @@
+{
+  "decision": "REVISE RELEASE COMPONENT BEFORE SOURCE APPROVAL",
+  "reviewed_sha": "857d92b1f38d420af63e9615c9be0ed7b5723d1a",
+  "initial_review_sha": "cf7011d6955d3d5bfa12aaeb8b783412014ac7ec",
+  "observed_utc": "2026-10-15T18:00:32.685060+00:00",
+  "scope": "Original release/preparation seam and reached operation/context/observer/transaction metadata/cleanup only",
+  "clean_at_reviewed_head_observation": true,
+  "source_sha256": {
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "9112308766e237ab6fc1068a68044db786b7060adae2c4e406df642f9e42e515",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureContext.php": "11dc94281a5417295baa72a6e6c541f2fed8bed6b9503f65ef9860d06d88249e",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeaturePreparation.php": "06598d8698b4635cb742ccd019bfadbac214e811997b10a0462a8494f8d98c77",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureRelease.php": "40942d2808abd9d16cf13266f6c63d69f19d043dc8fe0ae460bc301a3209c9b4",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransaction.php": "9e4a75e45eaedf26087bfba495467aa28866206c8872ff26d75bf2e4f7f241f8",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php": "14f20d6e95fb1337760dfe3c299bfee1901dd35ba80d890336d2ee2dc5fc59e8",
+    "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningLibrary.php": "7cc909f22ed1c71696e0f40b49a5858729b2aa1fe61988d8c427faa5cf316378",
+    "app/Domain/Customers/ProductionFeatures/Preferences/ProductionConsentPreferences.php": "8565aea18093dd8ede2f727f2208b5414a9a5f94c2f985625141c969bfcd8a7c",
+    "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php": "a020a50d0667c9ec3a56a6fcf723c799256cd9babb0f940db775f45c1997459b"
+  },
+  "positive_assessment": [
+    "Optional final preparation is threaded through seven existing domain entrypoints; absent preparation preserves immediate closure and array API.",
+    "Issuer is populated only after normal original commit/observer proof returns; one-use release retains original context/identity/reader/metadata and ten-second deadline. No policy/source/time recapture is introduced.",
+    "JSON plain-byte preparation precedes commit; deferred release creates no frame until finish; an unused boundary creates no SQL.",
+    "857 raw binding check correctly avoids current foreign manager/dispatcher rollback; pointer-conditional restoration preserves explicit callback replacements."
+  ],
+  "findings": [
+    {
+      "id": "B4-R1",
+      "severity": "P2",
+      "title": "Original birth may strand its native transaction before cleanup anchor exists",
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+      "method": "dispatch/abort",
+      "trace": "A genuine beforeStartingTransaction callback changes captured app.key/identity metadata while native PDO is idle. Standard begin opens PDO, increments depth and creates the scoped manager record, then dispatches TransactionBeginning. The first metadata.requireCurrent rejects before frame allocation; abort(frame=null) cannot close the original new transaction.",
+      "required_fix": "Protect original actual birth before mutable admission can refuse: a pure authenticated post-before-start guard can reject policy/metadata/hooks/observer/manager/idle drift before physical begin; retain an original birth anchor before callback-capable admission. Never infer ownership from an active PDO or adopt a prestart foreign frame.",
+      "control": "Single target-operation prestart metadata withdrawal: refusal/idle original PDO/no staged DML/no leaked callbacks plus fresh retry. Keep direct prestart foreign-frame/replacement preservation positive."
+    },
+    {
+      "id": "B4-R2",
+      "severity": "P2",
+      "title": "Native-only abort does not discard original scoped-manager callback records",
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureTransactionObserver.php",
+      "method": "abort",
+      "trace": "857 correctly avoids invoking the replacement current framework manager/dispatcher. Its native-only protectFailure(false) rollback branch still leaves the captured original scoped manager pending record/callbacks intact; the record can survive a retained manager and later restoration/retry.",
+      "required_fix": "Capture the exact standard original root record before domain callbacks. On native-only fallback, discard only that record and strict owned descendants callback-free, preserving unrelated reopened same-name root records and foreign manager records. Do not use blanket manager.rollback(name,0) as a pure discard: it invokes afterRollback callbacks. Normal genuinely owned framework rollback retains normal afterRollback semantics.",
+      "control": "Retained foreign same-name manager records and rollback listener untouched; retained original aborted afterCommit cannot fire later; native-only original afterRollback sentinel stays zero; ordinary owned rollback afterRollback positive fires once."
+    },
+    {
+      "id": "B4-R3",
+      "severity": "P2",
+      "title": "New preparation guard has no post-call original continuity fence before domain work",
+      "path": "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php",
+      "method": "run",
+      "trace": "Preparation.start invokes the supplied guard Closure after original context birth, then run immediately calls operation(context). A guard can direct-commit/reopen the captured PDO; the first domain Eloquent write can occur in that foreign frame before expected() refuses.",
+      "required_fix": "Re-prove the original outer frame/context immediately after preparation.start and before operation(context), without recapturing source/authority.",
+      "control": "Start guard normal check then commit/reopen with a native probe: refuse before feature DML, preserve the foreign transaction/probe, and permit a fresh authorized retry after its owner closes it."
+    }
+  ],
+  "open_established_P0_P1": [],
+  "evidence_status": {
+    "initial_cf_component": "Parent reports original18/158/F3/E0/S0 PHP/recorder/OS1; unchanged source. Changed assertion expectations concern old foreign-depth/reset/binding behavior and remain preserved originals. Not a passing selection.",
+    "current_857_component": "Active/pending when reviewed; no completed pass/count/exit claim here.",
+    "reviewer_execution": "No app/PHP/DB/network/CI execution; source-only static paths and test mechanisms."
+  },
+  "remaining_gates": [
+    "Fresh fixed controls and coherent current component execution must reconcile original commands/source/runtime/exits.",
+    "HTTP kernel epoch/response/request-session guards/routes/privacy/UI integration remains pending and unapproved.",
+    "Independent frozen integrated source/test and final sealed evidence review, exact-head preflight/inventory/expected-SHA merge still required.",
+    "No adjacent frozen V1/generic/OriginalCommitWitness/membership or SAPI-wide expansion."
+  ],
+  "commands": [
+    "git rev-parse HEAD; git status --short; scoped diffs at cf7011 and857",
+    "Read new Preparation/Release and reached Operation/Context/Observer/Transaction source plus new/changed focused tests",
+    "Read exact installed Laravel beginTransaction order to trace callback->physical begin->record->observer birth",
+    "Immutable857 Git-byte hashes and exclusive reviewer runtime artifacts"
+  ],
+  "preparation_errors": []
+}

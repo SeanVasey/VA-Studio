@@ -1,0 +1,43 @@
+{
+  "decision": "APPROVE DESIGN WITH CONDITIONS",
+  "reviewed_sha": "e78e25fa6dd7b0286e242ad4d0e63438a2899063",
+  "prior_reviewed_sha": "36e1f63ab3c448d70b8bd2cc799eaab21f999879",
+  "observed_utc": "2026-10-15T17:47:28.241352+00:00",
+  "scope": "Narrow design closure of split-emission refinement; planning only",
+  "clean_head": true,
+  "changed_paths": [
+    "docs/verification/account-features-http-20261015/design.md",
+    "docs/verification/account-features-http-20261015/send-design-review-36e1f63a-original.json",
+    "docs/verification/account-features-http-20261015/send-design-review-36e1f63a-original.md"
+  ],
+  "sha256": {
+    "docs/verification/account-features-http-20261015/design.md": "0a10fdede2a681f02ce7b92a1d8fecc7fa98663a27bfa4aef0be9231361adb6b",
+    "docs/verification/account-features-http-20261015/send-design-review-36e1f63a-original.json": "55a7f4d9ef0ea962f4de46e6375fb07aec12c9d6e0c7f57ec34a72035751e202",
+    "docs/verification/account-features-http-20261015/send-design-review-36e1f63a-original.md": "ffaa501b85c8a55a47b1cea0b0e826c2146e62649094ffb74e0bdcbacbc1a201"
+  },
+  "operative_app_test_source_unchanged": true,
+  "original_36_review_imports_byte_identical": true,
+  "required_design_corrections": [],
+  "open_design_P0_P1": [],
+  "closure_assessment": "Explicit inert standalone sendHeaders/sendContent plus private internal emission phase during a single synchronous send removes the returned-to-caller gap. The private kernel epoch still ensures completion only after parent handle and all RequestHandled listeners. Required split-call/late-withdrawal negative and ordinary atomic-send positive are explicit.",
+  "conditions": [
+    "Implement the authentic private completed-root epoch and exact request/response/one-use boundary; no public phase operation may mint or complete it.",
+    "Keep standalone headers/content and string conversion inert; allow internal split methods only within one synchronous send after callback-capable header/cookie materialization and final original closure. Reentry/second-send/already-sent-headers produce no private output.",
+    "Retain exact original context/identity/reader/admission/private deadline; mint the closing boundary only after positively observed original framework commit, create no read-only frame across session save, and cleanup only an actually owned closing frame. Non-HTTP closure remains immediate.",
+    "Obtain genuine root/session-save/RequestHandled send-path tests, early-send then late-withdrawal and split-call then withdrawal/expiry negatives, replacement/incomplete epoch, scope/actor/manager/deadline and native ownership controls. Unsent TestResponse is not release evidence.",
+    "Independent integrated frozen-source/test and final coherent evidence review, exact-head cheap preflight/inventory/expected-SHA development merge remain required; default false/unmounted and adjacent frozen scopes unchanged."
+  ],
+  "execution_claims": "No HTTP implementation/test/native/final acceptance is approved by this planning gate. Existing metadata14/85/component approval remains separate original evidence.",
+  "reviewer_operations": {
+    "application_tests": false,
+    "database": false,
+    "network_CI": false,
+    "shared_edits": false
+  },
+  "commands": [
+    "git rev-parse HEAD; git status --short",
+    "git diff 36e1f63a..e78e25fa design and changed-path list",
+    "sha256sum imported36 originals; offline Git/current hash assertions and exclusive runtime artifacts"
+  ],
+  "preparation_errors": []
+}

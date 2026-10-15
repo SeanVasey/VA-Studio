@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Http\AccountFeatures;
+
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
+use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Throwable;
+
+/** Private bytes become observable only during one atomic post-kernel native send. */
+final class AccountFeatureResponse extends Response
+{
+    private static ?self $birth = null;
+
+    private static ?self $attempt = null;
+
+    private readonly object $epoch;
+
+    private readonly self $original;
+
+    private ?ProductionFeaturePreparation $preparation = null;
+
+    private bool $attempted = false;
+
+    private bool $emitting = false;
+
+    private array $nativeHeaders = [];
+
+    private ?array $candidateState = null;
+
+    private readonly ResponseHeaderBag $failureHeaders;
+
+    private readonly array $failureNative;
+
+    public function __construct(private readonly Request $request)
+    {
+        self::$birth = $this;
+        try {
+            $this->epoch = AccountFeatureHttpKernel::capture($request, $this);
+            $this->original = $this;
+        } finally {
+            self::$birth = null;
+        }
+        parent::__construct('', 200, AccountFeaturePrivacy::headers());
+        $this->setProtocolVersion('1.1');
+        $failure = AccountFeaturePrivacy::error(503);
+        $this->failureHeaders = $failure->headers;
+        $this->failureNative = self::materialize($failure);
+    }
+
+    public function attach(ProductionFeaturePreparation $preparation): void
+    {
+        if ($this->preparation !== null || $this->attempted) {
+            throw new ProductionFeatureException;
+        }
+        $this->preparation = $preparation;
+    }
+
+    public function forRequest(Request $request): bool
+    {
+        return $this->original === $this && $request === $this->request;
+    }
+
+    public static function constructing(self $response): bool
+    {
+        return self::$birth === $response;
+    }
+
+    public static function attempting(self $response): bool
+    {
+        return self::$attempt === $response;
+    }
+
+    public function __clone(): void
+    {
+        throw new ProductionFeatureException;
+    }
+
+    public function __serialize(): never
+    {
+        throw new \LogicException('Feature responses cannot be serialized.');
+    }
+
+    public function __toString(): string
+    {
+        return '';
+    }
+
+    public function getContent(): string|false
+    {
+        return $this->attempted ? parent::getContent() : '';
+    }
+
+    public function requireUnchanged(): void
+    {
+        if ($this->content !== '' || $this->statusCode !== 200 || $this->version !== '1.1'
+            || $this->headers::class !== ResponseHeaderBag::class
+            || ($this->candidateState !== null && self::stableState($this) !== $this->candidateState)) {
+            throw new ProductionFeatureException;
+        }
+    }
+
+    public function send(bool $flush = true): static
+    {
+        if ($this->original !== $this || $this->attempted || $this->emitting || headers_sent()
+            || ! AccountFeatureHttpKernel::completed($this->request, $this, $this->epoch)) {
+            return $this;
+        }
+        $this->attempted = true;
+        self::$attempt = $this;
+        try {
+            if (! AccountFeatureHttpKernel::consume($this->request, $this, $this->epoch)) {
+                return $this;
+            }
+        } finally {
+            self::$attempt = null;
+        }
+        try {
+            if ($this->preparation === null || $this->content !== '' || $this->statusCode !== 200
+                || $this->headers::class !== ResponseHeaderBag::class || $this->version !== '1.1') {
+                throw new ProductionFeatureException;
+            }
+            $body = $this->preparation->bytes();
+            $native = self::materialize($this);
+            $this->candidateState = self::stableState($this);
+            // Every callback-producing preparation finishes before the original final proof.
+            $this->preparation->finish();
+            $this->nativeHeaders = $native;
+            $this->content = $body;
+        } catch (Throwable) {
+            $this->statusCode = 503;
+            $this->statusText = 'Service Unavailable';
+            $this->headers = $this->failureHeaders;
+            $this->nativeHeaders = $this->failureNative;
+            $this->content = '{"code":"ACCOUNT_FEATURE_UNAVAILABLE"}';
+        }
+        $this->emitting = true;
+        try {
+            $this->sendHeaders();
+            $this->sendContent();
+        } finally {
+            $this->emitting = false;
+        }
+
+        return $this;
+    }
+
+    public function sendHeaders(?int $statusCode = null): static
+    {
+        if ($this->emitting && $statusCode === null) {
+            foreach ($this->nativeHeaders as $header) {
+                header($header, false, $this->statusCode);
+            }
+            http_response_code($this->statusCode);
+        }
+
+        return $this;
+    }
+
+    public function sendContent(): static
+    {
+        if ($this->emitting) {
+            echo $this->content;
+        }
+
+        return $this;
+    }
+
+    private static function materialize(Response $response): array
+    {
+        if ($response->headers::class !== ResponseHeaderBag::class) {
+            throw new ProductionFeatureException;
+        }
+        $allowed = ['content-type', 'cache-control', 'x-robots-tag', 'referrer-policy', 'x-content-type-options',
+            'vary', 'date', 'x-ratelimit-limit', 'x-ratelimit-remaining', 'retry-after', 'expires'];
+        $result = [];
+        foreach ($response->headers->allPreserveCaseWithoutCookies() as $name => $values) {
+            if (! in_array(strtolower($name), $allowed, true) || ! is_array($values) || count($values) > 8) {
+                throw new ProductionFeatureException;
+            }
+            foreach ($values as $value) {
+                if (! is_string($value) || strlen($value) > 1024 || preg_match('/[\x00-\x1F\x7F]/', $value)) {
+                    throw new ProductionFeatureException;
+                }
+                $result[] = $name.': '.$value;
+            }
+        }
+        foreach (AccountFeaturePrivacy::headers() as $name => $expected) {
+            if ($response->headers->get($name) !== $expected && $name !== 'Cache-Control') {
+                throw new ProductionFeatureException;
+            }
+        }
+        if ($response->headers->get('Cache-Control') !== 'no-store, private') {
+            throw new ProductionFeatureException;
+        }
+        $cookies = $response->headers->getCookies();
+        if (count($cookies) > 8) {
+            throw new ProductionFeatureException;
+        }
+        foreach ($cookies as $cookie) {
+            if ($cookie::class !== Cookie::class) {
+                throw new ProductionFeatureException;
+            }
+            $value = (string) $cookie;
+            if (strlen($value) > 8192 || preg_match('/[\x00-\x1F\x7F]/', $value)) {
+                throw new ProductionFeatureException;
+            }
+            $result[] = 'Set-Cookie: '.$value;
+        }
+
+        return $result;
+    }
+
+    /** Stable admitted facts; never recompute a cookie's time-dependent Max-Age during proof. */
+    private static function stableState(Response $response): array
+    {
+        if ($response->headers::class !== ResponseHeaderBag::class) {
+            throw new ProductionFeatureException;
+        }
+        $cookies = $response->headers->getCookies();
+        if (count($cookies) > 8) {
+            throw new ProductionFeatureException;
+        }
+        $state = [];
+        foreach ($cookies as $cookie) {
+            if ($cookie::class !== Cookie::class) {
+                throw new ProductionFeatureException;
+            }
+            $state[] = [$cookie, $cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(),
+                $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly(), $cookie->isRaw(), $cookie->getSameSite(), $cookie->isPartitioned()];
+        }
+
+        return [$response->headers, $response->headers->allPreserveCaseWithoutCookies(), $state];
+    }
+}

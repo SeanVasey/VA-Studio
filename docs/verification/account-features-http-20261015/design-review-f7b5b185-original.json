@@ -1,0 +1,63 @@
+{
+  "decision": "APPROVE DESIGN WITH CONDITIONS",
+  "reviewed_sha": "f7b5b185df3587605b21d3286f9021b4b23ee8c4",
+  "review_kind": "Independent bounded amended-design recheck; planning feasibility only",
+  "observed_utc": "2026-10-15T16:53:35.095245+00:00",
+  "worktree": "/workspace/VA-Studio-tax-v2-committed-read",
+  "base_receipt_sha": "a2cad0bae7ac09e7c74c34e460b2582ba23b111a",
+  "clean_head": true,
+  "changed_paths": [
+    "docs/verification/account-features-http-20261015/design-draft-original.md",
+    "docs/verification/account-features-http-20261015/design-review-draft-original.json",
+    "docs/verification/account-features-http-20261015/design-review-draft-original.md",
+    "docs/verification/account-features-http-20261015/design.md"
+  ],
+  "sha256": {
+    "docs/verification/account-features-http-20261015/design-draft-original.md": "e1ed807f5ade1e6572b03c818fb9a606847e1f06284acc3b938c3a6a746c57e9",
+    "docs/verification/account-features-http-20261015/design-review-draft-original.json": "2559c673670c289d9985c2cd715ab455db2e813fd6d0adbda450fdea27eb38bc",
+    "docs/verification/account-features-http-20261015/design-review-draft-original.md": "4ab415de55dcd30db56048e6cdd7506e8dd1d46015cb63cab51cb6a207e15f9e",
+    "docs/verification/account-features-http-20261015/design.md": "8d997bc5427c9c3cd6ad3e34b79b68aae32bfd83a493384f638f9c0f0cef9879"
+  },
+  "original_imports_byte_identical": true,
+  "four_required_amendments": {
+    "D1": "Satisfied: exact disjoint routes/verbs/body caps/envelopes; explicit downstream privacy handoff; default false plus stale cached-route refusal and route-cache rebuild.",
+    "D2": "Satisfied: preallocated exact native response, held-context trusted projection preparation before ordinary terminal/postcommit proof; private root/framework error precedence; original-only conditional cleanup.",
+    "D3": "Satisfied: scoped raw metadata/User admission at directly reached CustomerAccess/FeatureAccess/IdentityCommittedFrame boundaries; distinct frozen adjacent scopes remain deferred.",
+    "D4": "Satisfied: production initialized envelopes, explicit initialization/version/consent authority, opaque render lifecycle and unknown-result recovery; original post-identity 10-second budget."
+  },
+  "open_design_P0_P1": [],
+  "required_design_corrections": [],
+  "conditions": [
+    "Implement the frozen route/verb/cap/envelope contract, literal default-false registration and runtime stale-cache refusal; explicitly delegate the exact prefix before IdentityPrivacy reads the old 4 KiB body.",
+    "Keep encoding/allocation and the trusted projection-preparation closure inside the original 10-second operation before terminal admission and postcommit closure; preserve uncertain durable results and cleanup only the original owned observer/manager/frame.",
+    "Admit directly reached raw maps, exact native connection/PDO metadata and raw User state before offsets/getters/casts/resolvers, with genuine old-source callback sentinels and supported-runtime positive controls. IdentityOriginalCommitWitness, V1/generic and membership P2s remain deferred.",
+    "Exercise genuine session/CSRF/root privacy, initialized envelopes, explicit initialization, version/export bounds, render-scope clearing, unknown-result write blocking/readback and consent policy. No whole HTTP timing, activation or provider confirmation claim.",
+    "Complete independent frozen source/test and sealed-evidence review, proportionate focused native ownership/commit coverage, exact-published-head cheap preflight, complete check/review/thread inventory and expected-SHA development merge."
+  ],
+  "executions": {
+    "application_tests": false,
+    "database": false,
+    "network": false,
+    "hosted_ci": false,
+    "implementation_changes": false
+  },
+  "limits": [
+    "No B4 product implementation exists in this reviewed delta; no implementation correctness, runtime pass, deployment, live account or full acceptance is approved.",
+    "This recheck uses the prior bounded dependency observations and amended contract; it does not repeat the source audit or assert repaired shared metadata bodies."
+  ],
+  "preparation_failure": {
+    "stage": "Read-only binding command before process creation",
+    "error": "CreateProcess: Rejected(\"Failed to create unified exec process: exec-server transport disconnected\")",
+    "process_created": false,
+    "application_invocation": false,
+    "recovery": "One bounded pwd command completed exit 0; the binding command then completed exit 0."
+  },
+  "commands_observed_this_recheck": [
+    "git rev-parse HEAD",
+    "git status --short / --porcelain",
+    "git diff --name-only a2cad0bae7ac09e7c74c34e460b2582ba23b111a..f7b5b185df3587605b21d3286f9021b4b23ee8c4",
+    "sha256sum four selected design/import files",
+    "python3 offline hash/byte comparison and exclusive runtime artifact creation"
+  ],
+  "contract_read": "Amended design.md read in the preceding bounded review step; no renewed broad source scan."
+}

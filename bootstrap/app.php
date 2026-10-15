@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\AccountFeatures\AccountFeatureHttpKernel;
+use App\Http\AccountFeatures\AccountFeaturePrivacy;
 use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -22,6 +24,7 @@ use App\Http\Responses\SupportAttachmentResponse;
 use App\Http\Responses\TestDeliveryResponse;
 use App\Http\Responses\TestExceptionResolutionResponse;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -31,7 +34,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
-return Application::configure(basePath: dirname(__DIR__))
+$application = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -57,15 +60,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(PaidGrantPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
         $middleware->prepend(TaxRootPrivacy::class);
+        $middleware->prepend(AccountFeaturePrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations', 'name', 'body', 'trackIds', 'noticeVersion', 'noticeHash', 'affirmative']);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (AccountFeaturePrivacy::matches(request())) {
+                try {
+                    Log::error('Account feature request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private generic response. */
+                }
+
+                return false;
+            }
             if (TaxRootPrivacy::matches(request())) {
                 PaidTaxPrivacy::report($exception);
 
@@ -184,6 +196,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (AccountFeaturePrivacy::matches($request)) {
+                return AccountFeaturePrivacy::error($exception instanceof LockTimeoutException ? 503 : $response->getStatusCode());
+            }
             if (TaxRootPrivacy::matches($request)) {
                 $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
 
@@ -310,3 +325,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json(['code' => $code, 'message' => $message], $status, $headers);
         });
     })->create();
+
+$application->singleton(Kernel::class, AccountFeatureHttpKernel::class);
+
+return $application;

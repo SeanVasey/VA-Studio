@@ -1,0 +1,11 @@
+DECISION: APPROVE REPAIRED COMPONENT SOURCE WITH ONE NARROW CLEANUP CONDITION
+
+Reviewed exact `9187362e9d4fb9a988b02620203f1b1eb31eef8d`. The three original custody findings and their directly related followups are closed: prestart tail refusal precedes physical birth and becomes inert after capture/exit; exact-root callback-free bookkeeping preserves foreign records and normal owned rollback semantics; original continuity is re-proved after preparation.start before domain work. Raw standard-record metadata avoids unset-field error callbacks. No P0/P1 is open in this bounded component review.
+
+One P2 metadata correction remains before integrated final approval. Finally currently normalizes every array hook storage using array_values/filter, even a callback-replaced associative array containing no owned tail. Preserve such foreign storage without writing it; when removing our closure preserve unrelated keys/order, reindexing only a genuinely owned original list if needed. This same-mechanism correction does not invalidate the original918 receipts or require a full component rerun by itself.
+
+The actual tests now cover retained foreign manager/listener records, original callback suppression on native-only abort, ordinary afterRollback once, unrelated same-name/stale-parent root preservation, nested delegate work, retained inert tail and unset foreign records. Parent reports completed whole23/212/F0/E0/S0 with PHP/recorder/observedOS0 and unchanged source. Old857 three failures and249 exception-type error remain original nonzero evidence; none is relabeled green. The reviewer inspected mechanisms and executed no app checks or sealed-packet reconciliation here.
+
+This is source approval of the repaired component, conditional on that narrow cleanup edit. Integrated HTTP/kernel epoch/response/session/privacy/UI, real send-path/native evidence and independent final tested-source/sealed-packet review remain pending, followed by exact-head preflight/inventory/expected-SHA merge. Default-off, original deadline, non-HTTP behavior and adjacent frozen scopes stay unchanged.
+
+Only read-only scoped source/test review and original runtime artifact creation occurred; no app/PHP/DB/network/CI execution, shared edit or preparation failure. The JSON binds exact immutable source hashes and the remaining correction.

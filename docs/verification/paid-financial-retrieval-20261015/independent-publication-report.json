@@ -1,0 +1,53 @@
+{
+  "decision": "APPROVE EXACT-HEAD CARRY WITH CONDITIONS",
+  "reviewed_sha": "127c79a7dade4b4570927cdc752a4b5fc34c722a",
+  "carried_publication_head": "5490d000c0069cfc2451d619f5f2fe352736c153",
+  "original_full_approval_sha": "0c3b8f6c38a2dbc5caad6e73b1169bbba719b07c",
+  "independent_non_author": true,
+  "changed_paths": [
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md"
+  ],
+  "documentation_only": true,
+  "p1_documentation_finding": {
+    "thread_id": "r4285656008",
+    "root_reported_severity": "P1",
+    "local_disposition": "addressed",
+    "basis": "Both latest ledger entries now explicitly record completed independent0c3b APPROVE/imports and historical5490carry/preflight success while renewed current-head gates remain pending. No false completed merge or earlier-head preflight coverage is claimed.",
+    "remote_thread_resolution": "Not verified by this read-only local review; complete current remote inventory remains gate."
+  },
+  "open_source_test_packet_p0": 0,
+  "open_source_test_packet_p1": 0,
+  "required_local_correction": [],
+  "byte_original_imports_unchanged": 11,
+  "archive_index_reconciliation_hashes": {
+    "tested-f77f5c12-recorded-evidence.tar.gz": "07d49cc84657e24018f91f36aa2fb831a7c2d1b41bfa7467af2aacccf2315e37",
+    "tested-f77f5c12-recorded-evidence-index.json": "a277ebfd7373413f049956edeae0d751df0cd7ac2ea62f881c53eb2dd900801e",
+    "carry-map-reconciliation.json": "70e8ee9f7a1356a4d3fc550202704c05252df9d2e4f9763baf82540a3b9224fd"
+  },
+  "actual_source_inputs_verified": 2438,
+  "route_inputs": 17,
+  "actual_loaders_verified": 13,
+  "physical_originals_verified": 16,
+  "source_and_all_acceptance_limits_unchanged": [
+    "Current wholeSQLite64/572/F0/E0/S2 with PHP/recorder/OS0; two exact native source-age datasets skipped.",
+    "PrivateMySQL8.4.11 current6/86 in three2/40,2/18,2/28 originals, F/E/S0 and all exits0. Positive original closure, reopened creator frames and genuine elapsed older-source cap/late-caller/callback scope only.",
+    "Interrupted20-case native original remains PHP-15/recorder1/OS1 after796.186s, emptyJUnit/ParseError/null counts; no progress-dot/prefix evidence.",
+    "Native row-drift/failmint/rollback/direct-PDO/afterCommit/precommit and wider SQL/DDL/isolation/deadlock/concurrency/performance remain untested here; current SQLite and prior original-source evidence are separate.",
+    "V1 partial custody uses disclosed synthetic test-only new-wrapper real-clock forwarding; Tax uses genuine retained decrypt. Partial2/38 overlaps whole64 and is not summed.",
+    "Prior13/351 atae6 and69/291 at3e are narrow carries only:265 ae6/current,262 oldSDK with three exact candidate-file exclusions; two changed policies freshly checked,16physical originals including untracked vendor without Git binding claims.",
+    "17quality originals16success1failure preserved;263unique safeguards plus52helper repeat, Composer strictvalidate/audit/platform and read-onlyPint7/8. No new execution by reviewer.",
+    "Unattested candidate providerAuthenticated=false; no real account/provider authentication or atomic/settled/current financial state, no route/binding/schema/businessDML/refund/payment/grant/download/access/rights/inventory/settlement effect.",
+    "Defaultoff/unbound and local/testing synthetic controls; staging/production refuse. SDK21.3.2/API2026-08-26.dahlia/profiles/source/schema unchanged.",
+    "Real provider/account/key/host acceptance, durable append-only financial write/commit/MFA/idempotency/unknown outcomes/tax-refund allocation and Sean-reviewed eligibility/access/rights/exclusive policies remain future gates.",
+    "Frozen shared V1/Identity metadata and membership afterCommit P2s, full Foundation/legal/commercial/parity/activation/host cutover gates remain open."
+  ],
+  "publication_conditions": [
+    "Renewed independent carry is now bound exact127c79a7dade4b4570927cdc752a4b5fc34c722a.",
+    "Green cheap preflight bound this exact current publication head; prior5490 success is historical only.",
+    "Complete checks/reviews/threads/protection inventory, including the documentation thread, and expected40-character-SHA merge without bypass/settings changes.",
+    "Carry originals stay runtime until actual post-merge receipt/ledgers."
+  ],
+  "reviewer_activity": "Read-only exact two-file ledger diff plus byte imports/archive/current-source/loader/physical hash carry. No app/test/PHP/DB/network/CI/shared edits.",
+  "preparation_errors_this_carry": []
+}

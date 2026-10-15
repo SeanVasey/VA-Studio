@@ -1,0 +1,14 @@
+DECISION: REVISE INTEGRATED HTTP/UI SOURCE BEFORE APPROVAL
+
+Reviewed immutable `4854649a28f0ed8541d1b9eac1c0d7f04229b1e8`, upgrading requested b903 only by the correct preallocated protocol1.1 fix. No established P0/P1 is reported; four concrete P2 groups and HTTP acceptance gaps remain. This artifact approves neither the subsequently preserved three-file patch nor current028 source.
+
+- Release identity/lifetime: bind the exact original epoch/object and refuse clones; the current registry's strong response value keeps its weak request key and private graph alive. Require clone/substitution and collection controls.
+- Primitive request guard: raw session login value is cast before type admission, enabling Stringable code during terminal proof. Admit primitive canonical identity first.
+- Stable cookies: comparing renewed Cookie string materialization can differ merely because native Max-Age uses time(). Compare stable raw header/cookie facts, materialize output once before proof; require a real unchanged-cookie callback delay positive.
+- UI ownership: sign-out must clear/abort pending work instead of being disabled, with completion scoped to the original render. Public search timeout must release busy/pending locally even if cancellation is not acknowledged, and reject late results.
+
+Add genuine initial-root conditional registration (current fixture manually loads routes after boot), default/no-query and route-cache controls, actual session-save mutation, replacement/incomplete epoch/foreign frame/headers-sent/disposal, accepted exact body limits and private preprivacy/framework exits. Test/document current all5xx->503 mapping. Frontend needs public-search and sign-out/cancel/scope, consent notice/version and existing exact bound/export controls. Metadata/release component passes do not replace these HTTP checks.
+
+Literal mount admission, explicit old privacy handoff, bounded duplicate-aware body parsing, provisional content hiding, initialized envelopes/explicit initialization, strict UTF8/size/export validation and unknown-result recovery are coherent. Public catalog12/string-ID shape matches the helper. Parent reports old47 actual API positive plus three genuine clone/retention/Stringable failures (whole4/76/F3 with nonzero exits), and earlier isolated request-guard/frontend positives. Current repaired source execution remains unreviewed/pending here; no whole/native/integrated success is inferred.
+
+Reviewer made no shared source edits, including the unattributed patch, and ran no app/frontend/PHP/DB/network/CI check. One missing routes/api.php lookup was corrected to the actual routes/web.php mapping; it was preparation, not application failure. The JSON binds immutable source hashes, exact control scopes and conditions. Repair/frozen-source/evidence review and exact-head preflight/inventory/expected-SHA merge remain required; default-off and adjacent frozen scopes are unchanged.

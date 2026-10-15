@@ -1,0 +1,20 @@
+{
+  "started_utc": "2026-10-15T20:14:05.673504+00:00",
+  "finished_utc": "2026-10-15T20:14:44.392194+00:00",
+  "argv": [
+    "python3",
+    "scripts/ci/test-gitlab-database-receipts.py"
+  ],
+  "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+  "source_before": {
+    "head": "bd7e29119e718ace3a714fbee580c6e8992eeea7",
+    "status": ""
+  },
+  "source_after": {
+    "head": "bd7e29119e718ace3a714fbee580c6e8992eeea7",
+    "status": ""
+  },
+  "process_exit": 0,
+  "log_sha256": "e08811a11ff0b5d3c5c525c46355f0a57adaa7321fcd723cafff8cd13adb50ce",
+  "source_unchanged": true
+}

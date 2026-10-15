@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-10-15T20:07:00.511128+00:00",
+  "finished_utc": "2026-10-15T20:07:02.273176+00:00",
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+  "source_before": {
+    "head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+    "status": ""
+  },
+  "source_after": {
+    "head": "6fdabe77b839eb821fa418f53057707898f5eb3c",
+    "status": ""
+  },
+  "process_exit": 0,
+  "log_sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f",
+  "source_unchanged": true
+}

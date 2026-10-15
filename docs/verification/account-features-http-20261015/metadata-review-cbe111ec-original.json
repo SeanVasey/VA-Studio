@@ -1,0 +1,79 @@
+{
+  "decision": "REVISE COMPONENT BEFORE SOURCE APPROVAL",
+  "reviewed_sha": "cbe111eccc9ecbdfe5967b832eb155df2fc9af9d",
+  "observed_utc": "2026-10-15T17:07:15.629944+00:00",
+  "review_kind": "Independent bounded source/test component checkpoint; not integrated HTTP or final evidence approval",
+  "clean_head": true,
+  "sha256": {
+    "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php": "c3f834560ca52849355f8147255c40605a2f873af43afb74350f25a0b5be1226",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "333d84a841bad8cd0d01d79bfbfecef42b19dc50f2b64cefde190058379a817f",
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "57ee1e61f2c7eb525356f57cc1e4bdec85ea3dacb10ff460b5ffa397c4f61c8d",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "d79c3055c75108ea03ae671ac92d1947086fa961b0bf14b6b9051790a017f4ea",
+    "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php": "fc6b7caf9a6d550661f97eff27c9f9a221468a24d93386fe23bd265e16398344"
+  },
+  "findings": [
+    {
+      "id": "B4-M1",
+      "severity": "P2",
+      "status": "Required repair in this related component",
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+      "line": 100,
+      "title": "Reached resolver maps remain unadmitted before instance resolution",
+      "evidence": "The helper admits instances/aliases/callback maps and raw env descriptor, but not Container.contextual/abstractAliases/buildStack or Application.deferredServices. Application.make/resolve calls isDeferredService (isset deferredServices[key]) before the instance check. Container.resolve calls getContextualConcrete before its instance fast path; findInContextualBindings reads contextual[end(buildStack)][abstract], then abstractAliases[abstract] and its aliases. Non-array ArrayAccess maps or nested contextual entries can therefore run offsets after inspect passes; an effective critical contextual resolver can bypass the admitted raw instance.",
+      "correction": "Raw-admit the actual reached maps and nested critical branches before delegation, refuse effective contextual overrides for config/db/env, and exclude callback-capable resolution at the pure fence. Keep supported ordinary aliases/env binding positive. Avoid unrelated resolver/frozen-family changes.",
+      "control": "Meaningful old/fixed ArrayAccess sentinels for deferredServices and contextual/abstractAliases (including nested current-build branch), with callback count zero on fixed refusal and a standard-array/core-runtime positive.",
+      "claim_limit": "Static source finding; no new runtime counterexample was executed by reviewer."
+    },
+    {
+      "id": "B4-M2",
+      "severity": "P2",
+      "status": "Required repair in these reached call sites",
+      "path": "app/Domain/Customers/ProductionCustomerAccess.php",
+      "line": 65,
+      "title": "Some call sites reach facade/config resolution before raw admission",
+      "evidence": "ProductionCustomerAccess.lock calls DB::transactionLevel at line 67 before its read() admission. FeatureAccess.lock calls policy.current before the CustomerAccess guard. FeatureAccess.lockCommitted calls policy.current before its frame-backed identity proof; proveCommitted delegates to it. Thus an adversarial change at a callback boundary can execute facade/container offsets before the later guard refuses.",
+      "correction": "Admit the owned reader metadata before the first facade/policy access in lock/current paths; assert the original committed frame before policy resolution in committed paths. Ensure later integration boundaries retain original custody rather than recapturing replacement authority.",
+      "control": "Add a real held-reader call-site sentinel after admission/at a callback boundary, plus a late committed-frame metadata refusal test; require zero forbidden callbacks, original-only cleanup and standard positive behavior.",
+      "claim_limit": "These are existing reached gaps left open by the partial patch, not a claimed ordinary healthy-runtime bypass."
+    }
+  ],
+  "open_P0_P1": [],
+  "positive_assessment": [
+    "Exact raw User fields and ID access avoid the old custom ID cast; supplied facade-cache and peer-subclass controls target real existing APIs.",
+    "Application/repository/manager identities, native primary/default statement checks and plain relevant configuration capture precede newly guarded source/frame metadata paths. Source and committed frame retain their original admission snapshot and compare it after callbacks.",
+    "Original frame cleanup and numerical budgets are unchanged; this helper creates no source, principal, SQL receipt, frame or renewed deadline."
+  ],
+  "evidence_status": {
+    "old_source_controls": "Parent reports one actor control 1/3/F1 and remaining three 3/14/F2 with supported positive, all original failure/recorder/OS states retained. Their test bodies were reviewed; execution receipts were not independently reconciled in this source-only checkpoint.",
+    "current_four_case_fixed_run": "Pending when review requested; no pass/count/exit claimed in this artifact.",
+    "reviewer_application_tests": false,
+    "reviewer_database_operations": false,
+    "reviewer_network_or_CI": false
+  },
+  "remaining_integration_conditions": [
+    "ProductionFeatureOperation/context/observer/HTTP birth and post-callback boundaries are upcoming root-owned work, not approved by this partial checkpoint.",
+    "Independent exact tested-source and coherent sealed-evidence review remain necessary before exact-head preflight/inventory/expected-SHA development merge.",
+    "Frozen V1/generic/IdentityOriginalCommitWitness/membership scopes remain deferred."
+  ],
+  "preparation_errors": [
+    {
+      "exit": 128,
+      "operation": "git show of guessed app/Domain/ProductionIdentity/IdentityMetadataAdmission.php",
+      "diagnostic": "Path does not exist; corrected with rg --files and actual Customers/ProductionIdentity path.",
+      "application_failure": false
+    },
+    {
+      "exit": 2,
+      "operation": "rg of guessed ProductionIdentity/Features/ProductionFeatureOperation.php",
+      "diagnostic": "No such file; corrected actual Customers/ProductionFeatures path.",
+      "application_failure": false
+    }
+  ],
+  "read_commands": [
+    "git rev-parse HEAD; git status --short; git diff --stat; git diff -- app",
+    "rg --files app/tests for actual scoped paths",
+    "sed/nl of five selected source/test files and narrowly reached IdentityPolicy/FeaturePolicy/FeatureOperation bodies",
+    "sed of pinned installed Container.resolve/getContextualConcrete, Application deferred-resolution, DatabaseManager default/connection and Connection raw getters",
+    "Offline Git-byte hashes and exclusive reviewer artifact creation only"
+  ]
+}
