@@ -1,0 +1,25 @@
+{
+  "recorded_utc": "2026-10-15T00:54:21.853424+00:00",
+  "expected_head": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+  "response": {
+    "data": {
+      "repository": {
+        "pullRequest": {
+          "headRefOid": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+          "reviewThreads": {
+            "nodes": [],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "reviews": {
+            "nodes": [],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

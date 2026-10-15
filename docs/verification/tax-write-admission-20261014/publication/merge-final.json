@@ -1,0 +1,11 @@
+{
+  "headRefOid": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+  "isDraft": false,
+  "mergeCommit": {
+    "oid": "78efd558b1fafe5ea10a0974ed6e4ba0f9264679"
+  },
+  "mergedAt": "2026-10-15T00:55:40Z",
+  "number": 120,
+  "state": "MERGED",
+  "url": "https://github.com/SeanVasey/VA-Studio/pull/120"
+}
