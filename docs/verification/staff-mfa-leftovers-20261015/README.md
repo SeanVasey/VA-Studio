@@ -32,8 +32,8 @@ The first new private MySQL launch rejected125 because its bind datadir was miss
 
 ## Independent review and remaining limits
 
-Separate source review at11ab36d7 records APPROVE SOURCE WITH EXECUTION AND FINAL EVIDENCE CONDITIONS, no required source correction/openP0/P1. Final native/sealed-evidence review, exact-head carry, cheap preflight, complete current inventory/protections and expected-SHA merge remain pending. Source writer does not self-review.
+Separate source review at11ab36d7 records APPROVE SOURCE WITH EXECUTION AND FINAL EVIDENCE CONDITIONS, no required source correction/openP0/P1. Final separate review at `b7fb1a6c714697322dc70b34bcf81ee2bb4d0838` records **APPROVE BOUNDED DEVELOPMENT SOURCE AND FINAL SEALED EVIDENCE**, openP0/P1=0/0 and no required corrections. Its byte-original [decision](independent-final-review-b7fb1a6c.json) and [report](independent-final-review-b7fb1a6c.md) authenticate the completed scopes and preserve the native timeout and untested conditions. Exact-head publication carry, cheap preflight, complete current inventory/protections and expected-SHA merge remain pending. Source writer does not self-review.
 
 No real staff account, challenge/session/host/FPM/browser/provider/scanner/license/rights/payment/commerce/activation/complete Foundation/release acceptance is inferred from synthetic fixtures. No credentials/live money/customer-active import/host/deploy/DNS/cutover action. Free256's remaining mount/input/host/font/source/identity conditions, B4 and adjacent frozen P2s and full final verification remain open. Fixture normalization is the subsequent handoff item.
 
-Sealed originals: 7PHPinvocations/135members/1231822bytes, SHA256 `9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89`. Final independent source/sealed-evidence review and publication remain pending.
+Sealed originals: 7PHPinvocations/135members/1231822bytes, SHA256 `9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89`. Final independent source/sealed-evidence review is complete; publication remains pending.

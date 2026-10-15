@@ -1,0 +1,553 @@
+{
+  "decision": "APPROVE_BOUNDED_DEVELOPMENT_SOURCE_AND_FINAL_SEALED_EVIDENCE",
+  "evidence_verdict": "Pass for the explicitly completed focused scopes; timeout/incomplete and untested scopes retained",
+  "mechanical_verification": {
+    "archive_bytes": 1231822,
+    "archive_members": 135,
+    "archive_sha256": "9536bd198bb60dc63aa5cfee513698b5beda390ba30be7076eb98097b93ded89",
+    "archived_source_bindings": 22,
+    "bundle_count": 4,
+    "bundles": {
+      "bundle-11ab36d7ed08-3bc5bc140aedb546": {
+        "canonical_identity": {
+          "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+          "manifest_sha256": "829383abd6a58e1153648187bf1ab512e60cb6127b2b4a1230b17e133a2149ee",
+          "public_environment_sha256": "512765770fc4b86a71f79283669b1a000c213dac1fa452c8ccfcf17b72ae1ba2",
+          "runner_sha256": "85db264b648b1708b4483eecfc80922d2997b265a715de73cde431a381120e2d",
+          "runtime_sha256": "946fa14380bc2cff6bb7cecca117fdd3a00a99a90e0b08f14bb4eae7ed9c8369"
+        },
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "input_count": 2461,
+        "physical_loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "physical_loaders": 13,
+        "runtime": {
+          "database": {
+            "database_name": "vaseyaudio_staff_mfa_leftovers",
+            "version": "8.4.11"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+          "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+        }
+      },
+      "bundle-11ab36d7ed08-ab835dc5dbf05626": {
+        "canonical_identity": {
+          "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+          "manifest_sha256": "829383abd6a58e1153648187bf1ab512e60cb6127b2b4a1230b17e133a2149ee",
+          "public_environment_sha256": "d5abbb28963d2925fe0cfd9e072c1c7dee7b1680a9dd25365ee1063525b191bb",
+          "runner_sha256": "a8039c9f1fddaca057ce0dcbe25fe9d268f3efc4c5a437cc0cb464d8a16ec418",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "input_count": 2461,
+        "physical_loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "physical_loaders": 13,
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+          "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+        }
+      },
+      "bundle-8b2cd56c2c44-636f0767927aacf9": {
+        "canonical_identity": {
+          "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+          "manifest_sha256": "3e7d1b571b54b6f583e5854d40a33fd8a4fb76edb1713b745fa97e05c903aa39",
+          "public_environment_sha256": "9b6673b8998c9194593c17c9fce2abcec4e0fa1ac88e3e1844b85fbd07dfe6fa",
+          "runner_sha256": "36b18bed494bb58a46fbc16c4ce1ce3ae8badcca23bbe44e0bb3fda0e18c03b9",
+          "runtime_sha256": "21fb1495c36b17fb275d948718145332071d9eb1c83efbe0b5625c7e5ff8cada"
+        },
+        "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+        "input_count": 2461,
+        "physical_loader_root": "/workspace/VA-Studio-tax-v2-committed-read",
+        "physical_loaders": 13,
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+          "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+        }
+      },
+      "bundle-8b2cd56c2c44-66121446ae7b57e3": {
+        "canonical_identity": {
+          "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+          "manifest_sha256": "3e7d1b571b54b6f583e5854d40a33fd8a4fb76edb1713b745fa97e05c903aa39",
+          "public_environment_sha256": "d5abbb28963d2925fe0cfd9e072c1c7dee7b1680a9dd25365ee1063525b191bb",
+          "runner_sha256": "a8039c9f1fddaca057ce0dcbe25fe9d268f3efc4c5a437cc0cb464d8a16ec418",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+        "input_count": 2461,
+        "physical_loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "physical_loaders": 13,
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)",
+          "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors."
+        }
+      }
+    },
+    "index_sha256": "56222a7f454802aebd1fa1eaa13e1e75ee7aaceec7afa5dd0f71ce4b5b39f0a3",
+    "invocations": [
+      {
+        "bundle": "bundle-8b2cd56c2c44-636f0767927aacf9",
+        "command": "catalog-license-mfa-old-original/command.json",
+        "counts": {
+          "assertions": 50,
+          "errors": 32,
+          "failures": 20,
+          "skipped": 0,
+          "tests": 52
+        },
+        "cwd": "/workspace/VA-Studio-tax-v2-committed-read",
+        "filter": null,
+        "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+        "log_sha256": "47045967aa578d3ed62ef3984d5e4f63f0c40bb61052b8c07e84d8ecd6d88e8f",
+        "name": "catalog-license-mfa-old-original",
+        "original_command_sha256": "e31cab75feb8b8e4eafc0e232651cf3575d1f935cceb79c219361bcce0fff06a",
+        "original_result_sha256": "4127061d9ff285e1c184d7f47135e933ca0af1e1b71c60e9ea4c0eb1655bd21c",
+        "process_exit": 2,
+        "recorder_exit": 1,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 300,
+        "xml_sha256": "e407dddb91071eaf1d389e9be28a1966ab1a8eaa7c39511bdb1c32ae6ec3ffcc"
+      },
+      {
+        "bundle": "bundle-8b2cd56c2c44-66121446ae7b57e3",
+        "command": "catalog-license-mfa-old-storage-v2-original/command.json",
+        "counts": {
+          "assertions": 156,
+          "errors": 0,
+          "failures": 26,
+          "skipped": 0,
+          "tests": 52
+        },
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": null,
+        "head": "8b2cd56c2c4434a01bd1fd699f38a6649433adbb",
+        "log_sha256": "d118473dcb782da65cdf00bb82a9f1775c1bac1e82a7b9e22fcb52f8f11929ae",
+        "name": "catalog-license-mfa-old-storage-v2-original",
+        "original_command_sha256": "1ba70825f705ef8c8202ba1e7aef028928d1532d5794c82bd310cf56fff34194",
+        "original_result_sha256": "72eb2f0d71b92185ccc61e7534c7cafe89b310c9bdbfd686b8b2c1e14e0452d8",
+        "process_exit": 1,
+        "recorder_exit": 1,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 300,
+        "xml_sha256": "3e8efa8054541e82b6ed5b74194b2191b9a6a27e568221f53020320012437829"
+      },
+      {
+        "bundle": "bundle-11ab36d7ed08-ab835dc5dbf05626",
+        "command": "catalog-license-mfa-fixed-original/command.json",
+        "counts": {
+          "assertions": 208,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 52
+        },
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": null,
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "log_sha256": "a2751b40286b022f420b436af4f45d4d5a219a1b7214ff63aee0d581d9ab14a4",
+        "name": "catalog-license-mfa-fixed-original",
+        "original_command_sha256": "2941a61b399ef24ac08b4fa8ff545b610fd52ecae6da1d84656b9fcf20d75bae",
+        "original_result_sha256": "cbb2145d5864f8d694716db6b2fbcc49e6df2a63112fc5e62f66572e48faa8e1",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 300,
+        "xml_sha256": "f2736342b623f69fb86fe43b95de1fb37923be24d5fc2870ae30906c020ed4d8"
+      },
+      {
+        "bundle": "bundle-11ab36d7ed08-ab835dc5dbf05626",
+        "command": "legacy-writer-authority-sqlite-original/command.json",
+        "counts": {
+          "assertions": 272,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 90
+        },
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": null,
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "log_sha256": "4c6df1e5309e681562499bde36f16645d7a58624f138fe09ab4d30d824e59d39",
+        "name": "legacy-writer-authority-sqlite-original",
+        "original_command_sha256": "3d7fd664c59e1d1cb5cfecd5e9495f853a9a38ee61bde8ecdd45b12dae9235d4",
+        "original_result_sha256": "a2ce2942fad61738f0b040761aea7aa2bf904027b4faedd0fcb38b4856457d41",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "selected_files": [
+          "tests/Feature/CatalogWriterAuthorityTest.php",
+          "tests/Feature/LicenseWriterAuthorityTest.php",
+          "tests/Feature/ExclusiveWriterAuthorityTest.php"
+        ],
+        "timeout_seconds": 480,
+        "xml_sha256": "a5e7ef997e1938a44b0c3b88b8aea987691a6e3a302a1201b5336c775a3b421e"
+      },
+      {
+        "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+        "command": "exclusive-prepare-mfa-native-original/command.json",
+        "counts": null,
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": "exclusive prepare",
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "log_sha256": "4d835db0f16905400fd4a74a3062129d87275b62e6939a0e9581e806e22659cc",
+        "name": "exclusive-prepare-mfa-native-original",
+        "original_command_sha256": "84034c538512fa939dc95074e483539cc4f477c6152a725b96050e7c86977c59",
+        "original_result_sha256": "efd2db1e02e06d3800ccfb650ef3a8694885163acc152924b70777993b242486",
+        "process_exit": 124,
+        "recorder_exit": 1,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 420,
+        "xml_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+        "command": "exclusive-prepare-withdrawal-native-original/command.json",
+        "counts": {
+          "assertions": 5,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": "required_panel_rule_refuses.*exclusive prepare.*withdrawn",
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "log_sha256": "b2d41818fa26dc696a71d5d73be6b5b3884f162fdf6014d75f390b6a4be3f022",
+        "name": "exclusive-prepare-withdrawal-native-original",
+        "original_command_sha256": "a9485e49047d785b5c9cb7732f14c1c04135e0f2c0de7667385bbb545903639f",
+        "original_result_sha256": "4710975454d165de764faa19ef9162dfeea604a638442f38307f0a366cdc710c",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 600,
+        "xml_sha256": "2dfea50fc9c5aaa46bf2b799078daf5e60eddbd6a8eeb64e8d11310142da68e5"
+      },
+      {
+        "bundle": "bundle-11ab36d7ed08-3bc5bc140aedb546",
+        "command": "exclusive-prepare-enrolled-native-original/command.json",
+        "counts": {
+          "assertions": 4,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "filter": "required_panel_rule_admits.*exclusive prepare",
+        "head": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+        "log_sha256": "c78a961708c905a4c25001ba0af52a78cfc602c30d9cd34e4ae02fb754c849b2",
+        "name": "exclusive-prepare-enrolled-native-original",
+        "original_command_sha256": "bc1e9867261640ec491d380534b6f7db695b907257b5c9a8d08dcb664b6f57c2",
+        "original_result_sha256": "36b64d0e98ca3e73f64b5cca96ffff34ecf100d70bb02bba595fba1ded404d24",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "selected_files": [
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "timeout_seconds": 360,
+        "xml_sha256": "8d28af00e287bd55ff73e97a8b0f72c79b1f4d58bffd13fbb296acff58bb8362"
+      }
+    ],
+    "manifest_git_bindings": 9844,
+    "physical_loader_difference_paths": [
+      "vendor/composer/autoload_classmap.php",
+      "vendor/composer/autoload_static.php"
+    ],
+    "physical_runtime_member_matches": 107,
+    "private_originals": 6,
+    "reviewed_sha": "b7fb1a6c714697322dc70b34bcf81ee2bb4d0838",
+    "source_carry_unchanged": true,
+    "source_heads": 2,
+    "tested_sha": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+    "unique_git_blobs": 2416
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "private_originals": "Six raw failed log/XML originals are exact hash/size bound and excluded from the public archive. Derived case outcomes match original XML; the empty timeout XML produces [] derived cases and null counts, with no invented pass.",
+  "publication_conditions": [
+    "Import the byte-original final decision in a docs-only head, accurately mark final review complete and publication carry/preflight/inventory/merge pending, and obtain an explicit exact-head carry.",
+    "Require cheap exact-head preflight, complete current review/thread/check inventory, unchanged protections and expected-head merge."
+  ],
+  "required_corrections": [],
+  "review_execution": "Read-only immutable Git and standard-library archive/hash/XML inspection. No duplicate application tests, database/network/CI operations or shared edits. Only this exclusive reviewer MD/JSON report pair created.",
+  "reviewed_sha": "b7fb1a6c714697322dc70b34bcf81ee2bb4d0838",
+  "scope": "Authorized #92 catalog/license/exclusive-preparation enrollment leftovers; unchanged approved source plus final focused packet",
+  "source_verdict": "Pass for the bounded implementation",
+  "specification_assessment": "Eleven guards immediately follow existing locked-current actor/admin admission before resource/file/audit effects. Existing require() and required/optional panel policy, attestation behavior, business semantics and current-actor lock ordering remain unchanged.",
+  "status_assessment": "README and ledger evidence distinguish genuine baseline failures, an incomplete four-dataset native timeout and two completed narrow native successors. Final source/evidence review and publication were correctly pending at the reviewed immutable head.",
+  "supplemental_reconciliation": {
+    "copied_cli_proxies_verified": 8,
+    "first_launch_exit": 125,
+    "native_discovery": {
+      "discovered_cases": 9149,
+      "discovered_files": 674,
+      "fallback_timing_files": 69,
+      "generated_files_verified": 18,
+      "selected_cases": 2423,
+      "selected_files": 232,
+      "shard_case_counts": [
+        287,
+        288,
+        296,
+        305,
+        296,
+        313,
+        354,
+        284
+      ]
+    },
+    "native_lifecycle": {
+      "mysql-server-launch": {
+        "argv": [
+          "docker",
+          "run",
+          "--detach",
+          "--name",
+          "va-studio-private-mysql-staff-mfa-leftovers-v2-20261015",
+          "--publish",
+          "127.0.0.1:33523:3306",
+          "--mount",
+          "type=bind,source=/tmp/va-studio-staff-mfa-leftovers-mysql-data-v2-20261015,target=/var/lib/mysql",
+          "--mount",
+          "type=bind,source=/tmp/va-studio-staff-mfa-leftovers-mysql-socket-v2-20261015,target=/var/run/staff-mfa-leftovers",
+          "--env",
+          "MYSQL_ALLOW_EMPTY_PASSWORD=yes",
+          "--env",
+          "MYSQL_ROOT_HOST=%",
+          "mysql:8.4",
+          "--socket=/var/run/staff-mfa-leftovers/mysql.sock",
+          "--default-time-zone=+00:00"
+        ],
+        "process_exit": 0,
+        "recorded_utc": "2026-10-15T21:39:14.695868+00:00",
+        "stderr": "",
+        "stdout": "05b5a8d720c159fea44518b8f99f8a488239fee0e5ed8e7546d99d4405e6988f\n"
+      },
+      "mysql-server-ready": {
+        "attempts": 1,
+        "container": "va-studio-private-mysql-staff-mfa-leftovers-v2-20261015",
+        "host_port": 33523,
+        "host_socket": "/tmp/va-studio-staff-mfa-leftovers-mysql-socket-v2-20261015/mysql.sock",
+        "private_datadir": "/tmp/va-studio-staff-mfa-leftovers-mysql-data-v2-20261015",
+        "recorded_utc": "2026-10-15T21:39:57.631222+00:00",
+        "schema": "vaseyaudio_staff_mfa_leftovers",
+        "scope": "New owned synthetic local server; prior datadirs untouched. No provider/host acceptance.",
+        "socket_accessible": true
+      },
+      "mysql-server-stop": {
+        "argv": [
+          "docker",
+          "stop",
+          "--time",
+          "30",
+          "05b5a8d720c159fea44518b8f99f8a488239fee0e5ed8e7546d99d4405e6988f"
+        ],
+        "process_exit": 0,
+        "recorded_utc": "2026-10-15T22:15:28.399467+00:00",
+        "scope": "Only exact owned MFA private v2server stopped normally; datadir retained, unrelated containers untouched.",
+        "stderr": "",
+        "stdout": "Flag --time has been deprecated, use --timeout instead\n05b5a8d720c159fea44518b8f99f8a488239fee0e5ed8e7546d99d4405e6988f\n"
+      },
+      "mysql-server-version": {
+        "argv": [
+          "docker",
+          "exec",
+          "va-studio-private-mysql-staff-mfa-leftovers-v2-20261015",
+          "mysql",
+          "--socket=/var/run/staff-mfa-leftovers/mysql.sock",
+          "-uroot",
+          "--batch",
+          "--database",
+          "vaseyaudio_staff_mfa_leftovers",
+          "--execute",
+          "SELECT VERSION() AS version, DATABASE() AS database_name, @@session.time_zone AS time_zone, @@session.sql_mode AS sql_mode;"
+        ],
+        "process_exit": 0,
+        "recorded_utc": "2026-10-15T21:39:57.631028+00:00",
+        "stderr": "",
+        "stdout": "version\tdatabase_name\ttime_zone\tsql_mode\n8.4.11\tvaseyaudio_staff_mfa_leftovers\t+00:00\tONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION\n"
+      },
+      "mysql-stopped-state": {
+        "container_id": "05b5a8d720c159fea44518b8f99f8a488239fee0e5ed8e7546d99d4405e6988f",
+        "datadir_retained": true,
+        "state": {
+          "Dead": false,
+          "Error": "",
+          "ExitCode": 0,
+          "FinishedAt": "2026-10-15T22:15:28.30839093Z",
+          "OOMKilled": false,
+          "Paused": false,
+          "Pid": 0,
+          "Restarting": false,
+          "Running": false,
+          "StartedAt": "2026-10-15T21:39:14.507477957Z",
+          "Status": "exited"
+        },
+        "unrelated_policy_server_running": true
+      }
+    },
+    "observed_foreground_receipts": {
+      "corrected-old-tool-exit-original.json": {
+        "counts": {
+          "assertions": 156,
+          "errors": 0,
+          "failures": 26,
+          "skipped": 0,
+          "tests": 52
+        },
+        "name": "catalog-license-mfa-old-storage-v2-original",
+        "php_exit": 1,
+        "recorder_exit": 1,
+        "scope": "Observed completed foreground tool and original receipts, no inferred passing result",
+        "session_id": 40214,
+        "tool_exit": 1
+      },
+      "fixed-matrix-tool-exit-original.json": {
+        "name": "catalog-license-mfa-fixed-original",
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "scope": "Observed completed foreground tool output; genuine current whole52/208/F0/E0/S0, unchanged source/loader/runner.",
+        "session_id": 84059,
+        "tool_exit": 0
+      },
+      "legacy-authority-tool-exit-original.json": {
+        "counts": {
+          "assertions": 272,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 90
+        },
+        "name": "legacy-writer-authority-sqlite-original",
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "session_id": 15267,
+        "tool_exit": 0
+      },
+      "native-enrolled-tool-exit-original.json": {
+        "counts": {
+          "assertions": 4,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "name": "exclusive-prepare-enrolled-native-original",
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "session_id": 64860,
+        "tool_exit": 0
+      },
+      "native-timeout-tool-exit-original.json": {
+        "junit_counts": null,
+        "name": "exclusive-prepare-mfa-native-original",
+        "php_exit": 124,
+        "recorder_exit": 1,
+        "scope": "Actual420second budget timeout; empty JUnit is not a pass and no executed testcase/assertion count is claimed. Source/runner/loader unchanged, original log/hash retained.",
+        "session_id": 41979,
+        "tool_exit": 1
+      },
+      "native-withdrawal-tool-exit-original.json": {
+        "counts": {
+          "assertions": 5,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "name": "exclusive-prepare-withdrawal-native-original",
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "session_id": 47458,
+        "tool_exit": 0
+      }
+    },
+    "quality": [
+      {
+        "argv": [
+          "php",
+          "vendor/bin/pint",
+          "--test",
+          "app/Domain/Catalog/SaveTrackMetadata.php",
+          "app/Domain/Catalog/SaveOfferDraft.php",
+          "app/Domain/Catalog/DeactivateOffer.php",
+          "app/Domain/Catalog/PublishOffer.php",
+          "app/Domain/Catalog/PrepareExclusiveOffer.php",
+          "app/Domain/Catalog/ActivateExclusiveOffer.php",
+          "app/Domain/Rights/CreateLicenseDraft.php",
+          "app/Domain/Rights/UpdateLicenseDraft.php",
+          "app/Domain/Rights/ReviewLicense.php",
+          "app/Domain/Rights/PublishLicense.php",
+          "tests/Feature/CatalogLicenseStaffMfaTest.php"
+        ],
+        "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+        "name": "focused-pint",
+        "process_exit": 0
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-phpunit-shards.py"
+        ],
+        "log_sha256": "e10868e2daed8d72c23223d7f2d7212d68b06cb0b63597c471f15b393ea39c40",
+        "name": "shard-policy",
+        "process_exit": 0
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/phpunit-shards.py",
+          "--shards=8",
+          "--prefix=phpunit-ci-mysql",
+          "--timings=scripts/ci/phpunit-timings-mysql.json",
+          "--mysql-native-selection"
+        ],
+        "log_sha256": "d7ad8af2e7d8c89336483e9fbf5e2395bee322c02436c79e721e44a866002a2d",
+        "name": "native-discovery",
+        "process_exit": 1
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/phpunit-shards.py",
+          "--shards=8",
+          "--prefix=phpunit-ci-mysql",
+          "--timings=scripts/ci/phpunit-timings-mysql.json",
+          "--mysql-native-selection"
+        ],
+        "log_sha256": "da4a9dd6eea7589fbd93fd4621707e380ad7a221065bd5acd8cc05259c7cc161",
+        "name": "native-discovery-corrected",
+        "process_exit": 0
+      }
+    ]
+  },
+  "tested_source_sha": "11ab36d7ed0896b9bfe811f9530b7c27508a4117",
+  "untested": [
+    "Required-unenrolled and optional-testing native counterparts",
+    "Other writers on MySQL; original four-dataset native scope, full native matrix and concurrency",
+    "Real staff challenge/session, production host/FPM/browser/provider and full release acceptance",
+    "Remaining Free mount/source/font/identity/host/activation and B4/adjacent frozen P2 conditions"
+  ]
+}
