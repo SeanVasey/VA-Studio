@@ -18,6 +18,10 @@ use App\Domain\Commerce\ProductionFinancialInspection\FinancialInspectionExcepti
 use App\Domain\Commerce\ProductionFinancialInspection\FinancialInspectionPolicy;
 use App\Domain\Commerce\ProductionFinancialInspection\FinancialObservation;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Domain\Customers\ProductionCustomerAccess;
@@ -33,7 +37,10 @@ use Tests\Support\PaidTaxGrantFixtures;
 use Tests\Support\ProductionCheckoutFixtures;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\ProductionCheckoutProviderFixtures;
+use Tests\Support\ProductionTrackPreparationFixtures;
 use Tests\Support\QuoteFixtures;
+use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
 
 /** Actual local-SMTP paid source fixtures; envelopes are unattested synthetic inputs, never provider facts. */
@@ -51,14 +58,33 @@ final class FinancialCandidateTest extends TestCase
             'production-financial-inspection.enabled' => true]);
     }
 
-    private function paidV1(bool $two = false): array
+    private function financialCatalog(bool $tax, string $capture): array
     {
-        if (! $two) {
+        if ($tax) {
+            self::configureTax();
+        } else {
+            ProductionCheckoutProviderFixtures::configure();
+        }
+        $catalog = ProductionTrackPreparationFixtures::prepared();
+        $machine = $tax ? self::taxMachine() : ProductionCheckoutProviderFixtures::machine();
+        $machine['choices']['provider_account']['capture_method'] = $capture;
+        $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
+            app(PrepareProductionTrackCapabilities::class)->review($catalog['candidate'], $catalog['source'], $machine, $catalog['actor']), $catalog['actor']);
+        app(ReviewProductionTrackCapabilities::class)->applyReviewed(app(ReviewProductionTrackCapabilities::class)->review($candidate, $catalog['reviewer']),
+            ProductionTrackPreparationFixtures::reference('software_choices_reviewed'), $catalog['reviewer']);
+        config(['production_checkout.exemption_authoring_enabled' => true,
+            'production_checkout.exemption_policy_owner_ids' => [$catalog['actor']->id]]);
+
+        return array_replace($catalog, compact('candidate', 'machine'));
+    }
+
+    private function paidV1(bool $two = false, string $capture = 'automatic'): array
+    {
+        if (! $two && $capture === 'automatic') {
             $f = $this->payable();
         } else {
-            $catalog = ProductionCheckoutFixtures::catalog();
-            $second = QuoteFixtures::selection(3499);
-            $items = [...$catalog['items'], ...$second['items']];
+            $catalog = $this->financialCatalog(false, $capture);
+            $items = $two ? [...$catalog['items'], ...QuoteFixtures::selection(3499)['items']] : $catalog['items'];
             $buyer = $this->enrollThroughLocalSmtp();
             $access = new ProductionCustomerAccess;
             $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id,
@@ -181,6 +207,54 @@ final class FinancialCandidateTest extends TestCase
         $this->assertSame(9372, $summary['originalGrossMinor']);
         $this->assertFalse($summary['providerAuthenticated']);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    public function test_original_v1_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused(): void
+    {
+        $expected = $this->inV1($this->paidV1(capture: 'automatic_async'), fn ($source, $reader) => FinancialExpectation::fromV1($source, $reader));
+        $raw = $this->envelope($expected);
+        $raw['payment']['capture_method'] = 'automatic_async';
+        $this->assertSame('consistent_candidate', FinancialObservation::capture($expected, $raw)->summary()['inputState']);
+        $raw['payment']['capture_method'] = 'automatic';
+        $this->refuses(fn () => FinancialObservation::capture($expected, $raw));
+    }
+
+    public function test_original_tax_automatic_async_capture_is_admitted_and_other_capture_methods_are_refused(): void
+    {
+        $catalog = $this->financialCatalog(true, 'automatic_async');
+        $buyer = $this->enrollThroughLocalSmtp();
+        $access = new ProductionCustomerAccess;
+        $transport = new RecordingTaxCheckoutTransport;
+        $checkout = new ProductionTaxCheckout($access, $transport);
+        $preview = $checkout->preview($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items']);
+        $order = $checkout->order($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $preview['previewHash'], true,
+            ['legalName' => 'Declared synthetic buyer'], 'synthetic-tax-async');
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $checkout->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
+        $transport->paid = true;
+        $this->assertSame('verified', $checkout->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+        $locator = ProductionTaxPaidOrderLocatorV2::locate($order['orderId']);
+        $expected = CommandTransaction::run(function (Records $rows) use ($access, $locator) {
+            $history = $access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
+            $source = ProductionTaxPaidOrderSourceV2::lockedRead($locator, $rows->current, $history);
+
+            return FinancialExpectation::fromTaxV2($source, $rows->current);
+        });
+        $raw = $this->envelope($expected);
+        $raw['payment']['capture_method'] = 'automatic_async';
+        $this->assertSame('consistent_candidate', FinancialObservation::capture($expected, $raw)->summary()['inputState']);
+        $raw['payment']['capture_method'] = 'automatic';
+        $this->refuses(fn () => FinancialObservation::capture($expected, $raw));
+    }
+
+    public function test_charge_transfer_pointer_is_refused_in_either_separate_get(): void
+    {
+        $expected = $this->expectation();
+        foreach (['charge_before', 'charge_after'] as $key) {
+            $raw = $this->envelope($expected);
+            $raw[$key]['transfer'] = 'tr_SYNTHETIC';
+            $this->refuses(fn () => FinancialObservation::capture($expected, $raw));
+        }
     }
 
     public function test_refund_status_sums_and_historical_disputes_remain_separate_from_charge_flags_and_aggregate(): void
@@ -413,7 +487,7 @@ final class FinancialCandidateTest extends TestCase
             $this->refuses(fn () => FinancialExpectation::fromTaxV2($source, $rows->current), 'disabled');
             config(['production-financial-inspection.enabled' => true]);
             try {
-                FinancialExpectation::fromTaxV2($source, new CurrentRows(DB::getPdo(), DB::getDriverName()));
+                FinancialExpectation::fromTaxV2($source, new CurrentRows($rows->current->identityPrimary(), $rows->current->identityDriver()));
                 $this->fail('A different Tax reader was accepted.');
             } catch (CheckoutException $error) {
                 $this->assertSame('committed_read_frame', $error->reason);
