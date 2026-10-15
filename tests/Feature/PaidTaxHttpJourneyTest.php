@@ -6,9 +6,11 @@ use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutTransport;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxPaidOriginalCommitDispatcher;
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+use App\Domain\Grants\PaidTax\PaidTaxReads;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Http\Tax\PaidTaxRequestContext;
+use App\Http\Tax\PaidTaxResponseOwner;
 use App\Http\Tax\PaidTaxStreamResponse;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Auth;
@@ -134,6 +136,7 @@ final class PaidTaxHttpJourneyTest extends TestCase
         session()->regenerateToken();
         $fresh = session()->token();
         $this->assertNotSame($old, $fresh);
+        session()->save();
         $raw = http_build_query(['token' => $a['token'], '_token' => $old]);
         $this->call('POST', $this->redemptionPath($f, $a), [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded', 'REQUEST_TIME_FLOAT' => microtime(true)], $raw)->assertStatus(419);
         $this->assertDatabaseCount('paid_tax_redemptions', 0);
@@ -161,9 +164,57 @@ final class PaidTaxHttpJourneyTest extends TestCase
         $this->assertInstanceOf(TaxPaidOriginalCommitDispatcher::class, DB::connection()->getEventDispatcher());
         unset($r);
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
-        $this->assertDatabaseCount('paid_tax_redemptions', 1, 'Disposal retains the already durable attempt.');
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
         $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertStatus(409);
         $this->get('/paid-tax-grants/origins/'.$f['batch']['id'])->assertOk()->assertJsonPath('origin.id', $f['batch']['id']);
+    }
+
+    public function test_actual_captured_read_encoding_construction_and_clone_failures_preserve_cleanup_and_original_error(): void
+    {
+        $f = $this->complete();
+        $delegate = DB::connection()->getEventDispatcher();
+        foreach (['encoding', 'construction'] as $gap) {
+            $owner = new PaidTaxResponseOwner;
+            (new PaidTaxReads)->show($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'], $owner->read());
+            $this->assertInstanceOf(TaxPaidOriginalCommitDispatcher::class, DB::connection()->getEventDispatcher());
+            $original = new \RuntimeException('synthetic-response-header-callback');
+            try {
+                if ($gap === 'encoding') {
+                    PaidTaxStreamResponse::projection(['bad' => "\xff"], $owner);
+                } else {
+                    $header = new class($original) implements \Stringable
+                    {
+                        public function __construct(private \RuntimeException $original) {}
+
+                        public function __toString(): string
+                        {
+                            throw $this->original;
+                        }
+                    };
+                    new PaidTaxStreamResponse($owner, static function (): void {}, ['Cache-Control' => [$header]]);
+                }
+                $this->fail('The response allocation gap was accepted.');
+            } catch (\Throwable $error) {
+                if ($gap === 'encoding') {
+                    $this->assertInstanceOf(\JsonException::class, $error);
+                } else {
+                    $this->assertSame($original, $error);
+                }
+            }
+            $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+            $this->get('/paid-tax-grants/origins/'.$f['batch']['id'])->assertOk()->assertJsonPath('origin.id', $f['batch']['id']);
+        }
+        $response = $this->get('/paid-tax-grants/origins/'.$f['batch']['id'])->assertOk();
+        $observer = DB::connection()->getEventDispatcher();
+        try {
+            $copy = clone $response->baseResponse;
+            $this->fail('Private response cloned.');
+        } catch (\LogicException) {
+            $this->assertSame($observer, DB::connection()->getEventDispatcher(), 'A refused copy cannot close the original owner.');
+        }
+        $response->assertJsonPath('origin.id', $f['batch']['id']);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame(0, DB::transactionLevel());
     }
 
     public static function lateWithdrawal(): array

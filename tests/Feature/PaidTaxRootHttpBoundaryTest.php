@@ -10,7 +10,9 @@ use App\Domain\Grants\PaidTax\PaidTaxPolicy;
 use App\Http\Tax\PaidTaxRequestContext;
 use App\Http\Tax\PaidTaxResponseOwner;
 use App\Http\Tax\PaidTaxStreamResponse;
+use App\Http\Tax\TaxHttpMount;
 use Closure;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Tests\Support\PaidTaxRootHttpFixture;
 use Tests\TestCase;
 
@@ -181,6 +184,138 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         unset($response);
         $this->assertNull($ref->get(), 'The callback does not keep its response alive.');
         $this->assertOwnerClosed($owner);
+    }
+
+    public static function malformedMetadata(): array
+    {
+        return [['instances'], ['bindings'], ['env_binding'], ['config_parent']];
+    }
+
+    #[DataProvider('malformedMetadata')]
+    public function test_mount_admission_rejects_nonliteral_metadata_without_invoking_callbacks(string $case): void
+    {
+        $calls = 0;
+        $callback = new class($calls) implements \ArrayAccess
+        {
+            public function __construct(private int &$calls) {}
+
+            public function offsetExists(mixed $offset): bool
+            {
+                $this->calls++;
+
+                return true;
+            }
+
+            public function offsetGet(mixed $offset): mixed
+            {
+                $this->calls++;
+
+                return true;
+            }
+
+            public function offsetSet(mixed $offset, mixed $value): void
+            {
+                $this->calls++;
+            }
+
+            public function offsetUnset(mixed $offset): void
+            {
+                $this->calls++;
+            }
+        };
+        $instanceProperty = new \ReflectionProperty(Container::class, 'instances');
+        $bindingProperty = new \ReflectionProperty(Container::class, 'bindings');
+        $instances = $instanceProperty->getValue($this->app);
+        $bindings = $bindingProperty->getValue($this->app);
+        $configuration = $instances['config'];
+        $itemsProperty = new \ReflectionProperty($configuration, 'items');
+        $items = $itemsProperty->getValue($configuration);
+        try {
+            if ($case === 'instances') {
+                $instanceProperty->setValue($this->app, $callback);
+            } elseif ($case === 'config_parent') {
+                $changed = $items;
+                $changed['paid-tax-grants'] = $callback;
+                $itemsProperty->setValue($configuration, $changed);
+            } else {
+                unset($instances['env']);
+                $instanceProperty->setValue($this->app, $instances);
+                $bindings['env'] = ['concrete' => function () use (&$calls) {
+                    $calls++;
+
+                    return 'testing';
+                }, 'shared' => false];
+                $bindingProperty->setValue($this->app, $case === 'bindings' ? $callback : $bindings);
+            }
+            $admitted = TaxHttpMount::admitted('paid-tax-grants.http_mounted');
+        } finally {
+            $instanceProperty->setValue($this->app, $case === 'bindings' || $case === 'env_binding' ? [...$instances, 'env' => 'testing'] : $instances);
+            $bindingProperty->setValue($this->app, $bindings);
+            $itemsProperty->setValue($configuration, $items);
+        }
+        $this->assertFalse($admitted);
+        $this->assertSame(0, $calls, 'Raw descriptor refusal cannot invoke ArrayAccess or an env factory.');
+    }
+
+    public function test_standard_literal_environment_binding_mounts_without_resolving_its_factory(): void
+    {
+        $this->app['env'] = 'testing';
+        $this->assertTrue(TaxHttpMount::admitted('paid-tax-grants.http_mounted'));
+        $this->postJson('/paid-tax-grants/orders/11111111-1111-4111-8111-111111111111/finalize', [])->assertStatus(422);
+    }
+
+    public function test_request_start_descriptor_refuses_callback_bag_and_keeps_a_failed_capture_tombstone(): void
+    {
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $request = Request::create('/paid-tax-grants/origins/a/authorizations/b/redeem');
+        $bag = new class(['REQUEST_TIME_FLOAT' => microtime(true)]) extends ParameterBag
+        {
+            public int $calls = 0;
+
+            public function get(string $key, mixed $default = null): mixed
+            {
+                $this->calls++;
+
+                return parent::get($key, $default);
+            }
+        };
+        $request->server = $bag;
+        try {
+            PaidTaxRequestContext::capture($request);
+            $this->fail('Callback-producing server bag admitted.');
+        } catch (PaidTaxException $error) {
+            $this->assertSame(503, $error->status);
+        }
+        $this->assertSame(0, $bag->calls);
+        $request->server = new ParameterBag(['REQUEST_TIME_FLOAT' => microtime(true)]);
+        try {
+            PaidTaxRequestContext::capture($request);
+            $this->fail('Failed enrollment was renewed.');
+        } catch (PaidTaxException $error) {
+            $this->assertSame(503, $error->status);
+        }
+    }
+
+    public function test_producer_root_reads_the_actual_raw_stream_once_and_preserves_its_duplicate_parser(): void
+    {
+        config(['production-tax-checkout.enabled' => true]);
+        $request = new class extends Request
+        {
+            public int $reads = 0;
+
+            public function getContent(bool $asResource = false)
+            {
+                $this->reads++;
+
+                return parent::getContent($asResource);
+            }
+        };
+        $request->initialize([], [], [], [], [], ['REQUEST_METHOD' => 'POST', 'REQUEST_URI' => '/production/tax-checkout/previews',
+            'SERVER_NAME' => 'localhost', 'SERVER_PORT' => 80, 'CONTENT_TYPE' => 'application/json'], '{"candidateId":1,"\\u0063andidateId":2}');
+        $response = $this->app->make(Kernel::class)->handle($request);
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame(1, $request->reads);
+        $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
     }
 
     private function assertOwnerClosed(PaidTaxResponseOwner $owner): void

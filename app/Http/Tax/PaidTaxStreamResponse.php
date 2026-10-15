@@ -12,8 +12,11 @@ use Throwable;
 /** The response owns cleanup even if never sent. Its callback never captures the response. */
 final class PaidTaxStreamResponse extends StreamedResponse
 {
-    public function __construct(private ?PaidTaxResponseOwner $owner, Closure $callback, array $headers)
+    private ?PaidTaxResponseOwner $owner;
+
+    public function __construct(PaidTaxResponseOwner $owner, Closure $callback, array $headers)
     {
+        $this->owner = $owner;
         try {
             parent::__construct($callback, 200, $headers);
             PaidTaxPrivacy::protect($this);
