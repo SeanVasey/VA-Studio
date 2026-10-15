@@ -1,0 +1,21 @@
+{
+  "started_utc": "2026-10-15T22:58:46.169881+00:00",
+  "finished_utc": "2026-10-15T22:58:46.171588+00:00",
+  "argv": [
+    "bash",
+    "-n",
+    "scripts/dev/with-mysql-test-server.sh"
+  ],
+  "cwd": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+  "source_before": {
+    "head": "e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08",
+    "status": ""
+  },
+  "source_after": {
+    "head": "e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08",
+    "status": ""
+  },
+  "process_exit": 0,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source_unchanged": true
+}
