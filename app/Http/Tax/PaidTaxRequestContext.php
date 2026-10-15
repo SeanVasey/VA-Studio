@@ -7,6 +7,7 @@ use App\Domain\Grants\PaidTax\PaidTaxRequestBudget;
 use Illuminate\Http\Request;
 use ReflectionProperty;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\ServerBag;
 use WeakMap;
 
 /** One original budget and one claim; tombstones live only as long as the exact request. */
@@ -21,7 +22,7 @@ final class PaidTaxRequestContext
         // Reserve before clock/config callbacks, including failure: this request cannot recapture.
         self::$requests[$request] = ['budget' => null, 'claimed' => false];
         $server = $request->server;
-        PaidTaxException::require($server::class === ParameterBag::class);
+        PaidTaxException::require($server::class === ServerBag::class);
         $parameters = (new ReflectionProperty(ParameterBag::class, 'parameters'))->getValue($server);
         PaidTaxException::require(is_array($parameters));
         $started = $parameters['REQUEST_TIME_FLOAT'] ?? null;

@@ -12,10 +12,12 @@ use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Http\Tax\PaidTaxRequestContext;
 use App\Http\Tax\PaidTaxResponseOwner;
 use App\Http\Tax\PaidTaxStreamResponse;
+use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -54,10 +56,10 @@ final class PaidTaxHttpJourneyTest extends TestCase
             '_production_customer_identity' => ['binding_digest' => $buyer['principal']->sessionBindingDigest()]]);
     }
 
-    private function postTax(string $path, array $body = [], ?string $csrf = null)
+    private function postTax(string $path, array $body = [], ?string $csrf = null, float $age = 0)
     {
         return $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'text/html',
-            'HTTP_X_CSRF_TOKEN' => $csrf ?? session()->token(), 'REQUEST_TIME_FLOAT' => microtime(true)],
+            'HTTP_X_CSRF_TOKEN' => $csrf ?? session()->token(), 'REQUEST_TIME_FLOAT' => microtime(true) - $age],
             $body === [] ? '{}' : json_encode($body, JSON_THROW_ON_ERROR));
     }
 
@@ -251,9 +253,10 @@ final class PaidTaxHttpJourneyTest extends TestCase
             $original = $map[$request]['budget'];
             $request->server->set('REQUEST_TIME_FLOAT', microtime(true) + 3600);
             $request->attributes->set('_paid_tax_budget', new \stdClass);
-            $original->shortenTo(hrtime(true) - 1);
+            $this->assertLessThan(microtime(true) - 59, (float) $original->receivedAt->at->format('U.u'));
+            usleep(500_000);
         });
-        $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertStatus(410);
+        $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']], age: 59.7)->assertStatus(410);
         $this->assertDatabaseCount('paid_tax_redemptions', 0);
     }
 
@@ -292,8 +295,70 @@ final class PaidTaxHttpJourneyTest extends TestCase
         $first = (array) DB::table('paid_tax_originals')->sole();
         $this->assertDatabaseCount('paid_tax_authorizations', 0);
         $this->app->instance(PaidTaxRendererProcess::class, new PaidTaxRendererProcess);
-        $this->postTax('/paid-tax-grants/origins/'.$batch['id'].'/document')->assertOk()->assertJsonPath('origin.fulfilled', true);
+        $complete = $this->postTax('/paid-tax-grants/origins/'.$batch['id'].'/document')->assertOk()->assertJsonPath('origin.fulfilled', true)->json('origin');
         $this->assertSame($first, (array) DB::table('paid_tax_originals')->where('id', $first['id'])->sole());
         $this->assertDatabaseCount('paid_tax_originals', 2);
+        foreach ($complete['lines'] as $index => $line) {
+            $original = (array) DB::table('paid_tax_originals')->where('origin_public_id', $line['id'])->sole();
+            $artifact = PaidTaxRecords::decode($original)['artifact'];
+            foreach (['contract', 'master_wav'] as $kind) {
+                $a = $this->postTax('/paid-tax-grants/origins/'.$batch['id'].'/lines/'.$line['id'].'/authorize',
+                    ['requestKey' => (string) Str::uuid(), 'originHash' => $line['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))])->assertOk()->json('authorization');
+                $path = $kind === 'contract' ? $artifact['storage_path'] : ($index === 0 ? $f['catalog'] : $f['second'])['media']['master_wav']->storage_path;
+                $bytes = file_get_contents(Storage::disk('local')->path($path));
+                $r = $this->postTax('/paid-tax-grants/origins/'.$batch['id'].'/authorizations/'.$a['id'].'/redeem', ['token' => $a['token']])->assertOk();
+                $this->assertSame($bytes, $r->streamedContent());
+                $r->assertHeader('X-Paid-Tax-Sha256', hash('sha256', $bytes));
+            }
+        }
+        $this->assertDatabaseCount('paid_tax_redemptions', 4);
+    }
+
+    public function test_throwing_after_commit_preserves_one_spent_attempt_and_a_new_http_authorization_can_retry(): void
+    {
+        $f = $this->complete();
+        $a = $this->authorization($f);
+        $pdo = DB::getPdo();
+        $registered = false;
+        $executed = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function ($event) use ($pdo, &$registered, &$executed): void {
+            if (! $registered && $event->connection->getEventDispatcher()::class === TaxPaidOriginalCommitDispatcher::class
+                && (int) $pdo->query('SELECT COUNT(*) FROM paid_tax_redemptions')->fetchColumn() === 1) {
+                $registered = true;
+                DB::afterCommit(static function () use (&$executed): void {
+                    $executed++;
+                    throw new \RuntimeException('PRIVATE-DURABLE-CALLBACK');
+                });
+            }
+        });
+        Log::shouldReceive('error')->once()->with('Private Tax request failed.', ['exception_class' => \RuntimeException::class]);
+        $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertStatus(503)->assertDontSee('PRIVATE-DURABLE-CALLBACK');
+        $this->assertSame(1, $executed);
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse($pdo->inTransaction());
+        $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertStatus(409);
+        $next = $this->authorization($f);
+        $r = $this->postTax($this->redemptionPath($f, $next), ['token' => $next['token']])->assertOk();
+        $this->assertNotSame('', $r->streamedContent());
+        $this->assertDatabaseCount('paid_tax_redemptions', 2);
+    }
+
+    public function test_late_transfer_withdrawal_emits_no_attachment_error_bytes_and_retains_the_attempt(): void
+    {
+        $f = $this->complete();
+        $delegate = DB::connection()->getEventDispatcher();
+        $a = $this->authorization($f);
+        $r = $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertOk();
+        config(['paid-tax-grants.downloads_enabled' => false]);
+        $this->assertSame('', $r->streamedContent());
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $this->postTax($this->redemptionPath($f, $a), ['token' => $a['token']])->assertStatus(409);
+        $next = $this->authorization($f);
+        $r = $this->postTax($this->redemptionPath($f, $next), ['token' => $next['token']])->assertOk();
+        $this->assertSame(file_get_contents(Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path)), $r->streamedContent());
+        $this->assertDatabaseCount('paid_tax_redemptions', 2);
     }
 }

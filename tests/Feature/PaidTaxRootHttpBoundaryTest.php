@@ -16,12 +16,14 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\ServerBag;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\PaidTaxRootHttpFixture;
 use Tests\TestCase;
 
@@ -110,7 +112,7 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
 
     public static function outsideFailures(): array
     {
-        return array_merge(...array_map(fn ($path) => [[\RuntimeException::class, 500, $path], [LockTimeoutException::class, 503, $path], [ValidationException::class, 422, $path]], ['/paid-tax-grants/origins/example', '/production/tax-checkout/previews']));
+        return array_merge(...array_map(fn ($path) => [[\RuntimeException::class, 500, $path], [LockTimeoutException::class, 503, $path], [ValidationException::class, 422, $path], [TokenMismatchException::class, 419, $path]], ['/paid-tax-grants/origins/example', '/production/tax-checkout/previews']));
     }
 
     #[DataProvider('outsideFailures')]
@@ -131,7 +133,7 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         $this->app->instance('tax-before-root-fixture', $middleware);
         $this->app->make(Kernel::class)->prependMiddleware('tax-before-root-fixture');
         config(['app.debug' => true]);
-        if ($class !== ValidationException::class) {
+        if (! in_array($class, [ValidationException::class, TokenMismatchException::class], true)) {
             Log::shouldReceive('error')->once()->with('Private Tax request failed.', ['exception_class' => $class]);
         }
         $response = $this->call('POST', $path, ['token' => 'PRIVATE-TOKEN'], [], [], ['HTTP_ACCEPT' => 'text/html', 'CONTENT_TYPE' => 'application/json'], '{"token":"PRIVATE-TOKEN"}');
@@ -225,8 +227,8 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         };
         $instanceProperty = new \ReflectionProperty(Container::class, 'instances');
         $bindingProperty = new \ReflectionProperty(Container::class, 'bindings');
-        $instances = $instanceProperty->getValue($this->app);
-        $bindings = $bindingProperty->getValue($this->app);
+        $originalInstances = $instances = $instanceProperty->getValue($this->app);
+        $originalBindings = $bindings = $bindingProperty->getValue($this->app);
         $configuration = $instances['config'];
         $itemsProperty = new \ReflectionProperty($configuration, 'items');
         $items = $itemsProperty->getValue($configuration);
@@ -249,8 +251,8 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
             }
             $admitted = TaxHttpMount::admitted('paid-tax-grants.http_mounted');
         } finally {
-            $instanceProperty->setValue($this->app, $case === 'bindings' || $case === 'env_binding' ? [...$instances, 'env' => 'testing'] : $instances);
-            $bindingProperty->setValue($this->app, $bindings);
+            $instanceProperty->setValue($this->app, $originalInstances);
+            $bindingProperty->setValue($this->app, $originalBindings);
             $itemsProperty->setValue($configuration, $items);
         }
         $this->assertFalse($admitted);
@@ -268,7 +270,7 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
     {
         config(['paid-tax-grants.downloads_enabled' => true]);
         $request = Request::create('/paid-tax-grants/origins/a/authorizations/b/redeem');
-        $bag = new class(['REQUEST_TIME_FLOAT' => microtime(true)]) extends ParameterBag
+        $bag = new class(['REQUEST_TIME_FLOAT' => microtime(true)]) extends ServerBag
         {
             public int $calls = 0;
 
@@ -287,7 +289,7 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
             $this->assertSame(503, $error->status);
         }
         $this->assertSame(0, $bag->calls);
-        $request->server = new ParameterBag(['REQUEST_TIME_FLOAT' => microtime(true)]);
+        $request->server = new ServerBag(['REQUEST_TIME_FLOAT' => microtime(true)]);
         try {
             PaidTaxRequestContext::capture($request);
             $this->fail('Failed enrollment was renewed.');
@@ -301,11 +303,17 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         config(['production-tax-checkout.enabled' => true]);
         $request = new class extends Request
         {
-            public int $reads = 0;
+            public int $rawResourceReads = 0;
+
+            public int $cachedBodyReads = 0;
 
             public function getContent(bool $asResource = false)
             {
-                $this->reads++;
+                if ($asResource) {
+                    $this->rawResourceReads++;
+                } else {
+                    $this->cachedBodyReads++;
+                }
 
                 return parent::getContent($asResource);
             }
@@ -314,7 +322,41 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
             'SERVER_NAME' => 'localhost', 'SERVER_PORT' => 80, 'CONTENT_TYPE' => 'application/json'], '{"candidateId":1,"\\u0063andidateId":2}');
         $response = $this->app->make(Kernel::class)->handle($request);
         $this->assertSame(422, $response->getStatusCode());
-        $this->assertSame(1, $request->reads);
+        $this->assertSame(1, $request->rawResourceReads, 'Only root intake opens the raw input resource.');
+        $this->assertSame(1, $request->cachedBodyReads, 'Framework input normalization reads cached bytes without reopening the raw stream.');
+        $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
+    }
+
+    public function test_root_exception_headers_are_bounded_allowlisted_and_never_copy_private_metadata(): void
+    {
+        $middleware = new class
+        {
+            public function handle(Request $request, Closure $next): never
+            {
+                throw new HttpException(405, 'PRIVATE-EXCEPTION', headers: ['Allow' => 'GET, POST', 'Retry-After' => '12',
+                    'X-RateLimit-Limit' => '99999999999', 'X-Private-Marker' => 'PRIVATE-HEADER']);
+            }
+        };
+        $this->app->instance('tax-header-failure', $middleware);
+        $this->app->make(Kernel::class)->prependMiddleware('tax-header-failure');
+        $response = $this->get('/paid-tax-grants/origins/example', ['Accept' => 'text/html'])->assertStatus(405)
+            ->assertHeader('Allow', 'GET, POST')->assertHeader('Retry-After', '12')->assertHeaderMissing('X-Private-Marker')
+            ->assertHeaderMissing('X-RateLimit-Limit')->assertDontSee('PRIVATE-EXCEPTION')->assertHeaderMissing('Location');
+        $this->privateHeaders($response);
+    }
+
+    public function test_get_query_body_wrong_method_and_native_aliases_refuse_before_identity(): void
+    {
+        $path = '/paid-tax-grants/origins/11111111-1111-4111-8111-111111111111';
+        $this->get($path.'?token=PRIVATE-TOKEN')->assertStatus(422)->assertDontSee('PRIVATE-TOKEN');
+        $this->call('GET', $path, [], [], [], [], '{}')->assertStatus(422);
+        $this->call('PUT', $path, [], [], [], [], '{}')->assertStatus(405);
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        foreach (['token='.str_repeat('t', 43).'&_token='.str_repeat('c', 40).'&%74oken='.str_repeat('t', 43),
+            'token='.str_repeat('t', 43).'&_token='.str_repeat('c', 40).'&extra=PRIVATE-TOKEN'] as $body) {
+            $this->call('POST', $path.'/authorizations/22222222-2222-4222-8222-222222222222/redeem', [], [], [],
+                ['CONTENT_TYPE' => 'application/x-www-form-urlencoded', 'REQUEST_TIME_FLOAT' => microtime(true)], $body)->assertStatus(422);
+        }
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
     }
 
