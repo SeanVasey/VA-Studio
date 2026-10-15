@@ -14,6 +14,7 @@ use Closure;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -44,6 +45,10 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         $this->assertFalse($this->app->bound(TaxCheckoutTransport::class));
         $this->app->afterResolving(PaidTaxPolicy::class, fn () => $this->fail('Off path resolved policy.'));
         $this->app->afterResolving(ProductionCustomerSessions::class, fn () => $this->fail('Off path resolved identity.'));
+        $queries = [];
+        DB::listen(function ($event) use (&$queries): void {
+            $queries[] = $event->sql;
+        });
         foreach (['/paid-tax-grants/origins/'.str_repeat('a', 36).'/authorizations/x/redeem', '/production/tax-checkout/previews'] as $path) {
             $response = $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'text/html'], 'PRIVATE-BODY');
             $response->assertNotFound()->assertHeader('Content-Type', 'application/json')->assertDontSee('PRIVATE-BODY');
@@ -51,7 +56,7 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         }
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
         $this->assertFalse($this->app->resolved(PaidTaxPolicy::class));
-        $this->assertFalse($this->app->resolved('db'));
+        $this->assertSame([], $queries, 'The refused request performed no query.');
     }
 
     #[DataProvider('mountCases')]
@@ -59,13 +64,17 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
     {
         $this->assertTrue(Route::has('paid-tax-grants.finalize'));
         $this->assertTrue(Route::has('production.tax-checkout.previews'));
+        $queries = [];
+        DB::listen(function ($event) use (&$queries): void {
+            $queries[] = $event->sql;
+        });
         config(['paid-tax-grants.http_mounted' => $flag, 'production-tax-checkout.http_mounted' => $flag]);
         $this->app->instance('env', $environment);
         foreach (['/paid-tax-grants/orders/11111111-1111-4111-8111-111111111111/finalize', '/production/tax-checkout/previews'] as $path) {
             $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertNotFound();
         }
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class), $case);
-        $this->assertFalse($this->app->resolved('db'));
+        $this->assertSame([], $queries, 'The refused request performed no query.');
     }
 
     public function test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off(): void
