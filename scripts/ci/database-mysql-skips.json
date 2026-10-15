@@ -63,6 +63,14 @@
       "test_encryption_callback_cannot_remove_a_billing_guard_before_the_write"
     ],
     [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit"
+    ],
+    [
+      "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutCommitAdmissionTest",
+      "test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence"
+    ],
+    [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutMigrationTest",
       "test_installer_refuses_drift_gaps_populated_partials_shadows_and_foreign_references"
     ],

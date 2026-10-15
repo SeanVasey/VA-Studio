@@ -210,3 +210,19 @@ Each item has a thread reply on its PR naming this batch. None is P0/P1.
 
 - Separate non-author APPROVE WITH CONDITIONS at exact clean `59026e00c7b3a94d7ce8709d2bfc0358bbae2a9a`, no open P0/P1 or required correction. Unchanged [DECISION/report](../../verification/tax-v2-integration-20261014/independent-review-DECISION.md) bind54members/3Gitbundles/2340actualinputs/16routes/13loaders, four independently observed recorder OS exits and all original/current receipt limits.
 - Receipt-only carry, exact published-head preflight/protections and expected-head merge remain required. Terminal consumer/NEW-write/V2 wiring and all host/provider/activation conditions stay open; ordinary membership afterCommit P2 stays frozen for its related batch.
+
+### #119 Tax255 V2 prerequisite merge receipt — 2026-10-14
+
+- PR #119 merged at `cd73b3226531abb6f7a79cc779becb61ea5d166a` from exact reviewed head `0fa1a38c92d648570e0ee83f1827a3ceb48f55d4`. Separate APPROVE WITH CONDITIONS/carry, preflight38643440958 success, empty final review inventory and fetched tree equality are recorded in [the actual merge receipt](../../verification/tax-v2-integration-20261014/merge-receipt.md). Original failures/setup/127 and all focused coverage limits remain unchanged.
+- A1-1 adapter held-current/expected-order and A1-2 five Journey cases are addressed within the recorded scope. A1-1 terminal consumer proof, V2 committed-read/NEW-write admission, forward Paid252 schema/consumer integration and root registration remain. Next coherent dependency-ready slice is Tax255 NEW-write physical commit admission; no activation or live transport. Ordinary membership afterCommit P2 remains frozen for its related batch.
+
+### Tax255 NEW-write admission verified; final development review pending — 2026-10-15
+
+- Original-frame Tax config/raw current or historical ownership and exact family selectors are registered for all four NEW phases. Owner-key/equality/native RR snapshot gaps repaired at operative `d4b331039336450e65fd0263820e60ae6a7ad071`; separate source checkpoints establish no openP0/P1. Final sealed-packet DECISION/carry/cheap preflight and actual merge remain required.
+- Current SQLite176/1273 includes23 exact native-only skips (153 executed); native repaired pair2/31 and fresh prior11/130 both have zero failures/errors/skips and actual PHP/recorder/OS exits0. Earlier engine4/45 has only narrowly unchanged pre-DML path carry, not whole-app equality. Original nine behavior failures, seven fixture/assertion failures and runtime/proxy/transport corrections remain immutable in the [packet](../../verification/tax-write-admission-20261014/README.md).
+- Keep actual-isolation/gap exclusion,1213/general SQL interruption, unexpected-trigger/DDL, existing-request pre-create READ/final-I/O, V2 committed-source/terminal consumer/Paid252 schema wiring/root and host/provider/activation conditions open. Next related V2 integration batch must address its own admission requirements. Adjacent ordinary membership afterCommitP2 stays frozen; no Foundation/GitLab, live or host/provider claim.
+
+### Tax255 NEW-write final independent approval — 2026-10-15
+
+- Separate reviewer APPROVE WITH CONDITIONS at `ad4bf751a3302a816eda49dd7951000610fe736c`, no openP0/P1 or required correction. Unchanged DECISION/report verify all source/archive/original-exit/current-selection and narrow carry claims in the packet. Receipt-only final-head carry and exact-head preflight/protections remain.
+- Actual isolation/1213/general SQL/DDL/trigger, existing-request final-I/O, V2 committed-source/terminal consumer/Paid252/root/host/activation and adjacent ordinary membership afterCommitP2 conditions remain unchanged. No full Foundation/GitLab or provider/host claim.
