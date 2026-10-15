@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
@@ -84,7 +85,8 @@ class ProductionAccountFeaturesHttpTest extends TestCase
     public function test_actual_session_csrf_read_initialize_change_export_and_preferences_unknown(): void
     {
         $this->signIn();
-        $this->assertSame([200, ['initialized' => false]], $this->released($this->getJson('/customer/features/listening')));
+        $test = $this->getJson('/customer/features/listening')->assertStatus(200);
+        $this->assertSame([200, ['initialized' => false]], $this->released($test));
         $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
         [$status, $initial] = $this->released($this->emptyPost('/customer/features/listening/initialize'));
         $this->assertSame(200, $status);
@@ -108,7 +110,7 @@ class ProductionAccountFeaturesHttpTest extends TestCase
     {
         $this->signIn();
         $error = null;
-        Route::middleware('web')->get('/customer/features/guard-probe', function (Request $request) use (&$error) {
+        Route::middleware('web')->withoutMiddleware(HandleInertiaRequests::class)->get('/customer/features/guard-probe', function (Request $request) use (&$error) {
             try {
                 $response = new AccountFeatureResponse($request);
                 $identity = ProductionAccountFeatureIdentity::forRequest($request, 'listening_library');
