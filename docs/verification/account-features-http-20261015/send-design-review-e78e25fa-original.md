@@ -1,0 +1,9 @@
+DECISION: APPROVE DESIGN WITH CONDITIONS
+
+Reviewed exact clean `e78e25fa6dd7b0286e242ad4d0e63438a2899063`. The narrow correction closes the split-emission planning gap: standalone `sendHeaders`/`sendContent` are inert, and their internal use is limited to a single synchronous `send` with no returned-to-caller interval after closing proof. String conversion is empty; reentry/second sends and already-sent headers release no private payload. The private completed-root epoch continues to place release after all middleware/session-save/RequestHandled callbacks. No further required design amendment or open design P0/P1 remains in this recheck.
+
+Approval is planning-only. Implementation must retain the original context/identity/reader/admission and private deadline, mint only after positive original commit, materialize native headers/cookies before final proof, and cleanup only the owned closing frame. Non-HTTP immediate closure remains unchanged. Real send-path positives and early/split emission followed by withdrawal/expiry, replacement/incomplete epochs, reentry and ownership negatives are required; unsent TestResponse is never release evidence.
+
+Integrated frozen-source/test and coherent final-evidence review, exact-head cheap preflight, complete inventory and expected-SHA development merge remain required. Default-false/unmounted and adjacent frozen scopes stay unchanged. No HTTP implementation, test pass, native acceptance, activation or host/provider claim is approved here.
+
+Only three documentation paths changed from `36e1f63ab3c448d70b8bd2cc799eaab21f999879`; both original36 REVISE imports have exact prior hashes. Design SHA256: `0a10fdede2a681f02ce7b92a1d8fecc7fa98663a27bfa4aef0be9231361adb6b`. The JSON records binding and conditions. No application/DB/network/CI execution, shared edit or preparation failure occurred.
