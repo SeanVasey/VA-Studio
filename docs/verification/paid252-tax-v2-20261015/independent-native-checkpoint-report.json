@@ -1,0 +1,266 @@
+{
+  "kind": "Independent completed native/component evidence checkpoint, not final development approval",
+  "reviewed_commit": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+  "decision": "NATIVE CHECKPOINT RECONCILED; EXACT SCHEMA COMPONENT CARRY ACCEPTED; FINAL APPROVAL PENDING",
+  "current_native": {
+    "name": "mysql-bounded-origin-race-and-private-original",
+    "counts": {
+      "tests": 2,
+      "assertions": 100,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "case_identities": [
+      {
+        "class": "Tests\\Feature\\PaidTaxNativeBoundaryTest",
+        "name": "test_native_provider_replays_serialize_one_origin_and_refuse_temporary_or_nontransactional_owned_objects",
+        "assertions": 77
+      },
+      {
+        "class": "Tests\\Feature\\PaidTaxGrantJourneyTest",
+        "name": "test_actual_tax_original_is_private_deterministic_idempotent_and_restore_only",
+        "assertions": 23
+      }
+    ],
+    "php_exit": 0,
+    "verifier_exit": 0,
+    "marker_exit": 0,
+    "observed_recorder_os_exit": 0,
+    "os_launch_identity_match": true,
+    "stability": {
+      "autoload_unchanged": true,
+      "runner_unchanged": true,
+      "source_head_unchanged": true,
+      "source_status_unchanged": true,
+      "source_unchanged": true
+    },
+    "workers": [
+      {
+        "result": "saved",
+        "id": "76b49918-94f1-403c-9833-43431133e573",
+        "order_id": "48ad77d8-ff96-4edd-b53d-dd1e1c8baca7",
+        "error_class": null,
+        "status": null,
+        "location": null,
+        "phase": "command-started",
+        "trace": [],
+        "command_elapsed_seconds": 7.315054569,
+        "waits": [
+          31536000,
+          50
+        ],
+        "begun_dictionary_read": true,
+        "connection_id": 163,
+        "pid": 165033,
+        "transaction_level": 0,
+        "in_transaction": false
+      },
+      {
+        "result": "unexpected",
+        "id": null,
+        "order_id": null,
+        "error_class": "App\\Domain\\Grants\\PaidTax\\PaidTaxException",
+        "status": 503,
+        "location": "PaidTaxActor.php:58",
+        "phase": "command-started",
+        "trace": [
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxActor->lockOriginal",
+            "site": "PaidTaxTransaction.php:16"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::{closure:App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run():14}",
+            "site": "PaidTaxBeginningDispatcher.php:115"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxBeginningDispatcher->dispatch",
+            "site": "Connection.php:1129"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->fireConnectionEvent",
+            "site": "ManagesTransactions.php:138"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->beginTransaction",
+            "site": "PaidTaxTransaction.php:19"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run",
+            "site": "PaidTaxGrants.php:50"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalizeOwned",
+            "site": "PaidTaxGrants.php:26"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalize",
+            "site": "paid-tax-origin-race-worker.php:50"
+          }
+        ],
+        "command_elapsed_seconds": 5.02867012,
+        "waits": [
+          31536000,
+          50
+        ],
+        "begun_dictionary_read": false,
+        "connection_id": 164,
+        "pid": 165039,
+        "transaction_level": 0,
+        "in_transaction": false
+      }
+    ],
+    "forced_block_worker": {
+      "result": "unexpected",
+      "id": null,
+      "order_id": null,
+      "error_class": "App\\Domain\\Grants\\PaidTax\\PaidTaxException",
+      "status": 503,
+      "location": "PaidTaxActor.php:58",
+      "phase": "command-started",
+      "trace": [
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxActor->lockOriginal",
+          "site": "PaidTaxTransaction.php:16"
+        },
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::{closure:App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run():14}",
+          "site": "PaidTaxBeginningDispatcher.php:115"
+        },
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxBeginningDispatcher->dispatch",
+          "site": "Connection.php:1129"
+        },
+        {
+          "call": "Illuminate\\Database\\Connection->fireConnectionEvent",
+          "site": "ManagesTransactions.php:138"
+        },
+        {
+          "call": "Illuminate\\Database\\Connection->beginTransaction",
+          "site": "PaidTaxTransaction.php:19"
+        },
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run",
+          "site": "PaidTaxGrants.php:50"
+        },
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalizeOwned",
+          "site": "PaidTaxGrants.php:26"
+        },
+        {
+          "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalize",
+          "site": "paid-tax-origin-race-worker.php:50"
+        }
+      ],
+      "command_elapsed_seconds": 5.019997411,
+      "waits": [
+        31536000,
+        50
+      ],
+      "begun_dictionary_read": false,
+      "connection_id": 169,
+      "pid": 165098,
+      "transaction_level": 0,
+      "in_transaction": false
+    },
+    "log_hash_match": true,
+    "scope": "Native race1/77 plus actual private original1/23. Exact replay/counts/temp/engine negatives/forced cleanup passed via completed reviewed test; not full native suite."
+  },
+  "input_verification": {
+    "actual_source_inputs": 2395,
+    "routes": 16,
+    "loaders": 13,
+    "all_manifest_entries_current_bytes_and_exact_git_blobs_match": true,
+    "all_current_loader_bytes_match": true,
+    "canonical_bundle_hashes_match": true,
+    "runner_original_and_captured_bytes_match": true,
+    "overlays": [],
+    "runtime_database": {
+      "database_name": "vaseyaudio_paid252_tax_v2",
+      "version": "8.4.11"
+    },
+    "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)\nCopyright (c) The PHP Group\nBuilt by Debian\nZend Engine v4.4.26, Copyright (c) Zend Technologies\n",
+    "phpunit": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\n"
+  },
+  "schema_carry": {
+    "original_head": "94a2c49b3236a68d204c86014e80a96e8cf877e8",
+    "current_head": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+    "component_counts": {
+      "tests": 11,
+      "assertions": 1305,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "exact_skip": [
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    "whole_original_counts": {
+      "assertions": 1350,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 1,
+      "tests": 12
+    },
+    "whole_original_exits": [
+      1,
+      1,
+      1
+    ],
+    "only_delta": [
+      "tests/Feature/PaidTaxNativeBoundaryTest.php"
+    ],
+    "schema_product_support_bytes_unchanged": true,
+    "case_names": [
+      "test_installed_schema_admits_the_standard_uninitialized_schema_grammar_of_a_fresh_application",
+      "test_every_sqlite_statement_and_selected_native_create_fk_index_guard_boundaries_retry_exactly",
+      "test_completed_installation_with_retained_rows_survives_log_uncertainty_idempotently_and_refuses_down",
+      "test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #0",
+      "test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #1",
+      "test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #2",
+      "test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #3",
+      "test_foreign_metadata_partial_evidence_and_shadow_drift_refuse_before_any_retry_write with data set #4",
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target",
+      "test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl",
+      "test_no_line_can_activate_until_all_first_originals_are_complete_and_immutable"
+    ],
+    "scope": "Completed Schema component only; original whole94 remains failed. Later private-original was absent from original94 but executed freshly at26c."
+  },
+  "server_stop": {
+    "recorded_process_exit": 0,
+    "exact_container_id": "d7079351c8c2ab362a921b4999288e30f6580263babaa1a0ada61ad5386d9dc5",
+    "stopped_exit": 0,
+    "retained_volume": "va-studio-private-mysql-paid252-tax-v2-data-20261015",
+    "launch_identity_matches": true,
+    "version": "8.4.11",
+    "scope": "Root-executed stop receipt inspected read-only; no reviewer container/DB operation."
+  },
+  "receipt_sha256": {
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-bounded-origin-race-and-private-original/command.json": "328b04ac7e8150c7fba5d238685d75a53dfbe656feb9bacd38bde456e0fccd28",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-bounded-origin-race-and-private-original/result.json": "bb16780fbc89f72724e0c516b82d13f07489430f6384c49ef7e1b9e7c232182f",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-bounded-origin-race-and-private-original/junit.xml": "8e94208cc43dc57b8870dfdba2aa9adf1232cce6b85410424e901e44a334f844",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-bounded-origin-race-and-private-original/log.txt": "13348207a95b3b4aeabe1e0c4ee3dec2da35e70ecd81a4570c5620d5e55a9c41",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-bounded-origin-race-and-private-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-mysql-bounded-origin-race-and-private-original.json": "73ed683207ee2ff1f03e52dd28946d116707e5c47b55a030cd9223493bfc2be4",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-mysql-bounded-origin-race-and-private-original.json": "17bddb24f23db4c142a142d2b0e07b6c6200fa663929f36b8be7fac4453feab7",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/process-reconciliation-after-native-success.json": "eaa3cf83284ce8a43729c974dc2518d3121afe19a068283a863dd773d51ba52e",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/native-schema-component-carry-26c0c472.json": "ea0d9245728f2479489fed6a08d7b9b7787c7d0fbbf7f5a36cb0216aa8ebf073",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-server-stop.json": "a49a87fd3e58bce4421430159b0e945db3bc68595dbc888d99d205e477a3f43f",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-server-launch.json": "ae124f541dd1ec2113610ec7f6331504b7fc02d072c880145e4692beda7eb399",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-server-version.json": "029fcff56ce47327c6a242060dae7c7f9456a5b7a714859f8052d686a72835b9",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/bundle-26c0c472ac6b-c70b96070b5ef70b/identity.json": "8610505b2fe63c1881a91f4eafa805321083f3f0c1f8eca7e02f2f62a3220f09",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/bundle-26c0c472ac6b-c70b96070b5ef70b/manifest.json": "4935e3d1c60ef559fa8fbc718032129c16d7f5bbef9efc4d01445e624ac0ccbc",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/bundle-26c0c472ac6b-c70b96070b5ef70b/public-environment.json": "2e85e827ffa34c1dc4aeb71a8776255060b84d96c25a6321d78b595015ace32a",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/bundle-26c0c472ac6b-c70b96070b5ef70b/runner.py": "c36eeb1d64ebde938f4f9013048adb2fe84c4c4903490310b95c058a353dabac",
+    "/workspace/runtime/paid252-tax-v2-evidence-20261015/bundle-26c0c472ac6b-c70b96070b5ef70b/runtime.json": "4117eff3ae3fa320146bdcb710aa1b080ca36bcedfdb62c4c1a7564e9f08a571"
+  },
+  "limits": [
+    "No final development or merge approval; whole9-file SQLite and next V1 evidence/final census/sealed archive/publication head remain pending.",
+    "Native successful race includes one saved worker and one controlled Actor503 refusal, followed by exact fresh replay; do not claim two concurrent successes.",
+    "Original94 invocation failed; its completed Schema component alone carries. Original04f stale403 and earlier unresolved81e/625 diagnostics remain original.",
+    "Sanitized Actor503 identifies1205/1213 mapped branch, not direct original native code. No general deadlock/SQL/RC-gap/DDL/trigger/reconnect/host/provider/HTTP/download/activation/full acceptance claim.",
+    "All independent source/oracle approval conditions preserved."
+  ],
+  "reviewer_preparation": "Initial read used missing shortened reconciliation filename; actual original process-reconciliation-after-native-success.json found and verified. This was a reviewer read-path error, not an application result.",
+  "actions": "Read-only source/Git/original receipt hashes and parsers; original runtime checkpoint notes only. No source/test/DB/network/CI execution or tracked edit."
+}
