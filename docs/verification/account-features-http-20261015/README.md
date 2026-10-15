@@ -77,3 +77,9 @@ Original appendix SHA256 bindings:
 - `account-features-http-final-review-6fdabe77-20261015-verification-original.json`: `dbd32c9af51ef585e4a68aafa06e665b1715516277affea27a5940965b9785a9`
 - `typecheck-6fd-final-original.json`: `288137c1a72d2068fd4014ccfa4cf5788cf078a19713bba581072b571c0d8f56`
 - `typecheck-6fd-final-original.log`: `8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f`
+
+## Publication safeguard correction
+
+PR127 at0902 had a genuine backend preflight failure in test-phpunit-shards.py; frontend passed. Its local unchanged-source reproduction ran52 safeguard tests with1failure/exit1: the new release and metadata test files branch on the database driver but were absent from both native include and residual lists. Both whole files are now included for future reviewed MySQL final selection; this neither executes nor claims a whole native pass. The generated census is2,423 selected tests/232files of9,069 discovered/670files; GitHub/GitLab comments now match. No application/test change. Original local failure JSON/log are retained; hosted raw log download was Forbidden and is privately retained.
+
+Three census preparation attempts failed before successful activated discovery: an absolute prefix was rejected, an alternate basename was rejected because native selection requires phpunit-ci-mysql, and an unactivated shell lacked php. No application tests ran in those attempts. The activated accepted command was `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`; generated files were moved to runtime after recording, not committed. Timing weights are estimates, not executed durations.
