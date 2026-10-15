@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionIdentityAdapters;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureAccess;
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeaturePolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use ArrayObject;
@@ -181,6 +182,7 @@ class ProductionFeatureMetadataAdmissionTest extends TestCase
         } else {
             $connection->beginTransaction();
         }
+        $expected = ['configuration' => (new ProductionAccountFeaturePolicy($identity->feature))->current(), 'identity' => []];
         $target = $phase === 'customer_lock' ? null : app();
         $property = new ReflectionProperty($target === null ? Facade::class : Container::class,
             $target === null ? 'resolvedInstance' : 'contextual');
@@ -195,7 +197,7 @@ class ProductionFeatureMetadataAdmissionTest extends TestCase
             match ($phase) {
                 'customer_lock' => (new ProductionCustomerAccess)->lock($identity->principal(), $identity->actor(), $reader),
                 'feature_lock' => (new ProductionAccountFeatureAccess)->lock($identity, $reader),
-                'feature_committed' => (new ProductionAccountFeatureAccess)->lockCommitted($identity, $frame, []),
+                'feature_committed' => (new ProductionAccountFeatureAccess)->lockCommitted($identity, $frame, $expected),
             };
         } catch (Throwable $caught) {
             $error = $caught;
