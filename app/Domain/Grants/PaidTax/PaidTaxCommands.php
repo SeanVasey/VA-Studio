@@ -39,6 +39,7 @@ final class PaidTaxCommands
         $producerRead = null;
         $producerSecond = null;
         $heldSource = null;
+        $heldFrame = null;
         try {
             app(PaidTaxPolicy::class)->capture();
             app(ProductionCustomerAccess::class)->current($principal, $actor);
@@ -49,9 +50,9 @@ final class PaidTaxCommands
             $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
             $deadline->proveCurrent();
             $runtime->prove(0);
-            $result = $runtime->connection->transaction(function () use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
+            $result = PaidTaxTransaction::run($runtime, function (PaidTaxOwnedFrame $frame) use ($batchId, $principal, $actor, $operation, $locator, $grants, $additionalSnapshots,
                 $deadline, $projectionRead, $runtime, $actorOriginal, &$heldSource, &$heldRows, &$receipt, &$producerRead, &$producerSecond): array {
-                $rows = new PaidTaxRows($runtime);
+                $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;
                 $policy = app(PaidTaxPolicy::class)->capture();
                 $access = app(ProductionCustomerAccess::class);
@@ -89,7 +90,7 @@ final class PaidTaxCommands
                 $grants->fence($principal, $actor, $access, $authority, $source, $policy, $expected, $rows, $receipt);
 
                 return $result;
-            });
+            }, $heldFrame);
             PaidTaxException::require($receipt instanceof PaidTaxReadReceipt && $producerRead instanceof ProductionTaxPaidOrderCommittedReadReceiptV2
                 && ($projectionRead === null || $producerSecond instanceof ProductionTaxPaidOrderCommittedReadReceiptV2));
             // Trusted transfer construction occurs before the terminal post-commit raw proof.
@@ -101,16 +102,13 @@ final class PaidTaxCommands
 
             return $result;
         } catch (IdentityException) {
-            $heldSource?->abortOwnedFrame();
-            $heldRows?->abort();
+            PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw new PaidTaxException(403);
         } catch (CheckoutException $error) {
-            $heldSource?->abortOwnedFrame();
-            $heldRows?->abort();
+            PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw new PaidTaxException(in_array($error->status, [403, 404, 409, 422, 503], true) ? $error->status : 503);
         } catch (Throwable $error) {
-            $heldSource?->abortOwnedFrame();
-            $heldRows?->abort();
+            PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw $error;
         }
     }

@@ -45,11 +45,12 @@ final class PaidTaxGrants
         $producerRead = null;
         $producerSecond = null;
         $heldSource = null;
+        $heldFrame = null;
         $runtime->prove(0);
         try {
-            $projection = $runtime->connection->transaction(function () use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
+            $projection = PaidTaxTransaction::run($runtime, function (PaidTaxOwnedFrame $frame) use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
                 &$heldSource, &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
-                $rows = new PaidTaxRows($runtime);
+                $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;
                 $policyService = app(PaidTaxPolicy::class);
                 $policy = $policyService->capture();
@@ -122,7 +123,7 @@ final class PaidTaxGrants
                 $this->fence($principal, $actor, $access, $authority, $source, $policy, $graph, $rows, $receipt);
 
                 return $projection;
-            });
+            }, $heldFrame);
             PaidTaxException::require($receipt instanceof PaidTaxReadReceipt && $producerRead instanceof ProductionTaxPaidOrderCommittedReadReceiptV2
                 && ($projectionRead === null || $producerSecond instanceof ProductionTaxPaidOrderCommittedReadReceiptV2));
             $projectionRead?->capture($receipt, $producerSecond, $deadline);
@@ -133,8 +134,7 @@ final class PaidTaxGrants
 
             return $projection;
         } catch (\Throwable $error) {
-            $heldSource?->abortOwnedFrame();
-            $heldRows?->abort();
+            PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw $error;
         }
     }

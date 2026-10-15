@@ -32,8 +32,9 @@ final class PaidTaxRecords
     {
         PaidTaxException::require(isset(PaidTaxSchema::specs()[$table]) && array_keys($values) === array_keys(PaidTaxSchema::specs()[$table]['columns']));
         $columns = array_keys($values);
-        $rows->execute('INSERT INTO '.$rows->table($table).' ('.implode(', ', $columns).') VALUES ('.implode(', ', array_fill(0, count($values), '?')).')', array_values($values));
+        $insertId = $rows->execute('INSERT INTO '.$rows->table($table).' ('.implode(', ', $columns).') VALUES ('.implode(', ', array_fill(0, count($values), '?')).')', array_values($values));
+        PaidTaxException::require($insertId >= 1);
 
-        return $rows->one($table, 'id = ?', [(int) $rows->identity()->lastInsertId()]);
+        return $rows->one($table, 'id = ?', [$insertId]);
     }
 }

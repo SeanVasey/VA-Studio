@@ -52,5 +52,10 @@ final class PaidTaxDeadline
         throw new \LogicException('Private paid observation budgets cannot be serialized.');
     }
 
+    public function __unserialize(array $data): never
+    {
+        throw new \LogicException('Private Tax observation budgets cannot be deserialized.');
+    }
+
     private function __clone() {}
 }

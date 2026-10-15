@@ -93,8 +93,8 @@ final class PaidTaxDocuments
                     continue;
                 }
                 // The lease's own instant on both clocks: the line's budget below ends with this lease, never after it.
-                $now = CarbonImmutable::now('UTC');
                 $tick = hrtime(true);
+                $now = CarbonImmutable::now('UTC');
                 $at = $now->startOfSecond();
                 if ($line['work']['state'] === 'claimed' && $at->lessThan($line['work']['expires_at'])) {
                     return ['busy' => true, 'projection' => (new PaidTaxGrants)->project($graph)];
@@ -186,7 +186,7 @@ final class PaidTaxDocuments
 
             return $graph;
         }, $deadline);
-        // An already fulfilled order is not re-verified: each download re-hashes its exact bytes anyway, and re-hashing up
+        // An already fulfilled order is not re-verified: later reviewed delivery must re-hash its exact bytes, and re-hashing up
         // to 10 lines of 1 GiB assets per request only spends the server (independent review A10-L1). The fulfillment
         // frame below still runs: it requires the unchanged bundle, inserts nothing and returns the projection.
         foreach ($bundle['complete'] === null ? $bundle['lines'] : [] as $line) {

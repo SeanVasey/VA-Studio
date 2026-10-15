@@ -16,6 +16,8 @@ final class PaidTaxOwnedFrame implements \JsonSerializable
 {
     private bool $aborted = false;
 
+    private bool $sourceAdmitted = false;
+
     private readonly DatabaseTransactionsManager $manager;
 
     private readonly DatabaseTransactionRecord $record;
@@ -64,6 +66,17 @@ final class PaidTaxOwnedFrame implements \JsonSerializable
             && $pending->containsStrict($this->record));
     }
 
+    /** Once, BEFORE the younger SourceV2: prove the original physical frame without renewing its age. */
+    public function admitSource(): void
+    {
+        $this->proveHeld();
+        PaidTaxException::require(! $this->sourceAdmitted);
+        $this->sourceAdmitted = true;
+        $this->execute('RELEASE SAVEPOINT '.$this->abortAnchor);
+        $this->execute('SAVEPOINT '.$this->abortAnchor);
+        $this->proveHeld();
+    }
+
     /** Discard only original records. No callback, policy, alias, deadline or replacement PDO is consulted. */
     public function abort(): void
     {
@@ -88,7 +101,8 @@ final class PaidTaxOwnedFrame implements \JsonSerializable
         foreach (['pendingTransactions', 'committedTransactions'] as $name) {
             $property = new ReflectionProperty(DatabaseTransactionsManager::class, $name);
             $records = $property->getValue($this->manager);
-            if ($records instanceof Collection && $records::class === Collection::class) {
+            if ($records instanceof Collection && $records::class === Collection::class
+                && is_array((new ReflectionProperty(Collection::class, 'items'))->getValue($records))) {
                 // Removal suppresses owned deferred commit AND rollback callbacks.
                 $property->setValue($this->manager, $records->reject(fn ($record): bool => $this->owns($record))->values());
             }

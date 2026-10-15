@@ -22,8 +22,6 @@ final class PaidTaxRows
 
     public readonly string $environment;
 
-    private readonly PaidTaxOwnedFrame $frame;
-
     private readonly string $database;
 
     private readonly string $driver;
@@ -38,7 +36,7 @@ final class PaidTaxRows
 
     private ?CurrentRows $sourceReader = null;
 
-    public function __construct(private readonly PaidTaxRuntime $runtime)
+    public function __construct(private readonly PaidTaxRuntime $runtime, private readonly PaidTaxOwnedFrame $frame)
     {
         $runtime->prove(1);
         $this->primary = $runtime->primary;
@@ -48,7 +46,7 @@ final class PaidTaxRows
         $this->driver = $runtime->driver;
         $this->database = $this->driver === 'mysql' ? $runtime->database : 'main';
         PaidTaxException::require(preg_match('/\A[a-zA-Z0-9_]+\z/D', $this->database) === 1);
-        $this->frame = PaidTaxOwnedFrame::capture($this->connection, $this->primary);
+        $this->frame->proveHeld();
         try {
             // Installation callbacks occur after the original cleanup marker and before final raw comparisons.
             $this->held(function (): void {
@@ -105,6 +103,7 @@ final class PaidTaxRows
     {
         $this->assertCurrent();
         PaidTaxException::require($this->sourceReader === null);
+        $this->frame->admitSource();
         $this->sourceReader = new CurrentRows($this->primary, $this->driver);
 
         return $this->sourceReader;
@@ -239,12 +238,17 @@ final class PaidTaxRows
         return $rows[0] ?? [];
     }
 
-    public function execute(string $sql, array $bindings): void
+    public function execute(string $sql, array $bindings): int
     {
-        $this->held(function () use ($sql, $bindings): void {
+        return $this->held(function () use ($sql, $bindings): int {
             $statement = $this->primary->prepare($sql);
             $statement->execute($bindings);
+            // MySQL resets mysql_insert_id on subsequent SET/SELECT commands, including wait restoration.
+            $insertId = $this->primary->lastInsertId();
             PaidTaxException::require($statement->rowCount() === 1);
+            PaidTaxException::require(is_string($insertId) && preg_match('/\A[0-9]+\z/D', $insertId) === 1);
+
+            return (int) $insertId;
         });
     }
 

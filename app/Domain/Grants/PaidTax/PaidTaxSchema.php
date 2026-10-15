@@ -47,7 +47,7 @@ final class PaidTaxSchema
         $wrap = DB::connection()->getQueryGrammar()->wrap(...);
         foreach (self::specs() as $logical => $spec) {
             $physical = $prefix.$logical;
-            $definitions[$logical] = function (Blueprint $table) use ($spec, $physical): void {
+            $definitions[$logical] = function (Blueprint $table) use ($spec, $physical, $driver): void {
                 $table->engine = 'InnoDB';
                 $table->id();
                 foreach ($spec['columns'] as $name => $type) {
@@ -64,6 +64,9 @@ final class PaidTaxSchema
                     };
                     if ($nullable) {
                         $column->nullable();
+                    }
+                    if ($driver === 'mysql' && in_array($name, ['provider_account', 'provider_session_id', 'provider_payment_id', 'funds_mode'], true)) {
+                        $column->charset('ascii')->collation('ascii_bin');
                     }
                 }
                 foreach ($spec['foreign'] as $name => [$column, $target]) {
@@ -252,7 +255,9 @@ final class PaidTaxSchema
             $nullable = str_ends_with($type, '?');
             $type = rtrim($type, '?');
             $text = str_starts_with($type, 'char(') || str_starts_with($type, 'varchar(') || $type === 'longtext';
-            $columns[] = [$name, $type, $nullable ? 'YES' : 'NO', null, $name === 'id' ? 'auto_increment' : '', $text ? $charset : null, $text ? $collation : null, '', ''];
+            $providerIdentity = in_array($name, ['provider_account', 'provider_session_id', 'provider_payment_id', 'funds_mode'], true);
+            $columns[] = [$name, $type, $nullable ? 'YES' : 'NO', null, $name === 'id' ? 'auto_increment' : '',
+                $text ? ($providerIdentity ? 'ascii' : $charset) : null, $text ? ($providerIdentity ? 'ascii_bin' : $collation) : null, '', ''];
         }
 
         return ['storage' => ['InnoDB', $collation, '', ''], 'columns' => $columns,
