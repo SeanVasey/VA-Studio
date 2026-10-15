@@ -1,0 +1,37 @@
+{
+  "head": "8cf6c60ca8d26cd515369dcc36122ec22a10945e",
+  "recorded_utc": "2026-10-15T00:23:03.811768+00:00",
+  "before": {
+    ".github/workflows/final-verification.yml": "b645aafce488a4a5dca3d32a73ae6926811faac5c5e3d951c82299aba23e1169",
+    ".gitlab-ci.yml": "f6749c2e6eb03cc381cc3d0fb427861835af0c62ac30ebe0a6beec0092436b0d",
+    "scripts/ci/test-workflow-cadence.py": "5913073b2e4cd7364d914d77aed3cea60fdcebdfe93c67489bad150a21c83cc5",
+    "scripts/ci/test-ci-scope.py": "fc1b01c137d20b0b6f0cabaa60e299742e78acd4659a8801288be8cb0fa455d4"
+  },
+  "after": {
+    ".github/workflows/final-verification.yml": "b645aafce488a4a5dca3d32a73ae6926811faac5c5e3d951c82299aba23e1169",
+    ".gitlab-ci.yml": "f6749c2e6eb03cc381cc3d0fb427861835af0c62ac30ebe0a6beec0092436b0d",
+    "scripts/ci/test-workflow-cadence.py": "5913073b2e4cd7364d914d77aed3cea60fdcebdfe93c67489bad150a21c83cc5",
+    "scripts/ci/test-ci-scope.py": "fc1b01c137d20b0b6f0cabaa60e299742e78acd4659a8801288be8cb0fa455d4"
+  },
+  "results": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "process_exit": 0,
+      "stdout": "",
+      "stderr": "..............\n----------------------------------------------------------------------\nRan 14 tests in 0.011s\n\nOK\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "process_exit": 0,
+      "stdout": "",
+      "stderr": "...........................\n----------------------------------------------------------------------\nRan 27 tests in 0.703s\n\nOK\n"
+    }
+  ],
+  "scope": "Local CI trigger/routing safeguards after comment-only census refresh; no hosted dispatch or database execution."
+}
