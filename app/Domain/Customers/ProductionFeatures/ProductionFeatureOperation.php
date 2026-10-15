@@ -83,12 +83,20 @@ final class ProductionFeatureOperation
         }
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
-        $tail = function () use ($metadata, $configuration, $connection, $primary, $observer, $manager, $managerProperty, $hooksProperty, &$installed): void {
-            $metadata->requireCurrent();
-            $configuration->admit();
-            if ($connection->getRawPdo() !== $primary || $connection->transactionLevel() !== 0 || $primary->inTransaction()
-                || $connection->getEventDispatcher() !== $observer || $managerProperty->getRawValue($connection) !== $manager
-                || $hooksProperty->getRawValue($connection) !== $installed) {
+        $tailActive = true;
+        $tail = function () use ($metadata, $configuration, $connection, $primary, $observer, $manager, $managerProperty, $hooksProperty, &$installed, &$tailActive): void {
+            if (! $tailActive || $observer->hasOriginalFrame()) {
+                return;
+            }
+            try {
+                $metadata->requireCurrent();
+                $configuration->admit();
+                if ($connection->getRawPdo() !== $primary || $connection->transactionLevel() !== 0 || $primary->inTransaction()
+                    || $connection->getEventDispatcher() !== $observer || $managerProperty->getRawValue($connection) !== $manager
+                    || $hooksProperty->getRawValue($connection) !== $installed) {
+                    throw new ProductionFeatureException;
+                }
+            } catch (Throwable) {
                 throw new ProductionFeatureException;
             }
         };
@@ -124,6 +132,7 @@ final class ProductionFeatureOperation
             }
             throw new ProductionFeatureException;
         } finally {
+            $tailActive = false;
             // Remove only our tail; a callback may have replaced or extended the list.
             $currentHooks = $hooksProperty->getRawValue($connection);
             if (is_array($currentHooks)) {

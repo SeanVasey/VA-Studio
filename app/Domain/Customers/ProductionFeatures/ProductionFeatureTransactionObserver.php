@@ -22,6 +22,11 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     private ?ProductionFeatureBookkeeping $bookkeeping = null;
 
+    public function hasOriginalFrame(): bool
+    {
+        return $this->frame !== null;
+    }
+
     public function __construct(private readonly Connection $connection, private readonly PDO $primary,
         private readonly ProductionFeatureConfiguration $configuration, private readonly ?Dispatcher $delegate,
         private readonly DatabaseTransactionsManager $manager, private readonly IdentityMetadataAdmission $metadata) {}

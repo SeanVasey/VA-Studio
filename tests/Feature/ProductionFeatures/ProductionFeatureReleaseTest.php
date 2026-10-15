@@ -8,6 +8,7 @@ use App\Domain\Customers\ProductionFeatures\Preferences\ProductionConsentPrefere
 use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use Illuminate\Database\Connection;
+use Illuminate\Database\DatabaseTransactionRecord;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionRolledBack;
@@ -228,6 +229,69 @@ class ProductionFeatureReleaseTest extends TestCase
             $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
             $this->assertSame(0, DB::transactionLevel());
             $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
+        }
+    }
+
+    public function test_original_birth_guard_is_inert_for_completed_nested_delegate_work_and_after_exit(): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $property = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $retained = null;
+        $nested = 0;
+        Event::listen(TransactionBeginning::class, function () use ($connection, $property, &$retained, &$nested): void {
+            if ($connection->transactionLevel() === 1) {
+                $hooks = $property->getValue($connection);
+                $retained = end($hooks);
+                $connection->beginTransaction();
+                $connection->commit();
+                $nested++;
+            }
+        });
+        $projection = (new ProductionListeningLibrary)->initialize($owner);
+        $this->assertTrue($projection['initialized']);
+        $this->assertSame(1, $nested);
+        $this->assertIsCallable($retained);
+        $original = $property->getValue($connection);
+        $property->setValue($connection, new \ArrayObject);
+        try {
+            $retained(); // Even retained against malformed callback-owned storage, it is inert.
+            $this->assertInstanceOf(\ArrayObject::class, $property->getValue($connection));
+        } finally {
+            $property->setValue($connection, $original);
+        }
+        $this->assertSame(0, $connection->transactionLevel());
+        $this->assertFalse($connection->getRawPdo()->inTransaction());
+    }
+
+    public function test_callback_free_discard_preserves_unset_foreign_record_without_error_handler(): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $managerProperty = new ReflectionProperty(Connection::class, 'transactionsManager');
+        $owned = null;
+        $foreign = new DatabaseTransactionRecord($connection->getName(), 1);
+        unset($foreign->connection, $foreign->level, $foreign->parent);
+        LibraryRow::saved(function () use ($connection, $managerProperty, $foreign, &$owned): void {
+            $owned = $managerProperty->getValue($connection);
+            $pending = (new ReflectionProperty(DatabaseTransactionsManager::class, 'pendingTransactions'))->getValue($owned);
+            $pending->push($foreign);
+            $connection->setTransactionManager(new DatabaseTransactionsManager);
+        });
+        try {
+            $refused = null;
+            try {
+                (new ProductionListeningLibrary)->initialize($owner);
+            } catch (Throwable $error) {
+                $refused = $error;
+            }
+            $this->assertInstanceOf(ProductionFeatureException::class, $refused);
+            $this->assertSame([$foreign], array_values($owned->getPendingTransactions()->all()));
+            $this->assertSame([], get_object_vars($foreign));
+            $this->assertFalse($connection->getRawPdo()->inTransaction());
+        } finally {
+            LibraryRow::flushEventListeners();
+            $connection->setPdo($connection->getRawPdo());
         }
     }
 

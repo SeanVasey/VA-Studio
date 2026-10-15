@@ -17,8 +17,9 @@ final class ProductionFeatureBookkeeping
     {
         $current = self::property('currentTransaction')->getRawValue($manager);
         $root = is_array($current) ? ($current[$name] ?? null) : null;
-        if (! $root instanceof DatabaseTransactionRecord || $root::class !== DatabaseTransactionRecord::class
-            || $root->connection !== $name || $root->level !== 1 || $root->parent !== null) {
+        $raw = $root instanceof DatabaseTransactionRecord && $root::class === DatabaseTransactionRecord::class ? get_object_vars($root) : [];
+        if (! array_key_exists('parent', $raw) || ($raw['connection'] ?? null) !== $name
+            || ($raw['level'] ?? null) !== 1 || $raw['parent'] !== null) {
             throw new ProductionFeatureException;
         }
 
@@ -75,13 +76,13 @@ final class ProductionFeatureBookkeeping
             if ($record === $this->root) {
                 return true;
             }
-            if (! $record instanceof DatabaseTransactionRecord || $record::class !== DatabaseTransactionRecord::class
-                || $record->connection !== $this->name || ! is_int($record->level)
-                || $record->level <= 1 || $record->level >= $previousLevel) {
+            $raw = $record instanceof DatabaseTransactionRecord && $record::class === DatabaseTransactionRecord::class ? get_object_vars($record) : [];
+            if (! array_key_exists('parent', $raw) || ($raw['connection'] ?? null) !== $this->name || ! is_int($raw['level'] ?? null)
+                || $raw['level'] <= 1 || $raw['level'] >= $previousLevel) {
                 return false;
             }
-            $previousLevel = $record->level;
-            $record = $record->parent;
+            $previousLevel = $raw['level'];
+            $record = $raw['parent'];
         }
 
         return false;
