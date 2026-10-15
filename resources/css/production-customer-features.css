@@ -1,0 +1,10 @@
+.production-customer-features section { display: grid; gap: 20px; padding: 28px 0; border-top: 1px solid var(--va-border); }
+.production-customer-features article { display: grid; gap: 12px; padding: 20px; background: var(--va-surface); border: 1px solid var(--va-border); overflow-wrap: anywhere; }
+.production-customer-features ul { display: grid; gap: 16px; padding-left: 20px; }
+.production-customer-features li { overflow-wrap: anywhere; }
+.production-customer-features select, .production-customer-features textarea { min-height: 48px; padding: 12px 14px; border: 1px solid var(--va-border); border-radius: var(--va-radius-control); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; width: 100%; }
+.production-customer-features textarea { min-height: 140px; }
+.production-customer-features form { display: grid; gap: 16px; max-width: 640px; }
+.production-customer-features .button { justify-self: start; max-width: 100%; white-space: normal; }
+.production-customer-features [role="status"] { overflow-wrap: anywhere; }
+.production-customer-features :focus-visible { outline: 3px solid var(--va-accent); outline-offset: 3px; }

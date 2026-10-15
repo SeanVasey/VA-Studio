@@ -16,6 +16,7 @@ use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/production-customer-identity.php';
+require __DIR__.'/production-account-features.php';
 require __DIR__.'/support-attachments.php';
 require __DIR__.'/support-attachment-pages.php';
 
