@@ -18,6 +18,10 @@ use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
 use App\Domain\Grants\PaidTax\PaidTaxConsumerCommitAdmission;
 use App\Domain\Grants\PaidTax\PaidTaxReadReceipt;
+use App\Domain\Grants\PaidTax\PaidTaxDeadline;
+use App\Domain\Grants\PaidTax\PaidTaxPolicy;
+use App\Domain\Grants\PaidTax\PaidTaxCommands;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -361,6 +365,57 @@ class PaidTaxGrantJourneyTest extends TestCase
                 $connection->rollBack();
             }
         }
+    }
+
+    public function test_delayed_claim_wall_clock_cannot_extend_the_original_physical_lease_budget(): void
+    {
+        $f = $this->paid();
+        $retained = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $originalClock = CarbonImmutable::getTestNow();
+        $delayed = 0;
+        $entryBound = null;
+        $renderSeen = false;
+        $publicationBudget = null;
+        CarbonImmutable::setTestNow(static function ($instant) use (&$delayed, &$entryBound): CarbonImmutable {
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+                if ($delayed === 0 && ($frame['class'] ?? null) === PaidTaxDocuments::class
+                    && str_starts_with($frame['function'] ?? '', '{closure')) {
+                    $delayed++;
+                    $entryBound = hrtime(true) + 300_000_000_000 - (int) $instant->format('u') * 1000;
+                    // Real callback delay, returning the wall instant supplied BEFORE that delay.
+                    usleep(2_000_000);
+                    break;
+                }
+            }
+
+            return CarbonImmutable::instance($instant);
+        });
+        app()->afterResolving(PaidTaxRendererProcess::class, static function () use (&$renderSeen): void {
+            $renderSeen = true;
+        });
+        app()->afterResolving(PaidTaxPolicy::class, static function () use (&$renderSeen, &$publicationBudget): void {
+            if (! $renderSeen || $publicationBudget !== null) {
+                return;
+            }
+            foreach (debug_backtrace() as $frame) {
+                if (($frame['class'] ?? null) === PaidTaxCommands::class && ($frame['function'] ?? null) === 'run'
+                    && ($frame['args'][4] ?? null) instanceof PaidTaxDeadline) {
+                    $publicationBudget = $frame['args'][4]->value();
+                    break;
+                }
+            }
+        });
+        try {
+            $complete = (new PaidTaxDocuments)->prepare($retained['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        } finally {
+            CarbonImmutable::setTestNow($originalClock);
+        }
+        $this->assertSame(1, $delayed, 'The real claim clock callback did not execute exactly once.');
+        $this->assertTrue($renderSeen);
+        $this->assertIsInt($entryBound);
+        $this->assertIsInt($publicationBudget);
+        $this->assertLessThanOrEqual($entryBound, $publicationBudget, 'Publication restarted time spent in the original claim clock.');
+        $this->assertTrue($complete['fulfilled']);
     }
 }
 
