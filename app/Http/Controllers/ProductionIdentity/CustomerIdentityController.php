@@ -8,6 +8,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityRequests;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+use App\Http\AccountFeatures\AccountFeatureMount;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Requests\ProductionIdentity\IdentityBody;
 use Illuminate\Http\Request;
@@ -95,6 +96,7 @@ final class CustomerIdentityController
         Inertia::encryptHistory();
 
         return IdentityPrivacy::protect(Inertia::render('ProductionCustomerIdentity', ['mode' => 'account',
+            'featuresMounted' => AccountFeatureMount::admitted(),
             'rehearsal' => $principal->provenance === IdentityPolicy::REHEARSAL])->toResponse($request));
     }
 

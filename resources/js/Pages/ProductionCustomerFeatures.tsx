@@ -7,6 +7,10 @@ import '../../css/customer-account.css';
 import '../../css/production-customer-features.css';
 
 export default function ProductionCustomerFeatures({ scope }: { scope: string }) {
+  return <ProductionFeatureJourney key={scope} scope={scope} />;
+}
+
+function ProductionFeatureJourney({ scope }: { scope: string }) {
   const [library, setLibrary] = useState<{ scope: string; value: LibraryEnvelope } | null>(null);
   const [preferences, setPreferences] = useState<{ scope: string; value: PreferencesEnvelope } | null>(null);
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(''), [closed, setClosed] = useState(false);

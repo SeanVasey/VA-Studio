@@ -13,6 +13,14 @@ use Throwable;
 /** Private bytes become observable only during one atomic post-kernel native send. */
 final class AccountFeatureResponse extends Response
 {
+    private static ?self $birth = null;
+
+    private static ?self $attempt = null;
+
+    private readonly object $epoch;
+
+    private readonly self $original;
+
     private ?ProductionFeaturePreparation $preparation = null;
 
     private bool $attempted = false;
@@ -29,6 +37,13 @@ final class AccountFeatureResponse extends Response
 
     public function __construct(private readonly Request $request)
     {
+        self::$birth = $this;
+        try {
+            $this->epoch = AccountFeatureHttpKernel::capture($request, $this);
+            $this->original = $this;
+        } finally {
+            self::$birth = null;
+        }
         parent::__construct('', 200, AccountFeaturePrivacy::headers());
         $this->setProtocolVersion('1.1');
         $failure = AccountFeaturePrivacy::error(503);
@@ -46,7 +61,27 @@ final class AccountFeatureResponse extends Response
 
     public function forRequest(Request $request): bool
     {
-        return $request === $this->request;
+        return $this->original === $this && $request === $this->request;
+    }
+
+    public static function constructing(self $response): bool
+    {
+        return self::$birth === $response;
+    }
+
+    public static function attempting(self $response): bool
+    {
+        return self::$attempt === $response;
+    }
+
+    public function __clone(): void
+    {
+        throw new ProductionFeatureException;
+    }
+
+    public function __serialize(): never
+    {
+        throw new \LogicException('Feature responses cannot be serialized.');
     }
 
     public function __toString(): string
@@ -65,11 +100,19 @@ final class AccountFeatureResponse extends Response
 
     public function send(bool $flush = true): static
     {
-        if ($this->attempted || $this->emitting || headers_sent()
-            || ! AccountFeatureHttpKernel::completed($this->request, $this)) {
+        if ($this->original !== $this || $this->attempted || $this->emitting || headers_sent()
+            || ! AccountFeatureHttpKernel::completed($this->request, $this, $this->epoch)) {
             return $this;
         }
         $this->attempted = true;
+        self::$attempt = $this;
+        try {
+            if (! AccountFeatureHttpKernel::consume($this->request, $this, $this->epoch)) {
+                return $this;
+            }
+        } finally {
+            self::$attempt = null;
+        }
         try {
             if ($this->preparation === null || $this->content !== '' || $this->statusCode !== 200
                 || $this->headers::class !== ResponseHeaderBag::class || $this->version !== '1.1') {
