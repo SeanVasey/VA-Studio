@@ -110,6 +110,9 @@ class ProductionFeatureReleaseTest extends TestCase
         $foreignRollbacks = 0;
         $foreignCallbacks = 0;
         $ownCallbacks = 0;
+        $ownRollbacks = 0;
+        $reopenedCallbacks = 0;
+        $reopenedRecords = [];
         $ownedManager = null;
         $foreignEvents->listen(TransactionRolledBack::class, function () use (&$foreignRollbacks): void {
             $foreignRollbacks++;
@@ -119,13 +122,22 @@ class ProductionFeatureReleaseTest extends TestCase
             $foreignCallbacks++;
         });
         $foreignRecords = $foreignManager->getPendingTransactions()->all();
-        Event::listen(TransactionBeginning::class, function () use ($connection, &$ownCallbacks): void {
+        Event::listen(TransactionBeginning::class, function () use ($connection, &$ownCallbacks, &$ownRollbacks): void {
             $connection->afterCommit(function () use (&$ownCallbacks): void {
                 $ownCallbacks++;
             });
+            $connection->afterRollBack(function () use (&$ownRollbacks): void {
+                $ownRollbacks++;
+            });
         });
-        LibraryRow::saved(function () use ($connection, $property, $foreignEvents, $foreignManager, &$ownedManager): void {
+        LibraryRow::saved(function () use ($connection, $property, $foreignEvents, $foreignManager, &$ownedManager, &$reopenedCallbacks, &$reopenedRecords): void {
             $ownedManager = $property->getValue($connection);
+            // An unrelated same-name level-one record even has a stale original parent link.
+            $ownedManager->begin($connection->getName(), 1);
+            $ownedManager->addCallback(function () use (&$reopenedCallbacks): void {
+                $reopenedCallbacks++;
+            });
+            $reopenedRecords = array_slice($ownedManager->getPendingTransactions()->all(), 1, null, true);
             $connection->setEventDispatcher($foreignEvents);
             $connection->setTransactionManager($foreignManager);
         });
@@ -142,8 +154,12 @@ class ProductionFeatureReleaseTest extends TestCase
             $this->assertSame($foreignRecords, $foreignManager->getPendingTransactions()->all());
             $this->assertSame(0, $foreignRollbacks);
             $this->assertSame(0, $foreignCallbacks);
-            $this->assertSame([], $ownedManager->getPendingTransactions()->all());
+            $this->assertSame($reopenedRecords, $ownedManager->getPendingTransactions()->all());
             $this->assertSame(0, $ownCallbacks);
+            $this->assertSame(0, $ownRollbacks, 'Native-only abort must never invoke displaced runtime callbacks.');
+            $ownedManager->commit($connection->getName(), 1, 0);
+            $this->assertSame(1, $reopenedCallbacks);
+            $this->assertSame(0, $ownCallbacks, 'The original record cannot run when its caller restores/reuses its manager.');
             $foreignManager->commit($connection->getName(), 1, 0);
             $this->assertSame(1, $foreignCallbacks, 'Only its owner consumes the retained foreign record.');
         } finally {
@@ -190,6 +206,29 @@ class ProductionFeatureReleaseTest extends TestCase
             }
         }
         $this->assertSame(['initialized' => false], (new ProductionListeningLibrary)->read($owner));
+    }
+
+    public function test_owned_framework_rollback_keeps_normal_afterrollback_callback_once(): void
+    {
+        $owner = $this->featureIdentity();
+        $calls = 0;
+        Event::listen(TransactionBeginning::class, function () use (&$calls): void {
+            DB::connection()->afterRollBack(function () use (&$calls): void {
+                $calls++;
+            });
+        });
+        $prepared = new ProductionFeaturePreparation(static function (): void {
+            throw new ProductionFeatureException;
+        }, 4096);
+        try {
+            (new ProductionListeningLibrary)->initialize($owner, $prepared);
+            $this->fail('Original ordinary callback refusal must roll back.');
+        } catch (ProductionFeatureException) {
+            $this->assertSame(1, $calls);
+            $this->assertFalse(DB::connection()->getRawPdo()->inTransaction());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
+        }
     }
 
     public function test_preparation_start_cannot_move_feature_writes_into_a_foreign_frame(): void

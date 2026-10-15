@@ -76,8 +76,24 @@ final class ProductionFeatureOperation
         // queued callbacks into a later transaction, and other connections are untouched.
         $manager = new DatabaseTransactionsManager;
         $observer = new ProductionFeatureTransactionObserver($connection, $primary, $configuration, $events, $manager, $metadata);
+        $hooksProperty = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $hooks = $hooksProperty->getRawValue($connection);
+        if (! is_array($hooks) || ! array_is_list($hooks)) {
+            throw new ProductionFeatureException;
+        }
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
+        $tail = function () use ($metadata, $configuration, $connection, $primary, $observer, $manager, $managerProperty, $hooksProperty, &$installed): void {
+            $metadata->requireCurrent();
+            $configuration->admit();
+            if ($connection->getRawPdo() !== $primary || $connection->transactionLevel() !== 0 || $primary->inTransaction()
+                || $connection->getEventDispatcher() !== $observer || $managerProperty->getRawValue($connection) !== $manager
+                || $hooksProperty->getRawValue($connection) !== $installed) {
+                throw new ProductionFeatureException;
+            }
+        };
+        $installed = [...$hooks, $tail];
+        $hooksProperty->setValue($connection, $installed);
         try {
             $connection->beginTransaction();
             $frame = $observer->frame();
@@ -86,6 +102,7 @@ final class ProductionFeatureOperation
             self::$live[spl_object_id($context)] = $context;
             try {
                 $preparation?->start($context);
+                $context->admitOuter();
                 $projection = $operation($context);
                 $preparation?->prepare($context, $projection);
             } finally {
@@ -107,6 +124,11 @@ final class ProductionFeatureOperation
             }
             throw new ProductionFeatureException;
         } finally {
+            // Remove only our tail; a callback may have replaced or extended the list.
+            $currentHooks = $hooksProperty->getRawValue($connection);
+            if (is_array($currentHooks)) {
+                $hooksProperty->setValue($connection, array_values(array_filter($currentHooks, fn ($hook) => $hook !== $tail)));
+            }
             if ($connection->getEventDispatcher() === $observer) {
                 if ($events === null) {
                     $connection->unsetEventDispatcher();

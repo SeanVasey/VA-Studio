@@ -20,6 +20,8 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     private bool $proved = false;
 
+    private ?ProductionFeatureBookkeeping $bookkeeping = null;
+
     public function __construct(private readonly Connection $connection, private readonly PDO $primary,
         private readonly ProductionFeatureConfiguration $configuration, private readonly ?Dispatcher $delegate,
         private readonly DatabaseTransactionsManager $manager, private readonly IdentityMetadataAdmission $metadata) {}
@@ -55,13 +57,19 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
 
     public function abort(): void
     {
-        if ($this->frame !== null) {
-            $owned = (new ReflectionProperty(Connection::class, 'events'))->getRawValue($this->connection) === $this
-                && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getRawValue($this->connection) === $this->manager;
-            if ($this->frame->protectFailure($owned)) {
-                // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
-                $this->connection->rollBack();
+        try {
+            if ($this->frame !== null) {
+                $owned = (new ReflectionProperty(Connection::class, 'events'))->getRawValue($this->connection) === $this
+                    && (new ReflectionProperty(Connection::class, 'transactionsManager'))->getRawValue($this->connection) === $this->manager;
+                if ($this->frame->protectFailure($owned)) {
+                    // Ordinary Laravel rollback owns this physical source and its scoped callbacks.
+                    $this->connection->rollBack();
+                }
             }
+        } finally {
+            // This fresh scoped manager is ours even when the connection slot was replaced.
+            // Its unacknowledged callbacks must never leak into a later caller operation.
+            $this->bookkeeping?->discard();
         }
     }
 
@@ -76,6 +84,7 @@ final class ProductionFeatureTransactionObserver implements Dispatcher
         // They are not our original frame; the subsequent read-only proof assesses their effects.
         if ($outerBeginning) {
             $this->admitBinding();
+            $this->bookkeeping = ProductionFeatureBookkeeping::capture($this->manager, $this->connection->getName());
             if ($this->frame !== null || $this->connection->getRawPdo() !== $this->primary) {
                 throw new ProductionFeatureException;
             }
