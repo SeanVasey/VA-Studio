@@ -1,0 +1,130 @@
+{
+  "actions_performed": [
+    "Read-only supplied original inventory and exact scoped source/deferral-policy inspection",
+    "Exclusive runtime triage MD/JSON creation"
+  ],
+  "app_db_network_ci_execution": false,
+  "application_tests_executed": false,
+  "carry_scope": "The prior focused final review and explicit483f publication carry remain valid, supplemented by these two newly identified open P2s. Earlier no-material-finding wording does not erase this addendum. No source/artifact changed.",
+  "decision": "RETAIN DEVELOPMENT APPROVAL; BOTH LATE P2S MAY BE DEFERRED UNDER EXPLICIT FREEZE-AND-BATCH",
+  "development_merge_permitted_with_conditions": true,
+  "findings": [
+    {
+      "confidence": "confirmed by source semantics; not independently executed",
+      "effect": "Removing middle tail with array_filter preserves numeric holes; next feature operation using that retained Connection refuses its hook-list admission",
+      "id": "r4287886519",
+      "location": "ProductionFeatureOperation finally array_filter tail cleanup plus initial array_is_list hook admission",
+      "remediation_direction": "In next related B4 batch, detect whether current pre-removal storage is a list; reindex only that list after removing our tail, preserving associative replacement arrays/keys/order. Test appended-hook future operation and associative foreign storage controls.",
+      "scope_limit": "Connection/process lifetime availability and bookkeeping shape; refusal does not grant stale authority, release private bytes, roll back foreign work or make an invalid durable write. No open P0/P1 established.",
+      "severity": "P2",
+      "state": "DEFERRED OPEN; not fixed/not executed/not resolved",
+      "trigger": "Commit-phase callback appends a beforeStartingTransaction hook after the operation-owned tail in the existing numeric list",
+      "url": "https://github.com/SeanVasey/VA-Studio/pull/127#discussion_r4287886519"
+    },
+    {
+      "confidence": "confirmed by source semantics; not independently executed",
+      "effect": "Server refuses invalid name or capacity; UI treats failed mutation conservatively as uncertain, clears library and requires fresh read. Avoidable journey interruption",
+      "id": "r4287886535",
+      "location": "ProductionCustomerFeatures create-playlist form/button and mutation catch; ProductionListeningState validateCommand/apply",
+      "remediation_direction": "In next related B4 UI batch, disable/guard create on valid trimmed bounded name and current projected capacity; submit admitted trimmed value, preserve server authority and uncertainty/version rules. Add no-request controls and valid-create positive.",
+      "scope_limit": "UI validity/recovery usability; domain authority and capacity remain enforced, no false success/invalid durable playlist/private release. Capacity is rejected in apply; invalid names in validateCommand.",
+      "severity": "P2",
+      "state": "DEFERRED OPEN; not fixed/not executed/not resolved",
+      "trigger": "Initialized page has enabled Create playlist when name empty/whitespace-only or supplied playlist capacity reached",
+      "url": "https://github.com/SeanVasey/VA-Studio/pull/127#discussion_r4287886535"
+    }
+  ],
+  "gate_requirements": [
+    "Exactly these two independently classified P2 comment IDs may be accepted unresolved after one deferral reply each with retained receipt; no arbitrary unresolved/unknown/unclassified thread acceptance.",
+    "Fresh complete exact483f reviews/threads/checks inventory; new P0/P1 or unknown material finding blocks, actual required review/check/protection failures still block.",
+    "Green exact483f cheap preflight and expected-head-SHA merge; no repository setting/protection bypass or fabricated pass.",
+    "Retain original gate-preparation refusal; replacement of local all-threads-resolved assertion must implement explicit userP2 policy, not weaken enforced repository requirements.",
+    "List both open findings and one reply URL each in codex-deferred plus both merge ledgers/actual receipt at merge, queued for next related B4 operation/UI batch. No single-finding frozen-head push, no mark-fixed/resolved claim."
+  ],
+  "governing_policy": {
+    "path": "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+    "quoted_rules": [
+      "A PR merges at its exact current SHA once preflight is green, its independent review approves, and no P0/P1 Codex finding is open.",
+      "Codex P2 findings on a frozen or merged head get one thread reply (deferred to the lane follow-up batch) and are listed here.",
+      "No single-finding pushes."
+    ],
+    "user_authorization": "User explicitly requested freeze-and-batch and exact-head development merge with no openP0/P1; source fixes are next related batch."
+  },
+  "immutable_source_sha256": {
+    "app/Domain/Customers/ProductionFeatures/Listening/ProductionListeningState.php": "9a8c40add57a47a680e702365e6147c7c0ce448e5dc28c9bdd608077ef727aea",
+    "app/Domain/Customers/ProductionFeatures/ProductionFeatureOperation.php": "116d84d8e99d32129e3145a97d367bceb8acda4a4419cdc51292b267e72fa11e",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "800aba96088e2522ae7f7051cc2d5171c9a5ef7a34081d5305f5b6fdd74ca524",
+    "resources/js/Pages/ProductionCustomerFeatures.tsx": "6dd0bef458e62c8ecc9ba60838b245aa447ef9d3cc1b210191b9bef479c8db5c"
+  },
+  "inventory_original": {
+    "check_conclusions": [
+      {
+        "conclusion": "SUCCESS",
+        "name": "scope"
+      },
+      {
+        "conclusion": "SKIPPED",
+        "name": "documentation"
+      },
+      {
+        "conclusion": "SUCCESS",
+        "name": "frontend"
+      },
+      {
+        "conclusion": "SUCCESS",
+        "name": "backend-quality"
+      },
+      {
+        "conclusion": "SUCCESS",
+        "name": "Development preflight result"
+      }
+    ],
+    "contexts": 5,
+    "head": "483f037a6b4c35ef29b89adf4b342ba8dc823eab",
+    "pagination_complete": true,
+    "path": "/workspace/runtime/account-features-http-publication-20261015/corrected-final-review-check-inventory.json",
+    "recorded_preflight": "38800826915",
+    "review_states": [
+      "COMMENTED"
+    ],
+    "reviews": 1,
+    "sha256": "b725228a3b4062079b00210ecabe4ed7d7c34e173181766c4b0a3fee7cdf59fb",
+    "threads": 2
+  },
+  "open_deferred_p2": 2,
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_threads": [
+    {
+      "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Reindex an extended hook list after removing the tail**\n\nWhen a `TransactionCommitting`, `afterCommit`, or `TransactionCommitted` callback appends a `beforeStartingTransaction` hook during this operation, the array remains a list containing the owned tail followed by the new hook. `array_filter` removes the middle element but preserves its numeric keys, so the next feature operation rejects the stored hooks at the `array_is_list($hooks)` check and all subsequent listening/preferences operations become unavailable until the worker is reset. Preserve associative replacement arrays, but reindex when removing the tail from a list.\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.\n\n<!-- codex-code-review-finding:v1 -->",
+      "isOutdated": false,
+      "isResolved": false,
+      "original_body_sha256": "087dc49847b5b6f31b4a1e307a1f931fc661b71153c29377bbc07dabe087b1e5",
+      "reply_observed": false,
+      "url": "https://github.com/SeanVasey/VA-Studio/pull/127#discussion_r4287886519"
+    },
+    {
+      "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Disable invalid playlist creation submissions**\n\nAfter loading an initialized library, this submit button is enabled while `name` is initially empty, and it also remains enabled for whitespace-only names or after the playlist limit is reached. Those inputs are rejected by `ProductionListeningState::validateCommand`, but the client treats every failed mutation as uncertain, clears the library, and forces a reload, so an accidental click on the immediately available button disrupts the journey. Disable submission unless the trimmed name is valid and the playlist count is below the provided limit.\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.\n\n<!-- codex-code-review-finding:v1 -->",
+      "isOutdated": false,
+      "isResolved": false,
+      "original_body_sha256": "1f9da962c72b3abf47739afee231f77053152000c89aa8c145f34c316c04e78a",
+      "reply_observed": false,
+      "url": "https://github.com/SeanVasey/VA-Studio/pull/127#discussion_r4287886535"
+    }
+  ],
+  "preparation_errors": [
+    {
+      "failure": "Initialrg included nonexistent app/Domain/Customers/Listening/ListeningState.php",
+      "reconciliation": "Actual production path inspected at ProductionFeatures/Listening/ProductionListeningState.php; source lookup preparation only, no app test/execution."
+    }
+  ],
+  "recorded_utc": "2026-10-15T20:25:52.812329+00:00",
+  "remaining_limits": [
+    "Full/native-concurrency/browser/SAPI/FPM/host/provider/commercial/activation/release gates",
+    "Previously frozen adjacentV1/generic/IdentityOriginalCommitWitness/membershipP2s"
+  ],
+  "reply_or_merge_claim": "Neither reply nor merge has been observed or performed by this reviewer; conditions remain for root to reconcile.",
+  "reviewed_head": "483f037a6b4c35ef29b89adf4b342ba8dc823eab",
+  "reviewer_session": "/root/account_features_final_review",
+  "shared_files_modified": false
+}
