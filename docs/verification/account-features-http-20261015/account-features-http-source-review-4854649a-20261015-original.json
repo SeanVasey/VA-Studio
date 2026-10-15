@@ -1,0 +1,115 @@
+{
+  "decision": "REVISE INTEGRATED HTTP/UI SOURCE BEFORE APPROVAL",
+  "reviewed_sha": "4854649a28f0ed8541d1b9eac1c0d7f04229b1e8",
+  "initial_requested_sha": "b90347006ab2a7cb675d9bf3aad995465899de83",
+  "observed_utc": "2026-10-15T19:26:00.164845+00:00",
+  "scope": "Bounded new seven HTTP classes/root/privacy/routes/config/UI/helper and their tests; no frozen-family or SAPI-wide audit",
+  "source_sha256": {
+    "app/Http/AccountFeatures/AccountFeatureBody.php": "f3e9189ad521b100faaea7ab1b456e03975787fd423799fa06dd4fbe8e4b1397",
+    "app/Http/AccountFeatures/AccountFeatureController.php": "1756316ed020e904349f176c8de1c13f8e70a026a57083f1d384dbd4fee865f1",
+    "app/Http/AccountFeatures/AccountFeatureHttpKernel.php": "9ba8d042db570535865382a27adaf1879ffba3e9837dca7f94cc0c664452773e",
+    "app/Http/AccountFeatures/AccountFeatureMount.php": "95d76ce7445eca456692136cc130be069fae25cd69a21e350fae72ce145a8b22",
+    "app/Http/AccountFeatures/AccountFeaturePrivacy.php": "9619a3e56e9bec353b0fe2bd516a2213563a7958d605d0b91c17a8707696904d",
+    "app/Http/AccountFeatures/AccountFeatureRequestGuard.php": "4a441e931284da515498ffb8d20c778807e23d7ac9c668babc19bfd5bbabf545",
+    "app/Http/AccountFeatures/AccountFeatureResponse.php": "31fcc66a75ba6603cd783f6c3e1dab21f4b241589ce4a5860d05a6e86a4480d9",
+    "bootstrap/app.php": "36adabf5e7aa11e05d9e010e441cb3740cfe431faa3c1cabd03e8f78ae39a6fb",
+    "app/Http/Middleware/ProductionIdentity/IdentityPrivacy.php": "34bd1ff03fa08aa3d54a6c5a0e2d4b25c5efb7385c81547c0964c361ecea1c91",
+    "config/production-account-features.php": "e7b7669ed02e5773b5145ef6420c3ac76a5eaf66d5c3bb20f653be46b1e50e4b",
+    "routes/production-account-features.php": "89ca04175e3a0bb7747bdcb72eaa6aeb04ddbd43cb67e877c095af75a6b74f0e",
+    "routes/web.php": "9e497b98cf182d3fd6fb95eb1d70a01620d6157868da7ccb3a88231107a8f7ac",
+    "resources/js/Pages/ProductionCustomerFeatures.tsx": "4fbf2b342071a27179d1d5819e996adca0752a687aa4123a6da24d4f8342c8cc",
+    "resources/js/lib/production-account-features.ts": "617a0ef32a8d72a53659b60a738ecec84f8cc8f59d78b6d529c1af56d5359f29",
+    "tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php": "ab3f69173af84c1075ac634d9f5c4a52eae6fe617954af53fe6e6ee68e559e83",
+    "tests/frontend/production-account-features.test.tsx": "47ad8487e024b9424ad9c73ab7629790042db1ab78e3d2763b4aa5352484423f"
+  },
+  "protocol_fix": "The only app/input delta b903->485 is preallocated native Response protocol1.1 before held preparation. This addresses the observed protocol ordering refusal without renewing authority/time.",
+  "findings": [
+    {
+      "id": "B4-H1",
+      "severity": "P2",
+      "group": "Original release identity and lifetime",
+      "paths": [
+        "app/Http/AccountFeatures/AccountFeatureHttpKernel.php",
+        "app/Http/AccountFeatures/AccountFeatureResponse.php"
+      ],
+      "issue": "Kernel completed state binds only request/returned response, while Response does not retain its original epoch or reject clones. A clone returned as a middleware substitute still passes forRequest and can complete the epoch, while its preparation guard retains the original response. WeakMap values retain the response strongly and response retains its request, keeping the weak key alive and retaining request/projection/authority graphs in a long-lived process.",
+      "required_fix": "Bind exact original epoch/object with clone refusal and no public substitute; retain response weakly in the registry, release completed/failed request entries without strong key cycles.",
+      "control": "Genuine clone substitution cannot release; old-request epoch cannot be re-earned by rehandle/substitution; dropped request/response graph collects; ordinary native send positive.",
+      "status": "Present in immutable485. Parent reports genuine old47 controls reproduce clone/retention failures; later preserved three-file patch is not reviewed/approved by this artifact."
+    },
+    {
+      "id": "B4-H2",
+      "severity": "P2",
+      "group": "Primitive terminal request/session metadata",
+      "paths": [
+        "app/Http/AccountFeatures/AccountFeatureRequestGuard.php"
+      ],
+      "issue": "scope string-casts the raw login session value before admitting a primitive type; a Stringable object can invoke user code inside the terminal guard.",
+      "required_fix": "Type/shape admit native integer or canonical bounded numeric-string login identity before conversion/comparison; retain exact standard raw guard/store/request identities.",
+      "control": "Late raw login Stringable sentinel stays zero on fixed refusal; authentic standard session positive.",
+      "status": "Present in immutable485; parent reports genuine old47 Stringable failure. Later fix not approved here."
+    },
+    {
+      "id": "B4-H3",
+      "severity": "P2",
+      "group": "Stable native header/cookie proof",
+      "paths": [
+        "app/Http/AccountFeatures/AccountFeatureResponse.php"
+      ],
+      "issue": "requireUnchanged re-materializes cookies to compare candidateHeaders. Native Cookie::__toString computes Max-Age using time(); an unchanged session cookie crossing a wall-second during original closure can differ and falsely refuse healthy output.",
+      "required_fix": "Materialize emission strings once before proof and compare stable raw header/cookie facts during guards, without a renewed time-dependent serialization. Keep all user-capable conversions before final proof.",
+      "control": "Genuine initialized HTTP/session cookie with real delayed decrypt/source callback spanning a wall-second must still release within original deadline; actual cookie/header mutation still refuses.",
+      "status": "Static ordinary-runtime path established from installed typed native Cookie; not a reproduced run or attribution for current failure markers."
+    },
+    {
+      "id": "B4-H4",
+      "severity": "P2",
+      "group": "Frontend cancellation and render ownership",
+      "paths": [
+        "resources/js/Pages/ProductionCustomerFeatures.tsx"
+      ],
+      "issue": "Sign out is disabled while busy and returns while pending, so it cannot perform the required abort/clear transition. Its eventual redirect lacks original render/generation ownership. Public search timeout only aborts and leaves pending/busy owned until an unresolved operation settles.",
+      "required_fix": "Allow sign-out to synchronously erase/abort current work; scope its completion/redirect to its original lifecycle and handle failure. Public search timeout must locally settle ownership/busy state and invalidate late results independently of transport acknowledgement.",
+      "control": "Sign-out during pending private request clears and aborts; later old-scope logout completion cannot redirect fresh scope. Abort-ignoring public search timeout unlocks controls and rejects late results.",
+      "status": "Concrete source paths; reviewer executed no frontend controls."
+    }
+  ],
+  "required_acceptance_gaps": [
+    "Current fixture manually registers conditional feature routes after application boot. Add a genuine initial-root override after LoadConfiguration/before providers and route load, with default-false/no-identity/no-request-query and route-cache rebuild/stale-cache controls; existing tests remain actual controller/kernel/send evidence, not initial registration proof.",
+    "Execute real session-save mutation plus all RequestHandled release controls; response substitution/clone/incomplete epoch, original foreign reopened frame, authentic manager/deadline, unused disposal and headers-already-sent cases. Do not infer these from metadata/release unit components.",
+    "Cover accepted exact 4KiB/16KiB body boundaries and preserved old identity cap, real preprivacy/framework CSRF/validation/405/429/debug500/503 privacy and bounded headers/no flash. Current code maps all5xx to503: document/test the deliberate status mapping or preserve the frozen framework status contract.",
+    "Frontend controls still need actual public-catalog shape/search lifecycle, sign-out/scope navigation and affirmative consent notice/version/unknown/version/export bounds. Verify shipped grants/notes remain disabled and no persistent storage."
+  ],
+  "open_established_P0_P1": [],
+  "positive_assessment": [
+    "Literal default-false plain mount admission repeats at runtime; IdentityPrivacy explicitly delegates before old4KiB read; raw cap+1 capture and duplicate/escaped-key parser precede feature work.",
+    "Source preparation/one-use closing seam remains separately approved; API rejects X-Inertia and hides provisional content; real send/bounded private error methods are exercised by isolated tests.",
+    "UI uses exact initialized envelopes/versioned minimized export, strict fatal UTF8/body-byte limits, explicit initialization and unknown-result readback blocking, no optimistic consent/suppression claims. Public catalog page size12/string IDs match the new helper."
+  ],
+  "execution_scope": {
+    "original_first_HTTP952": "Parent reports1/6/F1, not passing HTTP; separate-process missing PHPUNIT_COMPOSER_INSTALL original2/5/E1 retained as harness preparation.",
+    "parent_reported_b903": "RequestGuard1/7 all0; frontend9/9 and typecheck at earlier952 observed pass. These are bounded original outcomes, not integrated acceptance.",
+    "parent_reported_old47": "4/76/F3/E0/S0, PHP/recorder/OS1; actual API positive passed, clone/retention/Stringable each failed. Original failure evidence not rewritten.",
+    "current_repaired_028": "Unreviewed here and running when notified; no counts/pass inference from markers.",
+    "reviewer_execution": "No PHP/app/frontend/DB/network/CI execution."
+  },
+  "ownership": "Reviewer wrote no shared HTTP/source file, including the unattributed three-file edits. Only immutable Git reads and runtime artifacts. No attribution or approval of the preserved patch/new1b/028 source is made.",
+  "conditions": [
+    "Review actual coherent repaired frozen source and execute meaningful controls above.",
+    "Proportionate native/current source evidence and independent final sealed packet, exact-head cheap preflight/inventory/expected-SHA development merge remain required.",
+    "Default-off/unmounted, original10-second post-identity budget, scoped prior metadata14/85/release23/212 and frozen adjacent scopes remain preserved; no native/full/host/provider/activation claim."
+  ],
+  "read_commands": [
+    "Scoped Git diff/read of seven HTTP files, root/privacy/config/routes and UI/test bodies",
+    "Immutable485 protocol diff and selected hashes",
+    "Read typed installed Cookie/SessionDecorator and root Kernel/StartSession/Response methods for reached composition only",
+    "Read unchanged PublicCatalog page/project to confirm API page12/string-ID compatibility"
+  ],
+  "preparation_errors": [
+    {
+      "stage": "Dependency path lookup",
+      "diagnostic": "git show485:routes/api.php failed: path does not exist (combined read command exit1). Corrected immutable routes/web.php maps api/catalog to StorefrontController; relevant PublicCatalog shape read.",
+      "application_invocation": false
+    }
+  ]
+}
