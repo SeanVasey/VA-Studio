@@ -85,14 +85,11 @@ final class AccountFeatureRequestGuard
         $name = self::raw($this->store, Store::class, 'name');
         $login = 'login_customer_'.sha1(SessionGuard::class);
         $marker = is_array($attributes) ? ($attributes['_production_customer_identity'] ?? null) : null;
-        $loginId = is_array($attributes) ? ($attributes[$login] ?? null) : null;
         if (! is_array($attributes) || ! is_string($id) || ! is_string($name)
             || ! is_array($marker) || array_keys($marker) !== ['binding_digest'] || ! is_string($marker['binding_digest'])
             || ! is_string($attributes['_token'] ?? null)
-            || (! is_int($loginId) && (! is_string($loginId) || preg_match('/\A[1-9][0-9]{0,17}\z/D', $loginId) !== 1))
-            || (is_int($loginId) && $loginId < 1)
             || ! hash_equals($this->identity->principal()->sessionBindingDigest(), $marker['binding_digest'])
-            || (string) $loginId !== (string) IdentityMetadataAdmission::actorId($this->identity->actor())) {
+            || (string) ($attributes[$login] ?? '') !== (string) IdentityMetadataAdmission::actorId($this->identity->actor())) {
             throw new ProductionFeatureException;
         }
 
