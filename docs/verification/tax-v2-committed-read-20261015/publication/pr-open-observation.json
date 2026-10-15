@@ -1,0 +1,16 @@
+{
+  "recorded_utc": "2026-10-15T04:09:08.322640+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "view",
+    "121",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--json",
+    "number,url,state,isDraft,headRefOid,baseRefName,mergeable,mergeStateStatus,statusCheckRollup,reviewDecision"
+  ],
+  "exit": 0,
+  "stdout": "{\"baseRefName\":\"main\",\"headRefOid\":\"78e2c7e773f4fa0a310360b67e50fe24cb6cfa62\",\"isDraft\":false,\"mergeStateStatus\":\"UNSTABLE\",\"mergeable\":\"MERGEABLE\",\"number\":121,\"reviewDecision\":\"\",\"state\":\"OPEN\",\"statusCheckRollup\":[{\"__typename\":\"CheckRun\",\"completedAt\":\"2026-10-15T04:07:16Z\",\"conclusion\":\"SUCCESS\",\"detailsUrl\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38679773420/job/116241425025\",\"name\":\"scope\",\"startedAt\":\"2026-10-15T04:07:08Z\",\"status\":\"COMPLETED\",\"workflowName\":\"Development preflight\"},{\"__typename\":\"CheckRun\",\"completedAt\":\"2026-10-15T04:07:16Z\",\"conclusion\":\"SKIPPED\",\"detailsUrl\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38679773420/job/116241475781\",\"name\":\"documentation\",\"startedAt\":\"2026-10-15T04:07:16Z\",\"status\":\"COMPLETED\",\"workflowName\":\"Development preflight\"},{\"__typename\":\"CheckRun\",\"completedAt\":\"2026-10-15T04:08:44Z\",\"conclusion\":\"SUCCESS\",\"detailsUrl\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38679773420/job/116241474354\",\"name\":\"frontend\",\"startedAt\":\"2026-10-15T04:07:19Z\",\"status\":\"COMPLETED\",\"workflowName\":\"Development preflight\"},{\"__typename\":\"CheckRun\",\"completedAt\":\"0001-01-01T00:00:00Z\",\"conclusion\":\"\",\"detailsUrl\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38679773420/job/116241474351\",\"name\":\"backend-quality\",\"startedAt\":\"2026-10-15T04:07:18Z\",\"status\":\"IN_PROGRESS\",\"workflowName\":\"Development preflight\"}],\"url\":\"https://github.com/SeanVasey/VA-Studio/pull/121\"}\n",
+  "stderr": ""
+}

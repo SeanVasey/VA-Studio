@@ -1,0 +1,79 @@
+{
+  "recorded_utc": "2026-10-15T04:05:46.220562+00:00",
+  "decision": "APPROVE RECEIPT-ONLY CARRY WITH ORIGINAL CONDITIONS",
+  "reviewed_head": "78e2c7e773f4fa0a310360b67e50fe24cb6cfa62",
+  "carried_from": "789ecf4abf23220059d2b4fd83cd7b5f7a77cfd8",
+  "operative_source": "e455c2871ade602653bd0f59b20e151b57afe57d",
+  "no_open_p0_p1": true,
+  "required_repairs": [],
+  "changed_paths": [
+    "docs/verification/tax-v2-committed-read-20261015/README.md",
+    "docs/verification/tax-v2-committed-read-20261015/evidence-tools/reviewer-final-verifier.py",
+    "docs/verification/tax-v2-committed-read-20261015/evidence-tools/reviewer-original-serialization.py",
+    "docs/verification/tax-v2-committed-read-20261015/evidence-tools/reviewer-reconciled-originals.json",
+    "docs/verification/tax-v2-committed-read-20261015/evidence-tools/reviewer-serialization-error.json",
+    "docs/verification/tax-v2-committed-read-20261015/independent-packet-verification.json",
+    "docs/verification/tax-v2-committed-read-20261015/independent-review-DECISION.md"
+  ],
+  "changed_path_count": 7,
+  "all_changes_documentation_or_exact_review_receipts": true,
+  "unchanged_copies": {
+    "independent-review-DECISION.md": {
+      "sha256": "7d6fc3df6762e5744d08a49adb25112ebf50976d0a05d508a74e61a1fccf09fb",
+      "original_runtime_path": "/workspace/runtime/tax-v2-committed-read-independent-final-packet-789ecf4a-20261015.md",
+      "unchanged": true
+    },
+    "independent-packet-verification.json": {
+      "sha256": "6589980406d37d6d44f57aec62c3b6c5fe11b40aaa3f8306f5af1f2c167f98ef",
+      "original_runtime_path": "/workspace/runtime/tax-v2-committed-read-independent-final-packet-789ecf4a-20261015.json",
+      "unchanged": true
+    },
+    "evidence-tools/reviewer-final-verifier.py": {
+      "sha256": "3be9d7eb48868f9db538803690789a7172c9447d2463b801cfd8a73b5d2962e2",
+      "original_runtime_path": "/workspace/runtime/tax-v2-cr-final-packet-verifier-789ecf4a-20261015.py",
+      "unchanged": true
+    },
+    "evidence-tools/reviewer-original-serialization.py": {
+      "sha256": "2a03bc04df37df739e2dc8efeccf15735b5bed87f044f95f21c0c27524c37b79",
+      "original_runtime_path": "/workspace/runtime/tax-v2-cr-final-packet-verifier-789ecf4a-20261015-original-serialization.py",
+      "unchanged": true
+    },
+    "evidence-tools/reviewer-reconciled-originals.json": {
+      "sha256": "55ab15b2f0a14e3f46a90178b529f50257a39bb8d53b2139ecb40b4dc7da9a7c",
+      "original_runtime_path": "/workspace/runtime/tax-v2-cr-final-packet-789ecf4a-20261015.working.json",
+      "unchanged": true
+    },
+    "evidence-tools/reviewer-serialization-error.json": {
+      "sha256": "c01dd7eac40cc3fbd00e504854bc099c71e6563c751a4388b7d1487bc8c04e95",
+      "original_runtime_path": "/workspace/runtime/tax-v2-cr-final-packet-verifier-789ecf4a-20261015-serialization-error.json",
+      "unchanged": true
+    }
+  },
+  "archive": {
+    "sha256": "07964bc4f96220ce69648d4b8d57c79556545272245dfa4a344f6dc0b6589c80",
+    "bytes": 7886765,
+    "members": 2666,
+    "index_sha256": "653f210802d0f12f095b2817820b9726f645153e0b580a4ef507a298442c5ee7",
+    "unchanged": true
+  },
+  "source_carry": {
+    "actual_inputs": 2351,
+    "route_inputs": 16,
+    "loader_hashes": 13,
+    "all_current_files_match_original_manifest": true,
+    "all_loader_files_match_original_runtime": true,
+    "git_input_diff_from_prior_and_operative_source_empty": true,
+    "app_test_schema_config_contracts_routes_ci_original_evidence_unchanged": true
+  },
+  "readme": "Links actual immutable789 approval; pending carry/preflight wording is a checkpoint. Reviewer report serialization error is separate; deferred section unchanged. This runtime carry is external to its own reviewed commit.",
+  "original_conditions": [
+    "Receipt-only successor carry must be independently explicit; cheap preflight/protections must succeed on the exact published 40-character head before expected-SHA merge. No Foundation/GitLab dispatch or bypass is authorized by this decision.",
+    "Whole SQLite211/1523/25 and actual >300s source age remain bound only to b1; native2/19 and10/71 only9d; currente45511/62 is focused. Narrow carry is accepted, not current whole/native execution or whole application equality.",
+    "Captured original abort anchor, owner record and native primary authorize cleanup only; missing anchor/idlePDO cannot prove commit or undo durable effects. No automatic retry or compensation after throwing postphysical callbacks. Arbitrary nondelegating replacement requires owner terminal fence.",
+    "Actual effective RR/Serializable gap behavior or intact canonical uniqueness and single-transaction overrides remain explicit conditions. No READ COMMITTED gap proof, generalized damaged restore/blind writers/unexpected triggers/overlapping DDL/invisible empty direct-PDO reopen guarantee.",
+    "Native300s source-age,1213 deadlock/general SQL interruption/wall-time guarantees and broader concurrency remain unexecuted. Bounded/restored waits do not interrupt arbitrary SQL or certify host/SAPI/proxy/queue clock coverage.",
+    "Paid252 forward V2 schema/render/concrete current consumer and terminal after-use proof, existing-request pre-create READ/final provider I/O, root mounting/registration and host/provider/merchant/tax/live/cutover/activation acceptance remain subsequent. Literal receipt/operative defaults stayfalse; provider staysunbound.",
+    "Adjacent OLD NEW-write FreshTaxCheckoutPolicy env descriptorP2 remains frozen for next related Tax admission; shared generic/V1/identity facade/primary metadataP2 remains frozen for related shared/identity work; ordinary membership throwing-afterCommitP2 remains open. Tax wrapper repairs do not globally fix these paths."
+  ],
+  "review_operations": "Read-only Git diff/status and Python original-file/hash/tar manifest inspection. No app/test/DB/CI/hosted/network action, source edit or publication. Original verifier copies were not executed."
+}
