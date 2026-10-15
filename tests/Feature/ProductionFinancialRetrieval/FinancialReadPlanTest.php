@@ -1,0 +1,402 @@
+<?php
+
+namespace Tests\Feature\ProductionFinancialRetrieval;
+
+use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
+use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
+use App\Domain\Commerce\ProductionFinancialRetrieval\FinancialReadPlan;
+use App\Domain\Commerce\ProductionFinancialRetrieval\FinancialRetrievalException;
+use App\Domain\Commerce\ProductionFinancialRetrieval\RetrievalPolicy;
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
+use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
+use Illuminate\Support\Facades\DB;
+use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
+use Stripe\ApiRequestor;
+use Stripe\HttpClient\ClientInterface;
+use Stripe\Stripe;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidTaxGrantFixtures;
+use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\TestCase;
+
+/** Genuine retained paid sources and stock SDK; transport replies are nonbinding synthetic arrays. */
+final class FinancialReadPlanTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use PaidTaxGrantFixtures;
+    use ProductionCheckoutJourneyFixture;
+
+    private ClientInterface $previousTransport;
+
+    private array $previousGlobals;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->preparePaidTaxFixture();
+        $this->app->instance('env', 'testing');
+        config(['production_checkout.fresh_checkout_enabled' => true, 'production_checkout.reconciliation_enabled' => true,
+            'production_checkout.committed_read_receipts_enabled' => true,
+            'production_checkout.committed_read_receipt_version' => 'production-checkout-committed-read-v1',
+            'production-financial-inspection.enabled' => true, 'production-financial-retrieval.enabled' => true,
+            'payments.stripe.mode' => 'test', 'payments.stripe.account_id' => 'acct_SYNTHETIC',
+            'payments.stripe.secret_key' => 'sk_test_SYNTHETICFINANCIAL']);
+        $this->previousTransport = ApiRequestor::httpClient();
+        $this->previousGlobals = [Stripe::$accountId, Stripe::$verifySslCerts];
+        Stripe::$accountId = null;
+        Stripe::$verifySslCerts = true;
+    }
+
+    protected function tearDown(): void
+    {
+        ApiRequestor::setHttpClient($this->previousTransport);
+        [Stripe::$accountId, Stripe::$verifySslCerts] = $this->previousGlobals;
+        $this->app->instance('env', 'testing');
+        parent::tearDown();
+    }
+
+    private function paid(bool $tax): array
+    {
+        if ($tax) {
+            return $this->paidTaxOrder(twoLines: true);
+        }
+        $f = $this->payable();
+        $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+
+        return $f;
+    }
+
+    private function held(array $f, bool $tax, callable $use): mixed
+    {
+        $locator = $tax ? ProductionTaxPaidOrderLocatorV2::locate($f['order']['orderId'])
+            : ProductionPaidOrderLocatorV1::locate($f['order']['orderId']);
+
+        return DB::transaction(function () use ($f, $tax, $locator, $use) {
+            $reader = new CurrentRows(DB::getPdo(), DB::getDriverName());
+            $history = $f['access']->verifyHistoricalBinding($locator->historicalBuyerBinding(), $reader);
+            $source = $tax ? ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $history)
+                : ProductionPaidOrderSourceV1::lockedRead($locator, $reader, $history);
+
+            return $use($source, $reader);
+        });
+    }
+
+    private function makePlan(bool $tax = false, ?int $deadline = null): array
+    {
+        $f = $this->paid($tax);
+        $delegate = DB::connection()->getEventDispatcher();
+        [$plan, $line] = $this->held($f, $tax, function ($source, $reader) use ($tax, $deadline) {
+            $line = $source->line(1);
+            $plan = $tax ? FinancialReadPlan::fromTaxV2($source, $reader, $deadline ?? hrtime(true) + 60_000_000_000)
+                : FinancialReadPlan::fromV1($source, $reader, $deadline ?? hrtime(true) + 60_000_000_000);
+
+            return [$plan, $line];
+        });
+
+        return [$plan, $this->transport($line, $tax), $delegate, $f];
+    }
+
+    private function transport(array $line, bool $tax): RetrievalHttpFixture
+    {
+        $gross = $tax ? $line['tax']['order_total_minor'] : $line['amounts']['total_minor'];
+        $payment = ['id' => $line['provider_payment_id'], 'object' => 'payment_intent', 'livemode' => false,
+            'currency' => 'usd', 'amount' => $gross, 'amount_received' => $gross, 'amount_capturable' => 0,
+            'status' => 'succeeded', 'capture_method' => $line['execution_context']['capture_method'],
+            'latest_charge' => 'ch_SYNTHETIC', 'client_secret' => 'NONBINDING_SYNTHETIC_PRIVATE'];
+        $charge = ['id' => 'ch_SYNTHETIC', 'object' => 'charge', 'payment_intent' => $payment['id'], 'livemode' => false,
+            'currency' => 'usd', 'amount' => $gross, 'amount_captured' => $gross, 'amount_refunded' => 0,
+            'refunded' => false, 'paid' => true, 'captured' => true, 'status' => 'succeeded', 'disputed' => false];
+        $list = ['object' => 'list', 'has_more' => false, 'data' => []];
+
+        return new RetrievalHttpFixture([['object' => 'account', 'id' => $line['provider_account']], $payment, $charge, $list, $list, $charge]);
+    }
+
+    private function refuses(callable $operation, ?string $reason = null): void
+    {
+        try {
+            $operation();
+            $this->fail('Invalid original read plan was admitted.');
+        } catch (FinancialRetrievalException $error) {
+            if ($reason !== null) {
+                $this->assertSame($reason, $error->reason);
+            }
+            $this->assertSame('PAID_FINANCIAL_RETRIEVAL_UNAVAILABLE', $error->getMessage());
+            $this->assertNull($error->getPrevious());
+        }
+    }
+
+    public static function kinds(): array
+    {
+        return ['v1' => [false], 'tax_v2' => [true]];
+    }
+
+    #[DataProvider('kinds')]
+    public function test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        $this->assertNotSame($delegate, DB::connection()->getEventDispatcher());
+        $result = $plan->readSynthetic($http)->summary();
+        $this->assertSame('consistent_candidate', $result['inputState']);
+        $this->assertFalse($result['providerAuthenticated']);
+        $this->assertSame('unattested_input', $result['inputProvenance']);
+        $this->assertSame($tax ? 9372 : 4999, $result['originalGrossMinor']);
+        $this->assertCount(6, $http->calls);
+        $this->assertSame(array_fill(0, 6, 0), array_column($http->calls, 'transaction_level'));
+        $this->assertSame(array_fill(0, 6, 'get'), array_column($http->calls, 'method'));
+        $this->assertSame(['account', 'payment_intents/'.($tax ? 'pi_SYNTHETICTAX' : 'pi_SYNTHETIC'),
+            'charges/ch_SYNTHETIC', 'refunds', 'disputes', 'charges/ch_SYNTHETIC'], array_column($http->calls, 'path'));
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertDatabaseCount('license_grants', 0);
+        $this->refuses(fn () => $plan->readSynthetic($http), 'used');
+        $this->assertCount(6, $http->calls);
+        $plan->close();
+        $plan->close();
+    }
+
+    #[DataProvider('kinds')]
+    public function test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        try {
+            $copy = clone $plan;
+            $this->fail('A copied plan was admitted.');
+        } catch (LogicException) {
+            $this->assertNotSame($delegate, DB::connection()->getEventDispatcher(), 'Failed clone disposal touched the original receipts.');
+        }
+        foreach ([fn () => serialize($plan), fn () => json_encode($plan, JSON_THROW_ON_ERROR),
+            fn () => unserialize('O:'.strlen(FinancialReadPlan::class).':"'.FinancialReadPlan::class.'":0:{}', ['allowed_classes' => [FinancialReadPlan::class]])] as $operation) {
+            try {
+                $operation();
+                $this->fail('Plan reconstruction was admitted.');
+            } catch (LogicException) {
+                $this->assertNotSame($delegate, DB::connection()->getEventDispatcher());
+            }
+        }
+        $plan->close();
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->refuses(fn () => $plan->readSynthetic($http), 'used');
+        $this->assertCount(0, $http->calls);
+        unset($plan);
+    }
+
+    #[DataProvider('kinds')]
+    public function test_early_policy_refusal_and_sdk_failure_drain_remaining_receipts_and_restore_the_saved_sdk_slot(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        config(['production-financial-retrieval.enabled' => false]);
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(0, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+        $this->refuses(fn () => $plan->readSynthetic($http), 'used');
+    }
+
+    #[DataProvider('kinds')]
+    public function test_sdk_error_and_changed_original_rows_suppress_the_result_and_release_the_original_observer(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        $http->after = function (int $position) use ($tax): void {
+            if ($position === 0) {
+                DB::table($tax ? TaxCheckoutSchema::TABLES['order'] : CheckoutSchema::TABLES['order'])->update(['payload_hash' => str_repeat('0', 64)]);
+            }
+        };
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(6, $http->calls, 'The second original receipt must recheck rows after the complete SDK path.');
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+        $this->assertSame(0, DB::transactionLevel());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer(bool $tax): void
+    {
+        $f = $this->paid($tax);
+        $delegate = DB::connection()->getEventDispatcher();
+        $receipt = $this->held($f, $tax, function ($source, $reader) use ($tax) {
+            $deadline = hrtime(true) + 60_000_000_000;
+            $peer = $source->committedReadReceipt($reader, $deadline);
+            $observer = DB::connection()->getEventDispatcher();
+            $this->refuses(fn () => $tax ? FinancialReadPlan::fromTaxV2($source, $reader, $deadline)
+                : FinancialReadPlan::fromV1($source, $reader, $deadline), 'existing_cohort');
+            $this->assertSame($observer, DB::connection()->getEventDispatcher());
+            $this->assertFalse($peer->used());
+
+            return $peer;
+        });
+        $receipt->proveClosed();
+        $this->assertTrue($receipt->used());
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    public function test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport(): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan();
+        $displaced = new RetrievalHttpFixture([]);
+        $notices = 0;
+        $http->responseHeaders[0] = ['Stripe-Notice' => 'SYNTHETIC NOTICE'];
+        set_error_handler(function () use (&$notices, $displaced): bool {
+            $notices++;
+            ApiRequestor::setHttpClient($displaced);
+
+            return true;
+        });
+        try {
+            $this->refuses(fn () => $plan->readSynthetic($http));
+        } finally {
+            restore_error_handler();
+        }
+        $this->assertSame(0, $notices);
+        $this->assertCount(1, $http->calls);
+        $this->assertCount(0, $displaced->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+    }
+
+    public function test_sdk_slot_flag_tls_and_credential_changes_stop_the_following_get_and_preserve_changed_values(): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan();
+        $displaced = new RetrievalHttpFixture([]);
+        $http->after = function () use ($displaced): void {
+            ApiRequestor::setHttpClient($displaced);
+            Stripe::$verifySslCerts = false;
+        };
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(1, $http->calls);
+        $this->assertCount(0, $displaced->calls);
+        $this->assertFalse(Stripe::$verifySslCerts);
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_held_abandonment_keeps_physical_cleanup_with_the_original_caller(bool $tax): void
+    {
+        $f = $this->paid($tax);
+        $delegate = DB::connection()->getEventDispatcher();
+        try {
+            $this->held($f, $tax, function ($source, $reader) use ($tax) {
+                $plan = $tax ? FinancialReadPlan::fromTaxV2($source, $reader, hrtime(true) + 60_000_000_000)
+                    : FinancialReadPlan::fromV1($source, $reader, hrtime(true) + 60_000_000_000);
+                $plan->close();
+                $this->assertSame(1, DB::transactionLevel());
+                $this->assertTrue(DB::getPdo()->inTransaction());
+                throw new RuntimeException('Original fixture caller abandons its read.');
+            });
+            $this->fail('Caller rollback was not exercised.');
+        } catch (RuntimeException $error) {
+            $this->assertSame('Original fixture caller abandons its read.', $error->getMessage());
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        $this->assertNotSame($delegate, DB::connection()->getEventDispatcher());
+        unset($plan);
+        gc_collect_cycles();
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertCount(0, $http->calls);
+        $this->assertSame(0, DB::transactionLevel());
+    }
+
+    #[DataProvider('kinds')]
+    public function test_sdk_exception_drains_both_owned_observations_without_retry(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        $http->responses = [];
+        $this->refuses(fn () => $plan->readSynthetic($http));
+        $this->assertCount(1, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+        $this->refuses(fn () => $plan->readSynthetic($http), 'used');
+        $this->assertCount(1, $http->calls);
+    }
+
+    #[DataProvider('kinds')]
+    public function test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back(bool $tax): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan($tax);
+        $http->after = function (int $index): void {
+            if ($index === 0) {
+                DB::beginTransaction();
+            }
+        };
+        try {
+            $this->refuses(fn () => $plan->readSynthetic($http));
+            $this->assertCount(1, $http->calls);
+            $this->assertSame(1, DB::transactionLevel());
+            $this->assertTrue(DB::getPdo()->inTransaction());
+        } finally {
+            if (DB::transactionLevel() === 1) {
+                DB::rollBack();
+            }
+        }
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
+    }
+
+    public function test_bounded_response_and_incomplete_lists_remain_refusals_without_an_observation_or_rights_effect(): void
+    {
+        [$plan, $http, $delegate] = $this->makePlan();
+        $http->responses[3]['has_more'] = true;
+        $this->refuses(fn () => $plan->readSynthetic($http), 'incomplete');
+        $this->assertCount(6, $http->calls);
+        $this->assertSame($delegate, DB::connection()->getEventDispatcher());
+        $this->assertDatabaseCount('license_grants', 0);
+        $this->assertSame(0, DB::transactionLevel());
+    }
+
+    public function test_default_off_and_nonliteral_policy_refuse_before_source_or_transport_work(): void
+    {
+        $shipped = require base_path('config/production-financial-retrieval.php');
+        $this->assertFalse($shipped['enabled']);
+        foreach ([false, 'true', 1, null, new \ArrayObject] as $value) {
+            config(['production-financial-retrieval.enabled' => $value]);
+            try {
+                RetrievalPolicy::capture();
+                $this->fail('Unsupported policy was admitted.');
+            } catch (FinancialRetrievalException $error) {
+                $this->assertSame('disabled', $error->reason);
+            }
+        }
+    }
+}
+
+final class RetrievalHttpFixture implements ClientInterface
+{
+    public array $calls = [];
+
+    public array $responseHeaders = [];
+
+    public ?\Closure $after = null;
+
+    public function __construct(public array $responses) {}
+
+    public function request($method, $absUrl, $headers, $params, $hasFile, $apiMode = 'v1', $maxNetworkRetries = null)
+    {
+        $index = count($this->calls);
+        $this->calls[] = ['method' => $method, 'path' => substr($absUrl, strlen('https://api.stripe.com/v1/')),
+            'params' => $params, 'hasFile' => $hasFile, 'apiMode' => $apiMode, 'retries' => $maxNetworkRetries,
+            'transaction_level' => DB::transactionLevel()];
+        ($this->after ?? static function (): void {})($index);
+        if (! array_key_exists($index, $this->responses)) {
+            throw new RuntimeException('Synthetic bounded transport failure.');
+        }
+
+        return [json_encode($this->responses[$index], JSON_THROW_ON_ERROR), 200, $this->responseHeaders[$index] ?? []];
+    }
+}
