@@ -35,10 +35,6 @@
       "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
     ],
     [
-      "Tests\\Feature\\PaidTaxDownloadJourneyTest",
-      "test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
-    ],
-    [
       "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
       "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
     ],
@@ -101,6 +97,10 @@
     [
       "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
       "test_sqlite_receipt_birth_refuses_disabled_rollback_journaling"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxDownloadJourneyTest",
+      "test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
     ]
   ]
 }
