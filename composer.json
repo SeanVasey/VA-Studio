@@ -14,7 +14,7 @@
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
-        "stripe/stripe-php": "^21.3.1",
+        "stripe/stripe-php": "^22.0.0",
         "tecnickcom/tc-lib-pdf": "^8.76.2",
         "tecnickcom/tc-lib-pdf-font": "^4.4.0"
     },
