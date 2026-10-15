@@ -69,6 +69,11 @@ final readonly class DisposableTestDatabase
         return $connection;
     }
 
+    public function forInMemoryFixture(): self
+    {
+        return new self('sqlite', ':memory:', false, false, false);
+    }
+
     private static function refuse(): never
     {
         throw new LogicException('Disposable test database admission refused.');

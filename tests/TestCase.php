@@ -18,6 +18,8 @@ abstract class TestCase extends BaseTestCase
 {
     private DisposableTestDatabase $testDatabaseSelection;
 
+    private array $ownedInMemorySqliteFixtures = [];
+
     protected function setUp(): void
     {
         // Capture before bootstrap; route-boot fixtures intentionally change application mode.
@@ -62,7 +64,39 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
+        if (isset($this->ownedInMemorySqliteFixtures[$connection->getName()])) {
+            $owned = $this->ownedInMemorySqliteFixtures[$connection->getName()];
+            if ($connection !== $owned['connection'] || $connection->getPdo() !== $owned['pdo']) {
+                throw new LogicException('Disposable test database admission refused.');
+            }
+
+            return $this->testDatabaseSelection->forInMemoryFixture()->admit($connection);
+        }
+
         return $this->testDatabaseSelection->admit($connection);
+    }
+
+    /** Create an owned memory canary without changing the external database selection. */
+    protected function createInMemorySqliteFixture(): Connection
+    {
+        $this->requireFixtureDatabase();
+        $name = 'owned_sqlite_fixture_'.bin2hex(random_bytes(16));
+        if ($this->app['config']->has('database.connections.'.$name)) {
+            throw new LogicException('Disposable test database admission refused.');
+        }
+        $this->app['config']->set('database.connections.'.$name, [
+            'driver' => 'sqlite', 'database' => ':memory:', 'url' => null,
+            'prefix' => '', 'foreign_key_constraints' => true,
+        ]);
+        $connection = $this->app['db']->connection($name);
+        $this->testDatabaseSelection->forInMemoryFixture()->admit($connection);
+        $this->ownedInMemorySqliteFixtures[$name] = ['connection' => $connection, 'pdo' => $connection->getPdo()];
+        $this->beforeApplicationDestroyed(function () use ($name): void {
+            $this->app['db']->purge($name);
+            unset($this->ownedInMemorySqliteFixtures[$name]);
+        });
+
+        return $connection;
     }
 
     public function artisan($command, $parameters = [])

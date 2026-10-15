@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use LogicException;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
@@ -12,6 +13,61 @@ use Tests\TestCase;
 /** Real child PHPUnit setup proves refusal precedes all four Laravel database helpers. */
 class FixtureDatabaseAdmissionTest extends TestCase
 {
+    public function test_owned_memory_fixture_is_distinct_and_admitted_for_actual_artisan_cleanup(): void
+    {
+        $first = $this->createInMemorySqliteFixture();
+        $second = $this->createInMemorySqliteFixture();
+        $this->assertNotSame($first->getName(), $second->getName());
+        $this->assertNotSame($first->getPdo(), $second->getPdo());
+        $first->statement('CREATE TABLE retained_fixture (id INTEGER)');
+        $second->statement('CREATE TABLE retained_fixture (id INTEGER)');
+        $second->statement('INSERT INTO retained_fixture VALUES (47)');
+        $this->artisan('db:wipe', ['--database' => $first->getName(), '--force' => true])->assertExitCode(0);
+        $this->assertFalse($first->getSchemaBuilder()->hasTable('retained_fixture'));
+        $this->assertSame([47], $second->getPdo()->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    public static function ownedMemoryChanges(): array
+    {
+        return ['changed memory PDO' => ['memory-pdo'], 'changed file PDO' => ['file-pdo'],
+            'changed config' => ['configuration'], 'purged connection' => ['purge']];
+    }
+
+    #[DataProvider('ownedMemoryChanges')]
+    public function test_owned_memory_cleanup_refuses_redirects_and_preserves_original_and_file_rows(string $damage): void
+    {
+        $connection = $this->createInMemorySqliteFixture();
+        $original = $connection->getPdo();
+        $original->exec('CREATE TABLE retained_fixture (id INTEGER)');
+        $original->exec('INSERT INTO retained_fixture VALUES (47)');
+        $file = tempnam(sys_get_temp_dir(), 'owned-fixture-refusal-');
+        $filePdo = new PDO('sqlite:'.$file);
+        $filePdo->exec('CREATE TABLE retained_fixture (id INTEGER)');
+        $filePdo->exec('INSERT INTO retained_fixture VALUES (59)');
+        $before = hash_file('sha256', $file);
+        $name = $connection->getName();
+        try {
+            match ($damage) {
+                'memory-pdo' => $connection->setPdo(new PDO('sqlite::memory:')),
+                'file-pdo' => $connection->setPdo($filePdo),
+                'configuration' => $this->app['config']->set('database.connections.'.$name.'.database', $file),
+                'purge' => $this->app['db']->purge($name),
+            };
+            try {
+                $this->artisan('db:wipe', ['--database' => $name, '--force' => true]);
+                $this->fail('A redirected owned fixture was admitted for cleanup.');
+            } catch (LogicException $error) {
+                $this->assertSame('Disposable test database admission refused.', $error->getMessage());
+            }
+            $this->assertSame([47], $original->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+            $this->assertSame([59], $filePdo->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+            $this->assertSame($before, hash_file('sha256', $file));
+        } finally {
+            unset($filePdo);
+            unlink($file);
+        }
+    }
+
     public static function refusedSetups(): array
     {
         $cases = [];
