@@ -1,0 +1,62 @@
+{
+  "recorded_utc": "2026-10-15T03:45:56.768598+00:00",
+  "reviewed_head": "e455c2871ade602653bd0f59b20e151b57afe57d",
+  "disposition": "Original source approval and narrow carry unchanged; current SQLite recorder OS exit0 now independently reconciled. Final sealed packet/merge approval still pending.",
+  "original_note_sha256": "034a7ee777be79266cd07b01a204e1fd8125aa06d8c92d7e338f0f504406f8b8",
+  "original_report_sha256": "b814e6448afc71d36caed08b58716a7c5bb118c9bada9f92dcd32a81b015150f",
+  "current_sqlite_junit": {
+    "assertions": 62,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 11
+  },
+  "observed_os_exit": {
+    "observed_utc": "2026-10-15T03:43:57.606253+00:00",
+    "pid": 138664,
+    "start_ticks": "5645961",
+    "state": "Z",
+    "process_uids": [
+      1000,
+      1000,
+      1000,
+      1000
+    ],
+    "raw_wait_status": 0,
+    "exit": 0
+  },
+  "os_bound_to_original_launch": true,
+  "os_exit_raw_wait_consistent": true,
+  "source_carry_comparisons": [
+    {
+      "earlier_invocation": "sqlite-whole-tax-final-source",
+      "earlier_source": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "recorded_differences_match_independent_report": true,
+      "recorded_counts_match_independent_report": true,
+      "patch_hash_matches": true,
+      "patch_equals_exact_git_diff": true
+    },
+    {
+      "earlier_invocation": "mysql-closed-reader-driver-cases",
+      "earlier_source": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "recorded_differences_match_independent_report": true,
+      "recorded_counts_match_independent_report": true,
+      "patch_hash_matches": true,
+      "patch_equals_exact_git_diff": true
+    },
+    {
+      "earlier_invocation": "mysql-source-receipt-current-callbacks",
+      "earlier_source": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "recorded_differences_match_independent_report": true,
+      "recorded_counts_match_independent_report": true,
+      "patch_hash_matches": true,
+      "patch_equals_exact_git_diff": true
+    }
+  ],
+  "receipt_hashes": {
+    "observed-os-exit-sqlite-facade-and-container-repair.json": "e2105170ef34b1dffd038a354f9af3aa3b80bdd56adde816219aff2b2a7bdd37",
+    "launch-sqlite-facade-and-container-repair.json": "ebe1402935bcbb475d4b063f6023bf48d969c6871b9862163f7686cd3ff86b1e",
+    "e455-narrow-source-carry.json": "27974379b078ea4cb53ee2f8504d6f94851d96015d617526d5f9b7a4fab39f42"
+  },
+  "scope": "Read-only receipt parsing and exact Git diff comparison only. Original source note/report are retained unchanged; no database/test/CI action."
+}
