@@ -1,0 +1,57 @@
+{
+  "conditions": [
+    "Owned alias generated internally, fresh in both configuration and manager cache; no caller-supplied database configuration.",
+    "Existing outer admission precedes creation; captured outer selection and unregistered alias refusal remain unchanged.",
+    "Literal SQLite memory configuration, actual PDO driver and empty main filename validated before registration; strong Connection and PDO identity rechecked thereafter.",
+    "Current config/cache comparisons retained; config drift, Connection replacement, purge/reconnect and PDO replacement refuse before a destructive command.",
+    "Registry scoped to this test application; owned cleanup only, original default/schema binding restored.",
+    "Existing 46 SQLite canaries and compile-only MySQL grammar fixture preserved, no native exclusion or assertion removal.",
+    "MySQL-only CI marker=1, SQLite empty marker, inherited local marker/socket cleared; actual CI unchanged and missing/false CI still refuses."
+  ],
+  "decision": "APPROVE BOUNDED REMEDIATION DESIGN; IMPLEMENTATION AND BOTH P1 CLOSURES PENDING",
+  "limits": [
+    "Design review is not corrected source/evidence approval or P1 resolution.",
+    "Canaries executed under external MySQL selection remain SQLite coverage, not native DDL/concurrency proof.",
+    "Original native lifecycle 4 tests/8 assertions/4 errors and old default control 1/2/1 error remain failed/open.",
+    "Cheap preflight, fresh review inventory and exact-head merge remain required; no full F2, host, provider or release acceptance."
+  ],
+  "open_p0": 0,
+  "open_p1": 2,
+  "required_corrections": [
+    "Implement and prove owned SQLite canary admission without widening external selection admission.",
+    "Declare the focused MySQL service and clear inherited socket/local marker without inventing CI=true."
+  ],
+  "retained_controls": {
+    "focused_declaration": {
+      "failures": 2,
+      "process_exit": 1,
+      "source_sha": "9738a211f6b36e491b37952cb1f00a68689490d5",
+      "tests": 52
+    },
+    "owned_sqlite_under_mysql": {
+      "assertions": 0,
+      "errors": 46,
+      "failures": 0,
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "skips": 0,
+      "source_sha": "0db6b8709db5084d0d8113a81184286738afee75",
+      "tests": 46
+    }
+  },
+  "review_scope": "Read-only reached source and retained originals; no application, database, network, CI execution or shared edits.",
+  "reviewed_sha": "0db6b8709db5084d0d8113a81184286738afee75",
+  "source_sha256": {
+    ".github/workflows/focused-feedback.yml": "7736593ab9303763809e9856c613eecefb774d11bdc4f3e74125462459291be9",
+    "AGENTS.md": "87737fbd65a37de56cd55de13ef97f773466620fa814cb783d7c0328ce7e0ac8",
+    "scripts/ci/focused-tests.py": "032de31ccc1901f72c750bb0e8f9b274f27a1a2f74917f3d9b21ebebc94e67fb",
+    "scripts/ci/test-focused-tests.py@9738a211f6b36e491b37952cb1f00a68689490d5": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329",
+    "tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php": "e06982164d4f0b615fd37990b4a6a7843b9a0ab64992f183caf919edbd1c32ff",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484",
+    "tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+  },
+  "test_only_regression_sha": "9738a211f6b36e491b37952cb1f00a68689490d5"
+}
