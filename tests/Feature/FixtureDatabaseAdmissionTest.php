@@ -9,10 +9,104 @@ use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\TestCase;
+use WeakReference;
 
 /** Real child PHPUnit setup proves refusal precedes all four Laravel database helpers. */
 class FixtureDatabaseAdmissionTest extends TestCase
 {
+    public function test_owned_file_cleanup_releases_the_source_pdo_and_cannot_reopen_a_released_target(): void
+    {
+        $connection = $this->createFileSqliteFixture();
+        $path = $connection->getDatabaseName();
+        $name = $connection->getName();
+        $reference = WeakReference::create($connection->getPdo());
+        $this->assertSame('delete', $connection->getPdo()->query('PRAGMA journal_mode')->fetchColumn());
+        $this->assertSame('DEFERRED', $connection->getConfig('transaction_mode'));
+        $connection->statement('CREATE TABLE retained_fixture (id INTEGER)');
+        $this->artisan('db:wipe', ['--database' => $name, '--force' => true])->assertExitCode(0);
+        $this->assertFalse($connection->getSchemaBuilder()->hasTable('retained_fixture'));
+        $this->releaseOwnedSqliteFixture($name);
+        $this->assertNull($reference->get(), 'No registry-held source PDO may satisfy the independent restore.');
+        $this->assertFileDoesNotExist($path);
+        $this->assertDirectoryDoesNotExist(dirname($path));
+        $this->releaseOwnedSqliteFixture($name);
+        try {
+            $this->artisan('db:wipe', ['--database' => $name, '--force' => true]);
+            $this->fail('An unregistered released file was admitted again.');
+        } catch (LogicException $error) {
+            $this->assertSame('Disposable test database admission refused.', $error->getMessage());
+        }
+        $this->assertFileDoesNotExist($path, 'Refusal must precede opening a replacement file.');
+    }
+
+    public static function ownedFileChanges(): array
+    {
+        return ['replaced file' => ['file'], 'symlinked file' => ['symlink'], 'replaced directory' => ['directory'],
+            'changed file mode' => ['mode'], 'changed PDO' => ['pdo'], 'changed configuration' => ['configuration']];
+    }
+
+    #[DataProvider('ownedFileChanges')]
+    public function test_owned_file_admission_and_release_refuse_replacement_without_touching_either_database(string $damage): void
+    {
+        $connection = $this->createFileSqliteFixture();
+        $name = $connection->getName();
+        $path = $connection->getDatabaseName();
+        $directory = dirname($path);
+        $original = $connection->getPdo();
+        $original->exec('CREATE TABLE retained_fixture (id INTEGER)');
+        $original->exec('INSERT INTO retained_fixture VALUES (47)');
+        $foreign = tempnam(sys_get_temp_dir(), 'unregistered-file-fixture-');
+        $foreignPdo = new PDO('sqlite:'.$foreign);
+        $foreignPdo->exec('CREATE TABLE retained_fixture (id INTEGER)');
+        $foreignPdo->exec('INSERT INTO retained_fixture VALUES (59)');
+        $before = hash_file('sha256', $foreign);
+        try {
+            if (in_array($damage, ['file', 'symlink'], true)) {
+                rename($path, $path.'.retained');
+                $damage === 'file' ? copy($foreign, $path) : symlink($foreign, $path);
+            } elseif ($damage === 'directory') {
+                rename($directory, $directory.'.retained');
+                mkdir($directory, 0700);
+                copy($foreign, $path);
+            } elseif ($damage === 'mode') {
+                chmod($path, 0644);
+            } elseif ($damage === 'pdo') {
+                $connection->setPdo($foreignPdo);
+            } else {
+                $this->app['config']->set('database.connections.'.$name.'.database', $foreign);
+            }
+            foreach ([fn () => $this->artisan('db:wipe', ['--database' => $name, '--force' => true]),
+                fn () => $this->releaseOwnedSqliteFixture($name)] as $operation) {
+                try {
+                    $operation();
+                    $this->fail('A replaced owned file was admitted or released.');
+                } catch (LogicException $error) {
+                    $this->assertSame('Disposable test database admission refused.', $error->getMessage());
+                }
+            }
+            $this->assertSame([47], $original->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+            $this->assertSame([59], $foreignPdo->query('SELECT id FROM retained_fixture')->fetchAll(PDO::FETCH_COLUMN));
+            $this->assertSame($before, hash_file('sha256', $foreign));
+        } finally {
+            if (in_array($damage, ['file', 'symlink'], true)) {
+                unlink($path);
+                rename($path.'.retained', $path);
+            } elseif ($damage === 'directory') {
+                unlink($path);
+                rmdir($directory);
+                rename($directory.'.retained', $directory);
+            } elseif ($damage === 'mode') {
+                chmod($path, 0600);
+            } elseif ($damage === 'pdo') {
+                $connection->setPdo($original);
+            } else {
+                $this->app['config']->set('database.connections.'.$name.'.database', $path);
+            }
+            unset($foreignPdo);
+            unlink($foreign);
+        }
+    }
+
     public function test_owned_memory_fixture_is_distinct_and_admitted_for_actual_artisan_cleanup(): void
     {
         $first = $this->createInMemorySqliteFixture();

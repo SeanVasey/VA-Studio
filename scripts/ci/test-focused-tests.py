@@ -603,6 +603,15 @@ class SelectionTests(unittest.TestCase):
             without_ci = focused.runner_environment(selected, {})
             self.assertNotIn("CI", without_ci, "The runner must not invent GitHub CI authority.")
 
+    def test_local_mysql_runner_preserves_only_its_exact_operator_declaration(self):
+        for engine in ("mysql", "sqlite"):
+            selected = focused.selection({"FOCUSED_SUITE": "media", "FOCUSED_ENGINE": engine})
+            for declaration in ("vaseyaudio_focused", "vaseyaudio_other", "", "1"):
+                env = focused.runner_environment(selected, {"VA_LOCAL_DISPOSABLE_MYSQL": declaration})
+                expected = "vaseyaudio_focused" if engine == "mysql" and declaration == "vaseyaudio_focused" else ""
+                self.assertEqual(env["VA_LOCAL_DISPOSABLE_MYSQL"], expected)
+                self.assertNotIn("CI", env)
+
     def test_junit_counts_preserve_skip_failure_error_and_assertion_evidence(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

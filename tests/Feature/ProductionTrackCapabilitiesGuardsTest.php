@@ -49,16 +49,14 @@ class ProductionTrackCapabilitiesGuardsTest extends TestCase
         // DROP TRIGGER implicitly commits; these adversaries never prove native
         // rollback. Keep their full assertions on an isolated SQLite connection.
         $original = DB::getDefaultConnection();
-        config(['database.connections.production_capability_sqlite_adversary' => array_replace(config('database.connections.sqlite'),
-            ['database' => ':memory:', 'url' => null])]);
-        DB::setDefaultConnection('production_capability_sqlite_adversary');
+        $fixture = $this->createInMemorySqliteFixture()->getName();
+        DB::setDefaultConnection($fixture);
         Schema::clearResolvedInstance('db.schema');
         $this->beforeApplicationDestroyed(function () use ($original): void {
-            DB::purge('production_capability_sqlite_adversary');
             DB::setDefaultConnection($original);
             Schema::clearResolvedInstance('db.schema');
         });
-        $this->artisan('migrate:fresh', ['--database' => 'production_capability_sqlite_adversary', '--force' => true])->assertExitCode(0);
+        $this->artisan('migrate:fresh', ['--database' => $fixture, '--force' => true])->assertExitCode(0);
         $this->assertSame('sqlite', DB::getDriverName());
     }
 
