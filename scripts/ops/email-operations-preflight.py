@@ -151,12 +151,18 @@ def domain(value):
 def origin(value):
     if not isinstance(value, str):
         return False
-    parts = urlsplit(value)
+    try:
+        parts = urlsplit(value)
+        port = parts.port
+    except ValueError:
+        return False
+    if not domain(parts.hostname):
+        return False
+    canonical = "https://" + parts.hostname + ("" if port is None else ":" + str(port))
     # This installation planning format is deliberately canonical HTTPS; it makes no DNS claim.
-    return parts.scheme == "https" and domain(parts.hostname) and not parts.username and not parts.password \
+    return parts.scheme == "https" and not parts.username and not parts.password \
         and not parts.path and not parts.query and not parts.fragment \
-        and value == "https://" + parts.netloc and parts.netloc == parts.netloc.lower() \
-        and (parts.port is None or 1 <= parts.port <= 65535)
+        and value == canonical and (port is None or 1 <= port <= 65535)
 
 
 def reference(value):
