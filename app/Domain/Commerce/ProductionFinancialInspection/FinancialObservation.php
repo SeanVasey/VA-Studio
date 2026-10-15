@@ -41,7 +41,7 @@ final class FinancialObservation
             && ($payment['id'] ?? null) === $paymentId && ($payment['livemode'] ?? null) === false
             && ($payment['currency'] ?? null) === 'usd' && ($payment['amount'] ?? null) === $gross
             && ($payment['amount_received'] ?? null) === $gross && ($payment['amount_capturable'] ?? null) === 0
-            && ($payment['status'] ?? null) === 'succeeded' && ($payment['capture_method'] ?? null) === 'automatic'
+            && ($payment['status'] ?? null) === 'succeeded' && ($payment['capture_method'] ?? null) === $expected['capture_method']
             && self::id($chargeId, 'ch'));
         $before = self::charge(self::map($raw['charge_before'] ?? null), $paymentId, $chargeId, $gross);
         $after = self::charge(self::map($raw['charge_after'] ?? null), $paymentId, $chargeId, $gross);
@@ -139,7 +139,7 @@ final class FinancialObservation
     private static function ownAccount(array $value): void
     {
         foreach (['account', 'context', 'application', 'application_fee', 'application_fee_amount', 'on_behalf_of',
-            'transfer_data', 'transfer_group', 'source_transfer', 'source_transfer_reversal', 'transfer_reversal'] as $key) {
+            'transfer', 'transfer_data', 'transfer_group', 'source_transfer', 'source_transfer_reversal', 'transfer_reversal'] as $key) {
             FinancialInspectionException::require(($value[$key] ?? null) === null);
         }
     }

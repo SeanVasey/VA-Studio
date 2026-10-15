@@ -44,12 +44,14 @@ final readonly class FinancialExpectation implements JsonSerializable
                 'provider_payment_id', 'provenance', 'payment_evidence_origin',
                 ...($version === 1 ? ['payment_id', 'payment_hash'] : ['request_id', 'request_hash', 'reviewed_session_id', 'reviewed_session_hash'])]));
             $tuple += ['source_kind' => $kind, 'schema_version' => $version, 'currency' => $amounts['currency'],
+                'capture_method' => $line['execution_context']['capture_method'],
                 'gross_minor' => $amounts[$version === 1 ? 'total_minor' : 'order_total_minor']];
             foreach ($tuple as $key => $value) {
                 FinancialInspectionException::require($key === 'schema_version' || $key === 'gross_minor'
                     ? is_int($value) : is_string($value) && strlen($value) >= 1 && strlen($value) <= 160, 'source_binding');
             }
             FinancialInspectionException::require($tuple['currency'] === 'USD' && $tuple['funds_mode'] === 'test'
+                && in_array($tuple['capture_method'], ['automatic', 'automatic_async'], true)
                 && $tuple['gross_minor'] >= 1 && $tuple['gross_minor'] <= 99999999
                 && FinancialObservation::id($tuple['provider_account'], 'acct')
                 && FinancialObservation::id($tuple['provider_payment_id'], 'pi'), 'source_binding');
