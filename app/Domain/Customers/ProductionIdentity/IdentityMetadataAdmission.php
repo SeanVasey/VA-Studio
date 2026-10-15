@@ -164,6 +164,8 @@ final class IdentityMetadataAdmission
     /** Application resolves deferred/contextual branches before its cached-instance return. */
     private static function resolverMetadata(Application $app): void
     {
+        self::array($app, Container::class, 'with');
+        self::array($app, Container::class, 'resolved');
         $stack = self::array($app, Container::class, 'buildStack');
         if (! array_is_list($stack) || count($stack) > 128) {
             throw new IdentityException;
