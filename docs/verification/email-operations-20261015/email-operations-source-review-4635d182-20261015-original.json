@@ -1,0 +1,70 @@
+{
+  "artifact_timing": "Delayedbypre-process transportfailure andoverlybroad HEADpreparation assertion; authorfix alreadyexists, reviewed separately",
+  "decision": "REVISE NARROW ORIGIN CONSISTENCY BEFORE SOURCE APPROVAL",
+  "initial_observation": "Exactclean4635 atfirstsourceinspection",
+  "limits": [
+    "No realhost/effectiveconfig/sender/DNS/TLS/credentials/provider/queue/scheduler/retention/delivery/activationacceptance",
+    "Finalrepairedsource/evidence/publicationgates pending"
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "preparation_errors": [
+    {
+      "failure": "Initialreviewartifact exec_command failedbeforeprocesscreation with exec-servertransportdisconnected",
+      "reconciliation": "Oneboundedpwd/head/output-list probe succeeded; noartifact existed and noapp/testprocess started. Thisoriginal4635judgment is writtenafterrecovery whileauthoralreadyfixedsource."
+    },
+    {
+      "failure": "Secondartifactpreparation asserted currentHEAD=f782 andcleanness; exit1beforeoutputcreation afterrootadvanced to docs-onlyf1ea",
+      "reconciliation": "Immutable4635source review is preserved independently ofcurrentdocs head; nooriginal outputoverwritten/testfailure inferred."
+    },
+    {
+      "failure": "Sourcecrosscheckrg included nonexistent scripts/ops/worker-invariants.php",
+      "reconciliation": "Actualmedia960s lease constants located inSoundKitProcessor/SiteImageProcessor; source lookup only."
+    }
+  ],
+  "primary_original": {
+    "argv": [
+      "python3",
+      "scripts/ops/test-email-operations-preflight.py"
+    ],
+    "json_sha256": "006d5e6dfee3c71df4755d12d27be91837ca8d2ad24cedd10b34c573f98a8e1b",
+    "log_sha256": "4a617620bcaa62b11198745d75b6575aedfd95edc6892ce34d33910c4cd839f4",
+    "process_exit": 0,
+    "source_after": {
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "status": ""
+    },
+    "source_before": {
+      "head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+      "status": ""
+    },
+    "source_unchanged": true,
+    "tests": 30
+  },
+  "recorded_utc": "2026-10-15T20:37:14.181365+00:00",
+  "required_corrections": [
+    {
+      "direction": "Reconstruct admittedhostname plus optional bounded canonical decimalport, rejectempty/padded syntax, catchmalformed URL and add genuine CLInegatives retaining8443positive.",
+      "effect": "Empty/padded explicitport admitted as validcanonical plannedorigin; firsttwo also contradict actualIdentityRequests1..5digitportgrammar. Nohost/network/write/provider/activation effect.",
+      "id": "B5-S1",
+      "location": "origin(), original copied-netloc canonical comparison",
+      "severity": "P2",
+      "trigger": [
+        "https://store.example.com:",
+        "https://store.example.com:000443",
+        "https://store.example.com:0443"
+      ]
+    }
+  ],
+  "reviewed_head": "4635d182f6c6113b2c496ff45a924db91d47a503",
+  "reviewer_app_checker_tests_db_network_ci_execution": false,
+  "reviewer_session": "/root/account_features_final_review",
+  "scope": "Four newpurechecker/test/template/runbook files; unchangeddomain/config/routes/schema/job/provider sources. Boundedprotected32KiBread, closedtypedduplicateawareJSON, fixedredactedoutput anddisabled/unverifiedscopes coherent apartfromB5-S1.",
+  "shared_files_modified": false,
+  "source_sha256": {
+    "docs/ops/email-operations-runtime.md": "6c48f8ebc909d74009daab67c434e0f2eea9fb93635ba839f010cdf009b797a4",
+    "ops/email-operations/facts.example.json": "a09bb06a20bf4ee1e08ade92a6aeb284a2bcd6ef63b77fb440fc0b60136fd2a9",
+    "scripts/ops/email-operations-preflight.py": "c4be1f03cf1d451328cf2d5f18a27b9403ed28f6c94ff67d48c417b7e294cc1c",
+    "scripts/ops/test-email-operations-preflight.py": "cf97d22a914fd05de927e056dc6416a1ba9c36926e570f1a4549897ff3c4f0d8"
+  }
+}
