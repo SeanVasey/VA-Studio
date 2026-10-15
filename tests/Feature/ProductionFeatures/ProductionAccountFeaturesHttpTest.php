@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\ProductionFeatures;
 
+use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
+use App\Http\AccountFeatures\AccountFeatureRequestGuard;
 use App\Http\AccountFeatures\AccountFeatureResponse;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -13,6 +16,7 @@ use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\Support\ProductionFeatureFixtures;
 use Tests\TestCase;
 
@@ -96,6 +100,25 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         $this->assertSame('unknown', $pref['preferences']['purposes'][0]['status']);
         $this->assertFalse($pref['preferences']['purposes'][0]['canGrant']);
         $this->assertSame('not_requested', $pref['preferences']['purposes'][0]['suppression']['status']);
+    }
+
+    public function test_original_resolved_request_guard_is_positive_through_the_actual_web_stack(): void
+    {
+        $this->signIn();
+        $error = null;
+        Route::middleware('web')->get('/customer/features/guard-probe', function (Request $request) use (&$error) {
+            try {
+                $identity = ProductionAccountFeatureIdentity::forRequest($request, 'listening_library');
+                $guard = new AccountFeatureRequestGuard($request, $identity);
+                $guard->requireCurrent();
+            } catch (\Throwable $caught) {
+                $error = $caught;
+            }
+
+            return new Response('probe-complete');
+        });
+        $this->get('/customer/features/guard-probe')->assertOk();
+        $this->assertNull($error, $error === null ? '' : $error::class.' at '.$error->getFile().':'.$error->getLine());
     }
 
     public function test_premature_handled_send_and_split_withdrawal_never_release_delayed_private_bytes(): void

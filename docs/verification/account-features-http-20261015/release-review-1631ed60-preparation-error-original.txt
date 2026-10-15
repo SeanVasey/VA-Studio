@@ -1,0 +1,8 @@
+Reviewer artifact preparation failure, not application failure.
+Expected reviewed current head: 1631ed60c2bb7241efced1de0fda54bd4e7119f7.
+Original command exit1 before any artifact write:
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+AssertionError
+Follow-up read observed clean author successor: 952fb9e3a2d0d96f28ee80aa33ddc6078a3335c5.
+Corrected preparation uses immutable163 Git bodies; no952 approval/carry inferred. No application/test/DB/CI action.
