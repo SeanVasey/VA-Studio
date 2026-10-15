@@ -1,0 +1,11 @@
+{
+  "reviewer_preparation": true,
+  "original_exit": 1,
+  "reviewed_sha": "0c3b8f6c38a2dbc5caad6e73b1169bbba719b07c",
+  "phase": "narrow carry assertion after archive/Git/run/quality checks",
+  "fault": "Reviewer incorrectly required265 bodies equal both prior source heads. Actual correct scope is265 equal ae6/f77/current and262 equal legacy3e; three new candidate files had previously reviewed repairs outside legacy69 selected execution.",
+  "application_failure": false,
+  "corrected_verifier": "/workspace/runtime/paid-financial-retrieval-final-verifier-0c3b8f6c-corrected-20261015.py",
+  "original_verifier_unchanged": "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py",
+  "original_error_sha256": "7e3b2dcc8571a82d13608049c13a503d8057985fb4461c42f45729c874ebed1c"
+}

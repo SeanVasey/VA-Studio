@@ -1037,6 +1037,10 @@
     [
       "Tests\\Feature\\PaidTaxDownloadNativeTest",
       "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt"
+    ],
+    [
+      "Tests\\Feature\\ProductionFinancialRetrieval\\FinancialReadPlanTest",
+      "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback"
     ]
   ]
 }

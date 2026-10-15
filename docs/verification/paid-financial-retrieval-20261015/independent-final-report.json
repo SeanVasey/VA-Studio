@@ -1,0 +1,1629 @@
+{
+  "decision": "APPROVE WITH CONDITIONS",
+  "reviewed_sha": "0c3b8f6c38a2dbc5caad6e73b1169bbba719b07c",
+  "independent_non_author": true,
+  "development_only": true,
+  "open_p0": 0,
+  "open_p1": 0,
+  "required_source_test_packet_corrections": [],
+  "actual_base_merge": "0d7a7da24db2ef6dca76cd1f14ce1294bc1c7bb5",
+  "tested_final_source": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+  "source_reviewed_app_head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+  "operative_delta_from_actual_base": [
+    "app/Domain/Commerce/ProductionFinancialRetrieval/FinancialReadPlan.php",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/FinancialRetrievalException.php",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/GuardedSdkTransport.php",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/ReadOwnership.php",
+    "app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php",
+    "config/production-financial-retrieval.php",
+    "scripts/ci/database-mysql-selection.json",
+    "scripts/ci/database-sqlite-skips.json",
+    "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+    "tests/Support/FinancialRetrievalClockFixture.php"
+  ],
+  "both_enabled_defaults_false": true,
+  "fresh_carry_reconciliation_sha256": "70e8ee9f7a1356a4d3fc550202704c05252df9d2e4f9763baf82540a3b9224fd",
+  "document_corrections_resolved": [
+    "Unsealed numerical CPU observation removed as sealed evidence; archived metadata snapshot scope only.",
+    "Original carry observed_utc inherited froma796 explicitly disclosed; immutable map/archive unchanged; fresh and independent hashes verified."
+  ],
+  "verification": {
+    "status": "PASS",
+    "reviewed_sha": "0c3b8f6c38a2dbc5caad6e73b1169bbba719b07c",
+    "tested_source": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+    "archive_sha256": "07d49cc84657e24018f91f36aa2fb831a7c2d1b41bfa7467af2aacccf2315e37",
+    "archive_bytes": 7787263,
+    "archive_members": 2571,
+    "index_sha256": "a277ebfd7373413f049956edeae0d751df0cd7ac2ea62f881c53eb2dd900801e",
+    "source_heads": [
+      "3b4d34e6203e4aa745792cea5c82c89caf53da20",
+      "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+      "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+      "a94b623feedf02229a660b39037e0b279f5ae4f6",
+      "f77f5c12e590b2d9295ebff582b142b4091ff8c2"
+    ],
+    "source_bindings": 12186,
+    "deduplicated_source_objects": 2392,
+    "runtime_inventories": 6,
+    "current_source_inputs": 2438,
+    "route_inputs": 17,
+    "loader_inputs": 13,
+    "original_invocations": {
+      "retrieval-whole-initial": {
+        "head": "3b4d34e6203e4aa745792cea5c82c89caf53da20",
+        "counts": {
+          "assertions": 144,
+          "errors": 2,
+          "failures": 9,
+          "skipped": 0,
+          "tests": 22
+        },
+        "php_exit": 2,
+        "recorder_exit": 1,
+        "observed_os_exit": 1,
+        "filter": null,
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 155.676293616998,
+        "cases": [
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"v1\"",
+            "assertions": 3,
+            "seconds": 7.231243
+          },
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"tax_v2\"",
+            "assertions": 3,
+            "seconds": 7.46906
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 6.952792
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.432613
+          },
+          {
+            "name": "test_early_policy_refusal_and_sdk_failure_drain_remaining_receipts_and_restore_the_saved_sdk_slot with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.950639
+          },
+          {
+            "name": "test_early_policy_refusal_and_sdk_failure_drain_remaining_receipts_and_restore_the_saved_sdk_slot with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.622985
+          },
+          {
+            "name": "test_sdk_error_and_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"v1\"",
+            "assertions": 5,
+            "seconds": 7.049941
+          },
+          {
+            "name": "test_sdk_error_and_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"tax_v2\"",
+            "assertions": 5,
+            "seconds": 7.479661
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.699667
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.509588
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport",
+            "assertions": 6,
+            "seconds": 7.101573
+          },
+          {
+            "name": "test_sdk_slot_flag_tls_and_credential_changes_stop_the_following_get_and_preserve_changed_values",
+            "assertions": 5,
+            "seconds": 7.142737
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.795718
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.423597
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"v1\"",
+            "assertions": 6,
+            "seconds": 7.171614
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"tax_v2\"",
+            "assertions": 6,
+            "seconds": 7.500052
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"v1\"",
+            "assertions": 5,
+            "seconds": 7.065441
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"tax_v2\"",
+            "assertions": 5,
+            "seconds": 7.667927
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"v1\"",
+            "assertions": 5,
+            "seconds": 7.05387
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"tax_v2\"",
+            "assertions": 5,
+            "seconds": 7.809162
+          },
+          {
+            "name": "test_bounded_response_and_incomplete_lists_remain_refusals_without_an_observation_or_rights_effect",
+            "assertions": 3,
+            "seconds": 7.394059
+          },
+          {
+            "name": "test_default_off_and_nonliteral_policy_refuse_before_source_or_transport_work",
+            "assertions": 6,
+            "seconds": 3.009205
+          }
+        ],
+        "source_inputs": 2437
+      },
+      "retrieval-whole-repaired-toolchain": {
+        "head": "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+        "counts": {
+          "assertions": 474,
+          "errors": 0,
+          "failures": 4,
+          "skipped": 2,
+          "tests": 57
+        },
+        "php_exit": 1,
+        "recorder_exit": 1,
+        "observed_os_exit": 1,
+        "filter": null,
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 391.9602532949939,
+        "cases": [
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"v1\"",
+            "assertions": 20,
+            "seconds": 7.741365
+          },
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"tax_v2\"",
+            "assertions": 20,
+            "seconds": 7.73789
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 6.980023
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.477804
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.992371
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.388588
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"v1\"",
+            "assertions": 5,
+            "seconds": 6.874344
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"tax_v2\"",
+            "assertions": 5,
+            "seconds": 7.500903
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.726455
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.422054
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport",
+            "assertions": 9,
+            "seconds": 7.060792
+          },
+          {
+            "name": "test_sdk_slot_and_tls_changes_stop_the_following_get_and_preserve_changed_values",
+            "assertions": 9,
+            "seconds": 7.126375
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.725894
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.319218
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"v1\"",
+            "assertions": 6,
+            "seconds": 7.029474
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"tax_v2\"",
+            "assertions": 6,
+            "seconds": 7.632777
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 6.965764
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.782489
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.143168
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.541238
+          },
+          {
+            "name": "test_incomplete_lists_remain_refusals_without_an_observation_or_rights_effect",
+            "assertions": 9,
+            "seconds": 6.927866
+          },
+          {
+            "name": "test_default_off_and_nonliteral_policy_refuse_before_source_or_transport_work",
+            "assertions": 6,
+            "seconds": 2.889744
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"flag\"",
+            "assertions": 8,
+            "seconds": 7.04025
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"credential\"",
+            "assertions": 8,
+            "seconds": 7.035158
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"account\"",
+            "assertions": 8,
+            "seconds": 7.180404
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"mode\"",
+            "assertions": 8,
+            "seconds": 7.056365
+          },
+          {
+            "name": "test_sdk_slot_displacement_alone_cannot_dispatch_a_following_get",
+            "assertions": 9,
+            "seconds": 6.979982
+          },
+          {
+            "name": "test_loaded_manager_replacement_cannot_hide_the_original_connection",
+            "assertions": 8,
+            "seconds": 6.975973
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"facade cache\"",
+            "assertions": 8,
+            "seconds": 7.013979
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"connection config\"",
+            "assertions": 8,
+            "seconds": 7.060688
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"database name\"",
+            "assertions": 8,
+            "seconds": 7.019441
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"table prefix\"",
+            "assertions": 8,
+            "seconds": 7.062019
+          },
+          {
+            "name": "test_custom_statement_constructor_is_not_reached_after_callback_withdrawal",
+            "assertions": 8,
+            "seconds": 7.139475
+          },
+          {
+            "name": "test_native_primary_replacement_is_refused_before_invoking_a_subclass_method",
+            "assertions": 8,
+            "seconds": 7.192293
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object envelope\"",
+            "assertions": 8,
+            "seconds": 7.038775
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"wrong status\"",
+            "assertions": 8,
+            "seconds": 7.0774
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"nonstring body\"",
+            "assertions": 8,
+            "seconds": 7.055756
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object headers\"",
+            "assertions": 8,
+            "seconds": 7.083555
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object header value\"",
+            "assertions": 8,
+            "seconds": 7.031226
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"body budget\"",
+            "assertions": 8,
+            "seconds": 7.121465
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"depth budget\"",
+            "assertions": 8,
+            "seconds": 7.727901
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"node budget\"",
+            "assertions": 8,
+            "seconds": 7.343734
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"bad JSON\"",
+            "assertions": 8,
+            "seconds": 6.894143
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"lower notice\"",
+            "assertions": 8,
+            "seconds": 7.027628
+          },
+          {
+            "name": "test_cumulative_wire_budget_is_applied_across_individually_small_responses",
+            "assertions": 7,
+            "seconds": 7.051628
+          },
+          {
+            "name": "test_environment_and_raw_parent_refusal_evaluate_no_metadata_object",
+            "assertions": 13,
+            "seconds": 2.87047
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.821652
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.404956
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 7.123564
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.653594
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"v1\"",
+            "assertions": 4,
+            "seconds": 6.979452
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"tax_v2\"",
+            "assertions": 4,
+            "seconds": 7.419806
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.902562
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.577182
+          },
+          {
+            "name": "test_oversized_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 6,
+            "seconds": 7.107973
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"v1\"",
+            "assertions": 0,
+            "seconds": 2.884594
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"tax_v2\"",
+            "assertions": 0,
+            "seconds": 2.85249
+          }
+        ],
+        "source_inputs": 2437
+      },
+      "recursive-list-regression-red": {
+        "head": "a94b623feedf02229a660b39037e0b279f5ae4f6",
+        "counts": {
+          "assertions": 3,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "php_exit": 1,
+        "recorder_exit": 1,
+        "observed_os_exit": 1,
+        "filter": "nested_dense_list",
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 7.636098600996775,
+        "cases": [
+          {
+            "name": "test_nested_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 3,
+            "seconds": 7.512414
+          }
+        ],
+        "source_inputs": 2437
+      },
+      "retrieval-whole-final": {
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "counts": {
+          "assertions": 549,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 2,
+          "tests": 64
+        },
+        "php_exit": 1,
+        "recorder_exit": 1,
+        "observed_os_exit": 1,
+        "filter": null,
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 442.59692024899414,
+        "cases": [
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"v1\"",
+            "assertions": 20,
+            "seconds": 7.673568
+          },
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"tax_v2\"",
+            "assertions": 20,
+            "seconds": 7.612645
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 7.054486
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.415185
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.970736
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.487183
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.048567
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.631252
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.718733
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.453236
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"upper\"",
+            "assertions": 9,
+            "seconds": 7.024347
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"lower\"",
+            "assertions": 9,
+            "seconds": 7.069218
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"mixed\"",
+            "assertions": 9,
+            "seconds": 7.099857
+          },
+          {
+            "name": "test_sdk_slot_and_tls_changes_stop_the_following_get_and_preserve_changed_values",
+            "assertions": 9,
+            "seconds": 6.998625
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.911454
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.323287
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"v1\"",
+            "assertions": 6,
+            "seconds": 6.919506
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"tax_v2\"",
+            "assertions": 6,
+            "seconds": 7.430261
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 7.065908
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.710688
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.121506
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.623993
+          },
+          {
+            "name": "test_incomplete_lists_remain_refusals_without_an_observation_or_rights_effect",
+            "assertions": 9,
+            "seconds": 7.145316
+          },
+          {
+            "name": "test_default_off_and_nonliteral_policy_refuse_before_source_or_transport_work",
+            "assertions": 6,
+            "seconds": 2.907663
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"flag\"",
+            "assertions": 8,
+            "seconds": 6.941323
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"credential\"",
+            "assertions": 8,
+            "seconds": 6.982178
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"account\"",
+            "assertions": 8,
+            "seconds": 7.103079
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"mode\"",
+            "assertions": 8,
+            "seconds": 7.087952
+          },
+          {
+            "name": "test_sdk_slot_displacement_alone_cannot_dispatch_a_following_get",
+            "assertions": 9,
+            "seconds": 7.130311
+          },
+          {
+            "name": "test_loaded_manager_replacement_cannot_hide_the_original_connection",
+            "assertions": 8,
+            "seconds": 7.137054
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"facade cache\"",
+            "assertions": 8,
+            "seconds": 6.99498
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"connection config\"",
+            "assertions": 8,
+            "seconds": 6.969567
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"database name\"",
+            "assertions": 8,
+            "seconds": 7.021914
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"table prefix\"",
+            "assertions": 8,
+            "seconds": 7.13945
+          },
+          {
+            "name": "test_custom_statement_constructor_is_not_reached_after_callback_withdrawal",
+            "assertions": 8,
+            "seconds": 7.196463
+          },
+          {
+            "name": "test_native_primary_replacement_is_refused_before_invoking_a_subclass_method",
+            "assertions": 8,
+            "seconds": 7.036274
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object envelope\"",
+            "assertions": 8,
+            "seconds": 7.048763
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"wrong status\"",
+            "assertions": 8,
+            "seconds": 7.168047
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"nonstring body\"",
+            "assertions": 8,
+            "seconds": 7.105058
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object headers\"",
+            "assertions": 8,
+            "seconds": 7.122654
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object header value\"",
+            "assertions": 8,
+            "seconds": 7.194081
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"body budget\"",
+            "assertions": 8,
+            "seconds": 7.109409
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"depth budget\"",
+            "assertions": 8,
+            "seconds": 7.158883
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"node budget\"",
+            "assertions": 8,
+            "seconds": 7.055919
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"bad JSON\"",
+            "assertions": 8,
+            "seconds": 7.106574
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"lower notice\"",
+            "assertions": 8,
+            "seconds": 7.147265
+          },
+          {
+            "name": "test_cumulative_wire_budget_is_applied_across_individually_small_responses",
+            "assertions": 7,
+            "seconds": 7.185211
+          },
+          {
+            "name": "test_environment_and_raw_parent_refusal_evaluate_no_metadata_object",
+            "assertions": 13,
+            "seconds": 2.934833
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.898592
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.376686
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 7.216196
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.694048
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"v1\"",
+            "assertions": 3,
+            "seconds": 6.968581
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"tax_v2\"",
+            "assertions": 12,
+            "seconds": 7.218456
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.873923
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.390847
+          },
+          {
+            "name": "test_oversized_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 6,
+            "seconds": 7.133618
+          },
+          {
+            "name": "test_nested_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 6,
+            "seconds": 7.201946
+          },
+          {
+            "name": "test_original_after_commit_failure_never_admits_sdk_dispatch with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.133857
+          },
+          {
+            "name": "test_original_after_commit_failure_never_admits_sdk_dispatch with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.745676
+          },
+          {
+            "name": "test_direct_pdo_commit_cannot_substitute_for_the_original_framework_commit with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.822041
+          },
+          {
+            "name": "test_direct_pdo_commit_cannot_substitute_for_the_original_framework_commit with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.409501
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"v1\"",
+            "assertions": 0,
+            "seconds": 2.923295
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"tax_v2\"",
+            "assertions": 0,
+            "seconds": 2.958092
+          }
+        ],
+        "source_inputs": 2437
+      },
+      "partial-custody-clock-control": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": {
+          "assertions": 38,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        },
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "observed_os_exit": 0,
+        "filter": "failed_second_mint",
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 16.02612914898782,
+        "cases": [
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"v1\"",
+            "assertions": 19,
+            "seconds": 7.898531
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"tax_v2\"",
+            "assertions": 19,
+            "seconds": 7.97658
+          }
+        ],
+        "source_inputs": 2438
+      },
+      "retrieval-whole-clock-fixture": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": {
+          "assertions": 572,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 2,
+          "tests": 64
+        },
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "observed_os_exit": 0,
+        "filter": null,
+        "driver": {
+          "database_name": ":memory:",
+          "driver": "sqlite",
+          "version": "3.46.1"
+        },
+        "wall_seconds": 442.08707765299187,
+        "cases": [
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"v1\"",
+            "assertions": 20,
+            "seconds": 7.277113
+          },
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"tax_v2\"",
+            "assertions": 20,
+            "seconds": 7.399263
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 6.873483
+          },
+          {
+            "name": "test_unused_plan_close_destruction_and_clone_refusal_settle_only_the_original_receipts with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.696869
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 7.067296
+          },
+          {
+            "name": "test_early_policy_refusal_drains_remaining_receipts_and_restores_the_saved_sdk_slot with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.438727
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.932025
+          },
+          {
+            "name": "test_changed_original_rows_suppress_the_result_and_release_the_original_observer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.398095
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.6522
+          },
+          {
+            "name": "test_existing_peer_is_refused_before_source_extraction_without_invalidating_the_peer with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.263165
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"upper\"",
+            "assertions": 9,
+            "seconds": 6.904204
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"lower\"",
+            "assertions": 9,
+            "seconds": 7.133406
+          },
+          {
+            "name": "test_sdk_notice_header_never_invokes_the_real_error_handler_or_displaced_transport with data set \"mixed\"",
+            "assertions": 9,
+            "seconds": 7.01245
+          },
+          {
+            "name": "test_sdk_slot_and_tls_changes_stop_the_following_get_and_preserve_changed_values",
+            "assertions": 9,
+            "seconds": 6.958763
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.798531
+          },
+          {
+            "name": "test_held_abandonment_keeps_physical_cleanup_with_the_original_caller with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.364419
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"v1\"",
+            "assertions": 6,
+            "seconds": 7.043879
+          },
+          {
+            "name": "test_unused_plan_is_actually_disposed_after_commit_without_leaving_an_observer with data set \"tax_v2\"",
+            "assertions": 6,
+            "seconds": 7.61875
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"v1\"",
+            "assertions": 11,
+            "seconds": 7.101671
+          },
+          {
+            "name": "test_sdk_exception_drains_both_owned_observations_without_retry with data set \"tax_v2\"",
+            "assertions": 11,
+            "seconds": 7.549487
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.087154
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.480706
+          },
+          {
+            "name": "test_incomplete_lists_remain_refusals_without_an_observation_or_rights_effect",
+            "assertions": 9,
+            "seconds": 7.110702
+          },
+          {
+            "name": "test_default_off_and_nonliteral_policy_refuse_before_source_or_transport_work",
+            "assertions": 6,
+            "seconds": 2.926719
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"flag\"",
+            "assertions": 8,
+            "seconds": 7.031868
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"credential\"",
+            "assertions": 8,
+            "seconds": 7.044624
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"account\"",
+            "assertions": 8,
+            "seconds": 7.172429
+          },
+          {
+            "name": "test_callback_policy_changes_stop_the_next_get_without_reverting_callback_work with data set \"mode\"",
+            "assertions": 8,
+            "seconds": 7.012255
+          },
+          {
+            "name": "test_sdk_slot_displacement_alone_cannot_dispatch_a_following_get",
+            "assertions": 9,
+            "seconds": 6.966986
+          },
+          {
+            "name": "test_loaded_manager_replacement_cannot_hide_the_original_connection",
+            "assertions": 8,
+            "seconds": 7.066885
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"facade cache\"",
+            "assertions": 8,
+            "seconds": 7.100913
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"connection config\"",
+            "assertions": 8,
+            "seconds": 7.023655
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"database name\"",
+            "assertions": 8,
+            "seconds": 7.03091
+          },
+          {
+            "name": "test_reached_metadata_objects_are_refused_without_offset_callbacks with data set \"table prefix\"",
+            "assertions": 8,
+            "seconds": 7.063641
+          },
+          {
+            "name": "test_custom_statement_constructor_is_not_reached_after_callback_withdrawal",
+            "assertions": 8,
+            "seconds": 7.158737
+          },
+          {
+            "name": "test_native_primary_replacement_is_refused_before_invoking_a_subclass_method",
+            "assertions": 8,
+            "seconds": 7.182758
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object envelope\"",
+            "assertions": 8,
+            "seconds": 7.140335
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"wrong status\"",
+            "assertions": 8,
+            "seconds": 7.080184
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"nonstring body\"",
+            "assertions": 8,
+            "seconds": 7.21634
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object headers\"",
+            "assertions": 8,
+            "seconds": 7.009139
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"object header value\"",
+            "assertions": 8,
+            "seconds": 7.109046
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"body budget\"",
+            "assertions": 8,
+            "seconds": 7.079581
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"depth budget\"",
+            "assertions": 8,
+            "seconds": 7.263632
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"node budget\"",
+            "assertions": 8,
+            "seconds": 7.08244
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"bad JSON\"",
+            "assertions": 8,
+            "seconds": 7.119784
+          },
+          {
+            "name": "test_raw_response_admission_refuses_before_sdk_decode_and_restores_ownership with data set \"lower notice\"",
+            "assertions": 8,
+            "seconds": 6.970491
+          },
+          {
+            "name": "test_cumulative_wire_budget_is_applied_across_individually_small_responses",
+            "assertions": 7,
+            "seconds": 6.998448
+          },
+          {
+            "name": "test_environment_and_raw_parent_refusal_evaluate_no_metadata_object",
+            "assertions": 13,
+            "seconds": 2.920794
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"v1\"",
+            "assertions": 10,
+            "seconds": 6.80055
+          },
+          {
+            "name": "test_attempt_before_original_commit_refuses_and_keeps_caller_physical_cleanup with data set \"tax_v2\"",
+            "assertions": 10,
+            "seconds": 7.379595
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 7.2267
+          },
+          {
+            "name": "test_callback_reentry_cannot_claim_the_plan_twice with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.570022
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"v1\"",
+            "assertions": 19,
+            "seconds": 7.436343
+          },
+          {
+            "name": "test_failed_second_mint_settles_only_its_partial_cohort_and_preserves_the_held_caller_frame with data set \"tax_v2\"",
+            "assertions": 19,
+            "seconds": 7.902711
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"v1\"",
+            "assertions": 8,
+            "seconds": 6.94141
+          },
+          {
+            "name": "test_original_rollback_never_admits_sdk_dispatch with data set \"tax_v2\"",
+            "assertions": 8,
+            "seconds": 7.560328
+          },
+          {
+            "name": "test_oversized_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 6,
+            "seconds": 7.105831
+          },
+          {
+            "name": "test_nested_dense_list_is_refused_before_sdk_conversion_and_following_get",
+            "assertions": 6,
+            "seconds": 7.169774
+          },
+          {
+            "name": "test_original_after_commit_failure_never_admits_sdk_dispatch with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 6.94953
+          },
+          {
+            "name": "test_original_after_commit_failure_never_admits_sdk_dispatch with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.70135
+          },
+          {
+            "name": "test_direct_pdo_commit_cannot_substitute_for_the_original_framework_commit with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 7.079831
+          },
+          {
+            "name": "test_direct_pdo_commit_cannot_substitute_for_the_original_framework_commit with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 7.389781
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"v1\"",
+            "assertions": 0,
+            "seconds": 2.884647
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"tax_v2\"",
+            "assertions": 0,
+            "seconds": 2.915173
+          }
+        ],
+        "source_inputs": 2438
+      },
+      "retrieval-native-original-controls": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": null,
+        "php_exit": -15,
+        "recorder_exit": 1,
+        "observed_os_exit": 1,
+        "filter": "original_positive_closure|changed_original_rows|sdk_exception_drains|callback_reopened_frame|failed_second_mint|original_rollback|native_older_source_deadline|attempt_before_original_commit|original_after_commit_failure|direct_pdo_commit",
+        "driver": {
+          "database_name": "vaseyaudio_paid_financial_retrieval",
+          "version": "8.4.11"
+        },
+        "wall_seconds": 796.1859602790064,
+        "cases": [],
+        "source_inputs": 2438
+      },
+      "retrieval-native-positive": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": {
+          "assertions": 40,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        },
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "observed_os_exit": 0,
+        "filter": "original_positive_closure",
+        "driver": {
+          "database_name": "vaseyaudio_paid_financial_retrieval",
+          "version": "8.4.11"
+        },
+        "wall_seconds": 381.54256957399775,
+        "cases": [
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"v1\"",
+            "assertions": 20,
+            "seconds": 206.869585
+          },
+          {
+            "name": "test_original_positive_closure_surrounds_six_exact_sdk_test_gets_and_returns_only_an_unattested_candidate with data set \"tax_v2\"",
+            "assertions": 20,
+            "seconds": 174.534278
+          }
+        ],
+        "source_inputs": 2438
+      },
+      "retrieval-native-reopened-frame": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": {
+          "assertions": 18,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        },
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "observed_os_exit": 0,
+        "filter": "callback_reopened_frame",
+        "driver": {
+          "database_name": "vaseyaudio_paid_financial_retrieval",
+          "version": "8.4.11"
+        },
+        "wall_seconds": 375.22058426600415,
+        "cases": [
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"v1\"",
+            "assertions": 9,
+            "seconds": 201.880695
+          },
+          {
+            "name": "test_callback_reopened_frame_is_refused_and_left_for_its_creator_to_roll_back with data set \"tax_v2\"",
+            "assertions": 9,
+            "seconds": 173.185949
+          }
+        ],
+        "source_inputs": 2438
+      },
+      "retrieval-native-source-caps": {
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "counts": {
+          "assertions": 28,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        },
+        "php_exit": 0,
+        "recorder_exit": 0,
+        "observed_os_exit": 0,
+        "filter": "native_older_source_deadline",
+        "driver": {
+          "database_name": "vaseyaudio_paid_financial_retrieval",
+          "version": "8.4.11"
+        },
+        "wall_seconds": 1089.0034187569981,
+        "cases": [
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"v1\"",
+            "assertions": 14,
+            "seconds": 517.308237
+          },
+          {
+            "name": "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback with data set \"tax_v2\"",
+            "assertions": 14,
+            "seconds": 571.529428
+          }
+        ],
+        "source_inputs": 2438
+      }
+    },
+    "original_passes": 5,
+    "original_nonzero": 5,
+    "prePHP_setup": "separate failed original, no app counts",
+    "quality": [
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-20261015/00-test-ci-scope.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-ci-scope.py"
+        ],
+        "head": "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+        "exit": 0,
+        "tests": 27
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-20261015/01-test-workflow-cadence.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-workflow-cadence.py"
+        ],
+        "head": "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+        "exit": 0,
+        "tests": 14
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-20261015/02-test-focused-tests.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-focused-tests.py"
+        ],
+        "head": "487f24618813b96ca27ef7a3cb1467c23ec8e1b8",
+        "exit": 1,
+        "tests": 50
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/00-test-focused-tests.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-focused-tests.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 50
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/01-test-database-receipts.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-database-receipts.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 61
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/02-test-gitlab-database-receipts.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-gitlab-database-receipts.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 32
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/03-test-gitlab-writer-feedback.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-gitlab-writer-feedback.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 7
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/04-test-php-test-runtime.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-php-test-runtime.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 5
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/05-test-phpunit-shards.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-phpunit-shards.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 52
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/06-test-bootstrap-macos.json",
+        "argv": [
+          "python3",
+          "scripts/dev/test-bootstrap-macos.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 13
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/07-test-publish-github.json",
+        "argv": [
+          "python3",
+          "scripts/test-publish-github.py"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0,
+        "tests": 2
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/08-validate.json",
+        "argv": [
+          "composer",
+          "validate",
+          "--strict"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/09-audit.json",
+        "argv": [
+          "composer",
+          "audit",
+          "--format=json"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/10-check-platform-reqs.json",
+        "argv": [
+          "composer",
+          "check-platform-reqs"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-continuation-20261015/11---test.json",
+        "argv": [
+          "vendor/bin/pint",
+          "--test",
+          "app/Domain/Commerce/ProductionFinancialRetrieval",
+          "config/production-financial-retrieval.php",
+          "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php"
+        ],
+        "head": "a7963f4ea8b47789f21eba1ec3d29b53c2c2c6f3",
+        "exit": 0
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-fixture-20261015/00-test-phpunit-shards.json",
+        "argv": [
+          "python3",
+          "scripts/ci/test-phpunit-shards.py"
+        ],
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "exit": 0,
+        "tests": 52
+      },
+      {
+        "member": "cheap/paid-financial-retrieval-cheap-fixture-20261015/01---test.json",
+        "argv": [
+          "vendor/bin/pint",
+          "--test",
+          "app/Domain/Commerce/ProductionFinancialRetrieval",
+          "config/production-financial-retrieval.php",
+          "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+          "tests/Support/FinancialRetrievalClockFixture.php"
+        ],
+        "head": "f77f5c12e590b2d9295ebff582b142b4091ff8c2",
+        "exit": 0
+      }
+    ],
+    "quality_commands": 17,
+    "quality_passes": 16,
+    "quality_failures": 1,
+    "unique_python_tests": 263,
+    "helper_python_repeat": 52,
+    "carry_bindings": 265,
+    "legacy_sdk_carry_bindings": 262,
+    "legacy_sdk_scope_exclusions": [
+      "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php",
+      "app/Domain/Commerce/ProductionFinancialInspection/FinancialObservation.php",
+      "tests/Feature/ProductionFinancialInspection/FinancialCandidateTest.php"
+    ],
+    "protected_physical_originals": 16,
+    "carried_policy_exclusions": {
+      "scripts/ci/database-mysql-selection.json": "New retrieval file explicitly selected for native coverage.",
+      "scripts/ci/database-sqlite-skips.json": "Original259pairs unchanged and one reviewed native-only method appended; two datasets."
+    },
+    "review_original_hashes": {
+      "design-review-aa3d01ac-original.md": "4914921d6956f7955c1babc942e418a304e854f0a578f61e7ef637950e66a7e8",
+      "design-review-aa3d01ac-original.json": "51bd29c02ef714bc6e551ff43f20c9bb3df9985ecfaa5fa3d3d7202058cbd3fb",
+      "design-review-fd06135d-original.md": "97a753be1cb55599f03968b0f694700bbe7b0b5839cb94d691096eff441ac973",
+      "design-review-fd06135d-original.json": "72ad2b0a3c9e04d39cf648cf388a9043bb5fece0ae7cddb469a1f4fdfa2202db",
+      "source-review-3b4d34e6-original.md": "b5ea6a9e1068c495c686e5d59371b80d5bbc21437590e1e7c9c54a8007351db7",
+      "source-review-3b4d34e6-original.json": "28465700250ba2b33703ee5810aa3d2170756b93a09b5e3c51960fbe794283f7",
+      "source-review-487f2461-original.md": "286848461005b723dd1e2a16226bc88efb99cc0acec8b4b669871ad887311882",
+      "source-review-487f2461-original.json": "3d224907ef59a4dc269637f3e2e55a88450070c8f1359a491cf4e665cac3ebcb",
+      "source-review-a7963f4e-original.md": "9956d0e629dd0c3f7bb2204c30fc794d749fe026840c6a0140fdc5ebf7b6f76f",
+      "source-review-a7963f4e-original.json": "ee4b3cb8f2422e3ba35e7337df1d34f10466b3d6991a53d323b843180050b134",
+      "partial-custody-review-f77f5c12-original.md": "21d2c2a2f987deab82376aaddc45777200fcff1bd3ede5a965c0bbcd643356db",
+      "partial-custody-review-f77f5c12-original.json": "f118b0e660dff2de6b060bb7c351552812f7d6280e7cbe876e4daf3820985885"
+    },
+    "docs_only_final_delta": [
+      "docs/handoff/2026-10-07/CLAUDE-PLAN.md",
+      "docs/handoff/2026-10-07/codex-deferred-20261011.md",
+      "docs/verification/paid-financial-retrieval-20261015/README.md",
+      "docs/verification/paid-financial-retrieval-20261015/carry-map-reconciliation.json",
+      "docs/verification/paid-financial-retrieval-20261015/partial-custody-review-f77f5c12-original.json",
+      "docs/verification/paid-financial-retrieval-20261015/partial-custody-review-f77f5c12-original.md",
+      "docs/verification/paid-financial-retrieval-20261015/source-review-a7963f4e-original.json",
+      "docs/verification/paid-financial-retrieval-20261015/source-review-a7963f4e-original.md",
+      "docs/verification/paid-financial-retrieval-20261015/tested-f77f5c12-recorded-evidence-index.json",
+      "docs/verification/paid-financial-retrieval-20261015/tested-f77f5c12-recorded-evidence.tar.gz"
+    ],
+    "owned_mysql": {
+      "version": "8.4.11",
+      "port": 33520,
+      "container_id": "19afe0537644a2ed773ba8e354767ace7cec2420090127358a6b0a8fdc2c459d",
+      "stop_exit": 0
+    },
+    "limits": [
+      "No broad/native20 prefix or whole native file claim",
+      "Only native positive/reopened/sourcecaps6/86; other native controls untested",
+      "Current full SQLite64/572 with2 exact native-only skips",
+      "V1 partial-custody synthetic new-wrapper real-clock forwarding; Tax genuine decrypt",
+      "No current fresh prior13/351 or69/291 or all10 cheap source-independent whole-run claim",
+      "Source/loader hashes do not establish whole historical vendor environment or provider/host authentication"
+    ],
+    "document_corrections_requested_and_resolved_in_successor": [
+      "Numerical CPU observation lacks sealed raw CPU receipt; remove or explicitly label unsealed console observation",
+      "f77 carry observed_utc inherited from a796 and predates actual f77 commit; disclose it is not a fresh f77 observation; hashes independently reverified now"
+    ],
+    "reviewer_actions": "Offline read-only archive/Git/hash/JUnit/receipt verification; runtime report only; no application/test/DB/network/hosted execution"
+  },
+  "original_runtime_artifact_sha256": {
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py": "fafeaee1499f8266ae05558d55882878bff47adf0ff0ed82a38d7ba613faeebe",
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-error-20261015.txt": "32833e3d28413fe8b6fe096347b61b3750b980019b73dd0670e33e5b6136c0b6",
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-error-20261015.json": "0012cb6d623559def6ac27eddbbac8782f15a7a3a08a675a1fb78b6d242d5cbe",
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-0c3b8f6c-scope-error-20261015.txt": "7e3b2dcc8571a82d13608049c13a503d8057985fb4461c42f45729c874ebed1c",
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-0c3b8f6c-scope-error-20261015.json": "513ad87ce1adc53147a90d9d9a625514b411048be3db7c7f1ad5b9db87a30ec5",
+    "/workspace/runtime/paid-financial-retrieval-final-verifier-0c3b8f6c-corrected-20261015.py": "c7c6ea818daa273ab6b8ed56c33eb15f90299565366b65671eabe8b5fce3ed99",
+    "/workspace/runtime/paid-financial-retrieval-final-working-report-0c3b8f6c-20261015.json": "46673cb0e3ff6041d1174d94f81a7465a9a62651c81126417f1702dfc8aa376c",
+    "/workspace/runtime/paid-financial-retrieval-final-note-assembly-error-0c3b8f6c-20261015.txt": "3bfdaafe80d862585b09b4e6fc6328343cf7377712163a8a26bcf5c8e42da47a",
+    "/workspace/runtime/paid-financial-retrieval-final-note-assembly-error-0c3b8f6c-20261015.json": "bbf0d957ddeba7bc8c72d73b76ecc7a2b48261bad48c94e701b72608294f5444"
+  },
+  "reviewer_preparation_errors": [
+    "Initial clean-worktree guard while author applied requested docs clarification; no archive/application checks in that attempt.",
+    "Overly broad265/both-heads carry assertion corrected to265 ae6 and262 legacy3e plus three candidate file exclusions, outside old69 selected execution.",
+    "Final note assembly wrongly assumed flat reconciliation hash values; actual four-field tracked/two-field physical schema verified, no partial decision/report written."
+  ],
+  "acceptance_limits": [
+    "Current wholeSQLite64/572/F0/E0/S2 with PHP/recorder/OS0; two exact native source-age datasets skipped.",
+    "PrivateMySQL8.4.11 current6/86 in three2/40,2/18,2/28 originals, F/E/S0 and all exits0. Positive original closure, reopened creator frames and genuine elapsed older-source cap/late-caller/callback scope only.",
+    "Interrupted20-case native original remains PHP-15/recorder1/OS1 after796.186s, emptyJUnit/ParseError/null counts; no progress-dot/prefix evidence.",
+    "Native row-drift/failmint/rollback/direct-PDO/afterCommit/precommit and wider SQL/DDL/isolation/deadlock/concurrency/performance remain untested here; current SQLite and prior original-source evidence are separate.",
+    "V1 partial custody uses disclosed synthetic test-only new-wrapper real-clock forwarding; Tax uses genuine retained decrypt. Partial2/38 overlaps whole64 and is not summed.",
+    "Prior13/351 atae6 and69/291 at3e are narrow carries only:265 ae6/current,262 oldSDK with three exact candidate-file exclusions; two changed policies freshly checked,16physical originals including untracked vendor without Git binding claims.",
+    "17quality originals16success1failure preserved;263unique safeguards plus52helper repeat, Composer strictvalidate/audit/platform and read-onlyPint7/8. No new execution by reviewer.",
+    "Unattested candidate providerAuthenticated=false; no real account/provider authentication or atomic/settled/current financial state, no route/binding/schema/businessDML/refund/payment/grant/download/access/rights/inventory/settlement effect.",
+    "Defaultoff/unbound and local/testing synthetic controls; staging/production refuse. SDK21.3.2/API2026-08-26.dahlia/profiles/source/schema unchanged.",
+    "Real provider/account/key/host acceptance, durable append-only financial write/commit/MFA/idempotency/unknown outcomes/tax-refund allocation and Sean-reviewed eligibility/access/rights/exclusive policies remain future gates.",
+    "Frozen shared V1/Identity metadata and membership afterCommit P2s, full Foundation/legal/commercial/parity/activation/host cutover gates remain open."
+  ],
+  "publication_conditions": [
+    "Byte-identical reviewer original imports followed by explicit independent carry to any resulting publication successor.",
+    "Green cheap preflight bound exact published head; complete checks/reviews/threads/protection inventory with no settings change/bypass.",
+    "Expected40-character-SHA development merge; actual merge/tree/preflight/decision/carry receipts and both handoff ledgers preserved afterward."
+  ],
+  "reviewer_activity": "Offline read-only Git/source/archive/hash/JUnit/argv/OS/quality/carry verification; own runtime artifacts only. No app/PHP diagnostics/test/DB/SDK/network/hosted CI/shared/vendor modification."
+}
