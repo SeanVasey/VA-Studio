@@ -35,6 +35,7 @@ class ProductionFeatureMetadataAdmissionTest extends TestCase
         FeatureActorIdCast::$calls = 0;
         FeatureFacadeCache::$calls = 0;
         FeaturePeerConnection::$calls = 0;
+        FeatureResolverWrites::$calls = 0;
     }
 
     public function test_custom_actor_id_cast_is_refused_before_eloquent_executes_it(): void
@@ -169,6 +170,63 @@ class ProductionFeatureMetadataAdmissionTest extends TestCase
         return [['customer_lock'], ['feature_lock'], ['feature_committed']];
     }
 
+    public static function resolverWrites(): array
+    {
+        return [['with'], ['resolved']];
+    }
+
+    #[DataProvider('resolverWrites')]
+    public function test_resolver_write_maps_are_refused_before_supported_literal_environment_setters(string $name): void
+    {
+        $identity = $this->featureIdentity();
+        $app = app();
+        $instancesProperty = new ReflectionProperty(Container::class, 'instances');
+        $bindingsProperty = new ReflectionProperty(Container::class, 'bindings');
+        $instances = $instancesProperty->getRawValue($app);
+        $bindings = $bindingsProperty->getRawValue($app);
+        $literal = $app->environment();
+        $app['env'] = $literal;
+        $property = new ReflectionProperty(Container::class, $name);
+        $original = $property->getRawValue($app);
+        $property->setValue($app, new FeatureResolverWrites($original));
+        $error = null;
+        try {
+            (new ProductionCustomerAccess)->source($identity->actor());
+        } catch (Throwable $caught) {
+            $error = $caught;
+        } finally {
+            $property->setValue($app, $original);
+            $instancesProperty->setValue($app, $instances);
+            $bindingsProperty->setValue($app, $bindings);
+        }
+        $this->assertSame(0, FeatureResolverWrites::$calls);
+        $this->assertInstanceOf(IdentityException::class, $error);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+    }
+
+    public function test_standard_literal_environment_descriptor_keeps_the_original_positive_source(): void
+    {
+        $identity = $this->featureIdentity();
+        $app = app();
+        $instancesProperty = new ReflectionProperty(Container::class, 'instances');
+        $bindingsProperty = new ReflectionProperty(Container::class, 'bindings');
+        $instances = $instancesProperty->getRawValue($app);
+        $bindings = $bindingsProperty->getRawValue($app);
+        $literal = $app->environment();
+        $app['env'] = $literal;
+        try {
+            $proof = (new ProductionCustomerAccess)->current($identity->principal(), $identity->actor());
+            $this->assertSame($identity->principal()->userId, (int) $proof['user']['id']);
+            $this->assertSame($literal, $app->environment());
+            $this->assertSame(0, DB::transactionLevel());
+            $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        } finally {
+            $instancesProperty->setValue($app, $instances);
+            $bindingsProperty->setValue($app, $bindings);
+        }
+    }
+
     #[DataProvider('earlyLocks')]
     public function test_early_feature_lock_metadata_is_admitted_before_facade_or_policy(string $phase): void
     {
@@ -268,5 +326,16 @@ final class FeaturePeerConnection extends SQLiteConnection
         self::$calls++;
 
         return parent::getRawPdo();
+    }
+}
+
+final class FeatureResolverWrites extends ArrayObject
+{
+    public static int $calls = 0;
+
+    public function offsetSet(mixed $key, mixed $value): void
+    {
+        self::$calls++;
+        parent::offsetSet($key, $value);
     }
 }
