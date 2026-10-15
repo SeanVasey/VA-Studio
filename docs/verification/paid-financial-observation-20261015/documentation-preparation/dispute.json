@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/workspace/.va-studio-stripe-docs-tool-20261015/stripe",
+    "--config",
+    "/workspace/.va-studio-stripe-docs-tool-20261015/empty.toml",
+    "docs",
+    "api",
+    "dispute"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "time=\"Thu, 15 Oct 2026 12:34:31 UTC\" level=error msg=\"request failed\" error=\"Get \"https://docs.stripe.com/_endpoint/api-reference-locator?q=dispute\": Forbidden\" url=https://docs.stripe.com/_endpoint/api-reference-locator?q=dispute version=1.53.1\n\u001b[38;2;255;0;0m\u2717\u001b[m Unable to locate API Reference documentation for \"dispute\"\nAPI reference not found for \"dispute\": docs: request failed: Get \"https://docs.stripe.com/_endpoint/api-reference-locator?q=dispute\": Forbidden\n",
+  "observed_at": "2026-10-15T12:34:31.564123+00:00",
+  "scope": "Public docs only; empty isolated CLI config and process API-key variable removed. No login/sandbox/account/payment operation."
+}

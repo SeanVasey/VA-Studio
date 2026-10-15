@@ -1,0 +1,10 @@
+{
+  "url": "https://github.com/stripe/stripe-cli/releases/download/v1.53.1/stripe_1.53.1_linux_x86_64.tar.gz",
+  "expected_sha256": "032fe0b849a9d6a222488bc846445bafeae993af1026b78a8121d02321ca1fd1",
+  "scope": "Public latest Stripe CLI documentation tooling; no login/account/API operation.",
+  "observed_at": "2026-10-15T12:32:50.730262+00:00",
+  "exit": 0,
+  "stdout": "stripe version 1.53.1\nChecking for new versions...\n\n",
+  "stderr": "",
+  "actual_sha256": "032fe0b849a9d6a222488bc846445bafeae993af1026b78a8121d02321ca1fd1"
+}

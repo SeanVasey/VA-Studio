@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/workspace/.va-studio-stripe-docs-tool-20261015/stripe",
+    "--config",
+    "/workspace/.va-studio-stripe-docs-tool-20261015/empty.toml",
+    "docs",
+    "--help"
+  ],
+  "exit": 0,
+  "stdout": "Browse docs.stripe.com from the terminal.\n\nRead a page by path:\n\n  stripe docs /payments\n  stripe docs /api/customers\n\nSearch documentation by keywords:\n\n  stripe docs search \"payment intents\"\n\nRead API Reference pages by their identifier:\n\n  stripe docs api product\n  stripe docs api GET /v1/products\n  stripe docs api product.created\n\nUsage:\n  stripe docs <path> [flags]\n  stripe docs [command]\n\nAvailable commands:\n  api         Look up Stripe API reference documentation\n  prefs       Manage preferences to customize rendered documentation\n  search      Search docs.stripe.com from the terminal\n\n[Agent guidance]\n  If you do not have an account: run stripe sandbox create (provisions a claimable sandbox without a browser).\n  If you already have a key: use --api-key (or set STRIPE_API_KEY).\n  Nested API fields use bracket flags, e.g. --parent[child]=value, not dotted --parent.child=value.\n  Run stripe --map to quickly see all available commands.\n  Run stripe resources to discover all available API resources.\n  Run stripe [resource] --help to see operations and required/common parameters for a resource.\n  Run stripe help [resource] [operation] to see the full parameter list for a specific operation.\n\n\nFlags:\n  -h, --help              help for docs\n      --no-pager          Write output directly to stdout (default true)\n      --non-interactive   Write output directly without the interactive\n                          browser (default true)\n\nGlobal flags:\n      --api-key string        Your API key to use for the command, instead\n                              of your logged in session. Overridden by the\n                              STRIPE_API_KEY environment variable, if set\n      --color string          turn on/off color output (on, off, auto)\n      --config string         config file (default is\n                              $HOME/.config/stripe/config.toml)\n      --device-name string    device name\n      --log-level string      log level (debug, info, trace, warn, error)\n                              (default \"info\")\n      --map string[=\"tree\"]   Print a command tree [tree|compact|paths|json]\n  -p, --project-name string   the project name to read from for config\n                              (default \"default\")\n\nUse \"stripe docs [command] --help\" for more information about a command.\n",
+  "stderr": "",
+  "observed_at": "2026-10-15T12:34:03.096487+00:00"
+}
