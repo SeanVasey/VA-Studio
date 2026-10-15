@@ -3,21 +3,28 @@
 namespace Tests\Feature;
 
 use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\PaidTax\PaidTaxCommands;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxDownloads;
 use App\Domain\Grants\PaidTax\PaidTaxException;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
+use App\Domain\Grants\PaidTax\PaidTaxPrepareStream;
 use App\Domain\Grants\PaidTax\PaidTaxProjectionRead;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRequestBudget;
+use App\Domain\Grants\PaidTax\PaidTaxRows;
 use App\Domain\Grants\PaidTax\PaidTaxSchema;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\PaidTaxDeliveryFixtures;
 use Tests\Support\PaidTaxGrantFixtures;
 use Tests\TestCase;
 
@@ -25,6 +32,7 @@ use Tests\TestCase;
 class PaidTaxDownloadJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
+    use PaidTaxDeliveryFixtures;
     use PaidTaxGrantFixtures;
 
     protected function setUp(): void
@@ -208,12 +216,16 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $encrypter = Crypt::getFacadeRoot();
         $mode = 'key';
         $calls = 0;
-        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($key, $pdo, $user, $encrypter, &$mode, &$calls): void {
+        $mutations = [];
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($key, $pdo, $user, $encrypter, &$mode, &$calls, &$mutations): void {
             if ($mode === 'key') {
                 config(['app.key' => $key.'-synthetic-changed']);
             } else {
-                Crypt::shouldReceive('decryptString')->andReturnUsing(static function (string $cipher) use ($encrypter, $pdo, $user, &$calls): string {
+                Crypt::shouldReceive('decryptString')->andReturnUsing(static function (string $cipher) use ($encrypter, $pdo, $user, &$calls, &$mutations): string {
                     if ($calls++ === 0) {
+                        $mutations[] = ['pdo_transaction' => $pdo->inTransaction(), 'framework_depth' => DB::transactionLevel(),
+                            'calls' => array_map(static fn (array $frame): string => ($frame['class'] ?? '').($frame['type'] ?? '').($frame['function'] ?? ''),
+                                array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 0, 16))];
                         $pdo->exec("UPDATE users SET password='synthetic-delivery-withdrawal' WHERE id=".$user['id']);
                     }
 
@@ -231,8 +243,9 @@ class PaidTaxDownloadJourneyTest extends TestCase
             config(['app.key' => $key]);
         }
         $this->assertGreaterThan(0, $calls);
-        $this->assertSame($user, (array) DB::table('users')->where('id', $user['id'])->sole());
+        fwrite(STDOUT, 'Tax withdrawal mutation timing: '.json_encode($mutations, JSON_THROW_ON_ERROR).PHP_EOL);
         $this->assertDatabaseCount('paid_tax_authorizations', 0);
+        $this->assertSame($user, (array) DB::table('users')->where('id', $user['id'])->sole());
     }
 
     public function test_late_owner_change_in_first_chunk_clock_refuses_all_bytes_after_committed_attempt(): void
@@ -297,5 +310,133 @@ class PaidTaxDownloadJourneyTest extends TestCase
         config(['paid-tax-grants.downloads_enabled' => true]);
         $this->assertSame(2, (new PaidTaxDownloads)->status($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['lines'][0]['attemptCount']);
         $this->assertDatabaseCount('paid_tax_redemptions', 2);
+    }
+
+    public function test_recent_issuance_set_is_reproved_after_late_valid_commit_append(): void
+    {
+        $f = $this->complete();
+        $this->authorize($f);
+        $this->authorize($f);
+        $source = (array) DB::table('paid_tax_authorizations')->orderBy('id')->first();
+        unset($source['id']);
+        $source['public_id'] = (string) Str::uuid();
+        $source['request_key'] = (string) Str::uuid();
+        $source['token_hash'] = hash('sha256', 'NONBINDING SYNTHETIC LATE ISSUANCE');
+        $pdo = DB::getPdo();
+        $calls = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, static function () use ($pdo, $source, &$calls): void {
+            if ($calls++ === 0) {
+                $q = $pdo->prepare('INSERT INTO paid_tax_authorizations ('.implode(', ', array_keys($source)).') VALUES ('.implode(', ', array_fill(0, count($source), '?')).')');
+                $q->execute(array_values($source));
+            }
+        });
+        $this->refused(403, fn () => $this->authorize($f));
+        $this->assertSame(1, $calls);
+        $this->assertDatabaseCount('paid_tax_authorizations', 2);
+    }
+
+    public function test_live_snapshot_budget_shortening_is_observed_before_any_adapter_copy(): void
+    {
+        $f = $this->complete();
+        $a = $this->authorize($f);
+        $budget = PaidTaxRequestBudget::capture(null);
+        $copies = 0;
+        $stream = new class($copies) extends PaidTaxPrepareStream
+        {
+            public function __construct(private int &$copies) {}
+
+            protected function copyTarget(array $target, $destination, mixed $deadline): void
+            {
+                $this->copies++;
+                parent::copyTarget($target, $destination, $deadline);
+            }
+        };
+        app()->instance(PaidTaxPrepareStream::class, $stream);
+        app()->afterResolving(PaidTaxPrepareStream::class, static function () use ($budget): void {
+            $budget->shortenTo(0);
+        });
+        try {
+            (new PaidTaxDownloads)->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user'], requestBudget: $budget);
+            $this->fail('Spent snapshot budget yielded transfer.');
+        } catch (PaidTaxException|DeliveryException) {
+            $this->assertSame(0, $copies, 'The adapter copied after its live request budget was spent.');
+        }
+        $this->assertDatabaseCount('paid_tax_redemptions', 0);
+    }
+
+    public function test_late_second_chunk_clock_cannot_return_old_tick_to_deliver_past_transfer_end(): void
+    {
+        $f = $this->allRolesTaxOrder();
+        $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['batch'] = (new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $a = $this->authorize($f);
+        config(['paid-tax-grants.transfer_base_seconds' => 0, 'paid-tax-grants.transfer_min_bytes_per_second' => 1073741824]);
+        $start = hrtime(true);
+        $calls = 0;
+        $d = new PaidTaxDownloads(static function () use ($start, &$calls): int {
+            if (++$calls === 3) {
+                usleep(1_100_000);
+            }
+
+            return $start;
+        });
+        $transfer = $d->redeem($f['batch']['id'], $a['id'], $a['token'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertGreaterThan(1048576, $transfer->sizeBytes);
+        $bytes = 0;
+        $this->refused(410, fn () => $transfer->writeTo(static function (string $chunk) use (&$bytes): void {
+            $bytes += strlen($chunk);
+        }));
+        $this->assertSame(1048576, $bytes, 'The delayed second chunk reached its consumer.');
+        $this->assertSame(3, $calls);
+        $this->assertDatabaseCount('paid_tax_redemptions', 1);
+    }
+
+    public function test_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('SQLite grammar callback is the explicit pending-admission probe.');
+        }
+        $f = $this->complete();
+        $connection = DB::connection();
+        $original = $connection->getSchemaGrammar();
+        $called = false;
+        $refusal = false;
+        (new PaidTaxCommands)->run($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'],
+            function (array $graph, PaidTaxRows $rows) use ($connection, $original, &$called, &$refusal): array {
+                $grammar = new class($connection, $rows, $called, $refusal) extends SQLiteGrammar
+                {
+                    public function __construct($connection, private PaidTaxRows $rows, private bool &$called, private bool &$refusal)
+                    {
+                        parent::__construct($connection);
+                    }
+
+                    public function compileCreate(Blueprint $blueprint, Fluent $command)
+                    {
+                        if (! $this->called) {
+                            $this->called = true;
+                            try {
+                                $this->rows->one('paid_tax_authorizations', 'id = ?', [0]);
+                            } catch (PaidTaxException) {
+                                $this->refusal = true;
+                            }
+                        }
+
+                        return parent::compileCreate($blueprint, $command);
+                    }
+                };
+                $connection->setSchemaGrammar($grammar);
+                try {
+                    $rows->admitDelivery();
+                } finally {
+                    $connection->setSchemaGrammar($original);
+                }
+
+                return [];
+            });
+        $this->assertTrue($called);
+        $this->assertTrue($refusal, 'Public new-table access succeeded before complete schema admission.');
+        $this->assertDatabaseCount('paid_tax_authorizations', 0);
+        $this->authorize($f);
+        $this->assertDatabaseCount('paid_tax_authorizations', 1);
     }
 }
