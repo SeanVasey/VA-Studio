@@ -50,8 +50,7 @@ final class TaxPaidReadContext implements \JsonSerializable
     private function __construct(private readonly CurrentRows $reader, private readonly int $bornAtNs)
     {
         $this->container = Container::getInstance();
-        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
-        CheckoutException::require(is_array($instances), 'committed_read_frame');
+        $instances = $this->admitContainerMaps();
         $configuration = $instances['config'] ?? null;
         $manager = $instances['db'] ?? null;
         CheckoutException::require($configuration instanceof Repository && $configuration::class === Repository::class
@@ -101,6 +100,7 @@ final class TaxPaidReadContext implements \JsonSerializable
         CheckoutException::require($this->generic === null && $context->connection() === $this->connection, 'committed_read_frame');
         $this->generic = $context;
         // Callback-capable policy work is deliberately after the literal birth/older markers.
+        $this->admitContainerMaps();
         $this->fresh = FreshTaxCheckoutPolicy::capture();
         $this->prove(1);
     }
@@ -116,14 +116,13 @@ final class TaxPaidReadContext implements \JsonSerializable
     {
         $this->proveNative($depth);
         $this->admitConnections();
-        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
-        CheckoutException::require(is_array($instances), 'committed_read_frame');
+        $instances = $this->admitContainerMaps();
         $items = (new ReflectionProperty(Repository::class, 'items'))->getValue($this->configuration);
         CheckoutException::require(Container::getInstance() === $this->container && ($instances['config'] ?? null) === $this->configuration
             && is_array($items) && ($items['production-tax-checkout'] ?? null) === $this->policy
             && hrtime(true) < $this->bornAtNs + 300_000_000_000 && $this->generic !== null, 'committed_read_frame');
         $this->fresh?->prove();
-        // Fresh proof admits raw container maps before the frozen generic binding closure indexes them.
+        // V2 admits raw maps and the nested env descriptor before either retained policy proof indexes them.
         $this->generic->prove($this->reader, $depth);
         $this->observer?->proveContextOwner($depth);
         $this->proveNative($depth);
@@ -164,6 +163,20 @@ final class TaxPaidReadContext implements \JsonSerializable
                 && $raw->getAttribute(PDO::ATTR_STATEMENT_CLASS) === [PDOStatement::class]
                 && $raw->getAttribute(PDO::ATTR_DRIVER_NAME) === ($connection::class === MySqlConnection::class ? 'mysql' : 'sqlite'), 'committed_read_frame');
         }
+    }
+
+    /** Offset access in final proof must never dispatch ArrayAccess metadata callbacks. */
+    private function admitContainerMaps(): array
+    {
+        $instances = (new ReflectionProperty(Container::class, 'instances'))->getValue($this->container);
+        $bindings = (new ReflectionProperty(Container::class, 'bindings'))->getValue($this->container);
+        $aliases = (new ReflectionProperty(Container::class, 'aliases'))->getValue($this->container);
+        CheckoutException::require(is_array($instances) && is_array($bindings) && is_array($aliases), 'committed_read_frame');
+        if (($instances['env'] ?? null) === null) {
+            CheckoutException::require(is_array($bindings['env'] ?? null), 'committed_read_frame');
+        }
+
+        return $instances;
     }
 
     public function held(callable $operation): mixed
