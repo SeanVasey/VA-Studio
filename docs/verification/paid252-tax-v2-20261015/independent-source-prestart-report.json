@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "kind": "Independent bounded transaction-birth source recheck",
+  "decision": "REVISE SOURCE",
+  "reviewed_commit": "8ae2903be6c259e1465830f0e1ca792308b00c58",
+  "prior_checkpoint_commit": "51257e9675af14d794e4e2ac16182dd98966ee3f",
+  "observed_head": "8ae2903be6c259e1465830f0e1ca792308b00c58",
+  "observed_status": "",
+  "changed_paths": [
+    "app/Domain/Grants/PaidTax/PaidTaxBeginningDispatcher.php",
+    "app/Domain/Grants/PaidTax/PaidTaxTransaction.php",
+    "docs/verification/paid252-tax-v2-20261015/independent-source-birth-REVISE.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-source-birth-report.json",
+    "tests/Feature/PaidTaxGrantJourneyTest.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxBeginningDispatcher.php",
+      "git_blob": "e6567947161269341fc735ca5598759235fd90a2",
+      "sha256": "160fae5f2e941f73b4e6ab9d8b628d1639aa88913be6d772b73fde26e440d93e"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxTransaction.php",
+      "git_blob": "07814a1edf5a64a193a7127a587e3fd7891edf49",
+      "sha256": "e3363988ed9147780c17f3e049ce59e7f45aa7b6329e3e220b59a21e0b4fdb17"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-birth-REVISE.md",
+      "git_blob": "52678d775f33ac9a9682822e684ff46ccbc10bcb",
+      "sha256": "b64f3b41fdcf10b389a5233ce3a08a42af6501600feb9b3e8bfb3fc46aa186b7"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-source-birth-report.json",
+      "git_blob": "babf4b6d1ccbda758cad59e03668c699605b712d",
+      "sha256": "2f9d9905ad9db6907da06d8d8458243db0a86fdcf001e7327003e613a161da61"
+    },
+    {
+      "path": "tests/Feature/PaidTaxGrantJourneyTest.php",
+      "git_blob": "94ec6254c91abb7be3ec0cc204ff882276cd4d45",
+      "sha256": "3e2b2fe78f4595692fefcbe4b530c8a303905b03bfe96c43bfa4b293919dcc50"
+    }
+  ],
+  "prior_finding_assessment": {
+    "id": "PTV2-512-01",
+    "result": "Specified ordinary TransactionBeginning throw/withdrawal/live deadline and direct reopened/replaced dispatcher paths repaired in source",
+    "evidence": "Original frame and anchor are captured before delegated TransactionBeginning; retain closure writes by reference before callback; finally restores delegate only if still owned; runtime admission now follows retained handle; post-birth replacement remains untouched."
+  },
+  "findings": [
+    {
+      "id": "PTV2-8AE-01",
+      "severity": "P2",
+      "confidence": "high source/framework path; behavioral reproduction pending",
+      "location": "PaidTaxTransaction.php:18 / PaidTaxBeginningDispatcher.php:24",
+      "title": "Pre-physical beforeStartingTransaction callbacks can displace the birth observer",
+      "mechanism": "Laravel beginTransaction invokes the public beforeStartingTransaction closures before PDO begin/root creation. A standard callback can set another dispatcher after the wrapper installed its observer. Standard begin then opens the original PDO/root and dispatches to that replacement. No frame is retained; original-null refusal occurs after begin, and outer owned cleanup has no handle. Original PDO/root/deferred locks remain open.",
+      "required": "Ensure observer/metadata continuity at the final callback-free pre-physical begin boundary or explicitly admit a constrained beforeStartingTransaction mechanism so displacement refuses before any owned PDO frame is opened. Keep normal begin semantics, no renewed authority, conditional restoration and captured cleanup. Do not fix with blind post-begin rollback or frame recapture.",
+      "focused_case": "Use genuine Connection::beforeStartingTransaction to replace dispatcher, then require refusal before owned physical begin or a positive original retained witness; no original transaction leak, no replacement overwrite/owned deferred callbacks. Include a normal supported hook and throwing hook counterpart."
+    }
+  ],
+  "original_behavioral_evidence": {
+    "head": "ba89be684e81408e1fd8286fd0bc9880b97e86a9",
+    "application_diff_vs_prior_checkpoint": [],
+    "counts": {
+      "tests": 1,
+      "assertions": 6,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "failure": "Original PDO active after ordinary begun delegate throw",
+    "php_process_exit": 1,
+    "reported_process_exit": 1,
+    "verifier_exit": 1,
+    "os_exit": 1,
+    "launch_os_identity_matches": true,
+    "log_hash_matches": true,
+    "stability_receipt": {
+      "autoload_unchanged": true,
+      "runner_unchanged": true,
+      "source_head_unchanged": true,
+      "source_status_unchanged": true,
+      "source_unchanged": true
+    },
+    "source_input_count": 2390,
+    "receipt_hashes": {
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/result.json": "97e01ed692286bd4ca200bdf0e3b84a8cfab71845a6803c8d74a7d65119ad385",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/junit.xml": "a26f734100118c1a2db11bf89fd5ac88c264e44348cd640f76e40bd9447f82db",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/command.json": "bcf8fc1acde075e89b4a11d7c350c81a5a8b4d0ee0bbfb4d2ef9295496d6ee0f",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-begin-throw-old-source/log.txt": "f9f2bc43feb9714a9b70dc3cc5518056ec305817eff5736a45a99aefce0b352b",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-begin-throw-old-source.json": "bde313a259873c8fc557db66866db03b09a2f36f8e948d6d6b20e2c3b6961c94",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-begin-throw-old-source.json": "0d9b55064aa07c34fb8bbcdee628216152a2d0988c70c4929e5029b39c81ffbe"
+    }
+  },
+  "current_four_case_run": "Active at request; no current run result reconciled or claimed by this source checkpoint.",
+  "preserved_original_repairs": true,
+  "manifest": {
+    "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "members": [
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxText.php",
+        "matches": true,
+        "sha256": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d"
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php",
+        "matches": true,
+        "sha256": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a"
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php",
+        "matches": true,
+        "sha256": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3"
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php",
+        "matches": true,
+        "sha256": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1"
+      },
+      {
+        "path": "app/Domain/Grants/PaidTax/PaidTaxFiles.php",
+        "matches": true,
+        "sha256": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db"
+      },
+      {
+        "path": "scripts/render-paid-tax-grant.php",
+        "matches": true,
+        "sha256": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8"
+      }
+    ],
+    "all_match": true,
+    "changed_member_paths": []
+  },
+  "frozen_or_ci_route_delta": [],
+  "commands": "Read-only immutable Git/source/vendor inspection; closed original JUnit/marker/result/log/launch/OS JSON parsing and hashing; runtime artifacts only.",
+  "prohibited_actions_performed": false,
+  "limits": [
+    "One current required P2; no P0/P1 identified in this bounded delta.",
+    "Not final source/evidence/development merge/native/physical or host approval.",
+    "New current four-case evidence not reconciled; no native pass inferred from old setup/insert-ID errors.",
+    "Pre-physical observer admission needs repaired source and focused original/current proof before approval.",
+    "Source age, native concurrency/isolation/DDL/trigger/restore, invisible empty post-closure reopen and blocking SQL/output/host deadlines remain open.",
+    "HTTP/root/download redemption, live/operative flags, provider/host/legal/commercial/release acceptance and frozen shared/identity/ordinary membership P2 remain outside the slice."
+  ]
+}

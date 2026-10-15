@@ -74,6 +74,7 @@ final readonly class FreshTaxCheckoutPolicy
     {
         $environment = $binding[0];
         if ($environment === null) {
+            CheckoutException::require(is_array($binding[1]), 'disabled', 503);
             $concrete = $binding[1]['concrete'] ?? null;
             CheckoutException::require($concrete instanceof Closure, 'disabled', 503);
             $reflection = new ReflectionFunction($concrete);

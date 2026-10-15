@@ -35,6 +35,10 @@
       "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
     ],
     [
+      "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
+      "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
       "Tests\\Feature\\ProductionCheckoutMigrationTest",
       "test_sqlite_duplicate_table_and_trigger_namespace_cannot_hide_a_foreign_marker"
     ],

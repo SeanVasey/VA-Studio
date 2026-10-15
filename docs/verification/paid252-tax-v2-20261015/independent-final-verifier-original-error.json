@@ -1,0 +1,9 @@
+{
+  "kind": "Reviewer verifier preparation error, not product/check failure",
+  "original_verifier": "/workspace/runtime/paid252-tax-v2-independent-final-verifier-562147da-20261015.py",
+  "original_verifier_sha256": "fed372bdc6df44bd5825f6e11174c6489bc95387e100c0aa3fdd09aab65f75ef",
+  "process_exit": 1,
+  "error": "KeyError: files",
+  "site": "old_paths.update(old_profile[files]); legacy test-v1/test-v2 use implementation/assets instead of files",
+  "effect": "All archive/inventory/JUnit/process/current-source/policy/census checks preceding this shape assumption passed; no working report created. Original verifier preserved; corrected verifier follows."
+}

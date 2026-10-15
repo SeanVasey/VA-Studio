@@ -1,0 +1,172 @@
+{
+  "kind": "Independent bounded native oracle adjustment and exact unchanged product source carry",
+  "decision": "APPROVE BOUNDED ORACLE/SOURCE CARRY; CURRENT EXECUTION AND FINAL EVIDENCE PENDING",
+  "reviewed_commit": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+  "baseline_commit": "94a2c49b3236a68d204c86014e80a96e8cf877e8",
+  "approved_product_source_commit": "a051ac2e5044269e415ee147ca7bc3063ca54c5d",
+  "observed_head": "26c0c472ac6b19060e42064e3e9315aae80e6eb5",
+  "observed_status": "",
+  "changed_paths": [
+    "tests/Feature/PaidTaxNativeBoundaryTest.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "tests/Feature/PaidTaxNativeBoundaryTest.php",
+      "git_blob": "08a53ccf34bf7a23c16383b31842e178b8b05587",
+      "sha256": "77a00a73878f892af0b95f25150d6e1e14927a238dd7995daaa66d63594148d1"
+    }
+  ],
+  "product_and_protected_delta": [],
+  "open_p0_p1": false,
+  "required_source_or_oracle_repairs": [],
+  "oracle_assessment": [
+    "Two independent workers must reach exact parent original-user row waits before release; unchanged worker beginning delegate starts a real dictionary read only after original buyer prelock.",
+    "Only genuine saved results or exact PaidTaxException503 with first tracecall Actor::lockOriginal and no begun delegate are accepted; closed frame, same connection and original restored wait variables required for every worker.",
+    "At least one saved result is mandatory; every saved ID must be identical; original paid order ID and begun dictionary delegate required for successes.",
+    "Fresh ordinary authenticated replay must return the winning ID; exact byte-distinct provider identities remain two, grant origins remain two, ordinary V1 origins remain zero; no duplicate or all-refused outcome accepted.",
+    "Independent third held-user worker still requires bounded503/closed-frame/wait-restoration/no delegate/no row changes and explicit fresh authorized replay.",
+    "The503 source branch maps native1205 or1213. Original sanitized diagnostics do not independently record the native error code; do not claim a direct1205-code witness or general deadlock recovery."
+  ],
+  "preserved_original_94_evidence": {
+    "overall_counts": {
+      "tests": 12,
+      "assertions": 1350,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 1
+    },
+    "schema_component_counts": {
+      "tests": 11,
+      "assertions": 1305,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "race_component_counts": {
+      "tests": 1,
+      "assertions": 45,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "exact_skips": [
+      {
+        "class": "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
+        "name": "test_sqlite_composite_dependency_primary_key_is_not_a_unique_id_target"
+      }
+    ],
+    "php_process_exit": 1,
+    "verifier_exit": 1,
+    "marker_exit": 1,
+    "observed_recorder_os_exit": 1,
+    "launch_bound_os_identity": true,
+    "log_sha_matches": true,
+    "stability": {
+      "autoload_unchanged": true,
+      "runner_unchanged": true,
+      "source_head_unchanged": true,
+      "source_status_unchanged": true,
+      "source_unchanged": true
+    },
+    "source_input_count_recorded": 2395,
+    "workers": [
+      {
+        "result": "saved",
+        "id": "a6555af4-68c6-4612-9307-f485cb74bacd",
+        "order_id": "48d2ae95-0918-42ce-8437-6c2a4b544d0d",
+        "error_class": null,
+        "status": null,
+        "location": null,
+        "phase": "command-started",
+        "trace": [],
+        "command_elapsed_seconds": 9.010504275,
+        "waits": [
+          31536000,
+          50
+        ],
+        "begun_dictionary_read": true,
+        "connection_id": 149,
+        "pid": 163822,
+        "transaction_level": 0,
+        "in_transaction": false
+      },
+      {
+        "result": "unexpected",
+        "id": null,
+        "order_id": null,
+        "error_class": "App\\Domain\\Grants\\PaidTax\\PaidTaxException",
+        "status": 503,
+        "location": "PaidTaxActor.php:58",
+        "phase": "command-started",
+        "trace": [
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxActor->lockOriginal",
+            "site": "PaidTaxTransaction.php:16"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::{closure:App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run():14}",
+            "site": "PaidTaxBeginningDispatcher.php:115"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxBeginningDispatcher->dispatch",
+            "site": "Connection.php:1129"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->fireConnectionEvent",
+            "site": "ManagesTransactions.php:138"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->beginTransaction",
+            "site": "PaidTaxTransaction.php:19"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run",
+            "site": "PaidTaxGrants.php:50"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalizeOwned",
+            "site": "PaidTaxGrants.php:26"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalize",
+            "site": "paid-tax-origin-race-worker.php:50"
+          }
+        ],
+        "command_elapsed_seconds": 5.026710165,
+        "waits": [
+          31536000,
+          50
+        ],
+        "begun_dictionary_read": false,
+        "connection_id": 150,
+        "pid": 163825,
+        "transaction_level": 0,
+        "in_transaction": false
+      }
+    ],
+    "private_original_executed": false,
+    "classification": "Original whole invocation failed. Schema component passed with one reviewed SQLite-composite skip; race assertion required two saved but winner took9.0105s and original-cap waiter refused503 after5.0267s before begun delegate. Later private-original case unexecuted. No rerun/exits reinterpretation.",
+    "receipt_sha256": {
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-buyer-serialization-and-native-recovery/result.json": "c8f460fdd468727f74afecb519f8f36469c9ae31ce8c1ce957a8e99afac9e8d9",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-buyer-serialization-and-native-recovery/junit.xml": "1c2d98a1a5a40e2b34d31aa90923dd11da07b11d1b54b37190c0b255ad75b34c",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-buyer-serialization-and-native-recovery/log.txt": "e20706fd8b1d2518883b454b61b9084332ce2e74e4923d1d38fa336441f90c16",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-buyer-serialization-and-native-recovery/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-buyer-serialization-and-native-recovery/command.json": "e0da5b8bf75ea10bda3491a10a7b6151f64ee33f163d01809a188e564e9447d5",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-mysql-buyer-serialization-and-native-recovery.json": "30c2c1f7daf1a4bb05fa3bb37af40e4e1fd3dd12675640eceae2dd687b43f758",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-mysql-buyer-serialization-and-native-recovery.json": "f7853c522a2f30eab2ee9073e6ca40c4e061a0b2b80712ead660ad83bb6f45dc"
+    }
+  },
+  "carry": {
+    "approved_source_report": "/workspace/runtime/paid252-tax-v2-independent-early-owner-DECISION-a051ac2e-20261015.json",
+    "sha256": "753422223ec4182e84de970a07e95af599f88ac1942aff2ba4a5bbd41825e031",
+    "all_original_conditions_preserved": true
+  },
+  "limits": [
+    "Current mysql-bounded-origin-race-and-private-original execution active at review request; no current pass claimed.",
+    "No final whole affected SQLite/native physical/portable packet or merge approval.",
+    "Original04f stale403 oracle preserved; earlier81e unresolved cause and a051 wrong temp-users status assertion preserved.",
+    "Source/caps/isolation/budgets/flags/profile/frozenV1/shared interfaces unchanged. No host/provider/HTTP/download/activation/full acceptance claim.",
+    "Same-owner replay serializes only its admitted buyer; general mutable-set currentness/RC gaps/effective deployed isolation/DDL/trigger/general SQL/deadlock/reconnect remain unproved."
+  ],
+  "actions": "Read-only exact Git/source and original completed receipts; original runtime artifacts only. No app/test/DB/network/CI execution or tracked edits."
+}

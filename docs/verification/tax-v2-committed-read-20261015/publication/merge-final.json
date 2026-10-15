@@ -1,0 +1,16 @@
+{
+  "recorded_utc": "2026-10-15T04:14:17.864233+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "view",
+    "121",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--json",
+    "number,url,state,headRefOid,mergeCommit,mergedAt,isDraft"
+  ],
+  "exit": 0,
+  "stdout": "{\"headRefOid\":\"78e2c7e773f4fa0a310360b67e50fe24cb6cfa62\",\"isDraft\":false,\"mergeCommit\":{\"oid\":\"7567c52a3246ab2625196952a448c8cd7a890dcb\"},\"mergedAt\":\"2026-10-15T04:14:15Z\",\"number\":121,\"state\":\"MERGED\",\"url\":\"https://github.com/SeanVasey/VA-Studio/pull/121\"}\n",
+  "stderr": ""
+}

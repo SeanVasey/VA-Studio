@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-10-15T04:07:02.757567+00:00",
+  "expected_head": "78e2c7e773f4fa0a310360b67e50fe24cb6cfa62",
+  "argv": [
+    "gh",
+    "pr",
+    "create",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--base",
+    "main",
+    "--head",
+    "harness/tax-v2-committed-read-20261015",
+    "--title",
+    "Add Tax V2 receipts for original committed-source reads",
+    "--body-file",
+    "/workspace/runtime/tax-v2-committed-read-publication-20261015/pr-body.md"
+  ],
+  "process_exit": 0,
+  "stdout": "https://github.com/SeanVasey/VA-Studio/pull/121\n",
+  "stderr": ""
+}
