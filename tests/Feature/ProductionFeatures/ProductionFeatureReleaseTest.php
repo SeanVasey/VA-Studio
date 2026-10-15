@@ -9,8 +9,11 @@ use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
 use Tests\Support\ProductionFeatureFixtures;
@@ -104,7 +107,25 @@ class ProductionFeatureReleaseTest extends TestCase
         $originalManager = $property->getValue($connection);
         $foreignEvents = new Dispatcher(app());
         $foreignManager = new DatabaseTransactionsManager;
-        LibraryRow::saved(function () use ($connection, $foreignEvents, $foreignManager): void {
+        $foreignRollbacks = 0;
+        $foreignCallbacks = 0;
+        $ownCallbacks = 0;
+        $ownedManager = null;
+        $foreignEvents->listen(TransactionRolledBack::class, function () use (&$foreignRollbacks): void {
+            $foreignRollbacks++;
+        });
+        $foreignManager->begin($connection->getName(), 1);
+        $foreignManager->addCallback(function () use (&$foreignCallbacks): void {
+            $foreignCallbacks++;
+        });
+        $foreignRecords = $foreignManager->getPendingTransactions()->all();
+        Event::listen(TransactionBeginning::class, function () use ($connection, &$ownCallbacks): void {
+            $connection->afterCommit(function () use (&$ownCallbacks): void {
+                $ownCallbacks++;
+            });
+        });
+        LibraryRow::saved(function () use ($connection, $property, $foreignEvents, $foreignManager, &$ownedManager): void {
+            $ownedManager = $property->getValue($connection);
             $connection->setEventDispatcher($foreignEvents);
             $connection->setTransactionManager($foreignManager);
         });
@@ -118,6 +139,13 @@ class ProductionFeatureReleaseTest extends TestCase
             $this->assertInstanceOf(ProductionFeatureException::class, $refused);
             $this->assertSame($foreignEvents, $connection->getEventDispatcher());
             $this->assertSame($foreignManager, $property->getValue($connection));
+            $this->assertSame($foreignRecords, $foreignManager->getPendingTransactions()->all());
+            $this->assertSame(0, $foreignRollbacks);
+            $this->assertSame(0, $foreignCallbacks);
+            $this->assertSame([], $ownedManager->getPendingTransactions()->all());
+            $this->assertSame(0, $ownCallbacks);
+            $foreignManager->commit($connection->getName(), 1, 0);
+            $this->assertSame(1, $foreignCallbacks, 'Only its owner consumes the retained foreign record.');
         } finally {
             LibraryRow::flushEventListeners();
             $connection->setEventDispatcher($originalEvents);
@@ -126,6 +154,77 @@ class ProductionFeatureReleaseTest extends TestCase
                 $connection->getRawPdo()->rollBack();
                 $connection->setPdo($connection->getRawPdo());
             }
+        }
+    }
+
+    public function test_before_start_metadata_withdrawal_refuses_before_original_physical_begin(): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $primary = $connection->getRawPdo();
+        $key = config('app.key');
+        $fired = false;
+        $connection->beforeStartingTransaction(function () use (&$fired): void {
+            if (! $fired) {
+                $fired = true;
+                config(['app.key' => 'base64:'.base64_encode(str_repeat('z', 32))]);
+            }
+        });
+        try {
+            $refused = null;
+            try {
+                (new ProductionListeningLibrary)->initialize($owner);
+            } catch (Throwable $error) {
+                $refused = $error;
+            }
+            $this->assertNotNull($refused);
+            $this->assertTrue($fired);
+            $this->assertFalse($primary->inTransaction(), 'A pure tail refuses before PDO begin.');
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
+        } finally {
+            config(['app.key' => $key]);
+            if ($primary->inTransaction()) {
+                $primary->rollBack();
+                $connection->setPdo($primary);
+            }
+        }
+        $this->assertSame(['initialized' => false], (new ProductionListeningLibrary)->read($owner));
+    }
+
+    public function test_preparation_start_cannot_move_feature_writes_into_a_foreign_frame(): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $primary = $connection->getRawPdo();
+        $primary->exec('CREATE '.(DB::getDriverName() === 'mysql' ? 'TEMPORARY ' : '').'TABLE release_foreign_probe (marker INTEGER PRIMARY KEY)');
+        $fired = false;
+        $prepared = new ProductionFeaturePreparation(function () use ($primary, &$fired): void {
+            $fired = true;
+            $primary->commit();
+            $primary->beginTransaction();
+            $primary->exec('INSERT INTO release_foreign_probe VALUES (1)');
+        }, 3 * 1024 * 1024);
+        try {
+            $refused = null;
+            try {
+                (new ProductionListeningLibrary)->initialize($owner, $prepared);
+            } catch (Throwable $error) {
+                $refused = $error;
+            }
+            $this->assertNotNull($refused);
+            $this->assertTrue($fired);
+            $this->assertTrue($primary->inTransaction());
+            $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM release_foreign_probe')->fetchColumn());
+            $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM production_account_feature_bindings')->fetchColumn());
+            $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM production_listening_libraries')->fetchColumn());
+            $this->assertSame(1, $connection->transactionLevel());
+        } finally {
+            if ($primary->inTransaction()) {
+                $primary->rollBack();
+            }
+            $connection->setPdo($primary);
+            $primary->exec('DROP TABLE release_foreign_probe');
         }
     }
 
