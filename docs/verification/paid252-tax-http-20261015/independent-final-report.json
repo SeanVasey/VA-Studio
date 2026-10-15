@@ -1,0 +1,557 @@
+{
+  "DECISION": "APPROVE WITH CONDITIONS",
+  "actual_invocations": [
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidGrantRootRegistrationTest": {
+          "assertions": 77,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 7
+        },
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 133,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 9
+        },
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 502,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 32
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 21,
+          "errors": 0,
+          "failures": 16,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 733,
+        "errors": 1,
+        "failures": 16,
+        "skipped": 0,
+        "tests": 65
+      },
+      "name": "http-whole-after-class-repair",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "760c9388b8f07f250fc67d5489f93feb85420051"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidGrantHttpJourneyTest": {
+          "assertions": 648,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 19
+        },
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 191,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 12
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 131,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 970,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 48
+      },
+      "name": "journey-producer-v1-affected",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 111,
+          "errors": 0,
+          "failures": 5,
+          "skipped": 0,
+          "tests": 10
+        },
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 509,
+          "errors": 2,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 39
+        },
+        "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCheckoutHttpBoundaryTest": {
+          "assertions": 131,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 17
+        }
+      },
+      "counts": {
+        "assertions": 751,
+        "errors": 2,
+        "failures": 6,
+        "skipped": 0,
+        "tests": 66
+      },
+      "name": "metadata-root-and-producer-repair",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "e430832785ad8e3911240e350278f875e4aba82e"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 17,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "producer-csrf-original-red",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 580,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 44
+        }
+      },
+      "counts": {
+        "assertions": 580,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 44
+      },
+      "name": "root-armed-getter-final",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "e3f06b084538dac11665ff9be77c74228bdab64d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 578,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 43
+        }
+      },
+      "counts": {
+        "assertions": 578,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 43
+      },
+      "name": "root-final-serverbag",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "ae1cfe040f2ccfc8969ce80b58693c93482b2f97"
+    },
+    {
+      "PHP_exit": 1,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 34,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      "counts": {
+        "assertions": 34,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "root-initial-a565",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "a565e54a47fd46a3cf62eeab40826674f8c84988"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 578,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 44
+        }
+      },
+      "counts": {
+        "assertions": 578,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 44
+      },
+      "name": "root-raw-property-final",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "306b9fbb5918a58779194492a80f5141f191190f"
+    },
+    {
+      "PHP_exit": 2,
+      "components": {},
+      "counts": null,
+      "name": "root-whole-query-observation",
+      "observed_recorder_OS_exit": 1,
+      "pass": false,
+      "recorder_exit": 1,
+      "source": "dfb45468dc2b4520436ede024b2626f58a6c260d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxHttpJourneyTest": {
+          "assertions": 40,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 2
+        }
+      },
+      "counts": {
+        "assertions": 40,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 2
+      },
+      "name": "unfinished-two-line-and-current-timing",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "e3f06b084538dac11665ff9be77c74228bdab64d"
+    },
+    {
+      "PHP_exit": 0,
+      "components": {
+        "Tests\\Feature\\PaidTaxRootHttpBoundaryTest": {
+          "assertions": 597,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 45
+        }
+      },
+      "counts": {
+        "assertions": 597,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 45
+      },
+      "name": "whole-root-with-real-producer-csrf",
+      "observed_recorder_OS_exit": 0,
+      "pass": true,
+      "recorder_exit": 0,
+      "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+    }
+  ],
+  "archive": {
+    "all_indexed_digests_valid": true,
+    "bytes": 8323164,
+    "exact_safe_regular_member_set": true,
+    "members": 2546,
+    "sha256": "e72a5383d387a23048fc350bbfdc824b426e42380f362050d374956d49327c87"
+  },
+  "archive_index_sha256": "c1eb05831f45bf13ba1a410c596e14aeaf9c41bd48460393fcfbb89ccbe029b1",
+  "base_actual_merge_sha": "d95e4a74606ee257a2cda06d0793c1cedf165137",
+  "created_utc": "2026-10-15T12:04:59.938063+00:00",
+  "empty_JUnit_original": "root-whole-query-observation; partial counts remain null",
+  "engineering_verdict": "Approved for bounded development integration with no remaining material source/packet repair identified; full host/payment/provider acceptance is not established.",
+  "independent_originals_byte_preserved": [
+    {
+      "path": "independent-design-original-REVISE.md",
+      "sha256": "1c6067418ae0c5325b646a53129292a85b01a84f0a05252f77a3e8a9c3dc806e"
+    },
+    {
+      "path": "independent-design-original-REVISE.json",
+      "sha256": "6e966805b93588ce6879b1bec415b7ee8a3b13a5b70bc7f1f7ede0636f75f72b"
+    },
+    {
+      "path": "independent-design-DECISION.md",
+      "sha256": "e792e95cf472aba1871ca5e19ac92244b2eed3ac535f56a1a9144f4c4479240e"
+    },
+    {
+      "path": "independent-design-DECISION.json",
+      "sha256": "5bed6b7d1ba16e8ddffdf2e3b5c51f328a1a241bce8af2be0a591bc9b1dc2d93"
+    },
+    {
+      "path": "independent-source-original-REVISE.md",
+      "sha256": "c4f0dd6a21aecdf4dc60ac31d56a6e28f908d97e8c58dd89e431b0ad79e0afd5"
+    },
+    {
+      "path": "independent-source-original-REVISE.json",
+      "sha256": "c59eece664c070848b13991048bb7761435e086d2dc6e03f0e258d32bc7bfc66"
+    },
+    {
+      "path": "independent-source-ae1-residual-REVISE.md",
+      "sha256": "581da13f104a488d1c376b5620ef20fb7ce66402fe059a7eb1a11517460cbcf8"
+    },
+    {
+      "path": "independent-source-ae1-residual-REVISE.json",
+      "sha256": "9a3b1a0d6ab3273da7b56f7b88d0e17b7ebe5a5a111a00fb8369fe05a438cc8b"
+    },
+    {
+      "path": "independent-source-e3-DECISION.md",
+      "sha256": "b54c3132d76e23069e7432e7f6ce4b266ceec1f72b1287a3c85464ea34ac0ba5"
+    },
+    {
+      "path": "independent-source-e3-report.json",
+      "sha256": "a8d2131ec43d67a9c83c482ded1472fa3f1cb13d51a636a570ec0bb53611dbf5"
+    },
+    {
+      "path": "independent-source-DECISION.md",
+      "sha256": "b00fb3f2b35bae1cc20bdc954f28512d50fc11d3450ee85aa844a30842e59f18"
+    },
+    {
+      "path": "independent-source-report.json",
+      "sha256": "e52af518219bd0409a0775e1763cf6aadf508a0a358aa1a1b1e8abc5e8dfe0ea"
+    }
+  ],
+  "nonzero_invocations": 6,
+  "open_P0": false,
+  "open_P1": false,
+  "operative_application_test_source_sha": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+  "passing_invocations": 5,
+  "preserved_release_conditions": [
+    "Both mount flags and all commerce policies ship default-off; provider remains Unbound, synthetic fixtures provide no merchant authority.",
+    "No Tax UI/history index, live account/payment/credentials/import/DNS/deployment/cutover or activation claim.",
+    "No current native SQL/schema/race execution or census; unchanged primitive historical native evidence retains original scope/version/runtime conditions.",
+    "Existing-request final provider-I/O, global SQL/DDL/isolation/deadlock/trigger/invisible-reopen/damaged-restore and complete parity remain open.",
+    "Actual config/route-cache host rebuild, distributed cache/session, FPM/send-timeout/performance/capacity and real commercial/legal/merchant/provider/key/host conditions remain unproved.",
+    "Adjacent shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain frozen, not fixed by this batch.",
+    "No Foundation/GitLab/live/full-suite acceptance is asserted."
+  ],
+  "quality": {
+    "Pint": {
+      "current_file_bytes_equal": true,
+      "exit": 0,
+      "files": 20,
+      "format": "native installed Pint agent JSON",
+      "head": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+    },
+    "cheap_checks": [
+      {
+        "argv": [
+          "python3",
+          "scripts/dev/test-bootstrap-macos.py"
+        ],
+        "count": 13,
+        "exit": 0,
+        "member": "cheap/test-bootstrap-macos.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-ci-scope.py"
+        ],
+        "count": 27,
+        "exit": 0,
+        "member": "cheap/test-ci-scope.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-database-receipts.py"
+        ],
+        "count": 61,
+        "exit": 0,
+        "member": "cheap/test-database-receipts.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-focused-tests.py"
+        ],
+        "count": 50,
+        "exit": 0,
+        "member": "cheap/test-focused-tests.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-gitlab-database-receipts.py"
+        ],
+        "count": 32,
+        "exit": 0,
+        "member": "cheap/test-gitlab-database-receipts.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-gitlab-writer-feedback.py"
+        ],
+        "count": 7,
+        "exit": 0,
+        "member": "cheap/test-gitlab-writer-feedback.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-php-test-runtime.py"
+        ],
+        "count": 5,
+        "exit": 0,
+        "member": "cheap/test-php-test-runtime.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-phpunit-shards.py"
+        ],
+        "count": 52,
+        "exit": 0,
+        "member": "cheap/test-phpunit-shards.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/test-publish-github.py"
+        ],
+        "count": 2,
+        "exit": 0,
+        "member": "cheap/test-publish-github.json"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-workflow-cadence.py"
+        ],
+        "count": 14,
+        "exit": 0,
+        "member": "cheap/test-workflow-cadence.json"
+      }
+    ],
+    "cheap_script_configuration_carry_scope": [
+      "scripts/",
+      ".github/",
+      "composer.json",
+      "composer.lock",
+      "phpunit.xml"
+    ]
+  },
+  "ready_for_cheap_exact_head_preflight": true,
+  "ready_for_development_merge_after_required_gates": true,
+  "required_remaining_merge_gates": [
+    "Publish the reviewed head or obtain explicit independent doc-only successor carry.",
+    "Green cheap preflight bound to exact published40-character SHA; inspect full check/review/thread/protection inventory without bypass or settings changes.",
+    "Merge using the expected reviewed/published SHA; record actual merge/check/carry receipts and both ledgers afterward."
+  ],
+  "required_source_or_packet_corrections": [],
+  "review_kind": "Independent non-author final bounded source/evidence development decision",
+  "reviewed_sha": "2a382a505c3145f709cede4110dbcd0b57196a3c",
+  "reviewer_actions": {
+    "application_test_database_network_hosted_operations": 0,
+    "tracked_edits": 0,
+    "writes": "Original reviewer artifacts under /workspace/runtime only"
+  },
+  "source_and_test_assessment": [
+    "Final doc-only successor carries all2423 current actual input bytes from bb,17 route files and13 actual/recorded loader bodies. Original source/callback/clock/cleanup corrections and the disproved producer-CSRF concern retain immutable review records.",
+    "RequestContext uses callback-free raw standard server metadata and one original private WeakMap budget/claim; mutation cannot renew it. Actual backed property-hook and standard descriptor controls pass.",
+    "Mandatory plain response owner precedes domain captures and response construction; clone refusal preserves the original holder; encoding/header/never-started/disposal failures release only original captured observers/transfer handles. Positive JSON/attachment handoff retains original before-byte closure.",
+    "Real unit-bypass-disabled CSRF/session rotation, wrong-owner/credential, late withdrawal, exact private PDF/master and two-line retained-first-original recovery, genuine elapsed timing and durable throwing-afterCommit/spent retries have source-bound focused evidence.",
+    "Source/fixture failures remain original failures; no full green48 or Tax12 invocation is reconstructed from components/continuation. Narrow prior-source producer/V1/unchanged Tax bodies are sufficient under AGENTS cost policy for this one-line hook-bypass correction, not current full-suite/native proof.",
+    "Original239 protected V1/Tax producer+consumer/identity/schema/contracts/dependency/provider files, all resources/contracts, schema/selection/skip/workflow/dependency scopes remain byte-identical to actual PR123 base."
+  ],
+  "source_carry": {
+    "actual_current_inputs_equal_to_APP": 2423,
+    "actual_route_inputs": 17,
+    "current_and_recorded_loaders": 13,
+    "distinct_archive_source_blobs": 2383,
+    "final_doc_delta": [
+      "docs/ops/paid-tax-http-runtime.md",
+      "docs/verification/paid252-tax-http-20261015/README.md",
+      "docs/verification/paid252-tax-http-20261015/final-recorded-evidence-index.json",
+      "docs/verification/paid252-tax-http-20261015/final-recorded-evidence.tar.gz",
+      "docs/verification/paid252-tax-http-20261015/independent-source-DECISION.md",
+      "docs/verification/paid252-tax-http-20261015/independent-source-e3-DECISION.md",
+      "docs/verification/paid252-tax-http-20261015/independent-source-e3-report.json",
+      "docs/verification/paid252-tax-http-20261015/independent-source-report.json"
+    ],
+    "heads": [
+      "306b9fbb5918a58779194492a80f5141f191190f",
+      "760c9388b8f07f250fc67d5489f93feb85420051",
+      "a565e54a47fd46a3cf62eeab40826674f8c84988",
+      "ae1cfe040f2ccfc8969ce80b58693c93482b2f97",
+      "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+      "dfb45468dc2b4520436ede024b2626f58a6c260d",
+      "e3f06b084538dac11665ff9be77c74228bdab64d",
+      "e430832785ad8e3911240e350278f875e4aba82e"
+    ],
+    "inputs_each": 2423,
+    "inventories": 8,
+    "protected_actual_base_Git_and_current_bytes_equal": true,
+    "protected_original_files": 239,
+    "reachable_Git_objects_verified": 2383,
+    "total_path_bindings": 19384
+  },
+  "specification_verdict": "Pass for the focused default-off typed HTTP/root composition, original timing/response ownership/private errors/once-only producer intake and declared narrow evidence carries. Wider acceptance remains excluded.",
+  "verification_artifacts": {
+    "original_verifier": {
+      "path": "/workspace/runtime/paid252-tax-http-final-verifier-2a382a50-20261015.py",
+      "sha256": "0bb6949416b2e21491be446eecdbcb83c5251756c631a3dddd71c461224745e1"
+    },
+    "verifier_exit": 0,
+    "verifier_preparation_failures": [],
+    "working_report": {
+      "path": "/workspace/runtime/paid252-tax-http-final-working-report-2a382a50-20261015.json",
+      "sha256": "00f8bc994d9af1b30979647dabf64a2fe9363a858b6e015201a1912f131fc8a8"
+    }
+  },
+  "verification_method": "Independent read-only archive/index hashing, exact member set/safety, immutable Git cat-file bytes, current source/loaders/protected hashes, canonical8 manifests/runtime bundles, direct11 original command/JUnit/log/process/launch-bound OS receipts,10 original local check summaries, Pint arguments/output, original review imports and final docs/carry scope."
+}
