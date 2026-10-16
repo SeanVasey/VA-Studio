@@ -1,0 +1,35 @@
+{
+  "corrected_v2_requirements": {
+    "final_copy": "Satisfied: mtime_ns/link_count, copied length equals final size, and post-read descriptor metadata equality before saving.",
+    "surviving_group": "Post-leader group reconciliation now checks original parent birth/session/UID and captured child birth ticks, applies finite TERM/KILL polling, and reports no live writers.",
+    "terminal_receipt": "Still incomplete: two earlier leader-stop blocks retain unguarded os.killpg/proc.wait. A leader/group exit between poll and signal raises before result.json/process.exit are written."
+  },
+  "decision": "REVISE REMAINING TERMINAL-RECEIPT RACE BEFORE RETRY",
+  "immutable_sha256": {
+    "observer_v1_original": "7eb4a7017a7e60daeee24239861a5ba8f094202bcdd2f1b9407b476ef2874395",
+    "observer_v2": "afa5e90b5ec29cc8eda2a8de346dae3208217a33437cdfb8d916fd0bd9a80dc2",
+    "observer_v3": "0bdd86bf0013c81fe00175c8b7f6c9a02225653d5e02ce0f8830f25e4aac3044",
+    "runner_v1_original": "75878802ca6dd46e3fef2c364dd2df1cbbd3b28ee30793cad24e6d00cb90277c",
+    "runner_v2": "da4341cb2a88b472cda15e38aad097fad479cc9cbc379c752c102b899bfe3b14",
+    "runner_v3": "aa920ef87ce0e871cbca3e9b1b5a6801733b3b4c784b8d4002116b73c63f4104",
+    "v2_reconciliation": "df57d33cc6fb7ad138cf84f5930ab30fb7794e44c9e62f9793c2d7c8af64a6ef"
+  },
+  "limits": [
+    "This is the prior V2 terminal-receipt requirement, with no broadened application review.",
+    "Corrected capture remains ineligible for retry until the single remaining race is guarded; actual SQLite12 and native calibration1 remain unaccepted.",
+    "Parent source c96 unchanged; interrupted V1 -15/recorder1/NULL counts/zero groups remains unaccepted; original native4/E4 and old1/E1 remain failed/open.",
+    "No raw child exit/output or full F2/host/provider/activation/release acceptance."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "preservation": "V1 originals unchanged; reconstructed V2 bytes hash-exact to independent V2 review. Separate reconciliation honestly records reconstruction after repairs first touched working files; no V2 app execution asserted.",
+  "required_corrections": [
+    "Guard the existing except/finally leader-stop killpg/wait blocks against ProcessLookupError/cleanup exceptions and retain the real process result plus explicit cleanup errors; alternatively use one guarded cleanup helper for both leader and surviving group."
+  ],
+  "review_method": "Read-only source/hash comparison and Python AST parse only, no collector/app/test/DB/network/CI/shared edits or agents.",
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "baseline_sha": "8965587089f654d9da6e1cd5028ab382d70f8382",
+  "changed_files": [
+    "docs/verification/fixture-lifecycle-20261016/README.md",
+    "docs/verification/fixture-lifecycle-20261016/independent-budget-contract-review.md",
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+  ],
+  "decision": "REVISE PRIVATE CAPTURE BEFORE CALIBRATION; BOUNDED PARENT SOURCE ACCEPTED WITH EXECUTION CONDITIONS",
+  "immutable_sha256": {
+    "capture_contract": "ceff0b7dc2985d1c56ac5e94c70651e932f1fdda3277307748b918eb013ef621",
+    "observer_v1_original": "7eb4a7017a7e60daeee24239861a5ba8f094202bcdd2f1b9407b476ef2874395",
+    "runner_v1_original": "75878802ca6dd46e3fef2c364dd2df1cbbd3b28ee30793cad24e6d00cb90277c",
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "limits": [
+    "Read-only source/design review, no tests/application/database/network/CI/shared edits or agents.",
+    "V2 runtime capture is not approved by this v1 report; separate corrected review needed before acceptance.",
+    "Child exit remains derived from completed parent assertions, with no raw successful child stdout/stderr/independent wait-status capture.",
+    "Fixed300/90 requires completed bounded calibration and whole four native cases; prior native4/E4 and old1/E1 remain failed/open.",
+    "No full F2/native counterpart/concurrency/host/provider/activation/release claim."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "parent_source_assessment": "Only fixed mysql300/sqlite90 fixture timeout and real getenv string-or-false marker propagation change executable input. Four datasets/two child methods/writers/assertions/warnings/cleanup unchanged. Two documentation preparation files are additional delta; no application deadline change. Calibration/native acceptance pending.",
+  "preparation_note": "An initial scope assertion assumed only one changed path. Immutable diff also contains two preparation docs; corrected check isolates the one executable path and changes no original/app result.",
+  "required_corrections": [
+    "Pin/validate observer roots and baseline before launch; ensure every post-launch construction/poll/finish/copy failure terminates or waits the owned process group and preserves terminal receipts.",
+    "Guarantee finally-close of all partial/root/directory/file descriptors and preserve parent result plus explicit capture error even when final copying fails.",
+    "Enforce finite directory/FD/file-byte/total-byte/time bounds; record acquisition and final descriptor metadata/timestamps.",
+    "Validate copied XML/two receipts/unchanged warning criteria and unique dataset association; missing/replaced/partial/extra captures are evidence failures.",
+    "Strengthen descendant executable/phpunit/config/flags/cwd/PID-start correlation, recheck around acquisition and retain bounded skipped-child diagnostics/baseline without secret dumps."
+  ],
+  "retained_initial_calibration": {
+    "capture_errors": [],
+    "capture_groups": 0,
+    "parent_usable_counts": null,
+    "php_exit": -15,
+    "recorder_exit": 1,
+    "result_sha256": "7676a0dfcbce073d4792cf797b9348d8964c3720041ba13cd89d52ae7f9b9b55",
+    "seconds": 52.28310257100384,
+    "source": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+    "status": "Interrupted/unaccepted; no partial pass or inference of whether child creation/matching had begun.",
+    "xml_bytes": 0
+  },
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "v1_capture_findings": [
+    {
+      "id": "CAP1",
+      "issue": "Popen precedes observer construction outside protected cleanup; initialization failure can orphan owned native work and omit result.",
+      "scope": "Blocking private lifecycle/receipt flaw, no product P1 classification."
+    },
+    {
+      "id": "CAP2",
+      "issue": "Acquisition and finish lack guaranteed FD closure; copy error can omit terminal receipt, and bytearray/group/FD allocation is unbounded.",
+      "scope": "Blocking capture robustness gap."
+    },
+    {
+      "id": "CAP3",
+      "issue": "Capture success checks filenames/group count/removal, not copied child XML/receipts/warnings, dataset signature or final FD metadata.",
+      "scope": "Blocking evidence completeness gap."
+    },
+    {
+      "id": "CAP4",
+      "issue": "Fixture path anywhere in argv plus numeric descendant PID lacks executable/phpunit/config/flags/cwd/birth identity; no baseline/acquisition times.",
+      "scope": "Provenance correction, not an established cause of0groups."
+    }
+  ]
+}
