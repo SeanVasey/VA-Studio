@@ -8232,16 +8232,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-file",
-            "version": "3.9.4",
+            "version": "3.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-file.git",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e"
+                "reference": "4a4b8457ed3fe4a88e6cc85bc3f8a863ff8a667a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/02089faaaed42cb5137d23ba2236e6809124999e",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/4a4b8457ed3fe4a88e6cc85bc3f8a863ff8a667a",
+                "reference": "4a4b8457ed3fe4a88e6cc85bc3f8a863ff8a667a",
                 "shasum": ""
             },
             "require": {
@@ -8250,7 +8250,7 @@
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.55.0",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8296,7 +8296,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:57:54+00:00"
+            "time": "2026-10-10T08:22:31+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf",
@@ -8385,16 +8385,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-encrypt",
-            "version": "2.11.4",
+            "version": "2.11.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-encrypt.git",
-                "reference": "c9e6ee4456d4701b20897a12e35eb2820c723abd"
+                "reference": "d0874aa17e819477c575ce309b56160ba0491124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-encrypt/zipball/c9e6ee4456d4701b20897a12e35eb2820c723abd",
-                "reference": "c9e6ee4456d4701b20897a12e35eb2820c723abd",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-encrypt/zipball/d0874aa17e819477c575ce309b56160ba0491124",
+                "reference": "d0874aa17e819477c575ce309b56160ba0491124",
                 "shasum": ""
             },
             "require": {
@@ -8405,7 +8405,7 @@
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.55.0",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8446,7 +8446,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:58:11+00:00"
+            "time": "2026-10-10T08:26:41+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-filter",
@@ -8516,16 +8516,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-font",
-            "version": "4.4.1",
+            "version": "4.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-font.git",
-                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b"
+                "reference": "4cfad0e6cb126cd629104e5196723d6e12bee692"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
-                "reference": "a78b8e0ac9284d1594b6ba68488cf65c3e958f7b",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/4cfad0e6cb126cd629104e5196723d6e12bee692",
+                "reference": "4cfad0e6cb126cd629104e5196723d6e12bee692",
                 "shasum": ""
             },
             "require": {
@@ -8536,10 +8536,10 @@
                 "php": "^8.2",
                 "tecnickcom/tc-lib-file": "^3.9",
                 "tecnickcom/tc-lib-pdf-encrypt": "^2.11",
-                "tecnickcom/tc-lib-unicode-data": "^3.0"
+                "tecnickcom/tc-lib-unicode-data": "^3.1"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.55.0",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -8585,7 +8585,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T11:04:30+00:00"
+            "time": "2026-10-10T08:57:43+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-graph",
@@ -8972,23 +8972,23 @@
         },
         {
             "name": "tecnickcom/tc-lib-unicode-data",
-            "version": "3.0.9",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-unicode-data.git",
-                "reference": "24e5cec5ee4ce607fab77aceb1a67a3eaf817528"
+                "reference": "2c169c70961f61d012ed1a72ac2dcb2710aecccc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-unicode-data/zipball/24e5cec5ee4ce607fab77aceb1a67a3eaf817528",
-                "reference": "24e5cec5ee4ce607fab77aceb1a67a3eaf817528",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-unicode-data/zipball/2c169c70961f61d012ed1a72ac2dcb2710aecccc",
+                "reference": "2c169c70961f61d012ed1a72ac2dcb2710aecccc",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
+                "carthage-software/mago": "1.55.0",
                 "pdepend/pdepend": "^2.16",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
             },
@@ -9028,7 +9028,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:59:03+00:00"
+            "time": "2026-10-10T08:31:57+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -11627,5 +11627,5 @@
     "platform-overrides": {
         "php": "8.4.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
