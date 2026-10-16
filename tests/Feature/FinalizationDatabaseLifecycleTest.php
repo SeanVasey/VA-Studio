@@ -32,6 +32,9 @@ class FinalizationDatabaseLifecycleTest extends TestCase
         $filesystem = new Filesystem;
         $filesystem->makeDirectory($directory, 0700, true);
         $database = DB::connection()->getConfig();
+        // The admitted driver supervises two full schema/cleanup cycles in one child.
+        // This fixed fixture allowance does not change any application deadline.
+        $fixtureProcessTimeout = $database['driver'] === 'mysql' ? 420 : 90;
         $process = new Process([PHP_BINARY, base_path('vendor/bin/phpunit'), '--configuration', base_path('phpunit.xml'),
             '--log-junit', $directory.'/junit.xml', '--log-events-text', $directory.'/events.log', '--fail-on-phpunit-warning',
             base_path('tests/Support/FinalizationLifecycleFixture.php')], base_path(), [
@@ -40,10 +43,12 @@ class FinalizationDatabaseLifecycleTest extends TestCase
                 'DB_HOST' => (string) ($database['host'] ?? ''), 'DB_PORT' => (string) ($database['port'] ?? ''),
                 'DB_DATABASE' => (string) $database['database'], 'DB_USERNAME' => (string) ($database['username'] ?? ''),
                 'DB_PASSWORD' => (string) ($database['password'] ?? ''), 'DB_SOCKET' => (string) ($database['unix_socket'] ?? ''),
+                'VA_LOCAL_DISPOSABLE_MYSQL' => getenv('VA_LOCAL_DISPOSABLE_MYSQL'),
+                'VA_CI_DISPOSABLE_MYSQL' => getenv('VA_CI_DISPOSABLE_MYSQL'), 'CI' => getenv('CI'),
                 'VASEY_LIFECYCLE_RECEIPT' => $directory.'/receipt.jsonl',
                 'VASEY_LIFECYCLE_THROW' => $throws ? '1' : '0', 'VASEY_LIFECYCLE_ALIAS' => $alias ? '1' : '0',
                 'VASEY_LIFECYCLE_DROP_VIEWS' => $dropViews ? '1' : '0',
-            ], null, 90);
+            ], null, $fixtureProcessTimeout);
         try {
             $process->run();
             $output = $process->getOutput().$process->getErrorOutput();

@@ -1,0 +1,164 @@
+{
+  "archive": {
+    "bundles": 5,
+    "byte_original_runtime_members": 131,
+    "bytes": 798115,
+    "complete_child_sets_verified": 9,
+    "frozen_paths": 56,
+    "index_sha256": "7d37f6811dc850b2826ecf1df0a99a3f31c13491cbd99c262c6c4b3cb3cf9194",
+    "inputs_per_vector": 2467,
+    "loader_bindings": 65,
+    "manifest_git_bindings": 12335,
+    "members": 139,
+    "original_invocations": 6,
+    "physical_loaders": 13,
+    "prior_pr131_seals_unchanged": 5,
+    "private_failed_outputs": 9,
+    "review_byte_imports": 16,
+    "sha256": "19d25ee33151ae67bd7a9b9a471372931fe65fef7a4fef0600df69adcc4dff60",
+    "source_bindings": 8,
+    "unique_git_blobs": 2413
+  },
+  "decision": "APPROVE BOUNDED FINAL SOURCE/SEALED EVIDENCE FOR DEVELOPMENT",
+  "executed_sqlite_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "limits": [
+    "Bounded whole original native lifecycle4/70 and separate calibration1/17 execute572; SQLite12/181 executesc96 with literal-only mechanical carry. No repeated totals or child acceptance-case summation.",
+    "Child exits derive completed parent assertions; no raw child stdout/stderr or independent OS wait-status claim.",
+    "Read-only Git/artifact/JUnit/hash reconciliation; no duplicate app/tests/DB/network/CI/shared edits or agents.",
+    "Full F2/25 counterpart/raw-worker/later-hook/global/browser/concurrency/performance/host/provider/activation/release acceptance remains open; no Foundation/GitLab/live activity."
+  ],
+  "mechanical_verification": "All139 member hashes,131 runtime originals, nine private originals, five canonical bundles,12335 Git manifest bindings, eight source bindings, current2467 inputs,65 physical loader bindings,16 review imports,frozen56 and prior five seals reconciled. Nine completed child sets preserve ordered methods/receipts/error/view/alias/warning/inode/removal checks; partial300 child remains NULL, not acceptance.",
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_outcomes": [
+    {
+      "captured_groups": 0,
+      "command_sha256": "62e70009764757b26d93d9f3b6367601cc9960ac56073568f48be51360bb0441",
+      "counts": null,
+      "name": "native-default-calibration-original",
+      "php_exit": -15,
+      "recorder_exit": 1,
+      "result_sha256": "7676a0dfcbce073d4792cf797b9348d8964c3720041ba13cd89d52ae7f9b9b55",
+      "tested_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+      "wall_seconds": 52.28310257100384
+    },
+    {
+      "captured_groups": 0,
+      "command_sha256": "4b5a4ea33ff94fd521e6e6c73f7287c9cadce44ff79da83a0a5b0d243eeb86a2",
+      "counts": {
+        "assertions": 181,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "name": "sqlite-whole-compatibility-capture-original",
+      "php_exit": 0,
+      "recorder_exit": 1,
+      "result_sha256": "d817b3050dd837d8ce52ec9d2de65027df0cbe50608206eb4fa7bfe8a7c103b9",
+      "tested_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+      "wall_seconds": 30.870515123999212
+    },
+    {
+      "captured_groups": 4,
+      "command_sha256": "465ead4e5759c4c8829bf35971d220ae5e10c254a1501c96fb4ce17c6ef41736",
+      "counts": {
+        "assertions": 181,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "name": "sqlite-whole-compatibility-proc-stat-corrected-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "f3e6730082ff150c72b44633558e4d890930eda0ba4628abc2d3315778e5e6c5",
+      "tested_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+      "wall_seconds": 31.220001531008165
+    },
+    {
+      "captured_groups": 1,
+      "command_sha256": "48b0ef0fe67a9dd21b3d3e8ef3a7fc87b93a6b855020a490e382431699e1b1f0",
+      "counts": {
+        "assertions": 2,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "native-default-calibration-proc-stat-corrected-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "b89aa6c7048842ca27d6f1d10608b1954a6c38b026e66c0a981d9c061ab90365",
+      "tested_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+      "wall_seconds": 300.3667853230145
+    },
+    {
+      "captured_groups": 1,
+      "command_sha256": "63c05a1c04ba5931d184f431826c545f235936b2c72f68f0d05ecab2ce65639f",
+      "counts": {
+        "assertions": 17,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "native-default-fixed420-calibration-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "e70557adb1d40e9b22474066a685d79d60dd3e5e5fa04fc6469a75d3a4ca3f7d",
+      "tested_sha": "572f078afe5ec7815e80fe052f3dd0b1975d9776",
+      "wall_seconds": 273.5381937609927
+    },
+    {
+      "captured_groups": 4,
+      "command_sha256": "b122dd4de7e79260eb9b6bb61dd4f00e85aa0a9d4612c5a934236346041512f6",
+      "counts": {
+        "assertions": 70,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "name": "native-whole-fixed420-lifecycle-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "5f8cbd2247e53b42e38db2258bcd3f7456d074b0465a381d9abafb1df938d109",
+      "tested_sha": "572f078afe5ec7815e80fe052f3dd0b1975d9776",
+      "wall_seconds": 1195.164592496003
+    }
+  ],
+  "publication_conditions": [
+    "Import byte-original final decision and update final-review status; exact publication-head documentation carry, cheap preflight/current inventory/protections/expected-SHA merge remain required.",
+    "Retain all earlier failures/capture revisions and shutdown nonzero/zombie/FD limits; observed durations do not replace historical failures or prove throughput."
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "a21658ad2d179eec0605c006b7fe479af0190c85",
+  "shutdown": {
+    "bounded_checker_exit": 1,
+    "database": "vaseyaudio_fixture_lifecycle",
+    "datadir_retained": "/tmp/va-studio-fixture-lifecycle-mysql-data-20261016",
+    "engine_inactive": true,
+    "fd_count": null,
+    "fd_inspection": "PermissionError retained; no FD-count claim.",
+    "mysql_version": "8.4.11",
+    "no_repeat_shutdown_or_init_signal_claim": true,
+    "parent_pid": 1,
+    "pid_gone": false,
+    "private_port": 33525,
+    "socket_gone": true,
+    "sql_shutdown_exit": 0,
+    "state": "Z"
+  },
+  "source_carry": {
+    "572_to_final": "Docs/evidence only; all2467 captured executable inputs equal tested572.",
+    "c96_to572": "Only admitted-MySQL300\u2192420 literal; SQLite90 and all other input hashes unchanged.",
+    "child_sha256": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6",
+    "parent_sha256": "c06cabe288752a474f0c0084dbc673fd79154a99f67fd20cdf943784bbbe5dd5",
+    "pr131_merge": "Actual3b90 merge tree equals approvedc4a; post-merge receipt896 preserved.",
+    "pr131_to_final_non_doc_delta": [
+      "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+    ]
+  },
+  "tested_native_sha": "572f078afe5ec7815e80fe052f3dd0b1975d9776"
+}

@@ -1,0 +1,87 @@
+{
+  "baseline_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "changed_paths": [
+    "docs/verification/fixture-lifecycle-20261016/README.md",
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+  ],
+  "completed_native_calibration": {
+    "child_artifact_sets": 1,
+    "child_exit": "Derived from completed parent assertions, no raw child output or independent wait status.",
+    "directory_removed": true,
+    "mysql_version": "8.4.11",
+    "no_live_writers": true,
+    "ordered_child_methods": 2,
+    "outer_timeout_seconds": 480,
+    "parent_counts": {
+      "assertions": 17,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1
+    },
+    "php_exit": 0,
+    "private_port": 33525,
+    "recorder_exit": 0,
+    "reset_receipts": 2,
+    "tested_sha": "572f078afe5ec7815e80fe052f3dd0b1975d9776",
+    "wall_seconds": 273.5381937609927,
+    "warning_policy": "Unchanged; no prohibited warning."
+  },
+  "decision": "APPROVE BOUNDED LITERAL SOURCE/SQLITE CARRY AND COMPLETED SINGLE-DATASET CALIBRATION",
+  "immutable_sha256": {
+    "literal_carry_proof": "fc6ecd95059441cf19e2aa911dba6d28c32903fc4c5abc6db5fc57ad8acf83d4",
+    "native_capture": "47762cabad34f2032a2eeb8b4fef4ca07cc7237876adadf749f20f38c7ef8fb2",
+    "native_child_events.log": "01796eaece6594f27e70858f821b113001420abcd767c0d4265cce42b04c0b83",
+    "native_child_junit.xml": "3076387b0793582e7e3722a56efe2237000540a8db31d5d2d6e66147d949abba",
+    "native_child_receipt.jsonl": "0a5b7f095b681fddcf21997160b33260e5dbeffab5554e0b118c0ecf5f61966a",
+    "native_command": "63c05a1c04ba5931d184f431826c545f235936b2c72f68f0d05ecab2ce65639f",
+    "native_group_reconciliation": "307c6c1bcd24ffba38fad44e3b873c5ce2dc7b1d36893a89ccdd4af4463d20d7",
+    "native_parent_junit": "6ee0dd4c2c7d2e1a1d7dfd481a751dcc7212adb1b88b2adaa5f43b24d9048939",
+    "native_result": "e70557adb1d40e9b22474066a685d79d60dd3e5e5fa04fc6469a75d3a4ca3f7d",
+    "revised_contract": "0be6b0de11b96eb79d3b9f1c8c7b075f7e8e383e84c1438660f1ab56c44392cd",
+    "sqlite_capture": "84abbf5629d7e87126527d24321cab3aa5337fd3283b628bffc7e023ea648cb3",
+    "sqlite_command": "465ead4e5759c4c8829bf35971d220ae5e10c254a1501c96fb4ce17c6ef41736",
+    "sqlite_result": "f3e6730082ff150c72b44633558e4d890930eda0ba4628abc2d3315778e5e6c5"
+  },
+  "limits": [
+    "Read-only Git/artifact/hash/JUnit reconciliation, no app/tests/DB/network/CI/shared edits or agents.",
+    "Bounded one-dataset calibration and SQLite source carry only; no whole-native/fullF2/counterpart/host/provider/activation/release acceptance."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "pending_conditions": [
+    "Whole unchanged native four-case file remains in progress/unaccepted; no partial result inferred.",
+    "Update final packet/status after actual outcomes, preserve old3001/2/E1, interrupted-15/NULL, V4 recorder failure and old90-second failures as originals. Observed273.538s current duration does not invalidate previous300 failure or establish throughput.",
+    "Normal owned server shutdown, sealed final source/evidence review, exact publication-head carry, cheap preflight/current inventory/protections/expected-SHA merge remain pending."
+  ],
+  "required_corrections": [],
+  "reviewed_sha": "572f078afe5ec7815e80fe052f3dd0b1975d9776",
+  "source_sha256": {
+    "child_sha256": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6",
+    "current_parent_sha256": "c06cabe288752a474f0c0084dbc673fd79154a99f67fd20cdf943784bbbe5dd5",
+    "previous_parent_sha256": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7"
+  },
+  "sqlite_carry": {
+    "counts": {
+      "assertions": 181,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 12
+    },
+    "executed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+    "php_exit": 0,
+    "recorder_exit": 0,
+    "status": "Mechanically carried through sole MySQL literal change; not executed again at572."
+  },
+  "verified_source_carry": {
+    "loaders_equal_across_native_and_sqlite_bundles": true,
+    "manifest_delta": [
+      "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+    ],
+    "manifest_inputs": 2467,
+    "only_executable_change": "Admitted MySQL literal300\u2192420; SQLite90 and all remaining parent bytes identical. Entire Git diff otherwise only README.",
+    "physical_loaders": 13,
+    "runner": "Previously approved V5, hash-bound unchanged. No full-manifest equality claimed across the one changed executable input."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "decision": "APPROVE BOUNDED V4 COLLECTOR CARRY FOR ACTUAL CHECKS",
+  "execution_eligibility": [
+    "Eligible to evaluate actual existing SQLite compatibility12 and bounded native default calibration1. This approval records code/design readiness only.",
+    "Whole four native lifecycle datasets and final sealed source/evidence review remain required for later bounded acceptance."
+  ],
+  "immutable_sha256": {
+    "observer_v1_original": "7eb4a7017a7e60daeee24239861a5ba8f094202bcdd2f1b9407b476ef2874395",
+    "observer_v2": "afa5e90b5ec29cc8eda2a8de346dae3208217a33437cdfb8d916fd0bd9a80dc2",
+    "observer_v3": "0bdd86bf0013c81fe00175c8b7f6c9a02225653d5e02ce0f8830f25e4aac3044",
+    "observer_v4": "0bdd86bf0013c81fe00175c8b7f6c9a02225653d5e02ce0f8830f25e4aac3044",
+    "runner_v1_original": "75878802ca6dd46e3fef2c364dd2df1cbbd3b28ee30793cad24e6d00cb90277c",
+    "runner_v2": "da4341cb2a88b472cda15e38aad097fad479cc9cbc379c752c102b899bfe3b14",
+    "runner_v3": "aa920ef87ce0e871cbca3e9b1b5a6801733b3b4c784b8d4002116b73c63f4104",
+    "runner_v4": "dde5280069f6c82ca2dcba770ae4d2f76c445edb92c815321fadca077e43e966"
+  },
+  "limits": [
+    "No collector/app/tests/DB/network/CI execution/shared edits or agents performed; syntax checked only by AST parse.",
+    "No passing result inferred. Interrupted V1 -15/recorder1/NULL counts/zero observed groups is retained as unaccepted.",
+    "Prior native whole4/8/E4 and old matching1/2/E1 remain failed/open until separately assessed completed new evidence.",
+    "No raw child output/OS exit capture, full F2/native counterpart/throughput/host/provider/activation/release claim."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "required_corrections": [],
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "verified_carry": [
+    "V3 original bytes remain hash-exact; V1 originals and reconstructed reviewed V2 bytes still match previous independent bindings.",
+    "V4 observer is byte-identical to V3. Runner delta adds ProcessLookupError-safe signalling and routes all six TERM/KILL sites through it; other changes only identify the V4 module/hash/fresh storage path.",
+    "All os.killpg calls reside in the guarded helper. Vanished-group signalling no longer propagates from the existing leader-stop blocks; proc.wait return remains the actual PHP leader result.",
+    "Previously reviewed post-leader group reconciliation, bounded captures, FD closure, exact provenance, final byte checks and copied artifact/dataset validation carry unchanged.",
+    "Captured parent/child source bytes equal immutable c96 and earlier reviewed hashes."
+  ]
+}
