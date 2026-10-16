@@ -275,6 +275,7 @@
     "tests/Support/track-publication-manifest-race-worker.php",
     "tests/Support/transactional-notification-worker.php",
     "tests/Support/unpaid-release-worker.php",
+    "tests/TestCase.php",
     "tests/browser/bootstrap.php",
     "tests/browser/prepare-contact-inquiry.php",
     "tests/browser/prepare-customer-history.php",
