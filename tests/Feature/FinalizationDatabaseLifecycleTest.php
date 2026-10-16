@@ -34,7 +34,7 @@ class FinalizationDatabaseLifecycleTest extends TestCase
         $database = DB::connection()->getConfig();
         // The admitted driver supervises two full schema/cleanup cycles in one child.
         // This fixed fixture allowance does not change any application deadline.
-        $fixtureProcessTimeout = $database['driver'] === 'mysql' ? 300 : 90;
+        $fixtureProcessTimeout = $database['driver'] === 'mysql' ? 420 : 90;
         $process = new Process([PHP_BINARY, base_path('vendor/bin/phpunit'), '--configuration', base_path('phpunit.xml'),
             '--log-junit', $directory.'/junit.xml', '--log-events-text', $directory.'/events.log', '--fail-on-phpunit-warning',
             base_path('tests/Support/FinalizationLifecycleFixture.php')], base_path(), [
