@@ -1,0 +1,7 @@
+# Owned-fixture/local-runner exact publication carry
+
+Reviewed `c4a0bbe33ec815e4e90d4d6251b2fdff9e33f787` against approved `4de9e2b921dee71342179dd63d2d94844b1ecb64`. **DECISION: APPROVE EXACT DOCUMENTATION-ONLY PUBLICATION CARRY.** Open source P0/P1: 0; required corrections: none. The sole final-review documentation condition is satisfied.
+
+The exact five-file delta imports the final MD/JSON byte-originals and updates README/two ledgers. Original hashes match. README correctly identifies the focused-runner safeguard and distinguishes completed final approval/closure eligibility from pending remote replies/resolution/preflight/merge. All application/test/script/config/route/workflow/policy/frozen inputs, four evidence archives/three indexes and the agenda are unchanged from approved head. Input equality applies to this exact carry; the earlier one-policy-input difference between tested heads remains explicitly recorded.
+
+Current P1 `r4289377653` and P2 `r4289377661` remain eligible for evidence-backed closure; no remote closure is claimed. Fresh exact-head cheap preflight/current complete inventory/protections and expected-SHA merge remain required. Native lifecycle4/8/E4 and olddefault1/2/E1 remain failed/open. Partial Guards/native-outer SQLite classifications and all fullF2/worker/counterpart/native-concurrency/host/provider/activation/release limits remain unchanged. No executable rerun or duplicate packet check was necessary or performed; no shared edits. Companion JSON records exact imports and carry scope.
