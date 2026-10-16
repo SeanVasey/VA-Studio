@@ -1,0 +1,1194 @@
+{
+  "archive_bytes": 2573499,
+  "archive_member_count": 271,
+  "archive_sha256": "7976add384769b1e6b5c8c701ffce9158e7928cc6a68790b59568283964293f6",
+  "bundles": [
+    "bundle-0d307a57484c-33ac8bf04954d6b1",
+    "bundle-3810fd904b3a-305cb6299b890c69",
+    "bundle-4aa1a434102b-b29f25db2e7d3557",
+    "bundle-4dd6bc195477-727ab73f71f5c6da",
+    "bundle-4ff10a054980-49b980e91b55a3d6",
+    "bundle-4ff10a054980-51a884fca6f3f94d",
+    "bundle-5b35b78700ea-84439e1134953127",
+    "bundle-6098bdc2fc38-4f02a1f917528b60",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93",
+    "bundle-b502df69dfe0-ac1befb35099df79"
+  ],
+  "candidate_head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+  "current_input_count": 2467,
+  "git_bindings": [
+    {
+      "blob": "3fa7c62378ce85ba9aca2f1d7f41927442c1f9aa",
+      "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+      "member": "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183"
+    },
+    {
+      "blob": "f28cc8809a40089bdbbf7f07473fade7516774a1",
+      "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+      "member": "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+      "member": "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "21a1a0a93b6881485dc5cd414c02fe97b56db55a",
+      "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+      "member": "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "bcb80414efc9c9e86f1d635a0725b478243149e8",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "f2f7c7da94af41ceecd7145d26bd0092aba114dc",
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "member": "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "8e0353c5911c1e63b9f95a08737dea0019d5a686c6ba501d969e6be6cfc6e129"
+    },
+    {
+      "blob": "a6ef1f10ef168921c7d449384909cac30f174b1c",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "cea78999ecb14c8580952d9367d0d193bcc5d21f",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad"
+    },
+    {
+      "blob": "f28cc8809a40089bdbbf7f07473fade7516774a1",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "21a1a0a93b6881485dc5cd414c02fe97b56db55a",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "member": "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "bcb80414efc9c9e86f1d635a0725b478243149e8",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "3e4560660da1ca83bcb757a670fbf0d68945c86b",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "member": "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "a6ef1f10ef168921c7d449384909cac30f174b1c",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "bcb80414efc9c9e86f1d635a0725b478243149e8",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "3e4560660da1ca83bcb757a670fbf0d68945c86b",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "member": "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "a6ef1f10ef168921c7d449384909cac30f174b1c",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "cea78999ecb14c8580952d9367d0d193bcc5d21f",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad"
+    },
+    {
+      "blob": "f28cc8809a40089bdbbf7f07473fade7516774a1",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "21a1a0a93b6881485dc5cd414c02fe97b56db55a",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "member": "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "a6ef1f10ef168921c7d449384909cac30f174b1c",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "cea78999ecb14c8580952d9367d0d193bcc5d21f",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "3e4560660da1ca83bcb757a670fbf0d68945c86b",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "member": "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "a6ef1f10ef168921c7d449384909cac30f174b1c",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "cea78999ecb14c8580952d9367d0d193bcc5d21f",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "3e4560660da1ca83bcb757a670fbf0d68945c86b",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "blob": "4c2d3a8d94204282a744b17698f952d61f824283",
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "member": "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Unit/DisposableTestDatabaseTest.php",
+      "path": "tests/Unit/DisposableTestDatabaseTest.php",
+      "sha256": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "bcb80414efc9c9e86f1d635a0725b478243149e8",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "ed38f81d43caf049a7129973418bfd3df3376c95",
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "member": "source/892144b3b19f29835fc35d71cd393796def0e634/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "ccc7f063933d4a7020d073ce32261b884b04c890d2a55ab2ea67c86d96b114f7"
+    },
+    {
+      "blob": "3fa7c62378ce85ba9aca2f1d7f41927442c1f9aa",
+      "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "member": "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183"
+    },
+    {
+      "blob": "f28cc8809a40089bdbbf7f07473fade7516774a1",
+      "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "member": "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff"
+    },
+    {
+      "blob": "5e4af7edc9ec4c89b91700355d2aa26bd07a2e56",
+      "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "member": "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "9aec288154beb2560f4a4df8b9404a50c697c2b89a4bf733564c9d7f59083f20"
+    },
+    {
+      "blob": "21a1a0a93b6881485dc5cd414c02fe97b56db55a",
+      "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "member": "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93"
+    },
+    {
+      "blob": "6528c8081b25daae4e0e4ef0345f34dc9d201193",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "bcb80414efc9c9e86f1d635a0725b478243149e8",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+      "sha256": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "3e4560660da1ca83bcb757a670fbf0d68945c86b",
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "member": "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "blob": "3fa7c62378ce85ba9aca2f1d7f41927442c1f9aa",
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "member": "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183"
+    },
+    {
+      "blob": "0c9caf69c4e492bfc9731b69d1a6171527004c8c",
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "member": "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/DisposableTestDatabase.php",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "blob": "37c50145fee85655910a09fcc9470c61facd0934",
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "member": "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/FinalizationDatabaseMigrations.php",
+      "path": "tests/Support/FinalizationDatabaseMigrations.php",
+      "sha256": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597"
+    },
+    {
+      "blob": "4f1e55183e11c8b53a6ff9a5224492428f0239fa",
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "member": "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "path": "tests/Support/FixtureDatabaseAdmissionProbe.php",
+      "sha256": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c"
+    },
+    {
+      "blob": "ed38f81d43caf049a7129973418bfd3df3376c95",
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "member": "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/TestCase.php",
+      "path": "tests/TestCase.php",
+      "sha256": "ccc7f063933d4a7020d073ce32261b884b04c890d2a55ab2ea67c86d96b114f7"
+    }
+  ],
+  "invocations": [
+    {
+      "bundle": "bundle-8b435917b7fc-fa7f4e988edf2adf",
+      "command": "invalid-selection-old-original/command.json",
+      "counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 8,
+        "skipped": 0,
+        "tests": 8
+      },
+      "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "name": "invalid-selection-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-0d307a57484c-33ac8bf04954d6b1",
+      "command": "invalid-selection-old-corrected-fixture-original/command.json",
+      "counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 8,
+        "skipped": 0,
+        "tests": 8
+      },
+      "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+      "name": "invalid-selection-old-corrected-fixture-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-b502df69dfe0-ac1befb35099df79",
+      "command": "invalid-selection-fixed-original/command.json",
+      "counts": {
+        "assertions": 72,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+      "name": "invalid-selection-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-892144b3b19f-e3da4bc3b7a2c46b",
+      "command": "finalization-admission-current-original/command.json",
+      "counts": {
+        "assertions": 132,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 14
+      },
+      "head": "892144b3b19f29835fc35d71cd393796def0e634",
+      "name": "finalization-admission-current-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-3810fd904b3a-305cb6299b890c69",
+      "command": "finalization-admission-config-fixed-original/command.json",
+      "counts": {
+        "assertions": 0,
+        "errors": 14,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+      "name": "finalization-admission-config-fixed-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-aeee2f4d5867-8dc2b499c5fa5f93",
+      "command": "finalization-admission-identity-fixed-original/command.json",
+      "counts": {
+        "assertions": 135,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+      "name": "finalization-admission-identity-fixed-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-4dd6bc195477-727ab73f71f5c6da",
+      "command": "selection-unit-original/command.json",
+      "counts": {
+        "assertions": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 26
+      },
+      "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+      "name": "selection-unit-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-4ff10a054980-49b980e91b55a3d6",
+      "command": "native-admission-original/command.json",
+      "counts": {
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "name": "native-admission-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-4ff10a054980-51a884fca6f3f94d",
+      "command": "existing-mfa-lifecycle-sqlite-original/command.json",
+      "counts": {
+        "assertions": 181,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+      "name": "existing-mfa-lifecycle-sqlite-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-5b35b78700ea-84439e1134953127",
+      "command": "finalization-captured-recipe-old-original/command.json",
+      "counts": {
+        "assertions": 34,
+        "errors": 0,
+        "failures": 4,
+        "skipped": 0,
+        "tests": 6
+      },
+      "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+      "name": "finalization-captured-recipe-old-original",
+      "process_exit": 1,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-6098bdc2fc38-82a705044bfcfcf1",
+      "command": "current-boundary-selection-whole-original/command.json",
+      "counts": {
+        "assertions": 184,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 40
+      },
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "name": "current-boundary-selection-whole-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    },
+    {
+      "bundle": "bundle-6098bdc2fc38-4f02a1f917528b60",
+      "command": "native-existing-lifecycle-whole-original/command.json",
+      "counts": {
+        "assertions": 8,
+        "errors": 4,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+      "name": "native-existing-lifecycle-whole-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-4aa1a434102b-b29f25db2e7d3557",
+      "command": "native-existing-lifecycle-prior-source-control-original/command.json",
+      "counts": {
+        "assertions": 2,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+      "name": "native-existing-lifecycle-prior-source-control-original",
+      "process_exit": 2,
+      "recorder_exit": 1
+    },
+    {
+      "bundle": "bundle-733c2c9f1eed-d0e6c2b2f2c47e64",
+      "command": "native-admission-complete-runtime-original/command.json",
+      "counts": {
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+      "name": "native-admission-complete-runtime-original",
+      "process_exit": 0,
+      "recorder_exit": 0
+    }
+  ],
+  "limits": "Bounded F2a shared pre-trait admission and captured finalization recipe, not an SQL sandbox or complete F2/counterpart census. Each focused scope retains its actual source and exits, without sums. First malformed fixture and premature preparation-repeat0 statement are explicitly corrected by actual255 originals; genuine prior-source8 failures and cleanup4 failures are separate. Failed raw output retained privately by hash; derived outcomes labeled. Original server/storage/CLI preparation failures and warnings retained. No Foundation/GitLab/live/provider/host/frozen/activation/full-release claim.",
+  "loader_hash_count": 13,
+  "members": {
+    "bundle-0d307a57484c-33ac8bf04954d6b1/identity.json": "3bd771273108d793c6a90e81b35f027259f31418b9d7d85c065ab154e79a0c35",
+    "bundle-0d307a57484c-33ac8bf04954d6b1/manifest.json": "6e3a075a78683075376fe37d64e8ef4304192330162d2f3f24f4476293811546",
+    "bundle-0d307a57484c-33ac8bf04954d6b1/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-0d307a57484c-33ac8bf04954d6b1/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-0d307a57484c-33ac8bf04954d6b1/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-3810fd904b3a-305cb6299b890c69/identity.json": "e792a89142b86c27e247fbb28ae6cccd34d71c8671360c98e74ec99ded2ab20c",
+    "bundle-3810fd904b3a-305cb6299b890c69/manifest.json": "2e5d2b228b2beb9832248d8979a7bb0a190a27e0cbee1b970031761ac091455b",
+    "bundle-3810fd904b3a-305cb6299b890c69/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-3810fd904b3a-305cb6299b890c69/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-3810fd904b3a-305cb6299b890c69/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-4aa1a434102b-b29f25db2e7d3557/identity.json": "ee9d61382816b06ddc8afaadd7a456f34ccf82b097ac820ca9c03ef8d95d8517",
+    "bundle-4aa1a434102b-b29f25db2e7d3557/manifest.json": "beb0730bc60f09b9237146aee8ee192c23ede7cb5906123905528a07342de199",
+    "bundle-4aa1a434102b-b29f25db2e7d3557/public-environment.json": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe",
+    "bundle-4aa1a434102b-b29f25db2e7d3557/runner.py": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+    "bundle-4aa1a434102b-b29f25db2e7d3557/runtime.json": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309",
+    "bundle-4dd6bc195477-727ab73f71f5c6da/identity.json": "44d27f3b1f12e578ffb64bda401f63936eb479a2ee514dc98a13c7fbab0c250e",
+    "bundle-4dd6bc195477-727ab73f71f5c6da/manifest.json": "2a13a097a3f587c6dafad711033023129a615cf652008024724ba345276c1207",
+    "bundle-4dd6bc195477-727ab73f71f5c6da/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-4dd6bc195477-727ab73f71f5c6da/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-4dd6bc195477-727ab73f71f5c6da/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-4ff10a054980-49b980e91b55a3d6/identity.json": "01ca0d41d3e0e5cc410e8ee7026a57cc4c85e6a9d483c30356bee969bc41235e",
+    "bundle-4ff10a054980-49b980e91b55a3d6/manifest.json": "9adc1da6b59841161b167cb0a6f137b0fe8d98ee4872093acaff688229db4ce1",
+    "bundle-4ff10a054980-49b980e91b55a3d6/public-environment.json": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe",
+    "bundle-4ff10a054980-49b980e91b55a3d6/runner.py": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+    "bundle-4ff10a054980-49b980e91b55a3d6/runtime.json": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309",
+    "bundle-4ff10a054980-51a884fca6f3f94d/identity.json": "acdd565ce668201d837d8229fcb64d52e50277bfb1338af5081e887f6d03dd17",
+    "bundle-4ff10a054980-51a884fca6f3f94d/manifest.json": "9adc1da6b59841161b167cb0a6f137b0fe8d98ee4872093acaff688229db4ce1",
+    "bundle-4ff10a054980-51a884fca6f3f94d/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-4ff10a054980-51a884fca6f3f94d/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-4ff10a054980-51a884fca6f3f94d/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-5b35b78700ea-84439e1134953127/identity.json": "111432cff1072cf67301ea332b07abea9cd477407a599938c78134bb1d2f0add",
+    "bundle-5b35b78700ea-84439e1134953127/manifest.json": "beb0730bc60f09b9237146aee8ee192c23ede7cb5906123905528a07342de199",
+    "bundle-5b35b78700ea-84439e1134953127/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-5b35b78700ea-84439e1134953127/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-5b35b78700ea-84439e1134953127/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-6098bdc2fc38-4f02a1f917528b60/identity.json": "946304e302998fb2fa48b55d72c7345af30679f44ef638ec9383d53e1cf24f1d",
+    "bundle-6098bdc2fc38-4f02a1f917528b60/manifest.json": "91a5533045cc4648dcd9b7f6f1cdef8c504113f6ac52ca88704a5121180a48ac",
+    "bundle-6098bdc2fc38-4f02a1f917528b60/public-environment.json": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe",
+    "bundle-6098bdc2fc38-4f02a1f917528b60/runner.py": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+    "bundle-6098bdc2fc38-4f02a1f917528b60/runtime.json": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1/identity.json": "fa71f36e0598b8778a8c243e9d5ae1d99088ef28b8e82bbc9251e9b0f057cf2e",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1/manifest.json": "91a5533045cc4648dcd9b7f6f1cdef8c504113f6ac52ca88704a5121180a48ac",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-6098bdc2fc38-82a705044bfcfcf1/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64/identity.json": "657fdf6f0d1449152d8f75ce29ea843ade337e501bcba79236127c596dc0b5af",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64/manifest.json": "91a5533045cc4648dcd9b7f6f1cdef8c504113f6ac52ca88704a5121180a48ac",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64/public-environment.json": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64/runner.py": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+    "bundle-733c2c9f1eed-d0e6c2b2f2c47e64/runtime.json": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b/identity.json": "5f9996bfd536fb0bed732d871fc2920be283ff8e26aeb273d74cb4e36f8673d8",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b/manifest.json": "bfde02306ae746a12052acb2284b67afb1c1d2e376b502b9aa44414d7c280f8b",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-892144b3b19f-e3da4bc3b7a2c46b/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf/identity.json": "281ea20698e00ccf8cecd53d7e5f9de7d641de5eae1218ef1493c7a4c04d3161",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf/manifest.json": "7e2497560f00206c265bc7be22f751807f4f8e3757d4bffe3508b490f1dd023f",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-8b435917b7fc-fa7f4e988edf2adf/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93/identity.json": "b0ce2584def0d10f6daaf030a5ec4aeccfc44e32d78a5e6171197f92a66b6b4f",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93/manifest.json": "aa37d023d234f267821c16afa3ca1a0ef1ef47f38a3186f05dc7c55b7412ecc5",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-aeee2f4d5867-8dc2b499c5fa5f93/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "bundle-b502df69dfe0-ac1befb35099df79/identity.json": "dbf3c7d5ca1e1c404e09fd9d64890e4641325caf06e42b30ab9332729c51919d",
+    "bundle-b502df69dfe0-ac1befb35099df79/manifest.json": "c1ba48b604a486983c4d73081f31c6093bc69ee71eb97fef39a00be6eb906afc",
+    "bundle-b502df69dfe0-ac1befb35099df79/public-environment.json": "f3ecc0153562fa04f5d539efd7486ecb95f3e2138f1176949b517f8745dde840",
+    "bundle-b502df69dfe0-ac1befb35099df79/runner.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "bundle-b502df69dfe0-ac1befb35099df79/runtime.json": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc",
+    "current-boundary-selection-whole-original/command.json": "fee6f2902807b802cb18f3f792312b0b37cf79dda2e6e9bfa7534254513658cc",
+    "current-boundary-selection-whole-original/junit.xml": "023f39d5bc77ef2efb139cd8bda3e5813ec3bed237890bffe7eccd165c4ccff2",
+    "current-boundary-selection-whole-original/log.txt": "d264ff0aeab363e8785a996ddc09bd62ca0c78e806bf6d48a867e4006aa2323a",
+    "current-boundary-selection-whole-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "current-boundary-selection-whole-original/result.json": "1ca2261e758b3afa41c772074f482741c6d36a5cd5b5b1f599ea41f0ace568dd",
+    "diff-format-original.json": "3c140b64ea99acafac5431208e47678695c74c78b76c3aa6fef4ab2b1f2ca47e",
+    "evidence-tools/package-recorded-evidence.py": "2f42b602620af278c19ae2000fae5ed3fdb8cac682e9e852a259aaa63994a78c",
+    "existing-mfa-lifecycle-sqlite-original/command.json": "4cde3a3290b9eec43f6d38c46a69897fafd098c33a0809e71fcdd0439881868f",
+    "existing-mfa-lifecycle-sqlite-original/junit.xml": "8b0b354573a91954264733e1ad03d0209ae18c03eff224893e1bedf1bc5463a3",
+    "existing-mfa-lifecycle-sqlite-original/log.txt": "0a0d6cef06580705947024abffe2db6e8e21d89766140c542b66b2d4c73279d7",
+    "existing-mfa-lifecycle-sqlite-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "existing-mfa-lifecycle-sqlite-original/result.json": "ef7519cfdaedc80469b71b6c7065dd46cb5a0ea8ecf00d924112bc16179c5aeb",
+    "finalization-admission-config-fixed-original/command.json": "ff2774928f2a7eeaf6ddf437c88f9ca2086eef4d796b6191ef777bb905ef6b7b",
+    "finalization-admission-config-fixed-original/derived-case-outcomes.json": "b73a82a9c6915017efabcc22980c9a391be5f90a4429945e7634b0e508b9f3d6",
+    "finalization-admission-config-fixed-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "finalization-admission-config-fixed-original/result.json": "f29b06cc8756f8e901ff4301230a1824a3098e46a671bbeeb7a2e5dad57885d8",
+    "finalization-admission-current-original/command.json": "f7305f2442368060e9b4f4ad1e77146188353a9b5ce788611187e311a8193614",
+    "finalization-admission-current-original/derived-case-outcomes.json": "06226abc8c9c73da47b96e18e98c22a777e5e4378ded9ba17da2f80bec6bd3bf",
+    "finalization-admission-current-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "finalization-admission-current-original/result.json": "a4bd3f960197f1c5c24d4f890590defbcf775c4c13251e771befe23b88c01107",
+    "finalization-admission-identity-fixed-original/command.json": "f3383051ad678c14aa6ebe27bcba350f860ba84921cda2e63ab339e7d9ef62e2",
+    "finalization-admission-identity-fixed-original/junit.xml": "81756a4410deb1a4a0fc63a8a47020f1285cd17e7ebc84b9dec33503ed4bb14e",
+    "finalization-admission-identity-fixed-original/log.txt": "96326f30b62efb1477be339d530cc392dd49fc63cbb6cc60c332477fc0fee22e",
+    "finalization-admission-identity-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "finalization-admission-identity-fixed-original/result.json": "1d6b50c4c0f9414897f0652bc56cb44a2e37c82d4e2ac0b9b7e9c7c679ec0e52",
+    "finalization-captured-recipe-old-original/command.json": "2189ff7678480e2ef0984e36c431ebdda4c3727dda1e3dd4e1235e7b41c80758",
+    "finalization-captured-recipe-old-original/derived-case-outcomes.json": "de26bffae8bd3d1a3b58aade39e56385b847b46de93309d40502065d2993ea15",
+    "finalization-captured-recipe-old-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "finalization-captured-recipe-old-original/result.json": "681414dd333a9c2ff618f38d9a3a4f6ca55d49f4ab7cec283f6dd2c87f8ce193",
+    "focused-pint-original.json": "b86752cb1f865ddfdbc4dbdc1b0eb5c77926d9680351df89068c00c7dd3d2b94",
+    "focused-pint-original.log": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "frozen-proof-preparation-reconciliation.json": "91f2148a63b1364ca1b50b2d19697a9c21fa13086d0d789b6f9a1c10138ca001",
+    "independent/fixture-admission-source-review-4ff10a05-20261015.json": "4bd53e7d673f136a748826971bf623df7045baa70709fbcf836264819595e892",
+    "independent/fixture-admission-source-review-4ff10a05-20261015.md": "a06b95ec325735eab3102d2c2dfa17d0df95ffe16f87f8da51ad0d2ae79a1b7e",
+    "invalid-selection-fixed-original/command.json": "b6fff670ec976b052943847adb5cc56b1dcb284335d86c839cbd07e0dca862fd",
+    "invalid-selection-fixed-original/junit.xml": "6dca7cad4d588a4ee28aafa087ce40cbdae0c8e4435724f79fd1b89479d0f849",
+    "invalid-selection-fixed-original/log.txt": "88072592bd76ad77fdcd51b93fa97ac8159c27fe270e1065c8d08fc7fc178f3a",
+    "invalid-selection-fixed-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "invalid-selection-fixed-original/result.json": "d644e16b9d9f20307b47897708bd3787d8ff9258dad823ffde742ea3541d3732",
+    "invalid-selection-old-corrected-fixture-original/command.json": "d2464bab10357dfcf427be5f7b0f6b9fd81816ae740a11eafa08de0011504a12",
+    "invalid-selection-old-corrected-fixture-original/derived-case-outcomes.json": "db0c64139b02949ab201a2a6893dfe3c1bd154ca5edce1493ea3a29ebd22422b",
+    "invalid-selection-old-corrected-fixture-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "invalid-selection-old-corrected-fixture-original/result.json": "1e2640e7162264e3d8724e65a7f8e002fc8e9fd4657844af87de3223c9a29e7a",
+    "invalid-selection-old-original/command.json": "0a7ff8815865b14933f167c462e5d3a5423c736d175106a94cb743274dfe88ad",
+    "invalid-selection-old-original/derived-case-outcomes.json": "db0c64139b02949ab201a2a6893dfe3c1bd154ca5edce1493ea3a29ebd22422b",
+    "invalid-selection-old-original/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "invalid-selection-old-original/result.json": "eeb9896651478f36ebfad59a65c4fb4026236167a78fdc4009af5eb9dcea7fae",
+    "mysql-private/mysql-server-launch.json": "53f35a532f32116a2d74f853c886060c743abe8afe994eb40bdc8b8e0b6ef9da",
+    "mysql-standalone/final-stopped-state.json": "49967a54d6a4aa51a1cc74e169e1b73d6efddf1973e94f484b35a80aa4cf2c8f",
+    "mysql-standalone/initialize.json": "1deb2030351887056ceb8f62d02f714c1731d00c50bf0ab26e7651a93e8ef1a3",
+    "mysql-standalone/schema-create.json": "0e49c189685891a11d26f12d0412367510476c74d95f4061440f39cedc0d4be2",
+    "mysql-standalone/server-final-shutdown.json": "368d571f04f36b6fccf841006e147b15940191722d5ae5dfb8fbe946018868af",
+    "mysql-standalone/server-shutdown.json": "d5f5e6413780dc6236efe6e0d2054f4bd735eabdcdd58e587c6536d7a1a41def",
+    "mysql-standalone/server-start-v2.json": "83206c6cc5c468804cc552bb78c10b34d57c78eeedf9d475d5d41f30a0170683",
+    "mysql-standalone/server-start-v3.json": "873494765efd35fdf5787aa96b00c33a2c90f2647cceb619e7b84de0415a6544",
+    "mysql-standalone/server-start.json": "7c63015257f0b14c4a3f31e6521d7e57908a3af59b9e30df4c1ef923ff5c4e2a",
+    "mysql-standalone/server-version-v3.json": "7b2ce569cc56673ee0aa11405c94cfc06077b7ef692c47979fe394be3250654d",
+    "mysql-standalone/server-version.json": "06031a0e557836fa78a5e3a0b35e73a12d7315c8c8158d3dcd8f699311cc8891",
+    "native-admission-complete-runtime-original/command.json": "1c4aca8de9e04546456c4c191db4225b57bc1afe9a4463cc5ff2e1de1340567d",
+    "native-admission-complete-runtime-original/junit.xml": "36a4d9412c69efb6580aa8924db2469bd2b44b5a0348901162965baab62e82b6",
+    "native-admission-complete-runtime-original/log.txt": "0d51ca6e5b326097d8b0f86424f53006ec9ca2464c910ebade3e1396094cd7e2",
+    "native-admission-complete-runtime-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-admission-complete-runtime-original/result.json": "1a0de227ae0fc64aa37b536d7865f6e7013297485e664ad4838dd17821bd7071",
+    "native-admission-original/command.json": "c6e4176644347e0ea7146058e61f163fc19acc00c4888027163f70c22b75e9a4",
+    "native-admission-original/junit.xml": "8c74997fb9880a4662ce557d0f9dff8a3933a9ed820d0bf20c5c3408bfddfe93",
+    "native-admission-original/log.txt": "bc557012de3107390f6dd64e12a5b3f2bacf6b8683645bd75af59ac047a73d1d",
+    "native-admission-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "native-admission-original/result.json": "d04a3710e7a15c9aaf58c44ff4a1a80ddc7aa2e1071e5839ad91e8d3a7b489cf",
+    "native-discovery-corrected-original.json": "ac76470b94b11164af73b9140f81a00e74a82c1e89970c06311be1bc51beaa27",
+    "native-discovery-corrected-original.log": "60f2607ec7d59d04c7f4ce1216959f2626626bc547da1a4d432fa4f88bfe5e45",
+    "native-discovery-generated-receipt.json": "3cb95bdb5db47422484f460adc1bac82e014063bbb9e2a00351363b936b1809c",
+    "native-discovery-generated/phpunit-ci-mysql-1-tests.xml": "a59bd90c0509485b848117c6815e107afee5204ea0eb19bb85f3e334fae87d34",
+    "native-discovery-generated/phpunit-ci-mysql-1.xml": "152ee8fb70021b80b6047c8b8d8a83e8eb525fe76b5ed55c35420f8afa06a15d",
+    "native-discovery-generated/phpunit-ci-mysql-2-tests.xml": "de786fd1a45ace26956c08d42668d52849ec269035360a28b55fc7b8dd8c3351",
+    "native-discovery-generated/phpunit-ci-mysql-2.xml": "8ac474c981274ef7ba29eaad948d6799a1b299d1429d0134640453327cff904d",
+    "native-discovery-generated/phpunit-ci-mysql-3-tests.xml": "7ba6a2e3e2fbed18ebd8029a52dc913a7b7de8a1c1b30faf2aef448c2287b859",
+    "native-discovery-generated/phpunit-ci-mysql-3.xml": "e066d6edc0f570ac2471de5d2cdf311625100b09c50fd82566471b84b06123b3",
+    "native-discovery-generated/phpunit-ci-mysql-4-tests.xml": "948bef2af30114634e53e4516d399be71c412d07471443525003c96e80c6259a",
+    "native-discovery-generated/phpunit-ci-mysql-4.xml": "90d344fbb4909f84846ce20cc77ee9adafed2dd647dfe985f00ee6c610dc8702",
+    "native-discovery-generated/phpunit-ci-mysql-5-tests.xml": "69aeb17a787f66a796dbd0f0cd653b758974077b9a74420a096f1ab756729fe9",
+    "native-discovery-generated/phpunit-ci-mysql-5.xml": "446a6f137327c48decc3a8de0ccefe560ebb28b5cc508798a3d54c1b435e17cf",
+    "native-discovery-generated/phpunit-ci-mysql-6-tests.xml": "c7fac19ccd1f113acf4e23b3aba925f310c5f5160cb5dc3cc293504fdc545b03",
+    "native-discovery-generated/phpunit-ci-mysql-6.xml": "c3813ae5247dd29e98a741485acd049751f3905e3e5ed95aae7dac73c951fdfa",
+    "native-discovery-generated/phpunit-ci-mysql-7-tests.xml": "e0d47c1f566f3d800778414c12ac2b69c95887274d2c661117d957f2a7caf6b2",
+    "native-discovery-generated/phpunit-ci-mysql-7.xml": "3d573a1670fa78dbd1f75a2b1d4ad545075b418392b7c05b484d421dca07e63a",
+    "native-discovery-generated/phpunit-ci-mysql-8-tests.xml": "0b22334d2674d792e747ab9d7e295f0192889dbcc6c337d3527c2d5fc21292db",
+    "native-discovery-generated/phpunit-ci-mysql-8.xml": "a2c807b75029192a10f325e3b53778bd121319823ac7ef9288f1bed2906305d9",
+    "native-discovery-generated/phpunit-ci-mysql-manifest.json": "e63d90da24c78697f4bf3db07a64a83c3050d445ba636b54e1fd9a8c578a617f",
+    "native-discovery-generated/phpunit-ci-mysql-source-tests.xml": "3791dbced156f1e0b7e2d7467489f4b16c2cc232ab9ef33eaf3076dc49e410ff",
+    "native-discovery-original.json": "fe9d7752b6439620996e860921dc9c74ea1a595e36d47ab91dd2a52b527f1d09",
+    "native-discovery-original.log": "aa68ecf1d88d708fd999ba0989f81a61c0b447026149a0ec977bb5c93b378f1a",
+    "native-existing-lifecycle-prior-source-control-original/command.json": "664234160285e9688b03ddb53e6ad678d0bb6ed50330c0b0ee2df62b64a60c93",
+    "native-existing-lifecycle-prior-source-control-original/derived-case-outcomes.json": "34dce219d3e428c77d3d6ab7a507207c52fc547664fd0c0309856a727b6b9ada",
+    "native-existing-lifecycle-prior-source-control-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "native-existing-lifecycle-prior-source-control-original/result.json": "dd01f8524cc9541d97b89b303361d1e1d1ab7ed0fafb6e4e5c47791777ff41aa",
+    "native-existing-lifecycle-whole-original/command.json": "a362bea00dc12e9bbff1dd26809ab15c2d3697cf2942cceb850090d5b9106586",
+    "native-existing-lifecycle-whole-original/derived-case-outcomes.json": "adc2ed3a57299a3322379e1b6cea0fceedc1384dac81d69112a0815e0bb18f26",
+    "native-existing-lifecycle-whole-original/process.exit": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "native-existing-lifecycle-whole-original/result.json": "b6556286410f046e9174027d3a2f717d07f9eda7cad30defb6779ecfe986685c",
+    "native-lifecycle-prior-control-reconciliation.json": "f0d93b7292714339f6358b40d61545e8c833692acef19028162cde7cb7676a0c",
+    "native-lifecycle-timeout-reconciliation-original.json": "e2631af75454bd832eab3a02d41a7d2bfc23276e9e698e33da6f9314801f0475",
+    "owned-runtime-cleanup/d1-container-removal.json": "6a89c723c41298a987462a26108c156522c7c178bd3e29cf57d65dd987d08f88",
+    "owned-runtime-cleanup/mfa-container-removal.json": "ffa9d138e5bd98d7629bf5af0a6be72016f942593a3b06879a278e5d48ebc567",
+    "owned-runtime-cleanup/runtime-copy-container-create.json": "7ed36a44bf8dc81d70e474eefff7a96fa8885f276de6610378be2505ae7d7258",
+    "prepare-private-mysql.py": "b26bbc1c47b6a2df88411f2a5bf29f8f777c022203786e76273961f671cae050",
+    "prepare-standalone-mysql-final.py": "bd2fef9d558a0e1bfc238a72deecda07330226302c22f5883cc0612ec87c081b",
+    "prepare-standalone-mysql-v2.py": "393054d0ee4a126b06257fa8366b3da3bc58a43d95d9ea390a4c14238c3a64bf",
+    "prepare-standalone-mysql-v3.py": "0ae13ef62211f4685edbf5867a691e1dff957c0e1330ca6479bc6e43f8d92b64",
+    "prepare-standalone-mysql.py": "76ec7dfeca0a0e69be9b6589ec91cdf86060446a79d3d28d1e66d596db06b6ff",
+    "probe-class-preparation-original.json": "e13b214680c44687b7447beba42c088797c95a7c0024ae64a4cb5a332ebbbd71",
+    "probe-preparation-reconciliation-v2.json": "95ee1379361f43ed7ed54c57074e4dbfa267130e11cc2dad414cb2432b7cd7a0",
+    "run-focused-native-v2.py": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+    "run-focused.py": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+    "run-quality.py": "db54ff910eb6f28902950042e462639400593d6892b0d24e2e6b5d701ac0eb26",
+    "selection-unit-original/command.json": "fbd3ec44d4a455a4be300e7444281b5171a5bd28cbaf30e14a7a50fc5fa97c17",
+    "selection-unit-original/junit.xml": "b64ca2a332309084ab7d6b556eaa8e79c1a3aefde0ed7030447d34b9472c1bf2",
+    "selection-unit-original/log.txt": "cfb2c22dd5de9fc471d9b9432337b25fd81828784cd6fb14844a9934480b4b45",
+    "selection-unit-original/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "selection-unit-original/result.json": "7c77011fbd55f116bec11d8cc5586623adf0dfb5ebba29c01c83d1522a403dfd",
+    "shard-policy-original.json": "773297f94a1be189c6c1719f567fe21bef7efd7fcf8016dbf72358274d04c8c3",
+    "shard-policy-original.log": "d3b689379f2a527ddf929193ab282709ab8e6f4ebe69630ff382a078bc53c1d6",
+    "source-carry-and-frozen-proof.json": "4aca98fc93827c22b85a00c604bb5f86b0fbbcda44cfe7127327216850cc1255",
+    "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Feature/FixtureDatabaseAdmissionTest.php": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183",
+    "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+    "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/0d307a57484caeda68a4f19f67a5f2389135826a/tests/TestCase.php": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/3810fd904b3a9f06e37e351606ec43fb7d54093d/tests/TestCase.php": "8e0353c5911c1e63b9f95a08737dea0019d5a686c6ba501d969e6be6cfc6e129",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FinalizationDatabaseAdmissionProbe.php": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/TestCase.php": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93",
+    "source/4aa1a434102bb24aa429570361b656adefc6ba5c/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "source/4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "source/4ff10a05498079cbcb5b9b65c4c546a0d1d6d158/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FinalizationDatabaseAdmissionProbe.php": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/TestCase.php": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93",
+    "source/5b35b78700ea77d5e45633c0b5e3eecef2baa568/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FinalizationDatabaseAdmissionProbe.php": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "source/6098bdc2fc388ec0a11d180375d9f353ff5126b1/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FinalizationDatabaseAdmissionProbe.php": "3d351bb86f10f9e879422149e61014d59ee03cc16dd81d98206c5eebc301a0ad",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "source/733c2c9f1eed77cbfda82c8f491609cf460aabef/tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/892144b3b19f29835fc35d71cd393796def0e634/tests/TestCase.php": "ccc7f063933d4a7020d073ce32261b884b04c890d2a55ab2ea67c86d96b114f7",
+    "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Feature/FixtureDatabaseAdmissionTest.php": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183",
+    "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Support/FinalizationDatabaseMigrations.php": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+    "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/Support/FixtureDatabaseAdmissionProbe.php": "9aec288154beb2560f4a4df8b9404a50c697c2b89a4bf733564c9d7f59083f20",
+    "source/8b435917b7fc6d333e959a7cca62a4a5815f375b/tests/TestCase.php": "da50491fabe195ca3f6ac9efca53b1992c1967af01f3dc6d970ac6389bca9a93",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/aeee2f4d5867718a23b30f0d74ad96e7116d26be/tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Feature/FixtureDatabaseAdmissionTest.php": "15fde57d112ea3221f9bde8b83cbdfd099b7529761a43a37273a8fe181d6c183",
+    "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "source/b502df69dfe01a7ac78e2073833e305bb7fb680d/tests/TestCase.php": "ccc7f063933d4a7020d073ce32261b884b04c890d2a55ab2ea67c86d96b114f7",
+    "standalone-runtime-copy-proof.json": "1e6795b8df4b08c622d4697381685de6c7802d95c062f42209c35b7e384ae21a"
+  },
+  "original_phpunit_invocations": 14,
+  "private_originals": [
+    {
+      "bytes": 18084,
+      "path": "/tmp/fixture-admission-evidence-20261015/invalid-selection-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "792685cf75bbf7daf3c0a1edb17d98483a649b35e6ab83bafc6fc90a825f0548"
+    },
+    {
+      "bytes": 14140,
+      "path": "/tmp/fixture-admission-evidence-20261015/invalid-selection-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "63c0294e9f6a7da05a5e958ed922a501fbdfa2b6072fceb8d18fe51701c242d9"
+    },
+    {
+      "bytes": 7388,
+      "path": "/tmp/fixture-admission-evidence-20261015/invalid-selection-old-corrected-fixture-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "48e41997e02e7b0730df85c4546c0218524772c764798f99d19bc3d882f2eeef"
+    },
+    {
+      "bytes": 3588,
+      "path": "/tmp/fixture-admission-evidence-20261015/invalid-selection-old-corrected-fixture-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "d375957ab9c3aac23964fe15c0f7d6fa05ffd200af3411f2c3e5df57c61774bc"
+    },
+    {
+      "bytes": 6874,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-admission-current-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "d848281054e76ca57829ecf9831f7cf130fb58bd676324bf436c783834f7c607"
+    },
+    {
+      "bytes": 991,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-admission-current-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "88fa42a4b493be9a1c9691091b025f094b7641ff540b125acc6b27e2b3c74cb9"
+    },
+    {
+      "bytes": 16394,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-admission-config-fixed-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "65c4a61356adfc6eb1526c9dac5f08eaac5d48b2f93eb4d82a68e65fe350b4ce"
+    },
+    {
+      "bytes": 10059,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-admission-config-fixed-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "852116dcac5d679f409cededdccc6154509f7f067170ce473b9369c50848eb50"
+    },
+    {
+      "bytes": 4868,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-captured-recipe-old-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "1c250394c91bc448e1fba97720008bd2da50b762bcb395f9d914e1b3ba19293b"
+    },
+    {
+      "bytes": 2023,
+      "path": "/tmp/fixture-admission-evidence-20261015/finalization-captured-recipe-old-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "c6c0f357ee023ac5127617ccf47eaea6cb7f595d9bdab74c1a07f2baca94d4d5"
+    },
+    {
+      "bytes": 7684,
+      "path": "/tmp/fixture-admission-evidence-20261015/native-existing-lifecycle-whole-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "f90ae90640835f92d1050f0476ae026fa17d33b37edf153c51b35073974aa880"
+    },
+    {
+      "bytes": 5442,
+      "path": "/tmp/fixture-admission-evidence-20261015/native-existing-lifecycle-whole-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "40bbe63ff2e0c06a7f5bd383b6eef435e68fce568e22fb4c1b831a19e00ae9a3"
+    },
+    {
+      "bytes": 2331,
+      "path": "/tmp/fixture-admission-evidence-20261015/native-existing-lifecycle-prior-source-control-original/junit.xml",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "346759624af831ba20f7b8ec95f57e3e1f0cfa47185a138a1246a89489b9603c"
+    },
+    {
+      "bytes": 1614,
+      "path": "/tmp/fixture-admission-evidence-20261015/native-existing-lifecycle-prior-source-control-original/log.txt",
+      "reason": "Original failed output may contain synthetic private identity or configuration dumps; retained privately, not copied into Git.",
+      "sha256": "34dc01468863668b705d6b5eb939f06d9b3782d93af9d3051961638eb8759e58"
+    },
+    {
+      "bytes": 1173,
+      "path": "/tmp/fixture-admission-evidence-20261015/mysql-standalone/initialize.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "3045e4bb776ea7fb5e371aff64d788f32058543139d888652692595ec98b8f7c"
+    },
+    {
+      "bytes": 3879,
+      "path": "/tmp/fixture-admission-evidence-20261015/mysql-standalone/server.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "b9bbcf83937ad2f00c2b0d39728d79788fc0cb807275a207a6cd819b123e73db"
+    },
+    {
+      "bytes": 8908,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/d1-container-inspect-private-original.json",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "e561c386383ad2ca43719b2dce06005fd76669e1cd0e37f7f053c1369df008a6"
+    },
+    {
+      "bytes": 3863,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/d1-container-stderr-private-original.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "1d7b3b2278ac568c47f6adb827d6945f87d7e1f8754277e525a367f075a9f771"
+    },
+    {
+      "bytes": 902,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/d1-container-stdout-private-original.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "893ad300266b086ceebad73bbcc76053ce88e91a946400dc3c867b4709430c51"
+    },
+    {
+      "bytes": 8891,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/mfa-container-inspect-private-original.json",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "f2f0e5cb2a7ac7fa1acf87f76fdabec6c7954a33f12be0fecca00f3abc639177"
+    },
+    {
+      "bytes": 3857,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/mfa-container-stderr-private-original.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "079cbf75c21237d52ea0ffcc4a5925261bfb3dc81102819da5b4493e9c21847c"
+    },
+    {
+      "bytes": 899,
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-runtime-cleanup/mfa-container-stdout-private-original.log",
+      "reason": "Private runtime original retained by hash.",
+      "sha256": "a48f8690cb249634f362904566958da86502d3147341fae61581c84c1b9fcd4d"
+    }
+  ],
+  "recorded_utc": "2026-10-15T22:53:31.201303+00:00"
+}

@@ -1,0 +1,906 @@
+{
+  "approved_implementation_sha": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+  "completed_scope_verdict": "Pass for the recorded 40/184, SQLite 12/181 and repaired native identity 8/15 selections",
+  "current_tested_sha": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+  "decision": "APPROVE_BOUNDED_DEVELOPMENT_SOURCE_AND_RECORDED_FOCUSED_EVIDENCE_NATIVE_LIFECYCLE_OPEN",
+  "development_readiness": "Eligible for bounded development publication under focused-check policy, conditional on exact-head carry, cheap preflight, current inventory/protections and expected-head merge. No new P0/P1 or source correction identified.",
+  "equivalent_tested_tree": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+  "honesty_assessment": "Fourteen PHP originals comprise seven zero and seven nonzero runs. Initial malformed eight-failure fixture is explicitly unusable as regression proof; the original premature repeat0 statement is superseded by actual255/Pint1 records. Genuine old admission and cleanup controls remain separate. Private derived outcomes exactly match raw originals. The full native lifecycle failure is never labeled green or replaced by other selections.",
+  "mechanical_verification": {
+    "approved_implementation_sha": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+    "archive_bytes": 2573499,
+    "archive_members": 271,
+    "archive_sha256": "7976add384769b1e6b5c8c701ffce9158e7928cc6a68790b59568283964293f6",
+    "archived_source_bindings": 78,
+    "bundle_count": 14,
+    "bundles": {
+      "bundle-0d307a57484c-33ac8bf04954d6b1": {
+        "canonical_identity": {
+          "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+          "manifest_sha256": "3263021af09b4fbbb4e12525d6dbbcd898c07fb50c246c9b6c22e9f107074117",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+        "input_count": 2463,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-3810fd904b3a-305cb6299b890c69": {
+        "canonical_identity": {
+          "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+          "manifest_sha256": "b16930a43a9b1d7343de4570441bc228a9530c8f8a4bae0916b8d920e5b426d5",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+        "input_count": 2465,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-4aa1a434102b-b29f25db2e7d3557": {
+        "canonical_identity": {
+          "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+          "manifest_sha256": "cdcf4c3f452fd856ae6f9b31429d99fd4b53e796646f94344dd13e7ee298c2c9",
+          "public_environment_sha256": "8e8f82ecbeedad50edf9d71dfe1fba3766a4a44f2716ddced5d5fee77f78bb6c",
+          "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+          "runtime_sha256": "f7bd164170b5644e791908a966b18d3dc2e490e85abffc94c79a5e8946ecba19"
+        },
+        "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": "vaseyaudio_fixture_admission",
+            "version": "8.4.11"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-4dd6bc195477-727ab73f71f5c6da": {
+        "canonical_identity": {
+          "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+          "manifest_sha256": "ccdeec1582ab50a4f66cf72d9f208fbb4fae5e85f4708c0ecae092eda579ef4f",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+        "input_count": 2466,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-4ff10a054980-49b980e91b55a3d6": {
+        "canonical_identity": {
+          "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+          "manifest_sha256": "e7b6614769bc9108d2dc0ceedf561b6566a28573fd031faed9847c4ea8048b4a",
+          "public_environment_sha256": "8e8f82ecbeedad50edf9d71dfe1fba3766a4a44f2716ddced5d5fee77f78bb6c",
+          "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+          "runtime_sha256": "f7bd164170b5644e791908a966b18d3dc2e490e85abffc94c79a5e8946ecba19"
+        },
+        "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": "vaseyaudio_fixture_admission",
+            "version": "8.4.11"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-4ff10a054980-51a884fca6f3f94d": {
+        "canonical_identity": {
+          "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+          "manifest_sha256": "e7b6614769bc9108d2dc0ceedf561b6566a28573fd031faed9847c4ea8048b4a",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-5b35b78700ea-84439e1134953127": {
+        "canonical_identity": {
+          "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+          "manifest_sha256": "cdcf4c3f452fd856ae6f9b31429d99fd4b53e796646f94344dd13e7ee298c2c9",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-6098bdc2fc38-4f02a1f917528b60": {
+        "canonical_identity": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "manifest_sha256": "6c17a7bd6ae20a864fe38fa9f583812619b1b22c1033651784165cd41dda9766",
+          "public_environment_sha256": "8e8f82ecbeedad50edf9d71dfe1fba3766a4a44f2716ddced5d5fee77f78bb6c",
+          "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+          "runtime_sha256": "f7bd164170b5644e791908a966b18d3dc2e490e85abffc94c79a5e8946ecba19"
+        },
+        "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": "vaseyaudio_fixture_admission",
+            "version": "8.4.11"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-6098bdc2fc38-82a705044bfcfcf1": {
+        "canonical_identity": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "manifest_sha256": "6c17a7bd6ae20a864fe38fa9f583812619b1b22c1033651784165cd41dda9766",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-733c2c9f1eed-d0e6c2b2f2c47e64": {
+        "canonical_identity": {
+          "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+          "manifest_sha256": "6c17a7bd6ae20a864fe38fa9f583812619b1b22c1033651784165cd41dda9766",
+          "public_environment_sha256": "8e8f82ecbeedad50edf9d71dfe1fba3766a4a44f2716ddced5d5fee77f78bb6c",
+          "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+          "runtime_sha256": "f7bd164170b5644e791908a966b18d3dc2e490e85abffc94c79a5e8946ecba19"
+        },
+        "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+        "input_count": 2467,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": "vaseyaudio_fixture_admission",
+            "version": "8.4.11"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-892144b3b19f-e3da4bc3b7a2c46b": {
+        "canonical_identity": {
+          "head": "892144b3b19f29835fc35d71cd393796def0e634",
+          "manifest_sha256": "f4187e8acc0a1eccb631d00634105963c13a363dff09836af9259519fcc5b372",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "892144b3b19f29835fc35d71cd393796def0e634",
+        "input_count": 2465,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-8b435917b7fc-fa7f4e988edf2adf": {
+        "canonical_identity": {
+          "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+          "manifest_sha256": "e19c34f8d88e2cfd5951c99bbe6c7b13b30657f6b202f50ced6df8801bda8eca",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+        "input_count": 2463,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-aeee2f4d5867-8dc2b499c5fa5f93": {
+        "canonical_identity": {
+          "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+          "manifest_sha256": "02f26f370f9dbf2ca8b078d904bb8c0aea091599f9dc79f4abb7f9fc7ff84ad6",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+        "input_count": 2465,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      },
+      "bundle-b502df69dfe0-ac1befb35099df79": {
+        "canonical_identity": {
+          "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+          "manifest_sha256": "5366047ff02f8e3ad2972d2f37fa070a6aaf39c2ec9c53f0ec3a20f9eb1db1d5",
+          "public_environment_sha256": "d4ae7392d5062ab0a828c04c70ce2e31b1ea990c2eda0a4a6e25c705a6f978d8",
+          "runner_sha256": "bf198649c4ca3fb54ce3446bfbfbe2905e6387095942bf44fa429c2c914cdc6d",
+          "runtime_sha256": "7176c1b5e64d3b468ab457a256af3db1321a01157a7e4b975340441c8e6ecbe4"
+        },
+        "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+        "input_count": 2464,
+        "loader_root": "/tmp/VA-Studio-staff-mfa-leftovers-20261015",
+        "runtime": {
+          "database": {
+            "database_name": ":memory:",
+            "driver": "sqlite",
+            "version": "3.46.1"
+          },
+          "php": "PHP 8.4.26 (cli) (built: Sep 24 2026 17:16:18) (NTS)"
+        }
+      }
+    },
+    "current_tested_sha": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+    "equivalent_tested_tree": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+    "frozen_paths_verified": 56,
+    "frozen_profiles_verified": 7,
+    "index_sha256": "92347c1cf5e1b0db7caa7f87367e4e9a17f277eb89aac39605b1ee65463dd179",
+    "invocations": [
+      {
+        "bundle": "bundle-8b435917b7fc-fa7f4e988edf2adf",
+        "command": "invalid-selection-old-original/command.json",
+        "command_sha256": "0a7ff8815865b14933f167c462e5d3a5423c736d175106a94cb743274dfe88ad",
+        "counts": {
+          "assertions": 8,
+          "errors": 0,
+          "failures": 8,
+          "skipped": 0,
+          "tests": 8
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+        "log_sha256": "63c0294e9f6a7da05a5e958ed922a501fbdfa2b6072fceb8d18fe51701c242d9",
+        "name": "invalid-selection-old-original",
+        "process_exit": 1,
+        "recorder_exit": 1,
+        "result_sha256": "eeb9896651478f36ebfad59a65c4fb4026236167a78fdc4009af5eb9dcea7fae",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "792685cf75bbf7daf3c0a1edb17d98483a649b35e6ab83bafc6fc90a825f0548"
+      },
+      {
+        "bundle": "bundle-0d307a57484c-33ac8bf04954d6b1",
+        "command": "invalid-selection-old-corrected-fixture-original/command.json",
+        "command_sha256": "d2464bab10357dfcf427be5f7b0f6b9fd81816ae740a11eafa08de0011504a12",
+        "counts": {
+          "assertions": 8,
+          "errors": 0,
+          "failures": 8,
+          "skipped": 0,
+          "tests": 8
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "0d307a57484caeda68a4f19f67a5f2389135826a",
+        "log_sha256": "d375957ab9c3aac23964fe15c0f7d6fa05ffd200af3411f2c3e5df57c61774bc",
+        "name": "invalid-selection-old-corrected-fixture-original",
+        "process_exit": 1,
+        "recorder_exit": 1,
+        "result_sha256": "1e2640e7162264e3d8724e65a7f8e002fc8e9fd4657844af87de3223c9a29e7a",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "48e41997e02e7b0730df85c4546c0218524772c764798f99d19bc3d882f2eeef"
+      },
+      {
+        "bundle": "bundle-b502df69dfe0-ac1befb35099df79",
+        "command": "invalid-selection-fixed-original/command.json",
+        "command_sha256": "b6fff670ec976b052943847adb5cc56b1dcb284335d86c839cbd07e0dca862fd",
+        "counts": {
+          "assertions": 72,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 8
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "b502df69dfe01a7ac78e2073833e305bb7fb680d",
+        "log_sha256": "88072592bd76ad77fdcd51b93fa97ac8159c27fe270e1065c8d08fc7fc178f3a",
+        "name": "invalid-selection-fixed-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "d644e16b9d9f20307b47897708bd3787d8ff9258dad823ffde742ea3541d3732",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "6dca7cad4d588a4ee28aafa087ce40cbdae0c8e4435724f79fd1b89479d0f849"
+      },
+      {
+        "bundle": "bundle-892144b3b19f-e3da4bc3b7a2c46b",
+        "command": "finalization-admission-current-original/command.json",
+        "command_sha256": "f7305f2442368060e9b4f4ad1e77146188353a9b5ce788611187e311a8193614",
+        "counts": {
+          "assertions": 132,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 14
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "892144b3b19f29835fc35d71cd393796def0e634",
+        "log_sha256": "88fa42a4b493be9a1c9691091b025f094b7641ff540b125acc6b27e2b3c74cb9",
+        "name": "finalization-admission-current-original",
+        "process_exit": 1,
+        "recorder_exit": 1,
+        "result_sha256": "a4bd3f960197f1c5c24d4f890590defbcf775c4c13251e771befe23b88c01107",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "d848281054e76ca57829ecf9831f7cf130fb58bd676324bf436c783834f7c607"
+      },
+      {
+        "bundle": "bundle-3810fd904b3a-305cb6299b890c69",
+        "command": "finalization-admission-config-fixed-original/command.json",
+        "command_sha256": "ff2774928f2a7eeaf6ddf437c88f9ca2086eef4d796b6191ef777bb905ef6b7b",
+        "counts": {
+          "assertions": 0,
+          "errors": 14,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 14
+        },
+        "error_types": [
+          "LogicException"
+        ],
+        "filter": null,
+        "head": "3810fd904b3a9f06e37e351606ec43fb7d54093d",
+        "log_sha256": "852116dcac5d679f409cededdccc6154509f7f067170ce473b9369c50848eb50",
+        "name": "finalization-admission-config-fixed-original",
+        "process_exit": 2,
+        "recorder_exit": 1,
+        "result_sha256": "f29b06cc8756f8e901ff4301230a1824a3098e46a671bbeeb7a2e5dad57885d8",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "65c4a61356adfc6eb1526c9dac5f08eaac5d48b2f93eb4d82a68e65fe350b4ce"
+      },
+      {
+        "bundle": "bundle-aeee2f4d5867-8dc2b499c5fa5f93",
+        "command": "finalization-admission-identity-fixed-original/command.json",
+        "command_sha256": "f3383051ad678c14aa6ebe27bcba350f860ba84921cda2e63ab339e7d9ef62e2",
+        "counts": {
+          "assertions": 135,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 14
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "aeee2f4d5867718a23b30f0d74ad96e7116d26be",
+        "log_sha256": "96326f30b62efb1477be339d530cc392dd49fc63cbb6cc60c332477fc0fee22e",
+        "name": "finalization-admission-identity-fixed-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "1d6b50c4c0f9414897f0652bc56cb44a2e37c82d4e2ac0b9b7e9c7c679ec0e52",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "81756a4410deb1a4a0fc63a8a47020f1285cd17e7ebc84b9dec33503ed4bb14e"
+      },
+      {
+        "bundle": "bundle-4dd6bc195477-727ab73f71f5c6da",
+        "command": "selection-unit-original/command.json",
+        "command_sha256": "fbd3ec44d4a455a4be300e7444281b5171a5bd28cbaf30e14a7a50fc5fa97c17",
+        "counts": {
+          "assertions": 49,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 26
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a",
+        "log_sha256": "cfb2c22dd5de9fc471d9b9432337b25fd81828784cd6fb14844a9934480b4b45",
+        "name": "selection-unit-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "7c77011fbd55f116bec11d8cc5586623adf0dfb5ebba29c01c83d1522a403dfd",
+        "selected_files": [
+          "tests/Unit/DisposableTestDatabaseTest.php",
+          "tests/Unit/DisposableNativeDatabaseTest.php"
+        ],
+        "xml_sha256": "b64ca2a332309084ab7d6b556eaa8e79c1a3aefde0ed7030447d34b9472c1bf2"
+      },
+      {
+        "bundle": "bundle-4ff10a054980-49b980e91b55a3d6",
+        "command": "native-admission-original/command.json",
+        "command_sha256": "c6e4176644347e0ea7146058e61f163fc19acc00c4888027163f70c22b75e9a4",
+        "counts": {
+          "assertions": 15,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 8
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+        "log_sha256": "bc557012de3107390f6dd64e12a5b3f2bacf6b8683645bd75af59ac047a73d1d",
+        "name": "native-admission-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "d04a3710e7a15c9aaf58c44ff4a1a80ddc7aa2e1071e5839ad91e8d3a7b489cf",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+        ],
+        "xml_sha256": "8c74997fb9880a4662ce557d0f9dff8a3933a9ed820d0bf20c5c3408bfddfe93"
+      },
+      {
+        "bundle": "bundle-4ff10a054980-51a884fca6f3f94d",
+        "command": "existing-mfa-lifecycle-sqlite-original/command.json",
+        "command_sha256": "4cde3a3290b9eec43f6d38c46a69897fafd098c33a0809e71fcdd0439881868f",
+        "counts": {
+          "assertions": 181,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 12
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+        "log_sha256": "0a0d6cef06580705947024abffe2db6e8e21d89766140c542b66b2d4c73279d7",
+        "name": "existing-mfa-lifecycle-sqlite-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "ef7519cfdaedc80469b71b6c7065dd46cb5a0ea8ecf00d924112bc16179c5aeb",
+        "selected_files": [
+          "tests/Feature/OperatorMfaTest.php",
+          "tests/Feature/StagingOperatorMfaTest.php",
+          "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+        ],
+        "xml_sha256": "8b0b354573a91954264733e1ad03d0209ae18c03eff224893e1bedf1bc5463a3"
+      },
+      {
+        "bundle": "bundle-5b35b78700ea-84439e1134953127",
+        "command": "finalization-captured-recipe-old-original/command.json",
+        "command_sha256": "2189ff7678480e2ef0984e36c431ebdda4c3727dda1e3dd4e1235e7b41c80758",
+        "counts": {
+          "assertions": 34,
+          "errors": 0,
+          "failures": 4,
+          "skipped": 0,
+          "tests": 6
+        },
+        "error_types": [],
+        "filter": "test_finalization_uses_the_captured_recipe_and_rechecks_actual_cleanup",
+        "head": "5b35b78700ea77d5e45633c0b5e3eecef2baa568",
+        "log_sha256": "c6c0f357ee023ac5127617ccf47eaea6cb7f595d9bdab74c1a07f2baca94d4d5",
+        "name": "finalization-captured-recipe-old-original",
+        "process_exit": 1,
+        "recorder_exit": 1,
+        "result_sha256": "681414dd333a9c2ff618f38d9a3a4f6ca55d49f4ab7cec283f6dd2c87f8ce193",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php"
+        ],
+        "xml_sha256": "1c250394c91bc448e1fba97720008bd2da50b762bcb395f9d914e1b3ba19293b"
+      },
+      {
+        "bundle": "bundle-6098bdc2fc38-82a705044bfcfcf1",
+        "command": "current-boundary-selection-whole-original/command.json",
+        "command_sha256": "fee6f2902807b802cb18f3f792312b0b37cf79dda2e6e9bfa7534254513658cc",
+        "counts": {
+          "assertions": 184,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 40
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+        "log_sha256": "d264ff0aeab363e8785a996ddc09bd62ca0c78e806bf6d48a867e4006aa2323a",
+        "name": "current-boundary-selection-whole-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "1ca2261e758b3afa41c772074f482741c6d36a5cd5b5b1f599ea41f0ace568dd",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionTest.php",
+          "tests/Unit/DisposableTestDatabaseTest.php",
+          "tests/Unit/DisposableNativeDatabaseTest.php"
+        ],
+        "xml_sha256": "023f39d5bc77ef2efb139cd8bda3e5813ec3bed237890bffe7eccd165c4ccff2"
+      },
+      {
+        "bundle": "bundle-6098bdc2fc38-4f02a1f917528b60",
+        "command": "native-existing-lifecycle-whole-original/command.json",
+        "command_sha256": "a362bea00dc12e9bbff1dd26809ab15c2d3697cf2942cceb850090d5b9106586",
+        "counts": {
+          "assertions": 8,
+          "errors": 4,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 4
+        },
+        "error_types": [
+          "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        ],
+        "filter": null,
+        "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+        "log_sha256": "40bbe63ff2e0c06a7f5bd383b6eef435e68fce568e22fb4c1b831a19e00ae9a3",
+        "name": "native-existing-lifecycle-whole-original",
+        "process_exit": 2,
+        "recorder_exit": 1,
+        "result_sha256": "b6556286410f046e9174027d3a2f717d07f9eda7cad30defb6779ecfe986685c",
+        "selected_files": [
+          "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+        ],
+        "xml_sha256": "f90ae90640835f92d1050f0476ae026fa17d33b37edf153c51b35073974aa880"
+      },
+      {
+        "bundle": "bundle-4aa1a434102b-b29f25db2e7d3557",
+        "command": "native-existing-lifecycle-prior-source-control-original/command.json",
+        "command_sha256": "664234160285e9688b03ddb53e6ad678d0bb6ed50330c0b0ee2df62b64a60c93",
+        "counts": {
+          "assertions": 2,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "error_types": [
+          "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        ],
+        "filter": "successful default connection uses the default view policy",
+        "head": "4aa1a434102bb24aa429570361b656adefc6ba5c",
+        "log_sha256": "34dc01468863668b705d6b5eb939f06d9b3782d93af9d3051961638eb8759e58",
+        "name": "native-existing-lifecycle-prior-source-control-original",
+        "process_exit": 2,
+        "recorder_exit": 1,
+        "result_sha256": "dd01f8524cc9541d97b89b303361d1e1d1ab7ed0fafb6e4e5c47791777ff41aa",
+        "selected_files": [
+          "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+        ],
+        "xml_sha256": "346759624af831ba20f7b8ec95f57e3e1f0cfa47185a138a1246a89489b9603c"
+      },
+      {
+        "bundle": "bundle-733c2c9f1eed-d0e6c2b2f2c47e64",
+        "command": "native-admission-complete-runtime-original/command.json",
+        "command_sha256": "1c4aca8de9e04546456c4c191db4225b57bc1afe9a4463cc5ff2e1de1340567d",
+        "counts": {
+          "assertions": 15,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 8
+        },
+        "error_types": [],
+        "filter": null,
+        "head": "733c2c9f1eed77cbfda82c8f491609cf460aabef",
+        "log_sha256": "0d51ca6e5b326097d8b0f86424f53006ec9ca2464c910ebade3e1396094cd7e2",
+        "name": "native-admission-complete-runtime-original",
+        "process_exit": 0,
+        "recorder_exit": 0,
+        "result_sha256": "1a0de227ae0fc64aa37b536d7865f6e7013297485e664ad4838dd17821bd7071",
+        "selected_files": [
+          "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+        ],
+        "xml_sha256": "36a4d9412c69efb6580aa8924db2469bd2b44b5a0348901162965baab62e82b6"
+      }
+    ],
+    "manifest_git_bindings": 34520,
+    "physical_loaders_verified_per_bundle": 13,
+    "physical_runtime_member_matches": 183,
+    "private_originals_verified": 22,
+    "reviewed_sha": "e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08",
+    "source_carry_verified": true,
+    "source_heads": 12,
+    "unique_git_blobs": 2422
+  },
+  "native_lifecycle_limits": [
+    "All four current parent cases report ProcessTimedOutException from unchanged 90-second child budgets.",
+    "One exact matching prior-source default-success dataset also times out at 90.468 seconds under its recorded runtime; only that dataset's pre-existing limit is supported.",
+    "The other three prior-source datasets and native lifecycle on the fully repaired runtime are not established.",
+    "SQLite route/lifecycle and native PDO-identity passes do not supply native lifecycle acceptance."
+  ],
+  "native_lifecycle_verdict": "Fail/unaccepted: current whole 4/8/E4 and matching prior-source default-success 1/2/E1 remain nonzero. No lifecycle completion or throughput acceptance inferred.",
+  "open_p0": 0,
+  "open_p1": 0,
+  "packet_integrity_verdict": "Pass: all members, private originals, source/runtime bindings and recorded outcomes reconcile",
+  "publication_conditions": [
+    "Import byte-original final decision and accurately retain the failed native lifecycle/untested conditions; obtain an explicit final documentation-head carry.",
+    "Require cheap exact-head preflight, complete current review/thread/check inventory, unchanged protections and expected-head merge."
+  ],
+  "remaining_conditions": [
+    "Related native lifecycle fixture timing/admission follow-up must reconcile the failed scope without weakening assertions; full acceptance stays blocked by that unresolved scope.",
+    "Complete F2 fixture normalization, all reviewed SQLite-only/native counterpart census and full native/concurrency verification remain open.",
+    "Raw worker SQL, bootstrap callbacks and later custom truncation redirects are outside this admission boundary.",
+    "Host/SAPI/browser/provider/session/activation/commercial/legal/release and Free/B4/adjacent frozen residual conditions remain open."
+  ],
+  "required_corrections": [],
+  "review_execution": "Read-only immutable Git, archive/member/hash, source/runtime-file and XML receipt inspection. No application/DB/network/CI execution or shared edits. Only this exclusive reviewer MD/JSON pair created.",
+  "review_preparation_errors": [
+    "An initial physical support-file hash read assumed every recorded path was under share/. The actual copied-support map records runtime-relative lib64/ and share/ paths; corrected reads match all 43 hashes. No application run or original evidence changed."
+  ],
+  "reviewed_sha": "e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08",
+  "runtime_quality_and_failure_reconciliation": {
+    "native_discovery": {
+      "discovered_cases": 9189,
+      "discovered_files": 677,
+      "generated_files_verified": 18,
+      "selected_cases": 2431,
+      "selected_files": 233,
+      "shard_counts": [
+        327,
+        288,
+        312,
+        302,
+        283,
+        303,
+        334,
+        282
+      ]
+    },
+    "native_lifecycle": {
+      "shutdown": {
+        "argv": [
+          "php",
+          "-r",
+          "$p=new PDO(\"mysql:unix_socket=/tmp/va-studio-fixture-admission-mysql-socket-standalone-20261015/mysql.sock;dbname=vaseyaudio_fixture_admission\",\"root\",\"\");$p->exec(\"SHUTDOWN\");"
+        ],
+        "exit": 0,
+        "observed_utc": "2026-10-15T22:52:57.764591+00:00",
+        "stderr": "",
+        "stdout": ""
+      },
+      "state": {
+        "datadir": "/tmp/va-studio-fixture-admission-mysql-data-standalone-20261015",
+        "datadir_retained": true,
+        "final_shutdown_exit": 0,
+        "observed_utc": "2026-10-15T22:53:23.926778+00:00",
+        "pid_file_absent": true,
+        "shutdown_complete_logged": true,
+        "socket_absent": true,
+        "unrelated_policy_state": "true"
+      },
+      "version": {
+        "argv": [
+          "php",
+          "-r",
+          "$p=new PDO(\"mysql:unix_socket=/tmp/va-studio-fixture-admission-mysql-socket-standalone-20261015/mysql.sock;dbname=vaseyaudio_fixture_admission\",\"root\",\"\");echo json_encode($p->query(\"SELECT VERSION() AS version,DATABASE() AS database_name,REGEXP_LIKE(CHAR(97,98,99 USING utf8mb4),CHAR(91,97,45,122,93,43 USING utf8mb4)) AS regex_ready\")->fetch(PDO::FETCH_ASSOC));"
+        ],
+        "exit": 0,
+        "observed_utc": "2026-10-15T22:41:06.143685+00:00",
+        "stderr": "",
+        "stdout": "{\"version\":\"8.4.11\",\"database_name\":\"vaseyaudio_fixture_admission\",\"regex_ready\":1}"
+      }
+    },
+    "native_lifecycle_prior_control": {
+      "child_timeout_seconds_unchanged": 90,
+      "counts": {
+        "assertions": 2,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "elapsed_seconds": 90.46827776300779,
+      "observed_tool_exit": 1,
+      "observed_tool_session": 91147,
+      "original": "native-existing-lifecycle-prior-source-control-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "same_default_success_dataset_preexisting_timeout": true,
+      "scope": "One exact prior-source dataset also exceeds original child90s. It demonstrates a pre-existing local timing limit for that dataset only. Current native whole4E4 remains failed; no completed native lifecycle/throughput or full-suite proof.",
+      "source": "4aa1a434102bb24aa429570361b656adefc6ba5c"
+    },
+    "native_lifecycle_whole_failure": {
+      "child_timeout_seconds_unchanged": 90,
+      "counts": {
+        "assertions": 8,
+        "errors": 4,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "elapsed_seconds": 360.87136792900856,
+      "errors": [
+        {
+          "case": "test_cleanup_and_the_next_setup_remain_isolated with data set \"successful default connection uses the default view policy\"",
+          "type": "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        },
+        {
+          "case": "test_cleanup_and_the_next_setup_remain_isolated with data set \"throwing default connection removes requested views\"",
+          "type": "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        },
+        {
+          "case": "test_cleanup_and_the_next_setup_remain_isolated with data set \"successful named default connection removes requested views\"",
+          "type": "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        },
+        {
+          "case": "test_cleanup_and_the_next_setup_remain_isolated with data set \"throwing named default connection uses the default view policy\"",
+          "type": "Symfony\\Component\\Process\\Exception\\ProcessTimedOutException"
+        }
+      ],
+      "observed_tool_exit": 1,
+      "observed_tool_session": 20301,
+      "original": "native-existing-lifecycle-whole-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "scope": "Failed native existing lifecycle scope. No completed child lifecycle or passing native lifecycle count inferred. Matching prior-source single-dataset control is still pending.",
+      "source": "6098bdc2fc388ec0a11d180375d9f353ff5126b1"
+    },
+    "physical_runtime_verified": {
+      "libraries": 101,
+      "runtime_members": 3,
+      "source_image_id": "sha256:8d132912e9d3c985237567595ec2aeae04936044eb1f9336e8e4da2326238b84",
+      "support_files": 43
+    },
+    "preparation_reconciliation": {
+      "corrected_class_load_exit": 0,
+      "corrected_pint_exit": 0,
+      "first_class_load_exit": 255,
+      "initial_child_exit": 255,
+      "initial_counts_not_regression_proof": true,
+      "initial_parent_counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 8,
+        "skipped": 0,
+        "tests": 8
+      },
+      "initial_test_head": "8b435917b7fc6d333e959a7cca62a4a5815f375b",
+      "note": "Original preparation record premature repeat0 statement is contradicted and superseded by these actual outcomes. Originals retained; source corrections are test-only.",
+      "pint_first_exit": 1,
+      "scope": "Initial class-load and first attempted behavioral baseline are fixture preparation errors, not missing-admission proof.",
+      "second_class_load_exit": 255,
+      "second_error": "Missing RefreshDatabase:: prefix in trait precedence syntax."
+    },
+    "quality": [
+      {
+        "argv": [
+          "vendor/bin/pint",
+          "--test",
+          "tests/TestCase.php",
+          "tests/Support/DisposableTestDatabase.php",
+          "tests/Support/FinalizationDatabaseMigrations.php",
+          "tests/Support/FixtureDatabaseAdmissionProbe.php",
+          "tests/Support/FinalizationDatabaseAdmissionProbe.php",
+          "tests/Feature/FixtureDatabaseAdmissionTest.php",
+          "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+          "tests/Unit/DisposableTestDatabaseTest.php"
+        ],
+        "exit": 0,
+        "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+        "name": "focused-pint",
+        "source_after": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "status": ""
+        },
+        "source_before": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "status": ""
+        }
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/test-phpunit-shards.py"
+        ],
+        "exit": 0,
+        "log_sha256": "d3b689379f2a527ddf929193ab282709ab8e6f4ebe69630ff382a078bc53c1d6",
+        "name": "shard-policy",
+        "source_after": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "status": ""
+        },
+        "source_before": {
+          "head": "6098bdc2fc388ec0a11d180375d9f353ff5126b1",
+          "status": ""
+        }
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/phpunit-shards.py",
+          "--shards=8",
+          "--prefix=phpunit-ci-fixture-admission-native",
+          "--timings=scripts/ci/phpunit-timings-mysql.json",
+          "--mysql-native-selection"
+        ],
+        "exit": 1,
+        "log_sha256": "aa68ecf1d88d708fd999ba0989f81a61c0b447026149a0ec977bb5c93b378f1a",
+        "name": "native-discovery",
+        "source_after": {
+          "head": "5e292b42e6fddf7c1a4fa3bfc79df630e4e0b4e7",
+          "status": ""
+        },
+        "source_before": {
+          "head": "5e292b42e6fddf7c1a4fa3bfc79df630e4e0b4e7",
+          "status": ""
+        }
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/ci/phpunit-shards.py",
+          "--shards=8",
+          "--prefix=phpunit-ci-mysql",
+          "--timings=scripts/ci/phpunit-timings-mysql.json",
+          "--mysql-native-selection"
+        ],
+        "exit": 0,
+        "log_sha256": "60f2607ec7d59d04c7f4ce1216959f2626626bc547da1a4d432fa4f88bfe5e45",
+        "name": "native-discovery-corrected",
+        "source_after": {
+          "head": "5e292b42e6fddf7c1a4fa3bfc79df630e4e0b4e7",
+          "status": ""
+        },
+        "source_before": {
+          "head": "5e292b42e6fddf7c1a4fa3bfc79df630e4e0b4e7",
+          "status": ""
+        }
+      }
+    ]
+  },
+  "scope": "F2a disposable process-selected fixture admission and captured finalization recipe, unchanged implementation plus narrow probe/census carry and sealed recorded evidence",
+  "source_carry_assessment": "Three implementation files remain byte-identical to approved 4ff. The one probe match arm now permits the prior-source setup-hook body to be well formed; helper census and exact workflow comments are the other source/policy delta. Current 733 tree equals consolidated-test 6098; publication source matches current 733.",
+  "source_verdict": "Pass for bounded implementation and narrow carry"
+}

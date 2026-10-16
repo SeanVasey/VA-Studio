@@ -31,36 +31,45 @@ use Tests\TestCase;
 
 /**
  * Offline synthetic SQLite rehearsal, even in the MySQL test job. It accepts no
- * database/path input and never opens the configured application database.
+ * database/path input; shared admission may inspect the selected disposable lane,
+ * while the rehearsal operates on its own SQLite database and private copies.
  * Production MySQL/object storage, backup encryption and retention are separate gates.
  */
 class SyntheticPrivateRestoreTest extends TestCase
 {
     private string $workspace;
+
+    private string $sourceConnection;
+
+    private string $sourceDatabase;
+
     private ContractRenderer $renderer;
+
     private StripePaymentGateway $gateway;
 
     protected function setUp(): void
     {
         parent::setUp();
-        if (! app()->environment('testing')) { throw new \LogicException('Restore rehearsal is test-only.'); }
+        if (! app()->environment('testing')) {
+            throw new \LogicException('Restore rehearsal is test-only.');
+        }
 
         $this->workspace = storage_path('framework/testing/restore-'.Str::uuid());
         $this->assertTrue(mkdir($this->workspace, 0700, true));
         $previousConnection = DB::getDefaultConnection();
         $this->beforeApplicationDestroyed(function () use ($previousConnection): void {
-            DB::purge('rehearsal_source');
             DB::purge('rehearsal_restored');
             DB::setDefaultConnection($previousConnection);
             (new Filesystem)->deleteDirectory($this->workspace);
         });
 
         // Ignore DB_URL and every ambient database credential. Never migrate:fresh.
-        $source = $this->workspace.'/source.sqlite';
-        $this->assertTrue(touch($source));
-        $this->assertTrue(chmod($source, 0600));
-        $this->connection('rehearsal_source', $source);
-        $this->artisan('migrate', ['--database' => 'rehearsal_source', '--force' => true])->assertSuccessful();
+        $source = $this->createFileSqliteFixture();
+        $this->sourceConnection = $source->getName();
+        $this->sourceDatabase = $source->getDatabaseName();
+        $this->assertSame(0600, fileperms($this->sourceDatabase) & 0777);
+        DB::setDefaultConnection($this->sourceConnection);
+        $this->artisan('migrate', ['--database' => $this->sourceConnection, '--force' => true])->assertSuccessful();
         $this->privateRoot($this->workspace.'/source-private');
         // The synthetic backup keeps its test key in this process only, never in a receipt/file.
         config(['app.key' => 'base64:'.base64_encode(random_bytes(32))]);
@@ -114,8 +123,11 @@ class SyntheticPrivateRestoreTest extends TestCase
             $this->assertTrue(unlink($path));
         }
         try {
-            if ($kind === 'original') { app(ContractFiles::class)->verify($record); }
-            else { app(DeliveryAssets::class)->verify($rehearsal['assets']); }
+            if ($kind === 'original') {
+                app(ContractFiles::class)->verify($record);
+            } else {
+                app(DeliveryAssets::class)->verify($rehearsal['assets']);
+            }
             $this->fail('Missing or corrupt restored bytes passed verification.');
         } catch (ContractIssuanceException|DeliveryException $error) {
             $this->assertSame($kind === 'original' ? 'original_unavailable' : 'asset_unavailable', $error->reason);
@@ -123,7 +135,9 @@ class SyntheticPrivateRestoreTest extends TestCase
         $this->assertNoNewEffects($rehearsal);
 
         // Recover only by copying the archived original, without invoking the renderer.
-        if ($corrupt) { $this->assertTrue(unlink($path)); }
+        if ($corrupt) {
+            $this->assertTrue(unlink($path));
+        }
         $this->copySealed($this->workspace.'/backup-private/'.$record['storage_path'], $path);
         $this->assertRestoredEvidence($rehearsal);
         $this->assertNoNewEffects($rehearsal);
@@ -156,16 +170,22 @@ class SyntheticPrivateRestoreTest extends TestCase
             $bytes = app(ContractFiles::class)->verify($contract);
             $target = $this->workspace.'/backup-private/'.$contract['storage_path'];
             $output = $this->newPrivateFile($target);
-            try { $this->assertSame(strlen($bytes), fwrite($output, $bytes)); }
-            finally { fclose($output); }
+            try {
+                $this->assertSame(strlen($bytes), fwrite($output, $bytes));
+            } finally {
+                fclose($output);
+            }
             $this->assertTrue(chmod($target, 0400));
             $this->assertSame($contract['pdf_hash'], hash_file('sha256', $target));
         }
         foreach ($assets as $asset) {
             $target = $this->workspace.'/backup-private/'.$asset['storage_path'];
             $output = $this->newPrivateFile($target);
-            try { app(DeliveryAssetFiles::class)->copyVerified($asset, $output); }
-            finally { fclose($output); }
+            try {
+                app(DeliveryAssetFiles::class)->copyVerified($asset, $output);
+            } finally {
+                fclose($output);
+            }
             $this->assertTrue(chmod($target, 0400));
             $this->assertSame($asset['sha256'], hash_file('sha256', $target));
         }
@@ -181,8 +201,8 @@ class SyntheticPrivateRestoreTest extends TestCase
 
         // No live source connection/file/object may satisfy a post-restore read.
         unset($pdo, $fixture, $order);
-        DB::purge('rehearsal_source');
-        $this->assertTrue(unlink($this->workspace.'/source.sqlite'));
+        $this->releaseOwnedSqliteFixture($this->sourceConnection);
+        $this->assertFileDoesNotExist($this->sourceDatabase);
         $this->assertTrue((new Filesystem)->deleteDirectory($this->workspace.'/source-private'));
         $this->connection('rehearsal_restored', $restoredDatabase);
         DB::statement('PRAGMA query_only = ON');
@@ -240,7 +260,9 @@ class SyntheticPrivateRestoreTest extends TestCase
 
     private function privateRoot(string $root): void
     {
-        if (! is_dir($root)) { $this->assertTrue(mkdir($root, 0700, true)); }
+        if (! is_dir($root)) {
+            $this->assertTrue(mkdir($root, 0700, true));
+        }
         config(['filesystems.disks.local.root' => $root]);
         Storage::forgetDisk('local');
     }
@@ -252,7 +274,9 @@ class SyntheticPrivateRestoreTest extends TestCase
         $schema = $pdo->query('SELECT type, name, tbl_name, sql FROM sqlite_master ORDER BY type, name')->fetchAll(PDO::FETCH_ASSOC);
         $tables = [];
         foreach ($schema as $entry) {
-            if ($entry['type'] !== 'table') { continue; }
+            if ($entry['type'] !== 'table') {
+                continue;
+            }
             $rows = $pdo->query('SELECT * FROM "'.str_replace('"', '""', $entry['name']).'"')->fetchAll(PDO::FETCH_ASSOC);
             $encoded = array_map(fn (array $row) => json_encode($row, JSON_THROW_ON_ERROR), $rows);
             sort($encoded, SORT_STRING);
@@ -264,10 +288,15 @@ class SyntheticPrivateRestoreTest extends TestCase
 
     private function newPrivateFile(string $path)
     {
-        if (! is_dir(dirname($path))) { $this->assertTrue(mkdir(dirname($path), 0700, true)); }
+        if (! is_dir(dirname($path))) {
+            $this->assertTrue(mkdir(dirname($path), 0700, true));
+        }
         $mask = umask(0077);
-        try { $output = fopen($path, 'x+b'); }
-        finally { umask($mask); }
+        try {
+            $output = fopen($path, 'x+b');
+        } finally {
+            umask($mask);
+        }
         $this->assertIsResource($output);
 
         return $output;
@@ -278,8 +307,12 @@ class SyntheticPrivateRestoreTest extends TestCase
         $input = fopen($source, 'rb');
         $this->assertIsResource($input);
         $output = $this->newPrivateFile($target);
-        try { $this->assertSame(filesize($source), stream_copy_to_stream($input, $output)); }
-        finally { fclose($input); fclose($output); }
+        try {
+            $this->assertSame(filesize($source), stream_copy_to_stream($input, $output));
+        } finally {
+            fclose($input);
+            fclose($output);
+        }
         $this->assertTrue(chmod($target, 0400));
         $this->assertSame(hash_file('sha256', $source), hash_file('sha256', $target));
     }

@@ -81,11 +81,13 @@ jobs:
       APP_DEBUG: 'false'
       DB_CONNECTION: ${{ needs.focused-selection.outputs.engine }}
       DB_DATABASE: ${{ needs.focused-selection.outputs.engine == 'mysql' && 'vaseyaudio_focused' || ':memory:' }}
+      VA_CI_DISPOSABLE_MYSQL: ${{ needs.focused-selection.outputs.engine == 'mysql' && '1' || '' }}
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_USERNAME: root
       DB_PASSWORD: ci-only-password
       DB_URL: ''
+      DB_SOCKET: ''
       CACHE_STORE: array
       SESSION_DRIVER: array
       QUEUE_CONNECTION: sync

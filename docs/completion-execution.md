@@ -1,6 +1,8 @@
 # Completion execution plan
 
-## Current cloud handoff — October 7, 2026 UTC
+Current development and production preparation are recorded in the [October 16 agenda](handoff/2026-10-15/DEVELOPMENT-AGENDA.md) and [merge ledger](handoff/2026-10-07/CLAUDE-PLAN.md). The dated checkpoints below preserve their original source, counts, failures and unfinished work; they are historical, not current implementation or launch claims.
+
+## Historical cloud handoff — October 7, 2026 UTC
 
 Sean requested completion/publication of current development batches and handoff of
 remaining implementation to Claude Code. The [detailed handoff](handoff/2026-10-07/README.md)

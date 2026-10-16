@@ -1,0 +1,52 @@
+{
+  "bounded_evidence_conditions": [
+    "Retain genuine old reached failures; prove complete existing restore and guard files under MySQL outer selection, labeling all owned SQLite cases SQLite coverage.",
+    "Exercise owned-file positive migration/cleanup, unregistered external file refusal, file/config/PDO replacement, symlink/directory drift and retained sentinel/hash controls, plus legitimate early release with no live source satisfying restored reads.",
+    "Exercise local-no-CI correct-marker success versus wrong/missing marker refusal and unchanged hosted-CI/memory paths; no duplicate full CI.",
+    "Independent corrected-source/final-evidence/exact-head carry, fresh cheap preflight/current complete inventory and expected-SHA gate before merge."
+  ],
+  "decision": "APPROVE BOUNDED OWNED-FILE AND LOCAL-FOCUSED REMEDIATION DESIGN; IMPLEMENTATION/EVIDENCE PENDING",
+  "file_contract": [
+    "Outer selected disposable target admitted before creation; generated unique alias absent in config and manager cache.",
+    "Allocate exclusive regular file0600 in new exclusive owned directory0700 under canonical owned test root; no arbitrary caller filename/configuration or file URI. Use umask0077 with finally restoration and confirm actual modes/owner/type.",
+    "Bind canonical absolute file path and file plus parent-directory device/inode. Clear filesystem stat cache before rechecks; refuse symlink/replacement or missing file for destructive admission.",
+    "Literal SQLite configuration with empty URL/no inherited read-write/options/pragmas; retain source DELETE journal and DEFERRED transaction semantics. Validate actual SQLite PDO/main path exactly before registration.",
+    "Retain exact Connection and PDO refs; at every destructive seam preserve live config/cache comparisons and validate identities plus pathname/inode/no-symlink/actual PRAGMA main before command. Unregistered files remain refused; existing memory/outer paths unchanged.",
+    "Explicit release/deregistration at restore source-discard boundary drops strong refs and disconnects owned original connection before removing only validated owned file. Release/teardown must be idempotent after legitimate early release.",
+    "Never unlink a replaced file or recursively remove a directory whose pinned ownership no longer matches; teardown cannot erase evidence or substitute an external target. Restore/adversarial controls must restore intentional test mutations or retain refusal evidence.",
+    "Reopened snapshot remains query_only with exact integrity/row/hash/private-copy/no-new-effects assertions; never registered for destructive operations."
+  ],
+  "focused_contract": [
+    "For PHP/MySQL selection retain local marker only when input is exactly vaseyaudio_focused; clear wrong/missing markers and all local markers for SQLite.",
+    "Keep conditional CI marker1 for MySQL/empty for SQLite; preserve actual CI (do not invent true). Exact local declaration supports no-CI local admission; wrong/missing local declaration without real CI must refuse.",
+    "Continue clearing inherited socket/URL and setting fixed loopback3306/schema/root/synthetic password and isolated cache/mail/queue/session settings.",
+    "Docs give exact local declaration/service recipe; actual runtime proof may remap only private transport and is not hosted execution."
+  ],
+  "limits": [
+    "Design approval is not implementation approval, new passing check or remote finding closure.",
+    "Original native lifecycle whole4/8/E4 and matching olddefault1/2/E1 remain failed/open.",
+    "Filesystem ownership checks are bounded fixture integrity, not a claimed hostile-filesystem race sandbox or host/provider proof.",
+    "No full F2/native concurrency/host/provider/activation/release or platform-classifier repair claim."
+  ],
+  "open_p0": 0,
+  "open_p1": 1,
+  "open_p2": 1,
+  "required_corrections": [
+    "Implement explicit helper-created file ownership admission and legitimate source-release lifecycle without admitting caller-selected/external SQLite files.",
+    "Convert the four capability adversary setup entrypoints to the existing owned-memory helper while preserving every original body, dataset and native DML case.",
+    "Retain only exact vaseyaudio_focused local declaration for selected MySQL, preserve actual CI requirements, and document the concrete disposable local recipe.",
+    "Correct the restore class residual claim that it never opens the configured application database; outer disposable admission does open that selected connection."
+  ],
+  "reviewed_sha": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+  "scope": "Read-only actual reached restore/adversary fixtures, shared helper/captured finalization, focused runner and local recipe; no source or shared edits, application/database/network/CI execution.",
+  "source_sha256": {
+    "docs/verification/focused-ci.md": "5bb46def99788db08a77de1fb4c4e5e1a94b7b4d5750e56f05fac7790b3a7e3d",
+    "scripts/ci/focused-tests.py": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812",
+    "scripts/ci/test-focused-tests.py": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329",
+    "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php": "2c45aa0e8b0b90f33e4cf78adbad4f812081eba193f43d85c063aabe3494dccf",
+    "tests/Feature/SyntheticPrivateRestoreTest.php": "a1477a8c9285c2bca976f20498114d0aa0d26008966591d96bbc32e48fac34cc",
+    "tests/Support/DisposableTestDatabase.php": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0",
+    "tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "tests/TestCase.php": "f5d22f5214be700108734c4dbc2b8f6bfa6f8502c6c2ad0eeca0e7aebf2810d0"
+  }
+}

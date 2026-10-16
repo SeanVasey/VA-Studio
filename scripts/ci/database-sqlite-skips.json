@@ -1041,6 +1041,30 @@
     [
       "Tests\\Feature\\ProductionFinancialRetrieval\\FinancialReadPlanTest",
       "test_native_older_source_deadline_cannot_be_renewed_by_a_late_caller_or_sdk_callback"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_actual_use_of_another_owned_schema_refuses_despite_unchanged_configuration"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_an_actual_sqlite_pdo_cannot_supply_native_mysql_identity"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_an_alias_of_the_selected_native_database_is_admitted"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_captured_testing_selection_survives_deliberate_product_route_boot_modes"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_ci_declaration_uses_external_testing_even_in_a_production_boot_fixture"
+    ],
+    [
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
+      "test_an_unregistered_memory_alias_cannot_borrow_the_native_selection"
     ]
   ]
 }

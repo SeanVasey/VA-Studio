@@ -1,0 +1,71 @@
+{
+  "baseline_sha": "0db6b8709db5084d0d8113a81184286738afee75",
+  "changed_files": [
+    ".github/workflows/focused-feedback.yml",
+    "scripts/ci/focused-tests.py",
+    "scripts/ci/test-focused-tests.py",
+    "tests/Feature/FixtureDatabaseAdmissionTest.php",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+    "tests/Support/DisposableTestDatabase.php",
+    "tests/TestCase.php"
+  ],
+  "closure_conditions": [
+    "Complete the actual eight-file SQLite invocation at its recorded head; do not infer its result from source review.",
+    "Complete both whole canary files with actual private MySQL outer selection, explicitly labeled SQLite canary coverage.",
+    "Verify unregistered named-memory refusal under MySQL selection and preserve same-memory/file-PDO/config/purge refusal controls.",
+    "Complete focused declaration/native admission evidence, retaining missing/false CI refusal and actual CI=true requirement.",
+    "Reconcile all original red/current receipts with source/loader/runner bindings in final evidence review; carry exact final head, reply to both P1 threads only after evidence supports closure.",
+    "Fresh cheap preflight and current complete review inventory must permit exact-SHA merge; existing lifecycle timeouts remain failed/open."
+  ],
+  "completed_quality_receipts": {
+    "p1-cadence-current-original": {
+      "exit": 0,
+      "log_sha256": "416bf32537d4ffc17e47fc9001e09449b734d88682763b59741e1f5b52a25f02",
+      "receipt_sha256": "27e323166a334b5445a0b3e6556973620332594b5700e6377c75435d92b2208b",
+      "tests": 14
+    },
+    "p1-focused-safeguards-current-original": {
+      "exit": 0,
+      "log_sha256": "0130ef17faa177d8c00807695c961a0f9198cb1be4665e6deeb66689fec112cb",
+      "receipt_sha256": "31378bcc03116f85e50febedcf89101ecc0d37b66297af3d77272057d58ee5de",
+      "tests": 52
+    },
+    "p1-shard-policy-current-original": {
+      "exit": 0,
+      "log_sha256": "e3e0590971794c655928bbe15f30998a5ec91f8b8805aece2b5fb08dce5c9f92",
+      "receipt_sha256": "79034a9a918e283929c8a4b5293c70190b50ebab6737ec357ef6af079304b585",
+      "tests": 52
+    }
+  },
+  "decision": "APPROVE BOUNDED CORRECTIVE SOURCE WITH FINAL CLOSURE CONDITIONS",
+  "limits": [
+    "No tests or application/database/network/CI execution or shared edits by reviewer.",
+    "This source decision does not resolve existing remote P1s, claim current running checks passed, or approve merge.",
+    "No new P0/P1 found; manager-cache omission is a bounded design conformance correction, not a new P1 with a naturally reachable collision.",
+    "No native lifecycle, full F2, host, provider or release acceptance."
+  ],
+  "mechanical_source_findings": {
+    "canary_assertion_call_inventory_unchanged": true,
+    "canary_bodies_after_setup_byte_unchanged": true,
+    "external_capture_and_admit_byte_unchanged": true
+  },
+  "new_source_p0": 0,
+  "new_source_p1": 0,
+  "open_p0": 0,
+  "open_p1": 2,
+  "required_corrections": [
+    "Add the approved manager-cache absence check alongside configuration collision refusal before installing an owned alias."
+  ],
+  "reviewed_sha": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+  "source_sha256": {
+    ".github/workflows/focused-feedback.yml": "f56079eb23bedcbdb6216ac354ec37f426bdd5ef5cd5e8a03b6b9e88221043d1",
+    "scripts/ci/focused-tests.py": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812",
+    "scripts/ci/test-focused-tests.py": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329",
+    "tests/Feature/FixtureDatabaseAdmissionTest.php": "8f56915967152669c485dae058594fbbabafdf34c2be40875c7e2847bb130509",
+    "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php": "86893301244d24893a0650770cd11d8081d5f7afa159c98d517e8a75ab51476a",
+    "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php": "8c98eef065ec084927b805b9bcf07753b6a68a7fca61941c21eacfb63a8fa551",
+    "tests/Support/DisposableTestDatabase.php": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0",
+    "tests/TestCase.php": "db17d4806f145e1affd57e7af8312f2cd43c49b48b624734ee573b65d8f10351"
+  }
+}
