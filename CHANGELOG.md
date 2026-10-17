@@ -46,6 +46,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
+- Documentation refresh (October 17, 2026): the README current-state pointer, foundation-scope table and Foundation CI counts, the status headings of `docs/remaining-development-plan.md` and `docs/development-order.md`, and the task-register status cells for T18, T21, T22, T28, T30 and T38 now describe the merged state through PR #132 and separate historical October 2 to 7 blocks from the current status. `docs/remaining-parity-coverage.csv` gains `development_status_20261017` and `status_evidence` columns: a source-read status for all 103 requirements (43 implemented and evidenced, 31 in part, 24 not implemented including 11 postlaunch, 5 blocked on Sean) that is explicitly not test or release acceptance. Documentation only; no behavior changes.
+
 - Development tooling: Vite 8.3.3, React plugin 6.1.2 and Vitest 5.0.3, with focused build/test/audit evidence. Automated Node types-major updates wait for a reviewed runtime-major upgrade; the runtime remains Node 24.
 
 - The production activation packet, the preparation queue and the Monday plan's interim-environment row now reflect that PR #68 admits Stripe-test commerce on `APP_ENV=staging` (staff MFA required, live mode refused); production-checkout test funds still require `local`/`testing`. The customer-account, self-service identity, service-project and free-grant guides no longer say those test features run only in `local`/`testing`.

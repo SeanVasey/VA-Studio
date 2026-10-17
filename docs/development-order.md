@@ -1,6 +1,17 @@
 # Ordered development status
 
-## Current development continuation — October 7, 2026 UTC
+## Current status pointer — October 17, 2026 UTC
+
+This file is the dated record of merged increments and their evidence. Every section below describes the state on its own date; none of them is the current status, including the sections that still say "current". For the current state read:
+
+- the [development agenda](handoff/2026-10-15/DEVELOPMENT-AGENDA.md): completed development and remaining work by area, and the dependency order;
+- the [October 17 resumption note](handoff/2026-10-17/RESUMPTION.md): open work lanes, CI cost posture and the items that wait on Sean;
+- the [Claude Code plan and merge ledger](handoff/2026-10-07/CLAUDE-PLAN.md): the phased plan (§3) and the per-merge ledger (§5);
+- the [PR #132 merge receipt](verification/fixture-lifecycle-20261016/merge-receipt.md), the most recent product merge, and the other `merge-receipt.md` files under [verification](verification/) for each earlier one.
+
+Merged since the October 7 records below (October 12 to 16 UTC; all default-off and test-only, and each receipt states what, if anything, is mounted): the membership writer and member-original preparation (PRs #109 and #111 to #117), whole-order paid delivery and typed Tax V2 (#118 to #124), refund and dispute prerequisites (#125, #126), account-feature HTTP and the email preflight (#127, #128), free-delivery progress prerequisites (#129), domain staff-MFA leftovers (#130) and the native fixture admission and lifecycle supervision (#131, #132). PR #137 reconciled the pointers after #132. The one complete Foundation CI pass, run 38077166247, tested `0f23e63f` on 2026-10-10 and does not cover any merge after it; there is no full integrated acceptance of current `main`. Commerce activation, live payments, production deployment and cutover remain unauthorized.
+
+## Historical development continuation — October 7, 2026 UTC (superseded)
 
 PR28 merged at `28eba5e0832a0cbccbf636d4e73fbc77e15968af`, after
 independent source review, cheap preflight37587155280 and automatic code/security
@@ -41,7 +52,7 @@ parent groups remain accepted and 34 open. Historical source/results below
 remain unchanged; current AGENTS.md governs focused low-cost development merges.
 
 
-## Current production preparation checkpoint — October 6, 2026 UTC
+## Historical production preparation checkpoint — October 6, 2026 UTC (superseded)
 
 [PR #16](https://github.com/SeanVasey/VA-Studio/pull/16) merged reviewed private
 foundations at native main `a348f67eff1fdd16b1945efd3b99aa27af3dd242`, tree
@@ -232,6 +243,8 @@ The [remaining development plan](remaining-development-plan.md) defines 40 compl
 Reconciled 2026-09-30. Accepted starting baseline `383354729e506ef93a4c458552c6087cb717fa9c`, tree `c36e602d2392423ad73e6ef797e2b89e8de12d51`, contains customer-facing test downloads, the first WP-09 CMS slice, test promotion administration, persisted editorial content, the repository engineering standard, scheduled site publication, fail-closed public pages, the Site Releases row menu, duration-balanced CI shards, the media upload path fix from PR #80, editable site images from PRs #81 and #82, and their follow-ups with CI time limits in [PR #83](https://github.com/VASEYDEV/VASEYAUDIO/pull/83), plus production scanner support and the shared worker budget in [PR #84](https://github.com/VASEYDEV/VASEYAUDIO/pull/84), and conservative track-media commit cleanup in [PR #86](https://github.com/VASEYDEV/VASEYAUDIO/pull/86). Each completed full CI and independent review before merge. No production activation or actual provider transaction is claimed.
 
 ## Current increment and next handoff
+
+*Historical, September 30, 2026: the heading and the "current increment" wording below describe that date. The heading is kept so existing links resolve; the current status is at the top of this file.*
 
 ### Encoder diagnostics — current increment
 
