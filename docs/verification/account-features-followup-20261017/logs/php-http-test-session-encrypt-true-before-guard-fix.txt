@@ -5,7 +5,7 @@ Configuration: /home/user/wt/b4f/phpunit.xml
 
 FFFFFFFFFF........FFF..E.FFF                                      28 / 28 (100%)
 
-Time: 01:56.443, Memory: 24.50 MB
+Time: 03:10.554, Memory: 24.50 MB
 
 There was 1 error:
 
