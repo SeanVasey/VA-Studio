@@ -357,3 +357,6 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-16 F2b separate finala216 review APPROVE BOUNDED SOURCE/SEALED EVIDENCE/noP0P1/requiredcorrections.139members/798115bytes/sixoriginals(3combinedpasses/3nonpasses)/5bundles/12335Gitbindings/65physical-loader/16reviewimports/56frozen independently reconciled;9completechildsets distinctfrompartial300set. Nativewhole4/70+calibration1/17 source572,SQLite12/181 sourcec96/literalcarry,allfailedoriginals andSQLshutdown0/ZPIDgonefalse/FDpermissionfailure retained. Exactheadcarry/newcheap/fullinventory/expectedSHAmergepending; fullF2/host/release remainopen.
+
+
+2026-10-17 F2b merged PR #132 at `efa6eea5b007f1f2623c4009c1e9bef737f06bee` from exact approved head `a6b143ce862f9da6c315dbbbb5884f8c01657653`, cheap preflight 38837046611 success, 0 review threads, merge tree equals head tree ([receipt](../../verification/fixture-lifecycle-20261016/merge-receipt.md), reconstructed 2026-10-17). No P2 was raised on PR #132. The open deferred P2s are unchanged: B4 #127 r4287886519 and r4287886535; membership afterCommit refusal (C4c review); shared/identity V1/generic/IdentityOriginalCommitWitness metadata; schema-admission unexpected-trigger inventory. Each still rides its next related batch.

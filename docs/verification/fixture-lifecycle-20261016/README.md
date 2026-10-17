@@ -1,5 +1,7 @@
 # Bounded native lifecycle supervision — work in progress
 
+> **Merged 2026-10-16 as PR #132** (`efa6eea5`, head `a6b143ce`). See the [merge receipt](merge-receipt.md). The text below is the pre-merge record and is kept unchanged.
+
 PR131 is merged at3b90ce476d4480de850e849d19dfd0a5b40d6835. Its failed native lifecycle whole4/8/E4 and older default-success1/2/E1 remain unaccepted originals; only one older dataset timeout is established.
 
 This batch evaluates one fixed MySQL300-second child allowance, retaining SQLite90 seconds, all four original datasets, two complete setup/body/cleanup cycles per child, exact expected body error/exit2, warning checks, migration/row/view/alias/reset assertions and actual parent cleanup. Actual local/CI declarations propagate without manufacturing authority. No application/provider/request timeout, schema, lockfile, resource profile or flag changes.
