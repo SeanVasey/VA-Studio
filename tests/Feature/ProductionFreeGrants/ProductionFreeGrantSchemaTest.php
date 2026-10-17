@@ -214,6 +214,61 @@ final class ProductionFreeGrantSchemaTest extends TestCase
         $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'shadowed_schema');
     }
 
+    public function test_native_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native installed definitions replayed in installer order; the SQLite catalog statements are the sibling SQLite-only test.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $full = $this->nativeObjects();
+        $steps = $this->nativeSteps();
+        $this->assertCount(36, $steps);
+        // One schema per test keeps the native cost bounded; every prefix still starts from an empty owned set.
+        foreach (array_column(self::prefixes(), 0) as $prefix) {
+            $this->wipeOwned();
+            foreach (array_slice($steps, 0, $prefix) as $sql) {
+                $pdo->exec($sql);
+            }
+            (new ProductionFreeGrantSchema)->up();
+            (new ProductionFreeGrantSchema)->up();
+            $this->assertSame($full, $this->nativeObjects(), 'Installation prefix '.$prefix.' did not resume to the exact schema.');
+        }
+    }
+
+    public function test_native_temporary_shadow_of_a_parent_table_is_refused(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native session temporary table resolution; the SQLite parent and owned shadows are the sibling SQLite-only test.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $before = $this->nativeObjects();
+        // Identical columns: only the session shadow itself differs from the durable parent.
+        $pdo->exec('CREATE TEMPORARY TABLE users LIKE `'.str_replace('`', '``', DB::connection()->getDatabaseName()).'`.users');
+        try {
+            $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'parent_floor');
+        } finally {
+            $pdo->exec('DROP TEMPORARY TABLE users');
+        }
+        $this->assertSame($before, $this->nativeObjects());
+        (new ProductionFreeGrantSchema)->up();
+        $this->assertSame($before, $this->nativeObjects());
+    }
+
+    public function test_native_parent_floor_drift_is_refused_before_the_first_owned_ddl(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native parent dictionary drift; the SQLite renamed parent is the sibling SQLite-only test.');
+        }
+        $this->wipeOwned();
+        $pdo = DB::connection()->getPdo();
+        // InnoDB moves existing references with the renamed table, leaving a drifted replacement under the parent name.
+        $pdo->exec('RENAME TABLE customer_accounts TO customer_accounts_moved');
+        $pdo->exec('CREATE TABLE customer_accounts (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, active VARCHAR(1) NOT NULL) ENGINE=InnoDB');
+        $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'parent_floor');
+        $this->assertFalse($this->exists('production_free_definitions'));
+        $this->assertSame([], $this->nativeObjects());
+    }
+
     private function journey(bool $revoke = false): array
     {
         $definition = $this->openDefinition();
@@ -257,6 +312,36 @@ final class ProductionFreeGrantSchemaTest extends TestCase
         }
 
         return $steps;
+    }
+
+    /** Native counterpart of steps(): the installed definitions as the server reports them, in the installer's own order. */
+    private function nativeSteps(): array
+    {
+        $pdo = DB::connection()->getPdo();
+        $steps = [];
+        foreach (ProductionFreeGrantSchema::TABLES as $table) {
+            $steps[] = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM)[1];
+            foreach (['insert', 'update', 'delete'] as $event) {
+                $steps[] = $pdo->query('SHOW CREATE TRIGGER `'.$table.'_'.$event.'`')->fetch(PDO::FETCH_ASSOC)['SQL Original Statement'];
+            }
+        }
+
+        return $steps;
+    }
+
+    /** Exact native definitions of every owned table and guard, not only their names. */
+    private function nativeObjects(): array
+    {
+        $pdo = DB::connection()->getPdo();
+        $objects = [];
+        foreach ($pdo->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE 'production\\_free\\_%' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_COLUMN) as $table) {
+            $objects['table '.$table] = $pdo->query('SHOW CREATE TABLE `'.$table.'`')->fetch(PDO::FETCH_NUM)[1];
+        }
+        foreach ($pdo->query("SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_ORDER, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND TRIGGER_NAME LIKE 'production\\_free\\_%' ORDER BY TRIGGER_NAME")->fetchAll(PDO::FETCH_ASSOC) as $guard) {
+            $objects['trigger '.$guard['TRIGGER_NAME']] = $guard;
+        }
+
+        return $objects;
     }
 
     private function wipeOwned(): void

@@ -183,6 +183,25 @@ class BillingSubscriptionApprovalTest extends TestCase
         (new BillingSchema)->assertOwned(DB::connection()->getPdo());
     }
 
+    public function test_native_encryption_callback_ddl_cannot_write_an_approval_after_its_implicit_commit(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL DDL implicitly commits; the transactional SQLite case is the sibling SQLite-only test.');
+        }
+        [$plan, $buyer, $staff] = $this->fixture();
+        $pdo = DB::connection()->getPdo();
+        $this->encryptionCallback(fn () => $pdo->exec('DROP TRIGGER production_membership_billing_subscriptions_update'));
+        $this->refused(fn () => $this->approve($plan, $buyer, $staff), 'schema_prefix');
+        $this->assertSame(0, DB::table(BillingSchema::TABLES[0])->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse($pdo->inTransaction());
+        // Unlike SQLite, the dropped guard cannot be rolled back; the schema stays refused rather than silently repaired.
+        $this->assertSame(0, (int) $pdo->query("SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND TRIGGER_NAME = 'production_membership_billing_subscriptions_update'")->fetchColumn());
+        $this->refused(fn () => (new BillingSchema)->assertOwned($pdo), 'schema_prefix');
+        $this->refused(fn () => $this->approve($plan, $buyer, $staff), 'schema_prefix');
+        $this->assertSame(0, DB::table(BillingSchema::TABLES[0])->count());
+    }
+
     public function test_result_is_provisional_and_caller_rollback_retains_no_approval(): void
     {
         [$plan, $buyer, $staff] = $this->fixture();

@@ -281,6 +281,42 @@ final class PaidTaxSchemaRecoveryTest extends TestCase
         }
     }
 
+    public function test_native_composite_dependency_primary_key_is_not_a_unique_id_target(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native PRIMARY dictionary shape refusal; the SQLite shape is the sibling SQLite-only test.');
+        }
+        $composite = 'CREATE TABLE users (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, tenant BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id, tenant)) ENGINE=InnoDB';
+        // Deliberate disposable parent damage; the preserved V1 row's FK prevents a normal drop.
+        Schema::withoutForeignKeyConstraints(function () use ($composite): void {
+            Schema::drop('users');
+            // MySQL 8.4 itself refuses a referenced parent whose key is not unique on id alone (ER 6125).
+            try {
+                DB::unprepared($composite);
+                $this->fail('The server accepted a non-standard referenced key under its default restriction.');
+            } catch (QueryException $error) {
+                $this->assertSame(6125, $error->errorInfo[1] ?? null);
+            }
+            // Reach the damaged state the application must still refuse even where the server permits it.
+            $restriction = (int) DB::selectOne('SELECT @@SESSION.restrict_fk_on_non_standard_key AS value')->value;
+            DB::unprepared('SET SESSION restrict_fk_on_non_standard_key = OFF');
+            try {
+                DB::unprepared($composite);
+            } finally {
+                DB::unprepared('SET SESSION restrict_fk_on_non_standard_key = '.($restriction === 1 ? 'ON' : 'OFF'));
+            }
+        });
+        $before = $this->objects();
+        try {
+            $this->migrate();
+            $this->fail('Composite first component cannot be an owned FK target.');
+        } catch (LogicException $error) {
+            $this->assertSame('Paid grant dependency primary key changed.', $error->getMessage());
+            $this->assertSame($before, $this->objects());
+            $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
+        }
+    }
+
     public function test_native_schema_global_exact_case_accent_fk_and_routine_identities_refuse_before_first_owned_ddl(): void
     {
         if (DB::getDriverName() !== 'mysql') {
