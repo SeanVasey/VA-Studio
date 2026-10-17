@@ -191,7 +191,8 @@ class BillingSubscriptionApprovalTest extends TestCase
         [$plan, $buyer, $staff] = $this->fixture();
         $pdo = DB::connection()->getPdo();
         $this->encryptionCallback(fn () => $pdo->exec('DROP TRIGGER production_membership_billing_subscriptions_update'));
-        $this->refused(fn () => $this->approve($plan, $buyer, $staff), 'schema_prefix');
+        // The implicit commit destroys the MembershipRows savepoint marker, so the frame refuses before the write.
+        $this->refused(fn () => $this->approve($plan, $buyer, $staff), 'changed_primary_or_schema');
         $this->assertSame(0, DB::table(BillingSchema::TABLES[0])->count());
         $this->assertSame(0, DB::transactionLevel());
         $this->assertFalse($pdo->inTransaction());
