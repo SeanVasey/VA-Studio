@@ -1,8 +1,46 @@
 # Remaining development and completion plan
 
-Current overlay: verified main4150b858 includes PR31 after fresh preflight37598818397 and exact independent review. Consent250 is approved on d22 and composed as e319 with all38 source bindings unchanged, actual HTTP16/171, frontend63 and TypeScript. Production identity is held by an actual incompatible-parent migration canary; its shared HTTP/UI/SMTP journey passes remain precise component evidence. Attachment root HTTP6/247 and mounted5 pass with private page/stream policy; original root harness mistakes are retained. Checkout9f, free retry/status, paid252, suppression251 and private discovery248 remain active. Six accepted/34 open parent groups and all103 parity rows remain; no final acceptance or external activation.
+## Current status — October 17, 2026 UTC
 
-## Current cloud execution — October 7, 2026 UTC
+This plan was written on October 2 and amended by dated blocks through October 7. Those blocks are historical: each records the state, pending items and checkpoints of its own date and is not the current status. For the current state read the [development agenda](handoff/2026-10-15/DEVELOPMENT-AGENDA.md) (completed development and remaining work by area, and the dependency order), the [October 17 resumption note](handoff/2026-10-17/RESUMPTION.md) (open work lanes, CI cost posture and the items that wait on Sean) and the [Claude Code plan and merge ledger](handoff/2026-10-07/CLAUDE-PLAN.md) (§3 phases and the §5 per-merge ledger).
+
+In the [task register](remaining-development-tasks.csv) only the six groups T03 to T08 are Accepted; 34 stay open, and six of forty is not a completion percentage. On October 17 the status cells of T18, T21, T22, T28, T30 and T38 were rewritten to cite the merged pull requests (SeanVasey/VA-Studio) and their remaining conditions. The other status cells are free text written between October 2 and 7 and were not re-audited in that refresh. Commerce, customer, membership and delivery capabilities remain default-off and test-only, and no live payment, production deployment, customer import or launch acceptance is claimed.
+
+## Parity status, source-read October 17, 2026
+
+The [parity coverage map](remaining-parity-coverage.csv) now carries two more columns, `development_status_20261017` and `status_evidence`, giving the result of reading the source on October 17, 2026 against each of the 103 requirements. **This is a reading of the code, not test acceptance, not release acceptance and not a completion percentage.** Nothing was executed for it. A row marked implemented and evidenced means the behavior exists in code with tests or documented evidence; where it involves commerce, customers, payments or delivery it exists only behind default-off, test-only policies. Every `acceptance_requirement` still has to be met on one exact, independently reviewed final candidate. A status goes stale as soon as a related pull request merges, so the pull request that changes the behavior also updates its row.
+
+| Status value | Meaning | Rows |
+| --- | --- | --- |
+| `implemented_evidenced` | The behavior exists and has tests or documented evidence, possibly default-off, test-only or awaiting device or host acceptance | 43 |
+| `implemented_partial` | Part of the behavior exists; `status_evidence` names the gap | 31 |
+| `not_implemented` | Nothing exists yet, including the conditional PayPal row (FP-062) | 13 |
+| `blocked_on_sean` | Needs a decision or private input that only Sean can give | 5 |
+| `postlaunch_by_design` | An explicit postlaunch enhancement that is not part of launch scope | 11 |
+
+The totals are 103 rows: 43 implemented and evidenced, 31 implemented in part, 24 not implemented (13 outright, including the conditional PayPal row, and 11 postlaunch by design) and 5 blocked on Sean.
+
+| Area | Implemented and evidenced | Implemented in part | Not implemented | Blocked on Sean | Postlaunch by design |
+| --- | --- | --- | --- | --- | --- |
+| Storefront and content | FP-001 to FP-004, FP-011, FP-012, FP-016 (7) | FP-005, FP-013 to FP-015, FP-017 (5) | none | none | none |
+| Product families | FP-086 (1) | FP-006 to FP-008, FP-010, FP-087 (5) | FP-088 (1) | none | none |
+| Player and preview | FP-018 to FP-022, FP-024 (6) | FP-023, FP-025 (2) | none | none | none |
+| Admin, catalog and media | FP-027, FP-029 to FP-031, FP-033, FP-036, FP-038, FP-039, FP-042 to FP-047 (14) | FP-032, FP-034, FP-035, FP-037, FP-040, FP-041 (6) | FP-028 (1) | none | none |
+| Licensing and exclusives | FP-049 to FP-054 (6) | FP-055 (1) | FP-056, FP-058 (2) | none | none |
+| Checkout, payments and tax | FP-060, FP-064, FP-065 (3) | FP-061, FP-067, FP-068 (3) | FP-062, FP-066, FP-069 (3) | FP-063 (1) | none |
+| Delivery and customer | FP-073, FP-074, FP-078 to FP-080 (5) | FP-075 to FP-077, FP-081, FP-082 (5) | none | none | none |
+| Memberships | FP-084 (1) | FP-009 (1) | none | FP-083, FP-085 (2) | none |
+| Reporting and integrations | none | FP-091 (1) | FP-089, FP-090 (2) | FP-095 (1) | none |
+| Postlaunch | none | none | none | none | FP-026, FP-048, FP-057, FP-059, FP-070 to FP-072, FP-092 to FP-094, FP-096 (11) |
+| Migration and launch | none | FP-098, FP-102 (2) | FP-099 to FP-101, FP-103 (4) | FP-097 (1) | none |
+
+The largest remaining gaps are the public storefront, purchase and delivery of collections, kits, services and merchandise (FP-006 to FP-008, FP-010, FP-087, FP-088); the money-moving refund and dispute lifecycle, which has only default-off prerequisites (FP-068); the member-facing membership lifecycle (FP-009, FP-083, FP-085); reporting and CRM (FP-089 to FP-091); and migration and launch (FP-097 to FP-103). Real-provider, real-host and physical-device evidence is missing across the board, and Sean's inputs (U-04, U-09, U-10, S-9) block FP-063, FP-083, FP-085, FP-095 and FP-097.
+
+## Historical overlay — October 7, 2026 (superseded)
+
+Overlay as of October 7: verified main4150b858 includes PR31 after fresh preflight37598818397 and exact independent review. Consent250 is approved on d22 and composed as e319 with all38 source bindings unchanged, actual HTTP16/171, frontend63 and TypeScript. Production identity is held by an actual incompatible-parent migration canary; its shared HTTP/UI/SMTP journey passes remain precise component evidence. Attachment root HTTP6/247 and mounted5 pass with private page/stream policy; original root harness mistakes are retained. Checkout9f, free retry/status, paid252, suppression251 and private discovery248 remain active. Six accepted/34 open parent groups and all103 parity rows remain; no final acceptance or external activation.
+
+## Historical cloud execution — October 7, 2026 UTC (superseded)
 
 Verified main `da70eba95c46522cd4084db4e79f764ba401fd7c` includes PRs25–30:
 epoch recovery, amount preparation, actual crawler correction, installation/
@@ -26,7 +64,7 @@ criteria/103 parity mappings remain; six parents accepted/34 open is not a code
 percentage. Actual legal/source/provider/hosting facts and final exact-SHA
 acceptance retain concrete gates. `/root` is the sole integration owner.
 
-## Reviewed corrective development candidate — October 7, 2026 UTC
+## Reviewed corrective development candidate — October 7, 2026 UTC (historical)
 
 PR #17 retains policy-bound preparation and corrects both the PR #16 membership
 rollback bookkeeping finding and the PR #17 concurrent replay finding. The
@@ -40,7 +78,7 @@ All forty criteria and their acceptance counts remain unchanged. After this
 batch, dependency PRs #1/#2 need selective current-main compatibility; #3 retains
 its immutable PDF-profile blocker.
 
-## Current development policy and source — October 6, 2026 UTC
+## Development policy and source — October 6, 2026 UTC (historical record)
 
 Verified main `13d7474f` includes merged PR #13 and every preceding product
 branch from PRs #7–#12. PR #14 at `4abee918` and current AGENTS.md supersede
@@ -62,7 +100,7 @@ Sean directed the GitLab-to-GitHub handoff to [SeanVasey/VA-Studio](https://gith
 
 The GitLab execution addendum below is a preserved checkpoint. Its capacity blocker and agent identities describe that environment and must not be assumed to describe current GitHub execution.
 
-## Current GitLab execution addendum — October 2, 2026
+## Historical GitLab execution addendum — October 2, 2026
 
 Sean's current direction is to organize agents, finish configuration and complete his single-owner store for content onboarding and sales. The [agent and launch queue](development-agent-queue.md) now maps all 40 groups to seven bounded delivery/review slots, actual current identities, queued successors and evidence-based release stages. One lead owns integration on `codex/gitlab-catalog-writer-locks-20261002`; later parallel runtime packages use separate worktrees with named files and contracts. Historical contributor-count and active-agent descriptions below describe their earlier checkpoints.
 
@@ -132,7 +170,7 @@ T34 import tooling starts early with synthetic fixtures after the source schema 
 
 ## Parity-map interpretation
 
-The coverage CSV gives a primary accountable task, not a completion mark. `baseline_benchmark` means preserve and reconcile related landed evidence; it can still contain uncovered acceptance cases. `unconditional_baseline_completion` identifies named remaining completion work; `unconditional_baseline_reconciliation` requires inspection before estimating its code delta. `conditional_source_baseline` needs a source-backed scope decision. `enhancement_postlaunch` preserves an already optional requirement. All entries are interpreted through the single-seller boundary above. New source findings use additional stable child IDs; record scope changes and their authority instead of altering history.
+The coverage CSV gives a primary accountable task, not a completion mark; its `development_status_20261017` and `status_evidence` columns add a dated source-read status (see [Parity status](#parity-status-source-read-october-17-2026)) that is likewise not acceptance. `baseline_benchmark` means preserve and reconcile related landed evidence; it can still contain uncovered acceptance cases. `unconditional_baseline_completion` identifies named remaining completion work; `unconditional_baseline_reconciliation` requires inspection before estimating its code delta. `conditional_source_baseline` needs a source-backed scope decision. `enhancement_postlaunch` preserves an already optional requirement. All entries are interpreted through the single-seller boundary above. New source findings use additional stable child IDs; record scope changes and their authority instead of altering history.
 
 ## Required coverage inside the larger deliverables
 
@@ -222,7 +260,9 @@ No delivery deadline was supplied. After B0 and the first B1 batch, record actua
 
 Top risks: unknown active obligations (high impact; resolve T09 early), policy/provider delays (high impact; prepare T10 in parallel), test timing variance (observed; profile T02), cross-branch integration conflict (bounded parallel ownership), and late design gaps (T11 plus feature-level browser acceptance). Each has a named task rather than an untracked contingency.
 
-## Immediate execution order
+## Immediate execution order — October 2, 2026 (historical)
+
+This order is the October 2 sequence and is kept for provenance. The current order is the dependency order in the [development agenda](handoff/2026-10-15/DEVELOPMENT-AGENDA.md).
 
 1. **T12 rights writers:** integrate current authority/MFA, create/edit/verify administration and adversarial tests into one independently reviewed candidate. Complete available focused feedback; hosted MySQL/full acceptance waits for the payment-authorization restriction.
 2. **T12 publication:** verified writer participation precedes reviewed manifest compare/apply; track scheduling follows its fence and an explicit timing decision.
