@@ -1,0 +1,16 @@
+ops/monitoring/queue-age-check.sh against MySQL 8.4.11 with the real `jobs` and `failed_jobs` tables created by the application's own migration
+(database/migrations/0001_01_01_000002_create_jobs_table.php), an account holding SELECT on those two tables only, and four jobs plus
+two failed rows inserted (a payload containing a sentinel string, to prove it is never read).
+
+$ queue-age-check.sh --conf <conf>
+WARN queue=media ready=2 oldest_ready_s=400 reserved=0 oldest_reserved_s=0 failed_24h=0 :: ready jobs have waited 400s (warning at 300s)
+WARN queue=payments ready=0 oldest_ready_s=0 reserved=1 oldest_reserved_s=1300 failed_24h=2 :: a job has been reserved 1300s; 2 failed in 24h
+SUMMARY WARN queues=2 failed_24h=2                                  exit 1
+  (a job whose available_at is in the future, queue `default`, is correctly not counted as ready; the payload sentinel is not in the output)
+
+$ mysql --init-command='SET SESSION TRANSACTION READ ONLY' -uroot -e 'DELETE FROM jobs'        (the script's session setting, even for root)
+ERROR 1792 (25006) at line 1: Cannot execute statement in a READ ONLY transaction.
+  rows in jobs afterwards: 4
+
+$ (SELECT revoked on failed_jobs) queue-age-check.sh --conf <conf>
+UNKNOWN the queue tables could not be read (database unreachable, account unable to SELECT, or schema missing)       exit 3
