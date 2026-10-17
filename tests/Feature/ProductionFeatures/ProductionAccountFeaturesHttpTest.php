@@ -3,6 +3,7 @@
 namespace Tests\Feature\ProductionFeatures;
 
 use App\Domain\Customers\ProductionFeatures\Listening\ProductionListeningLibrary;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureException;
 use App\Domain\Customers\ProductionFeatures\ProductionFeaturePreparation;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeatureIdentity;
 use App\Http\AccountFeatures\AccountFeatureController;
@@ -16,10 +17,13 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
 use Illuminate\Routing\CompiledRouteCollection;
 use Illuminate\Session\ArraySessionHandler;
+use Illuminate\Session\EncryptedStore;
+use Illuminate\Session\SessionManager;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -120,6 +124,82 @@ class ProductionAccountFeaturesHttpTest extends TestCase
         $this->assertSame('unknown', $pref['preferences']['purposes'][0]['status']);
         $this->assertFalse($pref['preferences']['purposes'][0]['canGrant']);
         $this->assertSame('not_requested', $pref['preferences']['purposes'][0]['suppression']['status']);
+    }
+
+    public static function sessionStores(): array
+    {
+        return [
+            'plain Store' => ['plain', Store::class, true],
+            'EncryptedStore' => ['encrypted', EncryptedStore::class, true],
+            'plain Store from a replaced session manager (control)' => ['replaced', Store::class, true],
+            'other Store subclass' => ['custom', null, false],
+        ];
+    }
+
+    /** The session store class is part of the guard's exact-class admission: the two framework classes only. */
+    #[DataProvider('sessionStores')]
+    public function test_request_guard_admits_exactly_the_two_framework_session_store_classes(string $kind, ?string $class, bool $admitted): void
+    {
+        config(['session.encrypt' => $kind === 'encrypted']);
+        if ($kind === 'replaced' || $kind === 'custom') {
+            // The framework builds only Store or EncryptedStore, so a replaced manager supplies the other subclass.
+            $custom = $kind === 'custom';
+            $this->app->singleton('session', fn ($app) => new class($app, $custom) extends SessionManager
+            {
+                public function __construct($app, private readonly bool $custom)
+                {
+                    parent::__construct($app);
+                }
+
+                protected function buildSession($handler)
+                {
+                    $name = $this->config->get('session.cookie');
+
+                    return $this->custom ? new class($name, $handler) extends Store {} : new Store($name, $handler);
+                }
+            });
+        }
+        $this->app->forgetInstance('session');
+        $this->app->forgetInstance('session.store');
+        Facade::clearResolvedInstance('session');
+        Facade::clearResolvedInstance('session.store');
+        Auth::forgetGuards();
+        $error = null;
+        $seen = null;
+        Route::middleware('web')->withoutMiddleware(HandleInertiaRequests::class)->get('/customer/features/guard-probe', function (Request $request) use (&$error, &$seen) {
+            $seen = $request->getSession()->store::class;
+            try {
+                $guard = new AccountFeatureRequestGuard($request, ProductionAccountFeatureIdentity::forRequest($request, 'listening_library'));
+                $guard->requireCurrent();
+            } catch (\Throwable $caught) {
+                $error = $caught;
+            }
+
+            return new Response('probe-complete');
+        });
+        $this->signIn();
+        $this->get('/customer/features/guard-probe')->assertOk();
+        if ($class === null) {
+            $this->assertTrue(is_subclass_of($seen, Store::class));
+            $this->assertNotContains($seen, [Store::class, EncryptedStore::class]);
+        } else {
+            $this->assertSame($class, $seen);
+        }
+        if ($admitted) {
+            $this->assertNull($error, $error === null ? '' : $error::class.' at '.$error->getFile().':'.$error->getLine());
+        } else {
+            // Refused by the constructor's own store check, not by another layer of the stack.
+            $this->assertInstanceOf(ProductionFeatureException::class, $error);
+            $this->assertSame(AccountFeatureRequestGuard::class, $error->getTrace()[0]['class'] ?? null);
+            $this->assertSame('__construct', $error->getTrace()[0]['function'] ?? null);
+        }
+        $read = $this->get('/customer/features/listening', ['Accept' => 'application/json']);
+        if ($admitted) {
+            $this->assertSame([200, ['initialized' => false]], $this->released($read));
+        } else {
+            $read->assertStatus(503);
+        }
+        $this->assertSame(0, DB::table('production_account_feature_bindings')->count());
     }
 
     public function test_original_resolved_request_guard_is_positive_through_the_actual_web_stack(): void
