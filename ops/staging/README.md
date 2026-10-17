@@ -318,6 +318,12 @@ There is no global CSP: the application sets CSP on the responses that need one.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
 
+Optional, off unless `/etc/vasey-staging/backup.conf` exists: age encryption to public recipients before the copy leaves the
+host, an rclone remote instead of rsync, and tiered retention. The default behaviour above is unchanged. See
+[`docs/ops/backup-offhost-hardening.md`](../../docs/ops/backup-offhost-hardening.md). Opt-in scanner (clamd) and monitoring
+checks live in [`ops/clamav/`](../clamav/README.md) and [`docs/ops/monitoring-and-host-baseline.md`](../../docs/ops/monitoring-and-host-baseline.md).
+The production counterpart of this kit is [`ops/production/`](../production/README.md); it is derived from these files.
+
 A served release must have a singly linked regular environment with one valid literal 32-byte APP_KEY
 before any snapshot is published. The backup profile requires one assignment per line; multiline quoted
 values are refused so apparent key lines inside another value cannot establish custody. Restore admission
