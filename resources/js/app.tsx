@@ -32,6 +32,8 @@ createInertiaApp({
     if (name === 'ProductionCustomerIdentity') return ProductionCustomerIdentity;
     if (name === 'ServiceProjects') return ServiceProjects;
     if (name === 'PrivateSupportAttachments') return PrivateSupportAttachments;
+    // Default-off Tax shell: a separate lazy chunk, so the main bundle is unchanged while its route stays unmounted.
+    if (name === 'PaidTaxLicenses') return import('./Pages/PaidTaxLicenses').then(page => page.default);
     throw new Error(`Unknown page: ${name}`);
   },
   setup({ el, App, props }) { createRoot(el).render(<App {...props} />); },
