@@ -242,8 +242,9 @@ final class ProductionFreeGrantSchemaTest extends TestCase
         }
         $pdo = DB::connection()->getPdo();
         $before = $this->nativeObjects();
-        // Identical columns: only the session shadow itself differs from the durable parent.
-        $pdo->exec('CREATE TEMPORARY TABLE users LIKE `'.str_replace('`', '``', DB::connection()->getDatabaseName()).'`.users');
+        // Same column names and types, no rows: the session shadow itself is what differs from the durable parent.
+        // MySQL refuses CREATE TEMPORARY TABLE ... LIKE the same name (1066); CREATE ... SELECT reads the durable table.
+        $pdo->exec('CREATE TEMPORARY TABLE users AS SELECT * FROM `'.str_replace('`', '``', DB::connection()->getDatabaseName()).'`.users WHERE 1 = 0');
         try {
             $this->refuses(fn () => (new ProductionFreeGrantSchema)->up(), 'parent_floor');
         } finally {
