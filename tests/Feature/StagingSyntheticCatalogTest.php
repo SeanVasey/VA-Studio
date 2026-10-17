@@ -278,6 +278,15 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->catalog()->expectsOutputToContain('withdrawn by staff; left unpublished')->assertExitCode(1);
         $this->assertSame($withdrawn, $this->census());
         $this->assertSame('draft', $first->fresh()->status);
+
+        // A staff edit that strips a published synthetic track's label is reported, never silently accepted or reverted.
+        $second = Track::where('slug', SyntheticRehearsalCatalog::tracks()[1]['slug'])->sole();
+        app(SaveTrackMetadata::class)->handle($second, ['title' => 'Edited published row', 'metadata_version' => $second->metadata_version], $operator);
+        $edited = $this->census();
+        $this->catalog()->expectsOutputToContain('track   '.$second->slug.'  present, metadata differs from the definition; left unchanged')
+            ->assertExitCode(1);
+        $this->assertSame($edited, $this->census());
+        $this->assertSame(['published', 'Edited published row'], [$second->fresh()->status, $second->fresh()->title]);
     }
 
     public function test_an_interrupted_run_resumes_and_a_marked_row_that_differs_is_refused_unchanged(): void

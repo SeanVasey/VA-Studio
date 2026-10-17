@@ -65,6 +65,11 @@ final class SyntheticRehearsalBuilder
     {
         $track = Track::query()->where('slug', $definition['slug'])->first();
         if ($track !== null && $track->status === 'published') {
+            if (! $this->metadataMatches($track, $definition)) {
+                // Staff edited a published synthetic track; its labels can no longer be vouched for, and it is not changed back.
+                return ['track' => $track, 'state' => 'present, metadata differs from the definition; left unchanged', 'ready' => false,
+                    'revisions' => $this->revisions($track, $licenses)];
+            }
             $blockers = app(PublicationReadiness::class)->blockers($track);
 
             return ['track' => $track, 'state' => $blockers === [] ? 'already present' : 'present, not ready: '.implode(' ', $blockers),
