@@ -1,0 +1,21 @@
+
+> test
+> vitest run
+
+
+ RUN  v5.0.3 /home/user/wt/b4f
+
+Not implemented: navigation to another Document
+A12 P3 stopped after 620000 ms
+Not implemented: navigation to another Document
+
+ Test Files  66 passed (66)
+      Tests  1151 passed (1151)
+   Start at  17:31:01
+   Duration  131.76s (tests 53%, environment 34%, setup 5%, import 5%, transform 2%)
+
+Environment  jsdom was created 66 times · 127.75s total, 34% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+exit=0

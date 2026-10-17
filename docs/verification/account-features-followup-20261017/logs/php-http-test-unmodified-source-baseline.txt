@@ -1,0 +1,126 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/b4f/phpunit.xml
+
+FFFFFFFFFF........FFF..E.FFF                                      28 / 28 (100%)
+
+Time: 01:56.443, Memory: 24.50 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_reentry_cannot_complete_original_epoch_before_later_withdrawal
+Error: Call to a member function getStatusCode() on null
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:347
+
+--
+
+There were 16 failures:
+
+1) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_actual_session_csrf_read_initialize_change_export_and_preferences_unknown
+Expected response status code [200] but received 503.
+Failed asserting that 503 is identical to 200.
+
+/home/user/wt/b4f/vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:46
+/home/user/wt/b4f/vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:183
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:104
+
+2) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_original_resolved_request_guard_is_positive_through_the_actual_web_stack
+App\Domain\Customers\ProductionFeatures\ProductionFeatureException at /home/user/wt/b4f/app/Http/AccountFeatures/AccountFeatureRequestGuard.php:51
+Failed asserting that App\Domain\Customers\ProductionFeatures\ProductionFeatureException Object #3241 (
+    'message' => 'Reload your account before trying again.',
+    'string' => '',
+    'code' => 0,
+    'file' => '/home/user/wt/b4f/app/Http/AccountFeatures/AccountFeatureRequestGuard.php',
+    'line' => 51,
+    'previous' => null,
+    'status' => 503,
+) is null.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:150
+
+3) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_premature_handled_send_and_split_withdrawal_never_release_delayed_private_bytes
+Failed asserting that null is identical to ''.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:171
+
+4) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_standalone_headers_then_late_scope_withdrawal_then_content_emit_nothing
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:182
+
+5) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_handled_late_changes_refuse_original_release@0 with data ('mount')
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:211
+
+6) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_handled_late_changes_refuse_original_release@1 with data ('body')
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:211
+
+7) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_handled_late_changes_refuse_original_release@2 with data ('location')
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:211
+
+8) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_handled_late_changes_refuse_original_release@3 with data ('actor')
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:211
+
+9) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_handled_late_changes_refuse_original_release@4 with data ('deadline')
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:211
+
+10) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_rotated_old_csrf_refuses_and_current_token_remains_valid_without_one_use_claim
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:225
+
+11) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_unused_completed_response_is_not_retained_by_the_kernel_registry
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:271
+
+12) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_late_stringable_auth_slot_is_refused_without_its_callback
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:288
+
+13) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_exact_body_bounds_preserve_feature_change_and_original_identity_limit
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:297
+
+14) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_real_session_save_withdrawal_occurs_before_final_original_release
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:375
+
+15) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_foreign_framework_frame_after_handling_remains_owned_by_its_callback
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:390
+
+16) Tests\Feature\ProductionFeatures\ProductionAccountFeaturesHttpTest::test_native_session_cookie_crossing_a_wall_second_keeps_healthy_original_release
+Failed asserting that an instance of class Symfony\Component\HttpFoundation\Response is an instance of class App\Http\AccountFeatures\AccountFeatureResponse.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:84
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionAccountFeaturesHttpTest.php:422
+
+ERRORS!
+Tests: 28, Assertions: 233, Errors: 1, Failures: 16.
+exit=2
