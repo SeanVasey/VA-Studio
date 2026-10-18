@@ -181,8 +181,8 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
 1. `APP_ENV` is `local`, `testing` or `staging`. The command refuses when the configured environment (`APP_ENV`,
    including a cached configuration) or the running environment is `production`, even with the flag on. It also
    refuses when the two differ, for example through `artisan --env=`.
-2. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true`. The default is false. The key is not yet in
-   `ops/staging/env.staging.example`; add it to the host's `.env` by hand.
+2. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true`. The default is false, and
+   `ops/staging/env.staging.example` states it as `false`; set it to `true` on the host only for the seeding run.
 3. Stripe is in test mode: `STRIPE_MODE=test`, an `sk_test_` key or none, and no live production-checkout setting.
 4. The catalog is empty or synthetic-only. A track that is or was published, or an approved license, outside the
    synthetic definition refuses the run. This is a configuration and catalog check, not proof of host identity.
