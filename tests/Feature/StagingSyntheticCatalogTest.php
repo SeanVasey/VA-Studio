@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\StagingSyntheticCatalog;
+use App\Domain\Catalog\DeactivateOffer;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
@@ -10,17 +12,31 @@ use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Catalog\SyntheticRehearsal\SyntheticRehearsalCatalog;
 use App\Domain\Commerce\CreateQuote;
+use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
+use App\Domain\Rights\SaveLicenseTemplate;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use Closure;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Facades\Filament;
+use Illuminate\Console\OutputStyle;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Testing\PendingCommand;
+use Mockery;
+use RuntimeException;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Question\Question;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
 use Tests\Support\TestOnlyMediaScanner;
 use Tests\TestCase;
@@ -43,6 +59,9 @@ class StagingSyntheticCatalogTest extends TestCase
 
     private TestOnlyMediaScanner $scanner;
 
+    /** The two accounts' passwords, answered at the command's hidden prompts and never printed. */
+    private array $passwords = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,20 +74,46 @@ class StagingSyntheticCatalogTest extends TestCase
 
     private function operators(string $operatorName = 'Synthetic Catalog Operator', string $reviewerName = 'Synthetic Catalog Reviewer'): array
     {
-        foreach ([[$operatorName, self::OPERATOR], [$reviewerName, self::REVIEWER]] as [$name, $email]) {
+        foreach ([[$operatorName, self::OPERATOR], [$reviewerName, self::REVIEWER]] as $index => [$name, $email]) {
+            $this->passwords[$index] = 'SyntheticRehearsal'.random_int(100000, 999999).'Pass';
             $this->artisan('vasey:create-admin')
                 ->expectsQuestion('Operator name', $name)
                 ->expectsQuestion('Email', $email)
-                ->expectsQuestion('Password (at least 16 characters)', 'SyntheticRehearsal'.random_int(100000, 999999).'Pass')
+                ->expectsQuestion('Password (at least 16 characters)', $this->passwords[$index])
                 ->assertSuccessful();
         }
 
         return [User::where('email', self::OPERATOR)->sole(), User::where('email', self::REVIEWER)->sole()];
     }
 
-    private function catalog(array $options = []): PendingCommand
+    /**
+     * A write run answers both hidden password prompts by default; `--check` asks none. `$answers` replaces them for
+     * runs that stop before or between the prompts.
+     */
+    private function catalog(array $options = [], ?array $answers = null): PendingCommand
     {
-        return $this->artisan('vasey:staging-synthetic-catalog', $options + ['--operator' => self::OPERATOR, '--reviewer' => self::REVIEWER]);
+        $pending = $this->artisan('vasey:staging-synthetic-catalog', $options + ['--operator' => self::OPERATOR, '--reviewer' => self::REVIEWER]);
+        $answers ??= isset($options['--check']) ? [] : [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[0],
+            StagingSyntheticCatalog::REVIEWER_PROMPT => $this->passwords[1]];
+        foreach ($answers as $prompt => $answer) {
+            $pending->expectsQuestion($prompt, $answer)->doesntExpectOutputToContain($answer);
+        }
+
+        return $pending;
+    }
+
+    /** Runs the probe under one environment, configured and detected alike unless told otherwise, and always restores testing. */
+    private function inEnvironment(string $detected, Closure $probe, ?string $configured = null): void
+    {
+        $this->app->detectEnvironment(fn (): string => $detected);
+        config(['app.env' => $configured ?? $detected]);
+        try {
+            $probe();
+        } finally {
+            // The disposable database teardown would ask for confirmation in production.
+            $this->app->detectEnvironment(fn (): string => 'testing');
+            config(['app.env' => 'testing']);
+        }
     }
 
     /** Every table a synthetic run could write, so a refusal can prove that it wrote nothing. */
@@ -80,21 +125,58 @@ class StagingSyntheticCatalogTest extends TestCase
         return array_combine($tables, array_map(fn (string $table): int => DB::table($table)->count(), $tables));
     }
 
-    private function assertRefusedWithoutWrites(array $options, string $message): void
+    private function assertRefusedWithoutWrites(array $options, string $message, array $answers = []): void
     {
         $before = $this->census();
         // One expectation per output line: the refusal is a single line ending "Nothing was written."; the census proves it.
-        $this->catalog($options)->expectsOutputToContain($message)->assertExitCode(1);
+        $this->catalog($options, $answers)->expectsOutputToContain($message)->assertExitCode(1);
         $this->assertSame($before, $this->census());
     }
 
-    public function test_production_is_refused_unconditionally_even_with_the_flag_and_test_mode(): void
+    private function attestations(): Collection
+    {
+        return AuditEvent::where('action', StaffWriteAuthority::ATTESTATION_ACTION)->orderBy('id')->get();
+    }
+
+    private function enroll(User ...$accounts): void
+    {
+        $provider = Filament::getPanel('admin')->getMultiFactorAuthenticationProviders()['app'];
+        $this->assertInstanceOf(AppAuthentication::class, $provider);
+        foreach ($accounts as $account) {
+            $account->saveAppAuthenticationSecret($provider->generateSecret());
+        }
+    }
+
+    public function test_production_is_refused_even_with_the_flag_and_test_mode(): void
     {
         $this->operators();
-        $this->app->detectEnvironment(fn (): string => 'production');
-        $this->assertRefusedWithoutWrites([], 'refused in production');
-        $this->assertRefusedWithoutWrites(['--check' => true], 'refused in production');
-        $this->app->detectEnvironment(fn (): string => 'testing'); // The disposable database teardown confirms in production.
+        $this->inEnvironment('production', function (): void {
+            $this->assertRefusedWithoutWrites([], 'refused in production');
+            $this->assertRefusedWithoutWrites(['--check' => true], 'refused in production');
+        });
+    }
+
+    public function test_a_production_configuration_is_refused_when_the_running_environment_says_staging(): void
+    {
+        // Artisan's --env switch changes the running environment only; a cached or loaded APP_ENV=production still refuses.
+        [$operator, $reviewer] = $this->operators();
+        $this->enroll($operator, $reviewer);
+        $this->inEnvironment('staging', function (): void {
+            $this->assertRefusedWithoutWrites([], 'refused in production');
+            $this->assertRefusedWithoutWrites(['--check' => true], 'refused in production');
+        }, 'production');
+    }
+
+    public function test_a_running_environment_that_differs_from_the_configuration_is_refused(): void
+    {
+        [$operator, $reviewer] = $this->operators();
+        $this->enroll($operator, $reviewer);
+        foreach ([['staging', 'testing'], ['testing', 'staging'], ['local', 'staging']] as [$detected, $configured]) {
+            $this->inEnvironment($detected, function (): void {
+                $this->assertRefusedWithoutWrites([], 'running environment differ');
+                $this->assertRefusedWithoutWrites(['--check' => true], 'running environment differ');
+            }, $configured);
+        }
     }
 
     public function test_the_default_off_flag_refuses_before_any_write(): void
@@ -111,10 +193,10 @@ class StagingSyntheticCatalogTest extends TestCase
     {
         $this->operators();
         foreach (['development', 'Staging', 'staging-eu', 'prod', ''] as $environment) {
-            $this->app->detectEnvironment(fn (): string => $environment);
-            $this->assertRefusedWithoutWrites([], 'runs only when APP_ENV is local, testing or staging');
+            $this->inEnvironment($environment, function (): void {
+                $this->assertRefusedWithoutWrites([], 'runs only when APP_ENV is local, testing or staging');
+            });
         }
-        $this->app->detectEnvironment(fn (): string => 'testing');
     }
 
     public function test_stripe_must_be_in_test_mode(): void
@@ -145,17 +227,15 @@ class StagingSyntheticCatalogTest extends TestCase
 
         // Staging requires the panel's staff MFA (evaluated on demand): unenrolled synthetic operators are refused,
         // and enrollment through the panel's own provider is what admits them. No check is relaxed for this command.
-        $this->app->detectEnvironment(fn (): string => 'staging');
-        $this->assertRefusedWithoutWrites([], "does not satisfy the admin panel's MFA rule");
-        $provider = Filament::getPanel('admin')->getMultiFactorAuthenticationProviders()['app'];
-        $this->assertInstanceOf(AppAuthentication::class, $provider);
-        $operator->saveAppAuthenticationSecret($provider->generateSecret());
-        $this->assertRefusedWithoutWrites([], "does not satisfy the admin panel's MFA rule");
-        $reviewer->saveAppAuthenticationSecret($provider->generateSecret());
-        $before = $this->census();
-        $this->catalog(['--check' => true])->expectsOutputToContain('Admission passed')->expectsOutputToContain('Environment: staging')->assertSuccessful();
-        $this->assertSame($before, $this->census());
-        $this->app->detectEnvironment(fn (): string => 'testing');
+        $this->inEnvironment('staging', function () use ($operator, $reviewer): void {
+            $this->assertRefusedWithoutWrites([], "does not satisfy the admin panel's MFA rule");
+            $this->enroll($operator);
+            $this->assertRefusedWithoutWrites([], "does not satisfy the admin panel's MFA rule");
+            $this->enroll($reviewer);
+            $before = $this->census();
+            $this->catalog(['--check' => true])->expectsOutputToContain('Admission passed')->expectsOutputToContain('Environment: staging')->assertSuccessful();
+            $this->assertSame($before, $this->census());
+        });
     }
 
     public function test_a_missing_or_mismatched_seller_tag_is_refused_and_never_generated(): void
@@ -287,6 +367,15 @@ class StagingSyntheticCatalogTest extends TestCase
             ->assertExitCode(1);
         $this->assertSame($edited, $this->census());
         $this->assertSame(['published', 'Edited published row'], [$second->fresh()->status, $second->fresh()->title]);
+
+        // A published synthetic track whose offers no longer match the two TEST PRICE offers is reported, not repaired.
+        $third = Track::where('slug', SyntheticRehearsalCatalog::tracks()[2]['slug'])->sole();
+        app(DeactivateOffer::class)->handle(Offer::where('track_id', $third->id)->orderBy('id')->firstOrFail(), $operator);
+        $deactivated = $this->census();
+        $this->catalog()->expectsOutputToContain('track   '.$third->slug.'  present, offers differ from the definition; left unchanged')
+            ->assertExitCode(1);
+        $this->assertSame($deactivated, $this->census());
+        $this->assertSame(['published', 1], [$third->fresh()->status, Offer::where('track_id', $third->id)->where('is_active', true)->count()]);
     }
 
     public function test_an_interrupted_run_resumes_and_a_marked_row_that_differs_is_refused_unchanged(): void
@@ -382,5 +471,114 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertSame(['width' => 600, 'height' => 600, 'sanitized' => true], $artwork->technical_metadata);
         }
         $this->assertSame([$operator->id], RightsDeclaration::distinct()->pluck('verified_by')->all());
+    }
+
+    public function test_writes_need_an_interactive_console_both_passwords_and_the_lock(): void
+    {
+        $this->operators();
+        $this->assertRefusedWithoutWrites(['--no-interaction' => true], 'interactive trusted console to confirm both staff passwords');
+        $this->assertRefusedWithoutWrites(['--check' => true, '--attest' => true], '--attest does not apply to --check');
+        $this->assertRefusedWithoutWrites([], 'password was not confirmed', [StagingSyntheticCatalog::OPERATOR_PROMPT => 'wrong-password']);
+        $this->assertRefusedWithoutWrites([], 'password was not confirmed', [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[0],
+            StagingSyntheticCatalog::REVIEWER_PROMPT => 'wrong-password']);
+        // The reviewer's password cannot stand in for the operator's, or the reverse.
+        $this->assertRefusedWithoutWrites([], 'password was not confirmed', [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[1]]);
+
+        $held = Cache::lock('vasey:staging-synthetic-catalog', 60);
+        $this->assertTrue($held->get());
+        try {
+            $this->assertRefusedWithoutWrites([], 'Another synthetic catalog run holds the lock', [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[0],
+                StagingSyntheticCatalog::REVIEWER_PROMPT => $this->passwords[1]]);
+        } finally {
+            $held->release();
+        }
+        $this->assertCount(0, $this->attestations());
+    }
+
+    public function test_the_password_prompt_never_falls_back_to_visible_input_and_failures_stay_generic(): void
+    {
+        $this->operators();
+        $command = app(StagingSyntheticCatalog::class);
+        $command->setLaravel($this->app);
+        $input = new ArrayInput(['--operator' => self::OPERATOR, '--reviewer' => self::REVIEWER], $command->getDefinition());
+        $input->setInteractive(true);
+        $buffer = new BufferedOutput;
+        $output = Mockery::mock(OutputStyle::class.'[askQuestion]', [$input, $buffer]);
+        $observed = null;
+        $output->shouldReceive('askQuestion')->once()->andReturnUsing(function (Question $question) use (&$observed): void {
+            $observed = ['hidden' => $question->isHidden(), 'fallback' => $question->isHiddenFallback()];
+            throw new RuntimeException('Unable to hide response at /private/path.');
+        });
+        Log::shouldReceive('warning')->once()->with('Synthetic rehearsal catalog could not confirm the result.', ['exception_class' => RuntimeException::class]);
+        $before = $this->census();
+
+        $this->assertSame(1, $command->run($input, $output));
+        $this->assertSame(['hidden' => true, 'fallback' => false], $observed);
+        $this->assertSame($before, $this->census());
+        $text = $buffer->fetch();
+        $this->assertStringContainsString('Stopped: the result is unconfirmed. Re-run the command to resume', $text);
+        $this->assertStringNotContainsString('Unable to hide', $text);
+        $this->assertStringNotContainsString('/private/path', $text);
+    }
+
+    public function test_staging_requires_an_attestation_and_then_runs_the_whole_chain_with_enrolled_accounts(): void
+    {
+        [$operator, $reviewer] = $this->operators();
+        $this->enroll($operator, $reviewer);
+        // Staging accepts only ClamAV scan evidence, so the media carry the existing synthetic host-scan stand-in pattern.
+        $this->app->instance(MalwareScanner::class, new class extends MalwareScanner
+        {
+            public function scan(string $path): array
+            {
+                return ['engine' => 'clamav', 'version' => 'synthetic-host-scan-stand-in', 'status' => 'clean', 'sha256' => hash_file('sha256', $path)];
+            }
+        });
+        $this->inEnvironment('staging', function () use ($operator, $reviewer): void {
+            $this->assertRefusedWithoutWrites([], 'Re-run with --attest to record a console attestation for both accounts',
+                [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[0], StagingSyntheticCatalog::REVIEWER_PROMPT => $this->passwords[1]]);
+            $this->assertCount(0, $this->attestations());
+
+            $auditStart = (int) AuditEvent::max('id');
+            $this->catalog(['--attest' => true])->expectsOutputToContain('attestation=recorded audit_event=')
+                ->expectsOutputToContain('created and published')->assertSuccessful();
+            $attestations = $this->attestations();
+            $this->assertSame([[$operator->id, 'synthetic_catalog.operator'], [$reviewer->id, 'synthetic_catalog.reviewer']],
+                $attestations->map(fn (AuditEvent $row): array => [$row->actor_id, $row->context['action']])->all());
+            foreach ($attestations as $row) {
+                $this->assertSame('vasey:staging-synthetic-catalog', $row->context['command']);
+                $this->assertSame('synthetic-rehearsal operator='.$operator->id.' reviewer='.$reviewer->id, $row->context['scope_key']);
+                $this->assertSame(['staging', true, true], [$row->context['environment'], $row->context['mfa_required'], $row->context['mfa_enrolled']]);
+            }
+            $this->assertSame($attestations->pluck('id')->all(), AuditEvent::where('id', '>', $auditStart)->orderBy('id')->limit(2)->pluck('id')->all(),
+                'Both attestations precede the first catalog write.');
+            $this->assertSame(6, Track::where('status', 'published')->count());
+            foreach (Track::all() as $track) {
+                $this->assertSame([], app(PublicationReadiness::class)->blockers($track));
+            }
+            $this->assertSame([$reviewer->id], LicenseVersion::distinct()->pluck('approved_by')->all());
+        });
+    }
+
+    public function test_a_catalog_with_a_published_or_once_published_real_track_is_refused(): void
+    {
+        [$operator] = $this->operators();
+        // A real draft that was never published does not block a rehearsal catalog.
+        $real = app(SaveTrackMetadata::class)->handle(null, ['title' => 'Real draft', 'slug' => 'real-draft', 'artist' => 'Real artist'], $operator);
+        $this->catalog(['--check' => true])->expectsOutputToContain('Admission passed')->assertSuccessful();
+        // Simulate a real track that was published and later withdrawn: its reserved URL marks a real catalog.
+        DB::table('tracks')->where('id', $real->id)->update(['published_slug' => 'real-draft']);
+        $this->assertRefusedWithoutWrites([], 'runs only on an empty or synthetic-only catalog');
+        $this->assertRefusedWithoutWrites(['--check' => true], 'runs only on an empty or synthetic-only catalog');
+    }
+
+    public function test_a_catalog_with_an_approved_real_license_is_refused(): void
+    {
+        [$operator, $reviewer] = $this->operators();
+        // A real license template with only a draft does not block; an approved version does.
+        $template = app(SaveLicenseTemplate::class)->create(['name' => 'Real lease', 'slug' => 'real-lease', 'type' => 'non-exclusive'], $operator);
+        $this->assertSame('real-lease', $template->slug);
+        $this->catalog(['--check' => true])->expectsOutputToContain('Admission passed')->assertSuccessful();
+        LicenseFixtures::approved($operator, $reviewer);
+        $this->assertRefusedWithoutWrites([], 'runs only on an empty or synthetic-only catalog');
     }
 }
