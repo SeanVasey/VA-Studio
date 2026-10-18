@@ -244,11 +244,10 @@ All data in it is synthetic: local loopback-SMTP buyers, a recording synthetic T
 
 ## Independent review
 
-A separate reviewer approved the batch at `e947cdb3e08a570362d3380727384d51b97ab43d` with no P0, P1 or P2 ([decision record](independent-review-e947cdb3-DECISION.md), imported verbatim). P3-4 (the changelog said "20 per page", but there is no paging) is corrected in the changelog. P3-1 to P3-3 and P3-5 to P3-7 are deferred to the next Tax batch and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`:
+A separate reviewer approved the batch at `e947cdb3e08a570362d3380727384d51b97ab43d` with no P0, P1 or P2 ([decision record](independent-review-e947cdb3-DECISION.md), imported verbatim). P3-4 (the changelog said "20 per page", but there is no paging) is corrected in the changelog. P3-5 is fixed in `6066e772` (see the Codex P1 section below). P3-1 to P3-3, P3-6 and P3-7 are deferred to the next Tax batch and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`:
 - P3-1: null-safe producer abort;
 - P3-2: a capped locking list helper for the index and status selects;
 - P3-3: distinguish a changed window from a sign-out in the client;
-- P3-5: label the client tax arithmetic as non-authoritative, or drop it;
 - P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
 - P3-7: a signed-out page response.
 
@@ -285,4 +284,8 @@ The change:
 | `npm run build`, then `scripts/ci/scan-client-bundle.py public/build` | exit 0; 14 bundle files, no hits; `public/build` deleted |
 
 No PHP, route, privacy or authorization code changed.
+
+### Re-review of the fix
+
+A separate reviewer approved `6066e772` with no P0, P1 or P2 ([decision record](independent-rereview-6066e772-DECISION.md), imported verbatim). It reproduced the red/green, recomputed both main merges and found no interaction with T1's files. P3-A (stale status text here and in the resumption ledger) is corrected in the following documentation commit. P3-B (seven `amounts()` checks no test catches, a gap that predates this fix), P3-C (wider acceptance variants: inclusive, order scope, subtotal mismatch) and P3-D (consider "included" wording for inclusive tax, with a render case) join the deferred Tax batch.
 

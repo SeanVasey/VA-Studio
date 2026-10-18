@@ -395,3 +395,8 @@ Both need staff to edit an interrupted synthetic draft between runs on staging; 
 - (P3-5, the client tax arithmetic in `amounts()`, is fixed in PR #147 itself: Codex raised the same point as P1 r4305333346, so it could not be deferred.)
 - P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
 - P3-7: a signed-out page response instead of raw JSON.
+
+From the re-review at `6066e772` (also deferred to the next Tax batch):
+- P3-B: refusal cases for the `amounts()` checks no test catches (exact keys on `preTax` and `tax`, `authority`, `calculator`, `tax.currency`, `automatic_tax.enabled`, the `preTax.order_subtotal_minor` range);
+- P3-C: acceptance variants for inclusive tax, order scope and a pre-tax/tax subtotal mismatch;
+- P3-D: consider "included" wording for inclusive tax, with a render case.
