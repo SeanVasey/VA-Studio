@@ -418,7 +418,8 @@ esac
     def test_both_apt_timers_must_be_enabled_and_active(self):
         self.assertIn("OK upgrades: apt-daily.timer and apt-daily-upgrade.timer are enabled and active", self.check().stdout)
         for unit, state, value in (("apt-daily-upgrade.timer", "enabled", "disabled"), ("apt-daily.timer", "active", "inactive"),
-                                   ("apt-daily.timer", "enabled", "masked"), ("apt-daily-upgrade.timer", "enabled", "static")):
+                                   ("apt-daily.timer", "enabled", "masked"), ("apt-daily-upgrade.timer", "enabled", "static"),
+                                   ("apt-daily.timer", "enabled", "enabled-runtime")):
             with self.subTest(unit=unit, state=state, value=value):
                 path = self.timers / f"{unit}.{state}"
                 path.write_text(value + "\n")
