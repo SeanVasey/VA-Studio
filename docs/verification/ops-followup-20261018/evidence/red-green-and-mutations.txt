@@ -1,0 +1,116 @@
+Lane O2 transcripts (2026-10-18). Red runs used the new tests against the scripts as they are at efb22df3 (origin/main);
+green runs used the fixed scripts. Temporary paths are throwaway test directories. Nothing here touched a network or a host.
+
+################ Items 1 and 4: off-host retry and shipping lock (tests/ops/test_staging_backup_offhost.py)
+== RED: new tests vs backup.sh at efb22df3
+ERROR: test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/va-offhost-9018s6c6/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa/20261015T030000Z-aaaaaaaaaaaa.tar.age'
+ERROR: test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/va-offhost-pjrk4or4/backups/.offhost-retry.20261015T030000Z-aaaaaaaaaaaa/20261015T030000Z-aaaaaaaaaaaa.tar.age'
+FAIL: test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+AssertionError: 0 == 0
+FAIL: test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+AssertionError: 1 != 0 : flaky-rclone: immutable file modified
+FAIL: test_a_failing_remote_fails_the_ship_and_cleans_the_staging_copy
+AssertionError: Lists differ: [] != ['.offhost-retry.20261015T030000Z-aaaaaaaaaaaa']
+FAIL: test_a_kept_copy_for_other_recipients_is_never_sent
+AssertionError: 'remove that object first' not found in ''
+FAIL: test_a_kept_copy_whose_set_is_gone_is_removed
+AssertionError: True is not false : its set was pruned, so nothing can ever ship it
+FAIL: test_the_kept_copy_is_private_ciphertext_and_never_the_plaintext_set
+AssertionError: 'kept the encrypted copy' not found in ''
+Ran 52 tests in 12.485s
+FAILED (failures=6, errors=2)
+== GREEN
+Ran 52 tests in 13.575s
+
+OK
+
+################ Item 5: cleanup mutations (test_stale_shipping_directories_are_cleared_and_fresh_ones_are_not)
+ITEM 5 (P3-3), script at efb22df3 unchanged:
+ new test vs unmodified script: OK
+ mutation .ship.* : new test FAILED "a seven-character suffix is not the .ship.XXXXXX shape"; old test OK
+ mutation find -L (cleanup line only): new test FAILED "a link is never followed"; old test OK
+
+################ Item 2: host baseline (tests/ops/test_monitoring_scripts.py, class HostBaseline)
+== RED: host-baseline tests vs host-baseline.sh at efb22df3
+FAIL: test_apply_unattended_upgrades_fails_when_the_timers_cannot_be_enabled
+AssertionError: 0 != 2 : plan: apt-get install -y unattended-upgrades; write /tmp/va-monitoring-3xzqw6x6/52vasey:
+FAIL: test_both_apt_timers_must_be_enabled_and_active
+AssertionError: 'OK upgrades: apt-daily.timer and apt-daily-upgrade.timer are enabled and active' not found in 'OK firewall: ufw is active\nOK firewall: default deny incoming, allow outgoing\nOK firewall: allows exactly 80 443 22\nOK listeners: only SSH, 80 and 443 listen beyond loopback\nOK upgrades: daily unattended upgrades are enabled\nOK upgrades: the security pocket is allowed\nOK upgrades: no reboot is pending\nOK ssh: password authentication is off\nOK ssh: root cannot log in with a password\nSUMMARY OK\n'
+Ran 14 tests in 0.771s
+FAILED (failures=2)
+== GREEN (whole module after the fix)
+Ran 44 tests
+OK
+
+################ Item 3: clamd on re-provision (tests/ops/test_clamav_profile.py, class ReprovisioningKeepsAnOptInClamd)
+== RED: clamd reprovision tests vs provision.sh and build-kit.py at efb22df3
+FAIL: test_reprovisioning_leaves_an_installed_clamd_profile_running (kit='staging')
+----------------------------------------------------------------------
+AssertionError: Lists differ: ['disable --now clamav-daemon'] != []
+First list contains 1 additional elements.
+First extra element 0:
+- ['disable --now clamav-daemon']
++ [] : staging provision.sh would stop the opt-in clamd
+----------------------------------------------------------------------
+Ran 2 tests in 0.049s
+FAILED (failures=1)
+== GREEN
+Ran 2 tests in 0.051s
+
+OK
+Production kit before (efb22df3 build-kit.py + staging) and after: only provision.sh differs, in one comment (lines 262-263);
+every executable line is identical. semantic-delta.diff: 223 -> 213 lines, the clamd hunk gone, other hunks moved only.
+
+################ Item 7: scrub coverage of the built production forge-deploy.sh (tests/ops/test_staging_code_drift.py)
+== GREEN on the unmodified kit
+OK
+== mutation applied to ops/staging/forge-deploy.sh (second scrub arm; the end of the removed and added line):
+- ...|VASEY_*_SYNTHETIC_*) unset "$name" ;;
++ ...|VASEY_STAGING_SYNTHETIC_*) unset "$name" ;;
+== RED: drift tests with the arm narrowed to VASEY_STAGING_SYNTHETIC_*
+FAIL: test_the_built_production_deploy_scrubs_every_config_env_key_too
+AssertionError: Lists differ: ['VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED'] != []
+First list contains 1 additional elements.
+First extra element 0:
+- ['VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED']
++ [] : the production kit's forge-deploy.sh (after build-kit.py's renames) does not unset these config env keys: use a scrub pattern that survives the VASEY_STAGING_ -> VASEY_PRODUCTION_ rename (for example VASEY_*_SYNTHETIC_*)
+Ran 10 tests in 0.157s
+FAILED (failures=1)
+== the pre-existing staging check alone, same mutation
+OK
+(forge-deploy.sh restored with git checkout; only the test file was modified at that point)
+
+################ Mutations of the fixed scripts (each applied alone, the module run, the file restored and compared)
+backup.sh, against tests.ops.test_staging_backup_offhost.RcloneRemote:
+  M1 flock removed                                   FAILED (1) test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+  M2 kept copy never reused                          FAILED (1) test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+  M3 recipients digest not compared                  FAILED (1) test_a_kept_copy_for_other_recipients_is_never_sent
+  M4 ciphertext digest not compared                  FAILED (1) test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+  M5 copies of pruned sets not removed               FAILED (1) test_a_kept_copy_whose_set_is_gone_is_removed
+  M6 kept copy not removed after a verified ship     FAILED (2) the retry test and the damaged-copy test
+  M7 stale cleanup moved before the lock             FAILED (1) test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything
+  M8 age-header check on the kept copy removed       first run: OK (survived) -> added test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent;
+                                                     rerun: FAILED (1) that test
+  cleanup name broadened to .ship.*                  FAILED (1) stale-cleanup test (the old test passed)
+  find -L on the cleanup line                        FAILED (1) stale-cleanup test (the old test passed)
+host-baseline.sh, against tests.ops.test_monitoring_scripts.HostBaseline:
+  H1 is-active no longer required                    FAILED (1) test_both_apt_timers_must_be_enabled_and_active
+  H2 only apt-daily.timer checked                    FAILED (1 test, 3 subtests) test_both_apt_timers_must_be_enabled_and_active
+  H3 enable failure back to a printed warning        FAILED (1) test_apply_unattended_upgrades_fails_when_the_timers_cannot_be_enabled
+  H4 is-enabled by exit status, static accepted      FAILED (1) test_both_apt_timers_must_be_enabled_and_active
+forge-deploy.sh scrub arm VASEY_*_SYNTHETIC_* narrowed to VASEY_STAGING_SYNTHETIC_*:
+  FAILED (1) test_the_built_production_deploy_scrubs_every_config_env_key_too; the staging-only check passes
+
+################ rclone --immutable, measured (the reason the fake rclone in the retry tests refuses overwrites)
+rclone v1.60.1-DEV
+-- copyto --checksum --immutable, then different bytes under the same name
+first exit=0
+Copied (replaced existing)
+second exit=0
+destination now holds the second bytes
+-- copy --checksum --immutable, same situation
+immutable file modified
+exit=6
+destination kept
