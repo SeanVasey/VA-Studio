@@ -252,3 +252,17 @@ A separate reviewer approved the batch at `e947cdb3e08a570362d3380727384d51b97ab
 - P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
 - P3-7: a signed-out page response.
 
+
+## Merged-head addendum (lead, 2026-10-18)
+
+Before opening the PR, the lead merged main twice: `40e92c65` brought in PRs #140 and #141 (the C1 synthetic catalog, `laravel/framework` 13.36.0 and four npm updates), and `ef1261dc` brought in PR #146 (F2c tests, census and docs only). The only conflict was `CHANGELOG.md`, resolved by keeping both entries. None of the merged changes touch the Tax lane's files, `HandleInertiaRequests` or `resources/js/app.tsx`.
+
+The lead re-ran the T1 checks on `40e92c65`, with dependencies matching its lockfiles:
+
+| Check | Result |
+| --- | --- |
+| `PaidTaxHistoryIndexTest` and `PaidTaxGrantJourneyTest` as whole files (SQLite, the command above) | OK, 44 tests, 542 assertions (5 m 6 s); same counts as the reviewed source |
+| `npx vitest run` (all files) | 68 files, 1,172 tests passed |
+| `npx tsc --noEmit` | exit 0 |
+
+`ef1261dc` changes no file these checks load. Native MySQL was not re-run on the merged head; the reviewed source's native evidence stands as recorded above.
